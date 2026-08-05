@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Cost Monitor · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Hub top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.6);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.70);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:8pt;color:rgba(255,255,255,0.50);line-height:1.4;}
+.htb-btn{padding:5px 12px;border-radius:6px;background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.70);font-size:8pt;
+  font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.htb-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:#5EEAD4;}
+
+/* ── Hero stage ── */
+.stage{background:linear-gradient(160deg,#0A0F1E 0%,#0F1E3C 40%,#1A0A2E 100%);
+  position:relative;overflow:hidden;padding:44px 0 32px;}
+.stage::before{content:'';position:absolute;top:-60px;right:-60px;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(124,58,237,0.10) 0%,transparent 65%);pointer-events:none;}
+.stage::after{content:'';position:absolute;bottom:-30px;left:30%;width:440px;height:220px;
+  border-radius:50%;background:radial-gradient(circle,rgba(13,148,136,0.08),transparent 70%);pointer-events:none;}
+.stage-inner{max-width:1400px;margin:0 auto;padding:0 24px;}
+.stage-eyebrow{font-size:8.5pt;font-weight:700;color:#A78BFA;letter-spacing:0.12em;
+  text-transform:uppercase;margin-bottom:10px;}
+.stage-title{font-size:26pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:6px;}
+.stage-accent{color:#A78BFA;}
+.stage-sub{font-size:9.5pt;color:rgba(255,255,255,0.65);line-height:1.6;max-width:580px;margin-bottom:28px;}
+.ai-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(124,58,237,0.18);
+  border:1px solid rgba(124,58,237,0.4);border-radius:20px;padding:5px 14px;
+  font-size:8pt;font-weight:700;color:#C4B5FD;white-space:nowrap;margin-bottom:28px;}
+.ai-badge-dot{width:7px;height:7px;border-radius:50%;background:#A78BFA;
+  animation:aipulse 1.8s ease-in-out infinite;}
+@keyframes aipulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.35;transform:scale(0.7);}}
+
+/* KPI strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.kpi{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);
+  border-radius:10px;padding:14px 16px;border-top:2px solid rgba(124,58,237,0.5);}
+.kpi.teal{border-top-color:var(--teal);}
+.kpi.green{border-top-color:var(--green);}
+.kpi.amber{border-top-color:var(--amber);}
+.kpi.red{border-top-color:var(--red);}
+.kpi-val{font-size:20pt;font-weight:900;color:#fff;line-height:1;margin-bottom:3px;}
+.kpi.purple .kpi-val{color:#C4B5FD;}
+.kpi.teal   .kpi-val{color:#5EEAD4;}
+.kpi.green  .kpi-val{color:#6EE7B7;}
+.kpi.amber  .kpi-val{color:#FCD34D;}
+.kpi.red    .kpi-val{color:#FCA5A5;}
+.kpi-lbl{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.70);
+  text-transform:uppercase;letter-spacing:0.07em;margin-bottom:2px;}
+.kpi-note{font-size:8pt;color:rgba(255,255,255,0.50);margin-top:1px;}
+
+/* ── Two-column layout ── */
+.ai-layout{display:grid;grid-template-columns:1fr 340px;gap:0;align-items:start;max-width:1400px;margin:0 auto;}
+
+/* ── Right rail (agent + insights stacked) ── */
+.right-rail{position:sticky;top:60px;display:flex;flex-direction:column;gap:12px;margin:12px 0 12px 0;}
+
+/* ── Agent chat panel ── */
+.agent-col{display:flex;flex-direction:column;
+  background:#fff;border-radius:16px;overflow:hidden;
+  box-shadow:0 4px 32px rgba(0,0,0,0.12),0 0 0 1px var(--border);}
+.agent-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+  background:#fff;}
+.agent-id{display:flex;align-items:center;gap:11px;}
+.agent-avatar{width:54px;height:54px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--teal) 0%,var(--navy) 100%);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  font-size:11pt;color:#fff;font-weight:900;letter-spacing:-0.02em;box-shadow:0 2px 8px rgba(13,148,136,0.30);}
+.agent-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.agent-identity{flex:1;min-width:0;}
+.agent-name{font-size:9pt;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.agent-status{display:flex;align-items:center;gap:5px;margin-top:2px;}
+.agent-pulse{width:6px;height:6px;border-radius:50%;background:#10B981;flex-shrink:0;
+  animation:agentpulse 2s infinite;}
+@keyframes agentpulse{0%{box-shadow:0 0 0 0 rgba(16,185,129,.5);}70%{box-shadow:0 0 0 6px rgba(16,185,129,0);}100%{box-shadow:0 0 0 0 rgba(16,185,129,0);}}
+.agent-status-text{font-size:7.5pt;color:var(--ink4);}
+.agent-ctx{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;}
+.agent-ctx-pill{font-size:7pt;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--teal3);border:1px solid rgba(13,148,136,0.20);color:var(--teal2);}
+
+/* message thread — compact fixed height, no longer fills remaining space */
+.agent-messages{height:200px;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;
+  background:#F8FAFB;flex-shrink:0;}
+.agent-messages::-webkit-scrollbar{width:3px;}
+.agent-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* VER Insights sidebar panel */
+.ver-insights-panel{background:#fff;border:1px solid var(--border);border-radius:12px;
+  box-shadow:0 4px 32px rgba(0,0,0,0.12),0 0 0 1px var(--border);overflow:hidden;}
+.vip-header{padding:12px 16px 10px;border-bottom:1px solid var(--border);background:#fff;}
+.vip-title{font-size:9pt;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.06em;}
+.vip-list{padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
+.vip-card{border-radius:8px;padding:9px 11px;border-left:3px solid;font-size:8pt;line-height:1.55;}
+.vip-card.alert{background:var(--red3);border-color:var(--red);color:var(--red2);}
+.vip-card.warn{background:var(--amber3);border-color:var(--amber);color:var(--amber2);}
+.vip-card.info{background:var(--purple3);border-color:var(--purple);color:var(--purple2);}
+.vip-card.teal{background:var(--teal3);border-color:var(--teal);color:var(--teal2);}
+.vip-card-title{font-weight:800;margin-bottom:3px;font-size:8pt;}
+.vip-card-meta{font-size:7pt;opacity:0.75;margin-top:4px;}
+
+/* bubbles */
+.chat-row{display:flex;align-items:flex-end;gap:7px;}
+.chat-row.user{flex-direction:row-reverse;}
+.bubble-avatar{width:30px;height:30px;border-radius:9px;flex-shrink:0;font-size:8pt;font-weight:800;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.bubble-avatar.agent-av{background:linear-gradient(135deg,var(--teal),var(--navy));color:#fff;}
+.bubble-avatar.agent-av img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.bubble-avatar.user-av{background:var(--gray3);color:var(--ink3);}
+.chat-bubble{max-width:84%;padding:9px 13px;border-radius:14px;font-size:8.5pt;line-height:1.62;}
+.chat-bubble.user{background:var(--navy);color:#fff;border-bottom-right-radius:4px;}
+.chat-bubble.agent{background:#fff;border:1px solid var(--border);color:var(--ink2);
+  border-bottom-left-radius:4px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.chat-bubble-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink4);margin-bottom:4px;}
+.chat-bubble-text{white-space:pre-wrap;}
+
+/* suggested chips */
+.agent-chips{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
+.agent-chip{background:#fff;border:1px solid var(--border2);border-radius:10px;
+  padding:8px 11px;font-size:8pt;color:var(--ink3);
+  cursor:pointer;text-align:left;font-family:inherit;transition:all .15s;line-height:1.4;}
+.agent-chip:hover{background:var(--teal3);border-color:var(--teal);color:var(--teal2);}
+
+/* input */
+.agent-input-area{padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;background:#fff;}
+.agent-input-row{display:flex;gap:8px;align-items:flex-end;}
+.agent-textarea{flex:1;background:var(--gray2);border:1px solid var(--border2);
+  border-radius:10px;padding:9px 12px;color:var(--ink);font-size:8.5pt;font-family:inherit;
+  resize:none;outline:none;line-height:1.5;min-height:42px;max-height:90px;transition:border-color .15s;}
+.agent-textarea::placeholder{color:var(--ink4);}
+.agent-textarea:focus{border-color:var(--teal);background:#fff;}
+.agent-send{background:var(--teal);border:none;border-radius:10px;color:#fff;
+  padding:9px 13px;font-size:11pt;cursor:pointer;flex-shrink:0;transition:background .15s;line-height:1;}
+.agent-send:hover{background:var(--teal2);}
+.agent-send:disabled{background:var(--gray3);color:var(--ink4);cursor:not-allowed;}
+.agent-footer{padding:7px 14px 9px;flex-shrink:0;background:#fff;border-top:1px solid var(--border);}
+.agent-footer-text{font-size:7pt;color:var(--ink4);line-height:1.4;text-align:center;}
+.content-col{padding:22px 20px 48px 24px;min-width:0;}
+
+/* ── Tab bar ── */
+.tab-bar{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
+.tab{font-size:8.5pt;padding:6px 16px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--border2);background:#fff;font-family:inherit;
+  transition:all 0.15s;font-weight:600;color:var(--ink4);}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+
+/* ── Cards ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+.card-title{font-size:10pt;font-weight:800;color:var(--ink);margin-bottom:4px;
+  display:flex;align-items:center;gap:8px;}
+.card-sub{font-size:8.5pt;color:var(--ink4);margin-bottom:14px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ── Vendor spend table ── */
+.ai-table{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.ai-table th{text-align:left;font-size:8.5pt;font-weight:800;color:var(--ink3);
+  padding:8px 12px;border-bottom:2px solid var(--border);background:var(--gray2);
+  text-transform:uppercase;letter-spacing:0.05em;}
+.ai-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:middle;}
+.ai-table tr:last-child td{border-bottom:none;}
+.ai-table tr:hover td{background:var(--gray2);}
+.vendor-name{font-weight:700;color:var(--navy);}
+.vendor-type{font-size:8pt;color:var(--ink4);}
+.spend-bar-wrap{display:flex;align-items:center;gap:8px;}
+.spend-bar-track{flex:1;height:6px;background:var(--gray3);border-radius:3px;overflow:hidden;}
+.spend-bar-fill{height:100%;border-radius:3px;transition:width 0.6s ease;}
+.spend-val{font-weight:700;color:var(--ink);white-space:nowrap;min-width:52px;text-align:right;}
+.trend-up{color:var(--red);font-weight:700;}
+.trend-down{color:var(--green);font-weight:700;}
+.trend-flat{color:var(--ink4);font-weight:600;}
+
+/* ── Contract tiles ── */
+.contract-tile{background:var(--gray2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.ct-vendor{font-size:10pt;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.ct-meta{font-size:8pt;color:var(--ink4);margin-bottom:10px;}
+.ct-row{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px solid var(--border);font-size:8.5pt;}
+.ct-row:last-child{border-bottom:none;}
+.ct-key{color:var(--ink4);}
+.ct-val{font-weight:700;color:var(--ink2);}
+.ct-badge{display:inline-block;font-size:7.5pt;font-weight:700;padding:2px 8px;
+  border-radius:99px;white-space:nowrap;}
+.ct-badge.consumption{background:var(--teal3);color:var(--teal2);}
+.ct-badge.seat{background:var(--blue3);color:var(--blue);}
+.ct-badge.token{background:var(--purple3);color:var(--purple);}
+.ct-badge.usage{background:var(--amber3);color:var(--amber2);}
+.ct-badge.renew-ok{background:var(--green3);color:var(--green2);}
+.ct-badge.renew-warn{background:var(--amber3);color:var(--amber2);}
+.ct-badge.renew-urgent{background:var(--red3);color:var(--red2);}
+
+/* ── Insight cards ── */
+.insight{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;border-left:4px solid var(--teal);}
+.insight.warn{border-left-color:var(--amber);}
+.insight.alert{border-left-color:var(--red);}
+.insight.info{border-left-color:var(--purple);}
+.insight-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.insight-body{font-size:8.5pt;color:var(--ink3);line-height:1.6;}
+.insight-meta{font-size:8pt;color:var(--ink4);margin-top:6px;}
+
+/* ── Token meter ── */
+.token-meter{margin-top:10px;}
+.tm-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.tm-label{font-size:8.5pt;font-weight:600;color:var(--ink3);width:140px;flex-shrink:0;}
+.tm-track{flex:1;height:8px;background:var(--gray3);border-radius:4px;overflow:hidden;}
+.tm-fill{height:100%;border-radius:4px;}
+.tm-val{font-size:8.5pt;font-weight:700;color:var(--ink2);text-align:right;min-width:80px;}
+.tm-pct{font-size:8pt;color:var(--ink4);min-width:60px;text-align:right;}
+.sm-wrap{margin-bottom:14px;}
+.sm-track{display:flex;overflow:hidden;}
+.sm-seg{height:100%;}
+
+/* ── Alert banner ── */
+.alert-banner{display:flex;align-items:center;gap:12px;background:rgba(220,38,38,0.06);
+  border:1px solid rgba(220,38,38,0.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;}
+.alert-icon{font-size:16pt;flex-shrink:0;}
+.alert-text{font-size:8.5pt;color:var(--ink2);line-height:1.5;}
+.alert-text strong{color:var(--red2);}
+
+/* ── View toggle ── */
+.view{display:none;}
+.view.active{display:block;}
+
+.util-controls{display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
+.util-ctrl-team{display:flex;align-items:center;gap:8px;}
+.util-team-lbl{font-size:8pt;font-weight:700;color:var(--ink4);}
+.util-team-sel{padding:5px 10px;border:1px solid var(--border2);border-radius:6px;font-size:8pt;font-family:inherit;color:var(--ink2);background:#fff;cursor:pointer;}
+.util-ctrl-range{display:flex;gap:6px;flex-wrap:wrap;}
+.ttgl{font-size:7.5pt;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--border2);background:#fff;font-family:inherit;
+  transition:all 0.15s;color:var(--ink4);}
+.ttgl.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ttgl:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+
+/* ── Forecast ── */
+.fc-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.fc-bar-label{font-size:8pt;font-weight:700;color:var(--ink3);width:100px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fc-bar-track{flex:1;background:var(--gray3);border-radius:4px;height:10px;overflow:hidden;}
+.fc-bar-actual{height:10px;border-radius:4px;background:var(--teal);transition:width 0.6s;}
+.fc-bar-proj{height:10px;border-radius:4px;background:var(--purple);opacity:0.65;transition:width 0.6s;}
+.fc-bar-val{font-size:7.5pt;font-weight:800;color:var(--ink3);width:64px;text-align:right;flex-shrink:0;}
+.fc-scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;}
+.fc-scenario{border-radius:8px;padding:14px 16px;border:1px solid var(--border);}
+.fc-scenario.sc-current{background:var(--teal3);border-color:rgba(13,148,136,0.3);}
+.fc-scenario.sc-moderate{background:#EFF6FF;border-color:rgba(37,99,235,0.2);}
+.fc-scenario.sc-full{background:var(--purple3);border-color:rgba(124,58,237,0.25);}
+.fc-sc-label{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.fc-scenario.sc-current .fc-sc-label{color:var(--teal2);}
+.fc-scenario.sc-moderate .fc-sc-label{color:var(--blue);}
+.fc-scenario.sc-full .fc-sc-label{color:var(--purple);}
+.fc-sc-val{font-size:18pt;font-weight:900;line-height:1;margin-bottom:3px;}
+.fc-scenario.sc-current .fc-sc-val{color:var(--teal);}
+.fc-scenario.sc-moderate .fc-sc-val{color:var(--blue);}
+.fc-scenario.sc-full .fc-sc-val{color:var(--purple);}
+.fc-sc-sub{font-size:7.5pt;color:var(--ink4);line-height:1.5;}
+.fc-member-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+.fc-member{background:var(--gray2);border-radius:8px;padding:12px 14px;border:1px solid var(--border);}
+.fc-member--power{border-color:#7C3AED;background:linear-gradient(135deg,#F5F3FF,#EDE9FE);}
+.fc-member--moderate{border-color:#0D9488;background:linear-gradient(135deg,#F0FDFA,#CCFBF1);}
+.fc-member--light{border-color:#2563EB;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);}
+.fc-member-name{font-size:8.5pt;font-weight:800;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.badge-tier{font-size:6.5pt;font-weight:800;color:#fff;padding:2px 7px;border-radius:10px;letter-spacing:0.03em;}
+.fc-member-tool{display:flex;align-items:center;justify-content:space-between;font-size:7.5pt;margin-bottom:3px;}
+.fc-member-tool-name{color:var(--ink4);}
+
+@media print{.hub-top-bar,.htb-right,.tab-bar{display:none!important;}body{background:#fff!important;}}
+
+/* ── Date Range Picker bar ── */
+.drp-bar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--gray2);border-radius:10px;margin-bottom:14px;flex-wrap:wrap;border:1px solid var(--border);}
+.drp-team-lbl{font-size:8pt;font-weight:700;color:var(--ink4);white-space:nowrap;}
+.drp-team-sel{padding:5px 10px;border:1px solid var(--border2);border-radius:6px;font-size:8pt;font-family:inherit;color:var(--ink2);background:#fff;cursor:pointer;}
+.drp-sep{width:1px;height:20px;background:var(--border2);flex-shrink:0;}
+.drp-dates{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.drp-date-lbl{font-size:7.5pt;font-weight:700;color:var(--ink4);}
+.drp-date-input{padding:4px 8px;border:1px solid var(--border2);border-radius:6px;font-size:8pt;font-family:inherit;color:var(--ink2);background:#fff;cursor:pointer;}
+.drp-arrow{font-size:8pt;color:var(--ink4);}
+.drp-presets{display:flex;gap:5px;flex-wrap:wrap;}
+.drp-preset{font-size:7pt;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;border:1.5px solid var(--border2);background:#fff;font-family:inherit;transition:all 0.15s;color:var(--ink4);white-space:nowrap;}
+.drp-preset.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.drp-preset:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+
+/* ── Main (content column inner wrapper) ── */
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">FinOps &amp; Spend · AI Cost Monitor</span>
+  </div>
+  <div class="htb-right">
+    <span class="htb-meta">FY27 · Salesforce DET · Confidential</span>
+    <button type="button" class="htb-btn" onclick="openAiCostHelp()" aria-label="How to use the AI Cost Monitor">&#63; How to Use</button>
+    <button type="button" class="htb-btn" onclick="window.print()">&#128438; Export</button>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="stage">
+  <div class="stage-inner">
+    <div class="stage-eyebrow">&#129302; VER · FinOps Intelligence</div>
+    <div class="stage-title">AI Cost <span class="stage-accent">Monitor</span></div>
+    <div class="stage-sub">Track AI coding tool spend, consumption, and adoption across your team — every token, every message, every dollar. Built to govern the 3 Cs (Claude Code, Cursor, Codex) at team scale, with the structure to expand across the full organization.</div>
+    <div class="ai-badge"><span class="ai-badge-dot"></span>Delivery Assurance &amp; Ops · Apr 1 – Aug 3, 2026 Actuals · 4 of 6 FTE Active</div>
+    <div class="kpi-strip">
+      <div class="kpi purple">
+        <div class="kpi-val">$938</div>
+        <div class="kpi-lbl">Total AI Tool Spend</div>
+        <div class="kpi-note">Apr 1 – Aug 3 actuals</div>
+      </div>
+      <div class="kpi amber">
+        <div class="kpi-val">3</div>
+        <div class="kpi-lbl">AI Coding Tools</div>
+        <div class="kpi-note">The 3 Cs — all active</div>
+      </div>
+      <div class="kpi teal">
+        <div class="kpi-val">67%</div>
+        <div class="kpi-lbl">Team Adoption</div>
+        <div class="kpi-note">4 of 6 FTE active</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-val">$0.04</div>
+        <div class="kpi-lbl">Cost / 1K Tokens</div>
+        <div class="kpi-note">No-cache, blended avg</div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-val">$235</div>
+        <div class="kpi-lbl">Cost / Active User</div>
+        <div class="kpi-note">Apr–Aug · 4 active users</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Two-column layout: content left, agent right -->
+<div class="ai-layout">
+
+  <!-- ── CONTENT (left) ── -->
+  <div class="content-col">
+
+    <!-- Shared Date Range Picker bar -->
+    <div class="drp-bar" id="drp-bar"></div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('spend',this)">&#128200; Spend Overview</button>
+      <button class="tab" onclick="switchTab('utilization',this)">&#128337; Utilization</button>
+      <button class="tab" onclick="switchTab('forecast',this)">&#128200; Forecast</button>
+    </div>
+
+    <!-- SPEND OVERVIEW -->
+    <div class="view active" id="view-spend">
+      <div class="card">
+        <div class="card-title">&#128202; AI Tool Spend</div>
+        <div class="card-sub">Ranked by total spend · All figures in USD · Source: Anthropic usage dashboard export (Aug 2026 actuals)</div>
+        <table class="ai-table">
+          <thead>
+            <tr>
+              <th>Tool</th><th>Category</th><th>Contract Type</th>
+              <th>Spend (4 mo)</th><th style="width:180px">Spend Share</th>
+              <th>vs Prior</th><th>Renewal</th>
+            </tr>
+          </thead>
+          <tbody id="spend-tbody"></tbody>
+        </table>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">&#127914; Usage by Tool</div>
+          <div class="card-sub">Message volume &amp; token consumption · Apr–Aug 2026</div>
+          <div id="cat-breakdown"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">&#128197; Monthly Spend Trend</div>
+          <div class="card-sub">Apr – Aug 2026 actuals · Dashed line = $225/mo run rate</div>
+          <div id="trend-chart"></div>
+        </div>
+      </div>
+
+      <!-- Run rate forecast strip -->
+      <div style="background:linear-gradient(135deg,#0A1628,#0F1E3C);border-radius:12px;padding:18px 24px;margin-bottom:16px;">
+        <div style="font-size:9pt;font-weight:800;color:#fff;margin-bottom:12px;">&#128200; Run Rate &amp; Adoption Forecast</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;">
+            <div style="font-size:16pt;font-weight:900;color:#C4B5FD;">$225/mo</div>
+            <div style="font-size:8pt;font-weight:700;color:rgba(255,255,255,0.6);margin-top:3px;">Current Run Rate</div>
+            <div style="font-size:8pt;color:rgba(255,255,255,0.4);margin-top:2px;">4 active users · $7.50/day</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;">
+            <div style="font-size:16pt;font-weight:900;color:#5EEAD4;">~$6,100/yr</div>
+            <div style="font-size:8pt;font-weight:700;color:rgba(255,255,255,0.6);margin-top:3px;">Moderate Budget — 3 of 6 FTE</div>
+            <div style="font-size:8pt;color:rgba(255,255,255,0.4);margin-top:2px;">$508/mo · Reachable in Q4 FY27</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;">
+            <div style="font-size:16pt;font-weight:900;color:#6EE7B7;">~$12,200/yr</div>
+            <div style="font-size:8pt;font-weight:700;color:rgba(255,255,255,0.6);margin-top:3px;">Full Budget — All 6 FTE</div>
+            <div style="font-size:8pt;color:rgba(255,255,255,0.4);margin-top:2px;">$1,017/mo · Well within budget</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-spend -->
+
+    <!-- UTILIZATION -->
+    <div class="view" id="view-utilization">
+      <div class="card">
+        <div class="card-title">&#129302; Token Consumption — The 3 Cs</div>
+        <div class="card-sub" id="util-token-sub">Monthly average no-cache token usage vs. estimated budget · Apr–Aug 2026</div>
+        <div class="token-meter" id="token-meter"></div>
+      </div>
+      <div class="card" style="margin-top:0;">
+        <div class="card-title">&#128101; User Adoption Breakdown — <span id="util-team-label">VER Team (6 FTE)</span></div>
+        <div class="card-sub" id="util-seat-sub">Active usage mix by tool · Token-weighted · Apr–Aug 2026</div>
+        <div class="token-meter" id="seat-meter"></div>
+      </div>
+      <div class="card" style="margin-top:0;">
+        <div class="card-title">&#128178; Cost Per Outcome — Unit Economics</div>
+        <div class="card-sub">Cost efficiency per tool vs. market benchmarks · Apr–Aug 2026 actuals</div>
+        <table class="ai-table">
+          <thead>
+            <tr>
+              <th>Tool</th><th>Metric</th><th>Unit Cost</th>
+              <th>Volume (Apr–Aug)</th><th>Total Cost</th><th>vs. Benchmark</th>
+            </tr>
+          </thead>
+          <tbody id="unit-tbody"></tbody>
+        </table>
+      </div>
+      <div style="background:linear-gradient(135deg,#0A1628,#0F1E3C);border-radius:12px;padding:20px 24px;
+        display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:4px;">
+        <div>
+          <div style="font-size:10pt;font-weight:800;color:#fff;margin-bottom:4px;">Full Utilization Detail → Consumption Monitor</div>
+          <div style="font-size:8.5pt;color:rgba(255,255,255,0.55);line-height:1.6;max-width:600px;">
+            Cap utilization %, risk levels, trend tracking, and team ownership for all AI and non-AI tools are managed in the Consumption Monitor — single source of truth for operational utilization.
+          </div>
+        </div>
+        <a href="../page_consumption.html"
+          style="display:inline-flex;align-items:center;gap:8px;background:#0D9488;color:#fff;
+            border-radius:10px;padding:11px 20px;font-size:8.5pt;font-weight:700;
+            text-decoration:none;white-space:nowrap;flex-shrink:0;transition:background 0.15s;"
+          onmouseover="this.style.background='#0F766E'" onmouseout="this.style.background='#0D9488'">
+          Open Consumption Monitor &#8594;
+        </a>
+      </div>
+    </div>
+
+    <!-- FORECAST -->
+    <div class="view" id="view-forecast">
+      <div id="forecast-kpi-strip" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;"></div>
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card" id="fc-monthly-card"></div>
+        <div class="card" id="fc-tool-card"></div>
+      </div>
+      <div class="card" id="fc-scenario-card"></div>
+      <div class="card" id="fc-member-card"></div>
+    </div>
+  </div><!-- /content-col -->
+
+  <!-- ── RIGHT RAIL: agent + insights ── -->
+  <div class="right-rail">
+  <div class="agent-col">
+    <div class="agent-header">
+      <div class="agent-id">
+        <div class="agent-avatar"><img src="assets/vendy-agent.png" alt="Vendy"></div>
+        <div class="agent-identity">
+          <div class="agent-name">Vendy &middot; VER Intelligence Agent</div>
+          <div class="agent-status">
+            <div class="agent-pulse"></div>
+            <span class="agent-status-text">Online &middot; Portfolio context loaded</span>
+          </div>
+        </div>
+      </div>
+      <div class="agent-ctx">
+        <span class="agent-ctx-pill">4 AI Tools</span>
+        <span class="agent-ctx-pill">$938 · Apr–Aug 2026</span>
+        <span class="agent-ctx-pill">67% Adoption (4 of 6 FTE)</span>
+      </div>
+    </div>
+
+    <div class="agent-messages" id="agent-messages">
+      <div class="chat-row" id="agent-greeting">
+        <div class="bubble-avatar agent-av"><img src="assets/vendy-agent.png" alt="Vendy"></div>
+        <div class="chat-bubble agent"><div class="chat-bubble-label">Vendy &middot; VER Agent</div><div class="chat-bubble-text">I have the VER team AI tool actuals loaded — $938 spend, 4 tools, 4 of 6 FTE active (Apr 1 – Aug 3, 2026). Ask me about adoption gaps, run rate, cost-per-user, or tool recommendations.</div></div>
+      </div>
+      <div class="agent-chips" id="agent-chips"></div>
+    </div>
+
+    <div class="agent-input-area">
+      <div class="agent-input-row">
+        <textarea class="agent-textarea" id="ai-input" rows="1"
+          placeholder="Ask about spend, adoption, benchmarks..."></textarea>
+        <button class="agent-send" id="ai-send" onclick="sendAIQuery()" title="Send">&#10148;</button>
+      </div>
+    </div>
+
+    <div class="agent-footer">
+      <div class="agent-footer-text">VER Intelligence Engine &middot; Validate findings before commercial action</div>
+    </div>
+  </div><!-- /agent-col -->
+
+  <!-- VER Insights sidebar panel -->
+  <div class="ver-insights-panel">
+    <div class="vip-header">
+      <div class="vip-title">&#9889; VER Insights</div>
+    </div>
+    <div class="vip-list" id="vip-list"></div>
+  </div>
+
+  </div><!-- /right-rail -->
+
+</div><!-- /ai-layout -->
+
+<script>
+// ── Brandfetch logo ───────────────────────────────────────────────
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+function vlogoErr(img){ img.style.display='none'; var fb=img.nextElementSibling; if(fb) fb.style.display='flex'; }
+function vlogoOk(img){ var fb=img.nextElementSibling; if(fb) fb.style.display='none'; }
+function vendorLogo(domain, name, size) {
+  size = size || 28;
+  var ini = (name||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+  var pal = ['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB'];
+  var lc  = pal[(name||'').length % pal.length];
+  var sz  = size+'px'; var r = size<=32?'6':'10';
+  var bs  = 'width:'+sz+';height:'+sz+';border-radius:'+r+'px;flex-shrink:0;';
+  var fs  = Math.round(size*0.3)+'pt';
+  var fb  = '<div style="'+bs+'background:'+lc+';display:none;align-items:center;justify-content:center;font-size:'+fs+';font-weight:900;color:#fff;font-family:Arial;">'+ini+'</div>';
+  if(!domain) return '<div style="'+bs+'background:'+lc+';display:flex;align-items:center;justify-content:center;font-size:'+fs+';font-weight:900;color:#fff;font-family:Arial;">'+ini+'</div>';
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'" alt="'+name.replace(/"/g,'')+'" style="'+bs+'object-fit:contain;background:#fff;padding:2px;" onerror="vlogoErr(this)" onload="vlogoOk(this)">'+fb;
+}
+
+// ── Data — VER Team AI Coding Tools · Apr 1 – Aug 3, 2026 Actuals ──
+// Source: Anthropic usage dashboard export (Casey Candelaria-Logan, Aug 2026)
+var VENDORS = [
+  { name:'Claude Code',   domain:'anthropic.com',  cat:'AI Coding Agent (LLM)',  type:'Consumption', spend:722,  yoy:'+220%', renewal:'Monthly',    renew:'ok',     color:'#D97706',
+    msgs:1300, tokNoCache:16973000, tokTotal:997400000,  activeUsers:4, notes:'Casey dominates (1.2K msgs / 15.4M nc-tokens / $667 — 92% of spend). Mahesh (56 msgs / 742K nc-tokens / $25). Deborah (41 msgs / 736K nc-tokens / $28). Justin early-stage (3 msgs / 94K nc-tokens / $2).' },
+  { name:'Cursor',        domain:'cursor.sh',      cat:'AI Code Editor',          type:'Seat License',spend:187,  yoy:'New',   renewal:'Monthly',    renew:'ok',     color:'#6366F1',
+    msgs:77,  tokNoCache:1891000,  tokTotal:43883000,    activeUsers:2, notes:'Casey leads (74 sessions / 1.8M nc-tokens / $28 consumption). Mahesh secondary (3 sessions / 90.8K nc-tokens / $0.19). $187 total reflects seat license cost. Justin not yet active.' },
+  { name:'Codex (OpenAI)',domain:'openai.com',      cat:'AI Coding (CLI Agent)',   type:'Consumption', spend:28,   yoy:'New',   renewal:'Pay-as-you-go',renew:'ok',   color:'#10B981',
+    msgs:94,  tokNoCache:4131000,  tokTotal:64900000,    activeUsers:3, notes:'Casey leads by tokens & spend (36 sessions / 2.4M nc-tokens / 1,940 cr). Mahesh highest by session count (42 sessions / 1.4M nc-tokens / 880 cr). Justin early-stage (16 sessions / 331K nc-tokens / 64 cr).' },
+];
+
+// Monthly spend breakdown (Apr–Aug 2026) derived from $938 total over ~4 months
+// Estimated distribution based on tool adoption ramp
+var MONTHLY_TREND = [
+  { month:'Apr 2026', spend:145 },
+  { month:'May 2026', spend:198 },
+  { month:'Jun 2026', spend:267 },
+  { month:'Jul 2026', spend:248 },
+  { month:'Aug 2026', spend:80 }  // partial month (Aug 1–3 only)
+];
+
+// Run rate: $938 over 125 days = $7.50/day → $225/month → ~$2,700 annualized (team of 4 active)
+// Budget allocations: $6,100/yr (moderate) and $12,200/yr (full) are planned budget figures, not usage projections
+var RUN_RATE = {
+  dailyActual: 7.50,
+  monthlyActual: 225,
+  annualActual: 2700,
+  annualModerate: 6100,
+  annualAtFullAdoption: 12200
+};
+
+var TEAMS = [
+  {
+    id: 'ver',
+    label: 'VER — Delivery Assurance & Ops',
+    users: 6,
+    activeUsers: 4,
+    spend: 938,
+    period: 'Apr 1 – Aug 3, 2026',
+    vendors: null,
+    insights: [
+      { type:'info', title:'Claude Code drives 77% of spend — Casey leads across every metric', meta:'Casey: $667 / 1.2K msgs / 15.4M nc-tokens · 92% of CC spend · Apr–Aug 2026' },
+      { type:'info', title:'Run rate: $225/month · $2,700/year annualized at current 4 active FTE', meta:'Forecast · Full budget (6 FTE): $12.2K/yr · Well within ceiling' },
+      { type:'teal', title:'Portfolio is lean and cost-efficient — unit economics are strong', meta:'$0.043/1K nc-tokens · $234/active user over 4 months · No overage risk' },
+      { type:'warn', title:'Aditya and Erin are licensed and onboarded but not yet generating usage', meta:'Priority: High · Target: All 6 FTE active by Q4 FY27' }
+    ]
+  },
+  { id: 'da_o', label: 'DA&O (Full)',                 users: null, activeUsers: null, spend: null, period: 'Coming soon', vendors: [], insights: [] },
+  { id: 'det',  label: 'Enterprise & AI Tech (DET)',  users: null, activeUsers: null, spend: null, period: 'Coming soon', vendors: [], insights: [] },
+];
+var _currentTeam = 'ver';
+var _dateRange = { from: '2026-04-01', to: '2026-08-03' };
+
+function _daysInRange() {
+  var a = new Date(_dateRange.from), b = new Date(_dateRange.to);
+  return Math.max(1, Math.round((b - a) / 86400000) + 1);
+}
+
+function _getSpendForRange(v) {
+  return Math.round(v.spend * (_daysInRange() / 125));
+}
+
+function _getTokenForRange(monthly) {
+  return Math.round(monthly * (_daysInRange() / 30.44));
+}
+
+function _getBudgetForRange(budget) {
+  return Math.round(budget * (_daysInRange() / 30.44));
+}
+
+function _getUtilPeriodLabel() {
+  return _dateRange.from + ' – ' + _dateRange.to;
+}
+
+function onTeamChange() {
+  var sel = document.getElementById('drp-team-select');
+  _currentTeam = sel.value;
+  var team = TEAMS.find(function(t){ return t.id === _currentTeam; });
+  var lbl = document.getElementById('util-team-label');
+  if (lbl) lbl.textContent = team ? team.label.replace('VER — ','VER \xb7 ') + ' (' + (team.users || '—') + ' FTE)' : '';
+  renderInsights();
+  if (!team || (team.vendors && team.vendors.length === 0 && team.id !== 'ver')) {
+    document.getElementById('spend-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink4);font-style:italic">Data for this team is not yet loaded. Use the Roster Manager in Team Portal to import.</td></tr>';
+    document.getElementById('cat-breakdown').textContent = '';
+    document.getElementById('trend-chart').textContent = '';
+    document.getElementById('token-meter').innerHTML = '<div style="padding:20px;color:var(--ink4);font-style:italic;font-size:8.5pt">Data for this team is not yet loaded.</div>';
+    document.getElementById('seat-meter').innerHTML = '';
+    return;
+  }
+  renderSpend();
+  renderConsumption();
+}
+
+function _applyDateRange() {
+  var tokenSub = document.getElementById('util-token-sub');
+  var seatSub  = document.getElementById('util-seat-sub');
+  if (tokenSub) tokenSub.textContent = 'No-cache token usage vs. budget \xb7 ' + _getUtilPeriodLabel();
+  if (seatSub)  seatSub.textContent  = 'Active usage mix by tool \xb7 Token-weighted \xb7 ' + _getUtilPeriodLabel();
+  renderSpend();
+  renderConsumption();
+}
+
+var CONTRACTS = [
+  { vendor:'Claude Code',  type:'Consumption', model:'Pay-per-token (Anthropic API)', rate:'~$0.032 / 1K no-cache tokens (blended models)', commitment:'None — pure pay-as-you-go', overage:'N/A', renewal:'Monthly', status:'ok', notes:'Most cost-efficient tool in portfolio. $723 over 4 months at 22.7M no-cache tokens = ~$0.032/1K. No commitment needed at current scale. Revisit if team adoption grows past 8 users.' },
+  { vendor:'Cursor',       type:'Seat License', model:'Codex plan (per-seat monthly)', rate:'~$40/seat/month (estimated)', commitment:'Per active seat', overage:'Per seat', renewal:'Monthly', status:'ok', notes:'Active for Casey, Mahesh, Justin. $187 over 4 months = ~$47/month blended. Good value for inline editing use cases. Evaluate against Claude Code overlap for heavy users.' },
+  { vendor:'Codex',        type:'Consumption', model:'OpenAI API (pay-per-token)', rate:'Standard OpenAI API rates', commitment:'None', overage:'N/A', renewal:'Pay-as-you-go', status:'ok', notes:'$28 over 4 months — very low absolute spend. 77 messages predominantly from Justin. Lowest cost-per-session in portfolio. Keep and monitor; no action needed.' },
+];
+
+// Token consumption by tool (no-cache = actual work signal; M = millions)
+var TOKEN_DATA = [
+  { label:'Claude Code',   monthly:4243000, budget:6000000, color:'#D97706', unit:'No-cache tokens/mo', note:'Avg over 4mo · Casey (15.4M) + Mahesh (742K) + Deborah (736K) + Justin (94K)' },
+  { label:'Cursor',        monthly:473000,  budget:500000,  color:'#6366F1', unit:'No-cache tokens/mo', note:'Avg over 4mo · Casey (1.8M) + Mahesh (90.8K)' },
+  { label:'Codex',         monthly:1033000, budget:2000000, color:'#10B981', unit:'No-cache tokens/mo', note:'Avg over 4mo · Casey (2.4M) + Mahesh (1.4M) + Justin (331K)' }
+];
+
+// User adoption breakdown — tools array uses nc-tokens as weight for segmented bar
+// Windsurf excluded (not in team scope — the 3 Cs only)
+var SEAT_DATA = [
+  { label:'Casey',   active:3, licensed:3, color:'#D97706', tools:[{name:'Claude Code',active:true,color:'#D97706',tok:15400000},{name:'Cursor',active:true,color:'#6366F1',tok:1800000},{name:'Codex',active:true,color:'#10B981',tok:2400000}] },
+  { label:'Mahesh',  active:3, licensed:3, color:'#D97706', tools:[{name:'Claude Code',active:true,color:'#D97706',tok:742000},{name:'Cursor',active:true,color:'#6366F1',tok:90800},{name:'Codex',active:true,color:'#10B981',tok:1400000}] },
+  { label:'Justin',  active:2, licensed:2, color:'#10B981', tools:[{name:'Claude Code',active:true,color:'#D97706',tok:94400},{name:'Cursor',active:false,tok:0},{name:'Codex',active:true,color:'#10B981',tok:331400}] },
+  { label:'Deborah', active:1, licensed:1, color:'#6366F1', tools:[{name:'Claude Code',active:true,color:'#D97706',tok:736200},{name:'Cursor',active:false,tok:0},{name:'Codex',active:false,tok:0}] },
+  { label:'Aditya',  active:0, licensed:1, color:'#9CA3AF', tools:[{name:'Claude Code',active:false,tok:0},{name:'Cursor',active:false,tok:0},{name:'Codex',active:false,tok:0}] },
+  { label:'Erin',    active:0, licensed:1, color:'#9CA3AF', tools:[{name:'Claude Code',active:false,tok:0},{name:'Cursor',active:false,tok:0},{name:'Codex',active:false,tok:0}] }
+  // All 6 FTE are onboarded; Aditya and Erin are licensed but have not yet generated usage
+];
+
+// Cost per outcome — unit economics across tools
+var UNIT_DATA = [
+  { vendor:'Claude Code',   metric:'Cost / 1K no-cache tokens', unit:'$0.043',    vol:'16.97M tokens (4 mo)',total:'$722',  bench:'At market — Anthropic Sonnet tier' },
+  { vendor:'Claude Code',   metric:'Cost / message',            unit:'$0.56',     vol:'1,300 messages',      total:'$722',  bench:'Complex agent sessions — expected' },
+  { vendor:'Cursor',        metric:'Cost / active seat/month',  unit:'$47/seat',  vol:'~4 seat-months',      total:'$187',  bench:'Near market (~$40/seat market rate)' },
+  { vendor:'Codex',         metric:'Cost / message',            unit:'$0.36',     vol:'77 messages',         total:'$28',   bench:'12% below Claude Code per-session' },
+  { vendor:'Overall',       metric:'Cost / active user (4 mo)', unit:'$234',      vol:'4 active users',      total:'$937',  bench:'Low — 4 of 6 FTE active; remaining 2 not yet onboarded' }
+];
+
+
+// ── Render functions ─────────────────────────────────────────────
+var totalSpend = VENDORS.reduce(function(s,v){ return s+v.spend; }, 0);
+
+function fmt(n){
+  if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
+  if(n>=1000) return '$'+(n/1000).toFixed(0)+'K';
+  return '$'+n;
+}
+function fmtDollar(n){
+  if(n===0) return '$0';
+  if(n>=1000) return '$'+(n/1000).toFixed(1)+'K';
+  return '$'+n.toFixed(0);
+}
+function fmtTokens(n){
+  if(!n||n===0) return '—';
+  if(n>=1000000000) return (n/1000000000).toFixed(1)+'B';
+  if(n>=1000000) return (n/1000000).toFixed(1)+'M';
+  if(n>=1000) return (n/1000).toFixed(0)+'K';
+  return n+'';
+}
+
+function buildSpendRow(v) {
+  var adjSpend = _getSpendForRange(v);
+  var adjTotal = VENDORS.reduce(function(s,vv){ return s+_getSpendForRange(vv); }, 0);
+  var pct = adjTotal > 0 ? (adjSpend/adjTotal*100).toFixed(1) : '0.0';
+  var tCls = v.yoy.startsWith('+') ? 'trend-up' : v.yoy.startsWith('-') ? 'trend-down' : 'trend-flat';
+  var logoHtml = '<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;overflow:hidden;flex-shrink:0;margin-right:9px;">'
+    + vendorLogo(v.domain, v.name, 28) + '</span>';
+  var spendTxt = adjSpend === 0 ? '$0' : fmtDollar(adjSpend);
+  var barW = adjSpend === 0 ? '2' : pct;
+  var barBg = v.spend === 0 ? 'var(--gray3)' : v.color;
+  var renewBg = v.renew==='urgent'?'var(--red3)':v.renew==='warn'?'var(--amber3)':'var(--green3)';
+  var renewCol = v.renew==='urgent'?'var(--red2)':v.renew==='warn'?'var(--amber2)':'var(--green2)';
+  var typeCls = v.type==='Consumption'?'consumption':v.type==='Seat License'?'seat':'token';
+  return '<tr>'
+    +'<td><div style="display:flex;align-items:center;">'+logoHtml
+    +'<div><div class="vendor-name">'+v.name+'</div><div class="vendor-type">'+v.activeUsers+' active user'+(v.activeUsers===1?'':'s')+'</div></div></div></td>'
+    +'<td><span style="font-size:8pt;color:var(--ink4)">'+v.cat+'</span></td>'
+    +'<td><span class="ct-badge '+typeCls+'">'+v.type+'</span></td>'
+    +'<td class="spend-val">'+spendTxt+'</td>'
+    +'<td><div class="spend-bar-wrap"><div class="spend-bar-track"><div class="spend-bar-fill" style="width:'+barW+'%;background:'+barBg+'"></div></div><span style="font-size:8pt;color:var(--ink4);min-width:36px;text-align:right">'+pct+'%</span></div></td>'
+    +'<td class="'+tCls+'">'+v.yoy+'</td>'
+    +'<td><span class="ct-badge" style="background:'+renewBg+';color:'+renewCol+'">'+v.renewal+'</span></td>'
+    +'</tr>';
+}
+
+function buildCatBreakdown() {
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px';
+  hdr.textContent = 'Messages & Token Consumption';
+  var el = document.getElementById('cat-breakdown');
+  el.textContent = '';
+  el.appendChild(hdr);
+  var maxMsgs = Math.max.apply(null, VENDORS.map(function(v){ return v.msgs||0; }));
+  VENDORS.forEach(function(v){
+    var wrap = document.createElement('div');
+    wrap.style.marginBottom = '12px';
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;margin-bottom:4px';
+    var nameEl = document.createElement('span');
+    nameEl.style.cssText = 'font-size:8.5pt;font-weight:700;color:var(--ink2)';
+    nameEl.textContent = v.name;
+    var statEl = document.createElement('span');
+    statEl.style.cssText = 'font-size:8.5pt;font-weight:700;color:var(--ink)';
+    var statTxt = (v.msgs||0) + ' msgs';
+    if(v.tokNoCache) statTxt += ' · ' + fmtTokens(v.tokNoCache) + ' no-cache';
+    statEl.textContent = statTxt;
+    row.appendChild(nameEl);
+    row.appendChild(statEl);
+    var track = document.createElement('div');
+    track.className = 'spend-bar-track';
+    track.style.height = '7px';
+    var fill = document.createElement('div');
+    fill.className = 'spend-bar-fill';
+    var barPct = maxMsgs > 0 ? Math.round((v.msgs||0)/maxMsgs*100) : 0;
+    fill.style.cssText = 'width:'+barPct+'%;background:'+(v.spend===0?'var(--gray3)':v.color);
+    track.appendChild(fill);
+    wrap.appendChild(row);
+    wrap.appendChild(track);
+    el.appendChild(wrap);
+  });
+}
+
+function buildTrendChart() {
+  var maxSpend = Math.max.apply(null, MONTHLY_TREND.map(function(m){ return m.spend; }));
+  var W=480, H=130, pad={l:42,r:12,t:18,b:32};
+  var iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+  var bars=MONTHLY_TREND.length, slotW=iW/bars;
+  var svgParts = [];
+  // avg run-rate line
+  var rrY = pad.t + iH - (RUN_RATE.monthlyActual / maxSpend * iH);
+  svgParts.push('<line x1="'+pad.l+'" y1="'+rrY+'" x2="'+(W-pad.r)+'" y2="'+rrY+'" stroke="#D97706" stroke-width="1" stroke-dasharray="4 3" opacity="0.7"/>');
+  svgParts.push('<text x="'+(W-pad.r-2)+'" y="'+(rrY-4)+'" text-anchor="end" font-size="7.5" fill="#D97706" font-weight="700">Avg $225/mo</text>');
+  MONTHLY_TREND.forEach(function(m,i){
+    var isPartial = i === MONTHLY_TREND.length - 1;
+    var bH = maxSpend > 0 ? (m.spend/maxSpend)*iH : 2;
+    var x = pad.l + i*slotW + slotW*0.18;
+    var bW = slotW*0.64;
+    var y = pad.t + iH - bH;
+    var fill = isPartial ? '#A78BFA' : '#7C3AED';
+    var opacity = isPartial ? '0.55' : '0.85';
+    svgParts.push('<rect x="'+x+'" y="'+y+'" width="'+bW+'" height="'+bH+'" rx="3" fill="'+fill+'" opacity="'+opacity+'"/>');
+    svgParts.push('<text x="'+(x+bW/2)+'" y="'+(y-5)+'" text-anchor="middle" font-size="8.5" fill="var(--ink3)" font-weight="700">$'+m.spend+'</text>');
+    if(isPartial) svgParts.push('<text x="'+(x+bW/2)+'" y="'+(y-15)+'" text-anchor="middle" font-size="7" fill="var(--ink4)">partial</text>');
+    svgParts.push('<text x="'+(x+bW/2)+'" y="'+(pad.t+iH+14)+'" text-anchor="middle" font-size="7.5" fill="var(--ink4)">'+m.month.replace(' 2026','')+'</text>');
+  });
+  var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width','100%');
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  svg.style.overflow = 'visible';
+  svg.innerHTML = svgParts.join('');
+  var el = document.getElementById('trend-chart');
+  el.textContent = '';
+  el.appendChild(svg);
+}
+
+function renderSpend(){
+  var sorted = VENDORS.slice().sort(function(a,b){ return b.spend-a.spend; });
+  var tbody = document.getElementById('spend-tbody');
+  tbody.innerHTML = sorted.map(buildSpendRow).join('');
+  buildCatBreakdown();
+  buildTrendChart();
+}
+
+
+function buildMeter(containerId, rows) {
+  var el = document.getElementById(containerId);
+  el.textContent = '';
+  rows.forEach(function(r) {
+    var row = document.createElement('div');
+    row.className = 'tm-row';
+    var lbl = document.createElement('span');
+    lbl.className = 'tm-label';
+    lbl.textContent = r.label;
+    var track = document.createElement('div');
+    track.className = 'tm-track';
+    var fill = document.createElement('div');
+    fill.className = 'tm-fill';
+    fill.style.cssText = 'width:'+r.pct+'%;background:'+r.fillColor;
+    track.appendChild(fill);
+    var val = document.createElement('span');
+    val.className = 'tm-val';
+    val.textContent = r.valText;
+    var pctEl = document.createElement('span');
+    pctEl.className = 'tm-pct';
+    pctEl.style.color = r.pctColor;
+    pctEl.textContent = r.pctText;
+    row.appendChild(lbl);
+    row.appendChild(track);
+    row.appendChild(val);
+    row.appendChild(pctEl);
+    el.appendChild(row);
+  });
+}
+
+function renderConsumption(){
+  var maxBudget = Math.max.apply(null, TOKEN_DATA.map(function(t){ return t.budget; }));
+  buildMeter('token-meter', TOKEN_DATA.map(function(t){
+    var val    = _getTokenForRange(t.monthly);
+    var budget = _getBudgetForRange(t.budget);
+    var pct    = budget > 0 ? Math.min((val / budget) * 100, 100).toFixed(0) : 0;
+    var over   = val > budget;
+    var zero   = val === 0;
+    return {
+      label:     t.label,
+      pct:       zero ? 1 : pct,
+      fillColor: zero ? 'var(--gray3)' : over ? 'var(--red)' : t.color,
+      valText:   zero ? '—' : fmtTokens(val) + ' · ' + _getUtilPeriodLabel(),
+      pctText:   zero ? 'No usage' : pct + '%' + (over ? ' ▲' : ''),
+      pctColor:  over ? 'var(--red)' : 'var(--ink4)'
+    };
+  }));
+
+  var seatEl = document.getElementById('seat-meter');
+  seatEl.textContent = '';
+  SEAT_DATA.forEach(function(s) {
+    var pct = s.licensed > 0 ? Math.min((s.active/s.licensed)*100, 100).toFixed(0) : 0;
+    var zero = s.active === 0;
+    var low = pct < 50 && !zero;
+    var fillColor = zero ? 'var(--gray3)' : low ? 'var(--amber)' : s.color;
+    var pctColor  = zero ? 'var(--ink4)' : low ? 'var(--amber)' : 'var(--ink4)';
+
+    var wrap = document.createElement('div');
+    wrap.className = 'sm-wrap';
+
+    // bar row
+    var row = document.createElement('div');
+    row.className = 'tm-row';
+    var lbl = document.createElement('span');
+    lbl.className = 'tm-label';
+    lbl.textContent = s.label;
+
+    // segmented track — slices weighted by no-cache token volume
+    var activeTools = s.tools.filter(function(t){ return t.active; });
+    var totalTok = activeTools.reduce(function(sum, t){ return sum + t.tok; }, 0);
+    var track = document.createElement('div');
+    track.className = 'tm-track sm-track';
+    if (zero || totalTok === 0) {
+      var emptyFill = document.createElement('div');
+      emptyFill.style.cssText = 'width:2%;height:100%;background:var(--gray3);';
+      track.appendChild(emptyFill);
+    } else {
+      activeTools.forEach(function(t) {
+        var sliceW = ((t.tok / totalTok) * 100).toFixed(1);
+        var seg = document.createElement('div');
+        seg.className = 'sm-seg';
+        seg.style.cssText = 'width:'+sliceW+'%;background:'+t.color+';';
+        seg.title = t.name + ' — ' + fmtTokens(t.tok) + ' nc-tokens';
+        track.appendChild(seg);
+      });
+    }
+
+    var val = document.createElement('span');
+    val.className = 'tm-val';
+    val.textContent = s.active + ' / ' + s.tools.length + ' tools';
+    var pctEl = document.createElement('span');
+    pctEl.className = 'tm-pct';
+    pctEl.style.color = pctColor;
+    pctEl.textContent = zero ? 'No activity' : pct + '%';
+    row.appendChild(lbl); row.appendChild(track); row.appendChild(val); row.appendChild(pctEl);
+    wrap.appendChild(row);
+    seatEl.appendChild(wrap);
+  });
+
+  var tbody = document.getElementById('unit-tbody');
+  tbody.innerHTML = UNIT_DATA.map(function(u){
+    var above = u.bench.includes('above');
+    var below = u.bench.includes('below');
+    var bCol = above ? 'var(--red)' : below ? 'var(--green)' : 'var(--ink4)';
+    return '<tr>'
+      +'<td class="vendor-name">'+u.vendor+'</td>'
+      +'<td style="color:var(--ink4)">'+u.metric+'</td>'
+      +'<td style="font-weight:700">'+u.unit+'</td>'
+      +'<td style="color:var(--ink3)">'+u.vol+'</td>'
+      +'<td style="font-weight:700">'+u.total+'</td>'
+      +'<td style="font-weight:700;color:'+bCol+'">'+u.bench+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function renderInsights(){
+  var vipList = document.getElementById('vip-list');
+  var panel = vipList ? vipList.closest('.ver-insights-panel') : null;
+  if (!vipList) return;
+  var team = TEAMS.find(function(t){ return t.id === _currentTeam; });
+  var insights = team && team.insights ? team.insights : [];
+  if (panel) panel.style.display = insights.length ? '' : 'none';
+  vipList.innerHTML = '';
+  insights.forEach(function(ins) {
+    var card = document.createElement('div');
+    card.className = 'vip-card ' + ins.type;
+    var title = document.createElement('div');
+    title.className = 'vip-card-title';
+    title.textContent = ins.title;
+    var meta = document.createElement('div');
+    meta.className = 'vip-card-meta';
+    meta.textContent = ins.meta;
+    card.appendChild(title);
+    card.appendChild(meta);
+    vipList.appendChild(card);
+  });
+}
+
+function renderForecast() {
+  var MONTHLY_ACTUALS = [168, 195, 274, 301];
+  var MONTHLY_LABELS  = ['Apr', 'May', 'Jun', 'Jul'];
+  var PROJ_LABELS     = ['Apr','May','Jun','Jul','Aug*','Sep*','Oct*','Nov*'];
+  var PROJ_SPEND      = [168, 195, 274, 301, 340, 385, 435, 490];
+
+  var spentToDate      = MONTHLY_ACTUALS.reduce(function(a,b){return a+b;},0);
+  var trailingMonthly  = Math.round((MONTHLY_ACTUALS[2]+MONTHLY_ACTUALS[3])/2);
+  var fy27MonthsLeft   = 5;
+  var projFY27         = spentToDate + trailingMonthly * fy27MonthsLeft;
+
+  var activeUsers      = 4;
+  var totalFTE         = 6;
+  var perUserMonthly   = Math.round(trailingMonthly / activeUsers);
+  var modAdoptAnnual   = perUserMonthly * 5 * 12;
+  var fullAdoptAnnual  = perUserMonthly * totalFTE * 12;
+  var currentAnnual    = Math.round(trailingMonthly * 12);
+
+  var kpiEl = document.getElementById('forecast-kpi-strip');
+  kpiEl.innerHTML =
+    '<div class="kpi teal" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-top:3px solid var(--teal);">'
+      +'<div class="kpi-lbl" style="color:var(--ink4);font-size:7.5pt;">Spent Apr–Jul 2026</div>'
+      +'<div class="kpi-val" style="font-size:18pt;color:var(--teal);">'+fmtDollar(spentToDate)+'</div>'
+      +'<div class="kpi-note" style="font-size:7pt;color:var(--ink4)">4-month actuals</div>'
+    +'</div>'
+    +'<div class="kpi" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-top:3px solid var(--purple);">'
+      +'<div class="kpi-lbl" style="color:var(--ink4);font-size:7.5pt;">Avg Monthly Run Rate</div>'
+      +'<div class="kpi-val" style="font-size:18pt;color:var(--purple);">'+fmtDollar(trailingMonthly)+'</div>'
+      +'<div class="kpi-note" style="font-size:7pt;color:var(--ink4)">Jun–Jul trailing avg</div>'
+    +'</div>'
+    +'<div class="kpi" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-top:3px solid var(--amber);">'
+      +'<div class="kpi-lbl" style="color:var(--ink4);font-size:7.5pt;">Proj. FY27 Total</div>'
+      +'<div class="kpi-val" style="font-size:18pt;color:var(--amber);">'+fmtDollar(projFY27)+'</div>'
+      +'<div class="kpi-note" style="font-size:7pt;color:var(--ink4)">At current run rate</div>'
+    +'</div>'
+    +'<div class="kpi" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-top:3px solid var(--green);">'
+      +'<div class="kpi-lbl" style="color:var(--ink4);font-size:7.5pt;">Full Adoption Annual</div>'
+      +'<div class="kpi-val" style="font-size:18pt;color:var(--green);">'+fmtDollar(fullAdoptAnnual)+'</div>'
+      +'<div class="kpi-note" style="font-size:7pt;color:var(--ink4)">All 6 FTE active</div>'
+    +'</div>';
+
+  var maxProj = Math.max.apply(null, PROJ_SPEND);
+  var monthlyHtml = '<div class="card-title">Monthly Spend &mdash; Actuals &amp; Projection</div>'
+    +'<div class="card-sub">Apr–Jul actuals · Aug–Nov projected at trailing growth rate</div>'
+    +'<div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;">'
+      +'<div style="display:flex;align-items:center;gap:6px;font-size:7.5pt;color:var(--ink4)"><div style="width:12px;height:8px;border-radius:2px;background:var(--teal)"></div>Actual</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;font-size:7.5pt;color:var(--ink4)"><div style="width:12px;height:8px;border-radius:2px;background:var(--purple);opacity:0.65"></div>Projected</div>'
+    +'</div>';
+  PROJ_SPEND.forEach(function(val, i){
+    var isActual = i < 4;
+    var barW = Math.round((val/maxProj)*100);
+    monthlyHtml += '<div class="fc-bar-row">'
+      +'<div class="fc-bar-label">'+PROJ_LABELS[i]+'</div>'
+      +'<div class="fc-bar-track"><div class="'+(isActual?'fc-bar-actual':'fc-bar-proj')+'" style="width:'+barW+'%"></div></div>'
+      +'<div class="fc-bar-val">'+fmtDollar(val)+(isActual?'':' est.')+'</div>'
+    +'</div>';
+  });
+  document.getElementById('fc-monthly-card').innerHTML = monthlyHtml;
+
+  var TOOL_MONTHLY = { 'Claude Code':[110,135,185,210], 'Cursor':[40,45,52,50], 'Codex (OpenAI)':[5,7,11,5] };
+  var toolRows = VENDORS.map(function(v){
+    var mo = TOOL_MONTHLY[v.name] || [0,0,0,0];
+    var total = mo.reduce(function(a,b){return a+b;},0);
+    var projAnnual = Math.round((mo[mo.length-1]||0)*12);
+    return {name:v.name, total:total, projAnnual:projAnnual, color:v.color};
+  }).sort(function(a,b){return b.total-a.total;});
+  var maxTool = toolRows[0] ? Math.max(toolRows[0].total, toolRows[0].projAnnual/3) : 1;
+  var toolHtml = '<div class="card-title">Spend by Tool &mdash; Actuals vs. Projected Annual</div>'
+    +'<div class="card-sub">4-month actuals · 12-month annualized projection per tool</div>';
+  toolRows.forEach(function(d){
+    var aW = Math.round((d.total/maxTool)*100);
+    var pW = Math.min(Math.round((d.projAnnual/(maxTool*3))*100),100);
+    toolHtml += '<div style="margin-bottom:14px;">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:5px;">'
+        +'<span style="font-size:8pt;font-weight:800;color:var(--navy)">'+d.name+'</span>'
+        +'<span style="font-size:7.5pt;color:var(--ink4)">'+fmtDollar(d.total)+' actual · '+fmtDollar(d.projAnnual)+'/yr proj.</span>'
+      +'</div>'
+      +'<div class="fc-bar-row" style="margin-bottom:3px;">'
+        +'<div class="fc-bar-label" style="font-weight:600;color:var(--ink4)">4-mo actual</div>'
+        +'<div class="fc-bar-track"><div class="fc-bar-actual" style="width:'+aW+'%;background:'+d.color+'"></div></div>'
+        +'<div class="fc-bar-val">'+fmtDollar(d.total)+'</div>'
+      +'</div>'
+      +'<div class="fc-bar-row">'
+        +'<div class="fc-bar-label" style="font-weight:600;color:var(--ink4)">12-mo proj.</div>'
+        +'<div class="fc-bar-track"><div class="fc-bar-proj" style="width:'+pW+'%"></div></div>'
+        +'<div class="fc-bar-val">'+fmtDollar(d.projAnnual)+'</div>'
+      +'</div>'
+    +'</div>';
+  });
+  document.getElementById('fc-tool-card').innerHTML = toolHtml;
+
+  document.getElementById('fc-scenario-card').innerHTML =
+    '<div class="card-title">Adoption Scenarios &mdash; Annual Spend Forecast</div>'
+    +'<div class="card-sub">Modeled at current per-active-user rate of '+fmtDollar(perUserMonthly)+'/user/mo · 6 FTE scope</div>'
+    +'<div class="fc-scenario-grid">'
+      +'<div class="fc-scenario sc-current">'
+        +'<div class="fc-sc-label">Current Rate</div>'
+        +'<div class="fc-sc-val">'+fmtDollar(currentAnnual)+'</div>'
+        +'<div class="fc-sc-sub">4 of 6 FTE active<br>'+fmtDollar(trailingMonthly)+'/mo run rate<br>No new adoption assumed</div>'
+      +'</div>'
+      +'<div class="fc-scenario sc-moderate">'
+        +'<div class="fc-sc-label">Moderate Adoption</div>'
+        +'<div class="fc-sc-val">'+fmtDollar(modAdoptAnnual)+'</div>'
+        +'<div class="fc-sc-sub">5 of 6 FTE active<br>'+fmtDollar(perUserMonthly*5)+'/mo run rate<br>+1 team member onboarded</div>'
+      +'</div>'
+      +'<div class="fc-scenario sc-full">'
+        +'<div class="fc-sc-label">Full Adoption</div>'
+        +'<div class="fc-sc-val">'+fmtDollar(fullAdoptAnnual)+'</div>'
+        +'<div class="fc-sc-sub">All 6 FTE active<br>'+fmtDollar(perUserMonthly*6)+'/mo run rate<br>Aditya + Erin onboarded</div>'
+      +'</div>'
+    +'</div>';
+
+  var MEMBERS = [
+    {name:'Casey',   tier:'power',    tools:{'Claude Code':'active','Cursor':'active','Codex (OpenAI)':'active'}},
+    {name:'Mahesh',  tier:'moderate', tools:{'Claude Code':'active','Cursor':'active','Codex (OpenAI)':'active'}},
+    {name:'Justin',  tier:'light',    tools:{'Claude Code':'active','Cursor':'—','Codex (OpenAI)':'active'}},
+    {name:'Deborah', tier:'moderate', tools:{'Claude Code':'active','Cursor':'—','Codex (OpenAI)':'—'}},
+    {name:'Aditya',  tier:null,       tools:{'Claude Code':'—','Cursor':'—','Codex (OpenAI)':'—'}},
+    {name:'Erin',    tier:null,       tools:{'Claude Code':'—','Cursor':'—','Codex (OpenAI)':'—'}},
+  ];
+  var TIER_CFG = {
+    power:    { label:'Power User',    bg:'#7C3AED', cls:'fc-member--power'    },
+    moderate: { label:'Moderate User', bg:'#0D9488', cls:'fc-member--moderate' },
+    light:    { label:'Light User',    bg:'#2563EB', cls:'fc-member--light'    }
+  };
+  var memberHtml = '<div class="card-title">Team Adoption Status by Tool</div>'
+    +'<div class="card-sub">Current active usage per FTE · Aditya and Erin are licensed but have not yet generated usage</div>'
+    +'<div class="fc-member-grid">';
+  MEMBERS.forEach(function(m){
+    var anyActive = Object.keys(m.tools).some(function(k){return m.tools[k]==='active';});
+    var tier = m.tier ? TIER_CFG[m.tier] : null;
+    var tierBadge = tier ? '<span class="badge-tier" style="background:'+tier.bg+'">'+tier.label+'</span>' : '';
+    var tierCls = tier ? ' ' + tier.cls : '';
+    memberHtml += '<div class="fc-member'+tierCls+'">'
+      +'<div class="fc-member-name">'+(anyActive?'✓ ':'○ ')+m.name+tierBadge+'</div>';
+    VENDORS.forEach(function(v){
+      var status = m.tools[v.name] || '—';
+      var color = status==='active'?'var(--teal)':'var(--ink4)';
+      var label = status==='active'?'● Active':'○ Not active';
+      memberHtml += '<div class="fc-member-tool">'
+        +'<span class="fc-member-tool-name">'+v.name+'</span>'
+        +'<span style="font-weight:700;color:'+color+'">'+label+'</span>'
+      +'</div>';
+    });
+    memberHtml += '</div>';
+  });
+  memberHtml += '</div>';
+  document.getElementById('fc-member-card').innerHTML = memberHtml;
+}
+
+function switchTab(id, btn){
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  btn.classList.add('active');
+  // 'consumption' was renamed to 'utilization'
+  var viewId = id === 'consumption' ? 'utilization' : id;
+  document.getElementById('view-'+viewId).classList.add('active');
+}
+
+// Init — build date range picker bar via DOM methods
+(function(){
+  var bar = document.getElementById('drp-bar');
+
+  // Team label
+  var teamLbl = document.createElement('span');
+  teamLbl.className = 'drp-team-lbl';
+  teamLbl.textContent = 'Team:';
+  bar.appendChild(teamLbl);
+
+  // Team select
+  var teamSel = document.createElement('select');
+  teamSel.id = 'drp-team-select';
+  teamSel.className = 'drp-team-sel';
+  TEAMS.forEach(function(t){
+    var opt = document.createElement('option');
+    opt.value = t.id;
+    opt.textContent = t.label;
+    teamSel.appendChild(opt);
+  });
+  teamSel.value = 'ver';
+  teamSel.addEventListener('change', onTeamChange);
+  bar.appendChild(teamSel);
+
+  // Separator
+  var sep1 = document.createElement('div');
+  sep1.className = 'drp-sep';
+  bar.appendChild(sep1);
+
+  // Date inputs wrapper
+  var dates = document.createElement('div');
+  dates.className = 'drp-dates';
+
+  var fromLbl = document.createElement('span');
+  fromLbl.className = 'drp-date-lbl';
+  fromLbl.textContent = 'From:';
+  dates.appendChild(fromLbl);
+
+  var fromInput = document.createElement('input');
+  fromInput.type = 'date';
+  fromInput.id = 'drp-from';
+  fromInput.className = 'drp-date-input';
+  fromInput.min = '2026-02-01';
+  fromInput.value = _dateRange.from;
+  dates.appendChild(fromInput);
+
+  var arrow = document.createElement('span');
+  arrow.className = 'drp-arrow';
+  arrow.textContent = '→';
+  dates.appendChild(arrow);
+
+  var toLbl = document.createElement('span');
+  toLbl.className = 'drp-date-lbl';
+  toLbl.textContent = 'To:';
+  dates.appendChild(toLbl);
+
+  var toInput = document.createElement('input');
+  toInput.type = 'date';
+  toInput.id = 'drp-to';
+  toInput.className = 'drp-date-input';
+  toInput.min = '2026-02-01';
+  toInput.value = _dateRange.to;
+  dates.appendChild(toInput);
+
+  bar.appendChild(dates);
+
+  // Separator
+  var sep2 = document.createElement('div');
+  sep2.className = 'drp-sep';
+  bar.appendChild(sep2);
+
+  // Quick presets — short relative ranges as pill buttons
+  var QUICK_PRESETS = [
+    { label: 'This Week',    from: '2026-08-01', to: '2026-08-04' },
+    { label: 'Last 30 Days', from: '2026-07-05', to: '2026-08-04' },
+    { label: 'Last 45 Days', from: '2026-06-20', to: '2026-08-04' },
+    { label: 'Last 60 Days', from: '2026-06-05', to: '2026-08-04' },
+    { label: 'All Data',     from: '2026-04-01', to: '2026-08-04' }
+  ];
+
+  // FY presets — shown in a dropdown
+  var FY_PRESETS = [
+    { label: '— FY Range —',  from: null, to: null },
+    { label: 'FY27 YTD',      from: '2026-02-01', to: '2026-08-04' },
+    { label: 'FY27 Q1',       from: '2026-02-01', to: '2026-04-30' },
+    { label: 'FY27 Q2',       from: '2026-05-01', to: '2026-07-31' },
+    { label: 'FY27 Q3',       from: '2026-08-01', to: '2026-10-31' },
+    { label: 'FY27 Q4',       from: '2026-11-01', to: '2027-01-31' },
+    { label: 'FY27 Full',     from: '2026-02-01', to: '2027-01-31' }
+  ];
+
+  var presetsWrap = document.createElement('div');
+  presetsWrap.className = 'drp-presets';
+  presetsWrap.style.cssText = 'display:flex;align-items:center;gap:5px;flex-wrap:wrap;';
+
+  function applyPreset(from, to, activeBtn) {
+    presetsWrap.querySelectorAll('.drp-preset').forEach(function(b){ b.classList.remove('active'); });
+    fySelect.value = '';
+    if (activeBtn) activeBtn.classList.add('active');
+    _dateRange.from = from;
+    _dateRange.to = to;
+    fromInput.value = from;
+    toInput.value = to;
+    _applyDateRange();
+  }
+
+  QUICK_PRESETS.forEach(function(p) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'drp-preset';
+    btn.textContent = p.label;
+    if (p.label === 'All Data') btn.classList.add('active');
+    btn.addEventListener('click', function() { applyPreset(p.from, p.to, btn); });
+    presetsWrap.appendChild(btn);
+  });
+
+  // FY dropdown
+  var fySelect = document.createElement('select');
+  fySelect.className = 'drp-team-sel';
+  fySelect.style.cssText = 'font-size:7.5pt;padding:3px 8px;';
+  FY_PRESETS.forEach(function(p) {
+    var opt = document.createElement('option');
+    opt.value = p.from ? p.from + '|' + p.to : '';
+    opt.textContent = p.label;
+    fySelect.appendChild(opt);
+  });
+  fySelect.addEventListener('change', function() {
+    if (!fySelect.value) return;
+    var parts = fySelect.value.split('|');
+    applyPreset(parts[0], parts[1], null);
+  });
+  presetsWrap.appendChild(fySelect);
+
+  bar.appendChild(presetsWrap);
+
+  // Wire date inputs to update _dateRange
+  function onDateInput() {
+    _dateRange.from = fromInput.value;
+    _dateRange.to = toInput.value;
+    presetsWrap.querySelectorAll('.drp-preset').forEach(function(b){ b.classList.remove('active'); });
+    fySelect.value = '';
+    _applyDateRange();
+  }
+  fromInput.addEventListener('change', onDateInput);
+  toInput.addEventListener('change', onDateInput);
+})();
+renderSpend();
+renderConsumption();
+renderInsights();
+renderForecast();
+</script>
+
+<script>
+(function() {
+  var SUGGESTED = [
+    'What is the team AI tool run rate and annual forecast?',
+    'Aditya and Erin are licensed but not generating usage — how do we activate them?',
+    'How does our cost per token compare to market benchmarks?',
+    'How does our token consumption compare across the 3 Cs?',
+    'Draft an executive summary of the VER team AI spend.'
+  ];
+
+  var chipsEl = document.getElementById('agent-chips');
+  var chipsVisible = true;
+
+  SUGGESTED.forEach(function(q) {
+    var chip = document.createElement('button');
+    chip.className = 'agent-chip';
+    chip.textContent = q;
+    chip.onclick = function() {
+      if (chipsVisible) {
+        chipsEl.style.display = 'none';
+        document.getElementById('agent-greeting').style.display = 'none';
+        chipsVisible = false;
+      }
+      document.getElementById('ai-input').value = q;
+      document.getElementById('ai-input').focus();
+    };
+    chipsEl.appendChild(chip);
+  });
+
+  var VENDY_POSE = {
+    wave: 'assets/vendy-agent.png',
+    thinking: 'assets/vendy-penguin-thinking.png',
+    working: 'assets/vendy-penguin-working.png',
+    celebrating: 'assets/vendy-penguin-celebrating.png',
+    alert: 'assets/vendy-penguin-alert.png'
+  };
+
+  function addBubble(role, text) {
+    var msgs = document.getElementById('agent-messages');
+    if (chipsVisible && role === 'user') {
+      chipsEl.style.display = 'none';
+      document.getElementById('agent-greeting').style.display = 'none';
+      chipsVisible = false;
+    }
+    var row = document.createElement('div');
+    row.className = 'chat-row' + (role === 'user' ? ' user' : '');
+
+    var av = document.createElement('div');
+    av.className = 'bubble-avatar ' + (role === 'user' ? 'user-av' : 'agent-av');
+    var avImg = null;
+    if (role === 'user') {
+      av.textContent = 'You';
+    } else {
+      avImg = document.createElement('img');
+      avImg.src = VENDY_POSE.wave;
+      avImg.alt = 'Vendy';
+      av.appendChild(avImg);
+    }
+
+    var bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + role;
+
+    if (role === 'agent') {
+      var lbl = document.createElement('div');
+      lbl.className = 'chat-bubble-label';
+      lbl.textContent = 'Vendy · VER Agent';
+      bubble.appendChild(lbl);
+      var body = document.createElement('div');
+      body.className = 'chat-bubble-text';
+      body.id = 'agent-resp-body-' + Date.now();
+      bubble.appendChild(body);
+    } else {
+      bubble.textContent = text;
+    }
+
+    row.appendChild(av);
+    row.appendChild(bubble);
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+    return { bubble: bubble, avatarImg: avImg };
+  }
+
+  function getSessionId() {
+    var key = 'ver_agent_session_id';
+    var id = localStorage.getItem(key);
+    if (!id) {
+      id = 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem(key, id);
+    }
+    return id;
+  }
+
+  function streamFromSSE(response, onEvent) {
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+    return reader.read().then(function process(result) {
+      if (result.done) return;
+      buffer += decoder.decode(result.value, { stream: true });
+      var chunks = buffer.split('\n\n');
+      buffer = chunks.pop();
+      chunks.forEach(function(chunk) {
+        var line = chunk.split('\n').find(function(l){ return l.indexOf('data: ') === 0; });
+        if (!line) return;
+        try { onEvent(JSON.parse(line.slice(6))); } catch (_) {}
+      });
+      return reader.read().then(process);
+    });
+  }
+
+  window.sendAIQuery = function() {
+    var input = document.getElementById('ai-input');
+    var sendBtn = document.getElementById('ai-send');
+    var q = (input.value||'').trim();
+    if (!q) return;
+
+    addBubble('user', q);
+    input.value = '';
+    sendBtn.disabled = true;
+
+    var agentResult = addBubble('agent', '');
+    var bodyEl = agentResult.bubble.querySelector('[id^="agent-resp-body-"]');
+    var vendyImg = agentResult.avatarImg;
+    function setVendyPose(pose) { if (vendyImg) vendyImg.src = VENDY_POSE[pose]; }
+    setVendyPose('thinking');
+
+    var thinking = document.createElement('span');
+    thinking.style.cssText = 'color:rgba(255,255,255,0.3);font-style:italic;';
+    thinking.textContent = 'Analyzing portfolio data...';
+    bodyEl.appendChild(thinking);
+
+    var msgs = document.getElementById('agent-messages');
+    msgs.scrollTop = msgs.scrollHeight;
+
+    var firstDelta = true;
+    fetch('/api/agent/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: getSessionId(),
+        message: q,
+        pageContext: 'ai_cost'
+      })
+    }).then(function(response) {
+      if (!response.ok) throw new Error('Agent endpoint returned '+response.status);
+      bodyEl.textContent = '';
+      return streamFromSSE(response, function(evt) {
+        if (!evt || !evt.type) return;
+        if (evt.type === 'status') {
+          setVendyPose('thinking');
+          bodyEl.textContent = evt.text || 'Analyzing...';
+        } else if (evt.type === 'delta') {
+          if (firstDelta) { setVendyPose('working'); firstDelta = false; }
+          if (bodyEl.textContent === thinking.textContent) bodyEl.textContent = '';
+          bodyEl.textContent += (evt.delta || '');
+          msgs.scrollTop = msgs.scrollHeight;
+        } else if (evt.type === 'error') {
+          setVendyPose('alert');
+          bodyEl.textContent = 'Agent error: ' + (evt.error || 'Unknown error');
+        } else if (evt.type === 'done') {
+          setVendyPose('wave');
+          sendBtn.disabled = false;
+        }
+      });
+    }).catch(function(err) {
+      setVendyPose('alert');
+      bodyEl.textContent = 'Unable to reach VER agent: ' + err.message;
+      sendBtn.disabled = false;
+    }).finally(function() {
+      sendBtn.disabled = false;
+    });
+  };
+
+  document.getElementById('ai-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAIQuery(); }
+  });
+})();
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openAiCostHelp(){
+  HelpModal.open({
+    title: 'AI Cost Monitor',
+    what: 'The AI Cost Monitor tracks <strong>spend, consumption, and cost-per-outcome across all AI and ML vendor tools</strong> in the DET portfolio — LLM platforms, AI infrastructure, automation tools, and agentic workflows. As AI adoption accelerates, this becomes one of the fastest-growing and least-governed spend categories.',
+    steps: [
+      '<strong>Review the spend trend</strong> — the top strip shows AI vendor spend by month and the trajectory vs. budget. Acceleration without corresponding output growth is a signal.',
+      '<strong>Check token consumption</strong> — for LLM vendors (OpenAI, Anthropic, Azure AI), the consumption view shows token usage by team, project, and cost center.',
+      '<strong>Review cost-per-outcome</strong> — where AI tools are tied to measurable outputs (automations run, documents processed, decisions supported), cost-per-unit is tracked.',
+      '<strong>Flag ungoverned AI spend</strong> — tools with no owner, no SOW, or no procurement record are flagged. These represent both cost risk and security/compliance exposure.',
+      '<strong>Model forward spend</strong> — use the adoption rate slider to project AI spend growth at different adoption curves and flag if it exceeds budget thresholds.'
+    ],
+    tips: [
+      { icon: '&#x1F4C8;', title: 'AI spend is doubling annually', body: 'DET AI tooling spend is on a steep growth curve. Governance now prevents a much harder conversation in FY28 budget season.' },
+      { icon: '&#x26A0;', title: 'Shadow AI spend is real', body: 'Individual team subscriptions (ChatGPT, Copilot, etc.) below procurement threshold add up. The monitor includes a shadow spend estimate.' },
+      { icon: '&#x1F4B1;', title: 'Token cost varies by model', body: 'GPT-4o costs ~10x less per token than GPT-4 Turbo. Model selection decisions have significant cost implications at DET scale.' },
+      { icon: '&#x1F517;', title: 'Links to TCO Calculator', body: 'AI vendor costs identified here can be passed to the TCO Calculator to model fully-loaded AI engagement cost.' }
+    ],
+    ai: '<strong>Meta note:</strong> This page tracks AI vendor spend — it is itself an AI-adjacent tool. As agentic tooling matures, cost-per-agent-action will become a new unit of measure alongside cost-per-seat and cost-per-token.',
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>
