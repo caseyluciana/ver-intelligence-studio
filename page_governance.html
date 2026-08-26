@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Governance Posture &mdash; VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F3F4F6;--gray2:#F9FAFB;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  background:var(--navy);color:#fff;min-height:100vh;}
+
+/* ── Top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 32px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;
+  display:flex;align-items:center;gap:5px;transition:color 0.15s;}
+.htb-back:hover{color:var(--teal);}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:0.04em;}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-meta{font-size:7.5pt;color:rgba(255,255,255,0.3);}
+.htb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.htb-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+[data-theme="dark"] .htb-btn{background:rgba(13,148,136,0.15);border-color:rgba(13,148,136,0.35);color:#0D9488;}
+
+/* ── Stage ── */
+.stage{background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 60%,#061020 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden;}
+.stage::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 75% 40%,rgba(124,58,237,0.09) 0%,transparent 60%);
+  pointer-events:none;}
+.stage-inner{max-width:1200px;margin:0 auto;padding:36px 48px 32px;}
+.stage-eyebrow{font-size:7.5pt;font-weight:700;color:var(--purple);
+  text-transform:uppercase;letter-spacing:0.16em;margin-bottom:10px;}
+.stage-title{font-size:26pt;font-weight:900;color:#fff;line-height:1.1;
+  margin-bottom:6px;letter-spacing:-0.02em;}
+.stage-title span{color:var(--purple);}
+.stage-sub{font-size:9.5pt;color:rgba(255,255,255,0.5);margin-bottom:28px;max-width:600px;line-height:1.6;}
+.stage-sub strong{color:rgba(255,255,255,0.8);}
+
+/* Stage KPI strip */
+.kpi-strip{display:flex;gap:14px;flex-wrap:wrap;}
+.kpi{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:14px 20px;border-top:2px solid var(--teal);min-width:140px;}
+.kpi-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;margin-bottom:3px;}
+.kpi-lbl{font-size:7.5pt;font-weight:700;color:rgba(255,255,255,0.45);
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;}
+.kpi-note{font-size:7.5pt;color:rgba(255,255,255,0.3);}
+.kpi.green{border-top-color:var(--green);}.kpi.green .kpi-val{color:#34D399;}
+.kpi.red{border-top-color:var(--red);}.kpi.red .kpi-val{color:#F87171;}
+.kpi.amber{border-top-color:var(--amber);}.kpi.amber .kpi-val{color:#FBBF24;}
+.kpi.purple{border-top-color:var(--purple);}.kpi.purple .kpi-val{color:#C4B5FD;}
+/* ── Source / confidence badges ── */
+.src-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.src-badge{display:inline-flex;align-items:center;gap:4px;font-size:6.5pt;font-weight:700;
+  padding:3px 8px;border-radius:10px;white-space:nowrap;letter-spacing:0.04em;}
+.src-coupa{background:rgba(37,99,235,0.18);color:#93C5FD;border:1px solid rgba(37,99,235,0.3);}
+.src-mft{background:rgba(124,58,237,0.18);color:#C4B5FD;border:1px solid rgba(124,58,237,0.3);}
+.src-benchmark{background:rgba(13,148,136,0.18);color:#5EEAD4;border:1px solid rgba(13,148,136,0.3);}
+.src-qbr{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.3);}
+.src-manual{background:rgba(107,114,128,0.2);color:#D1D5DB;border:1px solid rgba(107,114,128,0.3);}
+.conf-high{background:rgba(5,150,105,0.18);color:#6EE7B7;border:1px solid rgba(5,150,105,0.3);}
+.conf-medium{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.3);}
+.conf-low{background:rgba(220,38,38,0.18);color:#FCA5A5;border:1px solid rgba(220,38,38,0.3);}
+.src-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* ── Body ── */
+.page-body{background:var(--gray);color:var(--ink2);}
+.page-inner{max-width:1200px;margin:0 auto;padding:28px 48px 48px;}
+
+/* ── Section header ── */
+.shdr{font-size:10pt;font-weight:800;color:var(--navy);
+  display:flex;align-items:center;gap:8px;padding:20px 0 12px;
+  border-bottom:2px solid var(--gray3);margin-bottom:16px;}
+[data-theme="dark"] .shdr{color:rgba(255,255,255,0.9);border-color:rgba(255,255,255,0.1);}
+
+/* ── Policy statement ── */
+.policy-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.policy-card{background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.policy-card.primary{border-top:3px solid var(--purple);}
+.policy-card.secondary{border-top:3px solid var(--teal);}
+.policy-card-icon{font-size:20pt;margin-bottom:10px;}
+.policy-card-title{font-size:9.5pt;font-weight:800;color:var(--navy);margin-bottom:8px;}
+.policy-card-body{font-size:8.5pt;color:var(--ink3);line-height:1.75;}
+.policy-card-body strong{color:var(--navy);}
+.policy-scope-list{margin-top:10px;display:flex;flex-direction:column;gap:5px;}
+.policy-scope-item{display:flex;align-items:flex-start;gap:8px;font-size:8.5pt;color:var(--ink3);}
+.policy-scope-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.dot-green{background:var(--green);}
+.dot-amber{background:var(--amber);}
+.dot-teal{background:var(--teal);}
+.dot-muted{background:var(--ink4);}
+[data-theme="dark"] .policy-card{background:var(--dm-card);border-color:var(--border);}
+[data-theme="dark"] .policy-card-title{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .policy-card-body{color:rgba(255,255,255,0.6);}
+[data-theme="dark"] .policy-card-body strong{color:rgba(255,255,255,0.85);}
+[data-theme="dark"] .policy-scope-item{color:rgba(255,255,255,0.6);}
+
+/* ── Compact engagement status grid ── */
+.eng-status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
+.eng-status-card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;border-left:4px solid var(--green);
+  cursor:pointer;transition:box-shadow 0.18s,transform 0.18s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.eng-status-card:hover{box-shadow:0 4px 14px rgba(0,0,0,0.09);transform:translateY(-2px);}
+.eng-status-card.monitoring{border-left-color:var(--amber);}
+.eng-status-card.below{border-left-color:var(--red);}
+.esc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.esc-logo{width:24px;height:24px;border-radius:4px;object-fit:contain;
+  border:1px solid var(--border);flex-shrink:0;}
+.esc-vendor{font-size:8.5pt;font-weight:800;color:var(--navy);flex:1;}
+.esc-engagement{font-size:7.5pt;color:var(--ink4);margin-bottom:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.esc-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.esc-spend{font-size:9pt;font-weight:900;color:var(--navy);}
+.esc-sla-row{display:flex;gap:5px;align-items:center;}
+.esc-hint{font-size:7pt;color:var(--ink4);margin-top:4px;font-style:italic;}
+[data-theme="dark"] .eng-status-card{background:var(--dm-card);border-color:var(--border);}
+[data-theme="dark"] .esc-vendor{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .esc-spend{color:rgba(255,255,255,0.85);}
+
+/* ── Quarterly release calendar ── */
+.cal-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.cal-qtr{background:#fff;border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  cursor:pointer;transition:box-shadow 0.2s,transform 0.2s;}
+.cal-qtr:hover{box-shadow:0 6px 18px rgba(0,0,0,0.10);transform:translateY(-2px);}
+.cal-qtr.cal-active{box-shadow:0 0 0 2px var(--teal),0 6px 18px rgba(13,148,136,0.15);}
+.cal-qtr-head{padding:14px 14px 10px;border-bottom:1px solid var(--border);}
+.cal-qtr-label{font-size:7.5pt;font-weight:700;color:var(--purple);
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
+.cal-qtr-name{font-size:11pt;font-weight:900;color:var(--navy);}
+.cal-qtr-period{font-size:7.5pt;color:var(--ink4);margin-top:3px;}
+.cal-qtr-badge{margin-top:8px;}
+.cal-months{display:flex;gap:4px;padding:10px 14px 4px;}
+.cal-month{flex:1;text-align:center;padding:6px 2px;border-radius:6px;
+  font-size:7pt;font-weight:700;transition:background 0.15s,color 0.15s;}
+.cal-month.past{background:var(--navy3);color:var(--navy2);}
+.cal-month.current{background:var(--teal);color:#fff;}
+.cal-month.future{background:var(--gray);color:var(--ink4);}
+.cal-month.release{background:var(--green);color:#fff;position:relative;}
+.cal-release-row{display:flex;align-items:center;gap:6px;
+  padding:6px 14px 10px;font-size:8pt;font-weight:700;color:var(--teal2);}
+.cal-release-icon{font-size:9pt;}
+.cal-detail{max-height:0;overflow:hidden;transition:max-height 0.3s ease;}
+.cal-detail.open{max-height:200px;}
+.cal-detail-inner{border-top:1px solid var(--gray3);padding:12px 14px;}
+.cal-detail-lbl{font-size:7.5pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;}
+.cal-detail-text{font-size:8pt;color:var(--ink3);line-height:1.65;}
+[data-theme="dark"] .cal-qtr{background:var(--dm-card);border-color:var(--border);}
+[data-theme="dark"] .cal-qtr-head{border-color:var(--border);}
+[data-theme="dark"] .cal-qtr-name{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .cal-qtr-label{color:#C4B5FD;}
+[data-theme="dark"] .cal-month.past{background:rgba(15,30,60,0.8);color:rgba(255,255,255,0.4);}
+[data-theme="dark"] .cal-month.future{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .cal-detail-inner{border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .cal-detail-text{color:rgba(255,255,255,0.6);}
+[data-theme="dark"] .cal-release-row{color:#5EEAD4;}
+
+/* ── Commitment list ── */
+.commit-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.commit-item{display:flex;align-items:flex-start;gap:14px;background:#fff;
+  border:1px solid var(--border);border-radius:10px;padding:14px 18px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.03);}
+.commit-num{width:28px;height:28px;border-radius:50%;background:var(--purple3);
+  color:var(--purple);font-size:9pt;font-weight:900;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.commit-body{flex:1;}
+.commit-title{font-size:9pt;font-weight:800;color:var(--navy);margin-bottom:3px;}
+.commit-desc{font-size:8.5pt;color:var(--ink3);line-height:1.65;}
+[data-theme="dark"] .commit-item{background:var(--dm-card);border-color:var(--border);}
+[data-theme="dark"] .commit-num{background:rgba(124,58,237,0.2);color:#C4B5FD;}
+[data-theme="dark"] .commit-title{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .commit-desc{color:rgba(255,255,255,0.6);}
+
+/* ── Advisory close ── */
+.advisory-close{margin-top:24px;
+  background:linear-gradient(135deg,var(--navy) 0%,#1a2f50 100%);
+  border-radius:12px;padding:20px 26px;
+  border:1px solid rgba(255,255,255,0.06);
+  border-top:2px solid rgba(124,58,237,0.4);}
+.ac-eyebrow{font-size:7.5pt;font-weight:700;color:var(--purple);
+  text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+.ac-text{font-size:9pt;color:rgba(255,255,255,0.6);line-height:1.75;}
+.ac-footer{font-size:7.5pt;color:rgba(255,255,255,0.25);
+  margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;justify-content:space-between;}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  padding:2px 7px;border-radius:10px;white-space:nowrap;}
+.bg{background:var(--green3);color:var(--green2);}
+.ba{background:var(--amber3);color:var(--amber2);}
+.br{background:var(--red3);color:var(--red2);}
+.bt{background:var(--teal3);color:var(--teal2);}
+.bz{background:var(--gray3);color:var(--ink4);}
+.bp{background:var(--purple3);color:var(--purple2);}
+.b-analyst{background:rgba(124,58,237,0.1);color:#7C3AED;border:1px solid rgba(124,58,237,0.2);}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;}
+
+/* ── Callout ── */
+.callout{border-radius:0 8px 8px 0;padding:11px 16px;margin-bottom:16px;
+  border-left:4px solid;font-size:8.5pt;line-height:1.65;}
+.c-info{background:var(--navy3);border-color:var(--navy2);color:var(--navy2);}
+.c-teal{background:var(--teal3);border-color:var(--teal);color:var(--green2);}
+.mt16{margin-top:16px;}
+
+/* ── Scroll fade-in ── */
+.fade-in{opacity:0;transform:translateY(14px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+/* ── Dark mode tokens ── */
+[data-theme="dark"]{
+  --dm-card:#0F1E3C;
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+  --purple3:rgba(124,58,237,0.15);
+  --green2:#6EE7B7;--amber2:#FDE68A;--red2:#FCA5A5;--teal2:#5EEAD4;--purple2:#C4B5FD;
+}
+[data-theme="dark"] body{background:var(--gray);}
+[data-theme="dark"] .page-body{background:var(--gray);}
+[data-theme="dark"] .c-info{background:rgba(15,30,60,0.8);color:var(--ink3);}
+[data-theme="dark"] .c-teal{background:rgba(13,148,136,0.12);color:#5EEAD4;}
+[data-theme="dark"] .callout.c-info strong{color:var(--ink2);}
+
+/* ── Modal ── */
+.gov-modal-backdrop{position:fixed;inset:0;z-index:200;
+  background:rgba(6,13,26,0.80);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  opacity:0;pointer-events:none;transition:opacity 0.25s ease;}
+.gov-modal-backdrop.open{opacity:1;pointer-events:all;}
+.gov-modal{background:#fff;border-radius:14px;
+  border:1px solid var(--border);
+  box-shadow:0 32px 80px rgba(0,0,0,0.35);
+  width:100%;max-width:700px;max-height:88vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  transform:translateY(28px) scale(0.97);transition:transform 0.25s ease;}
+.gov-modal-backdrop.open .gov-modal{transform:translateY(0) scale(1);}
+.gov-modal-signal{height:4px;flex-shrink:0;}
+.gov-modal-hdr{display:flex;align-items:center;gap:14px;
+  padding:18px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.gov-modal-logo{width:40px;height:40px;border-radius:8px;object-fit:contain;
+  border:1px solid var(--border);background:#fff;flex-shrink:0;padding:3px;}
+.gov-modal-info{flex:1;min-width:0;}
+.gov-modal-vendor{font-size:10pt;font-weight:800;color:var(--navy);margin-bottom:2px;}
+.gov-modal-eng{font-size:8.5pt;color:var(--ink4);}
+.gov-modal-right{text-align:right;flex-shrink:0;}
+.gov-modal-spend{font-size:15pt;font-weight:900;color:var(--navy);line-height:1;}
+.gov-modal-spend-lbl{font-size:7.5pt;color:var(--ink4);margin-top:2px;}
+.gov-modal-close{width:32px;height:32px;border-radius:50%;border:none;
+  background:var(--gray3);color:var(--ink4);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:all 0.15s;flex-shrink:0;font-family:inherit;}
+.gov-modal-close:hover{background:var(--red3);color:var(--red);}
+.gov-modal-badges{padding:10px 20px;display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);flex-shrink:0;}
+.gov-modal-scroll{overflow-y:auto;flex:1;padding:18px 20px;}
+.gov-modal-section{margin-bottom:16px;}
+.gov-modal-section-lbl{font-size:8pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.08em;
+  margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--gray3);}
+.gov-modal-desc{font-size:9pt;color:var(--ink3);line-height:1.7;}
+.gov-modal-notes{background:var(--teal3);border-left:3px solid var(--teal);
+  border-radius:0 8px 8px 0;padding:10px 14px;
+  font-size:8.5pt;color:var(--green2);line-height:1.6;margin-top:12px;}
+.gov-sla-table{width:100%;border-collapse:collapse;}
+.gov-sla-th{padding:7px 10px;text-align:left;background:var(--navy);color:#fff;
+  font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.gov-sla-th-c{padding:7px 10px;text-align:center;background:var(--navy);color:#fff;
+  font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.gov-sla-td{padding:7px 10px;font-size:8.5pt;color:var(--ink2);border-bottom:1px solid var(--gray3);}
+.gov-sla-td-c{padding:7px 10px;font-size:8.5pt;text-align:center;border-bottom:1px solid var(--gray3);}
+.gov-sla-td-cw{padding:7px 10px;font-size:8.5pt;text-align:center;
+  font-weight:600;border-bottom:1px solid var(--gray3);}
+.gov-modal-footer{padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;}
+.gov-modal-print{padding:6px 16px;border-radius:7px;background:var(--navy);color:#fff;
+  font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all 0.15s;}
+.gov-modal-print:hover{background:var(--navy2);}
+.gov-modal-cancel{padding:6px 16px;border-radius:7px;background:#fff;color:var(--ink3);
+  font-size:8pt;font-weight:600;cursor:pointer;font-family:inherit;
+  border:1px solid var(--border2);transition:all 0.15s;}
+.gov-modal-cancel:hover{background:var(--gray);}
+[data-theme="dark"] .gov-modal{background:var(--dm-card);border-color:var(--border);}
+[data-theme="dark"] .gov-modal-vendor{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .gov-modal-spend{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .gov-modal-close{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);}
+[data-theme="dark"] .gov-modal-section-lbl{border-color:var(--border);}
+[data-theme="dark"] .gov-modal-notes{background:rgba(13,148,136,0.12);color:#5EEAD4;}
+[data-theme="dark"] .gov-modal-footer{border-color:var(--border);background:var(--dm-card);}
+[data-theme="dark"] .gov-modal-badges{border-color:var(--border);}
+[data-theme="dark"] .gov-modal-hdr{border-color:var(--border);}
+[data-theme="dark"] .gov-sla-td,[data-theme="dark"] .gov-sla-td-c,[data-theme="dark"] .gov-sla-td-cw{border-color:var(--border);}
+[data-theme="dark"] .gov-modal-cancel{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border-color:var(--border);}
+
+@media print{.hub-top-bar,.htb-btn{display:none!important;}.page-inner{padding:12px!important;}}
+
+@media(max-width:860px){
+  .stage-inner{padding:24px 20px 20px;}
+  .page-inner{padding:20px 20px 40px;}
+  .hub-top-bar{padding:8px 16px;}
+  .kpi-strip{gap:10px;}
+  .kpi{min-width:120px;}
+}
+@media(max-width:600px){
+  .stage-inner{padding:18px 14px 16px;}
+  .page-inner{padding:16px 14px 24px;}
+  .hub-top-bar{padding:8px 12px;}
+  .htb-meta{display:none;}
+  .kpi-strip{flex-direction:column;gap:8px;}
+  .kpi{min-width:0;width:100%;}
+  .stage-title{font-size:20pt;}
+}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; VER Intelligence Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">Governance Posture</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="htb-btn" onclick="openGovHelp()" aria-label="How to use Governance Posture">&#63; How to Use</button>
+    <button type="button" class="htb-btn" onclick="window.print()">&#128438; Print</button>
+    <span class="htb-meta">FY27 &middot; Salesforce DET &middot; Confidential</span>
+    <button type="button" class="htb-btn" id="dm-btn" onclick="_dmToggle()">&#9789; Dark</button>
+  </div>
+</div>
+
+<!-- Stage -->
+<div class="stage">
+  <div class="stage-inner">
+    <div class="stage-eyebrow">VER Intelligence Hub &middot; Governance Posture &middot; FY27</div>
+    <div class="stage-title">VER <span>Governance</span></div>
+    <div class="stage-sub">
+      <strong>What VER commits to, how we report it, and where we stand.</strong>
+      Published intelligence replaces scheduled meetings.
+      Pillar Leads receive quarterly releases — no calendar invite required.
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi green">
+        <div class="kpi-lbl">Engagements Nominal</div>
+        <div class="kpi-val" id="g-nominal">—</div>
+        <div class="kpi-note">SLAs on or above target</div>
+        <div class="src-row">
+          <span class="src-badge src-qbr"><span class="src-dot"></span>QBR</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High Confidence</span>
+          <span class="src-badge src-manual">Jun 22</span>
+        </div>
+      </div>
+      <div class="kpi amber">
+        <div class="kpi-lbl">Under Monitoring</div>
+        <div class="kpi-val" id="g-monitor">—</div>
+        <div class="kpi-note">Active VER observation</div>
+        <div class="src-row">
+          <span class="src-badge src-qbr"><span class="src-dot"></span>QBR</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High Confidence</span>
+          <span class="src-badge src-manual">Jun 22</span>
+        </div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-lbl">Below Target</div>
+        <div class="kpi-val" id="g-below">—</div>
+        <div class="kpi-note">Remediation in progress</div>
+        <div class="src-row">
+          <span class="src-badge src-qbr"><span class="src-dot"></span>QBR</span>
+          <span class="src-badge src-benchmark"><span class="src-dot"></span>Benchmark</span>
+          <span class="src-badge conf-medium"><span class="src-dot"></span>Medium Confidence</span>
+        </div>
+      </div>
+      <div class="kpi purple">
+        <div class="kpi-lbl">Next Release</div>
+        <div class="kpi-val">Aug 1</div>
+        <div class="kpi-note">Q2 FY27 Intelligence Release</div>
+        <div class="src-row">
+          <span class="src-badge src-manual"><span class="src-dot"></span>Manual</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High Confidence</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="page-body">
+<div class="page-inner">
+
+  <!-- ── Section 1: VER's governance promise ── -->
+  <div class="shdr fade-in">&#128203; VER Governance Posture</div>
+  <div class="policy-grid fade-in">
+    <div class="policy-card primary">
+      <div class="policy-card-icon">&#127919;</div>
+      <div class="policy-card-title">What VER Governs <span class="badge b-analyst">Analyst-curated</span></div>
+      <div class="policy-card-body">
+        VER provides <strong>formal governance only where VER holds advisory scope</strong> —
+        meaning a live SOW, MSP engagement, or direct contract relationship exists and
+        VER can generate and act on real performance data.<br><br>
+        Current formal governance scope:
+        <div class="policy-scope-list">
+          <div class="policy-scope-item">
+            <div class="policy-scope-dot dot-green"></div>
+            <span><strong>NTT Data</strong> — AD restructure (24 POs) and AMS 5yr contract</span>
+          </div>
+          <div class="policy-scope-item">
+            <div class="policy-scope-dot dot-green"></div>
+            <span><strong>Cognizant</strong> — Workday ADAMS ES (Yr 3) and FINS (Yr 2)</span>
+          </div>
+          <div class="policy-scope-item">
+            <div class="policy-scope-dot dot-amber"></div>
+            <span><strong>Tech Mahindra</strong> — Techforce Service Desk and On-Site Services</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="policy-card secondary">
+      <div class="policy-card-icon">&#128274;</div>
+      <div class="policy-card-title">What VER Does Not Govern <span class="badge b-analyst">Analyst-curated</span></div>
+      <div class="policy-card-body">
+        VER <strong>monitors but does not formally govern</strong> the broader DET vendor
+        portfolio from SOW, MSP, and Fieldglass data. This provides visibility into
+        PO expiry, spend actuals, engagement status, and risk signals — without
+        formal governance commitments where VER does not hold advisory scope.<br><br>
+        Vendors outside governance scope receive:
+        <div class="policy-scope-list">
+          <div class="policy-scope-item">
+            <div class="policy-scope-dot dot-teal"></div>
+            <span>Portfolio-level monitoring via Risk Intelligence</span>
+          </div>
+          <div class="policy-scope-item">
+            <div class="policy-scope-dot dot-teal"></div>
+            <span>Renewal horizon tracking and spend alerts</span>
+          </div>
+          <div class="policy-scope-item">
+            <div class="policy-scope-dot dot-muted"></div>
+            <span>No SLA review or remediation obligation</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 2: Release calendar ── -->
+  <div class="shdr fade-in">&#128197; FY27 Quarterly Intelligence Release Calendar</div>
+  <div class="callout c-info fade-in">
+    VER publishes a <strong>Quarterly Intelligence Release on the first working day of each
+    new quarter</strong>. It covers SLA performance, spend actuals, engagement health, and
+    savings realized — delivered directly to leadership and Pillar Leads.
+    <strong>No meeting required.</strong> Click a quarter to see what it covers.
+  </div>
+  <div class="cal-wrap fade-in" id="release-cal"></div>
+
+  <!-- ── Section 3: Engagement status ── -->
+  <div class="shdr fade-in mt16">&#128202; Current Engagement Status</div>
+  <div class="callout c-info fade-in">
+    Compact status view — <strong>click any card for full SLA detail and VER notes.</strong>
+    Detailed intelligence for each engagement publishes in the quarterly release above.
+  </div>
+  <div class="eng-status-grid fade-in" id="eng-list"></div>
+
+  <!-- ── Section 4: VER's commitments ── -->
+  <div class="shdr fade-in mt16">&#9989; What VER Commits To</div>
+  <div class="commit-list fade-in">
+    <div class="commit-item">
+      <div class="commit-num">1</div>
+      <div class="commit-body">
+        <div class="commit-title">Quarterly Intelligence Release — no meeting required</div>
+        <div class="commit-desc">VER publishes a full engagement intelligence release on the first working day of each quarter. Pillar Leads and leadership receive it directly. The data speaks — no QBR scheduling friction.</div>
+      </div>
+    </div>
+    <div class="commit-item">
+      <div class="commit-num">2</div>
+      <div class="commit-body">
+        <div class="commit-title">SLA monitoring on every SOW-visible engagement</div>
+        <div class="commit-desc">Every engagement within VER governance scope has defined SLA metrics tracked quarterly. When performance deviates, VER flags it, documents it, and tracks remediation.</div>
+      </div>
+    </div>
+    <div class="commit-item">
+      <div class="commit-num">3</div>
+      <div class="commit-body">
+        <div class="commit-title">Renewal intelligence 90+ days in advance</div>
+        <div class="commit-desc">VER provides renewal analysis and recommendation at least 90 days before contract expiry for all governed engagements — giving Pillar Leads and leadership time to act, not react.</div>
+      </div>
+    </div>
+    <div class="commit-item">
+      <div class="commit-num">4</div>
+      <div class="commit-body">
+        <div class="commit-title">Transparent scope — clear about what we do and don't own</div>
+        <div class="commit-desc">VER does not overstate its role. Where VER monitors but does not govern, we say so explicitly. Pillar Leads should always know whether VER is their accountability partner or an observing intelligence layer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advisory close -->
+  <div class="advisory-close fade-in">
+    <div class="ac-eyebrow">VER Governance Posture &middot; FY27 <span class="badge b-analyst">Analyst-curated intelligence</span></div>
+    <div class="ac-text">
+      Six SOW-visible engagements are under active VER governance across three vendors.
+      NTT Data and Cognizant are performing at or above SLA targets.
+      Tech Mahindra Service Desk has three metrics under monitoring — remediation is active.
+      Q2 FY27 Intelligence Release publishes August 1, 2026.
+      No meeting required — the data comes to you.
+    </div>
+    <div class="ac-footer">
+      <span>VER Intelligence Hub &middot; Governance Posture &middot; FY27 &middot; Salesforce DET &middot; Confidential</span>
+      <span>Updated June 2026</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Modal -->
+<div class="gov-modal-backdrop" id="gov-modal-backdrop"
+     onclick="if(event.target===this)closeGovModal()">
+  <div class="gov-modal" id="gov-modal">
+    <div class="gov-modal-signal" id="gov-modal-signal"></div>
+    <div class="gov-modal-hdr">
+      <img class="gov-modal-logo" id="gov-modal-logo" src="" alt="">
+      <div class="gov-modal-info">
+        <div class="gov-modal-vendor" id="gov-modal-vendor"></div>
+        <div class="gov-modal-eng" id="gov-modal-eng"></div>
+      </div>
+      <div class="gov-modal-right">
+        <div class="gov-modal-spend" id="gov-modal-spend"></div>
+        <div class="gov-modal-spend-lbl">annual value</div>
+      </div>
+      <button type="button" class="gov-modal-close" onclick="closeGovModal()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="gov-modal-badges" id="gov-modal-badges"></div>
+    <div class="gov-modal-scroll">
+      <div class="gov-modal-section">
+        <div class="gov-modal-section-lbl">Engagement Scope</div>
+        <div class="gov-modal-desc" id="gov-modal-scope"></div>
+      </div>
+      <div class="gov-modal-section">
+        <div class="gov-modal-section-lbl">SLA Performance</div>
+        <table class="gov-sla-table" id="gov-modal-sla-table"></table>
+      </div>
+      <div class="gov-modal-section">
+        <div class="gov-modal-section-lbl">SLA Note</div>
+        <div class="gov-modal-desc" id="gov-modal-sla-note"></div>
+      </div>
+      <div class="gov-modal-notes" id="gov-modal-ver-notes"></div>
+    </div>
+    <div class="gov-modal-footer">
+      <button type="button" class="gov-modal-print" onclick="window.print()">&#128438; Print / Save PDF</button>
+      <button type="button" class="gov-modal-cancel" onclick="closeGovModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var LOGO_COLORS_G=['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB','#DC2626','#0891B2'];
+function gLogoColor(n){return LOGO_COLORS_G[(n||'').length%LOGO_COLORS_G.length];}
+function gInitials(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
+function gLogoFallback(img,name){
+  var el=document.createElement('div');
+  el.style.cssText='width:24px;height:24px;border-radius:4px;flex-shrink:0;background:'+gLogoColor(name)+';display:flex;align-items:center;justify-content:center;font-size:7pt;font-weight:800;color:#fff;font-family:Arial;';
+  el.textContent=gInitials(name);
+  img.parentNode.replaceChild(el,img);
+}
+
+// ── DATA ──────────────────────────────────────────────────────
+var GOV = {
+  engagements: [
+    {vendor:'NTT Data',domain:'nttdata.com',
+     engagement:'Application Development (Restructured)',
+     scope:'AD — 24 individual POs · ~140 resources · Sprint-velocity governed',
+     spend:'$10.0M',status:'Nominal',
+     sla_note:'SLAs not applicable post-restructure. Performance governed by sprint velocity and delivery KPIs.',
+     slas:[
+       {metric:'Sprint Velocity vs Committed',target:'Per team baseline',actual:'On track',status:'Green'},
+       {metric:'PO Utilization Rate',target:'>85%',actual:'~91%',status:'Green'},
+       {metric:'Resource Availability',target:'>95%',actual:'97%',status:'Green'}
+     ],
+     ver_notes:'AD restructure completed Apr 2026. Master PO closed Mar 15, 2026. 24 individual pillar-aligned POs executed. $9.0M savings realized.'},
+    {vendor:'NTT Data',domain:'nttdata.com',
+     engagement:'Application Maintenance Services (AMS)',
+     scope:'AMS — 5yr contract (Sep 2023–2028) · $33M+ TCV · 180-day notice',
+     spend:'$22.8M',status:'Nominal',
+     sla_note:'Nov 2025 QBR data — all SLAs meeting or exceeding targets.',
+     slas:[
+       {metric:'P1 Resolution (6hr)',target:'95%',actual:'97.8%',status:'Green'},
+       {metric:'P2 Resolution (3d)',target:'90%',actual:'93.8%',status:'Green'},
+       {metric:'Application Availability',target:'99.9%',actual:'99.9%',status:'Green'},
+       {metric:'CSAT',target:'90%',actual:'93.8%',status:'Green'}
+     ],
+     ver_notes:'AMS decentralization underway. VER monitoring scope realignment as sub-pillar contracts are established. 180-day notice period applies.'},
+    {vendor:'Cognizant',domain:'cognizant.com',
+     engagement:'Workday ADAMS — Enterprise Systems',
+     scope:'AMS · Nov 2023–Feb 2027 · Yr 3 of 3 · $202,778/mo · 350 tickets/mo baseline',
+     spend:'$2.43M',status:'Nominal',
+     sla_note:'FY26 performance — all SLAs meeting targets.',
+     slas:[
+       {metric:'P1 Response',target:'95%',actual:'100%',status:'Green'},
+       {metric:'P2 Response',target:'90%',actual:'97.8%',status:'Green'},
+       {metric:'P3 Response',target:'85%',actual:'98.5%',status:'Green'},
+       {metric:'Backlog BMI',target:'<1.1',actual:'1.015',status:'Green'}
+     ],
+     ver_notes:'Final year (Yr 3 of 3). Renewal decision required before Q1 FY28. All SLAs on target. Strong performance record throughout contract.'},
+    {vendor:'Cognizant',domain:'cognizant.com',
+     engagement:'Workday ADAMS — Financials',
+     scope:'AMS · Feb 2025–Feb 2027 · Yr 2 of 2 · $3.83M annual · L2 + L3 support',
+     spend:'$3.83M',status:'Nominal',
+     sla_note:'Active engagement — performing to scope.',
+     slas:[
+       {metric:'P1 Response',target:'95%',actual:'Meeting',status:'Green'},
+       {metric:'P2 Response',target:'90%',actual:'Meeting',status:'Green'},
+       {metric:'L3 Capacity Utilization',target:'1920 hrs/mo',actual:'Within cap',status:'Green'}
+     ],
+     ver_notes:'Year 2 of 2. Performing to scope. Renewal decision timeframe aligns with ES engagement — VER coordinating joint renewal approach.'},
+    {vendor:'Tech Mahindra',domain:'techmahindra.com',
+     engagement:'Techforce — Service Desk',
+     scope:'Managed Service · 24×7 · ~30K tickets/mo · $1.08M/yr · May 2026–Apr 2027',
+     spend:'$1.08M',status:'Monitoring',
+     sla_note:'VER monitoring Service Desk performance quarterly via SOW reporting. Three metrics currently below target.',
+     slas:[
+       {metric:'L2 Escalation Rate',target:'<8%',actual:'11.2%',status:'Red'},
+       {metric:'Misroute Rate',target:'<3%',actual:'5.1%',status:'Red'},
+       {metric:'Basecamp Closure Rate',target:'>90%',actual:'82%',status:'Red'},
+       {metric:'First Contact Resolution',target:'>75%',actual:'76.2%',status:'Green'},
+       {metric:'CSAT Score',target:'>4.0',actual:'4.1',status:'Green'}
+     ],
+     ver_notes:'Three SLA metrics below target. VER tracking remediation quarterly. Next data point: Q2 FY27 release (Aug 1). Formal governance review to be scheduled if no improvement.'},
+    {vendor:'Tech Mahindra',domain:'techmahindra.com',
+     engagement:'Techforce — On-Site Services',
+     scope:'Techbars · Deskside · AV · FedRAMP · New Hire OH · $5.45M/yr incl $1M contingency',
+     spend:'$5.45M',status:'Monitoring',
+     sla_note:'On-site services monitoring. SLAs tracked quarterly alongside Service Desk.',
+     slas:[
+       {metric:'Deskside SLA',target:'Per SOW',actual:'Nominal',status:'Green'},
+       {metric:'AV Uptime',target:'>99%',actual:'Monitoring',status:'Amber'},
+       {metric:'New Hire Onboarding',target:'Per schedule',actual:'Nominal',status:'Green'}
+     ],
+     ver_notes:'Separate SOW from Service Desk. On-site presence across DET facilities. AV uptime under observation. Performing generally to scope.'}
+  ],
+  releases:[
+    {quarter:'Q1 FY27',period:'Feb–Apr 2026',release_date:'May 1, 2026',status:'Published',
+     months:[{m:1,y:2026},{m:2,y:2026},{m:3,y:2026}],rel:{m:4,y:2026},
+     covers:'NTT AD restructure finalization · NTT AMS Q1 SLA review · Cognizant ES Yr3 progress · Cognizant FINS Yr2 status · Tech Mahindra service desk remediation baseline'},
+    {quarter:'Q2 FY27',period:'May–Jul 2026',release_date:'Aug 1, 2026',status:'Upcoming',
+     months:[{m:4,y:2026},{m:5,y:2026},{m:6,y:2026}],rel:{m:7,y:2026},
+     covers:'Mid-year engagement health · Tech Mahindra remediation progress update · Workday renewal preparation intelligence · Portfolio savings update · IBM context (if in scope)'},
+    {quarter:'Q3 FY27',period:'Aug–Oct 2026',release_date:'Nov 1, 2026',status:'Planned',
+     months:[{m:7,y:2026},{m:8,y:2026},{m:9,y:2026}],rel:{m:10,y:2026},
+     covers:'Q3 SLA summary · Workday renewal status (Nov 2026) · Cognizant ADAMS renewal planning · Portfolio savings progress toward FY27 target'},
+    {quarter:'Q4 FY27',period:'Nov 2026–Jan 2027',release_date:'Feb 1, 2027',status:'Planned',
+     months:[{m:10,y:2026},{m:11,y:2026},{m:0,y:2027}],rel:{m:1,y:2027},
+     covers:'Full-year portfolio review · FY27 savings final · Cognizant ADAMS ES renewal decision · Annual Vendor Insights Report preparation'}
+  ]
+};
+
+var MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── HELPERS ───────────────────────────────────────────────────
+function slaColor(s){
+  if(s==='Green') return {cls:'bg',label:'On Target'};
+  if(s==='Amber') return {cls:'ba',label:'Watch'};
+  if(s==='Red')   return {cls:'br',label:'Below Target'};
+  return {cls:'bz',label:s};
+}
+
+// ── RELEASE CALENDAR ──────────────────────────────────────────
+function renderCalendar(){
+  var now = new Date();
+  var nowM = now.getMonth(), nowY = now.getFullYear();
+
+  document.getElementById('release-cal').innerHTML = GOV.releases.map(function(r, qi){
+    var isUpcoming = r.status === 'Upcoming';
+    var isPublished = r.status === 'Published';
+    var badgeCls = isPublished ? 'bg' : isUpcoming ? 'ba' : 'bz';
+
+    var chips = r.months.map(function(md){
+      var isPast    = md.y < nowY || (md.y === nowY && md.m < nowM);
+      var isCurrent = md.y === nowY && md.m === nowM;
+      var cls = isCurrent ? 'cal-month current' : isPast ? 'cal-month past' : 'cal-month future';
+      return '<div class="'+cls+'">'+MONTH_NAMES[md.m]+'</div>';
+    }).join('');
+    chips += '<div class="cal-month release" title="Release publishes">'+MONTH_NAMES[r.rel.m]+'</div>';
+
+    return '<div class="cal-qtr'+(isUpcoming?' cal-active':'')+'" onclick="toggleCal('+qi+',this)">'
+      +'<div class="cal-qtr-head">'
+        +'<div class="cal-qtr-label">'+r.period+'</div>'
+        +'<div class="cal-qtr-name">'+r.quarter+'</div>'
+        +'<div class="cal-qtr-badge"><span class="badge '+badgeCls+'">'+r.status+'</span></div>'
+      +'</div>'
+      +'<div class="cal-months">'+chips+'</div>'
+      +'<div class="cal-release-row"><span class="cal-release-icon">&#9733;</span>Publishes '+r.release_date+'</div>'
+      +'<div class="cal-detail'+(isUpcoming?' open':'')+'" id="cal-'+qi+'">'
+        +'<div class="cal-detail-inner">'
+          +'<div class="cal-detail-lbl">This release covers</div>'
+          +'<div class="cal-detail-text">'+r.covers+'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function toggleCal(qi, el){
+  var detail = document.getElementById('cal-'+qi);
+  var isOpen = detail.classList.contains('open');
+  document.querySelectorAll('.cal-detail').forEach(function(d){ d.classList.remove('open'); });
+  document.querySelectorAll('.cal-qtr').forEach(function(c){ c.classList.remove('cal-active'); });
+  if(!isOpen){ detail.classList.add('open'); el.classList.add('cal-active'); }
+}
+
+// ── ENGAGEMENT STATUS GRID ────────────────────────────────────
+function renderEngagements(){
+  var nominal  = 0, monitor = 0, below = 0;
+  document.getElementById('eng-list').innerHTML = GOV.engagements.map(function(e,i){
+    var badgeCls = e.status==='Nominal' ? 'bg' : e.status==='Monitoring' ? 'ba' : 'br';
+    var cardCls  = e.status==='Monitoring' ? 'eng-status-card monitoring'
+                 : e.status==='Below Target' ? 'eng-status-card below' : 'eng-status-card';
+    var slaRed   = e.slas.filter(function(s){ return s.status==='Red'; }).length;
+    var slaOk    = e.slas.filter(function(s){ return s.status!=='Red'; }).length;
+    if(e.status==='Nominal') nominal++;
+    else if(e.status==='Monitoring') monitor++;
+    else below++;
+    return '<div class="'+cardCls+'" onclick="openModal('+i+')">'
+      +'<div class="esc-top">'
+        +'<img class="esc-logo" src="https://cdn.brandfetch.io/'+e.domain+'?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="gLogoFallback(this,this.alt)">'
+        +'<div class="esc-vendor">'+e.vendor+'</div>'
+        +'<span class="badge '+badgeCls+'">'+e.status+'</span>'
+      +'</div>'
+      +'<div class="esc-engagement">'+e.engagement+'</div>'
+      +'<div class="esc-bottom">'
+        +'<span class="esc-spend">'+e.spend+'</span>'
+        +'<div class="esc-sla-row">'
+          +(slaRed>0 ? '<span class="badge br">'+slaRed+' below</span>' : '')
+          +'<span class="badge bg">'+slaOk+' on target</span>'
+        +'</div>'
+      +'</div>'
+      +'<div class="esc-hint">Click for SLA detail &rarr;</div>'
+    +'</div>';
+  }).join('');
+  document.getElementById('g-nominal').textContent = nominal;
+  document.getElementById('g-monitor').textContent = monitor;
+  document.getElementById('g-below').textContent   = below;
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(i){
+  var e = GOV.engagements[i];
+  if(!e) return;
+  var sigColor = e.status==='Nominal' ? 'var(--green)'
+               : e.status==='Below Target' ? 'var(--red)' : 'var(--amber)';
+  var badgeCls = e.status==='Nominal' ? 'bg' : e.status==='Monitoring' ? 'ba' : 'br';
+  document.getElementById('gov-modal-signal').style.background = sigColor;
+  document.getElementById('gov-modal-logo').src = 'https://cdn.brandfetch.io/'+e.domain+'?c=1idLxwmT7Sv6VAWJq9j';
+  document.getElementById('gov-modal-vendor').textContent = e.vendor;
+  document.getElementById('gov-modal-eng').textContent = e.engagement;
+  document.getElementById('gov-modal-spend').textContent = e.spend;
+  document.getElementById('gov-modal-badges').innerHTML =
+    '<span class="badge '+badgeCls+'">'+e.status+'</span>'
+    +'<span class="badge bz">'+e.scope.split('·')[0].trim()+'</span>';
+  document.getElementById('gov-modal-scope').textContent = e.scope;
+  document.getElementById('gov-modal-sla-note').textContent = e.sla_note;
+  document.getElementById('gov-modal-ver-notes').innerHTML = '<strong>VER Notes:</strong> '+e.ver_notes;
+  document.getElementById('gov-modal-sla-table').innerHTML =
+    '<thead><tr>'
+    +'<th class="gov-sla-th">Metric</th>'
+    +'<th class="gov-sla-th-c">Target</th>'
+    +'<th class="gov-sla-th-c">Actual</th>'
+    +'<th class="gov-sla-th-c">Status</th>'
+    +'</tr></thead><tbody>'
+    +e.slas.map(function(s){
+      var sc = slaColor(s.status);
+      return '<tr>'
+        +'<td class="gov-sla-td">'+s.metric+'</td>'
+        +'<td class="gov-sla-td-c">'+s.target+'</td>'
+        +'<td class="gov-sla-td-cw">'+s.actual+'</td>'
+        +'<td class="gov-sla-td-c"><span class="badge '+sc.cls+'">'+sc.label+'</span></td>'
+        +'</tr>';
+    }).join('')+'</tbody>';
+  document.getElementById('gov-modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeGovModal(){
+  document.getElementById('gov-modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeGovModal(); });
+
+// ── DARK MODE ─────────────────────────────────────────────────
+function _dmToggle(){
+  var t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.textContent = t==='dark'?'☀ Light':'☾ Dark';
+}
+(function(){
+  var t; try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.textContent = t==='dark'?'☀ Light':'☾ Dark';
+})();
+
+// ── SCROLL FADE ───────────────────────────────────────────────
+(function(){
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  },{threshold:0.08});
+  document.querySelectorAll('.fade-in').forEach(function(el){ obs.observe(el); });
+})();
+
+// ── INIT ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  renderCalendar();
+  renderEngagements();
+});
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openGovHelp(){
+  HelpModal.open({
+    title: 'Governance Posture',
+    what: 'The Governance Posture page is your real-time queue for <strong>vendor compliance actions, escalations, and renewal gate decisions</strong>. It aggregates contract health signals, SOW compliance flags, and MFT data to show you which vendors need attention — and why.',
+    steps: [
+      '<strong>Read the KPI strip</strong> at the top: active engagements, at-risk contracts, escalations open, and compliance score. These are your leading indicators.',
+      '<strong>Work the Governance Queue</strong> — rows are sorted by urgency. Click any row to open the vendor detail modal with the full governance timeline, risk flags, and recommended actions.',
+      '<strong>Use the filter bar</strong> to slice by risk tier, vendor category, or action type. Focus on Critical and High items first.',
+      '<strong>Review the Engagement Calendar</strong> to track upcoming review milestones, renewal windows, and scheduled governance touchpoints.',
+      '<strong>Act from the modal</strong> — each vendor detail modal includes a recommended next action (escalate, schedule review, clear flag) with one-click navigation to the relevant tool.'
+    ],
+    tips: [
+      { icon: '&#x1F534;', title: 'Critical flags need same-week action', body: 'Any vendor in Critical status has a contractual or compliance breach risk that escalates if not addressed within the current week.' },
+      { icon: '&#x1F4C5;', title: 'Calendar milestones are binding', body: 'Renewal windows and review gates shown in the calendar reflect actual contract dates from Coupa and MFT — not estimates.' },
+      { icon: '&#x1F4CB;', title: 'Link to SOW review', body: 'Vendors with SOW compliance flags can be escalated directly to the SOW Builder for contract amendment.' },
+      { icon: '&#x1F50E;', title: 'Audit trail in modal', body: 'The governance event timeline in each modal records all past actions, flag changes, and owner assignments.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

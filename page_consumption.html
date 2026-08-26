@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Consumption Monitor · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --orange:#EA580C;--orange3:#FFF7ED;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F3F4F6;--gray2:#F9FAFB;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Hub Top Bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;
+  justify-content:space-between;padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-div{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.45);line-height:1.4;}
+.htb-meta-sub{font-size:7pt;}
+.htb-btn{padding:5px 12px;border-radius:6px;background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-size:7.5pt;
+  font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.htb-btn:hover{background:rgba(255,255,255,0.15);color:#fff;}
+.dm-btn.active{background:rgba(13,148,136,0.25);border-color:rgba(13,148,136,0.5);color:#5eead4;}
+
+/* ── Stage ── */
+.stage{background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 60%,#061020 100%);
+  position:relative;overflow:hidden;padding:48px 0 36px;}
+.stage::before{content:'';position:absolute;top:-80px;right:-80px;width:560px;height:560px;
+  background:radial-gradient(circle,rgba(13,148,136,0.07) 0%,transparent 70%);pointer-events:none;}
+.stage-inner{max-width:1200px;margin:0 auto;padding:0 48px;}
+.stage-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);letter-spacing:0.1em;
+  text-transform:uppercase;margin-bottom:10px;}
+.stage-title{font-size:26pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:4px;}
+.stage-accent{color:var(--teal);}
+.stage-pos{font-size:8.5pt;color:rgba(255,255,255,0.5);margin-bottom:28px;}
+.kpi-strip{display:flex;gap:28px;flex-wrap:wrap;}
+.kpi{min-width:110px;}
+.kpi-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;}
+.kpi.teal .kpi-val{color:var(--teal);}
+.kpi.red .kpi-val{color:#F87171;}
+.kpi.amber .kpi-val{color:#FBBF24;}
+.kpi.green .kpi-val{color:#34D399;}
+.kpi.purple .kpi-val{color:#C4B5FD;}
+.kpi-lbl{font-size:7.5pt;font-weight:600;color:rgba(255,255,255,0.45);
+  text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;}
+.kpi-sub{font-size:7pt;color:rgba(255,255,255,0.3);margin-top:2px;}
+
+/* ── Main wrapper ── */
+.cons-main{max-width:1200px;margin:0 auto;padding:24px 48px 40px;}
+
+/* ── Tab bar ── */
+.tab-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.drp-team-sel{padding:5px 10px;border:1.5px solid var(--border2);border-radius:6px;font-size:8pt;font-family:inherit;color:var(--ink2);background:#fff;cursor:pointer;}
+.tab{font-size:8pt;padding:6px 14px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--border2);background:#fff;font-family:inherit;
+  transition:all 0.15s;font-weight:600;color:var(--ink4);}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+.tab-count{font-size:7.5pt;color:var(--ink4);margin-left:auto;}
+
+/* ── View containers ── */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── Cards ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.card-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.card-sub{font-size:8pt;color:var(--ink4);margin-bottom:12px;}
+
+/* ── Overview grid ── */
+.tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;align-items:start;}
+@media(max-width:1100px){.tool-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.tool-grid{grid-template-columns:1fr;}}
+.tool-grid .cat-hdr:first-child{margin-top:0;}
+.tool-card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.05);
+  transition:box-shadow 0.2s,transform 0.2s;}
+.tool-card:hover{box-shadow:0 4px 14px rgba(15,30,60,0.10);transform:translateY(-1px);}
+.tc-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.tc-logo{width:30px;height:30px;border-radius:7px;background:var(--gray);
+  display:flex;align-items:center;justify-content:center;font-size:12pt;flex-shrink:0;overflow:hidden;}
+.tc-logo img{width:26px;height:26px;object-fit:contain;border-radius:3px;}
+.tc-head{flex:1;min-width:0;}
+.tc-name{font-size:9pt;font-weight:800;color:var(--navy);line-height:1.2;}
+.tc-type{font-size:7pt;color:var(--ink4);margin-top:1px;}
+.tc-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+.tc-util{margin-bottom:10px;}
+.tc-util-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
+.tc-util-lbl{font-size:7.5pt;font-weight:600;color:var(--ink3);}
+.tc-util-pct{font-size:9pt;font-weight:900;}
+.tc-track{background:var(--gray);border-radius:4px;height:6px;overflow:hidden;}
+.tc-fill{height:6px;border-radius:4px;transition:width 1s ease;}
+.tc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.tc-stat{background:var(--gray2);border-radius:6px;padding:6px 8px;text-align:center;}
+.tc-stat-val{font-size:9.5pt;font-weight:900;color:var(--navy);line-height:1;}
+.tc-stat-lbl{font-size:6pt;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;}
+.tc-stat.waste-stat .tc-stat-val{color:var(--red);}
+.tc-stat.idle-stat .tc-stat-val{color:var(--amber);}
+.tc-footer{display:flex;justify-content:space-between;align-items:center;
+  padding-top:8px;border-top:1px solid var(--gray3);}
+.tc-renewal{font-size:7pt;color:var(--ink4);}
+.tc-renewal strong{color:var(--ink3);}
+.tc-renewal-owner{font-size:6.5pt;color:var(--ink4);}
+.tc-trend{font-size:7.5pt;font-weight:700;}
+.tc-seat-btn{padding:4px 10px;border-radius:6px;background:var(--navy3);
+  border:1px solid rgba(30,58,95,0.25);color:var(--navy2);font-size:7pt;
+  font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.tc-seat-btn:hover{background:var(--navy);color:#fff;}
+.tc-seat-btn.disabled{opacity:0.4;cursor:default;pointer-events:none;}
+
+/* ── Seat overuse indicator ── */
+.tc-overuse{display:flex;align-items:center;gap:6px;padding:6px 10px;
+  background:var(--red3);border-radius:6px;font-size:8pt;color:var(--red2);
+  font-weight:700;margin-bottom:10px;}
+
+/* ── Stat banner ── */
+.stat-grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.stat{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;border-top:3px solid var(--navy);}
+.stat.teal{border-top-color:var(--teal);}
+.stat.green{border-top-color:var(--green);}
+.stat.amber{border-top-color:var(--amber);}
+.stat.red{border-top-color:var(--red);}
+.stat.purple{border-top-color:var(--purple);}
+.stat-val{font-size:18pt;font-weight:900;color:var(--navy);line-height:1;margin-bottom:3px;}
+.stat.teal .stat-val{color:var(--teal);}
+.stat.green .stat-val{color:var(--green);}
+.stat.amber .stat-val{color:var(--amber);}
+.stat.red .stat-val{color:var(--red);}
+.stat.purple .stat-val{color:var(--purple);}
+.stat-lbl{font-size:7.5pt;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;}
+.stat-note{font-size:7pt;color:var(--ink4);margin-top:4px;}
+
+/* ── Tables ── */
+.vt{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.vt th{background:var(--navy);color:#fff;padding:8px 12px;text-align:left;
+  font-size:7.5pt;font-weight:700;letter-spacing:0.03em;position:sticky;top:0;}
+.vt td{padding:9px 12px;border-bottom:1px solid var(--gray3);vertical-align:middle;}
+.vt tr:hover td{background:var(--gray2);}
+.vt tr:last-child td{border-bottom:none;}
+.tbl-card{border-radius:10px;overflow:hidden;border:1px solid var(--border);
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);margin-bottom:14px;overflow-x:auto;}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  padding:2px 7px;border-radius:10px;white-space:nowrap;}
+.b-green{background:var(--green3);color:var(--green2);}
+.b-amber{background:var(--amber3);color:var(--amber2);}
+.b-red{background:var(--red3);color:var(--red2);}
+.b-navy{background:var(--navy3);color:var(--navy2);}
+.b-teal{background:var(--teal3);color:var(--teal2);}
+.b-gray{background:var(--gray3);color:var(--ink4);}
+.b-orange{background:var(--orange3);color:var(--orange);}
+.b-purple{background:var(--purple3);color:var(--purple);}
+
+/* ── Progress bars ── */
+.prog-track{flex:1;background:var(--gray3);border-radius:4px;height:8px;overflow:hidden;}
+.prog-fill{height:8px;border-radius:4px;}
+.prog-green{background:#059669;}
+.prog-amber{background:#D97706;}
+.prog-orange{background:#EA580C;}
+.prog-red{background:#DC2626;}
+.prog-gray{background:#9CA3AF;}
+
+/* ── AI Contract tiles ── */
+.contracts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.contract-tile{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.ct-vendor{font-size:10pt;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.ct-meta{font-size:8pt;color:var(--ink4);margin-bottom:10px;}
+.ct-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:8.5pt;}
+.ct-row:last-child{border-bottom:none;}
+.ct-key{color:var(--ink4);}
+.ct-val{font-weight:700;color:var(--ink2);}
+.ct-badge{display:inline-block;font-size:7.5pt;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+
+/* ── Trend sparklines ── */
+.spark{display:flex;align-items:flex-end;gap:3px;height:32px;}
+.spark-bar{width:8px;border-radius:2px 2px 0 0;background:var(--navy2);opacity:0.6;
+  transition:opacity 0.15s;}
+.spark-bar:last-child{background:var(--teal);opacity:1;}
+.spark-bar.growing:last-child{background:var(--red);}
+.spark-bar.declining:last-child{background:var(--green);}
+
+/* ── Waste rank bar ── */
+.waste-bar-cell{min-width:120px;}
+.waste-bar-row{display:flex;align-items:center;gap:8px;}
+.waste-bar-track{flex:1;background:var(--gray3);border-radius:3px;height:8px;overflow:hidden;}
+.waste-bar-fill{height:8px;border-radius:3px;background:var(--red);}
+
+/* ── Pillar attribution ── */
+.pillar-bar{display:flex;gap:0;border-radius:6px;overflow:hidden;height:14px;margin:8px 0;}
+.pillar-seg{height:14px;position:relative;transition:opacity 0.2s;}
+.pillar-seg:hover{opacity:0.8;}
+.pillar-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.pillar-legend-item{display:flex;align-items:center;gap:5px;font-size:7.5pt;}
+.pillar-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+/* ── Seat status dots ── */
+.seat-active{color:var(--green);font-weight:700;}
+.seat-inactive{color:var(--amber);font-weight:700;}
+.seat-unassigned{color:var(--ink4);}
+
+/* ── Trend projection ── */
+.trend-row{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;margin-bottom:10px;}
+.trend-row-top{display:flex;align-items:center;gap:16px;margin-bottom:10px;}
+.trend-logo{width:28px;height:28px;border-radius:6px;background:var(--gray);
+  display:flex;align-items:center;justify-content:justify;overflow:hidden;}
+.trend-logo img{width:24px;height:24px;object-fit:contain;}
+.trend-name{font-weight:800;font-size:9.5pt;color:var(--navy);flex:1;}
+.trend-proj{font-size:8pt;color:var(--ink4);}
+.trend-proj strong{color:var(--red);}
+.trend-safe{font-size:8pt;color:var(--green);font-weight:600;}
+.trend-chart{display:flex;align-items:flex-end;gap:5px;}
+.trend-col{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:36px;}
+.trend-bar-wrap{height:44px;display:flex;align-items:flex-end;}
+.trend-bar{width:28px;border-radius:3px 3px 0 0;background:var(--navy2);opacity:0.7;
+  transition:opacity 0.2s;}
+.trend-bar:hover{opacity:1;}
+.trend-bar.last{background:var(--teal);opacity:1;}
+.trend-bar.last.growing{background:var(--red);}
+.trend-month{font-size:7pt;color:var(--ink4);}
+.trend-val{font-size:7pt;color:var(--ink4);}
+
+/* ── Section header ── */
+.sec-hdr{font-size:10pt;font-weight:800;color:var(--navy);
+  margin:20px 0 12px;padding-bottom:8px;
+  border-bottom:2px solid var(--gray3);display:flex;align-items:center;gap:8px;}
+
+/* ── Category group header (overview) ── */
+.cat-hdr{grid-column:1/-1;display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:8px;margin-top:8px;margin-bottom:2px;}
+.cat-hdr-icon{font-size:14pt;line-height:1;flex-shrink:0;}
+.cat-hdr-label{font-size:9.5pt;font-weight:900;color:var(--navy);flex:1;}
+.cat-hdr-note{font-size:7.5pt;color:var(--ink4);}
+.cat-hdr-count{font-size:7.5pt;font-weight:700;padding:2px 8px;border-radius:10px;
+  background:var(--gray3);color:var(--ink3);}
+[data-theme="dark"] .cat-hdr-label{color:var(--ink);}
+[data-theme="dark"] .cat-hdr-count{background:var(--gray3);color:var(--ink3);}
+
+/* ── Block layout (overview) ── */
+.overview-block{display:grid;grid-template-columns:2fr 1fr;gap:14px;align-items:start;margin-bottom:20px;}
+.overview-block[data-side-count="2"]{align-items:stretch;}
+.block-main{display:flex;flex-direction:column;}
+.block-main-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:10px;align-items:start;}
+.block-cat-solo{width:50%;}
+.block-main-grid--solo{grid-template-columns:1fr!important;}
+/* Equal-height cards — only for block with 2 side groups (AI coding vs AI Platform+Research) */
+.overview-block[data-side-count="2"] .block-main-grid{flex:1;grid-auto-rows:1fr;align-items:stretch;}
+.overview-block[data-side-count="2"] .block-main .tool-card{display:flex;flex-direction:column;}
+.overview-block[data-side-count="2"] .block-main .tc-footer{margin-top:auto;}
+.block-side{display:flex;flex-direction:column;gap:12px;}
+.cat-group{display:flex;flex-direction:column;gap:10px;}
+.cat-group>.cat-hdr,.block-main>.cat-hdr{margin-top:0;}
+.block-main>.block-main-grid+.cat-hdr{margin-top:12px;}
+@media(max-width:980px){.overview-block,.overview-block[data-side-count="2"]{grid-template-columns:1fr;align-items:start;}.block-side{display:grid;grid-template-columns:repeat(2,1fr);}.block-main-grid{grid-template-columns:repeat(2,1fr)!important;}}
+@media(max-width:600px){.block-side{grid-template-columns:1fr;}.block-main-grid{grid-template-columns:1fr!important;}}
+
+/* ── Callout ── */
+.callout-scope{margin-bottom:12px;}
+.cons-coming-soon{display:none;padding:64px 0;text-align:center;}
+.cons-cs-card{display:inline-block;background:#fff;border:1px solid var(--border);border-radius:14px;padding:40px 48px;max-width:480px;}
+.cons-cs-icon{font-size:22pt;margin-bottom:12px;}
+.cons-cs-title{font-size:13pt;font-weight:900;color:var(--navy);margin-bottom:8px;}
+.cons-cs-body{font-size:8.5pt;color:var(--ink4);line-height:1.6;}
+.badge-mid{vertical-align:middle;}
+.callout{border-radius:0 8px 8px 0;padding:11px 15px;margin-bottom:14px;
+  border-left:4px solid;font-size:8.5pt;line-height:1.6;}
+.callout.info{background:var(--navy3);border-color:var(--navy2);color:var(--navy2);}
+.callout.amber{background:var(--amber3);border-color:var(--amber);color:var(--amber2);}
+.callout.teal{background:var(--teal3);border-color:var(--teal);color:var(--green2);}
+.callout.red{background:var(--red3);border-color:var(--red);color:var(--red2);}
+
+/* ── Seat roster selector ── */
+.tool-selector{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.tool-selector label{font-size:8.5pt;font-weight:700;color:var(--ink3);}
+.tool-selector select{padding:6px 12px;border:1px solid var(--border2);border-radius:6px;
+  font-size:8.5pt;font-family:inherit;color:var(--ink2);background:#fff;cursor:pointer;}
+
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,13,26,0.65);
+  z-index:500;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center;
+  padding:40px 20px;overflow-y:auto;}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:800px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.25);overflow:hidden;margin:auto;}
+.modal-head{background:linear-gradient(135deg,#0F1E3C 0%,#1a3055 100%);
+  padding:20px 24px;display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-size:13pt;font-weight:900;color:#fff;line-height:1.2;}
+.modal-sub{font-size:8pt;color:rgba(255,255,255,0.5);margin-top:3px;}
+.modal-close{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.7);width:30px;height:30px;border-radius:50%;cursor:pointer;
+  font-size:16pt;display:flex;align-items:center;justify-content:center;
+  font-family:inherit;transition:all 0.15s;flex-shrink:0;margin-left:12px;}
+.modal-close:hover{background:rgba(255,255,255,0.25);color:#fff;}
+.modal-kpi-strip{display:flex;gap:0;background:var(--navy3);border-bottom:1px solid var(--border);}
+.modal-kpi{flex:1;padding:12px 16px;border-right:1px solid var(--border);text-align:center;}
+.modal-kpi:last-child{border-right:none;}
+.modal-kpi-val{font-size:13pt;font-weight:900;color:var(--navy);}
+.modal-kpi.red .modal-kpi-val{color:var(--red);}
+.modal-kpi.amber .modal-kpi-val{color:var(--amber);}
+.modal-kpi.green .modal-kpi-val{color:var(--green);}
+.modal-kpi-lbl{font-size:7pt;color:var(--ink4);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;}
+.modal-body{padding:20px 24px;}
+.modal-sec-title{font-size:9pt;font-weight:800;color:var(--navy);
+  margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--gray3);}
+.modal-sec-title:first-child{margin-top:0;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;
+  padding:14px 24px;border-top:1px solid var(--border);background:var(--gray2);}
+.modal-print-btn{padding:7px 16px;border-radius:7px;background:var(--navy);color:#fff;
+  font-size:8.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  border:none;transition:all 0.15s;}
+.modal-print-btn:hover{background:var(--navy2);}
+.modal-cancel-btn{padding:7px 16px;border-radius:7px;background:#fff;color:var(--ink3);
+  font-size:8.5pt;font-weight:600;cursor:pointer;font-family:inherit;
+  border:1px solid var(--border2);transition:all 0.15s;}
+.modal-cancel-btn:hover{background:var(--gray);}
+
+/* ── Dark mode ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#0f1c32;--gray3:#1A2D47;
+  --border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  /* ── tinted backgrounds (keep muted) ── */
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+  --purple3:rgba(124,58,237,0.15);--orange3:rgba(234,88,12,0.15);
+  /* ── flip *2 text colors to light pastels so they read on dark surfaces ── */
+  --green2:#6EE7B7;--amber2:#FDE68A;--red2:#FCA5A5;
+  --teal2:#5EEAD4;--orange:#FB923C;--purple:#C4B5FD;
+}
+[data-theme="dark"] body{background:var(--gray);}
+[data-theme="dark"] .card,
+[data-theme="dark"] .stat,
+[data-theme="dark"] .tool-card,
+[data-theme="dark"] .trend-row,
+[data-theme="dark"] .modal{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .tc-stat{background:var(--gray3);}
+[data-theme="dark"] .vt th{background:#162942;}
+[data-theme="dark"] .vt td{background:var(--gray2);border-color:var(--gray3);}
+[data-theme="dark"] .vt tr:hover td{background:var(--gray3);}
+[data-theme="dark"] .tab{background:var(--gray2);border-color:var(--border);color:var(--ink4);}
+[data-theme="dark"] .tab.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+[data-theme="dark"] .tool-selector select{background:var(--gray2);color:var(--ink2);border-color:var(--border2);}
+[data-theme="dark"] .modal-body,[data-theme="dark"] .modal-actions{background:var(--gray2);}
+[data-theme="dark"] .modal-kpi-strip{background:var(--gray3);border-color:var(--border);}
+[data-theme="dark"] .modal-kpi{border-color:var(--border);}
+[data-theme="dark"] .modal-kpi-val{color:var(--ink);}
+[data-theme="dark"] .callout.info{background:rgba(30,58,95,0.4);color:var(--ink3);}
+[data-theme="dark"] .callout.amber{background:rgba(217,119,6,0.12);border-color:rgba(253,230,138,0.4);}
+[data-theme="dark"] .callout.teal{background:rgba(13,148,136,0.12);border-color:rgba(94,234,212,0.4);}
+[data-theme="dark"] .callout.red{background:rgba(220,38,38,0.12);border-color:rgba(252,165,165,0.4);}
+[data-theme="dark"] .tbl-card{border-color:var(--border);}
+/* headings that use --navy as text color */
+[data-theme="dark"] .sec-hdr,
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .tc-name,
+[data-theme="dark"] .trend-name,
+[data-theme="dark"] .modal-sec-title{color:var(--ink);}
+[data-theme="dark"] .stat-val{color:var(--ink);}
+/* stat accent overrides so colored stat-vals stay legible */
+[data-theme="dark"] .stat.teal .stat-val{color:var(--teal);}
+[data-theme="dark"] .stat.green .stat-val{color:#34D399;}
+[data-theme="dark"] .stat.amber .stat-val{color:#FBBF24;}
+[data-theme="dark"] .stat.red .stat-val{color:#F87171;}
+[data-theme="dark"] .stat.purple .stat-val{color:var(--purple);}
+/* tc-stat values */
+[data-theme="dark"] .tc-stat-val{color:var(--ink);}
+[data-theme="dark"] .tc-stat.waste-stat .tc-stat-val{color:#F87171;}
+[data-theme="dark"] .tc-stat.idle-stat .tc-stat-val{color:#FBBF24;}
+
+/* ── Roster import ── */
+.roster-import-banner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:10px;padding:10px 14px;margin-bottom:12px;border-radius:8px;
+  background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);font-size:8.5pt;color:var(--purple);}
+.roster-import-banner--hidden{display:none;}
+.roster-import-banner-actions{display:flex;gap:8px;}
+.rib-btn{padding:4px 11px;border-radius:6px;font-size:8pt;font-weight:600;cursor:pointer;
+  font-family:inherit;border:1px solid rgba(124,58,237,0.4);background:rgba(124,58,237,0.1);
+  color:var(--purple);transition:all 0.15s;}
+.rib-btn:hover{background:rgba(124,58,237,0.2);}
+.rib-btn-clear{border-color:rgba(220,38,38,0.35);background:rgba(220,38,38,0.07);color:var(--red);}
+.rib-btn-clear:hover{background:rgba(220,38,38,0.15);}
+/* ── Layout helpers ── */
+.seat-summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.th-right{text-align:right;}
+.th-minw130{min-width:130px;}
+.callout-mt{margin-top:14px;}
+.card-mb{margin-bottom:14px;}
+.page-footer{background:#050d1a;border-top:1px solid rgba(13,148,136,0.18);padding:28px 48px;margin-top:0;}
+.page-footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:12px;}
+.footer-brand{font-size:8pt;color:rgba(255,255,255,0.4);line-height:1.7;}
+.footer-meta{font-size:7.5pt;color:rgba(255,255,255,0.25);}
+
+
+/* ── Print ── */
+@media print{
+  .hub-top-bar,.tab-bar,.stage,.modal-overlay{display:none!important;}
+  .cons-main{padding:12px;}
+  .tool-grid{grid-template-columns:1fr!important;}
+  .modal-overlay.print-open{display:block!important;position:static!important;
+    background:none!important;padding:0!important;}
+  .modal{box-shadow:none!important;max-width:100%!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Hub Top Bar ── -->
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-div"></div>
+    <span class="htb-brand">Consumption Monitor</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="htb-btn" onclick="openConsumptionHelp()">&#63; How to Use</button>
+    <button type="button" class="htb-btn dm-btn" id="dm-btn" onclick="_dmToggle()">&#9789; Dark</button>
+    <button type="button" class="htb-btn" onclick="window.print()">&#128438; Print</button>
+    <div class="htb-meta">DET Portfolio Intelligence &mdash; VER<br>
+      <span class="htb-meta-sub">FY27 Active &middot; Confidential</span></div>
+  </div>
+</nav>
+
+<!-- ── Stage ── -->
+<section class="stage">
+  <div class="stage-inner">
+    <div class="stage-eyebrow">VER Intelligence Hub · License &amp; Utilization Intelligence</div>
+    <div class="stage-title">Consumption <span class="stage-accent">Monitor</span></div>
+    <div class="stage-pos">Salesforce DET &middot; FY27 &middot; Active tracking across licensed capacity, seats, and committed spend</div>
+    <div class="kpi-strip">
+      <div class="kpi teal"><div class="kpi-val" id="kpi-spend">—</div><div class="kpi-lbl">Total License Spend</div><div class="kpi-sub">All tools monitored</div></div>
+      <div class="kpi red"><div class="kpi-val" id="kpi-waste">—</div><div class="kpi-lbl">Idle License Cost</div><div class="kpi-sub">Inactive + unassigned seats</div></div>
+      <div class="kpi amber"><div class="kpi-val" id="kpi-risk">—</div><div class="kpi-lbl">At Risk / Elevated</div><div class="kpi-sub">Utilization &gt; 80%</div></div>
+      <div class="kpi green"><div class="kpi-val" id="kpi-eff">—</div><div class="kpi-lbl">Portfolio Efficiency</div><div class="kpi-sub">Active value of spend</div></div>
+      <div class="kpi purple"><div class="kpi-val" id="kpi-tools">—</div><div class="kpi-lbl">Tools Monitored</div><div class="kpi-sub" id="kpi-tools-sub">—</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Main Content ── -->
+<div class="cons-main">
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <select id="cons-team-select" title="Select team scope" aria-label="Team scope" onchange="_consTeamChange(this.value)" class="drp-team-sel">
+      <option value="ver">VER — Delivery Assurance &amp; Ops</option>
+      <option value="dao">DA&amp;O (Full)</option>
+      <option value="det">Enterprise &amp; AI Tech (DET)</option>
+    </select>
+    <button type="button" class="tab active" onclick="switchView('overview',this)">&#128202; Overview</button>
+    <button type="button" class="tab" onclick="switchView('seats',this)">&#128101; Seat Roster</button>
+    <button type="button" class="tab" onclick="switchView('waste',this)">&#9888; Waste Analysis</button>
+    <button type="button" class="tab" onclick="switchView('pillar',this)">&#127919; Pillar Attribution</button>
+    <button type="button" class="tab" onclick="switchView('trend',this)">&#128200; Trend &amp; Projection</button>
+    <button type="button" class="tab" onclick="switchView('contracts',this)">&#128196; AI Contracts</button>
+    <span id="view-label" class="tab-count"></span>
+  </div>
+
+  <!-- Coming-soon overlay for non-VER team scopes -->
+  <div id="cons-coming-soon" class="cons-coming-soon">
+    <div class="cons-cs-card">
+      <div class="cons-cs-icon">&#128203;</div>
+      <div class="cons-cs-title" id="cons-cs-title">Coming Soon</div>
+      <div class="cons-cs-body" id="cons-cs-body">Data for this team scope is not yet available. Currently tracking VER — Delivery Assurance &amp; Ops actuals. Broader org data will be added as the hub scales.</div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────── VIEW: OVERVIEW ─────────────────────── -->
+  <div id="view-overview" class="view active">
+    <div class="callout info callout-scope">
+      <strong>Portfolio View.</strong> Overview always shows the full DET vendor portfolio regardless of team scope — all tools roll up to Enterprise &amp; AI Technology. Use the team selector to filter Seat Roster, Waste Analysis, Trend, and KPI tiles to a specific team's managed tools.
+    </div>
+    <div class="callout amber callout-scope" id="cons-scope-callout">
+      <strong>Monitoring Scope.</strong> <span class="badge b-teal badge-mid">VER Managed</span> = within governance scope. <span class="badge b-purple badge-mid">Monitoring · Pillar Distribution</span> = AI tools tracked in support of pillar cost attribution. <span class="badge b-gray badge-mid">Monitoring</span> = informational — spend decisions rest with the Pillar Lead.
+    </div>
+    <div id="overview-grid"></div>
+  </div>
+
+  <!-- ─────────────────────── VIEW: SEAT ROSTER ─────────────────────── -->
+  <div id="view-seats" class="view">
+    <div id="roster-import-banner" class="roster-import-banner roster-import-banner--hidden">
+      <span id="roster-import-banner-text"></span>
+      <div class="roster-import-banner-actions">
+        <a href="team_portal.html#roster-manager" class="rib-btn">&#9998; Manage in Team Portal</a>
+        <button type="button" class="rib-btn rib-btn-clear" onclick="clearRosterImport()">&#10005; Clear</button>
+      </div>
+    </div>
+    <div class="tool-selector">
+      <label for="seat-tool-select">Tool:</label>
+      <select id="seat-tool-select" onchange="renderSeatRoster(this.value)" title="Select tool to view seat roster"></select>
+    </div>
+    <div id="seat-summary-strip" class="seat-summary-strip"></div>
+    <div class="tbl-card">
+      <table class="vt" id="seat-table">
+        <thead>
+          <tr>
+            <th>Name / Account</th>
+            <th>Role / Title</th>
+            <th>Pillar</th>
+            <th>Status</th>
+            <th>Last Active</th>
+            <th class="th-right">Annual Cost</th>
+          </tr>
+        </thead>
+        <tbody id="seat-tbody"></tbody>
+      </table>
+    </div>
+    <div class="callout teal callout-mt">
+      <strong>Cost per seat</strong> is derived from contract value divided by licensed quantity. Inactive seats represent licenses not actively consumed — candidates for reclamation at next renewal.
+    </div>
+  </div>
+
+  <!-- ─────────────────────── VIEW: WASTE ANALYSIS ─────────────────────── -->
+  <div id="view-waste" class="view">
+    <div id="waste-callout" class="callout red"></div>
+    <div class="sec-hdr">Idle License Cost — Ranked by Waste $</div>
+    <div class="tbl-card">
+      <table class="vt" id="waste-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Type</th>
+            <th>Licensed</th>
+            <th>Active</th>
+            <th>Idle Units</th>
+            <th>Unit Cost</th>
+            <th>Waste $</th>
+            <th>% Wasted</th>
+            <th class="th-minw130">Waste Scale</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="waste-tbody"></tbody>
+      </table>
+    </div>
+    <div class="callout info callout-mt">
+      <strong>Note:</strong> AWS EDP committed spend is excluded from idle cost — uncommitted EDP envelope is a contractual commitment tracker, not idle license waste. It is shown separately in the Trend view.
+    </div>
+  </div>
+
+  <!-- ─────────────────────── VIEW: PILLAR ATTRIBUTION ─────────────────────── -->
+  <div id="view-pillar" class="view">
+    <div class="callout info callout-scope">
+      <strong>Org-Wide View.</strong> Pillar Attribution always reflects the full DET portfolio — it is not filtered by team scope. This view is designed to show how spend distributes across all organizational pillars simultaneously. As more teams are added to the hub, this view becomes more complete automatically.
+    </div>
+    <div class="sec-hdr">Spend Attribution by DET Pillar</div>
+    <div id="pillar-bar-card" class="card card-mb"></div>
+    <div class="tbl-card">
+      <table class="vt" id="pillar-table">
+        <thead>
+          <tr>
+            <th>Pillar</th>
+            <th class="th-right">Allocated Spend</th>
+            <th class="th-right">Active Spend</th>
+            <th class="th-right">Idle Cost</th>
+            <th>Efficiency</th>
+            <th>Tools</th>
+          </tr>
+        </thead>
+        <tbody id="pillar-tbody"></tbody>
+      </table>
+    </div>
+    <div class="callout info callout-mt">
+      Pillar attribution is derived from seat assignments for seat-based licenses (Gartner, Claude, Okta) and from tool ownership for compute/data licenses. Seat-level attribution reflects actual seat-to-pillar mapping at last roster review.
+    </div>
+  </div>
+
+  <!-- ─────────────────────── VIEW: TREND & PROJECTION ─────────────────────── -->
+  <div id="view-trend" class="view">
+    <div class="callout teal">
+      <strong>MoM Trend &amp; Breach Projection.</strong> Charts show last 6 months of usage. Projected breach date calculated at current linear growth rate. Growing tools highlighted in red.
+    </div>
+    <div id="trend-rows"></div>
+  </div>
+
+  <!-- ─────────────────────── VIEW: AI CONTRACTS ─────────────────────── -->
+  <div id="view-contracts" class="view">
+    <div class="callout info" id="contracts-callout">
+      <strong>AI Tool Contracts.</strong> Pricing model, commitment terms, and renewal status for the 3 Cs — AI coding tools actively tracked for the selected team scope. All terms are pay-as-you-go or monthly; no long-term commitments.
+    </div>
+    <div class="contracts-grid" id="contracts-grid"></div>
+  </div>
+
+</div><!-- /cons-main -->
+
+<!-- ── Footer ── -->
+<footer class="page-footer">
+  <div class="page-footer-inner">
+    <div class="footer-brand">
+      VER Intelligence Hub &middot; License &amp; Utilization Intelligence<br>
+      Salesforce DET &middot; FY27 &middot; Confidential
+    </div>
+    <div class="footer-meta">Data updated monthly by 5th business day</div>
+  </div>
+</footer>
+
+<!-- ── Modal Root ── -->
+<div id="modal-root" class="modal-overlay" onclick="_modalBgClose(event)">
+  <div class="modal" id="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-sub" id="modal-sub"></div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-kpi-strip" id="modal-kpi-strip"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions">
+      <button type="button" class="modal-print-btn" onclick="window.print()">&#128438; Print / Save PDF</button>
+      <button type="button" class="modal-cancel-btn" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── TOOL DATA ────────────────────────────────────────────────────────
+var TOOLS = [
+  {
+    id:'gartner', vendor:'Gartner', domain:'gartner.com', cat:'research',
+    type_label:'Seat License', is_seat:true,
+    licensed:32, active:30, inactive:1, unassigned:1,
+    unit_cost:37500, contract_value:1200000,
+    renewal:'2026-09-30', owner:'VER / Delivery Assurance & Ops', pillar:'Multiple',
+    ver_role:'Managed', trend:'stable',
+    mom:[29,29,30,30,31,31], mom_labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    notes:'VER manages this DET-wide engagement. 1 seat unassigned (Sam Wingo departed — pending re-assignment to DA&O). All other DET domain leads active. Review re-assignment before Sep 2026 renewal.',
+    seats:[
+      // Enterprise & AI Technology (Org President)
+      {name:'Joe Inzerillo',              role:'President, Enterprise & AI Technology', pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      // CDO
+      {name:'Alex LaBeck',               role:'Chief of Staff to Joe Inzerillo',       pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Craig Stauffer',            role:'Director, Strategy & Insights',         pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Rehan Ellani',              role:'Director, CDO',                         pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Ameeta Ambekar',            role:'Senior Director, CDO',                  pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      // IT
+      {name:'Daniel Shmitt',             role:'SVP, IT',                               pillar:'Techforce & Infra',       status:'active', last:'Jun 2026'},
+      {name:'John Hoffman',              role:'IT',                                    pillar:'Techforce & Infra',       status:'active', last:'Jun 2026'},
+      {name:'Nick Amido',                role:'Senior Director, IT',                   pillar:'Techforce & Infra',       status:'active', last:'Jun 2026'},
+      {name:'Georgi Stoev',              role:'IT',                                    pillar:'Techforce & Infra',       status:'active', last:'Jun 2026'},
+      // Emerging Technologies
+      {name:'Sasha Eysymontt',           role:'SVP, Emerging Technologies',            pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:"O'Brien Aquinde",           role:'Director, Emerging Technologies',       pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Saverio Mondelli',          role:'VP, Emerging Technologies',             pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      // Delivery Assurance & Operations
+      {name:'Roger Williams',            role:'SVP, Delivery Assurance & Ops',         pillar:'Delivery Assurance & Ops', status:'active', last:'Jun 2026'},
+      {name:'Casey Candelaria-Logan',    role:'Director, VER',                         pillar:'Delivery Assurance & Ops', status:'active', last:'Jun 2026'},
+      // Salesforce on Salesforce Technology
+      {name:'Andy White',                role:'SVP, SF on SF Technology',              pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Garth Pettijohn',           role:'VP, SF on SF Technology',               pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Amarbir Aujla',             role:'VP, SF on SF Technology',               pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Sanjeev Arora',             role:'VP, SF on SF Technology',               pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Sada Siva Rao Kanneganti',  role:'SF on SF Technology',                   pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Ross Baker',                role:'SF on SF Technology',                   pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Samir Bongale',             role:'SF on SF Technology',                   pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Seth Anderson',             role:'Senior Director, SF on SF Technology',  pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      // Data Solutions
+      {name:'Michael Andrew',            role:'SVP, Data Solutions',                   pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Vinay Gupta',               role:'VP, Data Solutions',                    pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Eric Charran',              role:'Data Solutions',                        pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Jen Atikins',               role:'Data Solutions',                        pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Derya Isler',               role:'VP, Data Solutions',                    pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Irina Malkova',             role:'Data Solutions',                        pillar:'Engineering & Delivery',  status:'inactive', last:'Jul 2026'},
+      {name:'Eshwari Chidambaram',       role:'VP, Data Solutions',                    pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Palvinder Parmar',          role:'Data Solutions',                        pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      {name:'Sonu Sharma',               role:'Data Solutions',                        pillar:'Engineering & Delivery',  status:'active', last:'Jun 2026'},
+      // Unassigned — Sam Wingo seat vacated
+      {name:'[Unassigned]', role:'DA&O', pillar:'Delivery Assurance & Ops', status:'unassigned', last:'—'},
+    ]
+  },
+  {
+    id:'conviva', vendor:'Conviva', domain:'conviva.com', cat:'data',
+    type_label:'Data License (TB/mo)', is_seat:false,
+    licensed:500, active:420, inactive:0, unassigned:80,
+    unit_cost:1600, contract_value:800000,
+    renewal:'2026-10-15', owner:'Digital Marketing Technology', pillar:'Digital Marketing Technology',
+    ver_role:'Monitoring', trend:'growing',
+    mom:[370,380,390,400,410,420], mom_labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    notes:'Usage trending +10 TB/mo. At 84% of contracted cap. At current rate, cap breach projected Oct 2026. Proactive conversation with DMT recommended.',
+    seats:[]
+  },
+  {
+    id:'claude', vendor:'Claude (Anthropic)', domain:'anthropic.com', cat:'ai_platform',
+    type_label:'Seat License (AI)', is_seat:true,
+    licensed:100, active:42, inactive:8, unassigned:50,
+    unit_cost:5000, contract_value:500000,
+    renewal:'2026-12-31', owner:'Enterprise & AI Technology', pillar:'Multiple',
+    ver_role:'Monitoring', trend:'growing',
+    mom:[28,30,33,36,40,42], mom_labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    notes:'Enterprise plan. DET usage growing as Agentforce and AI enablement expands. 58 seats unutilized — evaluate right-sizing at renewal.',
+    seats:[
+      {name:'[42 active users — roster managed by Enterprise & AI Technology]', role:'Various DET pillars', pillar:'Multiple', status:'active', last:'Jun 2026'},
+      {name:'[8 inactive users]',    role:'Deprovisioned / Transferred', pillar:'Multiple', status:'inactive',   last:'Varies'},
+      {name:'[Unassigned x50]',      role:'—',                            pillar:'—',        status:'unassigned', last:'—'},
+    ]
+  },
+  {
+    id:'newrelic', vendor:'New Relic', domain:'newrelic.com', cat:'cloud_infra',
+    type_label:'Data Ingest License', is_seat:false,
+    licensed:100, active:55, inactive:0, unassigned:45,
+    unit_cost:6000, contract_value:600000,
+    renewal:'2027-02-01', owner:'Engineering — Observability', pillar:'Engineering & Delivery',
+    ver_role:'Monitoring', trend:'stable',
+    mom:[52,53,54,55,55,55], mom_labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    notes:'Observability platform nominal. No concerns. Renewal Feb 2027 — no immediate action required.',
+    seats:[]
+  },
+  {
+    id:'sentry', vendor:'Sentry IO', domain:'sentry.io', cat:'cloud_infra',
+    type_label:'Error Volume License', is_seat:false,
+    licensed:100, active:45, inactive:0, unassigned:55,
+    unit_cost:3000, contract_value:300000,
+    renewal:'2026-07-31', owner:'Engineering — Platform', pillar:'Engineering & Delivery',
+    ver_role:'Monitoring', trend:'stable',
+    mom:[40,42,43,44,45,45], mom_labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    notes:'Error monitoring stable. Renewal Jul 2026 — coordinate with Engineering on right-sizing opportunity.',
+    seats:[]
+  },
+  {
+    id:'aws', vendor:'AWS Environment', domain:'aws.amazon.com', cat:'cloud_infra',
+    type_label:'Committed Spend (EDP)', is_seat:false,
+    licensed:100, active:72, inactive:0, unassigned:28,
+    unit_cost:172000, contract_value:17200000,
+    renewal:'2027-03-01', owner:'Infrastructure — Engineering', pillar:'Techforce & Infra',
+    ver_role:'Monitoring', trend:'stable',
+    exclude_waste:true,
+    mom:[68,69,70,71,72,72], mom_labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    notes:'EDP committed spend envelope. VER monitors vs. commitment threshold quarterly. $4.8M of committed envelope remaining for H2. On pace — no escalation.',
+    seats:[]
+  },
+  {
+    id:'okta', vendor:'Okta', domain:'okta.com', cat:'identity',
+    type_label:'User License', is_seat:true,
+    licensed:1200, active:936, inactive:200, unassigned:64,
+    unit_cost:667, contract_value:800000,
+    renewal:'2026-11-30', owner:'IT — Identity & Access', pillar:'Techforce & Infra',
+    ver_role:'Monitoring', trend:'stable',
+    mom:[910,915,920,925,930,936], mom_labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    notes:'FY27 renewal $1.27M approved. 78% seat utilization. 264 unused seats (200 inactive/deprovisioned + 64 reserved). Review inactive provisioning.',
+    seats:[
+      {name:'DET Staff — Active (936)',     role:'Various roles',              pillar:'Multiple',         status:'active',     last:'Jun 2026'},
+      {name:'Deprovisioned Users (200)',     role:'Departed / Transferred',     pillar:'Multiple',         status:'inactive',   last:'Varies'},
+      {name:'IT Reserved Accounts (64)',     role:'Service accounts / Buffer',  pillar:'Techforce & Infra',status:'unassigned', last:'—'},
+    ]
+  },
+  {
+    id:'snowflake', vendor:'Snowflake', domain:'snowflake.com', cat:'data',
+    type_label:'Compute / Storage', is_seat:false,
+    licensed:100, active:61, inactive:0, unassigned:39,
+    unit_cost:11000, contract_value:1100000,
+    renewal:'2026-08-15', owner:'Data Solutions', pillar:'Engineering & Delivery',
+    ver_role:'Monitoring', trend:'growing',
+    mom:[55,57,58,59,60,61], mom_labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    notes:'Usage trending upward with Data Solutions growth. Renewal Aug 2026 — coordinate with Data team on capacity planning and right-size.',
+    seats:[]
+  },
+  // ── VER Team AI Coding Tools · Real actuals Apr 1 – Aug 3, 2026 ──────
+  // Source: Anthropic usage dashboard export. mom values = active users/month.
+  {
+    id:'claude_code', vendor:'Claude Code', domain:'anthropic.com', cat:'ai_coding',
+    type_label:'AI Coding Agent · Consumption', is_seat:true,
+    licensed:6, active:4, inactive:0, unassigned:2,
+    unit_cost:542, contract_value:2169,
+    renewal:'Monthly', owner:'Delivery Assurance & Ops', pillar:'Delivery Assurance & Ops',
+    ver_role:'Monitoring', trend:'growing',
+    exclude_waste:true,
+    mom:[3,3,4,4], mom_labels:['Apr','May','Jun','Jul'],
+    notes:'Actuals Apr–Aug 2026: $722 spend · 1,300 messages · 16.97M no-cache tokens · $0.043/1K nc-tokens. 4 of 6 FTE active (67%). Casey = 92% of spend ($667). Consumption-based — no idle seat cost. Primary action: onboard Aditya and Erin.',
+    seats:[
+      {name:'Casey Candelaria-Logan', role:'Director, VER',       pillar:'Delivery Assurance & Ops', status:'active',     last:'Aug 2026'},
+      {name:'Mahesh',                 role:'Senior Manager, VER', pillar:'Delivery Assurance & Ops', status:'active',     last:'Aug 2026'},
+      {name:'Deborah',                role:'Manager, VER',        pillar:'Delivery Assurance & Ops', status:'active',     last:'Jul 2026'},
+      {name:'Justin',                 role:'Senior Analyst, VER', pillar:'Delivery Assurance & Ops', status:'active',     last:'Jul 2026'},
+      {name:'Aditya',                 role:'Senior Manager, VER', pillar:'Delivery Assurance & Ops', status:'unassigned', last:'—'},
+      {name:'Erin',                   role:'Senior Manager, VER', pillar:'Delivery Assurance & Ops', status:'unassigned', last:'—'},
+    ]
+  },
+  {
+    id:'cursor', vendor:'Cursor', domain:'cursor.sh', cat:'ai_coding',
+    type_label:'AI Code Editor · Seat License', is_seat:true,
+    licensed:6, active:2, inactive:1, unassigned:3,
+    unit_cost:480, contract_value:561,
+    renewal:'Monthly', owner:'Delivery Assurance & Ops', pillar:'Delivery Assurance & Ops',
+    ver_role:'Monitoring', trend:'stable',
+    mom:[2,2,3,3], mom_labels:['Apr','May','Jun','Jul'],
+    notes:'Actuals Apr–Aug 2026: $187 spend · 77 sessions · Casey + Mahesh active (2 of 6 FTE). Justin licensed but has not generated usage. 4 of 6 FTE seats unused — evaluate expansion vs. consolidation with Claude Code at next renewal.',
+    seats:[
+      {name:'Casey Candelaria-Logan', role:'Director, VER',       pillar:'Delivery Assurance & Ops', status:'active',     last:'Aug 2026'},
+      {name:'Mahesh',                 role:'Senior Manager, VER', pillar:'Delivery Assurance & Ops', status:'active',     last:'Jul 2026'},
+      {name:'Justin',                 role:'Senior Analyst, VER', pillar:'Delivery Assurance & Ops', status:'inactive',   last:'—'},
+      {name:'Aditya',                 role:'Senior Manager, VER', pillar:'Delivery Assurance & Ops', status:'unassigned', last:'—'},
+      {name:'Deborah',                role:'Manager, VER',        pillar:'Delivery Assurance & Ops', status:'unassigned', last:'—'},
+      {name:'Erin',                   role:'Senior Manager, VER', pillar:'Delivery Assurance & Ops', status:'unassigned', last:'—'},
+    ]
+  },
+  {
+    id:'codex', vendor:'Codex (OpenAI)', domain:'openai.com', cat:'ai_coding',
+    type_label:'AI Coding CLI · Consumption', is_seat:false,
+    licensed:6, active:3, inactive:0, unassigned:3,
+    unit_cost:42, contract_value:84,
+    renewal:'Pay-as-you-go', owner:'Delivery Assurance & Ops', pillar:'Delivery Assurance & Ops',
+    ver_role:'Monitoring', trend:'stable',
+    exclude_waste:true,
+    mom:[1,1,2,2], mom_labels:['Apr','May','Jun','Jul'],
+    notes:'Actuals Apr–Aug 2026: $28 spend · 94 sessions · 3 active users. Casey leads by tokens + spend (2.4M nc-tokens, 1,940 cr); Mahesh leads by session count (42 sessions); Justin early-stage (16 sessions). Lowest cost-per-session in portfolio. Consumption-based — no idle seat cost. No action needed.',
+    seats:[]
+  },
+  {
+    id:'windsurf', vendor:'Windsurf', domain:'codeium.com', cat:'ai_coding',
+    type_label:'AI Code Editor · Seat License', is_seat:true,
+    licensed:0, active:0, inactive:0, unassigned:0,
+    unit_cost:0, contract_value:0,
+    renewal:'Not contracted', owner:'Delivery Assurance & Ops', pillar:'Delivery Assurance & Ops',
+    ver_role:'Monitoring', trend:'stable',
+    mom:[0,0,0,0], mom_labels:['Apr','May','Jun','Jul'],
+    notes:'No active contract for DA&O. No usage Apr–Aug 2026. Listed for portfolio awareness — evaluate for potential future adoption as an alternative AI code editor.',
+    seats:[
+    ]
+  },
+];
+
+// ── CATEGORY METADATA ────────────────────────────────────────────────
+var CAT_META = {
+  ai_coding:   { label:'AI Coding Tools',          icon:'🤖', accent:'#7C3AED', note:'Monitoring · Pillar Distribution · DA&O actuals Apr–Aug 2026' },
+  ai_platform: { label:'AI Platforms',             icon:'✨', accent:'#D97706', note:'Enterprise AI licensing' },
+  research:    { label:'Research & Intelligence',  icon:'📚', accent:'#0D9488', note:'Market research & advisory' },
+  data:        { label:'Data & Analytics',         icon:'📊', accent:'#2563EB', note:'Data infrastructure & analytics' },
+  cloud_infra: { label:'Cloud & Infrastructure',   icon:'☁️', accent:'#059669', note:'Compute, observability & monitoring' },
+  identity:    { label:'Identity & Access',        icon:'🔐', accent:'#EA580C', note:'IAM & provisioning' }
+};
+
+// Two-block layout: each block = { main: cat or [cat,cat] (stacked), side: [cat...] }
+var BLOCK_LAYOUT = [
+  { main:'ai_coding',                side:['ai_platform','research']  },
+  { main:['cloud_infra','identity'],  side:['data']                   }
+];
+
+// ── COLORS ────────────────────────────────────────────────────────────
+var PILLAR_COLORS = {
+  'Delivery Assurance & Ops':'#0D9488',
+  'Finance':'#2563EB',
+  'Security':'#DC2626',
+  'Revenue Operations':'#7C3AED',
+  'Techforce & Infra':'#D97706',
+  'Engineering & Delivery':'#059669',
+  'Partner & Sales BPG':'#EA580C',
+  'Employee Success':'#0891B2',
+  'M&A':'#6B7280',
+  'Digital Marketing Technology':'#C026D3',
+  'Multiple':'#374151',
+  '—':'#9CA3AF'
+};
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function fmtM(n){
+  if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
+  if(n>=1000) return '$'+(n/1000).toFixed(0)+'K';
+  return '$'+Math.round(n);
+}
+function fmtK(n){
+  if(n>=1000) return '$'+(n/1000).toFixed(0)+'K';
+  return '$'+Math.round(n);
+}
+function fmtSeatCost(tool, seat) {
+  var multiplier = seat.name.indexOf('x50') >= 0 ? 50 : (seat.name.match(/\((\d+)\)/) ? parseInt(seat.name.match(/\((\d+)\)/)[1]) : 1);
+  var cost = tool.unit_cost * multiplier;
+  if (tool.cat === 'ai_coding' && tool.exclude_waste) return '~'+fmtM(cost)+'/yr est.';
+  return fmtK(cost)+'/yr';
+}
+function utilPct(t){ return Math.round((t.active/t.licensed)*100); }
+function wasteCost(t){
+  if(t.exclude_waste) return 0;
+  var idle = t.inactive + t.unassigned;
+  return idle * t.unit_cost;
+}
+function activeCost(t){ return t.active * t.unit_cost; }
+function getRisk(pct){
+  if(pct<=60) return {level:'Nominal', cls:'b-green', bar:'prog-green', txt:'#059669', label:'🟢 Nominal'};
+  if(pct<=80) return {level:'Monitor', cls:'b-amber', bar:'prog-amber', txt:'#D97706', label:'🟡 Monitor'};
+  if(pct<=90) return {level:'Elevated',cls:'b-orange',bar:'prog-orange',txt:'#EA580C', label:'🟠 Elevated'};
+  if(pct<100) return {level:'Critical',cls:'b-red',   bar:'prog-red',  txt:'#DC2626', label:'🔴 Critical'};
+  return              {level:'Exceeded',cls:'b-red',  bar:'prog-red',  txt:'#7F1D1D', label:'🚨 Exceeded'};
+}
+function trendMeta(t){
+  var cfg = {growing:{icon:'↑',cls:'cons-trend-growing',color:'#DC2626'},
+             stable: {icon:'→',cls:'',color:'#6B7280'},
+             declining:{icon:'↓',cls:'',color:'#059669'}};
+  return cfg[t]||cfg.stable;
+}
+function projBreach(tool){
+  var m = tool.mom;
+  if(!m||m.length<2) return null;
+  var n = m.length;
+  var slope = (m[n-1]-m[0])/(n-1);
+  if(slope<=0) return null;
+  var months = Math.ceil((tool.licensed - m[n-1]) / slope);
+  if(months>48) return null;
+  var d = new Date(2026,5,1);
+  d.setMonth(d.getMonth()+months);
+  return d.toLocaleString('en-US',{month:'short',year:'numeric'});
+}
+
+// ── KPI STRIP ─────────────────────────────────────────────────────────
+function renderKPIs(){
+  var tools = _getTeamTools();
+  var totalSpend = tools.reduce(function(a,t){return a+t.contract_value;},0);
+  var totalWaste = tools.reduce(function(a,t){return a+wasteCost(t);},0);
+  var atRisk = tools.filter(function(t){return utilPct(t)>80;}).length;
+  var totalActive = tools.reduce(function(a,t){return a+activeCost(t);},0);
+  var eff = totalSpend > 0 ? Math.round((totalActive/totalSpend)*100) : 0;
+  document.getElementById('kpi-spend').textContent = fmtM(totalSpend);
+  document.getElementById('kpi-waste').textContent = fmtM(totalWaste);
+  document.getElementById('kpi-risk').textContent  = atRisk;
+  document.getElementById('kpi-eff').textContent   = eff+'%';
+  document.getElementById('kpi-tools').textContent = tools.length;
+  document.getElementById('kpi-tools-sub').textContent = tools.filter(function(t){return t.ver_role==='Monitoring';}).length+' in monitoring scope';
+}
+
+// ── VIEW: OVERVIEW ────────────────────────────────────────────────────
+function _buildCatHeader(catKey, toolsOverride) {
+  var meta = CAT_META[catKey];
+  var tools = (toolsOverride || TOOLS).filter(function(t){ return t.cat === catKey; });
+  var hdr = document.createElement('div');
+  hdr.className = 'cat-hdr';
+  hdr.style.cssText = 'background:'+hexToAlpha(meta.accent,0.07)+';border-left:3px solid '+meta.accent+';';
+  var icon = document.createElement('span');
+  icon.className = 'cat-hdr-icon';
+  icon.textContent = meta.icon;
+  var label = document.createElement('span');
+  label.className = 'cat-hdr-label';
+  label.textContent = meta.label;
+  var note = document.createElement('span');
+  note.className = 'cat-hdr-note';
+  note.textContent = meta.note;
+  var count = document.createElement('span');
+  count.className = 'cat-hdr-count';
+  count.textContent = tools.length + ' tool' + (tools.length === 1 ? '' : 's');
+  hdr.appendChild(icon);
+  hdr.appendChild(label);
+  hdr.appendChild(note);
+  hdr.appendChild(count);
+  return hdr;
+}
+
+function _buildCatGroup(catKey, toolsOverride) {
+  var tools = (toolsOverride || TOOLS).filter(function(t){ return t.cat === catKey; });
+  if (!tools.length) return null;
+  var group = document.createElement('div');
+  group.className = 'cat-group';
+  group.appendChild(_buildCatHeader(catKey, toolsOverride));
+  tools.forEach(function(t){ group.appendChild(_buildToolCard(t)); });
+  return group;
+}
+
+function renderOverview(){
+  var container = document.getElementById('overview-grid');
+  container.textContent = '';
+
+  BLOCK_LAYOUT.forEach(function(block) {
+    var mainCats = Array.isArray(block.main) ? block.main : [block.main];
+    var hasAny = mainCats.some(function(c){ return TOOLS.some(function(t){ return t.cat===c; }); });
+    if (!hasAny) return;
+
+    var blockEl = document.createElement('div');
+    blockEl.className = 'overview-block';
+    blockEl.dataset.sideCount = block.side.length;
+
+    // main column — one section per cat key
+    var mainCol = document.createElement('div');
+    mainCol.className = 'block-main';
+    mainCats.forEach(function(catKey, idx) {
+      var tools = TOOLS.filter(function(t){ return t.cat === catKey; });
+      if (!tools.length) return;
+      var catHdr = _buildCatHeader(catKey);
+      var mainGrid = document.createElement('div');
+      mainGrid.className = 'block-main-grid' + (tools.length === 1 ? ' block-main-grid--solo' : '');
+      tools.forEach(function(t){ mainGrid.appendChild(_buildToolCard(t)); });
+      if (tools.length === 1) {
+        var soloWrap = document.createElement('div');
+        soloWrap.className = 'block-cat-solo';
+        soloWrap.appendChild(catHdr);
+        soloWrap.appendChild(mainGrid);
+        mainCol.appendChild(soloWrap);
+      } else {
+        mainCol.appendChild(catHdr);
+        mainCol.appendChild(mainGrid);
+      }
+    });
+    blockEl.appendChild(mainCol);
+
+    // side column — stacked cat groups
+    var sideCol = document.createElement('div');
+    sideCol.className = 'block-side';
+    block.side.forEach(function(catKey) {
+      var group = _buildCatGroup(catKey);
+      if (group) sideCol.appendChild(group);
+    });
+    blockEl.appendChild(sideCol);
+
+    container.appendChild(blockEl);
+  });
+
+  document.getElementById('view-label').textContent = TOOLS.length + ' tools';
+}
+
+function _buildToolCard(t) {
+  var pct = utilPct(t);
+  var risk = getRisk(pct);
+  var waste = wasteCost(t);
+  var idleUnits = t.inactive + t.unassigned;
+
+  var card = document.createElement('div');
+  card.className = 'tool-card';
+
+  // top row
+  var tcTop = document.createElement('div');
+  tcTop.className = 'tc-top';
+  var logoDiv = document.createElement('div');
+  logoDiv.className = 'tc-logo';
+  var logoImg = document.createElement('img');
+  logoImg.src = 'https://cdn.brandfetch.io/'+t.domain+'?c=1idLxwmT7Sv6VAWJq9j';
+  logoImg.alt = '';
+  var firstChar = t.vendor[0];
+  logoImg.onerror = function(){ this.parentElement.textContent = firstChar; };
+  logoDiv.appendChild(logoImg);
+  var head = document.createElement('div');
+  head.className = 'tc-head';
+  var nameEl = document.createElement('div');
+  nameEl.className = 'tc-name';
+  nameEl.textContent = t.vendor;
+  var typeEl = document.createElement('div');
+  typeEl.className = 'tc-type';
+  typeEl.textContent = t.type_label;
+  var badgesDiv = document.createElement('div');
+  badgesDiv.className = 'tc-badges';
+  var roleBadge = document.createElement('span');
+  var isAiMonitored = t.ver_role!=='Managed' && (t.cat==='ai_coding'||t.cat==='ai_platform');
+  roleBadge.className = 'badge ' + (t.ver_role==='Managed' ? 'b-teal' : isAiMonitored ? 'b-purple' : 'b-gray');
+  roleBadge.textContent = t.ver_role==='Managed' ? 'VER Managed' : isAiMonitored ? 'Monitoring · Pillar Distribution' : 'Monitoring';
+  var riskBadge = document.createElement('span');
+  riskBadge.className = 'badge ' + risk.cls;
+  riskBadge.textContent = risk.label;
+  var trendM = trendMeta(t.trend);
+  var trendSpan = document.createElement('span');
+  trendSpan.className = 'tc-trend';
+  trendSpan.dataset.color = trendM.color;
+  trendSpan.style.color = trendM.color;
+  trendSpan.textContent = trendM.icon + ' ' + t.trend.charAt(0).toUpperCase() + t.trend.slice(1);
+  badgesDiv.appendChild(roleBadge);
+  badgesDiv.appendChild(riskBadge);
+  badgesDiv.appendChild(trendSpan);
+  head.appendChild(nameEl);
+  head.appendChild(typeEl);
+  head.appendChild(badgesDiv);
+  tcTop.appendChild(logoDiv);
+  tcTop.appendChild(head);
+  card.appendChild(tcTop);
+
+  // overuse warning
+  if (t.active > t.licensed) {
+    var overuse = document.createElement('div');
+    overuse.className = 'tc-overuse';
+    overuse.textContent = '🚨 Overuse — '+Math.round(((t.active/t.licensed)-1)*100)+'% over cap. Escalation required.';
+    card.appendChild(overuse);
+  }
+
+  // utilization bar
+  var util = document.createElement('div');
+  util.className = 'tc-util';
+  var utilRow = document.createElement('div');
+  utilRow.className = 'tc-util-row';
+  var utilLbl = document.createElement('span');
+  utilLbl.className = 'tc-util-lbl';
+  utilLbl.textContent = 'Utilization';
+  var utilPctEl = document.createElement('span');
+  utilPctEl.className = 'tc-util-pct';
+  utilPctEl.style.color = risk.txt;
+  utilPctEl.textContent = pct + '%';
+  utilRow.appendChild(utilLbl);
+  utilRow.appendChild(utilPctEl);
+  var track = document.createElement('div');
+  track.className = 'tc-track';
+  var fill = document.createElement('div');
+  fill.className = 'tc-fill ' + risk.bar;
+  fill.style.width = Math.min(pct,100) + '%';
+  track.appendChild(fill);
+  util.appendChild(utilRow);
+  util.appendChild(track);
+  card.appendChild(util);
+
+  // stats row
+  var stats = document.createElement('div');
+  stats.className = 'tc-stats';
+  function mkStat(val, lbl, extraClass) {
+    var s = document.createElement('div');
+    s.className = 'tc-stat' + (extraClass ? ' '+extraClass : '');
+    var v = document.createElement('div');
+    v.className = 'tc-stat-val';
+    v.textContent = typeof val === 'number' ? val.toLocaleString() : val;
+    var l = document.createElement('div');
+    l.className = 'tc-stat-lbl';
+    l.textContent = lbl;
+    s.appendChild(v);
+    s.appendChild(l);
+    return s;
+  }
+  stats.appendChild(mkStat(t.active, 'Active'));
+  stats.appendChild(mkStat(idleUnits, 'Idle Units', 'idle-stat'));
+  stats.appendChild(mkStat(waste > 0 ? fmtK(waste) : '—', t.exclude_waste ? 'EDP Env.' : 'Idle Cost', 'waste-stat'));
+  card.appendChild(stats);
+
+  // footer
+  var footer = document.createElement('div');
+  footer.className = 'tc-footer';
+  var renewal = document.createElement('div');
+  renewal.className = 'tc-renewal';
+  var contractStrong = document.createElement('strong');
+  contractStrong.textContent = fmtM(t.contract_value);
+  var renewStrong = document.createElement('strong');
+  renewStrong.textContent = t.renewal;
+  var ownerSpan = document.createElement('span');
+  ownerSpan.className = 'tc-renewal-owner';
+  ownerSpan.textContent = 'Owner: ' + t.owner;
+  renewal.appendChild(document.createTextNode('Contract: '));
+  renewal.appendChild(contractStrong);
+  renewal.appendChild(document.createTextNode(' · Renew '));
+  renewal.appendChild(renewStrong);
+  renewal.appendChild(document.createElement('br'));
+  renewal.appendChild(ownerSpan);
+  var seatBtn = document.createElement('button');
+  seatBtn.type = 'button';
+  if (t.is_seat) {
+    seatBtn.className = 'tc-seat-btn';
+    seatBtn.textContent = '👥 View Seats';
+    (function(id){ seatBtn.onclick = function(){ openModal(id); }; })(t.id);
+  } else {
+    seatBtn.className = 'tc-seat-btn disabled';
+    seatBtn.textContent = 'No seat roster';
+  }
+  footer.appendChild(renewal);
+  footer.appendChild(seatBtn);
+  card.appendChild(footer);
+
+  return card;
+}
+
+// ── VIEW: SEAT ROSTER ─────────────────────────────────────────────────
+function renderSeatView(){
+  var tools = _getTeamTools();
+  var sel = document.getElementById('seat-tool-select');
+  sel.innerHTML = tools.filter(function(t){return t.is_seat;}).map(function(t){
+    return '<option value="'+t.id+'">'+t.vendor+'</option>';
+  }).join('');
+  if(sel.options.length>0) renderSeatRoster(sel.options[0].value);
+}
+function renderSeatRoster(id){
+  var tool = TOOLS.find(function(t){return t.id===id;});
+  if(!tool){return;}
+  var idleUnits = tool.inactive+tool.unassigned;
+  var waste = wasteCost(tool);
+  var strip = document.getElementById('seat-summary-strip');
+  strip.innerHTML =
+    '<div class="stat teal"><div class="stat-val">'+tool.licensed+'</div><div class="stat-lbl">Licensed</div></div>'+
+    '<div class="stat green"><div class="stat-val">'+tool.active+'</div><div class="stat-lbl">Active</div></div>'+
+    '<div class="stat amber"><div class="stat-val">'+idleUnits+'</div><div class="stat-lbl">Idle / Unassigned</div></div>'+
+    '<div class="stat red"><div class="stat-val">'+(waste>0?fmtK(waste):'—')+'</div><div class="stat-lbl">Idle Cost / yr</div></div>';
+  // Cost column header — flag consumption tools as estimated
+  var costColHdr = document.querySelector('#seat-table thead tr th:last-child');
+  if (costColHdr) {
+    costColHdr.textContent = tool.exclude_waste ? 'Est. Annual Cost' : 'Annual Cost';
+  }
+
+  var tbody = document.getElementById('seat-tbody');
+  tbody.innerHTML = tool.seats.map(function(s){
+    var statusHtml;
+    if(s.status==='active') statusHtml='<span class="seat-active">&#9679; Active</span>';
+    else if(s.status==='inactive') statusHtml='<span class="seat-inactive">&#9679; Inactive</span>';
+    else statusHtml='<span class="seat-unassigned">&#9675; Unassigned</span>';
+    var costFmt = fmtSeatCost(tool, s);
+    var rowStyle = s.status!=='active' ? ' style="opacity:0.75;"' : '';
+    return '<tr'+rowStyle+'>'
+      +'<td style="font-weight:700">'+s.name+'</td>'
+      +'<td style="color:var(--ink4)">'+s.role+'</td>'
+      +'<td>'
+        +(s.pillar!=='—'
+          ?'<span style="font-size:7.5pt;display:inline-block;padding:2px 7px;border-radius:10px;background:'
+            +hexToAlpha(PILLAR_COLORS[s.pillar]||'#374151',0.12)+';color:'+(PILLAR_COLORS[s.pillar]||'#374151')+'">'+s.pillar+'</span>'
+          :'<span style="color:var(--ink4)">—</span>')
+      +'</td>'
+      +'<td>'+statusHtml+'</td>'
+      +'<td style="color:var(--ink4)">'+s.last+'</td>'
+      +'<td style="text-align:right;font-weight:700">'+costFmt+'</td>'
+    +'</tr>';
+  }).join('');
+}
+function hexToAlpha(hex, a){
+  var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
+
+// ── VIEW: WASTE ANALYSIS ──────────────────────────────────────────────
+function renderWasteView(){
+  var items = _getTeamTools()
+    .filter(function(t){return !t.exclude_waste;})
+    .map(function(t){
+      return {tool:t, waste:wasteCost(t), idle:t.inactive+t.unassigned, pct:Math.round(((t.inactive+t.unassigned)/t.licensed)*100)};
+    })
+    .sort(function(a,b){return b.waste-a.waste;});
+  var totalWaste = items.reduce(function(a,i){return a+i.waste;},0);
+  var maxWaste = items[0]?items[0].waste:1;
+  document.getElementById('waste-callout').innerHTML =
+    '<strong>Total idle license cost: '+fmtM(totalWaste)+'</strong> across '+items.length+' tracked tools. '+
+    'This represents spend on licenses with no active user or usage assigned. '+
+    'Reclaiming idle seats at next renewal cycle is the highest-impact efficiency action.';
+  function getAction(t,waste){
+    if(waste===0) return '<span style="color:var(--green);font-weight:600">✓ No idle cost</span>';
+    if(t.active/t.licensed>0.9) return 'Monitor — near capacity';
+    if(t.trend==='growing') return 'Hold — growing utilization';
+    return '<span style="color:var(--red);font-weight:700">Reclaim at renewal</span>';
+  }
+  var html = items.map(function(item){
+    var t = item.tool;
+    var barW = maxWaste>0?Math.round((item.waste/maxWaste)*100):0;
+    return '<tr>'+
+      '<td><strong>'+t.vendor+'</strong><br><span style="font-size:7.5pt;color:var(--ink4)">'+t.type_label+'</span></td>'+
+      '<td>'+t.type_label+'</td>'+
+      '<td style="text-align:right">'+t.licensed.toLocaleString()+'</td>'+
+      '<td style="text-align:right">'+t.active.toLocaleString()+'</td>'+
+      '<td style="text-align:right">'+item.idle.toLocaleString()+'</td>'+
+      '<td style="text-align:right">'+fmtK(t.unit_cost)+'</td>'+
+      '<td style="text-align:right;font-weight:900;color:var(--red)">'+(item.waste>0?fmtK(item.waste):'—')+'</td>'+
+      '<td style="text-align:right;font-weight:700">'+item.pct+'%</td>'+
+      '<td class="waste-bar-cell"><div class="waste-bar-row"><div class="waste-bar-track"><div class="waste-bar-fill" style="width:'+barW+'%"></div></div><span style="font-size:7.5pt;color:var(--red);white-space:nowrap">'+(item.waste>0?fmtK(item.waste):'')+'</span></div></td>'+
+      '<td>'+getAction(t,item.waste)+'</td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('waste-tbody').innerHTML = html;
+}
+
+// ── VIEW: PILLAR ATTRIBUTION ──────────────────────────────────────────
+function renderPillarView(){
+  var map = {};
+  TOOLS.forEach(function(t){
+    if(t.is_seat && t.seats.length>0){
+      t.seats.forEach(function(s){
+        var p = s.pillar==='—'?'Unassigned':s.pillar;
+        if(!map[p]) map[p]={spend:0,active:0,waste:0,tools:[]};
+        var multiplier = s.name.indexOf('x50')>=0 ? 50 : 1;
+        map[p].spend += t.unit_cost * multiplier;
+        if(s.status==='active') map[p].active += t.unit_cost * multiplier;
+        else map[p].waste += t.unit_cost * multiplier;
+        if(map[p].tools.indexOf(t.vendor)<0) map[p].tools.push(t.vendor);
+      });
+    } else {
+      var p = t.pillar;
+      if(!map[p]) map[p]={spend:0,active:0,waste:0,tools:[]};
+      map[p].spend += t.contract_value;
+      map[p].active += activeCost(t);
+      if(!t.exclude_waste) map[p].waste += wasteCost(t);
+      if(map[p].tools.indexOf(t.vendor)<0) map[p].tools.push(t.vendor);
+    }
+  });
+  var rows = Object.keys(map).filter(function(p){return p!=='Unassigned';}).sort(function(a,b){return map[b].spend-map[a].spend;});
+  var totalSpend = rows.reduce(function(a,p){return a+map[p].spend;},0);
+  var barHtml = '<div class="card-title">Portfolio Spend Distribution by Pillar</div><div class="pillar-bar">';
+  rows.forEach(function(p){
+    var pct = (map[p].spend/totalSpend)*100;
+    var color = PILLAR_COLORS[p]||'#374151';
+    barHtml += '<div class="pillar-seg" style="width:'+pct.toFixed(1)+'%;background:'+color+'" title="'+p+': '+fmtM(map[p].spend)+'"></div>';
+  });
+  barHtml += '</div><div class="pillar-legend">';
+  rows.forEach(function(p){
+    var color = PILLAR_COLORS[p]||'#374151';
+    barHtml += '<div class="pillar-legend-item"><div class="pillar-dot" style="background:'+color+'"></div><span>'+p+'</span></div>';
+  });
+  barHtml += '</div>';
+  document.getElementById('pillar-bar-card').innerHTML = barHtml;
+  var tbody = rows.map(function(p){
+    var d = map[p];
+    var eff = d.spend>0?Math.round((d.active/d.spend)*100):0;
+    var color = PILLAR_COLORS[p]||'#374151';
+    var effColor = eff>=80?'var(--green)':eff>=60?'var(--amber)':'var(--red)';
+    return '<tr>'+
+      '<td><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:'+color+';margin-right:7px;"></span><strong>'+p+'</strong></td>'+
+      '<td style="text-align:right">'+fmtM(d.spend)+'</td>'+
+      '<td style="text-align:right;color:var(--green);font-weight:700">'+fmtM(d.active)+'</td>'+
+      '<td style="text-align:right;color:var(--red);font-weight:700">'+(d.waste>0?fmtK(d.waste):'—')+'</td>'+
+      '<td><strong style="color:'+effColor+'">'+eff+'%</strong></td>'+
+      '<td style="font-size:7.5pt;color:var(--ink4)">'+d.tools.join(', ')+'</td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('pillar-tbody').innerHTML = tbody;
+}
+
+// ── VIEW: TREND & PROJECTION ──────────────────────────────────────────
+function renderTrendView(){
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var html = _getTeamTools().map(function(t){
+    var m = t.mom;
+    var maxVal = Math.max.apply(null,m);
+    var minVal = Math.min.apply(null,m);
+    var range = maxVal - minVal || 1;
+    var breach = projBreach(t);
+    var pct = utilPct(t);
+    var risk = getRisk(pct);
+    var trendM = trendMeta(t.trend);
+    var projHtml = breach
+      ? '<div class="trend-proj">At current rate, cap breach projected <strong>'+breach+'</strong></div>'
+      : '<div class="trend-safe">✓ No breach risk within 4 years</div>';
+    var bars = m.map(function(val,i){
+      var h = Math.max(4, Math.round(((val-minVal)/range)*36)+4);
+      var isLast = i===m.length-1;
+      var barClass = 'trend-bar'+(isLast?' last':'')+(isLast&&t.trend==='growing'?' growing':'');
+      return '<div class="trend-col">'+
+        '<div class="trend-bar-wrap"><div class="'+barClass+'" style="height:'+h+'px" title="'+t.mom_labels[i]+': '+val+'"></div></div>'+
+        '<div class="trend-month">'+t.mom_labels[i]+'</div>'+
+        '<div class="trend-val">'+val+'</div>'+
+      '</div>';
+    }).join('');
+    var capLine = '<span style="font-size:7.5pt;color:var(--ink4);margin-left:16px;">Cap: '+t.licensed+(t.type_label.indexOf('TB')>=0?' TB':t.is_seat?' seats':' units')+'</span>';
+    return '<div class="trend-row">'+
+      '<div class="trend-row-top">'+
+        '<div class="trend-logo"><img src="https://cdn.brandfetch.io/'+t.domain+'?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.parentElement.textContent=\''+t.vendor[0]+'\'" style="width:24px;height:24px;object-fit:contain;"></div>'+
+        '<div class="trend-name">'+t.vendor+'</div>'+
+        '<span class="badge '+risk.cls+'">'+risk.label+'</span>'+
+        '<span style="font-size:8pt;font-weight:700;color:'+trendM.color+';margin-left:6px;">'+trendM.icon+' '+t.trend+'</span>'+
+        capLine+
+      '</div>'+
+      '<div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">'+
+        '<div class="trend-chart">'+bars+'</div>'+
+        '<div>'+projHtml+
+          '<div style="font-size:7.5pt;color:var(--ink4);margin-top:4px;">'+t.notes+'</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('trend-rows').innerHTML = html;
+}
+
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────
+function switchView(id, btn){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('view-'+id).classList.add('active');
+  btn.classList.add('active');
+  var teamTools = _getTeamTools();
+  var labels = {overview:TOOLS.length+' tools', seats:teamTools.filter(function(t){return t.is_seat;}).length+' seat-licensed tools', waste:'Ranked by waste $', pillar:'By DET Pillar', trend:'MoM + Projection'};
+  document.getElementById('view-label').textContent = labels[id]||'';
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────
+function openModal(id){
+  var tool = TOOLS.find(function(t){return t.id===id;});
+  if(!tool) return;
+  var pct = utilPct(tool);
+  var risk = getRisk(pct);
+  var waste = wasteCost(tool);
+  var idleUnits = tool.inactive+tool.unassigned;
+  document.getElementById('modal-title').textContent = tool.vendor+' — License Detail';
+  document.getElementById('modal-sub').textContent = tool.type_label+' · '+tool.owner+' · Renewal '+tool.renewal;
+  document.getElementById('modal-kpi-strip').innerHTML =
+    '<div class="modal-kpi"><div class="modal-kpi-val">'+tool.licensed+'</div><div class="modal-kpi-lbl">Licensed</div></div>'+
+    '<div class="modal-kpi green"><div class="modal-kpi-val">'+tool.active+'</div><div class="modal-kpi-lbl">Active</div></div>'+
+    '<div class="modal-kpi amber"><div class="modal-kpi-val">'+idleUnits+'</div><div class="modal-kpi-lbl">Idle</div></div>'+
+    '<div class="modal-kpi red"><div class="modal-kpi-val">'+(waste>0?fmtK(waste):'—')+'</div><div class="modal-kpi-lbl">Idle Cost/yr</div></div>'+
+    '<div class="modal-kpi"><div class="modal-kpi-val">'+pct+'%</div><div class="modal-kpi-lbl">Utilization</div></div>';
+  var bodyHtml = '<div class="modal-sec-title">Cost Summary</div>'+
+    '<table style="width:100%;font-size:8.5pt;border-collapse:collapse;">'+
+    '<tr><td style="padding:6px 0;color:var(--ink4)">Contract Value</td><td style="text-align:right;font-weight:700">'+fmtM(tool.contract_value)+'/yr</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--ink4)">Unit Cost</td><td style="text-align:right;font-weight:700">'+fmtK(tool.unit_cost)+' / unit</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--ink4)">Active Cost</td><td style="text-align:right;font-weight:700;color:var(--green)">'+fmtM(activeCost(tool))+'/yr</td></tr>'+
+    (waste>0?'<tr><td style="padding:6px 0;color:var(--ink4)">Idle License Cost</td><td style="text-align:right;font-weight:700;color:var(--red)">'+fmtK(waste)+'/yr</td></tr>':'')+
+    '</table>';
+  if(tool.is_seat && tool.seats.length>0){
+    bodyHtml += '<div class="modal-sec-title">Seat Roster</div>'+
+      '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:8pt;">'+
+      '<thead><tr style="background:var(--navy);color:#fff;">'+
+        '<th style="padding:7px 10px;text-align:left;font-size:7.5pt">Name</th>'+
+        '<th style="padding:7px 10px;text-align:left;font-size:7.5pt">Role</th>'+
+        '<th style="padding:7px 10px;text-align:left;font-size:7.5pt">Pillar</th>'+
+        '<th style="padding:7px 10px;text-align:left;font-size:7.5pt">Status</th>'+
+        '<th style="padding:7px 10px;text-align:left;font-size:7.5pt">Last Active</th>'+
+        '<th style="padding:7px 10px;text-align:right;font-size:7.5pt">Cost/yr</th>'+
+      '</tr></thead><tbody>'+
+      tool.seats.map(function(s,i){
+        var statusHtml = s.status==='active'?'<span style="color:var(--green);font-weight:700">Active</span>':
+          s.status==='inactive'?'<span style="color:var(--amber);font-weight:700">Inactive</span>':
+          '<span style="color:var(--ink4)">Unassigned</span>';
+        var bg = i%2===0?'':'background:var(--gray2);';
+        var multiplier = s.name.indexOf('x50')>=0?50:1;
+        return '<tr style="'+bg+'">'+
+          '<td style="padding:7px 10px;font-weight:600">'+s.name+'</td>'+
+          '<td style="padding:7px 10px;color:var(--ink4)">'+s.role+'</td>'+
+          '<td style="padding:7px 10px">'+s.pillar+'</td>'+
+          '<td style="padding:7px 10px">'+statusHtml+'</td>'+
+          '<td style="padding:7px 10px;color:var(--ink4)">'+s.last+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;font-weight:700">'+fmtK(tool.unit_cost*multiplier)+'</td>'+
+        '</tr>';
+      }).join('')+
+      '</tbody></table></div>';
+  }
+  bodyHtml += '<div class="modal-sec-title">Notes</div><div style="font-size:8.5pt;color:var(--ink3);line-height:1.7">'+tool.notes+'</div>';
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-root').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  document.getElementById('modal-root').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function _modalBgClose(e){
+  if(e.target===document.getElementById('modal-root')) closeModal();
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape') closeModal();});
+
+// ── DARK MODE ─────────────────────────────────────────────────────────
+function _dmToggle(){
+  var t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  var btn = document.getElementById('dm-btn');
+  if(btn){btn.textContent=t==='dark'?'☀ Light':'☾ Dark';btn.classList.toggle('active',t==='dark');}
+}
+(function(){
+  var t; try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('dm-btn');
+  if(btn){btn.textContent=t==='dark'?'☀ Light':'☾ Dark';btn.classList.toggle('active',t==='dark');}
+})();
+
+// ── ROSTER IMPORT (localStorage) ─────────────────────────────────────
+var ROSTER_STORE_KEY = 'ver_roster_overrides';
+
+function applyRosterOverrides() {
+  var raw = localStorage.getItem(ROSTER_STORE_KEY);
+  if (!raw) return;
+  var overrides;
+  try { overrides = JSON.parse(raw); } catch(e) { return; }
+  TOOLS.forEach(function(t) {
+    if (overrides[t.id] && overrides[t.id].length) {
+      t.seats = overrides[t.id];
+      t._hasImport = true;
+    }
+  });
+}
+
+function _showImportBanner() {
+  var raw = localStorage.getItem(ROSTER_STORE_KEY);
+  var banner = document.getElementById('roster-import-banner');
+  if (!banner) return;
+  if (!raw) {
+    banner.classList.add('roster-import-banner--hidden');
+    return;
+  }
+  var overrides;
+  try { overrides = JSON.parse(raw); } catch(e) { banner.classList.add('roster-import-banner--hidden'); return; }
+  var toolNames = [];
+  TOOLS.forEach(function(t){ if(overrides[t.id] && overrides[t.id].length) toolNames.push(t.vendor); });
+  if (!toolNames.length) { banner.classList.add('roster-import-banner--hidden'); return; }
+  var textEl = document.getElementById('roster-import-banner-text');
+  if (textEl) textEl.textContent = '✓ Custom roster active for: ' + toolNames.join(', ') + ' — imported from CSV';
+  banner.classList.remove('roster-import-banner--hidden');
+}
+
+function clearRosterImport() {
+  localStorage.removeItem(ROSTER_STORE_KEY);
+  // restore base seats from page-load snapshot
+  TOOLS.forEach(function(t) {
+    if (t._hasImport && t._baseSeat) {
+      t.seats = t._baseSeat.slice();
+      t._hasImport = false;
+    }
+  });
+  _showImportBanner();
+  var selVal = document.getElementById('seat-tool-select').value;
+  renderSeatRoster(selVal);
+}
+
+// ── TEAM SCOPE SELECTOR ───────────────────────────────────────────────
+var CONS_TEAMS = {
+  ver: { label:'VER — Delivery Assurance & Ops', available:true,  cats:['ai_coding'] },
+  dao: { label:'DA&O (Full)',                    available:false, cats:['ai_coding','research','data'] },
+  det: { label:'Enterprise & AI Tech (DET)',     available:true,  cats:null }
+};
+var _consCurrentTeam = 'ver';
+
+// Returns the subset of TOOLS visible for the current team scope.
+// cats:null means all tools (DET-wide).
+function _getTeamTools() {
+  var team = CONS_TEAMS[_consCurrentTeam];
+  if (!team || !team.cats) return TOOLS;
+  return TOOLS.filter(function(t){ return team.cats.indexOf(t.cat) >= 0; });
+}
+
+function _consTeamChange(val) {
+  _consCurrentTeam = val;
+  var team = CONS_TEAMS[val] || CONS_TEAMS.ver;
+  var csEl   = document.getElementById('cons-coming-soon');
+  var allViews = document.querySelectorAll('.cons-main .view');
+  var callout  = document.getElementById('cons-scope-callout');
+
+  if (!team.available) {
+    csEl.style.display = 'block';
+    allViews.forEach(function(v){ v.style.display = 'none'; });
+    if (callout) callout.style.display = 'none';
+    document.getElementById('cons-cs-title').textContent = team.label + ' — Coming Soon';
+    document.getElementById('cons-cs-body').textContent =
+      'License and utilization data for ' + team.label + ' is not yet available. '
+      + 'Currently tracking VER — Delivery Assurance & Ops actuals (Apr–Aug 2026). '
+      + 'Broader org data will be added as the hub scales to Roger\'s full org.';
+  } else {
+    csEl.style.display = 'none';
+    allViews.forEach(function(v){ v.style.display = ''; });
+    if (callout) callout.style.display = '';
+    renderKPIs();
+    renderSeatView();
+    renderWasteView();
+    renderTrendView();
+    renderAIContracts();
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  // snapshot base seats before any override
+  TOOLS.forEach(function(t){ t._baseSeat = (t.seats||[]).slice(); });
+  applyRosterOverrides();
+  renderKPIs();
+  renderOverview();
+  renderSeatView();
+  _showImportBanner();
+  renderWasteView();
+  renderPillarView();
+  renderTrendView();
+  renderAIContracts();
+  document.getElementById('view-label').textContent = TOOLS.length+' tools'; // Overview is org-wide
+});
+
+var AI_CONTRACTS = {
+  ver: [
+    { vendor:'Claude Code', type:'Consumption', model:'Pay-per-token (Anthropic API)', rate:'~$0.043 / 1K no-cache tokens', commitment:'None — pure pay-as-you-go', overage:'N/A', renewal:'Monthly', status:'ok',
+      notes:'$722 spend · 1,300 messages · 16.97M no-cache tokens · Apr–Aug 2026 · Delivery Assurance & Ops. 4 of 6 FTE active. Casey = 92% of spend ($667). No commitment needed at current scale. Revisit if team expands past 8 users.' },
+    { vendor:'Cursor', type:'Seat License', model:'Cursor Pro (per-seat monthly)', rate:'~$40/seat/month (estimated)', commitment:'Per active seat', overage:'Per seat', renewal:'Monthly', status:'ok',
+      notes:'$187 spend · 77 sessions · Apr–Aug 2026 · Delivery Assurance & Ops. 2 of 6 FTE active (Casey + Mahesh). Justin licensed but has not generated usage. 4 seats unused. Evaluate expansion vs. Claude Code consolidation at renewal.' },
+    { vendor:'Codex (OpenAI)', type:'Consumption', model:'OpenAI API (pay-per-token)', rate:'Standard OpenAI API rates', commitment:'None', overage:'N/A', renewal:'Pay-as-you-go', status:'ok',
+      notes:'$28 spend · 94 sessions · 3 active users · Apr–Aug 2026 · Delivery Assurance & Ops. Casey leads by tokens + spend; Mahesh leads by session count; Justin early-stage. Lowest cost-per-session in portfolio. No action needed.' }
+  ],
+  det: [
+    { vendor:'Claude Code', type:'Consumption', model:'Pay-per-token (Anthropic API)', rate:'~$0.043 / 1K no-cache tokens', commitment:'None — pure pay-as-you-go', overage:'N/A', renewal:'Monthly', status:'ok',
+      notes:'$722 spend · 1,300 messages · 16.97M no-cache tokens · Apr–Aug 2026 · Delivery Assurance & Ops actuals. Scoped to DA&O today; will expand as adoption grows across Enterprise & AI Technology. No commitment needed at current scale.' },
+    { vendor:'Cursor', type:'Seat License', model:'Cursor Pro (per-seat monthly)', rate:'~$40/seat/month (estimated)', commitment:'Per active seat', overage:'Per seat', renewal:'Monthly', status:'ok',
+      notes:'$187 spend · 77 sessions · Apr–Aug 2026 · Delivery Assurance & Ops actuals. 2 of 6 active FTE. As Cursor expands across DET teams, evaluate enterprise tier for volume discount. Currently month-to-month — no commitment exposure.' },
+    { vendor:'Codex (OpenAI)', type:'Consumption', model:'OpenAI API (pay-per-token)', rate:'Standard OpenAI API rates', commitment:'None', overage:'N/A', renewal:'Pay-as-you-go', status:'ok',
+      notes:'$28 spend · 94 sessions · 3 active users · Apr–Aug 2026 · Delivery Assurance & Ops actuals. Lowest cost-per-session in portfolio. Pure pay-as-you-go — zero commitment risk. Track as DET adoption expands.' }
+  ]
+};
+
+function renderAIContracts() {
+  var grid = document.getElementById('contracts-grid');
+  var callout = document.getElementById('contracts-callout');
+  if (!grid) return;
+
+  var team = CONS_TEAMS[_consCurrentTeam] || CONS_TEAMS.ver;
+  var contracts = AI_CONTRACTS[_consCurrentTeam];
+
+  if (!contracts || !contracts.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--ink4);font-size:8.5pt;">'
+      + 'AI contract detail for <strong>' + team.label + '</strong> is not yet available. '
+      + 'Currently tracking Delivery Assurance &amp; Ops actuals (Apr–Aug 2026).'
+      + '</div>';
+    if (callout) callout.innerHTML = '<strong>AI Tool Contracts.</strong> Pricing model, commitment terms, and renewal status for the 3 Cs — AI coding tools actively tracked for the selected team scope. All terms are pay-as-you-go or monthly; no long-term commitments.';
+    return;
+  }
+
+  if (callout) {
+    callout.innerHTML = '<strong>AI Tool Contracts.</strong> Pricing model, commitment terms, and renewal status for the 3 Cs — AI coding tools actively tracked for <strong>' + team.label + '</strong>. All terms are pay-as-you-go or monthly; no long-term commitments.';
+  }
+
+  grid.innerHTML = contracts.map(function(c) {
+    var sBg  = c.status==='urgent' ? 'var(--red3)'   : c.status==='warn' ? 'var(--amber3)' : 'var(--green3)';
+    var sCol = c.status==='urgent' ? 'var(--red2)'   : c.status==='warn' ? 'var(--amber2)' : 'var(--green2)';
+    return '<div class="contract-tile">'
+      +'<div class="ct-vendor">'+c.vendor+'</div>'
+      +'<div class="ct-meta">'+c.type+' contract</div>'
+      +'<div class="ct-row"><span class="ct-key">Pricing model</span><span class="ct-val">'+c.model+'</span></div>'
+      +'<div class="ct-row"><span class="ct-key">Rate</span><span class="ct-val" style="font-size:8pt">'+c.rate+'</span></div>'
+      +'<div class="ct-row"><span class="ct-key">Commitment</span><span class="ct-val">'+c.commitment+'</span></div>'
+      +'<div class="ct-row"><span class="ct-key">Overage</span><span class="ct-val">'+c.overage+'</span></div>'
+      +'<div class="ct-row"><span class="ct-key">Renewal</span><span class="ct-badge" style="background:'+sBg+';color:'+sCol+'">'+c.renewal+'</span></div>'
+      +'<div style="margin-top:10px;font-size:8.5pt;color:var(--ink3);line-height:1.55;padding-top:8px;border-top:1px solid var(--border)">'+c.notes+'</div>'
+      +'</div>';
+  }).join('');
+}
+</script>
+
+<script src="assets/help-modal.js"></script>
+<script>
+function openConsumptionHelp(){
+  HelpModal.open({
+    title: 'Consumption Intelligence',
+    what: 'The Consumption Intelligence page tracks <strong>actual utilization of vendor contracts relative to entitlements</strong> — surfacing over-licensed software, under-used cloud capacity, and CW effort that isn\'t tied to active deliverables. Low utilization is money that can be recaptured at renewal.',
+    steps: [
+      '<strong>Review the utilization summary</strong> — the top strip shows the portfolio-level utilization rate. Below 70% on a software contract means you\'re paying for capacity you don\'t use.',
+      '<strong>Filter by utilization band</strong> — Critical (<50%), At Risk (50–70%), Healthy (70–90%), and Over-utilized (>90%). At-risk and critical are your renegotiation targets.',
+      '<strong>Click any vendor row</strong> to see the utilization breakdown — by feature, user, department, or time period depending on the data available.',
+      '<strong>Apply the recapture estimate</strong> — the tool models the potential renewal savings if you right-size the contract to actual utilization. This estimate feeds directly into the Scenario Planning tool.',
+      '<strong>Export the utilization report</strong> to use as evidence in a renewal negotiation — vendor-facing evidence of under-utilization is the strongest negotiation lever available.'
+    ],
+    tips: [
+      { icon: '&#x1F4C9;', title: 'Under-utilization is a negotiation asset', body: 'A vendor cannot argue against evidence that you are using 42% of your licensed capacity. Bring the utilization report into every renewal conversation.' },
+      { icon: '&#x1F4C5;', title: 'Seasonality skews the data', body: 'Some tools spike in usage at year-end or quarter-close. Check trailing 12-month averages, not just point-in-time snapshots, before making a right-sizing call.' },
+      { icon: '&#x26A0;', title: 'Over-utilization is also a risk', body: 'Consistently over 90% utilization means you\'re at risk of a vendor-imposed upgrade or overage charge. Flag these for proactive capacity review.' },
+      { icon: '&#x1F517;', title: 'Feed into TCO and Scenario', body: 'Recapture estimates from this page can be imported into the TCO Calculator as a credit line, and into Scenario Planning as a "right-size" lever.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

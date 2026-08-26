@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vendor Performance Survey &mdash; VER Intelligence Hub</title>
+<style>
+:root{
+  --font-sans:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --text-xs:11px;--text-sm:12px;--text-base:14px;--text-md:15px;
+  --text-lg:18px;--text-xl:22px;--text-2xl:28px;--text-3xl:40px;
+  --weight-regular:400;--weight-medium:500;--weight-semibold:600;
+  --weight-bold:700;--weight-extrabold:800;--weight-black:900;
+  --tracking-tight:-0.03em;--tracking-snug:-0.01em;
+  --tracking-wide:0.04em;--tracking-wider:0.10em;--tracking-widest:0.18em;
+  --leading-none:1;--leading-tight:1.2;--leading-normal:1.6;--leading-relaxed:1.75;
+  --surface-base:#060D1A;--surface-raised:#0F1E3C;--surface-overlay:#1E3A5F;
+  --surface-light:#F9FAFB;--surface-card:#FFFFFF;--surface-subtle:#F3F4F6;
+  --teal:#0D9488;--teal-dim:#0F766E;
+  --green:#059669;--amber:#D97706;--red:#DC2626;--purple:#7C3AED;--blue:#2563EB;
+  --tint-teal:#F0FDF9;--tint-green:#D1FAE5;--tint-amber:#FEF3C7;
+  --tint-red:#FEE2E2;--tint-purple:#F5F3FF;--tint-navy:#EFF6FF;
+  --text-primary:#111827;--text-secondary:#1F2937;
+  --text-tertiary:#374151;--text-muted:#6B7280;
+  --on-dark-primary:rgba(255,255,255,0.92);
+  --on-dark-secondary:rgba(255,255,255,0.65);
+  --on-dark-muted:rgba(255,255,255,0.35);
+  --on-dark-micro:rgba(255,255,255,0.22);
+  --border:#E5E7EB;--border-dark:rgba(255,255,255,0.08);
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;
+  --sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-12:48px;
+  --r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-2xl:24px;--r-full:9999px;
+  --shadow-sm:0 1px 4px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.12),0 4px 8px rgba(0,0,0,0.06);
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --dur-fast:120ms;--dur-base:200ms;--dur-slow:350ms;
+}
+[data-theme="dark"]{
+  --surface-light:#080F1E;--surface-card:#0F1E3C;--surface-subtle:#162942;
+  --text-primary:rgba(255,255,255,0.92);--text-secondary:rgba(255,255,255,0.75);
+  --text-tertiary:rgba(255,255,255,0.60);--text-muted:rgba(255,255,255,0.40);
+  --border:rgba(255,255,255,0.08);
+  --shadow-sm:0 1px 4px rgba(0,0,0,0.35);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.45);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.60);
+  --tint-teal:rgba(13,148,136,0.18);--tint-green:rgba(5,150,105,0.18);
+  --tint-amber:rgba(217,119,6,0.18);--tint-red:rgba(220,38,38,0.18);
+  --tint-purple:rgba(124,58,237,0.18);--tint-navy:rgba(255,255,255,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:var(--font-sans);
+  background:var(--surface-light);
+  color:var(--text-primary);
+  -webkit-font-smoothing:antialiased;
+  transition:background var(--dur-slow) var(--ease),color var(--dur-slow) var(--ease);
+  min-height:100vh;
+}
+
+/* ── Back bar ── */
+.back-bar{
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  padding:10px var(--sp-8);
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  position:sticky;top:0;z-index:50;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.back-left{display:flex;align-items:center;gap:14px;}
+.back-link{
+  font-size:var(--text-xs);color:rgba(255,255,255,0.5);
+  text-decoration:none;font-weight:var(--weight-semibold);
+  display:flex;align-items:center;gap:5px;
+  transition:color var(--dur-fast) var(--ease);
+}
+.back-link:hover{color:var(--teal);}
+.back-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.back-brand{font-size:var(--text-xs);font-weight:var(--weight-bold);color:rgba(255,255,255,0.65);letter-spacing:0.04em;}
+.back-right{display:flex;align-items:center;gap:var(--sp-3);}
+.back-meta{font-size:var(--text-xs);color:rgba(255,255,255,0.3);}
+.theme-toggle{
+  display:flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:var(--r-full);background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);cursor:pointer;
+  font-family:var(--font-sans);font-size:var(--text-xs);
+  font-weight:var(--weight-bold);color:rgba(255,255,255,0.65);
+  transition:all var(--dur-base) var(--ease);
+}
+.theme-toggle:hover{background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .theme-toggle{background:rgba(13,148,136,0.20);border-color:rgba(13,148,136,0.40);color:var(--teal);}
+.toggle-icon{font-size:11px;display:inline-block;transition:transform var(--dur-slow) var(--ease);}
+[data-theme="dark"] .toggle-icon{transform:rotate(180deg);}
+
+/* ── Stage ── */
+.page-stage{
+  background:linear-gradient(145deg,#0D2137 0%,#0F1E3C 40%,#091220 100%);
+  position:relative;overflow:hidden;
+  padding:var(--sp-8) var(--sp-8) var(--sp-6);
+}
+.page-stage::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 80% 20%,rgba(13,148,136,0.20) 0%,transparent 55%),
+    radial-gradient(ellipse at 15% 85%,rgba(124,58,237,0.12) 0%,transparent 50%);
+  pointer-events:none;
+}
+.page-stage::after{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(13,148,136,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(13,148,136,0.025) 1px,transparent 1px);
+  background-size:52px 52px;pointer-events:none;
+}
+.stage-inner{max-width:760px;margin:0 auto;position:relative;z-index:1;}
+.stage-accent{width:36px;height:3px;background:var(--teal);border-radius:var(--r-full);margin-bottom:var(--sp-3);}
+.stage-eyebrow{
+  font-size:var(--text-xs);font-weight:var(--weight-bold);
+  color:var(--teal);text-transform:uppercase;letter-spacing:var(--tracking-widest);
+  margin-bottom:var(--sp-2);
+}
+.stage-title{
+  font-size:var(--text-2xl);font-weight:var(--weight-black);
+  color:var(--on-dark-primary);letter-spacing:var(--tracking-snug);
+  line-height:var(--leading-tight);margin-bottom:var(--sp-2);
+}
+.stage-sub{
+  font-size:var(--text-base);color:var(--on-dark-secondary);
+  margin-bottom:var(--sp-5);line-height:var(--leading-normal);
+}
+.vendor-badge{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:6px 16px 6px 8px;border-radius:var(--r-full);
+  background:rgba(13,148,136,0.18);border:1px solid rgba(13,148,136,0.35);
+  font-size:var(--text-sm);font-weight:var(--weight-bold);
+  color:var(--teal);letter-spacing:0.01em;
+}
+.vendor-badge-logo{
+  width:28px;height:28px;border-radius:50%;
+  background:#fff;object-fit:contain;padding:2px;
+  flex-shrink:0;display:none;box-shadow:0 0 0 1px rgba(0,0,0,0.08);
+}
+.vendor-badge-logo.loaded{display:block;}
+
+/* ── Page body ── */
+.page-body{
+  background:var(--surface-light);
+  transition:background var(--dur-slow) var(--ease);
+  padding:var(--sp-8) var(--sp-8) var(--sp-12);
+}
+.form-wrap{max-width:720px;margin:0 auto;}
+
+/* ── Section header ── */
+.section-eyebrow{
+  font-size:var(--text-xs);font-weight:var(--weight-bold);
+  color:var(--teal);text-transform:uppercase;
+  letter-spacing:var(--tracking-widest);
+  margin-bottom:var(--sp-3);margin-top:var(--sp-6);
+}
+.form-wrap > .section-eyebrow:first-child{margin-top:0;}
+
+/* ── Card ── */
+.form-card{
+  background:var(--surface-card);border-radius:10px;
+  border:1px solid var(--border);
+  padding:var(--sp-6);
+  margin-bottom:var(--sp-5);
+  box-shadow:var(--shadow-sm);
+  transition:background var(--dur-slow) var(--ease),border-color var(--dur-slow) var(--ease);
+}
+
+/* ── Form fields ── */
+.field-group{display:flex;flex-direction:column;gap:var(--sp-4);}
+.field{display:flex;flex-direction:column;gap:var(--sp-2);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);}
+.field-label{
+  font-size:var(--text-sm);font-weight:var(--weight-semibold);
+  color:var(--text-secondary);
+  transition:color var(--dur-slow) var(--ease);
+}
+.field-label .optional{
+  font-weight:var(--weight-regular);color:var(--text-muted);
+  font-size:var(--text-xs);margin-left:4px;
+}
+.field-input{
+  width:100%;padding:8px 12px;
+  border-radius:var(--r-md);
+  border:1px solid var(--border);
+  background:var(--surface-card);
+  font-family:var(--font-sans);font-size:var(--text-base);
+  color:var(--text-primary);
+  transition:border-color var(--dur-fast) var(--ease),
+    background var(--dur-slow) var(--ease),
+    color var(--dur-slow) var(--ease);
+}
+.field-input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,0.12);}
+.field-input::placeholder{color:var(--text-muted);}
+select.field-input{cursor:pointer;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:32px;}
+[data-theme="dark"] select.field-input{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+select.field-input option{background:var(--surface-card);}
+textarea.field-input{resize:vertical;min-height:56px;line-height:var(--leading-normal);}
+
+/* ── Score dimension ── */
+.score-dimension{
+  padding:var(--sp-5);border-radius:var(--r-lg);
+  background:var(--surface-subtle);
+  border:1px solid var(--border);
+  margin-bottom:var(--sp-4);
+  transition:background var(--dur-slow) var(--ease),border-color var(--dur-slow) var(--ease);
+}
+.score-dimension:last-child{margin-bottom:0;}
+.dim-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--sp-2);}
+.dim-label-wrap{flex:1;}
+.dim-label{
+  font-size:var(--text-base);font-weight:var(--weight-bold);
+  color:var(--text-primary);
+  transition:color var(--dur-slow) var(--ease);
+}
+.dim-desc{
+  font-size:var(--text-sm);color:var(--text-muted);
+  line-height:var(--leading-normal);margin-top:2px;
+  transition:color var(--dur-slow) var(--ease);
+}
+.dim-score{
+  font-size:28px;font-weight:var(--weight-black);
+  color:var(--teal);line-height:1;
+  min-width:38px;text-align:right;
+  flex-shrink:0;
+}
+.slider-wrap{margin:var(--sp-3) 0 var(--sp-2);}
+input[type="range"]{
+  width:100%;height:6px;border-radius:var(--r-full);
+  -webkit-appearance:none;appearance:none;
+  background:var(--border);cursor:pointer;
+  outline:none;
+  accent-color:var(--teal);
+  transition:background var(--dur-slow) var(--ease);
+}
+input[type="range"]::-webkit-slider-runnable-track{
+  height:6px;border-radius:var(--r-full);
+  background:var(--border);
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--teal);cursor:pointer;
+  margin-top:-7px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.20);
+  transition:transform var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease);
+}
+input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);box-shadow:0 2px 8px rgba(13,148,136,0.40);}
+input[type="range"]::-moz-range-thumb{
+  width:20px;height:20px;border-radius:50%;border:none;
+  background:var(--teal);cursor:pointer;
+}
+input[type="range"]::-moz-range-track{height:6px;border-radius:var(--r-full);background:var(--border);}
+.slider-labels{display:flex;justify-content:space-between;}
+.slider-label-min,.slider-label-max{font-size:var(--text-xs);color:var(--text-muted);}
+.dim-comment-toggle{
+  font-size:var(--text-xs);font-weight:var(--weight-semibold);
+  color:var(--teal);background:none;border:none;cursor:pointer;
+  padding:0;margin-top:var(--sp-2);
+  font-family:var(--font-sans);
+  display:inline-flex;align-items:center;gap:4px;
+  transition:opacity var(--dur-fast) var(--ease);
+}
+.dim-comment-toggle:hover{opacity:0.75;}
+.dim-comment-area{margin-top:var(--sp-3);display:none;}
+.dim-comment-area.open{display:block;}
+
+/* ── Radio group ── */
+.radio-group{display:flex;flex-direction:column;gap:var(--sp-3);}
+.radio-option{
+  display:flex;align-items:center;gap:var(--sp-3);
+  padding:var(--sp-3) var(--sp-4);
+  border-radius:var(--r-md);border:1px solid var(--border);
+  background:var(--surface-card);cursor:pointer;
+  transition:border-color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease);
+}
+.radio-option:hover{border-color:var(--teal);background:var(--tint-teal);}
+.radio-option.selected{border-color:var(--teal);background:var(--tint-teal);}
+.radio-option input[type="radio"]{
+  accent-color:var(--teal);width:16px;height:16px;cursor:pointer;flex-shrink:0;
+}
+.radio-label{font-size:var(--text-base);color:var(--text-primary);cursor:pointer;flex:1;
+  transition:color var(--dur-slow) var(--ease);}
+.radio-meta{font-size:var(--text-xs);color:var(--text-muted);margin-top:1px;}
+
+/* ── Radio color accents ── */
+.radio-option[data-val="continue"].selected{border-color:var(--green);background:var(--tint-green);}
+.radio-option[data-val="continue_conditions"].selected{border-color:var(--amber);background:var(--tint-amber);}
+.radio-option[data-val="escalate"].selected{border-color:var(--amber);background:var(--tint-amber);}
+.radio-option[data-val="do_not_continue"].selected{border-color:var(--red);background:var(--tint-red);}
+
+/* ── Submit button ── */
+.submit-btn{
+  width:100%;padding:14px var(--sp-6);
+  background:var(--teal);border:none;border-radius:var(--r-lg);
+  font-family:var(--font-sans);font-size:var(--text-md);
+  font-weight:var(--weight-bold);color:#fff;cursor:pointer;
+  letter-spacing:0.01em;
+  transition:background var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease),opacity var(--dur-fast) var(--ease);
+  margin-top:var(--sp-2);
+}
+.submit-btn:hover{background:var(--teal-dim);}
+.submit-btn:active{transform:scale(0.99);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* ── Validation message ── */
+.validation-msg{
+  display:none;
+  font-size:var(--text-sm);color:var(--red);
+  background:var(--tint-red);border:1px solid rgba(220,38,38,0.20);
+  border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);
+  margin-bottom:var(--sp-4);
+}
+.validation-msg.visible{display:block;}
+
+/* ── Confirmation screen ── */
+.confirm-screen{
+  display:none;text-align:center;
+  padding:var(--sp-12) var(--sp-8);
+}
+.confirm-screen.visible{display:block;}
+.confirm-icon{font-size:56px;margin-bottom:var(--sp-4);line-height:1;}
+.confirm-title{
+  font-size:var(--text-xl);font-weight:var(--weight-black);
+  color:var(--text-primary);margin-bottom:var(--sp-3);
+  transition:color var(--dur-slow) var(--ease);
+}
+.confirm-body{
+  font-size:var(--text-base);color:var(--text-muted);
+  line-height:var(--leading-relaxed);
+  max-width:440px;margin:0 auto var(--sp-6);
+  transition:color var(--dur-slow) var(--ease);
+}
+.confirm-link{
+  font-size:var(--text-sm);font-weight:var(--weight-semibold);
+  color:var(--teal);text-decoration:none;
+  border-bottom:1px solid rgba(13,148,136,0.30);
+  transition:border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);
+}
+.confirm-link:hover{color:var(--teal-dim);border-color:var(--teal-dim);}
+.is-hidden{display:none!important;}
+
+/* ── Vendor picker ── */
+.vendor-picker-card{background:var(--surface-card);border:2px solid var(--teal);
+  border-radius:var(--r-xl);padding:var(--sp-5) var(--sp-6);margin-bottom:var(--sp-4);
+  box-shadow:var(--shadow-md);}
+.vendor-picker-label{font-size:var(--text-xs);font-weight:var(--weight-extrabold);
+  text-transform:uppercase;letter-spacing:var(--tracking-wider);color:var(--teal);margin-bottom:var(--sp-2);}
+.vendor-picker-desc{font-size:var(--text-sm);color:var(--text-muted);margin-bottom:var(--sp-3);}
+.vendor-picker-select{width:100%;padding:10px 14px;border-radius:var(--r-md);
+  border:1px solid var(--border);background:var(--surface-subtle);
+  color:var(--text-primary);font-size:var(--text-sm);font-family:var(--font-sans);
+  font-weight:var(--weight-medium);cursor:pointer;transition:border-color var(--dur-base) var(--ease);}
+.vendor-picker-select:focus{outline:none;border-color:var(--teal);}
+[data-theme="dark"] .vendor-picker-select{background:var(--surface-subtle);color:var(--text-primary);border-color:var(--border);}
+
+/* ── Mobile ── */
+@media (max-width:640px){
+  .back-bar{padding:10px var(--sp-4);}
+  .back-meta{display:none;}
+  .page-stage{padding:var(--sp-6) var(--sp-4) var(--sp-5);}
+  .stage-title{font-size:var(--text-xl);}
+  .page-body{padding:var(--sp-5) var(--sp-4) var(--sp-10);}
+  .field-row{grid-template-columns:1fr;}
+  .form-card{padding:var(--sp-4);}
+  .score-dimension{padding:var(--sp-4);}
+  .dim-score{font-size:22px;}
+}
+</style>
+<script src="assets/vendors.js"></script>
+</head>
+<body>
+
+<!-- ── Back bar ── -->
+<header class="back-bar">
+  <div class="back-left">
+    <a href="../vendor_home.html" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1L3 7l6 6"/></svg>
+      VER Vendor Platform
+    </a>
+    <div class="back-divider"></div>
+    <span class="back-brand">VER Intelligence Hub</span>
+  </div>
+  <div class="back-right">
+    <span class="back-meta">FY27 &middot; Salesforce DET &middot; Confidential</span>
+    <button type="button" class="theme-toggle" onclick="openSurveyHelp()">&#63; How to Use</button>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <span class="toggle-icon">&#9788;</span>
+      <span id="toggleLabel">Dark</span>
+    </button>
+  </div>
+</header>
+
+<!-- ── Stage ── -->
+<section class="page-stage">
+  <div class="stage-inner">
+    <div class="stage-accent"></div>
+    <div class="stage-eyebrow">VER Intelligence Hub &middot; Vendor Scoring</div>
+    <h1 class="stage-title">Vendor Performance Survey</h1>
+    <p class="stage-sub">Your feedback is confidential and reviewed by the VER team before scores are updated.</p>
+    <div class="vendor-badge is-hidden" id="vendorBadgeWrap">
+      <img class="vendor-badge-logo" id="vendorBadgeLogo" src="" alt="">
+      <span id="vendorBadge"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Page body ── -->
+<main class="page-body">
+  <div class="form-wrap">
+
+    <!-- Confirmation screen (hidden until submit) -->
+    <div class="confirm-screen" id="confirmScreen">
+      <div class="confirm-icon">&#x2705;</div>
+      <div class="confirm-title">Thank you for your feedback</div>
+      <p class="confirm-body">Your response has been submitted to the VER team for review. Scores are updated after team approval.</p>
+      <a href="#" class="confirm-link" id="submitAnotherLink">Submit another response</a>
+    </div>
+
+    <!-- Survey form -->
+    <form id="surveyForm" novalidate>
+
+      <!-- Validation message -->
+      <div class="validation-msg" id="validationMsg"></div>
+
+      <!-- Vendor picker (shown only when no ?id= param) -->
+      <div id="vendorPickerWrap" class="is-hidden">
+        <div class="vendor-picker-card">
+          <div class="vendor-picker-label">&#127968; Select a Vendor</div>
+          <div class="vendor-picker-desc">Choose the vendor you are scoring from the list below.</div>
+          <select id="vendorPickerSelect" class="vendor-picker-select" title="Select vendor to score" aria-label="Select vendor to score">
+            <option value="">— Select vendor —</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Section 1: Respondent Info -->
+      <div class="section-eyebrow">Section 1 &mdash; Respondent Info</div>
+      <div class="form-card">
+        <div class="field-group">
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="respondentName">Name <span class="optional">(optional)</span></label>
+              <input type="text" id="respondentName" class="field-input" placeholder="Your name (optional)" autocomplete="off">
+            </div>
+            <div class="field">
+              <label class="field-label" for="respondentTeam">Team / Pillar <span class="optional">(optional)</span></label>
+              <input type="text" id="respondentTeam" class="field-input" placeholder="e.g. Asset Management, Technology Services" autocomplete="off">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="respondentRelationship">Relationship to vendor</label>
+            <select id="respondentRelationship" class="field-input">
+              <option value="">Select your role...</option>
+              <option value="day_to_day">Day-to-day contact</option>
+              <option value="sow_owner">SOW owner</option>
+              <option value="exec_sponsor">Executive sponsor</option>
+              <option value="finance_procurement">Finance / procurement</option>
+              <option value="technical_reviewer">Technical reviewer</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Scoring -->
+      <div class="section-eyebrow">Section 2 &mdash; Performance Scoring</div>
+      <div class="form-card">
+
+        <!-- SLA & Delivery -->
+        <div class="score-dimension">
+          <div class="dim-header">
+            <div class="dim-label-wrap">
+              <div class="dim-label">SLA &amp; Delivery</div>
+              <div class="dim-desc">Does the vendor consistently meet SLAs, milestones, and delivery commitments?</div>
+            </div>
+            <div class="dim-score" id="slaVal">5</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="slaSld" min="1" max="10" value="5" data-dim="sla" title="SLA &amp; Delivery score" aria-label="SLA &amp; Delivery score (1–10)">
+          </div>
+          <div class="slider-labels">
+            <span class="slider-label-min">1 &mdash; Poor</span>
+            <span class="slider-label-max">10 &mdash; Excellent</span>
+          </div>
+          <button type="button" class="dim-comment-toggle" data-target="slaComment">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10" class="toggle-plus"/></svg>
+            Add a comment
+          </button>
+          <div class="dim-comment-area" id="slaComment">
+            <textarea class="field-input" id="slaCommentText" rows="2" placeholder="Optional comment..."></textarea>
+          </div>
+        </div>
+
+        <!-- Relationship & Communication -->
+        <div class="score-dimension">
+          <div class="dim-header">
+            <div class="dim-label-wrap">
+              <div class="dim-label">Relationship &amp; Communication</div>
+              <div class="dim-desc">How effective is the vendor's communication, responsiveness, and escalation handling?</div>
+            </div>
+            <div class="dim-score" id="relVal">5</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="relSld" min="1" max="10" value="5" data-dim="relationship" title="Relationship &amp; Communication score" aria-label="Relationship &amp; Communication score (1–10)">
+          </div>
+          <div class="slider-labels">
+            <span class="slider-label-min">1 &mdash; Poor</span>
+            <span class="slider-label-max">10 &mdash; Excellent</span>
+          </div>
+          <button type="button" class="dim-comment-toggle" data-target="relComment">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10" class="toggle-plus"/></svg>
+            Add a comment
+          </button>
+          <div class="dim-comment-area" id="relComment">
+            <textarea class="field-input" id="relCommentText" rows="2" placeholder="Optional comment..."></textarea>
+          </div>
+        </div>
+
+        <!-- Financial & Commercial -->
+        <div class="score-dimension">
+          <div class="dim-header">
+            <div class="dim-label-wrap">
+              <div class="dim-label">Financial &amp; Commercial</div>
+              <div class="dim-desc">Are the vendor's pricing, invoicing, and contract terms transparent and fair?</div>
+            </div>
+            <div class="dim-score" id="finVal">5</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="finSld" min="1" max="10" value="5" data-dim="financial" title="Financial &amp; Commercial score" aria-label="Financial &amp; Commercial score (1–10)">
+          </div>
+          <div class="slider-labels">
+            <span class="slider-label-min">1 &mdash; Poor</span>
+            <span class="slider-label-max">10 &mdash; Excellent</span>
+          </div>
+          <button type="button" class="dim-comment-toggle" data-target="finComment">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10" class="toggle-plus"/></svg>
+            Add a comment
+          </button>
+          <div class="dim-comment-area" id="finComment">
+            <textarea class="field-input" id="finCommentText" rows="2" placeholder="Optional comment..."></textarea>
+          </div>
+        </div>
+
+        <!-- Compliance & Risk -->
+        <div class="score-dimension">
+          <div class="dim-header">
+            <div class="dim-label-wrap">
+              <div class="dim-label">Compliance &amp; Risk</div>
+              <div class="dim-desc">Does the vendor meet security, regulatory, and contractual compliance requirements?</div>
+            </div>
+            <div class="dim-score" id="compVal">5</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="compSld" min="1" max="10" value="5" data-dim="compliance" title="Compliance &amp; Risk score" aria-label="Compliance &amp; Risk score (1–10)">
+          </div>
+          <div class="slider-labels">
+            <span class="slider-label-min">1 &mdash; Poor</span>
+            <span class="slider-label-max">10 &mdash; Excellent</span>
+          </div>
+          <button type="button" class="dim-comment-toggle" data-target="compComment">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10" class="toggle-plus"/></svg>
+            Add a comment
+          </button>
+          <div class="dim-comment-area" id="compComment">
+            <textarea class="field-input" id="compCommentText" rows="2" placeholder="Optional comment..."></textarea>
+          </div>
+        </div>
+
+        <!-- Strategic Value -->
+        <div class="score-dimension">
+          <div class="dim-header">
+            <div class="dim-label-wrap">
+              <div class="dim-label">Strategic Value</div>
+              <div class="dim-desc">Does this vendor contribute strategic value beyond the transactional scope of work?</div>
+            </div>
+            <div class="dim-score" id="stratVal">5</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="stratSld" min="1" max="10" value="5" data-dim="strategic" title="Strategic Alignment score" aria-label="Strategic Alignment score (1–10)">
+          </div>
+          <div class="slider-labels">
+            <span class="slider-label-min">1 &mdash; Poor</span>
+            <span class="slider-label-max">10 &mdash; Excellent</span>
+          </div>
+          <button type="button" class="dim-comment-toggle" data-target="stratComment">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10" class="toggle-plus"/></svg>
+            Add a comment
+          </button>
+          <div class="dim-comment-area" id="stratComment">
+            <textarea class="field-input" id="stratCommentText" rows="2" placeholder="Optional comment..."></textarea>
+          </div>
+        </div>
+
+      </div><!-- /form-card section 2 -->
+
+      <!-- Section 3: Overall -->
+      <div class="section-eyebrow">Section 3 &mdash; Overall Assessment</div>
+      <div class="form-card">
+        <div class="field-group">
+          <div class="field">
+            <div class="field-label">Overall recommendation</div>
+            <div class="radio-group" id="recommendationGroup">
+              <label class="radio-option" data-val="continue">
+                <input type="radio" name="recommendation" value="continue">
+                <div>
+                  <div class="radio-label">Continue / Renew</div>
+                  <div class="radio-meta">Strong performance — recommend continuing or renewing without conditions</div>
+                </div>
+              </label>
+              <label class="radio-option" data-val="continue_conditions">
+                <input type="radio" name="recommendation" value="continue_conditions">
+                <div>
+                  <div class="radio-label">Continue / Renew with Conditions</div>
+                  <div class="radio-meta">Acceptable performance — continue or renew with specific improvement conditions</div>
+                </div>
+              </label>
+              <label class="radio-option" data-val="escalate">
+                <input type="radio" name="recommendation" value="escalate">
+                <div>
+                  <div class="radio-label">Escalate for Review</div>
+                  <div class="radio-meta">Concerns noted — a formal VER review is warranted before continuing</div>
+                </div>
+              </label>
+              <label class="radio-option" data-val="do_not_continue">
+                <input type="radio" name="recommendation" value="do_not_continue">
+                <div>
+                  <div class="radio-label">Do Not Continue / Renew</div>
+                  <div class="radio-meta">Significant issues — recommend ending this engagement</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="overallComments">Additional context <span class="optional">(optional)</span></label>
+            <textarea id="overallComments" class="field-input" rows="4" placeholder="Any additional context, specific incidents, or recommendations for the VER team?"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Submit Feedback &#8594;</button>
+
+    </form><!-- /surveyForm -->
+
+  </div><!-- /form-wrap -->
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ── Theme ── */
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const toggleLabel = document.getElementById('toggleLabel');
+  const savedTheme = localStorage.getItem('ver-theme') || 'light';
+  root.setAttribute('data-theme', savedTheme);
+  toggleLabel.textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+
+  themeToggle.addEventListener('click', function(){
+    const current = root.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('ver-theme', next);
+    toggleLabel.textContent = next === 'dark' ? 'Light' : 'Dark';
+  });
+
+  /* ── URL params + vendor picker ── */
+  const params = new URLSearchParams(window.location.search);
+  let vendorId   = params.get('id')   || '';
+  let vendorName = params.get('name') || '';
+
+  const badge     = document.getElementById('vendorBadge');
+  const badgeWrap = document.getElementById('vendorBadgeWrap');
+  const badgeLogo = document.getElementById('vendorBadgeLogo');
+
+  function _showBadge(name, domain){
+    badge.textContent = name;
+    badgeWrap.classList.remove('is-hidden');
+    badgeLogo.classList.remove('loaded');
+    if(domain){
+      badgeLogo.alt = name;
+      badgeLogo.onerror = function(){ badgeLogo.classList.remove('loaded'); };
+      badgeLogo.onload  = function(){ badgeLogo.classList.add('loaded'); };
+      badgeLogo.src = 'https://cdn.brandfetch.io/' + domain + '?c=1idLxwmT7Sv6VAWJq9j';
+    }
+  }
+  function _hideBadge(){
+    badgeWrap.classList.add('is-hidden');
+    badge.textContent = '';
+    badgeLogo.classList.remove('loaded');
+    badgeLogo.src = '';
+  }
+
+  if(vendorName){
+    // Try to find domain from vendors list if loaded via URL param
+    var urlVendor = (window.VER_VENDORS||[]).find(function(v){ return v.id === vendorId; });
+    _showBadge(vendorName, urlVendor ? urlVendor.domain : null);
+  }
+
+  // If no vendor was passed via URL, show the picker and populate it from vendors.js
+  if(!vendorId){
+    const pickerWrap = document.getElementById('vendorPickerWrap');
+    const pickerSel  = document.getElementById('vendorPickerSelect');
+    pickerWrap.classList.remove('is-hidden');
+
+    const vendors = (window.VER_VENDORS || []).slice().sort(function(a,b){
+      return a.name.localeCompare(b.name);
+    });
+    vendors.forEach(function(v){
+      const opt = document.createElement('option');
+      opt.value = v.id;
+      opt.textContent = v.name + (v.category ? ' · ' + v.category : '');
+      pickerSel.appendChild(opt);
+    });
+
+    pickerSel.addEventListener('change', function(){
+      const selected = vendors.find(function(v){ return v.id === pickerSel.value; });
+      if(selected){
+        vendorId   = selected.id;
+        vendorName = selected.name;
+        _showBadge(selected.name, selected.domain || null);
+      } else {
+        vendorId   = '';
+        vendorName = '';
+        _hideBadge();
+      }
+    });
+  }
+
+  /* ── "Submit another response" link ── */
+  document.getElementById('submitAnotherLink').addEventListener('click', function(e){
+    e.preventDefault();
+    window.location.reload();
+  });
+
+  /* ── Slider live update ── */
+  const sliderMap = [
+    { slider: 'slaSld',  display: 'slaVal'  },
+    { slider: 'relSld',  display: 'relVal'  },
+    { slider: 'finSld',  display: 'finVal'  },
+    { slider: 'compSld', display: 'compVal' },
+    { slider: 'stratSld',display: 'stratVal'},
+  ];
+  sliderMap.forEach(function(m){
+    const sld = document.getElementById(m.slider);
+    const disp = document.getElementById(m.display);
+    sld.addEventListener('input', function(){
+      disp.textContent = sld.value;
+      updateSliderTrack(sld);
+    });
+    updateSliderTrack(sld);
+  });
+
+  function updateSliderTrack(sld){
+    const pct = ((+sld.value - +sld.min) / (+sld.max - +sld.min)) * 100;
+    sld.style.background = 'linear-gradient(90deg,var(--teal) 0%,var(--teal) '+pct+'%,var(--border) '+pct+'%,var(--border) 100%)';
+  }
+
+  /* ── Comment toggles ── */
+  document.querySelectorAll('.dim-comment-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const target = document.getElementById(btn.getAttribute('data-target'));
+      const isOpen = target.classList.contains('open');
+      target.classList.toggle('open', !isOpen);
+      const plusPath = btn.querySelector('.toggle-plus');
+      if(plusPath){
+        plusPath.setAttribute('d', !isOpen ? 'M1 6h10' : 'M6 1v10M1 6h10');
+      }
+      btn.querySelector('span') && (btn.querySelector('span').textContent = !isOpen ? 'Remove comment' : 'Add a comment');
+      // Update text label
+      const textNodes = Array.from(btn.childNodes).filter(n => n.nodeType === 3);
+      if(textNodes.length){
+        textNodes[textNodes.length - 1].textContent = !isOpen ? ' Remove comment' : ' Add a comment';
+      }
+    });
+  });
+
+  /* ── Radio selection styling ── */
+  document.querySelectorAll('.radio-option input[type="radio"]').forEach(function(radio){
+    radio.addEventListener('change', function(){
+      document.querySelectorAll('.radio-option').forEach(function(opt){
+        opt.classList.toggle('selected', opt.querySelector('input[type="radio"]').checked);
+      });
+    });
+  });
+
+  /* ── Submit ── */
+  document.getElementById('surveyForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const msg = document.getElementById('validationMsg');
+    msg.classList.remove('visible');
+
+    // Validation: vendor must be selected
+    if(!vendorId){
+      msg.textContent = 'Please select a vendor before submitting.';
+      msg.classList.add('visible');
+      msg.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      document.getElementById('vendorPickerSelect') && document.getElementById('vendorPickerSelect').focus();
+      return;
+    }
+
+    // Validation: at least 3 of 5 sliders moved from default (5)
+    const sliderIds = ['slaSld','relSld','finSld','compSld','stratSld'];
+    const moved = sliderIds.filter(function(id){
+      return +document.getElementById(id).value !== 5;
+    });
+    if(moved.length < 3){
+      msg.textContent = 'Please rate at least 3 of the 5 dimensions by moving the sliders from their default position before submitting.';
+      msg.classList.add('visible');
+      msg.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      return;
+    }
+
+    // Recommendation
+    const recInput = document.querySelector('input[name="recommendation"]:checked');
+    const recommendation = recInput ? recInput.value : '';
+
+    // Build response object
+    const response = {
+      id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2),
+      vendorId:   vendorId,
+      vendorName: vendorName,
+      submittedAt: new Date().toISOString(),
+      status: 'pending',
+      respondent: {
+        name:         document.getElementById('respondentName').value.trim(),
+        team:         document.getElementById('respondentTeam').value.trim(),
+        relationship: document.getElementById('respondentRelationship').value,
+      },
+      scores: {
+        sla:          +document.getElementById('slaSld').value,
+        relationship: +document.getElementById('relSld').value,
+        financial:    +document.getElementById('finSld').value,
+        compliance:   +document.getElementById('compSld').value,
+        strategic:    +document.getElementById('stratSld').value,
+      },
+      comments: {
+        sla:          document.getElementById('slaCommentText').value.trim(),
+        relationship: document.getElementById('relCommentText').value.trim(),
+        financial:    document.getElementById('finCommentText').value.trim(),
+        compliance:   document.getElementById('compCommentText').value.trim(),
+        strategic:    document.getElementById('stratCommentText').value.trim(),
+        overall:      document.getElementById('overallComments').value.trim(),
+      },
+      recommendation: recommendation,
+    };
+
+    // Persist to localStorage
+    try {
+      const existing = JSON.parse(localStorage.getItem('ver_survey_responses') || '[]');
+      existing.push(response);
+      localStorage.setItem('ver_survey_responses', JSON.stringify(existing));
+    } catch(err){
+      console.warn('VER Survey: could not write to localStorage', err);
+    }
+
+    // Show confirmation
+    document.getElementById('surveyForm').style.display = 'none';
+    document.getElementById('confirmScreen').classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+})();
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openSurveyHelp(){
+  HelpModal.open({
+    title: 'Vendor Performance Survey',
+    what: 'The Vendor Performance Survey is the <strong>structured feedback mechanism for internal stakeholders to rate vendor performance</strong>. Survey responses feed directly into vendor scorecards, CQBR preparation, and renewal recommendations — this is how the organization\'s on-the-ground experience gets captured formally.',
+    steps: [
+      '<strong>Select the vendor</strong> you are rating from the dropdown — the survey loads the correct question set for that vendor\'s engagement type.',
+      '<strong>Answer each dimension</strong> honestly — Delivery Quality, Commercial Behavior, Responsiveness, Innovation, and Strategic Fit. Use the rating scale consistently (1 = poor, 5 = excellent).',
+      '<strong>Add qualitative comments</strong> in the free-text fields — specific examples and evidence are more valuable than scores alone. VER uses these in CQBR conversations.',
+      '<strong>Flag any critical issues</strong> using the flag toggle at the bottom — this escalates your response directly to the VER team for immediate follow-up.',
+      '<strong>Submit</strong> — your response is anonymous to the vendor but attributed to your team/pillar for VER analysis purposes.'
+    ],
+    tips: [
+      { icon: '&#x1F3AF;', title: 'Be specific, not general', body: 'Scores without examples are hard to act on. "Delivery is consistently 2 weeks late against SOW milestones" is far more useful than a 2/5 with no context.' },
+      { icon: '&#x23F0;', title: 'Submit within 2 weeks of CQBR', body: 'Survey responses are most valuable when collected close to a CQBR or delivery milestone while the experience is fresh.' },
+      { icon: '&#x26A0;', title: 'Flag serious issues immediately', body: 'Do not wait for a survey cycle to report a serious performance or compliance issue. Use the flag toggle for anything that needs urgent VER attention.' },
+      { icon: '&#x1F512;', title: 'Your identity is protected', body: 'Responses are attributed to pillar/team level only — individual identity is not shared with vendors or in CQBR sessions.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

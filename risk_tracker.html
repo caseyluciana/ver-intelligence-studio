@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Risk Assessment Tracker · VER Team Portal</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-border:rgba(244,63,94,0.30);--bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14);--mag-border:rgba(192,38,211,0.28);
+  --rose-gold:#E8A598;--violet:#A855F7;--violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12);--vio-border:rgba(168,85,247,0.28);
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.034);--bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 80% 0%,rgba(168,85,247,0.20) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.18) 0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(168,85,247,0.016) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(168,85,247,0.016) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(168,85,247,0.022) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── Shell ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sb-gem{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(244,63,94,0.38);}
+.sb-logo-title{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.42);}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);animation:pulse 2.5s ease-in-out infinite;}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-section{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);padding:12px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+.sb-user{margin:0 12px 8px;padding:9px 13px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:18px;line-height:1;}
+.sb-user-name{font-size:11px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:8.5px;color:rgba(255,255,255,0.52);}
+.sb-footer{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;font-size:8.5px;color:rgba(255,255,255,0.42);line-height:1.7;}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--violet-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--violet-bright);font-weight:700;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:var(--vio-glow);border-color:var(--vio-border);color:var(--violet-bright);}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(168,85,247,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(168,85,247,0.18);border-radius:99px;}
+
+/* ── Hero ── */
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:32px 40px 30px;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,#08040F 0%,#120826 40%,#0A0618 100%);
+  border:1px solid rgba(168,85,247,0.16);animation:rise 0.5s var(--ease) 0.05s both;}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 90% 10%,rgba(168,85,247,0.26) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(244,63,94,0.18) 0%,transparent 46%);}
+.hero-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);margin-bottom:10px;}
+.hero-title{font-size:clamp(26px,2.8vw,38px);font-weight:900;letter-spacing:-0.025em;
+  margin-bottom:8px;
+  background:linear-gradient(92deg,var(--violet) 0%,var(--magenta-bright) 55%,var(--bloom-bright) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.62);line-height:1.6;max-width:440px;}
+.hero-stat{text-align:center;flex-shrink:0;}
+.hero-stat-val{font-size:52px;font-weight:900;letter-spacing:-0.04em;
+  background:linear-gradient(135deg,var(--violet-bright),var(--magenta-bright));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;}
+.hero-stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;
+  color:rgba(255,255,255,0.52);margin-top:4px;}
+.hero-stat-sub{font-size:11px;color:var(--amber);font-weight:600;margin-top:3px;}
+
+/* ── KPI strip ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;animation:rise 0.5s var(--ease) 0.14s both;}
+.kpi-tile{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:12px;
+  padding:16px 18px;position:relative;overflow:hidden;}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0;}
+.kt-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.kt-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.kt-amber::before  {background:linear-gradient(90deg,#D97706,var(--amber));}
+.kt-green::before  {background:linear-gradient(90deg,#059669,var(--green));}
+.kt-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico{font-size:17px;}
+.kpi-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.kb-good{background:rgba(52,211,153,0.12);color:var(--green);}
+.kb-warn{background:rgba(251,191,36,0.12);color:var(--amber);}
+.kb-risk{background:rgba(244,63,94,0.12);color:var(--bloom-bright);}
+.kpi-val{font-size:30px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.kt-violet .kpi-val{color:var(--violet-bright);}
+.kt-bloom .kpi-val{color:var(--bloom-bright);}
+.kt-amber .kpi-val{color:var(--amber);}
+.kt-green .kpi-val{color:var(--green);}
+.kt-magenta .kpi-val{color:var(--magenta-bright);}
+.kpi-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;color:var(--ink-muted);margin-bottom:2px;}
+.kpi-sub{font-size:10px;color:var(--ink-muted);}
+
+/* ── Section head ── */
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.sec-title{font-size:13px;font-weight:800;color:var(--ink);}
+.sec-pill{font-size:8px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;
+  padding:2px 8px;border-radius:99px;
+  background:var(--vio-glow);color:var(--violet-bright);border:1px solid var(--vio-border);}
+.mb20{margin-bottom:20px;}
+
+/* ── Card ── */
+.card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;padding:20px 22px;}
+
+/* ── Horizontal bars ── */
+.hbar-list{display:flex;flex-direction:column;gap:10px;}
+.hbar-row{display:flex;align-items:center;gap:12px;}
+.hbar-label{font-size:11px;color:var(--ink-dim);width:160px;flex-shrink:0;}
+.hbar-track{flex:1;height:8px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;}
+.hbar-fill{height:100%;border-radius:99px;width:0;transition:width 1.3s var(--ease);}
+.hbf-violet {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.hbf-green  {background:linear-gradient(90deg,#059669,var(--green));}
+.hbf-amber  {background:linear-gradient(90deg,#D97706,var(--amber));}
+.hbf-bloom  {background:linear-gradient(90deg,var(--bloom-dim),var(--bloom-bright));}
+.hbf-magenta{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.hbar-val{font-size:11px;font-weight:700;color:var(--ink);width:40px;text-align:right;flex-shrink:0;}
+
+/* ── Two col ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+
+/* ── Risk band ── */
+.risk-band{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1px solid;margin-bottom:8px;}
+.rb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.rb-label{font-size:12px;font-weight:700;flex:1;}
+.rb-count{font-size:18px;font-weight:900;flex-shrink:0;}
+.rb-bar-track{flex:2;height:6px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;}
+.rb-bar-fill{height:100%;border-radius:99px;width:0;transition:width 1.3s var(--ease);}
+
+/* ── Table ── */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink-muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.data-table td{font-size:11.5px;color:var(--ink-dim);padding:10px 12px;border-bottom:1px solid var(--border);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(168,85,247,0.04);color:var(--ink);}
+.td-name{color:var(--ink)!important;font-weight:600;}
+.status-pill{display:inline-block;font-size:8px;font-weight:700;letter-spacing:0.08em;
+  text-transform:uppercase;padding:2px 8px;border-radius:99px;}
+.sp-green {background:rgba(52,211,153,0.12); color:var(--green); border:1px solid rgba(52,211,153,0.25);}
+.sp-amber {background:rgba(251,191,36,0.12); color:var(--amber); border:1px solid rgba(251,191,36,0.25);}
+.sp-red   {background:rgba(244,63,94,0.12);  color:var(--bloom-bright); border:1px solid rgba(244,63,94,0.25);}
+.sp-violet{background:rgba(168,85,247,0.12); color:var(--violet-bright); border:1px solid rgba(168,85,247,0.25);}
+.vlogo{width:18px;height:18px;object-fit:contain;border-radius:4px;margin-right:7px;vertical-align:middle;display:inline-block;}
+
+/* ── Coverage donut-style tile ── */
+.cov-tile{text-align:center;padding:16px 12px;border-radius:12px;border:1px solid var(--border-soft);background:var(--bg-surface);}
+.cov-pct{font-size:28px;font-weight:900;letter-spacing:-0.03em;}
+.cov-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--ink-muted);margin-top:3px;}
+.cov-sub{font-size:10px;color:var(--ink-muted);margin-top:2px;}
+
+/* ── Footer ── */
+.portal-footer{margin-top:24px;padding:12px 16px;
+  background:rgba(168,85,247,0.04);border:1px solid rgba(168,85,247,0.10);border-radius:10px;
+  display:flex;align-items:center;gap:10px;font-size:10px;color:var(--ink-muted);line-height:1.65;}
+.portal-footer strong{color:var(--ink-dim);}
+
+/* ── User picker ── */
+.up-overlay{position:fixed;inset:0;z-index:500;background:rgba(7,4,17,0.96);
+  backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center;padding:24px;}
+.up-overlay.hidden{display:none;}
+.up-panel{width:100%;max-width:500px;animation:slideUp 0.4s var(--ease) both;text-align:center;}
+.up-gem{width:48px;height:48px;border-radius:14px;margin:0 auto 18px;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 0 36px rgba(244,63,94,0.40);}
+.up-title{font-size:22px;font-weight:900;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom),var(--magenta),var(--violet));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.up-sub{font-size:12px;color:var(--ink-muted);margin-bottom:24px;}
+.up-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.up-tile{padding:14px 10px;border-radius:10px;cursor:pointer;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  transition:background 0.15s,border-color 0.15s,transform 0.15s;font-family:var(--font);}
+.up-tile:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);transform:translateY(-2px);}
+.up-tile-emoji{font-size:22px;margin-bottom:6px;display:block;}
+.up-tile-name{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:1px;}
+.up-tile-role{font-size:8.5px;color:var(--ink-muted);}
+
+@media(max-width:1100px){.kpi-strip{grid-template-columns:repeat(2,1fr);}.two-col{grid-template-columns:1fr;}.three-col{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.sidebar{display:none;}.content{padding:16px 16px 40px;}.three-col{grid-template-columns:1fr;}}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#151E2E;--bg-surface:rgba(255,255,255,0.03);--bg-hover:rgba(244,63,94,0.08);--ink:rgba(255,255,255,0.90);--ink-dim:rgba(255,255,255,0.68);--ink-muted:rgba(255,255,255,0.46);--ink-ghost:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.14);--bloom-border:rgba(244,63,94,0.28);--bloom-glow:rgba(244,63,94,0.12);--green:#34D399;--amber:#FBBF24;--red:#F87171;}
+body.mid-mode::before{background:radial-gradient(ellipse at 88% 0%,rgba(37,99,235,0.04) 0%,transparent 22%),radial-gradient(ellipse at 3% 98%,rgba(99,102,241,0.03) 0%,transparent 18%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#1A2540 0%,#172035 60%,#141B2E 100%);border-right:1px solid rgba(255,255,255,0.10);}
+body.mid-mode .topbar{background:rgba(24,31,48,0.92);}
+/* mid-mode up-overlay / user picker */
+body.mid-mode .up-overlay{background:rgba(20,27,46,0.97);}
+body.mid-mode .up-tile{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.14);}
+body.mid-mode .up-tile:hover{background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.35);}
+body.mid-mode .up-tile-name{color:rgba(255,255,255,0.90);}
+body.mid-mode .up-tile-role{color:rgba(255,255,255,0.50);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;--green:#059669;--amber:#B45309;--red:#DC2626;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title,body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .hero{background:linear-gradient(135deg,#FDE8EE 0%,#FCDDE7 38%,#FEE8F0 68%,#FFF0F4 100%);border:1px solid #F5C6D3;}
+body.light-mode .kpi-card,body.light-mode .risk-card,body.light-mode .two-col>*,body.light-mode .three-col>*{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .kpi-val,body.light-mode .risk-score{color:#E11D48;}
+body.light-mode .kpi-label,body.light-mode .risk-vendor{color:#1A0818;}
+body.light-mode .kpi-sub,body.light-mode .risk-meta,body.light-mode .ph-eyebrow{color:#7A4055;}
+body.light-mode .content{background:transparent;}
+body.light-mode .scan{opacity:0.12;}
+body.light-mode .hero-eyebrow{color:#7A4055;}
+body.light-mode .hero-sub{color:#3D1028;}
+body.light-mode .hero-stat-label{color:#7A4055;}
+body.light-mode .hero-stat-sub{color:#D97706;}
+body.light-mode .card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .sec-title{color:#1A0818;}
+body.light-mode .kpi-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .kpi-val{color:#C0143C;}
+body.light-mode .kpi-label{color:#1A0818;}
+body.light-mode .kpi-sub{color:#7A4055;}
+body.light-mode .hbar-track{background:rgba(26,8,24,0.18);}
+body.light-mode .hbar-label{color:#3D1028;}
+body.light-mode .hbar-val{color:#1A0818;}
+body.light-mode .rb-bar-track{background:rgba(26,8,24,0.18);}
+body.light-mode .rb-label{color:#3D1028;}
+body.light-mode .sp-green{background:rgba(5,150,105,0.14);color:#059669;border-color:rgba(5,150,105,0.35);}
+body.light-mode .sp-amber{background:rgba(180,83,9,0.12);color:#B45309;border-color:rgba(180,83,9,0.30);}
+body.light-mode .sp-red{background:rgba(192,20,60,0.12);color:#C0143C;border-color:rgba(192,20,60,0.30);}
+body.light-mode .sp-violet{background:rgba(109,40,217,0.10);color:#6D28D9;border-color:rgba(109,40,217,0.28);}
+body.light-mode .kb-good{background:rgba(5,150,105,0.14);color:#059669;}
+body.light-mode .kb-warn{background:rgba(180,83,9,0.12);color:#B45309;}
+body.light-mode .kb-risk{background:rgba(192,20,60,0.12);color:#C0143C;}
+body.light-mode .risk-band-critical{background:rgba(244,63,94,0.14)!important;border-color:rgba(244,63,94,0.35)!important;}
+body.light-mode .risk-band-high{background:rgba(251,191,36,0.14)!important;border-color:rgba(251,191,36,0.35)!important;}
+body.light-mode .risk-band-medium{background:rgba(109,40,217,0.10)!important;border-color:rgba(109,40,217,0.28)!important;}
+body.light-mode .risk-band-low{background:rgba(5,150,105,0.10)!important;border-color:rgba(5,150,105,0.28)!important;}
+body.light-mode .risk-band-sub{color:#7A4055!important;}
+body.light-mode .risk-dist-track{background:rgba(26,8,24,0.12)!important;}
+body.light-mode .cov-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .cov-pct{color:#C0143C;}
+body.light-mode .cov-label{color:#7A4055;}
+body.light-mode .cov-sub{color:#7A4055;}
+body.light-mode .data-table th{color:#7A4055;border-bottom-color:#F5C6D3;}
+body.light-mode .data-table td{color:#3D1028;border-bottom-color:#F5C6D3;}
+body.light-mode .data-table tr:hover td{background:rgba(168,85,247,0.04);color:#1A0818;}
+body.light-mode .td-name{color:#1A0818!important;}
+body.light-mode .portal-footer{background:rgba(168,85,247,0.04);border-color:rgba(168,85,247,0.12);color:#7A4055;}
+body.light-mode .portal-footer strong{color:#3D1028;}
+body.light-mode .up-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .up-overlay{background:rgba(255,240,244,0.97);backdrop-filter:blur(18px);}
+body.light-mode .up-title{-webkit-text-fill-color:initial;background:none;color:#C0143C;}
+body.light-mode .up-sub{color:#7A4055;}
+body.light-mode .up-tile-name{color:#1A0818;}
+body.light-mode .up-tile-role{color:#7A4055;}
+body.light-mode .up-tile:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.35);}
+body.light-mode .up-tile-name{color:#1A0818;}
+body.light-mode .up-tile-role{color:#7A4055;}
+</style>
+</head>
+<body data-portal="true">
+
+<div class="scan" aria-hidden="true"></div>
+
+<!-- User picker -->
+<div class="up-overlay hidden" id="up-overlay">
+  <div class="up-panel">
+    <div class="up-gem">&#128100;</div>
+    <div class="up-title">Who are you?</div>
+    <div class="up-sub">Personalize your portal experience.</div>
+    <div class="up-grid" id="up-grid"></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="window.location.href='team_portal.html'">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-user" id="sb-user-chip">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html" class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+
+
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"   class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"       class="sb-item active"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"    class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"        class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"      class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html" class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html"    class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html" class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html"     class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"         class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Risk Assessment Tracker</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button type="button" class="tb-btn">&#63; How to Use</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div>
+            <div class="hero-eyebrow">VER Intelligence &middot; Risk Visibility for Stakeholders</div>
+            <div class="hero-title">Risk Assessment Tracker</div>
+            <div class="hero-sub">Monitor assessment coverage across all vendor tiers and surface risk intelligence to stakeholders. VER flags, tracks, and escalates — stakeholders act. Target: 100% Tier 1 assessed quarterly.</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="hero-cov">7</div>
+            <div class="hero-stat-label">Open Risk Flags</div>
+            <div class="hero-stat-sub">&#9650; 2 critical &middot; Needs action</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip">
+        <div class="kpi-tile kt-violet">
+          <div class="kpi-top"><span class="kpi-ico">&#128737;</span><span class="kpi-badge kb-good">+9 vs Q2</span></div>
+          <div class="kpi-val" data-count="84" data-integer="1">0</div>
+          <div class="kpi-label">Assessments Q3</div>
+          <div class="kpi-sub">Total reviews completed</div>
+        </div>
+        <div class="kpi-tile kt-green">
+          <div class="kpi-top"><span class="kpi-ico">&#9989;</span><span class="kpi-badge kb-good">On track</span></div>
+          <div class="kpi-val" data-count="100" data-suffix="%">0</div>
+          <div class="kpi-label">Tier 1 Coverage</div>
+          <div class="kpi-sub">All 16 Tier 1 vendors assessed</div>
+        </div>
+        <div class="kpi-tile kt-amber">
+          <div class="kpi-top"><span class="kpi-ico">&#9888;</span><span class="kpi-badge kb-warn">2 critical</span></div>
+          <div class="kpi-val" data-count="7" data-integer="1">0</div>
+          <div class="kpi-label">Open Risk Flags</div>
+          <div class="kpi-sub">Awaiting remediation</div>
+        </div>
+        <div class="kpi-tile kt-bloom">
+          <div class="kpi-top"><span class="kpi-ico">&#128203;</span><span class="kpi-badge kb-risk">Action needed</span></div>
+          <div class="kpi-val" data-count="3" data-integer="1">0</div>
+          <div class="kpi-label">Overdue Reviews</div>
+          <div class="kpi-sub">Past scheduled review date</div>
+        </div>
+      </div>
+
+      <!-- COVERAGE BY TIER + BY DIMENSION -->
+      <div class="two-col mb20">
+
+        <!-- Coverage by tier -->
+        <div class="card">
+          <div class="sec-head" style="margin-bottom:18px;">
+            <div class="sec-title">&#127775; Coverage by Vendor Tier</div>
+            <span class="sec-pill">% assessed</span>
+          </div>
+          <div class="hbar-list">
+            <div class="hbar-row">
+              <span class="hbar-label">Tier 1 — Strategic (16)</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-green" data-w="100"></div></div>
+              <span class="hbar-val" style="color:var(--green);font-weight:800;">100%</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Tier 2 — Preferred (34)</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-violet" data-w="82"></div></div>
+              <span class="hbar-val">82%</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Tier 3 — Approved (71)</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-amber" data-w="54"></div></div>
+              <span class="hbar-val">54%</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Tier 4 — Transactional (110)</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-bloom" data-w="22"></div></div>
+              <span class="hbar-val">22%</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:20px;">
+            <div>
+              <div style="font-size:18px;font-weight:900;color:var(--violet-bright);">231</div>
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink-muted);">Total Vendors</div>
+            </div>
+            <div>
+              <div style="font-size:18px;font-weight:900;color:var(--green);">148</div>
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink-muted);">Assessed</div>
+            </div>
+            <div>
+              <div style="font-size:18px;font-weight:900;color:var(--amber);">83</div>
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink-muted);">Pending</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- By risk dimension -->
+        <div class="card">
+          <div class="sec-head" style="margin-bottom:16px;">
+            <div class="sec-title">&#128202; By Risk Dimension</div>
+            <span class="sec-pill">Avg score /10</span>
+          </div>
+          <div class="hbar-list">
+            <div class="hbar-row">
+              <span class="hbar-label">Financial Stability</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-green" data-w="78"></div></div>
+              <span class="hbar-val">7.8</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Operational Resilience</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-violet" data-w="71"></div></div>
+              <span class="hbar-val">7.1</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Security &amp; Compliance</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-amber" data-w="63"></div></div>
+              <span class="hbar-val">6.3</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Regulatory / Legal</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-violet" data-w="82"></div></div>
+              <span class="hbar-val">8.2</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Strategic Alignment</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-magenta" data-w="68"></div></div>
+              <span class="hbar-val">6.8</span>
+            </div>
+          </div>
+          <div style="margin-top:14px;font-size:10px;color:var(--ink-muted);padding-top:10px;border-top:1px solid var(--border);">
+            Security &amp; Compliance is the lowest-scoring dimension — <strong style="color:var(--amber);">3 vendors</strong> flagged for remediation plans.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RISK BAND DISTRIBUTION -->
+      <div class="sec-head">
+        <div class="sec-title">&#127917; Risk Band Distribution</div>
+        <span class="sec-pill">148 assessed vendors</span>
+      </div>
+      <div class="card mb20">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+          <div class="risk-band-critical" style="text-align:center;padding:16px 10px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.18);border-radius:10px;">
+            <div style="font-size:28px;font-weight:900;color:var(--bloom-bright);" data-count="4" data-integer="1">0</div>
+            <div class="risk-band-sub" style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:rgba(244,63,94,0.70);margin-top:4px;">Critical</div>
+            <div class="risk-band-sub" style="font-size:9px;color:var(--ink-muted);margin-top:2px;">Score &lt;4.0</div>
+          </div>
+          <div class="risk-band-high" style="text-align:center;padding:16px 10px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.18);border-radius:10px;">
+            <div style="font-size:28px;font-weight:900;color:var(--amber);" data-count="18" data-integer="1">0</div>
+            <div class="risk-band-sub" style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:rgba(251,191,36,0.70);margin-top:4px;">High</div>
+            <div class="risk-band-sub" style="font-size:9px;color:var(--ink-muted);margin-top:2px;">Score 4.0–6.0</div>
+          </div>
+          <div class="risk-band-medium" style="text-align:center;padding:16px 10px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.18);border-radius:10px;">
+            <div style="font-size:28px;font-weight:900;color:var(--violet-bright);" data-count="61" data-integer="1">0</div>
+            <div class="risk-band-sub" style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:rgba(168,85,247,0.70);margin-top:4px;">Medium</div>
+            <div class="risk-band-sub" style="font-size:9px;color:var(--ink-muted);margin-top:2px;">Score 6.0–8.0</div>
+          </div>
+          <div class="risk-band-low" style="text-align:center;padding:16px 10px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.18);border-radius:10px;">
+            <div style="font-size:28px;font-weight:900;color:var(--green);" data-count="65" data-integer="1">0</div>
+            <div class="risk-band-sub" style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:rgba(52,211,153,0.70);margin-top:4px;">Low</div>
+            <div class="risk-band-sub" style="font-size:9px;color:var(--ink-muted);margin-top:2px;">Score &gt;8.0</div>
+          </div>
+        </div>
+        <div class="risk-dist-track" style="height:10px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;display:flex;">
+          <div style="background:var(--bloom-bright);width:0;transition:width 1.3s var(--ease);" data-w="2.7" class="risk-seg"></div>
+          <div style="background:var(--amber);width:0;transition:width 1.3s var(--ease);transition-delay:0.1s;" data-w="12.2" class="risk-seg"></div>
+          <div style="background:var(--violet-bright);width:0;transition:width 1.3s var(--ease);transition-delay:0.2s;" data-w="41.2" class="risk-seg"></div>
+          <div style="background:var(--green);width:0;transition:width 1.3s var(--ease);transition-delay:0.3s;" data-w="43.9" class="risk-seg"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:9px;color:var(--ink-muted);">
+          <span>&#128308; Critical 3%</span><span>&#128992; High 12%</span><span style="color:var(--violet-bright);">&#128994; Medium 41%</span><span>&#128994; Low 44%</span>
+        </div>
+      </div>
+
+      <!-- OPEN FLAGS + RECENT ASSESSMENTS -->
+      <div class="two-col mb20">
+
+        <!-- Open flags -->
+        <div class="card">
+          <div class="sec-head" style="margin-bottom:14px;">
+            <div class="sec-title">&#128680; Open Risk Flags</div>
+            <span class="sec-pill">7 active</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="padding:10px 14px;border-radius:9px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.20);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <span style="font-size:11px;font-weight:700;color:var(--ink);display:flex;align-items:center;"><img class="vlogo" src="https://cdn.brandfetch.io/hexaware.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Hexaware — Data Breach Risk</span>
+                <span class="status-pill sp-red">Critical</span>
+              </div>
+              <div style="font-size:10px;color:var(--ink-muted);">Security audit overdue 14d &middot; Flagged Jun 22</div>
+            </div>
+            <div style="padding:10px 14px;border-radius:9px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.20);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <span style="font-size:11px;font-weight:700;color:var(--ink);display:flex;align-items:center;"><img class="vlogo" src="https://cdn.brandfetch.io/mphasis.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Mphasis — Financial Instability</span>
+                <span class="status-pill sp-red">Critical</span>
+              </div>
+              <div style="font-size:10px;color:var(--ink-muted);">Q2 financials flagged &middot; Remediation plan due Jul 12</div>
+            </div>
+            <div style="padding:10px 14px;border-radius:9px;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <span style="font-size:11px;font-weight:700;color:var(--ink);display:flex;align-items:center;"><img class="vlogo" src="https://cdn.brandfetch.io/ltimindtree.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">LTIMindtree — Concentration Risk</span>
+                <span class="status-pill sp-amber">High</span>
+              </div>
+              <div style="font-size:10px;color:var(--ink-muted);">Single-source dependency &middot; Mitigation in progress</div>
+            </div>
+            <div style="padding:10px 14px;border-radius:9px;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <span style="font-size:11px;font-weight:700;color:var(--ink);display:flex;align-items:center;"><img class="vlogo" src="https://cdn.brandfetch.io/kyndryl.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Kyndryl — Compliance Gap</span>
+                <span class="status-pill sp-amber">High</span>
+              </div>
+              <div style="font-size:10px;color:var(--ink-muted);">SOC 2 Type II lapsed &middot; Review scheduled Jul 15</div>
+            </div>
+            <div style="padding:10px 14px;border-radius:9px;background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.16);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <span style="font-size:11px;font-weight:700;color:var(--ink);">3 additional medium flags</span>
+                <span class="status-pill sp-violet">Medium</span>
+              </div>
+              <div style="font-size:10px;color:var(--ink-muted);">Unisys, Conduent, DXC Technology &middot; Under monitoring</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remediation pipeline -->
+        <div class="card">
+          <div class="sec-head" style="margin-bottom:14px;">
+            <div class="sec-title">&#128295; Remediation Pipeline</div>
+          </div>
+          <div class="hbar-list" style="margin-bottom:16px;">
+            <div class="hbar-row">
+              <span class="hbar-label">Plan Submitted</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-green" data-w="71"></div></div>
+              <span class="hbar-val">5</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">In Remediation</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-amber" data-w="57"></div></div>
+              <span class="hbar-val">4</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Awaiting Plan</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-bloom" data-w="43"></div></div>
+              <span class="hbar-val">3</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Resolved Q3</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-violet" data-w="100"></div></div>
+              <span class="hbar-val">7</span>
+            </div>
+          </div>
+          <div style="padding-top:12px;border-top:1px solid var(--border);">
+            <div style="font-size:10px;color:var(--ink-muted);margin-bottom:8px;">Avg days to resolve (Q3):</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">
+              <div style="padding:8px;background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.14);border-radius:8px;">
+                <div style="font-size:16px;font-weight:900;color:var(--bloom-bright);">34d</div>
+                <div style="font-size:8.5px;color:var(--ink-muted);">Critical</div>
+              </div>
+              <div style="padding:8px;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.14);border-radius:8px;">
+                <div style="font-size:16px;font-weight:900;color:var(--amber);">21d</div>
+                <div style="font-size:8.5px;color:var(--ink-muted);">High</div>
+              </div>
+              <div style="padding:8px;background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.14);border-radius:8px;">
+                <div style="font-size:16px;font-weight:900;color:var(--violet-bright);">12d</div>
+                <div style="font-size:8.5px;color:var(--ink-muted);">Medium</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RECENT ASSESSMENTS TABLE -->
+      <div class="sec-head">
+        <div class="sec-title">&#128336; Recent Assessments</div>
+        <span class="sec-pill">Last 12</span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Vendor</th>
+              <th>Tier</th>
+              <th>Dimension</th>
+              <th>Assessed</th>
+              <th>Score</th>
+              <th>Risk Band</th>
+              <th>Status</th>
+              <th>Assign</th>
+            </tr>
+          </thead>
+          <tbody id="rist-tbody">
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/accenture.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Accenture</td><td>Tier 1</td><td>Full Scope</td><td>Jul 2</td><td style="font-weight:700;color:var(--green);">8.6</td><td><span class="status-pill sp-green">Low</span></td><td><span class="status-pill sp-green">Clear</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/hexaware.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Hexaware</td><td>Tier 2</td><td>Security</td><td>Jun 22</td><td style="font-weight:700;color:var(--bloom-bright);">3.1</td><td><span class="status-pill sp-red">Critical</span></td><td><span class="status-pill sp-red">Flagged</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/deloitte.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Deloitte</td><td>Tier 1</td><td>Full Scope</td><td>Jun 30</td><td style="font-weight:700;color:var(--green);">8.1</td><td><span class="status-pill sp-green">Low</span></td><td><span class="status-pill sp-green">Clear</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/coupa.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Coupa</td><td>Tier 1</td><td>Full Scope</td><td>Jun 28</td><td style="font-weight:700;color:var(--violet-bright);">7.4</td><td><span class="status-pill sp-violet">Medium</span></td><td><span class="status-pill sp-green">Clear</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/mphasis.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Mphasis</td><td>Tier 2</td><td>Financial</td><td>Jun 25</td><td style="font-weight:700;color:var(--bloom-bright);">3.8</td><td><span class="status-pill sp-red">Critical</span></td><td><span class="status-pill sp-red">Flagged</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/infosys.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Infosys</td><td>Tier 1</td><td>Full Scope</td><td>Jun 22</td><td style="font-weight:700;color:var(--green);">8.4</td><td><span class="status-pill sp-green">Low</span></td><td><span class="status-pill sp-green">Clear</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/ltimindtree.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">LTIMindtree</td><td>Tier 2</td><td>Operational</td><td>Jun 20</td><td style="font-weight:700;color:var(--amber);">5.2</td><td><span class="status-pill sp-amber">High</span></td><td><span class="status-pill sp-amber">Monitor</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/workday.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Workday</td><td>Tier 1</td><td>Full Scope</td><td>Jun 18</td><td style="font-weight:700;color:var(--green);">8.9</td><td><span class="status-pill sp-green">Low</span></td><td><span class="status-pill sp-green">Clear</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/kyndryl.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Kyndryl</td><td>Tier 3</td><td>Compliance</td><td>Jun 15</td><td style="font-weight:700;color:var(--amber);">5.7</td><td><span class="status-pill sp-amber">High</span></td><td><span class="status-pill sp-amber">Monitor</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/sap.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">SAP</td><td>Tier 1</td><td>Full Scope</td><td>Jun 14</td><td style="font-weight:700;color:var(--violet-bright);">7.7</td><td><span class="status-pill sp-violet">Medium</span></td><td><span class="status-pill sp-green">Clear</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/slalom.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Slalom</td><td>Tier 2</td><td>Full Scope</td><td>Jun 10</td><td style="font-weight:700;color:var(--green);">8.2</td><td><span class="status-pill sp-green">Low</span></td><td><span class="status-pill sp-green">Clear</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/informatica.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Informatica</td><td>Tier 1</td><td>Full Scope</td><td>Jun 8</td><td style="font-weight:700;color:var(--violet-bright);">7.0</td><td><span class="status-pill sp-violet">Medium</span></td><td><span class="status-pill sp-green">Clear</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="portal-footer" style="margin-top:20px;">
+        <span style="font-size:15px;">&#128274;</span>
+        <span><strong>Internal Use Only.</strong> VER Team Portal &middot; Salesforce DET &middot; FY27</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/assign.js"></script>
+<script>
+var TEAM_MEMBERS=[
+  {id:'casey',name:'Casey',role:'Director',emoji:'&#128081;',director:true},
+  {id:'debs',name:'Debs',role:'Manager',emoji:'&#127775;'},
+  {id:'erin',name:'Erin',role:'Senior Manager',emoji:'&#11088;'},
+  {id:'mahesh',name:'Mahesh',role:'Senior Manager',emoji:'&#128171;'},
+  {id:'aditya',name:'Aditya',role:'Senior Manager',emoji:'&#10024;'},
+  {id:'justin',name:'Justin',role:'Senior Analyst',emoji:'&#127776;'},
+  {id:'guest',name:'Guest',role:'VER Team',emoji:'&#128100;'}
+];
+function _loadUser(){
+  var saved=null;try{saved=JSON.parse(localStorage.getItem('ver-team-user'));}catch(e){}
+  if(saved&&saved.name){_applyUser(saved);return;}
+  _showPicker();
+}
+function _applyUser(u){
+  var e=document.getElementById('sb-user-emoji'),n=document.getElementById('sb-user-name'),r=document.getElementById('sb-user-role');
+  if(e)e.innerHTML=u.emoji;if(n)n.textContent=u.name;if(r)r.textContent=u.role;
+  document.getElementById('up-overlay').classList.add('hidden');
+  AssignEngine.initDirectorChip(u,_showPicker);
+  AssignEngine._refreshAllBadges();
+}
+function _showPicker(){
+  var g=document.getElementById('up-grid');
+  g.innerHTML=TEAM_MEMBERS.map(function(m){
+    return '<div class="up-tile" onclick="_pick(\''+m.id+'\')"><span class="up-tile-emoji">'+m.emoji+'<\/span><div class="up-tile-name">'+m.name+'<\/div><div class="up-tile-role">'+m.role+'<\/div><\/div>';
+  }).join('');
+  document.getElementById('up-overlay').classList.remove('hidden');
+}
+function _pick(id){
+  var m=TEAM_MEMBERS.find(function(x){return x.id===id;});
+  if(!m)return;
+  try{localStorage.setItem('ver-team-user',JSON.stringify(m));}catch(e){}
+  _applyUser(m);
+}
+function animateCounter(el){
+  var target=parseFloat(el.getAttribute('data-count'));
+  var isInt=el.getAttribute('data-integer')==='1';
+  var suffix=el.getAttribute('data-suffix')||'';
+  var dur=1400,start=null;
+  var decimals=(target%1!==0&&!isInt)?1:0;
+  function step(ts){
+    if(!start)start=ts;
+    var p=Math.min((ts-start)/dur,1),e=1-Math.pow(1-p,3),v=target*e;
+    el.textContent=(isInt?Math.round(v).toLocaleString():v.toFixed(decimals))+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  setTimeout(function(){requestAnimationFrame(step);},500);
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('[data-count]').forEach(animateCounter);
+  setTimeout(function(){
+    document.querySelectorAll('[data-w]').forEach(function(el){el.style.width=el.getAttribute('data-w')+'%';});
+    document.querySelectorAll('.risk-seg[data-w]').forEach(function(el){el.style.width=el.getAttribute('data-w')+'%';});
+  },700);
+  var path=window.location.pathname.split('/').pop()||'';
+  document.querySelectorAll('.sb-item').forEach(function(a){
+    if((a.getAttribute('href')||'').split('/').pop()===path)a.classList.add('active');
+  });
+  _loadUser();
+
+  // Wire assignment buttons to each assessment row
+  var rows = document.querySelectorAll('#rist-tbody tr');
+  var rowDefs = [
+    { label:'Full Scope Assessment',  vendor:'Accenture',   checkType:'risk' },
+    { label:'Security Assessment',    vendor:'Hexaware',    checkType:'risk' },
+    { label:'Full Scope Assessment',  vendor:'Deloitte',    checkType:'risk' },
+    { label:'Full Scope Assessment',  vendor:'Coupa',       checkType:'risk' },
+    { label:'Financial Assessment',   vendor:'Mphasis',     checkType:'risk' },
+    { label:'Full Scope Assessment',  vendor:'Infosys',     checkType:'risk' },
+    { label:'Operational Assessment', vendor:'LTIMindtree', checkType:'risk' },
+    { label:'Full Scope Assessment',  vendor:'Workday',     checkType:'risk' },
+    { label:'Compliance Assessment',  vendor:'Kyndryl',     checkType:'risk' },
+    { label:'Full Scope Assessment',  vendor:'SAP',         checkType:'risk' },
+    { label:'Full Scope Assessment',  vendor:'Slalom',      checkType:'risk' },
+    { label:'Full Scope Assessment',  vendor:'Informatica', checkType:'risk' }
+  ];
+  rows.forEach(function(tr, i) {
+    if (!rowDefs[i]) return;
+    AssignEngine.wireTable(null, [{ tr: tr, contextId: 'rist-' + i, label: rowDefs[i].label, vendor: rowDefs[i].vendor, checkType: rowDefs[i].checkType }]);
+  });
+});
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+</script>
+</body>
+</html>

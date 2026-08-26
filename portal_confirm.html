@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Submission Received &middot; DET Supplier Portal</title>
+<style>
+:root {
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --ink2:#374151;--ink3:#6B7280;--ink4:#9CA3AF;
+  --border:#E5E7EB;--border2:#D1D5DB;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--gray);color:var(--ink2);font-size:9.5pt;line-height:1.5;}
+
+/* ── Portal shell ── */
+.por-shell{max-width:860px;margin:0 auto;padding:0 20px 40px;}
+
+/* ── Top nav bar ── */
+.por-nav{background:var(--navy);padding:0 20px;display:flex;align-items:center;
+  justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+.por-nav-brand{display:flex;align-items:center;gap:10px;}
+.por-nav-logo{font-size:9pt;font-weight:900;color:#fff;letter-spacing:0.02em;}
+.por-nav-sub{font-size:7.5pt;color:rgba(255,255,255,0.50);margin-top:1px;}
+.por-nav-links{display:flex;gap:4px;}
+.por-nav-link{font-size:8pt;font-weight:600;color:rgba(255,255,255,0.70);
+  padding:6px 12px;border-radius:6px;text-decoration:none;transition:all 0.15s;}
+.por-nav-link:hover{background:rgba(255,255,255,0.12);color:#fff;}
+.por-nav-link.active{background:rgba(255,255,255,0.15);color:#fff;}
+
+/* ── Page hero ── */
+.por-hero{background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);
+  border-radius:0 0 14px 14px;padding:28px 32px;color:#fff;margin-bottom:24px;}
+.por-hero-title{font-size:16pt;font-weight:900;margin-bottom:6px;letter-spacing:-0.01em;}
+.por-hero-sub{font-size:9pt;color:rgba(255,255,255,0.65);line-height:1.6;max-width:600px;}
+
+/* ── Cards ── */
+.por-card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:18px 20px;margin-bottom:16px;}
+.por-card-title{font-size:9.5pt;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.por-card-sub{font-size:8pt;color:var(--ink4);margin-bottom:12px;}
+
+/* ── Form elements ── */
+.por-section{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:18px 20px;margin-bottom:16px;}
+.por-section-title{font-size:9.5pt;font-weight:800;color:var(--navy);
+  margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.por-section-sub{font-size:8pt;color:var(--ink4);margin-bottom:14px;}
+.por-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.por-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.por-field{display:flex;flex-direction:column;gap:4px;}
+.por-label{font-size:8pt;font-weight:700;color:var(--ink2);}
+.por-req{color:var(--red);margin-left:2px;}
+.por-input{font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);width:100%;
+  transition:border-color 0.15s;}
+.por-input:focus{outline:none;border-color:var(--teal);
+  box-shadow:0 0 0 2px rgba(13,148,136,0.12);}
+.por-input.invalid{border-color:var(--red);}
+.por-select{font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);width:100%;background:#fff;}
+.por-textarea{font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);width:100%;
+  resize:vertical;min-height:80px;}
+.cap-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.cap-chk{display:none;}
+.cap-lbl{font-size:7.5pt;padding:4px 12px;border-radius:14px;
+  border:1px solid var(--border2);background:var(--gray2);color:var(--ink3);
+  cursor:pointer;transition:all 0.15s;user-select:none;}
+.cap-chk:checked + .cap-lbl{background:var(--navy);color:#fff;border-color:var(--navy);}
+.rate-row{display:grid;grid-template-columns:180px 1fr 1fr;gap:10px;
+  align-items:center;margin-bottom:8px;font-size:8.5pt;}
+.rate-row-hdr{display:grid;grid-template-columns:180px 1fr 1fr;gap:10px;
+  font-size:7.5pt;font-weight:700;color:var(--ink4);text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:6px;}
+.por-submit{width:100%;padding:13px;background:var(--navy);color:#fff;
+  border:none;border-radius:8px;font-size:10pt;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.por-submit:hover{background:#1E3A5F;}
+.code-gate{background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);
+  border-radius:12px;padding:40px 36px;text-align:center;color:#fff;margin:20px 0;}
+.code-input{font-size:14pt;letter-spacing:0.15em;padding:12px 20px;
+  border-radius:8px;border:2px solid rgba(255,255,255,0.30);
+  background:rgba(255,255,255,0.10);color:#fff;font-family:monospace;
+  text-align:center;width:240px;text-transform:uppercase;outline:none;}
+.code-input:focus{border-color:var(--teal);background:rgba(255,255,255,0.18);}
+.code-btn{margin:14px auto 0;display:block;padding:10px 32px;
+  background:var(--teal);color:#fff;border:none;border-radius:8px;
+  font-size:9.5pt;font-weight:700;cursor:pointer;font-family:inherit;}
+.code-btn:hover{background:var(--teal2);}
+.code-error{color:#FCA5A5;font-size:8.5pt;margin-top:8px;display:none;}
+.callout{border-radius:8px;padding:10px 14px;margin-bottom:14px;
+  font-size:8.5pt;line-height:1.6;}
+.callout-info{background:var(--navy3);border-left:3px solid var(--navy);}
+.callout-warn{background:var(--amber3);border-left:3px solid var(--amber);}
+
+/* ── Footer ── */
+.por-footer{text-align:center;font-size:7.5pt;color:var(--ink4);
+  padding:20px 0 10px;border-top:1px solid var(--border);margin-top:24px;}
+
+@media print{.por-nav,.por-submit{display:none!important;}body{background:#fff!important;}}
+</style>
+</head>
+<body>
+<nav class="por-nav">
+  <div class="por-nav-brand">
+    <div>
+      <div class="por-nav-logo">DET Supplier Portal</div>
+      <div class="por-nav-sub">Salesforce DET &middot; Powered by VER</div>
+    </div>
+  </div>
+  <div class="por-nav-links">
+    <a href="portal_home.html" class="por-nav-link active">Home</a>
+    <a href="portal_register.html" class="por-nav-link ">Register</a>
+    <a href="mailto:ver-intake@salesforce.com" class="por-nav-link">Contact VER</a>
+  </div>
+</nav>
+<div class="por-shell">
+  <div class="por-hero">
+    <div class="por-hero-title">Submission Received</div>
+    <div class="por-hero-sub">Thank you for registering with the DET Supplier Portal.</div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#059669 0%,#047857 100%);
+    border-radius:12px;padding:32px;text-align:center;color:#fff;margin-bottom:20px;">
+    <div style="font-size:40pt;margin-bottom:10px;">&#10003;</div>
+    <div style="font-size:14pt;font-weight:900;margin-bottom:6px;">Submission Received</div>
+    <div id="conf-ref" style="font-size:10pt;color:rgba(255,255,255,0.75);
+      margin-bottom:16px;font-family:monospace;letter-spacing:0.1em;"></div>
+    <div style="font-size:9pt;color:rgba(255,255,255,0.75);max-width:480px;
+      margin:0 auto;line-height:1.6;">
+      Your CSV has downloaded and your email client has opened.
+      Please attach the CSV file and send the email to complete your submission.
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+    <div class="por-card">
+      <div class="por-card-title">&#128203; What Happens Next</div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;font-size:8.5pt;">
+        <span style="background:#0D9488;color:#fff;border-radius:50%;
+          width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+          font-size:8pt;font-weight:800;flex-shrink:0;">1</span>
+        <div><strong style="color:var(--ink2);">Send your email</strong>
+          <div style="color:var(--ink4);">Attach the downloaded CSV and send the pre-filled email to complete your submission.</div></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;font-size:8.5pt;">
+        <span style="background:#0F1E3C;color:#fff;border-radius:50%;
+          width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+          font-size:8pt;font-weight:800;flex-shrink:0;">2</span>
+        <div><strong style="color:var(--ink2);">VER review — 5 business days</strong>
+          <div style="color:var(--ink4);">The VER team reviews your submission for completeness and DET advisory relevance.</div></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;font-size:8.5pt;">
+        <span style="background:#059669;color:#fff;border-radius:50%;
+          width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+          font-size:8pt;font-weight:800;flex-shrink:0;">3</span>
+        <div><strong style="color:var(--ink2);">Confirmation & activation</strong>
+          <div style="color:var(--ink4);">You receive a confirmation email. Approved suppliers are added to the DET vendor advisory registry.</div></div>
+      </div>
+    </div>
+    <div class="por-card">
+      <div class="por-card-title">&#128222; Questions?</div>
+      <div style="font-size:8.5pt;color:var(--ink3);line-height:1.7;margin-top:8px;">
+        Contact the VER team at<br>
+        <a href="mailto:ver-intake@salesforce.com"
+          style="color:var(--teal);font-weight:700;">ver-intake@salesforce.com</a><br><br>
+        Include your reference number in all correspondence.
+      </div>
+      <div id="conf-details" style="margin-top:12px;padding:10px 12px;
+        background:var(--gray);border-radius:8px;font-size:8pt;
+        font-family:monospace;color:var(--ink3);line-height:1.8;"></div>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <a href="portal_home.html" style="font-size:8.5pt;color:var(--teal);
+      text-decoration:none;font-weight:700;">&#8592; Back to Supplier Portal</a>
+  </div>
+
+<div class="por-footer">
+  DET Supplier Portal &middot; Powered by VER Intelligence &middot;
+  Salesforce DET &middot; FY27 &middot; Confidential &middot;
+  All submissions reviewed by VER within 5 business days
+</div>
+</div>
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  var ref     = sessionStorage.getItem('por_ref')     || 'VER-' + new Date().getFullYear() + '-XXXXXX';
+  var company = sessionStorage.getItem('por_company') || 'Your Company';
+  var contact = sessionStorage.getItem('por_contact') || '';
+
+  var refEl = document.getElementById('conf-ref');
+  if (refEl) refEl.textContent = 'Reference: ' + ref;
+
+  var detEl = document.getElementById('conf-details');
+  if (detEl) detEl.innerHTML =
+    'Reference: ' + ref + '<br>' +
+    'Company: ' + company + '<br>' +
+    (contact ? 'Contact: ' + contact + '<br>' : '') +
+    'Submitted: ' + new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vendor Selector &middot; VER Team Portal</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-border:rgba(244,63,94,0.30);--bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14);--mag-border:rgba(192,38,211,0.28);
+  --rose-gold:#E8A598;--violet:#A855F7;--violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12);--vio-border:rgba(168,85,247,0.28);
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.034);--bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  /* compat aliases for vendor selector JS output */
+  --ink2:rgba(255,255,255,0.88);--ink3:rgba(255,255,255,0.68);--ink4:rgba(255,255,255,0.48);
+  --gray2:rgba(255,255,255,0.07);--gray3:rgba(255,255,255,0.10);
+  --teal3:rgba(244,63,94,0.08);--green2:#10B981;--green3:rgba(52,211,153,0.12);
+  --amber2:#F59E0B;--amber3:rgba(251,191,36,0.12);
+  --navy:#1C1030;--navy2:#2A1848;--navy3:rgba(168,85,247,0.12);
+  --teal:#F43F5E;--teal2:#E11D48;
+  --border2:rgba(255,255,255,0.14);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 80% 0%,rgba(244,63,94,0.14) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(192,38,211,0.18) 0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(244,63,94,0.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,63,94,0.012) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(244,63,94,0.018) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+
+/* ── Shell ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sb-gem{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(244,63,94,0.38);}
+.sb-logo-title{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.42);}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);animation:pulse 2.5s ease-in-out infinite;}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-section{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);padding:12px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+.sb-footer{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;font-size:8.5px;color:rgba(255,255,255,0.42);line-height:1.7;}
+.sb-user{margin:0 12px 10px;padding:10px 14px;border-radius:10px;background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:20px;line-height:1;}
+.sb-user-name{font-size:11.5px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:9px;color:rgba(255,255,255,0.55);}
+body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-actions{display:flex;gap:8px;align-items:center;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);color:var(--bloom-bright);}
+
+/* ── Content ── */
+.content{flex:1;overflow-y:auto;padding:24px 28px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.18) transparent;}
+.content::-webkit-scrollbar{width:4px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── Hero ── */
+.hero{position:relative;overflow:hidden;padding:24px 28px 20px;margin-bottom:20px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(244,63,94,0.10) 0%,rgba(192,38,211,0.08) 50%,rgba(168,85,247,0.06) 100%);
+  border:1px solid rgba(244,63,94,0.18);animation:rise 0.5s var(--ease) 0.05s both;}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 90% 10%,rgba(244,63,94,0.22) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(192,38,211,0.18) 0%,transparent 46%);}
+.hero-inner{position:relative;z-index:1;}
+.hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);margin-bottom:8px;}
+.hero-title{font-size:clamp(20px,2vw,28px);font-weight:900;letter-spacing:-0.025em;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom) 0%,var(--magenta) 50%,var(--violet) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.hero-sub{font-size:11.5px;color:rgba(255,255,255,0.60);line-height:1.6;max-width:600px;}
+
+/* ── Callout ── */
+.callout{border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:11.5px;line-height:1.6;}
+.c-info{background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.22);
+  border-left:4px solid var(--violet);color:var(--ink-dim);}
+.c-info strong{color:var(--violet-bright);}
+
+/* ── Mode toggle ── */
+.mode-toggle{display:flex;gap:0;margin-bottom:16px;border-radius:10px;
+  overflow:hidden;border:1px solid var(--border-soft);width:100%;}
+.mode-btn{flex:1;padding:12px 14px;font-size:11px;font-weight:700;
+  cursor:pointer;font-family:var(--font);border:none;
+  background:rgba(255,255,255,0.04);color:var(--ink-muted);
+  transition:all 0.15s;line-height:1.3;text-align:left;}
+.mode-btn:first-child{border-right:1px solid var(--border-soft);}
+.mode-btn.active{background:linear-gradient(135deg,rgba(244,63,94,0.18),rgba(192,38,211,0.14));
+  color:var(--ink);border-bottom:2px solid var(--bloom);}
+.mode-icon{font-size:16px;display:block;margin-bottom:3px;}
+.mode-label{display:block;font-size:12px;}
+.mode-sub{display:block;font-size:9.5px;font-weight:400;opacity:0.65;margin-top:2px;}
+
+/* ── Selector form ── */
+.sel-form{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:14px;padding:20px;margin-bottom:20px;}
+.sel-section{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--bloom-bright);margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(244,63,94,0.14);}
+.sel-section:first-child{margin-top:0;}
+.sel-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.sel-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
+.sel-row-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
+.sel-label{font-size:9.5px;font-weight:700;color:var(--ink-dim);margin-bottom:5px;display:block;letter-spacing:0.03em;}
+.sel-input{width:100%;font-size:11.5px;padding:8px 10px;
+  border:1px solid var(--border-soft);border-radius:8px;
+  font-family:var(--font);color:var(--ink-dim);background:rgba(255,255,255,0.05);
+  outline:none;transition:border-color 0.15s,background 0.15s;}
+.sel-input:focus{border-color:var(--bloom);background:rgba(244,63,94,0.06);}
+.sel-input option{background:#1C1030;color:var(--ink);}
+
+/* ── Capability chips ── */
+.cap-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.cap-btn{font-size:9.5px;padding:5px 13px;border-radius:14px;
+  border:1px solid var(--border-soft);background:rgba(255,255,255,0.04);
+  cursor:pointer;font-family:var(--font);color:var(--ink-muted);
+  transition:all 0.15s;user-select:none;white-space:nowrap;}
+.cap-btn:hover{background:rgba(244,63,94,0.10);color:var(--ink);border-color:var(--bloom-border);}
+.cap-btn.active{background:linear-gradient(135deg,rgba(244,63,94,0.22),rgba(192,38,211,0.18));
+  color:var(--bloom-bright);border-color:var(--bloom-border);}
+
+/* ── Run / clear ── */
+.run-btn{width:100%;padding:12px;
+  background:linear-gradient(135deg,var(--bloom-dim),var(--magenta));
+  color:#fff;border:none;border-radius:10px;font-size:11.5px;font-weight:700;
+  cursor:pointer;font-family:var(--font);letter-spacing:0.03em;transition:all 0.15s;}
+.run-btn:hover{background:linear-gradient(135deg,var(--bloom),var(--magenta-bright));
+  box-shadow:0 4px 20px rgba(244,63,94,0.30);}
+.clear-btn{padding:12px 20px;background:rgba(255,255,255,0.05);color:var(--ink-muted);
+  border:1px solid var(--border-soft);border-radius:10px;font-size:11.5px;
+  font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all 0.15s;}
+.clear-btn:hover{background:rgba(248,113,113,0.10);color:var(--red);border-color:rgba(248,113,113,0.30);}
+
+/* ── Cost estimate box ── */
+.cost-box{background:linear-gradient(135deg,rgba(244,63,94,0.18) 0%,rgba(192,38,211,0.16) 100%);
+  border:1px solid rgba(244,63,94,0.28);border-radius:12px;padding:16px 20px;margin:12px 0;}
+.cost-range{font-size:26px;font-weight:900;color:var(--ink);line-height:1.1;letter-spacing:-0.01em;}
+.cost-label{font-size:9.5px;color:var(--ink-muted);margin-top:4px;}
+.cost-pill{background:rgba(255,255,255,0.10);border-radius:6px;padding:4px 10px;
+  color:var(--ink-dim);font-size:10.5px;margin-bottom:4px;}
+.cost-footer{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.10);
+  font-size:9px;color:rgba(255,255,255,0.40);}
+
+/* ── Results ── */
+#sel-results{margin-top:4px;}
+.results-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.results-title{font-size:12px;font-weight:800;color:var(--ink);}
+.results-count{font-size:9.5px;color:var(--ink-muted);}
+#rec-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:4px;}
+.rec-card{background:var(--bg-surface);border:1.5px solid var(--border-soft);border-radius:14px;overflow:hidden;
+  transition:box-shadow 0.15s;position:relative;}
+.rec-card.rank-1{border-color:var(--bloom);box-shadow:0 4px 20px rgba(244,63,94,0.15);}
+.rec-top{padding:16px 16px 12px;border-bottom:1px solid var(--border);}
+.rec-name{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.rec-body{padding:12px 16px;}
+.rec-col-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink-muted);margin-bottom:6px;}
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px;border-top:1px solid var(--border);}
+.risk-bar-wrap{background:rgba(255,255,255,0.08);border-radius:4px;height:6px;margin:4px 0;}
+.risk-bar{height:6px;border-radius:4px;transition:width 0.5s;}
+.show-more-btn{padding:9px 28px;background:linear-gradient(135deg,rgba(244,63,94,0.15),rgba(192,38,211,0.12));
+  color:var(--bloom-bright);border:1px solid var(--bloom-border);border-radius:10px;
+  cursor:pointer;font-size:11px;font-weight:700;font-family:var(--font);transition:all 0.15s;}
+.show-more-btn:hover{background:linear-gradient(135deg,rgba(244,63,94,0.28),rgba(192,38,211,0.24));}
+.next-step-callout{background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.22);
+  border-left:4px solid var(--violet);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:10px;font-size:11.5px;color:var(--ink-dim);}
+.next-step-callout strong{color:var(--violet-bright);}
+.next-step-callout a{color:var(--bloom-bright);font-weight:700;text-decoration:none;}
+.next-step-callout a:hover{text-decoration:underline;}
+
+/* ── Help modal ── */
+.help-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:500;
+  align-items:center;justify-content:center;padding:32px 20px;overflow-y:auto;backdrop-filter:blur(6px);}
+.help-modal-bg.open{display:flex;}
+.help-modal{background:#0F0A1E;border:1px solid rgba(244,63,94,0.22);border-radius:16px;
+  max-width:680px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 60px rgba(244,63,94,0.08);overflow:hidden;}
+.help-signal{height:3px;background:linear-gradient(90deg,var(--bloom),var(--magenta),var(--violet));}
+.help-hd{display:flex;align-items:flex-start;justify-content:space-between;
+  padding:20px 24px 14px;border-bottom:1px solid var(--border);}
+.help-title{font-size:16px;font-weight:900;
+  background:linear-gradient(92deg,var(--bloom-bright),var(--magenta-bright));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.help-close{background:rgba(255,255,255,0.06);border:1px solid var(--border-soft);
+  font-size:15px;cursor:pointer;color:var(--ink-muted);width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;transition:all 0.13s;}
+.help-close:hover{background:rgba(244,63,94,0.15);color:var(--bloom-bright);}
+.help-body{padding:20px 24px;overflow-y:auto;max-height:calc(100vh - 200px);
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.15) transparent;}
+
+@media(max-width:900px){
+  #rec-cards{grid-template-columns:1fr 1fr;}
+  .sel-row-4{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:640px){
+  .sidebar{display:none;}
+  #rec-cards{grid-template-columns:1fr;}
+  .sel-row,.sel-row-3,.sel-row-4{grid-template-columns:1fr;}
+}
+@media print{
+  .sidebar,.topbar,.cap-grid,.run-btn,.clear-btn{display:none!important;}
+  .shell,.main,.content{display:block!important;}
+}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode::before{background:radial-gradient(ellipse at 80% 0%,rgba(192,38,211,0.12) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.10) 0%,transparent 50%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title{color:#1A0818;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .hero{background:linear-gradient(135deg,#FDE8EE 0%,#FCDDE7 38%,#FEE8F0 68%,#FFF0F4 100%);border:1px solid #F5C6D3;}
+body.light-mode .rec-card,body.light-mode .sel-form,body.light-mode .cap-grid{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .sel-label,body.light-mode .sec-head{color:#7A4055;}
+body.light-mode input,body.light-mode select{background:#FFF8FA;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .scan{opacity:0.12;}
+body.light-mode .hero-eyebrow{color:#7A4055;}
+body.light-mode .hero-sub{color:#3D1028;}
+body.light-mode .callout.c-info{background:rgba(168,85,247,0.07);border-color:rgba(168,85,247,0.22);color:#3D1028;}
+body.light-mode .callout.c-info strong{color:#6D28D9;}
+body.light-mode .mode-btn{color:#5A2038;background:rgba(26,8,24,0.03);}
+body.light-mode .mode-btn.active{background:rgba(244,63,94,0.10);color:#1A0818;}
+body.light-mode .mode-sub{color:#7A4055;}
+body.light-mode .risk-bar-wrap{background:rgba(26,8,24,0.08);}
+body.light-mode .cost-footer{color:#7A4055;}
+body.light-mode .cost-pill{background:rgba(26,8,24,0.06);color:#3D1028;}
+body.light-mode .cost-range{color:#C0143C;}
+body.light-mode .cost-label{color:#7A4055;}
+body.light-mode #cost-estimate-box [style*="rgba(255"]{color:#7A4055!important;}
+body.light-mode .sel-input option{background:#FFF0F4;color:#1A0818;}
+body.light-mode .cap-btn{background:rgba(26,8,24,0.04);border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .cap-btn.active{background:rgba(244,63,94,0.14);color:#C0143C;border-color:rgba(244,63,94,0.32);}
+body.light-mode .cap-btn:hover{background:rgba(244,63,94,0.08);color:#1A0818;border-color:rgba(244,63,94,0.28);}
+body.light-mode .clear-btn{background:rgba(26,8,24,0.05);color:#7A4055;border-color:#F5C6D3;}
+body.light-mode .results-title{color:#1A0818;}
+body.light-mode .results-count{color:#7A4055;}
+body.light-mode .rec-card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .rec-top{border-bottom-color:#F5C6D3;}
+body.light-mode .rec-col-label{color:#7A4055;}
+body.light-mode .rec-name{color:#1A0818;}
+body.light-mode .rec-grid{border-top-color:#F5C6D3;}
+body.light-mode .next-step-callout{background:rgba(168,85,247,0.07);border-color:rgba(168,85,247,0.20);color:#3D1028;}
+body.light-mode .next-step-callout strong{color:#6D28D9;}
+body.light-mode .sel-section{border-bottom-color:rgba(244,63,94,0.20);}
+</style>
+</head>
+<body data-portal="true">
+
+<div class="scan" aria-hidden="true"></div>
+
+<div class="shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="window.location.href='team_portal.html'">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-user">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+      <div class="sb-section">Director</div>
+      <a href="assignments.html"    class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"        class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"            class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"         class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html"  class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"      class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"    class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"    class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html"  class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html"     class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html"  class="sb-item active"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"             class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Vendor Selector</span>
+      </div>
+      <div class="tb-actions">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button type="button" class="tb-btn" onclick="openSelectorHelp()">&#63; How to Use</button>
+        <button type="button" class="tb-btn" onclick="window.print()">&#128438; Print</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div class="hero-eyebrow">VER Intelligence &middot; Vendor Selection Engine &middot; FY27</div>
+          <div class="hero-title">Vendor Selector &amp; Recommendation Engine</div>
+          <div class="hero-sub">Match vendors to engagement requirements &middot; Rate card cost estimator &middot; VER advisory tool. Results are recommendations only &mdash; all engagements require VER intake review and Sourcing approval.</div>
+        </div>
+      </div>
+
+      <!-- CALLOUT -->
+      <div class="callout c-info">
+        <strong>VER Vendor Selector.</strong> This tool identifies qualified vendors from the DET monitored portfolio
+        based on your engagement requirements. All vendor engagements require VER intake review, Sourcing approval,
+        and an executed SOW or PO before work commences.
+      </div>
+
+      <!-- ══ MODE TOGGLE ══ -->
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="mode-best" onclick="setMode('best')">
+          <span class="mode-icon">&#127775;</span>
+          <span class="mode-label">Best Match</span>
+          <span class="mode-sub">Capability &amp; fit first &middot; relationship is a tiebreaker</span>
+        </button>
+        <button class="mode-btn" id="mode-portfolio" onclick="setMode('portfolio')">
+          <span class="mode-icon">&#128203;</span>
+          <span class="mode-label">Portfolio-First</span>
+          <span class="mode-sub">Prioritize existing DET relationships &amp; spend history</span>
+        </button>
+      </div>
+
+      <!-- ══ SELECTOR FORM ══ -->
+      <div class="sel-form">
+
+        <div class="sel-section">Engagement Requirements</div>
+        <div class="sel-row">
+          <div>
+            <label class="sel-label">Engagement Scope</label>
+            <select class="sel-input" id="sel-scope">
+              <option value="">Any scope</option>
+              <option value="strategic">Strategic &mdash; Multi-year, enterprise-wide</option>
+              <option value="project">Project &mdash; Fixed scope, defined deliverables</option>
+              <option value="staff">Staff Augmentation &mdash; Specific role(s)</option>
+              <option value="advisory">Advisory &mdash; Consulting and guidance</option>
+            </select>
+          </div>
+          <div>
+            <label class="sel-label">DET Pillar</label>
+            <select class="sel-input" id="sel-pillar">
+              <option value="">All pillars</option>
+              <option>Salesforce on Salesforce Technology</option>
+              <option>Engineering Development &amp; Delivery</option>
+              <option>IT</option>
+              <option>Delivery Assurance &amp; Operations</option>
+              <option>Digital Marketing Technology</option>
+              <option>Data Solutions</option>
+              <option>Agentic Transformation</option>
+              <option>Office of the CDO</option>
+              <option>Emerging Technology</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sel-row">
+          <div>
+            <label class="sel-label">Vendor Category</label>
+            <select class="sel-input" id="sel-cat" onchange="updateCostEstimate()">
+              <option value="">Any category</option>
+              <option>Software / SaaS</option>
+              <option>Contingent Workforce</option>
+              <option>Hardware &amp; Infrastructure</option>
+              <option>Professional Services</option>
+              <option>Cloud &amp; Managed Services</option>
+            </select>
+          </div>
+          <div>
+            <label class="sel-label">Preferred Tier</label>
+            <select class="sel-input" id="sel-tier">
+              <option value="">No preference</option>
+              <option value="1">Tier 1 &mdash; Strategic partners only</option>
+              <option value="2">Tier 2 &mdash; Established partners</option>
+              <option value="3">Tier 3 &mdash; Specialized / tactical</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sel-section">Cost Estimation</div>
+        <div class="sel-row-4">
+          <div>
+            <label class="sel-label">Geographic Region</label>
+            <select class="sel-input" id="sel-region" onchange="updateCostEstimate()">
+              <option value="AMER">AMER (US)</option>
+              <option value="APAC">APAC / India</option>
+              <option value="LATAM">LATAM</option>
+              <option value="EMEA">EMEA</option>
+              <option value="Global">Global</option>
+            </select>
+          </div>
+          <div>
+            <label class="sel-label">Engagement Duration</label>
+            <select class="sel-input" id="sel-duration" onchange="updateCostEstimate()">
+              <option value="">No estimate</option>
+              <option value="1">1 month</option>
+              <option value="3">3 months</option>
+              <option value="6">6 months</option>
+              <option value="12">12 months (1 yr)</option>
+              <option value="24">24 months (2 yr)</option>
+              <option value="36">36 months (3 yr)</option>
+            </select>
+          </div>
+          <div>
+            <label class="sel-label">Number of Resources</label>
+            <input type="number" class="sel-input" id="sel-resources" min="1" max="500"
+              placeholder="e.g. 3" oninput="updateCostEstimate()">
+          </div>
+          <div>
+            <label class="sel-label">Max Risk Tolerance</label>
+            <select class="sel-input" id="sel-risk">
+              <option value="100">Any risk level</option>
+              <option value="66">Medium or below</option>
+              <option value="33">Low risk only</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- COST ESTIMATE BOX -->
+        <div id="cost-estimate-box" style="display:none;">
+          <div class="cost-box">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+              <div>
+                <div style="font-size:8px;font-weight:700;color:var(--ink-muted);
+                  text-transform:uppercase;letter-spacing:0.10em;margin-bottom:4px;">
+                  Estimated Engagement Cost
+                </div>
+                <div id="cost-estimate-range" class="cost-range">--</div>
+                <div id="cost-estimate-label" class="cost-label"></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;font-size:10px;min-width:220px;">
+                <div id="cost-detail-resources" class="cost-pill"></div>
+                <div id="cost-detail-duration"  class="cost-pill"></div>
+                <div id="cost-detail-rate"      class="cost-pill" style="font-size:9px;"></div>
+              </div>
+            </div>
+            <div class="cost-footer">
+              For planning purposes only &middot; Based on VER advisory rate benchmarks &middot;
+              160 hrs/month billing assumption per resource &middot; Applies to CW and consultant engagements &middot;
+              Actual cost subject to SOW negotiation and Sourcing approval
+            </div>
+          </div>
+        </div>
+
+        <div class="sel-section">Required Capabilities</div>
+        <div class="cap-grid" id="cap-grid">
+          <button class="cap-btn" onclick="toggleCap(this)">Application Development</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Application Maintenance</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Cloud Infrastructure</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Data Engineering</button>
+          <button class="cap-btn" onclick="toggleCap(this)">AI / ML</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Security</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Staff Augmentation</button>
+          <button class="cap-btn" onclick="toggleCap(this)">ERP / Workday</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Service Desk</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Hardware Supply</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Consulting / Advisory</button>
+          <button class="cap-btn" onclick="toggleCap(this)">QA &amp; Testing</button>
+          <button class="cap-btn" onclick="toggleCap(this)">DevOps</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Platform Engineering</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Analytics &amp; BI</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Managed Services</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Network &amp; AV</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Identity &amp; Access</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Agile Coach</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Software Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Sr Software Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Lead Software Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Data Analyst</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Sr Data Analyst</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Data Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Sr Data Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">QA Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Sr QA Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Lead QA Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Test Automation Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Sr Test Automation Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Business Analyst / UI/UX Designer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Senior Business Analyst</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Senior UI/UX Designer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Product Manager / Project Manager</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Product Owner</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Sr Product Owner</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Scrum Master</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Sr Scrum Master</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Consultant</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Consulting Analyst</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Senior Consulting Analyst</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Consulting Manager / Program Manager</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Tech Lead</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Information Architect</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Program Director</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Delivery Manager</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Solution Architect</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Principal Software Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Chief Software Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Cloud Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Cloud Architect</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Machine Learning Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Security Analyst</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Security Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Security Architect</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Database Administrator</button>
+          <button class="cap-btn" onclick="toggleCap(this)">System Administrator</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Network Engineer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Production Support Analyst</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Technical Writer</button>
+          <button class="cap-btn" onclick="toggleCap(this)">Helpdesk Support</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+          <div>
+            <label class="sel-label">Timeline</label>
+            <select class="sel-input" id="sel-timeline">
+              <option value="">Any timeline</option>
+              <option value="immediate">Immediate (30 days)</option>
+              <option value="short">Short-term (60-90 days)</option>
+              <option value="planned">Planned (90+ days)</option>
+            </select>
+          </div>
+          <div>
+            <label class="sel-label">Additional Requirements</label>
+            <input type="text" class="sel-input" id="sel-notes" placeholder="e.g. FedRAMP, GDPR, on-site only...">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px;">
+          <button class="run-btn" onclick="runSelector()">Find Matching Vendors &#8594;</button>
+          <button class="clear-btn" id="clear-btn" onclick="clearSelector()">&#10005; Clear &amp; Start Over</button>
+        </div>
+
+      </div>
+
+      <!-- ══ RESULTS ══ -->
+      <div id="sel-results" style="display:none;">
+        <div class="results-hdr">
+          <div class="results-title">Recommended Vendors</div>
+          <span id="sel-result-count" class="results-count"></span>
+        </div>
+        <div id="rec-cards"></div>
+        <div style="text-align:center;margin-top:14px;">
+          <button id="show-more-btn" class="show-more-btn" onclick="runSelector(true)" style="display:none;">
+            Show More Vendors (up to 10) &#8594;
+          </button>
+        </div>
+        <div class="next-step-callout">
+          <strong>Next Step:</strong> Review recommendations above, then submit a VER Intake Request
+          to begin the formal engagement process. VER will review your request and advise on the
+          best path forward. <a href="portal_intake_review.html">Submit Intake Request &#8594;</a>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ══ HELP MODAL ══ -->
+<div class="help-modal-bg" id="help-modal-bg" onclick="if(event.target===this)closeHelp()">
+  <div class="help-modal">
+    <div class="help-signal"></div>
+    <div class="help-hd">
+      <div>
+        <div class="help-title">Vendor Selector</div>
+        <div style="font-size:11px;color:var(--ink-muted);margin-top:3px;">VER Advisory Tool &middot; FY27 &middot; Confidential</div>
+      </div>
+      <button class="help-close" onclick="closeHelp()">&#10005;</button>
+    </div>
+    <div class="help-body" id="help-body"></div>
+  </div>
+</div>
+
+<script src="assets/vendors.js"></script>
+<script>
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+function vlogoErr(img){img.style.display='none';var fb=img.nextElementSibling;if(fb)fb.style.display='flex';}
+function vlogoOk(img){var fb=img.nextElementSibling;if(fb)fb.style.display='none';}
+function vendorLogo(domain,name,size,extra){
+  size=size||36;extra=extra||'';
+  var ini=(name||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+  var pal=['#F43F5E','#C026D3','#A855F7','#FBBF24','#34D399'];
+  var lc=pal[(name||'').length%pal.length];
+  var bs='width:'+size+'px;height:'+size+'px;border-radius:8px;flex-shrink:0;';
+  var fb='<div style="'+bs+'background:'+lc+';display:none;align-items:center;'+
+    'justify-content:center;font-size:'+Math.round(size*0.33)+'pt;font-weight:800;'+
+    'color:#fff;font-family:Arial;'+extra+'">'+ini+'</div>';
+  if(!domain) return '<div style="'+bs+'background:'+lc+';display:flex;align-items:center;'+
+    'justify-content:center;font-size:'+Math.round(size*0.33)+'pt;font-weight:800;'+
+    'color:#fff;font-family:Arial;'+extra+'">'+ini+'</div>';
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'"'+
+    ' alt="'+name.replace(/[<>"]/g,'')+'" onerror="vlogoErr(this)" onload="vlogoOk(this)"'+
+    ' style="'+bs+'object-fit:contain;background:#fff;padding:2px;'+extra+'">'+fb;
+}
+
+window.clearSelector = function(){
+  setMode('best');
+  ['sel-scope','sel-pillar','sel-cat','sel-tier','sel-region','sel-duration','sel-timeline'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.value=el.id==='sel-region'?'AMER':'';
+  });
+  var r=document.getElementById('sel-resources');
+  if(r) r.value='';
+  document.querySelectorAll('.cap-btn').forEach(function(b){b.classList.remove('active');});
+  SELECTED_CAPS.clear();
+  var res=document.getElementById('sel-results');
+  if(res) res.style.display='none';
+  var cb=document.getElementById('cost-estimate-box');
+  if(cb) cb.style.display='none';
+  var mb=document.getElementById('show-more-btn');
+  if(mb) mb.style.display='none';
+  var form=document.querySelector('.sel-form');
+  if(form) form.scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+var CAP_RATE_LOOKUP = {"Agile Coach":{"AMER":{"lo":136,"hi":150},"APAC":{"lo":53,"hi":59},"LATAM":{"lo":58,"hi":68},"EMEA":{"lo":78,"hi":91},"Global":{"lo":136,"hi":150}},"Software Engineer":{"AMER":{"lo":90,"hi":100},"APAC":{"lo":90,"hi":100},"LATAM":{"lo":90,"hi":100},"EMEA":{"lo":90,"hi":100},"Global":{"lo":90,"hi":100}},"Sr Software Engineer":{"AMER":{"lo":98,"hi":108},"APAC":{"lo":98,"hi":108},"LATAM":{"lo":98,"hi":108},"EMEA":{"lo":98,"hi":108},"Global":{"lo":98,"hi":108}},"Lead Software Engineer":{"AMER":{"lo":125,"hi":138},"APAC":{"lo":125,"hi":138},"LATAM":{"lo":125,"hi":138},"EMEA":{"lo":125,"hi":138},"Global":{"lo":125,"hi":138}},"Data Analyst":{"AMER":{"lo":75,"hi":82},"APAC":{"lo":27,"hi":34},"LATAM":{"lo":37,"hi":46},"EMEA":{"lo":51,"hi":60},"Global":{"lo":75,"hi":82}},"Sr Data Analyst":{"AMER":{"lo":81,"hi":89},"APAC":{"lo":81,"hi":89},"LATAM":{"lo":81,"hi":89},"EMEA":{"lo":81,"hi":89},"Global":{"lo":81,"hi":89}},"Data Engineer":{"AMER":{"lo":102,"hi":113},"APAC":{"lo":32,"hi":40},"LATAM":{"lo":43,"hi":51},"EMEA":{"lo":63,"hi":74},"Global":{"lo":102,"hi":113}},"Sr Data Engineer":{"AMER":{"lo":110,"hi":121},"APAC":{"lo":110,"hi":121},"LATAM":{"lo":110,"hi":121},"EMEA":{"lo":110,"hi":121},"Global":{"lo":110,"hi":121}},"QA Engineer":{"AMER":{"lo":71,"hi":78},"APAC":{"lo":71,"hi":78},"LATAM":{"lo":71,"hi":78},"EMEA":{"lo":71,"hi":78},"Global":{"lo":71,"hi":78}},"Sr QA Engineer":{"AMER":{"lo":86,"hi":95},"APAC":{"lo":86,"hi":95},"LATAM":{"lo":86,"hi":95},"EMEA":{"lo":86,"hi":95},"Global":{"lo":86,"hi":95}},"Lead QA Engineer":{"AMER":{"lo":98,"hi":108},"APAC":{"lo":98,"hi":108},"LATAM":{"lo":98,"hi":108},"EMEA":{"lo":98,"hi":108},"Global":{"lo":98,"hi":108}},"Test Automation Engineer":{"AMER":{"lo":76,"hi":84},"APAC":{"lo":76,"hi":84},"LATAM":{"lo":76,"hi":84},"EMEA":{"lo":76,"hi":84},"Global":{"lo":76,"hi":84}},"Sr Test Automation Engineer":{"AMER":{"lo":92,"hi":102},"APAC":{"lo":92,"hi":102},"LATAM":{"lo":92,"hi":102},"EMEA":{"lo":92,"hi":102},"Global":{"lo":92,"hi":102}},"Business Analyst / UI/UX Designer":{"AMER":{"lo":85,"hi":93},"APAC":{"lo":85,"hi":93},"LATAM":{"lo":85,"hi":93},"EMEA":{"lo":85,"hi":93},"Global":{"lo":85,"hi":93}},"Senior Business Analyst":{"AMER":{"lo":92,"hi":101},"APAC":{"lo":92,"hi":101},"LATAM":{"lo":92,"hi":101},"EMEA":{"lo":92,"hi":101},"Global":{"lo":92,"hi":101}},"Senior UI/UX Designer":{"AMER":{"lo":92,"hi":102},"APAC":{"lo":92,"hi":102},"LATAM":{"lo":92,"hi":102},"EMEA":{"lo":92,"hi":102},"Global":{"lo":92,"hi":102}},"Product Manager / Project Manager":{"AMER":{"lo":98,"hi":108},"APAC":{"lo":98,"hi":108},"LATAM":{"lo":98,"hi":108},"EMEA":{"lo":98,"hi":108},"Global":{"lo":98,"hi":108}},"Product Owner":{"AMER":{"lo":109,"hi":121},"APAC":{"lo":31,"hi":37},"LATAM":{"lo":37,"hi":46},"EMEA":{"lo":63,"hi":73},"Global":{"lo":109,"hi":121}},"Sr Product Owner":{"AMER":{"lo":114,"hi":126},"APAC":{"lo":114,"hi":126},"LATAM":{"lo":114,"hi":126},"EMEA":{"lo":114,"hi":126},"Global":{"lo":114,"hi":126}},"Scrum Master":{"AMER":{"lo":112,"hi":123},"APAC":{"lo":112,"hi":123},"LATAM":{"lo":112,"hi":123},"EMEA":{"lo":112,"hi":123},"Global":{"lo":112,"hi":123}},"Sr Scrum Master":{"AMER":{"lo":110,"hi":122},"APAC":{"lo":110,"hi":122},"LATAM":{"lo":110,"hi":122},"EMEA":{"lo":110,"hi":122},"Global":{"lo":110,"hi":122}},"Consultant":{"AMER":{"lo":133,"hi":193},"APAC":{"lo":137,"hi":151},"LATAM":{"lo":137,"hi":151},"EMEA":{"lo":137,"hi":151},"Global":{"lo":137,"hi":151}},"Consulting Analyst":{"AMER":{"lo":89,"hi":98},"APAC":{"lo":89,"hi":98},"LATAM":{"lo":89,"hi":98},"EMEA":{"lo":89,"hi":98},"Global":{"lo":89,"hi":98}},"Senior Consulting Analyst":{"AMER":{"lo":96,"hi":106},"APAC":{"lo":96,"hi":106},"LATAM":{"lo":96,"hi":106},"EMEA":{"lo":96,"hi":106},"Global":{"lo":96,"hi":106}},"Consulting Manager / Program Manager":{"AMER":{"lo":149,"hi":164},"APAC":{"lo":149,"hi":164},"LATAM":{"lo":149,"hi":164},"EMEA":{"lo":149,"hi":164},"Global":{"lo":149,"hi":164}},"Tech Lead":{"AMER":{"lo":118,"hi":130},"APAC":{"lo":118,"hi":130},"LATAM":{"lo":118,"hi":130},"EMEA":{"lo":118,"hi":130},"Global":{"lo":118,"hi":130}},"Information Architect":{"AMER":{"lo":150,"hi":165},"APAC":{"lo":150,"hi":165},"LATAM":{"lo":150,"hi":165},"EMEA":{"lo":150,"hi":165},"Global":{"lo":150,"hi":165}},"Program Director":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":66,"hi":80},"LATAM":{"lo":72,"hi":86},"EMEA":{"lo":111,"hi":130}},"Delivery Manager":{"AMER":{"lo":141,"hi":156},"APAC":{"lo":141,"hi":156},"LATAM":{"lo":141,"hi":156},"EMEA":{"lo":141,"hi":156},"Global":{"lo":141,"hi":156}},"Solution Architect":{"AMER":{"lo":136,"hi":150},"APAC":{"lo":136,"hi":150},"LATAM":{"lo":136,"hi":150},"EMEA":{"lo":136,"hi":150},"Global":{"lo":136,"hi":150}},"Principal Software Engineer":{"AMER":{"lo":163,"hi":180},"APAC":{"lo":163,"hi":180},"LATAM":{"lo":163,"hi":180},"EMEA":{"lo":163,"hi":180},"Global":{"lo":163,"hi":180}},"Chief Software Engineer":{"AMER":{"lo":136,"hi":150},"APAC":{"lo":136,"hi":150},"LATAM":{"lo":136,"hi":150},"EMEA":{"lo":136,"hi":150},"Global":{"lo":136,"hi":150}},"Cloud Engineer":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":41,"hi":50},"LATAM":{"lo":50,"hi":62},"EMEA":{"lo":67,"hi":78}},"Cloud Architect":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":59,"hi":62},"LATAM":{"lo":63,"hi":80},"EMEA":{"lo":93,"hi":109}},"Machine Learning Engineer":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":37,"hi":46},"LATAM":{"lo":49,"hi":60},"EMEA":{"lo":60,"hi":70}},"Security Analyst":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":24,"hi":32},"LATAM":{"lo":43,"hi":49},"EMEA":{"lo":54,"hi":63}},"Security Engineer":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":34,"hi":43},"LATAM":{"lo":50,"hi":59},"EMEA":{"lo":68,"hi":79}},"Security Architect":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":54,"hi":62},"LATAM":{"lo":72,"hi":80},"EMEA":{"lo":78,"hi":91}},"Database Administrator":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":29,"hi":38},"LATAM":{"lo":37,"hi":46},"EMEA":{"lo":54,"hi":63}},"System Administrator":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":29,"hi":38},"LATAM":{"lo":34,"hi":46},"EMEA":{"lo":42,"hi":49}},"Network Engineer":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":48,"hi":57},"LATAM":{"lo":50,"hi":59},"EMEA":{"lo":66,"hi":78}},"Production Support Analyst":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":18,"hi":28},"LATAM":{"lo":26,"hi":35},"EMEA":{"lo":42,"hi":50}},"Technical Writer":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":29,"hi":38},"LATAM":{"lo":37,"hi":46},"EMEA":{"lo":48,"hi":56}},"Application Development":{"AMER":{"lo":90,"hi":100},"APAC":{"lo":90,"hi":100},"LATAM":{"lo":90,"hi":100},"EMEA":{"lo":90,"hi":100},"Global":{"lo":90,"hi":100}},"Application Maintenance":{"AMER":{"lo":98,"hi":108},"APAC":{"lo":98,"hi":108},"LATAM":{"lo":98,"hi":108},"EMEA":{"lo":98,"hi":108},"Global":{"lo":98,"hi":108}},"Cloud Infrastructure":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":41,"hi":50},"LATAM":{"lo":50,"hi":62},"EMEA":{"lo":67,"hi":78}},"Data Engineering":{"AMER":{"lo":102,"hi":113},"APAC":{"lo":32,"hi":40},"LATAM":{"lo":43,"hi":51},"EMEA":{"lo":63,"hi":74},"Global":{"lo":102,"hi":113}},"AI / ML":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":37,"hi":46},"LATAM":{"lo":49,"hi":60},"EMEA":{"lo":60,"hi":70}},"Security":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":24,"hi":32},"LATAM":{"lo":43,"hi":49},"EMEA":{"lo":54,"hi":63}},"Staff Augmentation":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":40,"hi":48},"LATAM":{"lo":48,"hi":59},"EMEA":{"lo":64,"hi":75}},"ERP / Workday":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":31,"hi":39},"LATAM":{"lo":46,"hi":55},"EMEA":{"lo":55,"hi":65}},"Service Desk":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":12,"hi":21},"LATAM":{"lo":13,"hi":24},"EMEA":{"lo":26,"hi":30}},"QA & Testing":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":31,"hi":38},"LATAM":{"lo":33,"hi":43},"EMEA":{"lo":50,"hi":59}},"DevOps":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":31,"hi":40},"LATAM":{"lo":45,"hi":54},"EMEA":{"lo":59,"hi":69}},"Platform Engineering":{"AMER":{"lo":125,"hi":138},"APAC":{"lo":125,"hi":138},"LATAM":{"lo":125,"hi":138},"EMEA":{"lo":125,"hi":138},"Global":{"lo":125,"hi":138}},"Analytics & BI":{"AMER":{"lo":75,"hi":82},"APAC":{"lo":27,"hi":34},"LATAM":{"lo":37,"hi":46},"EMEA":{"lo":51,"hi":60},"Global":{"lo":75,"hi":82}},"Managed Services":{"AMER":{"lo":85,"hi":130},"EMEA":{"lo":60,"hi":85},"APAC":{"lo":25,"hi":40},"LATAM":{"lo":35,"hi":52},"Global":{"lo":85,"hi":130}},"Network & AV":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":48,"hi":57},"LATAM":{"lo":50,"hi":59},"EMEA":{"lo":66,"hi":78}},"Identity & Access":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":24,"hi":32},"LATAM":{"lo":43,"hi":49},"EMEA":{"lo":54,"hi":63}},"Helpdesk Support":{"AMER":{"lo":121,"hi":133},"APAC":{"lo":12,"hi":21},"LATAM":{"lo":13,"hi":24},"EMEA":{"lo":26,"hi":30}},"Consulting / Advisory":{"AMER":{"lo":133,"hi":193},"APAC":{"lo":35,"hi":55},"LATAM":{"lo":50,"hi":75}}};
+
+var RATE_CARD_DATA = {"AMER":{"Contingent Workforce":{"avg_low":121.0,"avg_high":133.0,"low":71.0,"high":224.0,"count":98},"Professional Services":{"avg_low":2057.0,"avg_high":3626.0,"low":100.0,"high":15000.0,"count":7},"Hardware & Infrastructure":{"avg_low":1600.0,"avg_high":2500.0,"low":800.0,"high":3800.0,"count":2}},"APAC":{"Contingent Workforce":{"avg_low":40.0,"avg_high":48.0,"low":11.0,"high":89.0,"count":105},"Professional Services":{"avg_low":35.0,"avg_high":55.0,"low":35.0,"high":55.0,"count":1}},"LATAM":{"Contingent Workforce":{"avg_low":48.0,"avg_high":59.0,"low":13.0,"high":89.0,"count":104},"Professional Services":{"avg_low":50.0,"avg_high":75.0,"low":50.0,"high":75.0,"count":1}},"EMEA":{"Contingent Workforce":{"avg_low":64.0,"avg_high":75.0,"low":26.0,"high":130.0,"count":107}},"Global":{"Software / SaaS":{"avg_low":100006.0,"avg_high":725063.0,"low":0.01,"high":1500000.0,"count":8},"Cloud & Managed Services":{"avg_low":345002.0,"avg_high":680004.0,"low":8.0,"high":2000000.0,"count":4},"Hardware & Infrastructure":{"avg_low":8450.0,"avg_high":35300.0,"low":800.0,"high":100000.0,"count":4}}};
+
+const SAMPLE_VENDORS = [
+  {id:'V001',name:'NTT Data',category:'Professional Services',tier:1,status:'Active',region:'AMER|APAC|EMEA',annual_spend:'$22.8M',renewal_date:'2028-09-01',primary_contact:'VER Team',description:'MSP for DET Application Maintenance. Large-scale AMS and managed services engagement across DET pillars.',sla_score:97,concentration_risk:85,financial_risk:15,delivery_risk:20,compliance_risk:10,risk_score:40,capabilities:['Application Maintenance','Managed Services','Staff Augmentation','DevOps'],domain:'nttdata.com',notes:'AMS decentralization underway.'},
+  {id:'V002',name:'Cognizant',category:'Professional Services',tier:1,status:'Active',region:'AMER|APAC|EMEA',annual_spend:'$9.5M',renewal_date:'2027-02-14',primary_contact:'VER Team',description:'Workday ADAMS Enterprise Systems and Financials AMS engagements.',sla_score:99,concentration_risk:60,financial_risk:20,delivery_risk:15,compliance_risk:12,risk_score:31,capabilities:['ERP / Workday','Application Maintenance','Staff Augmentation','Analytics & BI'],domain:'cognizant.com',notes:'ES Yr3 final year. FINS Yr2.'},
+  {id:'V004',name:'Workday',category:'Software / SaaS',tier:1,status:'Active',region:'Global',annual_spend:'$23.7M',renewal_date:'2026-11-30',primary_contact:'VER Team',description:'Core HCM, Financials, and enterprise platform license.',sla_score:98,concentration_risk:90,financial_risk:10,delivery_risk:10,compliance_risk:8,risk_score:38,capabilities:['ERP / Workday','Analytics & BI','Identity & Access'],domain:'workday.com'},
+  {id:'V005',name:'AWS',category:'Cloud & Managed Services',tier:1,status:'Active',region:'Global',annual_spend:'$17.2M',renewal_date:'2027-03-01',primary_contact:'VER Team',description:'Cloud infrastructure and managed services via Enterprise Discount Program.',sla_score:99,concentration_risk:80,financial_risk:8,delivery_risk:10,compliance_risk:12,risk_score:34,capabilities:['Cloud Infrastructure','DevOps','Security','Managed Services','AI / ML'],domain:'aws.amazon.com'},
+  {id:'V013',name:'Microsoft',category:'Software / SaaS',tier:1,status:'Active',region:'Global',annual_spend:'$1.4M',renewal_date:'2026-06-30',primary_contact:'VER Team',description:'Microsoft 365, Azure dev tooling, and enterprise licensing.',sla_score:98,concentration_risk:50,financial_risk:10,delivery_risk:8,compliance_risk:10,risk_score:23,capabilities:['Cloud Infrastructure','DevOps','Platform Engineering','Analytics & BI'],domain:'microsoft.com'},
+  {id:'V033',name:'McKinsey & Company',category:'Professional Services',tier:1,status:'Active',region:'Global',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Strategic management consulting. Director-managed executive relationship.',sla_score:93,concentration_risk:25,financial_risk:20,delivery_risk:20,compliance_risk:15,risk_score:21,capabilities:['Consulting / Advisory'],domain:'mckinsey.com'},
+  {id:'V003',name:'Tech Mahindra',category:'Professional Services',tier:2,status:'Active',region:'Global',annual_spend:'$6.5M',renewal_date:'2027-04-30',primary_contact:'VER Team',description:'Techforce Service Desk and On-Site Services. 3 SLA metrics currently below target.',sla_score:82,concentration_risk:50,financial_risk:30,delivery_risk:68,compliance_risk:55,risk_score:52,capabilities:['Service Desk','Managed Services','Staff Augmentation','Network & AV'],domain:'techmahindra.com'},
+  {id:'V006',name:'IBM',category:'Professional Services',tier:2,status:'Active',region:'AMER|EMEA',annual_spend:'$14.3M',renewal_date:'2026-08-01',primary_contact:'VER Team',description:'Enterprise application and data services.',sla_score:91,concentration_risk:55,financial_risk:35,delivery_risk:40,compliance_risk:30,risk_score:43,capabilities:['Application Development','Data Engineering','Security','Analytics & BI','Managed Services'],domain:'ibm.com'},
+  {id:'V008',name:'Deloitte',category:'Professional Services',tier:2,status:'Active',region:'AMER|EMEA',annual_spend:'$9.1M',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Advisory and implementation services across DET programs.',sla_score:94,concentration_risk:40,financial_risk:25,delivery_risk:30,compliance_risk:20,risk_score:31,capabilities:['Consulting / Advisory','Application Development','Data Engineering','QA & Testing'],domain:'deloitte.com'},
+  {id:'V009',name:'BCG',category:'Professional Services',tier:2,status:'Active',region:'AMER',annual_spend:'$6.0M',renewal_date:'2026-06-30',primary_contact:'VER Team',description:'Strategic consulting and advisory engagement.',sla_score:78,concentration_risk:30,financial_risk:40,delivery_risk:70,compliance_risk:50,risk_score:47,capabilities:['Consulting / Advisory'],domain:'bcg.com'},
+  {id:'V029',name:'Accenture',category:'Professional Services',tier:2,status:'Active',region:'Global',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Global IT services and consulting. Active SOW supplier. LATAM supplier.',sla_score:88,concentration_risk:45,financial_risk:25,delivery_risk:30,compliance_risk:20,risk_score:33,capabilities:['Application Development','Consulting / Advisory','Data Engineering','Staff Augmentation'],domain:'accenture.com'},
+  {id:'V030',name:'PwC',category:'Professional Services',tier:2,status:'Active',region:'AMER',annual_spend:'$0.5M',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Advisory and technology consulting.',sla_score:91,concentration_risk:35,financial_risk:22,delivery_risk:25,compliance_risk:18,risk_score:27,capabilities:['Consulting / Advisory','Application Development','Security'],domain:'pwc.com'},
+  {id:'V014',name:'ServiceNow',category:'Software / SaaS',tier:2,status:'Active',region:'Global',annual_spend:'$0.9M',renewal_date:'2026-12-01',primary_contact:'VER Team',description:'ITSM and workflow automation platform.',sla_score:96,concentration_risk:35,financial_risk:18,delivery_risk:15,compliance_risk:12,risk_score:22,capabilities:['Platform Engineering','Managed Services'],domain:'servicenow.com'},
+  {id:'V015',name:'Splunk',category:'Software / SaaS',tier:2,status:'Active',region:'AMER',annual_spend:'$0.7M',renewal_date:'2027-03-15',primary_contact:'VER Team',description:'Security information and event management (SIEM) platform.',sla_score:95,concentration_risk:30,financial_risk:18,delivery_risk:12,compliance_risk:8,risk_score:19,capabilities:['Security','Analytics & BI','DevOps'],domain:'splunk.com'},
+  {id:'V016',name:'Tableau',category:'Software / SaaS',tier:2,status:'Active',region:'Global',annual_spend:'$0.5M',renewal_date:'2026-09-01',primary_contact:'VER Team',description:'Business intelligence and data visualization platform.',sla_score:97,concentration_risk:25,financial_risk:12,delivery_risk:10,compliance_risk:8,risk_score:15,capabilities:['Analytics & BI','Data Engineering'],domain:'tableau.com'},
+  {id:'V017',name:'Okta',category:'Software / SaaS',tier:2,status:'Active',region:'Global',annual_spend:'$0.8M',renewal_date:'2026-11-30',primary_contact:'VER Team',description:'Identity and access management platform.',sla_score:98,concentration_risk:40,financial_risk:15,delivery_risk:10,compliance_risk:10,risk_score:22,capabilities:['Identity & Access','Security'],domain:'okta.com'},
+  {id:'V018',name:'Atlassian',category:'Software / SaaS',tier:2,status:'Active',region:'AMER|APAC',annual_spend:'$0.6M',renewal_date:'2027-01-15',primary_contact:'VER Team',description:'Jira, Confluence, and collaboration tooling.',sla_score:96,concentration_risk:30,financial_risk:12,delivery_risk:10,compliance_risk:8,risk_score:17,capabilities:['Platform Engineering','DevOps','QA & Testing'],domain:'atlassian.com'},
+  {id:'V019',name:'Snowflake',category:'Software / SaaS',tier:2,status:'Active',region:'Global',annual_spend:'$1.1M',renewal_date:'2026-08-15',primary_contact:'VER Team',description:'Cloud data warehouse and analytics platform.',sla_score:96,concentration_risk:35,financial_risk:15,delivery_risk:12,compliance_risk:10,risk_score:20,capabilities:['Data Engineering','Analytics & BI','Cloud Infrastructure'],domain:'snowflake.com'},
+  {id:'V007',name:'Google Cloud',category:'Cloud & Managed Services',tier:2,status:'Active',region:'Global',annual_spend:'$14.0M',renewal_date:'2027-01-15',primary_contact:'VER Team',description:'Google Cloud Platform, Workspace, and AI/Gemini services.',sla_score:99,concentration_risk:65,financial_risk:10,delivery_risk:12,compliance_risk:10,risk_score:30,capabilities:['Cloud Infrastructure','Analytics & BI','AI / ML','Platform Engineering'],domain:'cloud.google.com'},
+  {id:'V066',name:'Microsoft Azure',category:'Cloud & Managed Services',tier:2,status:'Active',region:'Global',annual_spend:'$0',renewal_date:'2026-09-30',primary_contact:'VER Team',description:'Azure cloud computing, AI, and managed services.',sla_score:97,concentration_risk:55,financial_risk:10,delivery_risk:10,compliance_risk:10,risk_score:26,capabilities:['Cloud Infrastructure','AI / ML','DevOps','Security','Managed Services'],domain:'azure.microsoft.com'},
+  {id:'V068',name:'Verizon Business',category:'Cloud & Managed Services',tier:2,status:'Active',region:'AMER|EMEA',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Network, security, and managed communication services.',sla_score:88,concentration_risk:40,financial_risk:20,delivery_risk:22,compliance_risk:18,risk_score:27,capabilities:['Network & AV','Security','Managed Services','Cloud Infrastructure'],domain:'verizonbusiness.com'},
+  {id:'V044',name:'Insight Global',category:'Contingent Workforce',tier:2,status:'Active',region:'AMER',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'IT staffing and managed services. AMER Elite Partner. WBE certified.',sla_score:87,concentration_risk:35,financial_risk:22,delivery_risk:28,compliance_risk:18,risk_score:28,capabilities:['Staff Augmentation','Application Development','DevOps','QA & Testing','Data Engineering'],domain:'insightglobal.com'},
+  {id:'V045',name:'TEKsystems',category:'Contingent Workforce',tier:2,status:'Active',region:'AMER',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'IT staffing and managed services. AMER Elite Partner. MBE (LGBTQ+) certified.',sla_score:87,concentration_risk:35,financial_risk:22,delivery_risk:28,compliance_risk:18,risk_score:28,capabilities:['Staff Augmentation','Application Development','DevOps','QA & Testing'],domain:'teksystems.com'},
+  {id:'V046',name:'Adecco',category:'Contingent Workforce',tier:2,status:'Active',region:'AMER',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'General staffing and workforce solutions. AMER Elite Partner.',sla_score:83,concentration_risk:32,financial_risk:22,delivery_risk:26,compliance_risk:18,risk_score:26,capabilities:['Staff Augmentation'],domain:'adecco.com'},
+  {id:'V047',name:'BCForward',category:'Contingent Workforce',tier:2,status:'Active',region:'AMER',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'IT staffing firm. AMER Elite Partner. MBE certified.',sla_score:84,concentration_risk:30,financial_risk:22,delivery_risk:26,compliance_risk:18,risk_score:25,capabilities:['Staff Augmentation','Application Development'],domain:'bcforward.com'},
+  {id:'V048',name:'Spectraforce Technologies',category:'Contingent Workforce',tier:2,status:'Active',region:'AMER',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'IT staffing. AMER Elite Partner. WBE certified. Active SOW in Fieldglass.',sla_score:84,concentration_risk:30,financial_risk:22,delivery_risk:26,compliance_risk:18,risk_score:25,capabilities:['Staff Augmentation','Application Development','QA & Testing'],domain:'spectraforce.com'},
+  {id:'V049',name:'Swoon',category:'Contingent Workforce',tier:2,status:'Active',region:'AMER',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Technology staffing. AMER Elite Partner. SBA(8) and MBE certified.',sla_score:84,concentration_risk:28,financial_risk:20,delivery_risk:25,compliance_risk:18,risk_score:24,capabilities:['Staff Augmentation','Application Development'],domain:'swoonstaffing.com'},
+  {id:'V069',name:'Dell Technologies',category:'Hardware & Infrastructure',tier:2,status:'Active',region:'Global',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Enterprise hardware, servers, storage.',sla_score:92,concentration_risk:40,financial_risk:15,delivery_risk:18,compliance_risk:12,risk_score:24,capabilities:['Hardware Supply','Network & AV','Managed Services'],domain:'dell.com'},
+  {id:'V070',name:'HP Inc.',category:'Hardware & Infrastructure',tier:2,status:'Active',region:'Global',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Workstations, laptops, and enterprise hardware.',sla_score:90,concentration_risk:35,financial_risk:15,delivery_risk:18,compliance_risk:12,risk_score:22,capabilities:['Hardware Supply'],domain:'hp.com'},
+  {id:'V071',name:'Insight Direct',category:'Hardware & Infrastructure',tier:2,status:'Active',region:'AMER|EMEA',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'IT products and hardware. Highest hardware spend in Coupa.',sla_score:88,concentration_risk:30,financial_risk:15,delivery_risk:18,compliance_risk:12,risk_score:21,capabilities:['Hardware Supply','Managed Services'],domain:'insight.com'},
+  {id:'V072',name:'Cisco',category:'Hardware & Infrastructure',tier:2,status:'Active',region:'Global',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Networking, security, and collaboration infrastructure.',sla_score:92,concentration_risk:45,financial_risk:15,delivery_risk:18,compliance_risk:12,risk_score:26,capabilities:['Network & AV','Security','Cloud Infrastructure'],domain:'cisco.com'},
+  {id:'V073',name:'WWT (World Wide Technology)',category:'Hardware & Infrastructure',tier:2,status:'Active',region:'AMER',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Technology solutions, integration, and supply chain services.',sla_score:89,concentration_risk:32,financial_risk:16,delivery_risk:18,compliance_risk:14,risk_score:22,capabilities:['Hardware Supply','Network & AV','Cloud Infrastructure','Managed Services'],domain:'wwt.com'},
+  {id:'V074',name:'Computacenter',category:'Hardware & Infrastructure',tier:2,status:'Active',region:'EMEA',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'IT infrastructure, hardware, and managed services (EMEA).',sla_score:88,concentration_risk:30,financial_risk:15,delivery_risk:18,compliance_risk:12,risk_score:21,capabilities:['Hardware Supply','Managed Services','Network & AV'],domain:'computacenter.com'},
+  {id:'V010',name:'Gartner',category:'Software / SaaS',tier:3,status:'Active',region:'AMER',annual_spend:'$1.2M',renewal_date:'2026-09-30',primary_contact:'VER Team',description:'Research, advisory, and analyst subscription services.',sla_score:95,concentration_risk:15,financial_risk:20,delivery_risk:18,compliance_risk:15,risk_score:17,capabilities:['Consulting / Advisory','Analytics & BI'],domain:'gartner.com'},
+  {id:'V011',name:'Conviva',category:'Software / SaaS',tier:3,status:'Active',region:'AMER',annual_spend:'$0.8M',renewal_date:'2026-10-15',primary_contact:'VER Team',description:'Video intelligence and streaming analytics platform.',sla_score:93,concentration_risk:20,financial_risk:22,delivery_risk:25,compliance_risk:18,risk_score:22,capabilities:['Analytics & BI','Platform Engineering'],domain:'conviva.com'},
+  {id:'V067',name:'Rackspace',category:'Cloud & Managed Services',tier:3,status:'Active',region:'AMER|EMEA',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Managed cloud services across AWS, Azure, and GCP.',sla_score:85,concentration_risk:30,financial_risk:22,delivery_risk:25,compliance_risk:20,risk_score:25,capabilities:['Cloud Infrastructure','Managed Services','DevOps'],domain:'rackspace.com'},
+  {id:'V096',name:'Commoneo',category:'Professional Services',tier:3,status:'Active',region:'AMER|EMEA',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Consulting / Advisory',sla_score:90,concentration_risk:78,financial_risk:18,delivery_risk:16,compliance_risk:18,risk_score:38,capabilities:['Consulting / Advisory'],domain:''},
+  {id:'V083',name:'iCloud Nexus',category:'Contingent Workforce',tier:3,status:'Active',region:'AMER|APAC',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Staff Augmentation',sla_score:90,concentration_risk:80,financial_risk:20,delivery_risk:18,compliance_risk:20,risk_score:40,capabilities:['Staff Augmentation'],domain:''},
+  {id:'V106',name:'eTeam Workforce Limited',category:'Contingent Workforce',tier:3,status:'Active',region:'EMEA|APAC',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Staff Augmentation',sla_score:90,concentration_risk:75,financial_risk:18,delivery_risk:16,compliance_risk:20,risk_score:38,capabilities:['Staff Augmentation'],domain:''},
+  {id:'V097',name:'Matata Solutions',category:'Professional Services',tier:3,status:'Active',region:'LATAM',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Application Development / Consulting',sla_score:90,concentration_risk:78,financial_risk:20,delivery_risk:18,compliance_risk:22,risk_score:40,capabilities:['Application Development','Consulting / Advisory'],domain:''},
+  {id:'V098',name:'Page Interim',category:'Contingent Workforce',tier:3,status:'Active',region:'LATAM',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Staff Augmentation',sla_score:90,concentration_risk:75,financial_risk:18,delivery_risk:16,compliance_risk:20,risk_score:38,capabilities:['Staff Augmentation'],domain:''},
+  {id:'V126',name:'Pasona',category:'Contingent Workforce',tier:3,status:'Active',region:'JAPAC',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Staff Augmentation',sla_score:90,concentration_risk:75,financial_risk:18,delivery_risk:16,compliance_risk:20,risk_score:38,capabilities:['Staff Augmentation'],domain:''},
+  {id:'V127',name:'Persol Temp Staff',category:'Contingent Workforce',tier:3,status:'Active',region:'JAPAC',annual_spend:'$0',renewal_date:'2026-12-31',primary_contact:'VER Team',description:'Staff Augmentation',sla_score:90,concentration_risk:75,financial_risk:18,delivery_risk:16,compliance_risk:20,risk_score:38,capabilities:['Staff Augmentation'],domain:''}
+];
+
+var ALL_VENDORS = [];
+var SELECTED_CAPS = new Set();
+var ALL_SCORED = [];
+
+ALL_VENDORS = (window.VER_VENDORS && window.VER_VENDORS.length) ? window.VER_VENDORS : SAMPLE_VENDORS;
+
+function toggleCap(btn){
+  btn.classList.toggle('active');
+  if(btn.classList.contains('active')) SELECTED_CAPS.add(btn.textContent.trim());
+  else SELECTED_CAPS.delete(btn.textContent.trim());
+}
+
+window.updateCostEstimate = function(){
+  var box=document.getElementById('cost-estimate-box');
+  var rangeEl=document.getElementById('cost-estimate-range');
+  var labelEl=document.getElementById('cost-estimate-label');
+  var resEl=document.getElementById('cost-detail-resources');
+  var durEl=document.getElementById('cost-detail-duration');
+  var rateEl=document.getElementById('cost-detail-rate');
+  if(!box) return;
+  var months=parseInt((document.getElementById('sel-duration')||{}).value)||0;
+  var resources=parseInt((document.getElementById('sel-resources')||{}).value)||0;
+  var region=((document.getElementById('sel-region')||{}).value)||'AMER';
+  var category=((document.getElementById('sel-cat')||{}).value)||'';
+  if(!months||!resources){box.style.display='none';return;}
+  var selectedCaps=Array.from(SELECTED_CAPS);
+  var capRate=null,rateSource='';
+  if(selectedCaps.length>0){
+    for(var ci=0;ci<selectedCaps.length;ci++){
+      var capEntry=CAP_RATE_LOOKUP[selectedCaps[ci]];
+      if(capEntry){var re=capEntry[region]||capEntry['AMER'];if(re&&re.lo){capRate=re;rateSource=selectedCaps[ci];break;}}
+    }
+  }
+  if(!capRate&&category){
+    var rd=RATE_CARD_DATA[region]||RATE_CARD_DATA['AMER']||{};
+    var ce=rd[category];
+    if(ce&&ce.avg_low){capRate={lo:ce.avg_low,hi:ce.avg_high};rateSource=category;}
+  }
+  if(!capRate){var fb={AMER:{lo:90,hi:150},APAC:{lo:30,hi:55},LATAM:{lo:40,hi:65},EMEA:{lo:55,hi:85},Global:{lo:60,hi:110}};capRate=fb[region]||fb.AMER;rateSource='';}
+  var rateNote=rateSource?rateSource+' | '+region+' benchmark $'+capRate.lo+'-$'+capRate.hi+'/hr':region+' market benchmark $'+capRate.lo+'-$'+capRate.hi+'/hr (select capability for precision)';
+  var hrs=160;
+  var lo=Math.round(capRate.lo*hrs*months*resources/1000);
+  var hi=Math.round(capRate.hi*hrs*months*resources/1000);
+  function fmtK(n){if(n>=1000)return'$'+(n>=10000?Math.round(n/1000).toLocaleString():(n/1000).toFixed(1))+'M';return'$'+n.toLocaleString()+'K';}
+  if(rangeEl)rangeEl.textContent=fmtK(lo)+' - '+fmtK(hi);
+  if(labelEl)labelEl.textContent=resources+' resource'+(resources>1?'s':'')+' x '+months+' month'+(months>1?'s':'')+' | '+region;
+  if(resEl)resEl.textContent='Resources: '+resources+' resource(s) | 160 hrs/month billing assumption';
+  if(durEl)durEl.textContent='Duration: '+months+' month'+(months>1?'s':'');
+  if(rateEl)rateEl.textContent='Rate: '+rateNote;
+  box.style.display='block';
+};
+
+var SELECTOR_MODE='best';
+function setMode(mode){
+  SELECTOR_MODE=mode;
+  var best=document.getElementById('mode-best');
+  var port=document.getElementById('mode-portfolio');
+  if(best)best.classList.toggle('active',mode==='best');
+  if(port)port.classList.toggle('active',mode==='portfolio');
+}
+
+var CAP_SKILL_MAP={'Agile Coach':'Agile Delivery','Software Engineer':'Application Development','Sr Software Engineer':'Application Development','Lead Software Engineer':'Software Engineering','Principal Software Engineer':'Software Engineering','Chief Software Engineer':'Software Engineering','Tech Lead':'Software Engineering','Data Analyst':'Analytics & BI','Sr Data Analyst':'Analytics & BI','Data Engineer':'Data Engineering','Sr Data Engineer':'Data Engineering','Database Administrator':'Data Engineering','QA Engineer':'QA & Testing','Sr QA Engineer':'QA & Testing','Lead QA Engineer':'QA & Testing','Test Automation Engineer':'QA & Testing','Sr Test Automation Engineer':'QA & Testing','Business Analyst / UI/UX Designer':'Agile Delivery','Senior Business Analyst':'Agile Delivery','Senior UI/UX Designer':'Agile Delivery','Product Manager / Project Manager':'Agile Delivery','Product Owner':'Agile Delivery','Sr Product Owner':'Agile Delivery','Scrum Master':'Agile Delivery','Sr Scrum Master':'Agile Delivery','Information Architect':'Agile Delivery','Delivery Manager':'Agile Delivery','Solution Architect':'Enterprise Architecture','Cloud Engineer':'Cloud Infrastructure','Cloud Architect':'Cloud Infrastructure','Machine Learning Engineer':'AI / ML','Security Analyst':'Security','Security Engineer':'Security','Security Architect':'Security','Network Engineer':'Network & AV','System Administrator':'Managed Services','Production Support Analyst':'Application Maintenance','Technical Writer':'Application Development','Helpdesk Support':'Service Desk','Program Director':'Consulting / Advisory','Consultant':'Consulting / Advisory','Consulting Analyst':'Consulting / Advisory','Senior Consulting Analyst':'Consulting / Advisory','Consulting Manager / Program Manager':'Consulting / Advisory'};
+
+var CAP_CATEGORY_MAP={'Agile Coach':'Contingent Workforce','Software Engineer':'Contingent Workforce','Sr Software Engineer':'Contingent Workforce','Lead Software Engineer':'Contingent Workforce','Data Analyst':'Contingent Workforce','Sr Data Analyst':'Contingent Workforce','Data Engineer':'Contingent Workforce','Sr Data Engineer':'Contingent Workforce','QA Engineer':'Contingent Workforce','Sr QA Engineer':'Contingent Workforce','Lead QA Engineer':'Contingent Workforce','Test Automation Engineer':'Contingent Workforce','Sr Test Automation Engineer':'Contingent Workforce','Business Analyst / UI/UX Designer':'Contingent Workforce','Senior Business Analyst':'Contingent Workforce','Senior UI/UX Designer':'Contingent Workforce','Product Manager / Project Manager':'Contingent Workforce','Product Owner':'Contingent Workforce','Sr Product Owner':'Contingent Workforce','Scrum Master':'Contingent Workforce','Sr Scrum Master':'Contingent Workforce','Tech Lead':'Contingent Workforce','Information Architect':'Contingent Workforce','Delivery Manager':'Contingent Workforce','Solution Architect':'Contingent Workforce','Principal Software Engineer':'Contingent Workforce','Chief Software Engineer':'Contingent Workforce','Cloud Engineer':'Contingent Workforce','Cloud Architect':'Contingent Workforce','Machine Learning Engineer':'Contingent Workforce','Security Analyst':'Contingent Workforce','Security Engineer':'Contingent Workforce','Security Architect':'Contingent Workforce','Database Administrator':'Contingent Workforce','System Administrator':'Contingent Workforce','Network Engineer':'Contingent Workforce','Production Support Analyst':'Contingent Workforce','Technical Writer':'Contingent Workforce','Helpdesk Support':'Professional Services','Service Desk':'Professional Services','Program Director':'Contingent Workforce','Consultant':'Professional Services','Consulting Analyst':'Professional Services','Senior Consulting Analyst':'Professional Services','Consulting Manager / Program Manager':'Professional Services'};
+
+function scoreVendor(v,params,mode){
+  if(params.region&&v.region&&v.region!=='Global'){var vr=v.region.split('|');if(!vr.includes(params.region))return -1;}
+  var caps=v.capabilities||[];
+  var selCaps=params.capabilities;
+  var resolvedCaps=selCaps.map(function(c){return(CAP_SKILL_MAP&&CAP_SKILL_MAP[c])?CAP_SKILL_MAP[c]:c;});
+  var directMatch=[],proxyMatch=[];
+  if(selCaps.length>0){
+    directMatch=resolvedCaps.filter(function(c){return caps.includes(c);});
+    proxyMatch=resolvedCaps.filter(function(c){
+      if(directMatch.includes(c))return false;
+      var parentCat=(typeof CAP_CATEGORY_MAP!=='undefined')?CAP_CATEGORY_MAP[selCaps[resolvedCaps.indexOf(c)]]:null;
+      return parentCat&&v.category===parentCat;
+    });
+    if(directMatch.length===0&&proxyMatch.length===0)return -1;
+  }
+  var capScore=0;
+  if(selCaps.length>0){
+    if(directMatch.length>0){var mr=directMatch.length/resolvedCaps.length;var mc=directMatch.length/Math.max(caps.length,1);capScore=mr*40+mc*10;}
+    else{capScore=(proxyMatch.length/resolvedCaps.length)*15;}
+  }else{capScore=25;}
+  var catScore=0;
+  if(params.category){catScore=(v.category===params.category)?20:0;if(catScore===0&&directMatch.length===0&&proxyMatch.length===0)return -1;}
+  else{catScore=10;}
+  if(v.risk_score>params.risk_tolerance)return -1;
+  var riskScore=Math.round((1-v.risk_score/100)*8);
+  var relScore=0;
+  relScore+=v.status==='Active'?2:0;
+  relScore+=parseInt(v.tier)===1?3:parseInt(v.tier)===2?2:1;
+  relScore=Math.min(7,relScore);
+  var slaScore=Math.round(((v.sla_score||85)-80)/20*12);
+  slaScore=Math.max(0,Math.min(12,slaScore));
+  var total;
+  if(mode==='best'){total=capScore+catScore+riskScore+relScore+slaScore;}
+  else{var rh=Math.min(30,relScore*3.5);total=(capScore*0.55)+catScore+(riskScore*0.6)+rh+slaScore;}
+  return Math.min(99,Math.max(1,Math.round(total)));
+}
+
+function runSelector(showAll){
+  var scope=document.getElementById('sel-scope').value;
+  var pillar=document.getElementById('sel-pillar').value;
+  var category=document.getElementById('sel-cat').value;
+  var tier=document.getElementById('sel-tier').value;
+  var region=document.getElementById('sel-region').value||'AMER';
+  var months=parseInt(document.getElementById('sel-duration').value)||0;
+  var resources=parseInt(document.getElementById('sel-resources').value)||1;
+  var riskMax=parseInt(document.getElementById('sel-risk').value)||100;
+  var timeline=document.getElementById('sel-timeline').value;
+  var notes=document.getElementById('sel-notes').value;
+  var params={scope,pillar,category,tier:tier?parseInt(tier):0,region,duration_months:months,resources,capabilities:[...SELECTED_CAPS],risk_tolerance:riskMax,timeline,notes};
+  var scored=ALL_VENDORS.map(function(v){var s=scoreVendor(v,params,SELECTOR_MODE);if(s<0)return null;var caps=v.capabilities||[];var matched=params.capabilities.filter(function(c){return caps.includes(c);});return Object.assign({},v,{match_score:s,cap_match:matched});}).filter(function(v){return v!==null;});
+  scored.sort(function(a,b){return b.match_score-a.match_score;});
+  ALL_SCORED=scored;
+  if(scored.length===0){
+    document.getElementById('sel-results').style.display='block';
+    document.getElementById('sel-result-count').textContent='0 vendors matched — try broadening your filters';
+    document.getElementById('rec-cards').innerHTML='<div style="padding:24px;text-align:center;color:var(--ink-muted);font-size:12px;">No vendors matched all selected criteria.<br>Try removing capability filters or adjusting risk tolerance.</div>';
+    return;
+  }
+  var topN=showAll?scored.slice(0,10):scored.slice(0,3);
+  var regionData=RATE_CARD_DATA[region]||RATE_CARD_DATA['AMER']||{};
+  var modeLabel=SELECTOR_MODE==='best'?'&#127775; Best Match':'&#128203; Portfolio-First';
+  document.getElementById('sel-results').style.display='block';
+  document.getElementById('sel-result-count').textContent=scored.length.toLocaleString()+' vendors matched from '+ALL_VENDORS.length.toLocaleString()+' in portfolio &middot; '+modeLabel;
+  document.getElementById('rec-cards').innerHTML=topN.map(function(v,i){
+    var bv={color:v.risk_score>66?'#FB7185':v.risk_score>33?'#E879F9':'#C084FC'};
+    var rankBg=i===0?'linear-gradient(135deg,var(--bloom-dim),var(--magenta))':i===1?'linear-gradient(135deg,rgba(168,85,247,0.6),rgba(192,38,211,0.6))':'rgba(255,255,255,0.15)';
+    var rankLbl=i===0?'#1 Best Match':i===1?'#2 Alternative':'#'+(i+1)+' Alternative';
+    var capMatch=v.cap_match||[];
+    var selectedCapsArr=Array.from(SELECTED_CAPS);
+    var capRate=null;
+    for(var ci=0;ci<selectedCapsArr.length;ci++){var entry=CAP_RATE_LOOKUP[selectedCapsArr[ci]];if(entry){var re=entry[region]||entry['AMER'];if(re&&re.lo){capRate=re;break;}}}
+    if(!capRate){var cr=regionData[v.category];if(cr)capRate={lo:cr.avg_low,hi:cr.avg_high};}
+    var rateStr='',costStr='';
+    var NON_LABOR=['Hardware Supply'];
+    var allNL=selectedCapsArr.length>0&&selectedCapsArr.every(function(c){return NON_LABOR.indexOf(c)>-1;});
+    if(capRate&&!allNL){rateStr='VER Benchmark ('+region+'): $'+capRate.lo+'–$'+capRate.hi+'/hr';if(months>0&&resources>0){var lo=Math.round(capRate.lo*160*months*resources/1000);var hi=Math.round(capRate.hi*160*months*resources/1000);function fmtK(n){return n>=1000?'$'+(n>=10000?Math.round(n/1000).toLocaleString():(n/1000).toFixed(1))+'M':'$'+n.toLocaleString()+'K';}costStr='Est. '+resources+' resource(s) × '+months+' mo: '+fmtK(lo)+'–'+fmtK(hi);}}
+    else if(allNL){rateStr='Rate benchmark not applicable for hardware supply';}
+    var logoHtml=vendorLogo(v.domain||'',v.name,36);
+    var scoreBreakdown=SELECTOR_MODE==='best'?'Capability fit · Category · Risk · Relationship':'Portfolio relationship · Category · Capability · Risk';
+    var borderColor=i===0?'var(--bloom)':i===1?'var(--violet)':'var(--border-soft)';
+    return '<div class="rec-card'+(i===0?' rank-1':'')+'" style="border-left:4px solid '+borderColor+';">'+
+      '<div class="rec-top">'+
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'+
+          logoHtml+
+          '<div style="flex:1;">'+
+            '<div class="rec-name">'+v.name+'</div>'+
+            '<div style="font-size:9.5px;color:var(--ink-muted);">'+v.category+' &middot; Tier '+v.tier+' &middot; '+(v.region||'')+'</div>'+
+            (v.description?'<div style="font-size:9.5px;color:var(--ink-muted);margin-top:2px;line-height:1.4;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+v.description+'">'+v.description+'</div>':'')+(v.domain?'<div style="font-size:8.5px;color:var(--bloom-bright);margin-top:1px;">'+v.domain+'</div>':'')+'</div>'+
+          '<div style="text-align:right;flex-shrink:0;">'+
+            '<span style="display:inline-block;padding:3px 10px;border-radius:10px;font-size:8px;font-weight:700;background:'+rankBg+';color:#fff;">'+rankLbl+'</span><br>'+
+            '<span style="font-size:10px;font-weight:700;color:var(--ink-muted);">Score '+v.match_score+'%</span>'+
+          '</div>'+
+        '</div>'+
+        '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px;">'+
+          (pillar?'<span style="font-size:8px;background:var(--navy3);color:var(--violet-bright);padding:2px 8px;border-radius:8px;font-weight:700;">'+pillar+'</span>':'')+
+          (capMatch.length?'<span style="font-size:8px;background:rgba(52,211,153,0.12);color:var(--green);padding:2px 8px;border-radius:8px;font-weight:700;">'+capMatch.length+' cap match</span>':'')+
+          (months?'<span style="font-size:8px;background:rgba(244,63,94,0.10);color:var(--bloom-bright);padding:2px 8px;border-radius:8px;font-weight:700;">'+months+' mo</span>':'')+
+        '</div>'+
+      '</div>'+
+      '<div class="rec-grid">'+
+        '<div>'+
+          '<div class="rec-col-label">Capability Match</div>'+
+          (capMatch.length?capMatch.slice(0,4).map(function(c){return'<div style="font-size:9.5px;color:var(--green);margin-bottom:1px;">&#10003; '+c+'</div>';}).join('')+(capMatch.length>4?'<div style="font-size:9px;color:var(--ink-muted);">+'+( capMatch.length-4)+' more</div>':''):'<div style="font-size:9.5px;color:var(--ink-muted);">General portfolio match</div>')+
+        '</div>'+
+        '<div>'+
+          '<div class="rec-col-label">Risk &amp; Status</div>'+
+          '<div style="font-size:10px;"><span style="font-weight:700;color:'+bv.color+';">Risk: '+v.risk_score+'/100</span>'+
+          '<div class="risk-bar-wrap"><div class="risk-bar" style="width:'+v.risk_score+'%;background:'+bv.color+';"></div></div></div>'+
+          '<div style="font-size:8.5px;color:var(--ink-muted);margin-top:4px;">'+scoreBreakdown+'</div>'+
+        '</div>'+
+      '</div>'+
+      (rateStr?'<div style="margin:0 16px 14px;padding:8px 12px;background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);border-radius:8px;font-size:10px;color:var(--green);"><strong>'+rateStr+'</strong>'+(costStr?'<br><span style="color:var(--bloom-bright);font-weight:700;">'+costStr+'</span>':'')+'<br><span style="font-size:8px;color:var(--ink-muted);font-style:italic;">For planning only &middot; 160 hrs/month per resource &middot; Subject to SOW negotiation</span></div>':'')+
+    '</div>';
+  }).join('');
+  document.getElementById('sel-results').scrollIntoView({behavior:'smooth',block:'start'});
+  var moreBtn=document.getElementById('show-more-btn');
+  if(moreBtn) moreBtn.style.display=(!showAll&&scored.length>3)?'block':'none';
+  var rcEl=document.getElementById('rec-cards');
+  if(rcEl) rcEl.style.gridTemplateColumns=topN.length<=3?'repeat(3,1fr)':'repeat(2,1fr)';
+}
+
+function openSelectorHelp(){
+  var body=document.getElementById('help-body');
+  if(!body) return;
+  body.innerHTML=
+    '<p style="font-size:12px;color:var(--ink-dim);line-height:1.6;margin-bottom:16px;">The Vendor Selector is a <strong style="color:var(--ink);">structured tool for shortlisting and comparing vendors</strong> for a new engagement or replacement decision. It applies VER scoring criteria — capability, cost, risk, and strategic fit — to help you make a defensible vendor selection.</p>'+
+    '<div style="margin-bottom:16px;">'+
+      '<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--bloom-bright);margin-bottom:10px;">How to Use</div>'+
+      ['<strong>Define the engagement requirements</strong> — category, scope, term length, delivery model, and certifications. This filters the eligible vendor universe.','<strong>Review the shortlist</strong> — the tool surfaces vendors from the portfolio that match your requirements, sorted by fit score.','<strong>Compare vendors side by side</strong> — select up to 4 vendors for detailed comparison across capability, cost benchmark, risk score, and existing DET relationship.','<strong>Apply your weighting</strong> — toggle Best Match vs Portfolio-First mode based on your engagement priorities.','<strong>Export the selection rationale</strong> — use Print to generate a selection document suitable for approval routing and audit.'].map(function(s,i){return'<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11.5px;color:var(--ink-dim);line-height:1.5;"><span style="color:var(--bloom-bright);font-weight:700;flex-shrink:0;">'+(i+1)+'.</span><span>'+s+'</span></div>';}).join('')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'+
+      [['&#127942;','Start with registry vendors','Existing registered vendors are already screened, onboarded, and have a known track record with DET.'],['&#128176;','Cost benchmark is pre-loaded','The cost comparison uses Rate Benchmarks data — comparing against DET market intelligence, not vendor quotes.'],['&#128220;','Document your rationale','The selection rationale is an audit document. Every selection decision above $100K should have documented rationale on file.'],['&#9888;','Risk score is a gate','A vendor with a Critical risk score should not be selected regardless of capability or cost. Risk is a gate, not a trade-off.']].map(function(t){return'<div style="background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:10px;padding:12px;"><div style="font-size:16px;margin-bottom:5px;">'+t[0]+'</div><div style="font-size:10.5px;font-weight:700;color:var(--ink);margin-bottom:3px;">'+t[1]+'</div><div style="font-size:10px;color:var(--ink-muted);line-height:1.5;">'+t[2]+'</div></div>';}).join('')+
+    '</div>'+
+    '<div style="margin-top:14px;font-size:9px;color:var(--ink-muted);border-top:1px solid var(--border);padding-top:10px;">FY27 &middot; Salesforce DET &middot; Confidential</div>';
+  document.getElementById('help-modal-bg').classList.add('open');
+}
+function closeHelp(){document.getElementById('help-modal-bg').classList.remove('open');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeHelp();});
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+(function(){try{var u=JSON.parse(localStorage.getItem('ver-team-user')||'null');if(u){var e=document.getElementById('sb-user-emoji'),n=document.getElementById('sb-user-name'),r=document.getElementById('sb-user-role');if(e)e.textContent=u.emoji||'👤';if(n)n.textContent=u.name||'Team VER';if(r)r.textContent=u.role||'VER Team';}}catch(ex){}})();
+</script>
+</body>
+</html>

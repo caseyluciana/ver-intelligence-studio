@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Survey Review · VER Team Portal</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-border:rgba(244,63,94,0.30);--bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14);--mag-border:rgba(192,38,211,0.28);
+  --rose-gold:#E8A598;--violet:#A855F7;--violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12);--vio-border:rgba(168,85,247,0.28);
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.034);--bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 80% 0%,rgba(244,63,94,0.14) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(192,38,211,0.18) 0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(168,85,247,0.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(168,85,247,0.014) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(244,63,94,0.018) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── Shell ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sb-gem{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(244,63,94,0.38);}
+.sb-logo-title{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.42);}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);animation:pulse 2.5s ease-in-out infinite;}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-section{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);padding:12px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+.sb-user{margin:0 12px 8px;padding:9px 13px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:18px;line-height:1;}
+.sb-user-name{font-size:11px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:8.5px;color:rgba(255,255,255,0.52);}
+.sb-footer{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;font-size:8.5px;color:rgba(255,255,255,0.42);line-height:1.7;}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── Page Hero ── */
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:28px 36px 26px;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,#120610 0%,#1A0828 40%,#0E0620 100%);
+  border:1px solid rgba(168,85,247,0.18);animation:rise 0.5s var(--ease) 0.05s both;}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 90% 10%,rgba(244,63,94,0.20) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(168,85,247,0.16) 0%,transparent 46%);}
+.hero-inner{position:relative;z-index:1;}
+.hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;
+  color:rgba(255,255,255,0.50);margin-bottom:10px;}
+.hero-eyebrow span{color:var(--bloom-bright);}
+.hero-title{font-size:clamp(24px,2.6vw,36px);font-weight:900;letter-spacing:-0.025em;
+  margin-bottom:8px;
+  background:linear-gradient(92deg,var(--bloom-bright) 0%,var(--violet-bright) 55%,var(--magenta-bright) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.58);line-height:1.6;max-width:520px;}
+
+/* ── KPI strip ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;animation:rise 0.5s var(--ease) 0.14s both;}
+.kpi-tile{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:12px;
+  padding:16px 18px;position:relative;overflow:hidden;}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0;}
+.kt-amber::before {background:linear-gradient(90deg,#D97706,var(--amber));}
+.kt-green::before  {background:linear-gradient(90deg,#059669,var(--green));}
+.kt-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.kt-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.kt-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico{font-size:17px;}
+.kpi-val{font-size:28px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.kt-amber  .kpi-val{color:var(--amber);}
+.kt-green  .kpi-val{color:var(--green);}
+.kt-violet .kpi-val{color:var(--violet-bright);}
+.kt-bloom  .kpi-val{color:var(--bloom-bright);}
+.kt-magenta .kpi-val{color:var(--magenta-bright);}
+.kpi-val.v-green {color:var(--green)!important;}
+.kpi-val.v-amber {color:var(--amber)!important;}
+.kpi-val.v-red   {color:var(--red)!important;}
+.kpi-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;color:var(--ink-muted);margin-bottom:2px;}
+.kpi-sub{font-size:10px;color:var(--ink-muted);}
+
+/* ── Filter bar ── */
+.filter-bar{background:rgba(255,255,255,0.030);border:1px solid var(--border-soft);border-radius:12px;
+  padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  animation:rise 0.4s var(--ease) 0.20s both;}
+.filter-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink-muted);white-space:nowrap;}
+.pill-group{display:flex;gap:4px;flex-wrap:wrap;}
+.pill{padding:5px 13px;border-radius:20px;font-size:8pt;font-weight:700;cursor:pointer;
+  border:1.5px solid rgba(255,255,255,0.12);background:transparent;
+  color:rgba(255,255,255,0.55);font-family:var(--font);transition:all 0.12s;white-space:nowrap;}
+.pill:hover:not(.active){background:rgba(255,255,255,0.07);color:var(--ink);border-color:rgba(255,255,255,0.22);}
+.pill.active{background:var(--bloom-status);color:var(--ink);border-color:var(--bloom);}
+.filter-sep{width:1px;height:22px;background:var(--border);flex-shrink:0;}
+.search-input{font-size:8pt;padding:6px 10px 6px 30px;
+  border:1.5px solid rgba(255,255,255,0.12);border-radius:7px;
+  background:rgba(255,255,255,0.05) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23A855F7' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
+  color:var(--ink);font-family:var(--font);min-width:180px;}
+.search-input::placeholder{color:var(--ink-muted);}
+.search-input:focus{outline:2px solid rgba(168,85,247,0.50);border-color:var(--violet);background:rgba(168,85,247,0.06);}
+.sort-select{font-size:8pt;padding:6px 10px;border:1.5px solid rgba(255,255,255,0.12);border-radius:7px;
+  background:rgba(255,255,255,0.05);color:var(--ink);font-family:var(--font);cursor:pointer;}
+.sort-select:focus{outline:2px solid rgba(168,85,247,0.50);border-color:var(--violet);}
+.sort-select option{background:#1C1030;color:var(--ink);}
+.filter-count{font-size:8px;font-weight:700;color:var(--ink-muted);margin-left:auto;}
+
+/* ── Response cards ── */
+.response-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+
+.resp-card{
+  background:rgba(255,255,255,0.034);
+  border:1px solid var(--border-soft);
+  border-radius:12px;overflow:hidden;
+  transition:box-shadow 0.15s,border-color 0.15s;}
+.resp-card:hover{box-shadow:0 4px 24px rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.22);}
+.resp-card.approved-card{
+  background:rgba(52,211,153,0.05);
+  border-color:rgba(52,211,153,0.20);}
+.resp-card.dismissed-card{
+  background:rgba(255,255,255,0.018);
+  border-color:rgba(255,255,255,0.06);
+  opacity:0.75;}
+
+/* Card header */
+.resp-card-hdr{display:flex;align-items:flex-start;gap:12px;padding:14px 16px 10px;flex-wrap:wrap;}
+.resp-vendor-name{font-size:13pt;font-weight:900;
+  background:linear-gradient(90deg,var(--bloom-bright),var(--violet-bright));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1.2;}
+.resp-meta-col{flex:1;min-width:0;}
+.resp-date{font-size:8pt;color:var(--ink-muted);margin-top:3px;}
+.resp-respondent{font-size:8.5pt;color:var(--ink-dim);margin-top:3px;}
+.resp-hdr-right{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;margin-left:auto;}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:7px;font-weight:700;
+  padding:3px 9px;border-radius:9px;white-space:nowrap;text-transform:uppercase;letter-spacing:0.06em;}
+.b-pending {background:rgba(251,191,36,0.14);color:var(--amber);border:1px solid rgba(251,191,36,0.28);}
+.b-approved{background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.25);}
+.b-dismissed{background:rgba(255,255,255,0.06);color:var(--ink-muted);border:1px solid rgba(255,255,255,0.10);}
+.b-relationship{background:rgba(168,85,247,0.12);color:var(--violet-bright);border:1px solid rgba(168,85,247,0.25);}
+.b-renew     {background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.25);}
+.b-renew-cond{background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.25);}
+.b-review    {background:rgba(192,38,211,0.12);color:var(--magenta-bright);border:1px solid rgba(192,38,211,0.25);}
+.b-dnr       {background:rgba(244,63,94,0.12);color:var(--bloom-bright);border:1px solid rgba(244,63,94,0.25);}
+
+/* Score grid */
+.resp-scores{display:flex;align-items:center;gap:8px;padding:10px 16px;
+  background:rgba(255,255,255,0.02);border-top:1px solid var(--border);flex-wrap:wrap;}
+.score-dim{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.score-dim-lbl{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink-muted);}
+.score-badge{width:36px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:11pt;font-weight:900;}
+.score-badge.s-green{background:rgba(168,85,247,0.15);color:var(--violet-bright);}
+.score-badge.s-amber{background:rgba(192,38,211,0.14);color:var(--magenta-bright);}
+.score-badge.s-red  {background:rgba(244,63,94,0.14);color:var(--bloom-bright);}
+.score-sep{width:1px;height:34px;background:var(--border);margin:0 4px;}
+.score-avg-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.score-avg-lbl{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;color:var(--violet-bright);}
+.score-avg-badge{width:40px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:12pt;font-weight:900;}
+
+/* Comments toggle */
+.resp-comments-wrap{border-top:1px solid var(--border);}
+.comments-toggle{display:flex;align-items:center;gap:6px;width:100%;padding:9px 16px;
+  background:none;border:none;cursor:pointer;font-family:var(--font);font-size:8.5pt;
+  font-weight:700;color:var(--violet-bright);text-align:left;transition:background 0.12s;}
+.comments-toggle:hover{background:rgba(168,85,247,0.07);}
+.comments-body{display:none;padding:12px 16px 14px;border-top:1px solid var(--border);}
+.comments-body.open{display:block;}
+.comment-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:10px;}
+.comment-item{background:rgba(255,255,255,0.03);border-radius:8px;padding:9px 11px;border:1px solid var(--border);}
+.comment-dim-lbl{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;
+  color:var(--violet-bright);margin-bottom:4px;}
+.comment-text{font-size:8pt;color:var(--ink-dim);line-height:1.55;}
+.comment-overall{background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.20);border-radius:8px;padding:9px 11px;}
+.comment-overall .comment-dim-lbl{color:var(--magenta-bright);}
+.comment-overall .comment-text{color:var(--ink-dim);}
+
+/* Recommendation + actions */
+.resp-footer{display:flex;align-items:center;gap:10px;padding:10px 16px;
+  border-top:1px solid var(--border);flex-wrap:wrap;}
+.rec-label{font-size:8pt;font-weight:700;color:var(--ink-muted);margin-right:2px;}
+.resp-actions{display:flex;gap:7px;margin-left:auto;}
+.btn-approve{padding:6px 16px;border-radius:8px;font-family:var(--font);font-size:8pt;font-weight:700;
+  cursor:pointer;border:none;
+  background:linear-gradient(90deg,var(--violet),var(--magenta));
+  color:#fff;transition:opacity 0.15s,transform 0.12s;box-shadow:0 2px 12px rgba(168,85,247,0.30);}
+.btn-approve:hover{opacity:0.85;transform:translateY(-1px);}
+.btn-dismiss{padding:6px 14px;border-radius:8px;font-family:var(--font);font-size:8pt;font-weight:700;
+  cursor:pointer;background:transparent;border:1.5px solid rgba(244,63,94,0.40);
+  color:var(--bloom-bright);transition:all 0.15s;}
+.btn-dismiss:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom);}
+
+/* Inline feedback flash */
+.resp-flash{display:none;padding:8px 16px;font-size:8.5pt;font-weight:700;
+  background:rgba(52,211,153,0.08);color:var(--green);
+  border-top:1px solid rgba(52,211,153,0.18);align-items:center;gap:6px;}
+.resp-flash.show{display:flex;}
+.resp-flash.dismiss-flash{background:rgba(255,255,255,0.04);color:var(--ink-muted);border-color:var(--border);}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:56px 20px;color:var(--ink-muted);}
+.empty-icon{font-size:42pt;margin-bottom:16px;}
+.empty-title{font-size:13pt;font-weight:800;color:var(--ink-dim);margin-bottom:7px;}
+.empty-sub{font-size:9.5pt;color:var(--ink-muted);max-width:420px;margin:0 auto;line-height:1.6;}
+
+/* ── Section header ── */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;padding-bottom:10px;
+  border-bottom:1px solid rgba(168,85,247,0.25);}
+.section-title{font-size:11pt;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';display:inline-block;width:3px;height:14px;
+  background:linear-gradient(180deg,var(--bloom),var(--violet));border-radius:3px;}
+.section-sub{font-size:8pt;color:var(--ink-muted);margin-top:3px;}
+
+/* ── Aggregates table ── */
+.agg-table-wrap{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:12px;overflow:auto;}
+.agg-table{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.agg-table th{padding:9px 13px;font-size:7pt;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.09em;color:rgba(255,255,255,0.60);
+  background:linear-gradient(90deg,rgba(168,85,247,0.15),rgba(192,38,211,0.10));
+  text-align:left;white-space:nowrap;border-bottom:1px solid rgba(168,85,247,0.15);}
+.agg-table th:not(:first-child){text-align:center;}
+.agg-table td{padding:9px 13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.agg-table td:not(:first-child){text-align:center;}
+.agg-table tr:last-child td{border-bottom:none;}
+.agg-table tr:hover td{background:rgba(168,85,247,0.04);}
+.agg-vendor-name{font-weight:800;color:var(--ink);font-size:9pt;}
+.agg-vendor-id{font-size:7.5pt;color:var(--ink-muted);margin-top:1px;}
+.agg-score{font-size:9.5pt;font-weight:900;padding:3px 7px;border-radius:6px;}
+.agg-score.s-green{background:rgba(52,211,153,0.14);color:var(--green);}
+.agg-score.s-amber{background:rgba(251,191,36,0.14);color:var(--amber);}
+.agg-score.s-red  {background:rgba(244,63,94,0.14);color:var(--bloom-bright);}
+.agg-link{font-size:8pt;font-weight:700;color:var(--violet-bright);text-decoration:none;
+  padding:3px 10px;border-radius:6px;border:1px solid rgba(168,85,247,0.28);
+  background:rgba(168,85,247,0.08);transition:all 0.12s;}
+.agg-link:hover{background:rgba(168,85,247,0.18);border-color:var(--violet);}
+.agg-date{font-size:8pt;color:var(--ink-muted);}
+.agg-empty{padding:30px;text-align:center;color:var(--ink-muted);font-style:italic;font-size:9pt;}
+
+/* ── Portal footer ── */
+.portal-footer{margin-top:24px;padding:12px 16px;
+  background:rgba(168,85,247,0.04);border:1px solid rgba(168,85,247,0.12);border-radius:10px;
+  display:flex;align-items:center;gap:10px;font-size:10px;color:var(--ink-muted);line-height:1.65;}
+.portal-footer strong{color:var(--ink-dim);}
+
+/* ── User picker overlay ── */
+.up-overlay{position:fixed;inset:0;z-index:500;background:rgba(7,4,17,0.96);
+  backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center;padding:24px;}
+.up-overlay.hidden{display:none;}
+.up-panel{width:100%;max-width:500px;animation:slideUp 0.4s var(--ease) both;text-align:center;}
+.up-gem{width:48px;height:48px;border-radius:14px;margin:0 auto 18px;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 0 36px rgba(244,63,94,0.40);}
+.up-title{font-size:22px;font-weight:900;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom),var(--magenta),var(--violet));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.up-sub{font-size:12px;color:var(--ink-muted);margin-bottom:24px;}
+.up-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.up-tile{padding:14px 10px;border-radius:10px;cursor:pointer;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  transition:background 0.15s,border-color 0.15s,transform 0.15s;font-family:var(--font);}
+.up-tile:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);transform:translateY(-2px);}
+.up-tile-emoji{font-size:22px;margin-bottom:6px;display:block;}
+.up-tile-name{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:1px;}
+.up-tile-role{font-size:8.5px;color:var(--ink-muted);}
+
+/* ── Responsive ── */
+@media(max-width:1100px){.kpi-strip{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){
+  .resp-hdr-right{margin-left:0;margin-top:6px;width:100%;}
+  .resp-actions{margin-left:0;margin-top:6px;width:100%;}
+  .resp-actions .btn-approve,.resp-actions .btn-dismiss{flex:1;}
+  .content{padding:16px 16px 40px;}
+}
+@media(max-width:640px){.sidebar{display:none;}}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode::before{background:radial-gradient(ellipse at 80% 0%,rgba(192,38,211,0.12) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.10) 0%,transparent 50%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title{color:#1A0818;}
+body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .hero{background:linear-gradient(135deg,#FDE8EE 0%,#FCDDE7 38%,#FEE8F0 68%,#FFF0F4 100%);border:1px solid #F5C6D3;}
+body.light-mode .resp-card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .resp-card.approved-card{background:rgba(109,40,217,0.05);border-color:rgba(109,40,217,0.18);}
+body.light-mode .resp-vendor-name{-webkit-text-fill-color:initial;color:#1A0818;font-weight:900;}
+body.light-mode .resp-vendor,body.light-mode .resp-score-val,body.light-mode .agg-vendor{color:#1A0818;}
+body.light-mode .resp-date,body.light-mode .resp-respondent{color:#7A4055;}
+body.light-mode .resp-meta,body.light-mode .resp-cat,body.light-mode .agg-score,body.light-mode .resp-hdr-note{color:#7A4055;}
+body.light-mode .resp-q{color:#3D1028;}
+body.light-mode .resp-a{background:rgba(26,8,24,0.04);border-left-color:rgba(244,63,94,0.30);color:#3D1028;}
+body.light-mode .resp-scores{background:rgba(26,8,24,0.03);border-top-color:#F5C6D3;}
+body.light-mode .score-dim-lbl{color:#7A4055;}
+body.light-mode .score-badge.s-green{background:rgba(109,40,217,0.10);color:#6D28D9;}
+body.light-mode .score-badge.s-amber{background:rgba(154,13,175,0.10);color:#9A0DAF;}
+body.light-mode .score-badge.s-red{background:rgba(192,20,60,0.10);color:#C0143C;}
+body.light-mode .score-avg-lbl{color:#6D28D9;}
+body.light-mode .comments-toggle{color:#6D28D9;}
+body.light-mode .comment-item{background:rgba(26,8,24,0.03);border-color:#F5C6D3;}
+body.light-mode .comment-dim-lbl{color:#6D28D9;}
+body.light-mode .comment-text{color:#3D1028;}
+body.light-mode .comment-overall{background:rgba(154,13,175,0.06);border-color:rgba(154,13,175,0.18);}
+body.light-mode .comment-overall .comment-dim-lbl{color:#9A0DAF;}
+body.light-mode .resp-footer{border-top-color:#F5C6D3;}
+body.light-mode .rec-label{color:#7A4055;}
+body.light-mode .kpi-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .kpi-sub{color:#7A4055;}
+body.light-mode .filter-bar{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .pill{border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .pill:hover:not(.active){background:rgba(244,63,94,0.06);color:#1A0818;}
+body.light-mode .pill.active{background:rgba(244,63,94,0.12);border-color:var(--bloom);color:#1A0818;}
+body.light-mode .search-input{background:#FFF8FA;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .sort-select{background:#FFF8FA;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .sort-select option{background:#FFF8FA;color:#1A0818;}
+body.light-mode .filter-count{color:#7A4055;}
+body.light-mode .btn-approve{background:rgba(109,40,217,0.12);color:#6D28D9;border:1px solid rgba(109,40,217,0.24);}
+body.light-mode .btn-dismiss{background:rgba(192,20,60,0.08);color:#C0143C;border:1px solid rgba(192,20,60,0.20);}
+body.light-mode .agg-table-wrap{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .agg-table th{color:#7A4055;border-bottom-color:#F5C6D3;}
+body.light-mode .agg-table td{color:#3D1028;border-bottom-color:#F5C6D3;}
+body.light-mode .agg-table tr:hover td{background:rgba(244,63,94,0.04);}
+body.light-mode .agg-vendor{color:#1A0818;}
+body.light-mode .agg-link{color:#6D28D9;border-color:rgba(109,40,217,0.24);}
+body.light-mode .portal-footer{background:rgba(109,40,217,0.04);border-color:rgba(109,40,217,0.14);color:#7A4055;}
+body.light-mode .scan{opacity:0.12;}
+body.light-mode .hero-eyebrow{color:#7A4055;}
+body.light-mode .hero-sub{color:#3D1028;}
+body.light-mode .hero-stat-label{color:#7A4055;}
+body.light-mode .hero-stat-val{background:linear-gradient(135deg,#C0143C,#9A0DAF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+</style>
+</head>
+<body data-portal="true">
+
+<div class="scan" aria-hidden="true"></div>
+
+<!-- User picker -->
+<div class="up-overlay hidden" id="up-overlay">
+  <div class="up-panel">
+    <div class="up-gem">&#128100;</div>
+    <div class="up-title">Who are you?</div>
+    <div class="up-sub">Personalize your portal experience.</div>
+    <div class="up-grid" id="up-grid"></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="window.location.href='team_portal.html'">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-user" id="sb-user-chip">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html"      class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"     class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"         class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"      class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"   class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"    class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"    class="sb-item active"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html"  class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html" class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html" class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"         class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Survey Review</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button class="tb-btn" onclick="document.getElementById('up-overlay').classList.toggle('hidden')">&#128100; Switch User</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div class="hero-eyebrow">VER Team Portal &middot; <span>Operations</span></div>
+          <div class="hero-title">Survey Response Review</div>
+          <div class="hero-sub">Review stakeholder feedback before approving score updates to vendor dossiers. Approve responses to push aggregate scores, or dismiss outliers.</div>
+        </div>
+      </div>
+
+      <!-- KPI Strip -->
+      <div class="kpi-strip">
+        <div class="kpi-tile kt-amber">
+          <div class="kpi-top"><span class="kpi-ico">&#9719;</span></div>
+          <div class="kpi-val" id="kpiPending">—</div>
+          <div class="kpi-label">Pending Responses</div>
+          <div class="kpi-sub">Awaiting review</div>
+        </div>
+        <div class="kpi-tile kt-green">
+          <div class="kpi-top"><span class="kpi-ico">&#10003;</span></div>
+          <div class="kpi-val" id="kpiApprovedMonth">—</div>
+          <div class="kpi-label">Approved This Month</div>
+          <div class="kpi-sub">Score updates pushed</div>
+        </div>
+        <div class="kpi-tile kt-violet">
+          <div class="kpi-top"><span class="kpi-ico">&#128203;</span></div>
+          <div class="kpi-val" id="kpiVendorsScored">—</div>
+          <div class="kpi-label">Vendors Scored</div>
+          <div class="kpi-sub">With approved responses</div>
+        </div>
+        <div class="kpi-tile kt-bloom">
+          <div class="kpi-top"><span class="kpi-ico">&#11088;</span></div>
+          <div class="kpi-val" id="kpiAvgScore">—</div>
+          <div class="kpi-label">Avg Response Score</div>
+          <div class="kpi-sub">All responses</div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <span class="filter-label">Status:</span>
+        <div class="pill-group" id="statusPills">
+          <button class="pill active" data-status="all">All</button>
+          <button class="pill" data-status="pending">Pending</button>
+          <button class="pill" data-status="approved">Approved</button>
+          <button class="pill" data-status="dismissed">Dismissed</button>
+        </div>
+        <div class="filter-sep"></div>
+        <input type="text" class="search-input" id="vendorSearch" placeholder="Search vendor…" autocomplete="off">
+        <div class="filter-sep"></div>
+        <span class="filter-label">Sort:</span>
+        <select class="sort-select" id="sortSelect">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="vendor">Vendor name</option>
+        </select>
+        <span class="filter-count" id="filterCount"></span>
+      </div>
+
+      <!-- Response list -->
+      <div class="response-list" id="responseList"></div>
+
+      <!-- Aggregates section -->
+      <div class="section-hdr">
+        <div>
+          <div class="section-title">Approved Score Aggregates</div>
+          <div class="section-sub">Cumulative averages across all approved responses per vendor</div>
+        </div>
+      </div>
+      <div class="agg-table-wrap">
+        <table class="agg-table" id="aggTable">
+          <thead>
+            <tr>
+              <th>Vendor</th>
+              <th>Respondents</th>
+              <th>Avg SLA</th>
+              <th>Avg Financial</th>
+              <th>Avg Compliance</th>
+              <th>Avg Relationship</th>
+              <th>Avg Strategic</th>
+              <th>Overall Avg</th>
+              <th>Last Approved</th>
+              <th>Dossier</th>
+            </tr>
+          </thead>
+          <tbody id="aggTableBody">
+            <tr><td colspan="10" class="agg-empty">No approved responses yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="portal-footer">
+        <span>&#128274;</span>
+        <span><strong>VER Team Portal</strong> &mdash; Survey response data is confidential. Share aggregate findings only in CQBR sessions. Individual responses must not be disclosed to vendors. &middot; Salesforce DET &middot; FY27</span>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+/* ── One-time migration: fix stale name-based vendorIds → real V-ids ── */
+(function migrateSurveyVendorIds(){
+  if(localStorage.getItem('ver_survey_migration_v2')) return;
+  var NAME_TO_ID = {
+    'Infosys':'V025','Cognizant':'V002','NTT Data':'V001','Tech Mahindra':'V003',
+    'Wipro':'V026','IBM':'V006','Accenture':'V029','Deloitte':'V008','AWS':'V005',
+    'Microsoft':'V013','Workday':'V004','ServiceNow':'V014','BCG':'V009',
+    'McKinsey & Company':'V033','PwC':'V030','Capgemini':'V028','Kyndryl':'V259',
+    'TCS':'V777','HCLTech':'V027'
+  };
+  try {
+    // Fix responses
+    var responses = JSON.parse(localStorage.getItem('ver_survey_responses')||'[]');
+    var changed = false;
+    responses = responses.map(function(r){
+      var mapped = NAME_TO_ID[r.vendorId];
+      if(mapped && r.vendorId !== mapped){ r.vendorId = mapped; changed = true; }
+      return r;
+    });
+    if(changed) localStorage.setItem('ver_survey_responses', JSON.stringify(responses));
+    // Fix approved aggregate keys
+    var approved = JSON.parse(localStorage.getItem('ver_survey_approved')||'{}');
+    var newApproved = {};
+    var approvedChanged = false;
+    Object.keys(approved).forEach(function(k){
+      var mapped = NAME_TO_ID[k];
+      if(mapped && k !== mapped){ newApproved[mapped] = approved[k]; approvedChanged = true; }
+      else { newApproved[k] = approved[k]; }
+    });
+    if(approvedChanged) localStorage.setItem('ver_survey_approved', JSON.stringify(newApproved));
+    localStorage.setItem('ver_survey_migration_v2','done');
+  } catch(e){}
+})();
+</script>
+<script>
+/* ── Team members for user picker ── */
+const TEAM = [
+  {name:'Casey',  role:'Director',       emoji:'&#128081;', director:true},
+  {name:'Debs',   role:'Manager',        emoji:'&#127775;'},
+  {name:'Erin',   role:'Senior Manager', emoji:'&#11088;'},
+  {name:'Mahesh', role:'Senior Manager', emoji:'&#128171;'},
+  {name:'Aditya', role:'Senior Manager', emoji:'&#10024;'},
+  {name:'Justin', role:'Senior Analyst', emoji:'&#127776;'},
+  {name:'Guest',  role:'VER Team',       emoji:'&#128100;'},
+];
+
+/* ── User persistence ── */
+(function initUser(){
+  const saved = JSON.parse(localStorage.getItem('ver-team-user')||'null');
+  if(saved){
+    setUserChip(saved);
+  }
+  // Build user picker
+  const grid = document.getElementById('up-grid');
+  if(grid){
+    grid.innerHTML = TEAM.map(m => `
+      <button class="up-tile" onclick="selectUser(${JSON.stringify(JSON.stringify(m))})">
+        <span class="up-tile-emoji">${m.emoji}</span>
+        <div class="up-tile-name">${m.name}</div>
+        <div class="up-tile-role">${m.role}</div>
+      </button>`).join('');
+  }
+})();
+function selectUser(jsonStr){
+  const m = JSON.parse(jsonStr);
+  localStorage.setItem('ver-team-user', JSON.stringify(m));
+  setUserChip(m);
+  document.getElementById('up-overlay').classList.add('hidden');
+}
+function setUserChip(m){
+  const emoji = document.getElementById('sb-user-emoji');
+  const name  = document.getElementById('sb-user-name');
+  const role  = document.getElementById('sb-user-role');
+  if(emoji) emoji.innerHTML = m.emoji;
+  if(name)  name.textContent = m.name;
+  if(role)  role.textContent = m.role;
+}
+
+/* ── Brandfetch logos ── */
+const BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+const VENDOR_DOMAINS = {
+  'Infosys':'infosys.com','Cognizant':'cognizant.com','TCS':'tcs.com',
+  'HCLTech':'hcltech.com','NTT Data':'nttdata.com','Tech Mahindra':'techmahindra.com',
+  'Wipro':'wipro.com','IBM':'ibm.com','Accenture':'accenture.com','Deloitte':'deloitte.com',
+  'AWS':'aws.amazon.com','Microsoft':'microsoft.com','Workday':'workday.com',
+  'ServiceNow':'servicenow.com','BCG':'bcg.com','McKinsey & Company':'mckinsey.com',
+  'PwC':'pwc.com','Capgemini':'capgemini.com','Kyndryl':'kyndryl.com'
+};
+function vLogoSR(name, size){
+  var d = VENDOR_DOMAINS[name];
+  var ini = (name||'?')[0];
+  var fallback = '<div style="width:'+size+'px;height:'+size+'px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:'+(size*0.38)+'px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--bloom),var(--magenta));flex-shrink:0;">'+ini+'</div>';
+  if(!d) return fallback;
+  return '<img src="https://cdn.brandfetch.io/'+d+'?c='+BF_CLIENT+'" width="'+size+'" height="'+size+'" style="border-radius:8px;object-fit:contain;background:#fff;padding:2px;border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display=\'none\';var s=document.createElement(\'div\');s.style.cssText=\'width:'+size+'px;height:'+size+'px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:'+(size*0.38)+'px;font-weight:800;color:#fff;background:linear-gradient(135deg,#F43F5E,#C026D3);flex-shrink:0;\';s.textContent=\''+ini+'\';this.parentNode.insertBefore(s,this);">';
+}
+
+/* ── Data helpers ── */
+const LS_RESPONSES = 'ver_survey_responses';
+const LS_APPROVED  = 'ver_survey_approved';
+
+function getResponses(){ return JSON.parse(localStorage.getItem(LS_RESPONSES)||'[]'); }
+function saveResponses(data){ localStorage.setItem(LS_RESPONSES, JSON.stringify(data)); }
+function getApproved(){ return JSON.parse(localStorage.getItem(LS_APPROVED)||'{}'); }
+function saveApproved(data){ localStorage.setItem(LS_APPROVED, JSON.stringify(data)); }
+
+/* Seed demo data if nothing in storage */
+function seedDemoIfEmpty(){
+  const existing = getResponses();
+  if(existing.length > 0) return;
+  const now = new Date();
+  const demo = [
+    {
+      id:'resp-001',vendorId:'V025',vendorName:'Infosys',
+      submittedAt: new Date(now - 86400000*2).toISOString(),
+      status:'pending',
+      respondent:{name:'Sarah Chen',team:'Cloud Engineering',relationship:'Delivery Lead'},
+      scores:{sla:8,relationship:7,financial:6,compliance:9,strategic:7},
+      comments:{
+        sla:'Consistently meets SLA targets with 99.1% uptime. Minor incident response delays.',
+        relationship:'Strong engagement at director level. Quarterly business reviews well structured.',
+        financial:'Rates competitive but invoicing has had discrepancies twice this quarter.',
+        compliance:'Fully SOC2 compliant. Security posture is strong. MSA terms up to date.',
+        strategic:'Roadmap alignment good. Active in AI/ML capability building.',
+        overall:'Solid partner. Minor financial process issues to address before renewal.'
+      },
+      recommendation:'continue'
+    },
+    {
+      id:'resp-002',vendorId:'V025',vendorName:'Infosys',
+      submittedAt: new Date(now - 86400000*5).toISOString(),
+      status:'approved',
+      respondent:{name:'Marcus Webb',team:'Application Delivery',relationship:'Program Manager'},
+      scores:{sla:7,relationship:8,financial:7,compliance:8,strategic:6},
+      comments:{
+        sla:'Good performance. One P2 breach in Q2 but resolved within 4 hours.',
+        relationship:'Responsive team. Account manager proactive about escalations.',
+        financial:'Rates are fair. Would benefit from volume discount renegotiation.',
+        compliance:'No issues noted. All certifications current.',
+        strategic:'Not yet leveraged for strategic initiatives beyond BAU.',
+        overall:'Good operational partner. Consider strategic elevation for FY27.'
+      },
+      recommendation:'continue'
+    },
+    {
+      id:'resp-003',vendorId:'V002',vendorName:'Cognizant',
+      submittedAt: new Date(now - 86400000*1).toISOString(),
+      status:'pending',
+      respondent:{name:'Priya Nair',team:'Procurement',relationship:'Vendor Manager'},
+      scores:{sla:5,relationship:6,financial:4,compliance:7,strategic:5},
+      comments:{
+        sla:'SLA performance is borderline. Three consecutive months below 97% threshold.',
+        relationship:'Relationship is transactional. Limited executive engagement.',
+        financial:'Costs have crept 11% above benchmark. T&M overruns on last two projects.',
+        compliance:'Compliant but late on annual security questionnaire.',
+        strategic:'No strategic value demonstrated beyond headcount supply.',
+        overall:'Recommend renegotiation or competitive RFP before renewal decision.'
+      },
+      recommendation:'continue_conditions'
+    },
+    {
+      id:'resp-004',vendorId:'V027',vendorName:'HCL Technologies',
+      submittedAt: new Date(now - 86400000*10).toISOString(),
+      status:'dismissed',
+      respondent:{name:'James Ortega',team:'Infrastructure',relationship:'Technical Lead'},
+      scores:{sla:3,relationship:4,financial:3,compliance:5,strategic:2},
+      comments:{
+        sla:'Chronic SLA failures in Q1 and Q2. Four P1 breaches unresolved within SLA.',
+        relationship:'Poor responsiveness at all levels. Multiple escalations unresolved.',
+        financial:'Significantly above market. No flexibility shown in negotiations.',
+        compliance:'MSA terms expired. Security certification lapsed.',
+        strategic:'No strategic value. Recommend do not renew.',
+        overall:'This vendor relationship is not working. Recommend replacement.'
+      },
+      recommendation:'do_not_continue'
+    },
+    {
+      id:'resp-005',vendorId:'V777',vendorName:'Tata Consulting Services',
+      submittedAt: new Date(now - 86400000*3).toISOString(),
+      status:'pending',
+      respondent:{name:'Lisa Thornton',team:'Finance Systems',relationship:'Business Owner'},
+      scores:{sla:9,relationship:8,financial:8,compliance:9,strategic:8},
+      comments:{
+        sla:'Outstanding. No SLA breaches in 18 months.',
+        relationship:'Executive sponsor engaged. Innovation days productive.',
+        financial:'Rates well-negotiated. Invoice accuracy 100% last two quarters.',
+        compliance:'Best-in-class compliance posture. GDPR, SOC2, ISO27001 all current.',
+        strategic:'Co-innovation in AI for finance automation is delivering tangible ROI.',
+        overall:'Premier strategic partner. Full renewal recommended with scope expansion.'
+      },
+      recommendation:'continue'
+    }
+  ];
+  saveResponses(demo);
+  // Pre-seed the approved aggregate for the approved response
+  recalcAggregate('V001');
+}
+
+/* ── State ── */
+let state = { status:'all', search:'', sort:'newest' };
+
+/* ── Init ── */
+seedDemoIfEmpty();
+// Repair: ensure any vendor with approved responses has an aggregate entry
+(function repairAggregates(){
+  const approved = getResponses().filter(r => r.status === 'approved');
+  const agg = getApproved();
+  const missing = [...new Set(approved.map(r => r.vendorId))].filter(id => !agg[id]);
+  missing.forEach(id => recalcAggregate(id));
+})();
+renderAll();
+
+/* ── Event wiring ── */
+document.getElementById('statusPills').addEventListener('click', e => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  document.querySelectorAll('#statusPills .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  state.status = btn.dataset.status;
+  renderResponseList();
+  updateFilterCount();
+});
+document.getElementById('vendorSearch').addEventListener('input', e => {
+  state.search = e.target.value.trim().toLowerCase();
+  renderResponseList();
+  updateFilterCount();
+});
+document.getElementById('sortSelect').addEventListener('change', e => {
+  state.sort = e.target.value;
+  renderResponseList();
+});
+
+/* ── Render all ── */
+function renderAll(){
+  renderKPIs();
+  renderResponseList();
+  renderAggregates();
+  updateFilterCount();
+}
+
+/* ── KPI strip ── */
+function renderKPIs(){
+  const responses = getResponses();
+  const pending  = responses.filter(r => r.status === 'pending').length;
+  const thisMonth = responses.filter(r => {
+    if(r.status !== 'approved') return false;
+    const d = new Date(r.submittedAt);
+    const n = new Date();
+    return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+  }).length;
+  const vendorsScored = new Set(
+    responses.filter(r => r.status === 'approved').map(r => r.vendorId)
+  ).size;
+  const allScores = responses.map(r => calcAvg(r.scores));
+  const avgScore = allScores.length
+    ? (allScores.reduce((a,b) => a+b, 0) / allScores.length).toFixed(1) : '—';
+
+  document.getElementById('kpiPending').textContent = pending;
+  document.getElementById('kpiApprovedMonth').textContent = thisMonth;
+  document.getElementById('kpiVendorsScored').textContent = vendorsScored;
+  const avgEl = document.getElementById('kpiAvgScore');
+  avgEl.textContent = avgScore;
+  const n = parseFloat(avgScore);
+  avgEl.className = 'kpi-val ' + (isNaN(n) ? '' : n >= 7 ? 'v-green' : n >= 4 ? 'v-amber' : 'v-red');
+}
+
+/* ── Response list ── */
+function getFilteredResponses(){
+  let list = getResponses();
+  if(state.status !== 'all') list = list.filter(r => r.status === state.status);
+  if(state.search) list = list.filter(r => r.vendorName.toLowerCase().includes(state.search));
+  if(state.sort === 'newest') list.sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+  else if(state.sort === 'oldest') list.sort((a,b) => new Date(a.submittedAt) - new Date(b.submittedAt));
+  else if(state.sort === 'vendor') list.sort((a,b) => a.vendorName.localeCompare(b.vendorName));
+  return list;
+}
+
+function renderResponseList(){
+  const list = getFilteredResponses();
+  const container = document.getElementById('responseList');
+  if(list.length === 0){
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">&#128525;</div>
+        <div class="empty-title">No responses found</div>
+        <div class="empty-sub">No responses match your current filter. Share a survey link from a vendor dossier to collect stakeholder feedback.</div>
+      </div>`;
+    return;
+  }
+  container.innerHTML = list.map(r => buildCardHTML(r)).join('');
+}
+
+function updateFilterCount(){
+  const list = getFilteredResponses();
+  const total = getResponses().length;
+  const el = document.getElementById('filterCount');
+  el.textContent = list.length === total ? `${total} response${total !== 1 ? 's' : ''}` : `${list.length} of ${total}`;
+}
+
+/* ── Card HTML builder ── */
+function calcAvg(scores){
+  const vals = Object.values(scores).filter(v => typeof v === 'number');
+  return vals.length ? +(vals.reduce((a,b) => a+b,0) / vals.length).toFixed(1) : 0;
+}
+function scoreClass(n){ return n >= 7 ? 's-green' : n >= 4 ? 's-amber' : 's-red'; }
+function recBadgeClass(r){
+  if(r === 'continue') return 'b-renew';
+  if(r === 'continue_conditions') return 'b-renew-cond';
+  if(r === 'escalate') return 'b-review';
+  if(r === 'do_not_continue') return 'b-dnr';
+  return 'b-dismissed';
+}
+function recLabel(r){
+  if(r === 'continue') return 'Continue / Renew';
+  if(r === 'continue_conditions') return 'Continue / Renew with Conditions';
+  if(r === 'escalate') return 'Escalate for Review';
+  if(r === 'do_not_continue') return 'Do Not Continue / Renew';
+  return r || 'No recommendation';
+}
+function fmtDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function buildCardHTML(r){
+  const avg = calcAvg(r.scores);
+  const dims = [
+    {key:'sla',lbl:'SLA'},
+    {key:'relationship',lbl:'Relationship'},
+    {key:'financial',lbl:'Financial'},
+    {key:'compliance',lbl:'Compliance'},
+    {key:'strategic',lbl:'Strategic'}
+  ];
+  const statusBadge = r.status === 'pending'
+    ? '<span class="badge b-pending">&#9679; Pending</span>'
+    : r.status === 'approved'
+      ? '<span class="badge b-approved">&#10003; Approved</span>'
+      : '<span class="badge b-dismissed">&#8212; Dismissed</span>';
+
+  const cardClass = r.status === 'approved' ? 'approved-card' : r.status === 'dismissed' ? 'dismissed-card' : '';
+  const actions = r.status === 'pending' ? `
+    <div class="resp-actions">
+      <button class="btn-approve" onclick="approveResponse('${r.id}')">&#10003; Approve</button>
+      <button class="btn-dismiss" onclick="dismissResponse('${r.id}')">&#10007; Dismiss</button>
+    </div>` : '';
+
+  const scoreGrid = dims.map(d => `
+    <div class="score-dim">
+      <div class="score-badge ${scoreClass(r.scores[d.key])}">${r.scores[d.key]}</div>
+      <div class="score-dim-lbl">${d.lbl}</div>
+    </div>`).join('');
+
+  const commentsGrid = dims.map(d => {
+    const txt = (r.comments && r.comments[d.key]) ? r.comments[d.key] : '—';
+    return `<div class="comment-item">
+      <div class="comment-dim-lbl">${d.lbl}</div>
+      <div class="comment-text">${escHtml(txt)}</div>
+    </div>`;
+  }).join('');
+  const overallComment = (r.comments && r.comments.overall) ? `
+    <div class="comment-overall">
+      <div class="comment-dim-lbl">Overall</div>
+      <div class="comment-text">${escHtml(r.comments.overall)}</div>
+    </div>` : '';
+
+  return `
+<div class="resp-card ${cardClass}" id="card-${r.id}">
+  <div class="resp-card-hdr">
+    <div class="resp-meta-col">
+      <div style="display:flex;align-items:center;gap:12px;">
+        ${vLogoSR(r.vendorName, 38)}
+        <div>
+          <div class="resp-vendor-name">${escHtml(r.vendorName)}</div>
+          <div class="resp-date">Submitted ${fmtDate(r.submittedAt)}</div>
+          <div class="resp-respondent">${escHtml(r.respondent.name)} &middot; ${escHtml(r.respondent.team)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="resp-hdr-right">
+      <span class="badge b-relationship">${escHtml(r.respondent.relationship)}</span>
+      ${statusBadge}
+    </div>
+  </div>
+  <div class="resp-scores">
+    ${scoreGrid}
+    <div class="score-sep"></div>
+    <div class="score-avg-wrap">
+      <div class="score-avg-badge ${scoreClass(avg)}">${avg}</div>
+      <div class="score-avg-lbl">Avg</div>
+    </div>
+  </div>
+  <div class="resp-comments-wrap">
+    <button class="comments-toggle" onclick="toggleComments('${r.id}')">
+      <span id="comments-arrow-${r.id}">&#9654;</span> View comments
+    </button>
+    <div class="comments-body" id="comments-body-${r.id}">
+      <div class="comment-grid">${commentsGrid}</div>
+      ${overallComment}
+    </div>
+  </div>
+  <div class="resp-footer">
+    <span class="rec-label">Recommendation:</span>
+    <span class="badge ${recBadgeClass(r.recommendation)}">${recLabel(r.recommendation)}</span>
+    ${actions}
+  </div>
+  <div class="resp-flash" id="flash-${r.id}"></div>
+</div>`;
+}
+
+/* ── Comments toggle ── */
+function toggleComments(id){
+  const body = document.getElementById('comments-body-' + id);
+  const arrow = document.getElementById('comments-arrow-' + id);
+  if(!body) return;
+  const open = body.classList.toggle('open');
+  if(arrow) arrow.textContent = open ? '▾' : '▶';
+}
+
+/* ── Approve ── */
+function approveResponse(id){
+  const responses = getResponses();
+  const idx = responses.findIndex(r => r.id === id);
+  if(idx < 0) return;
+  responses[idx].status = 'approved';
+  saveResponses(responses);
+  recalcAggregate(responses[idx].vendorId);
+  const card = document.getElementById('card-' + id);
+  if(card){
+    card.classList.add('approved-card');
+    card.classList.remove('dismissed-card');
+    card.querySelectorAll('.resp-actions').forEach(el => el.remove());
+    card.querySelectorAll('.badge.b-pending').forEach(el => {
+      el.className = 'badge b-approved';
+      el.innerHTML = '&#10003; Approved';
+    });
+    const flash = document.getElementById('flash-' + id);
+    if(flash){
+      flash.className = 'resp-flash show';
+      flash.innerHTML = '&#10003; Response approved — vendor score aggregate updated.';
+      setTimeout(() => flash.classList.remove('show'), 3500);
+    }
+  }
+  renderKPIs();
+  renderAggregates();
+  updateFilterCount();
+}
+
+/* ── Dismiss ── */
+function dismissResponse(id){
+  const responses = getResponses();
+  const idx = responses.findIndex(r => r.id === id);
+  if(idx < 0) return;
+  responses[idx].status = 'dismissed';
+  saveResponses(responses);
+  const card = document.getElementById('card-' + id);
+  if(card){
+    card.classList.add('dismissed-card');
+    card.classList.remove('approved-card');
+    card.querySelectorAll('.resp-actions').forEach(el => el.remove());
+    card.querySelectorAll('.badge.b-pending').forEach(el => {
+      el.className = 'badge b-dismissed';
+      el.innerHTML = '&#8212; Dismissed';
+    });
+    const flash = document.getElementById('flash-' + id);
+    if(flash){
+      flash.className = 'resp-flash dismiss-flash show';
+      flash.innerHTML = '&#8212; Response dismissed.';
+      setTimeout(() => flash.classList.remove('show'), 2500);
+    }
+  }
+  renderKPIs();
+  updateFilterCount();
+}
+
+/* ── Recalculate aggregate ── */
+function recalcAggregate(vendorId){
+  const responses = getResponses();
+  const approved = responses.filter(r => r.vendorId === vendorId && r.status === 'approved');
+  const agg = getApproved();
+  if(approved.length === 0){
+    delete agg[vendorId];
+    saveApproved(agg);
+    return;
+  }
+  const dims = ['sla','relationship','financial','compliance','strategic'];
+  const avgScores = {};
+  dims.forEach(d => {
+    const vals = approved.map(r => r.scores[d]).filter(v => typeof v === 'number');
+    avgScores[d] = vals.length ? +(vals.reduce((a,b) => a+b,0) / vals.length).toFixed(2) : 0;
+  });
+  const allVals = Object.values(avgScores);
+  avgScores.overall = allVals.length ? +(allVals.reduce((a,b) => a+b,0) / allVals.length).toFixed(2) : 0;
+
+  const recs = {continue:0, continue_conditions:0, escalate:0, do_not_continue:0};
+  approved.forEach(r => { if(r.recommendation && recs[r.recommendation] !== undefined) recs[r.recommendation]++; });
+
+  agg[vendorId] = {
+    vendorName: approved[0].vendorName,
+    lastApproved: approved.reduce((a,b) => a.submittedAt > b.submittedAt ? a : b).submittedAt,
+    respondentCount: approved.length,
+    avgScores,
+    recommendations: recs,
+    approvedResponseIds: approved.map(r => r.id)
+  };
+  saveApproved(agg);
+}
+
+/* ── Aggregates table ── */
+function renderAggregates(){
+  const agg = getApproved();
+  const tbody = document.getElementById('aggTableBody');
+  const vendors = Object.keys(agg);
+  if(vendors.length === 0){
+    tbody.innerHTML = '<tr><td colspan="10" class="agg-empty">No approved responses yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = vendors.map(vid => {
+    const v = agg[vid];
+    const s = v.avgScores;
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          ${vLogoSR(v.vendorName, 30)}
+          <div>
+            <div class="agg-vendor-name">${escHtml(v.vendorName)}</div>
+            <div class="agg-vendor-id">${escHtml(vid)}</div>
+          </div>
+        </div>
+      </td>
+      <td>${v.respondentCount}</td>
+      <td><span class="agg-score ${scoreClass(s.sla)}">${s.sla}</span></td>
+      <td><span class="agg-score ${scoreClass(s.financial)}">${s.financial}</span></td>
+      <td><span class="agg-score ${scoreClass(s.compliance)}">${s.compliance}</span></td>
+      <td><span class="agg-score ${scoreClass(s.relationship)}">${s.relationship}</span></td>
+      <td><span class="agg-score ${scoreClass(s.strategic)}">${s.strategic}</span></td>
+      <td><span class="agg-score ${scoreClass(s.overall)}">${s.overall}</span></td>
+      <td class="agg-date">${fmtDate(v.lastApproved)}</td>
+      <td><a href="vendor_detail.html?id=${encodeURIComponent(vid)}" class="agg-link">View &#8599;</a></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── HTML escape ── */
+function escHtml(str){
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deprecation Clock</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --body-bg:#020B18; --section-bg:#020B18;
+      --card-bg:rgba(255,255,255,0.03); --card-border:rgba(255,255,255,0.07);
+      --card-hover:rgba(255,255,255,0.05); --card-shadow:rgba(0,0,0,0.3);
+      --text-primary:#fff; --text-secondary:rgba(255,255,255,0.55);
+      --text-muted:rgba(255,255,255,0.35); --text-dim:rgba(255,255,255,0.25);
+      --divider:rgba(13,148,136,0.2);
+      --top-bar-bg:rgba(2,11,24,0.88); --top-bar-border:rgba(13,148,136,0.15);
+      --teal:#0D9488; --teal2:#0F766E;
+      --amber:#D97706; --red:#DC2626; --green:#059669;
+      --surface:rgba(255,255,255,0.03); --surface-2:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.07);
+      --rt-bg:rgba(255,255,255,0.02); --rt-border:rgba(255,255,255,0.07);
+      --rt-hdr:rgba(255,255,255,0.04); --rt-row-hover:rgba(255,255,255,0.03);
+      /* legacy local aliases */
+      --bg: #020B18;
+      --surface-3: rgba(255,255,255,0.07);
+      --teal: #0D9488;
+      --teal-dim: rgba(13,148,136,0.12);
+      --red: #DC2626;
+      --red-dim: rgba(220,38,38,0.10);
+      --amber: #D97706;
+      --amber-dim: rgba(217,119,6,0.10);
+      --green: #059669;
+      --text: #fff;
+      --text-faint: rgba(255,255,255,0.35);
+      --mono: 'SF Mono','Fira Code','Cascadia Code','Consolas',monospace;
+    }
+    [data-theme="light"] {
+      --body-bg:#F0F4FA; --card-bg:#fff; --card-border:#E5E7EB;
+      --text-primary:#111827; --text-secondary:#374151;
+      --text-muted:#6B7280; --text-dim:#9CA3AF;
+      --top-bar-bg:rgba(15,30,60,0.97); --top-bar-border:rgba(13,148,136,0.2);
+      --surface:#fff; --surface-2:#F9FAFB; --border:#E5E7EB;
+      --rt-bg:#fff; --rt-border:#E5E7EB; --rt-hdr:#F3F4F6; --rt-row-hover:#F9FAFB;
+      /* legacy local aliases */
+      --bg: #F0F4FA;
+      --surface-3: #e2e8f0;
+      --text: rgba(15,23,42,0.93);
+      --text-faint: #9CA3AF;
+    }
+    [data-theme="light"] .clock-hero::before {
+      background: radial-gradient(ellipse at 50% -10%, rgba(239,68,68,0.04) 0%, transparent 60%);
+    }
+    [data-theme="light"] .savings-panel::before {
+      background: radial-gradient(ellipse at 50% 0%, rgba(45,212,191,0.03) 0%, transparent 60%);
+    }
+
+    /* ── Visibility helpers (replace inline style="display:none") ── */
+    .hidden { display: none !important; }
+
+    /* ── Theme toggle button ───────────────────── */
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      line-height: 1;
+    }
+    .theme-toggle:hover { background: var(--surface-2); color: var(--text); }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+      background: var(--body-bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    /* ── Top bar ── */
+    .top-bar{position:fixed;top:0;left:0;right:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 40px;height:50px;
+      background:var(--top-bar-bg);
+      border-bottom:1px solid var(--top-bar-border);
+      -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+      transition:background 0.3s;}
+    .tb-left{display:flex;align-items:center;gap:16px;}
+    .tb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;
+      display:flex;align-items:center;gap:5px;transition:color 0.2s;}
+    .tb-back:hover{color:#0D9488;}
+    .tb-sep{width:1px;height:14px;background:rgba(255,255,255,0.12);}
+    .tb-brand{font-size:8.5pt;font-weight:800;letter-spacing:0.06em;color:rgba(255,255,255,0.65);}
+    .tb-right{display:flex;align-items:center;gap:10px;}
+    .tb-live{display:flex;align-items:center;gap:6px;font-size:8pt;font-weight:700;color:#0D9488;}
+    .live-dot{width:6px;height:6px;border-radius:50%;background:#0D9488;animation:pulse 1.8s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(13,148,136,0.4);}
+      50%{opacity:0.6;box-shadow:0 0 0 5px rgba(13,148,136,0);}}
+    .tb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+      border-radius:6px;font-size:8pt;font-weight:700;cursor:pointer;
+      font-family:inherit;transition:all 0.18s;letter-spacing:0.04em;border:none;}
+    .tb-theme{background:transparent;border:1px solid rgba(255,255,255,0.12);
+      color:rgba(255,255,255,0.45);padding:5px 12px;border-radius:6px;
+      font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.18s;}
+    .tb-theme:hover{border-color:#0D9488;color:#0D9488;}
+
+    /* ── Scanline + particles ── */
+    .scanline{position:fixed;left:0;right:0;height:140px;pointer-events:none;z-index:1;
+      background:linear-gradient(180deg,transparent,rgba(13,148,136,0.04),transparent);
+      top:0;will-change:transform;animation:scan 7s linear infinite;}
+    @keyframes scan{from{transform:translateY(-140px)}to{transform:translateY(100vh)}}
+    #particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.6;}
+    [data-theme="light"] .scanline{opacity:0.3;}
+    [data-theme="light"] #particles{opacity:0.15;}
+
+    /* ── Animations ── */
+    @keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── legacy bar-actions alias ── */
+    .bar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+      transition: all 0.15s;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--surface-2); color: var(--text); }
+    .btn-red {
+      background: rgba(239,68,68,0.14);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.3);
+    }
+    .btn-red:hover { background: rgba(239,68,68,0.24); }
+
+    .s-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .s-pill.critical { background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); }
+    .s-pill.high     { background:rgba(245,158,11,0.12); color:var(--amber); border:1px solid rgba(245,158,11,0.25); }
+    .s-pill.moderate { background:rgba(16,185,129,0.10); color:#34d399; border:1px solid rgba(16,185,129,0.22); }
+
+    .coupa-pick-wrap { margin-bottom: 12px; }
+    .coupa-pick-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-faint);
+      margin-bottom: 5px;
+    }
+    .coupa-pick-select {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 7px;
+      padding: 8px 11px;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .page-wrap {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 36px 24px 72px;
+    }
+
+    .page-hero { margin-bottom: 32px; }
+    .page-title {
+      font-size: clamp(18pt, 2.5vw, 26pt);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .page-sub {
+      font-size: 10pt;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card + .card { margin-top: 16px; }
+    .card-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 18px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+    }
+    .field input[type="text"],
+    .field input[type="number"],
+    .field input[type="date"] {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 9px 12px;
+      width: 100%;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .field input:focus {
+      border-color: rgba(45,212,191,0.45);
+      background: var(--surface-3);
+    }
+    .field-note {
+      font-size: 11px;
+      color: var(--text-faint);
+      line-height: 1.55;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .toggle-row input[type="checkbox"] {
+      width: 15px; height: 15px;
+      accent-color: var(--teal);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .toggle-row span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    .rate-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .rate-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .rate-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 4px;
+    }
+    .rate-value {
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+    .rate-value.red   { color: #f87171; }
+    .rate-value.amber { color: var(--amber); }
+
+    .clock-col { display: flex; flex-direction: column; gap: 18px; }
+
+    .clock-hero {
+      background: var(--surface);
+      border: 1px solid rgba(239,68,68,0.22);
+      border-radius: 16px;
+      padding: 44px 40px 36px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .clock-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% -10%, rgba(239,68,68,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .clock-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-faint);
+    }
+    .clock-empty-icon { font-size: 44px; opacity: 0.35; }
+    .clock-empty p { font-size: 14px; line-height: 1.6; max-width: 280px; }
+
+    .clock-live {
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .clock-live:not(.hidden) { display: flex; }
+    .clock-sys-name {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(239,68,68,0.75);
+      margin-bottom: 10px;
+    }
+    .clock-main-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 10px;
+    }
+    .clock-big-number {
+      font-size: clamp(44px, 6vw, 72px);
+      font-weight: 800;
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 45%, #f87171 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    .clock-since-text {
+      font-size: 12px;
+      color: var(--text-faint);
+      margin-bottom: 24px;
+    }
+    .clock-tick-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ef4444;
+      flex-shrink: 0;
+      animation: pulse-anim 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse-anim {
+      0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.55); }
+      70%  { box-shadow: 0 0 0 9px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+    .clock-per-sec {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      color: rgba(239,68,68,0.85);
+    }
+    .clock-per-sec-label {
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+
+    .savings-panel {
+      background: var(--surface);
+      border: 1px solid rgba(45,212,191,0.18);
+      border-radius: 14px;
+      padding: 28px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      display: none;
+    }
+    .savings-panel.visible { display: block; }
+    .savings-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(45,212,191,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .savings-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: rgba(45,212,191,0.6);
+      margin-bottom: 8px;
+    }
+    .savings-big-number {
+      font-size: clamp(32px, 4.5vw, 52px);
+      font-weight: 800;
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 50%, #5eead4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .savings-sub {
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+
+    .proj-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 560px) {
+      .proj-grid { grid-template-columns: 1fr; }
+    }
+    .proj-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .proj-card-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 6px;
+    }
+    .proj-card-value {
+      font-size: 22px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: #f87171;
+      margin-bottom: 2px;
+    }
+    .proj-card-sub { font-size: 11px; color: var(--text-faint); }
+
+    .insight-strip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: none;
+    }
+    .insight-strip.visible { display: block; }
+    .insight-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .insight-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .insight-row:first-child { padding-top: 0; }
+    .insight-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .insight-text { flex: 1; }
+    .insight-val { color: var(--text); font-weight: 600; }
+
+    /* Presentation overlay */
+    #pres-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #03070f;
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    #pres-overlay.active { display: flex; }
+
+    .pres-esc {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.25);
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .pres-esc:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+
+    .pres-sys {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(239,68,68,0.6);
+      margin-bottom: 18px;
+    }
+    .pres-main-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(100,116,139,0.5);
+      margin-bottom: 10px;
+    }
+    .pres-big {
+      font-size: clamp(56px, 9vw, 104px);
+      font-weight: 800;
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(135deg, #b91c1c 0%, #ef4444 40%, #f87171 80%, #fca5a5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .pres-per-day {
+      font-size: 22px;
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      color: rgba(148,163,184,0.45);
+      margin-bottom: 48px;
+    }
+    .pres-breakdown-row {
+      display: flex;
+      gap: 60px;
+    }
+    .pres-bk { text-align: center; }
+    .pres-bk-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(100,116,139,0.5);
+      margin-bottom: 6px;
+    }
+    .pres-bk-value {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      color: rgba(248,113,113,0.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+  <canvas id="particles"></canvas>
+
+  <nav class="top-bar">
+    <div class="tb-left">
+      <a href="index.html" class="tb-back">← Hub</a>
+      <div class="tb-sep"></div>
+      <span class="tb-brand">VER INTELLIGENCE HUB</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-live"><div class="live-dot"></div>LIVE</div>
+      <span id="urgency-pill" class="s-pill hidden"></span>
+      <button class="tb-btn tb-theme" id="theme-btn" onclick="toggleTheme()">◐ Theme</button>
+      <button type="button" class="btn btn-ghost" onclick="resetAll()">Reset</button>
+      <button type="button" class="btn btn-red hidden" id="pres-btn" onclick="enterPres()">Presentation Mode</button>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <div class="page-hero">
+      <div style="font-size:8pt;font-weight:800;letter-spacing:0.25em;text-transform:uppercase;color:#0D9488;margin-bottom:8px;">VENDOR INTELLIGENCE · DEPRECATION ANALYSIS</div>
+      <div class="page-title">Deprecation Clock</div>
+      <div class="page-sub">Enter your legacy system's annual carry cost. Watch what it's costing you — in real time.</div>
+    </div>
+
+    <div class="main-grid">
+
+      <!-- Left: Config -->
+      <div>
+        <div class="card">
+          <div class="card-title">System Configuration</div>
+
+          <div class="coupa-pick-wrap">
+            <label class="coupa-pick-label" for="clock-coupa-pick">Quick Pick from Coupa FY27</label>
+            <select id="clock-coupa-pick" class="coupa-pick-select" title="Quick pick a Coupa FY27 vendor to auto-fill" onchange="onClockCoupaPick()">
+              <option value="">— select a vendor to auto-fill —</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>System Name</label>
+            <input type="text" id="inp-name" placeholder="e.g. SAP ECC 6.0, Legacy CRM" oninput="onConfigChange()" />
+          </div>
+
+          <div class="field">
+            <label>Annual Carry Cost ($)</label>
+            <input type="number" id="inp-carry" placeholder="0" min="0" step="10000" oninput="onConfigChange()" />
+            <div class="field-note">Total annual cost to keep this system alive. Use the TCO Calculator to build this number, or enter your estimate directly.</div>
+          </div>
+
+          <div class="field">
+            <label for="inp-date">Decision Pending Since</label>
+            <input type="date" id="inp-date" title="Decision pending since" oninput="onConfigChange()" />
+            <div class="field-note">When was deprecation first identified or discussed? Unlocks the total exposure counter.</div>
+          </div>
+
+          <hr class="divider">
+
+          <label class="toggle-row">
+            <input type="checkbox" id="chk-savings" onchange="onSavingsToggle()" />
+            <span>Show Savings Foregone Counter</span>
+          </label>
+
+          <div id="savings-input-wrap" class="hidden">
+            <div class="field">
+              <label>Annual Savings if Deprecated ($)</label>
+              <input type="number" id="inp-savings" placeholder="Defaults to full carry cost" min="0" step="10000" oninput="onConfigChange()" />
+              <div class="field-note">Net annual value recaptured after deprecation. Defaults to the full carry cost if blank.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card hidden" id="rate-card">
+          <div class="card-title">Cost Rate Breakdown</div>
+          <div class="rate-grid">
+            <div class="rate-card">
+              <div class="rate-label">Per Second</div>
+              <div class="rate-value red" id="r-sec">--</div>
+            </div>
+            <div class="rate-card">
+              <div class="rate-label">Per Minute</div>
+              <div class="rate-value red" id="r-min">--</div>
+            </div>
+            <div class="rate-card">
+              <div class="rate-label">Per Hour</div>
+              <div class="rate-value amber" id="r-hour">--</div>
+            </div>
+            <div class="rate-card">
+              <div class="rate-label">Per Day</div>
+              <div class="rate-value amber" id="r-day">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Clock -->
+      <div class="clock-col">
+
+        <div class="clock-hero">
+          <div class="clock-empty" id="clock-empty">
+            <div class="clock-empty-icon">&#9203;</div>
+            <p>Enter a system name and annual carry cost to start the clock.</p>
+          </div>
+          <div class="clock-live hidden" id="clock-live">
+            <div class="clock-sys-name" id="disp-name">SYSTEM</div>
+            <div class="clock-main-label" id="disp-label">DAILY BURN RATE</div>
+            <div class="clock-big-number" id="disp-counter">$0.00</div>
+            <div class="clock-since-text" id="disp-since"></div>
+            <div class="clock-tick-row">
+              <div class="pulse-dot"></div>
+              <div class="clock-per-sec" id="disp-per-sec">$0.0000</div>
+              <div class="clock-per-sec-label">per second</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="savings-panel" id="savings-panel">
+          <div class="savings-label">Savings Foregone Since Decision</div>
+          <div class="savings-big-number" id="disp-savings">$0.00</div>
+          <div class="savings-sub" id="disp-savings-sub">Set a decision date to calculate</div>
+        </div>
+
+        <div id="proj-section" class="hidden">
+          <div class="proj-grid">
+            <div class="proj-card">
+              <div class="proj-card-label">1-Year Projection</div>
+              <div class="proj-card-value" id="proj-1">--</div>
+              <div class="proj-card-sub">at current carry rate</div>
+            </div>
+            <div class="proj-card">
+              <div class="proj-card-label">3-Year Projection</div>
+              <div class="proj-card-value" id="proj-3">--</div>
+              <div class="proj-card-sub">if nothing changes</div>
+            </div>
+            <div class="proj-card">
+              <div class="proj-card-label">5-Year Projection</div>
+              <div class="proj-card-value" id="proj-5">--</div>
+              <div class="proj-card-sub">total unchecked burn</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="insight-strip" id="insight-strip">
+          <div class="insight-row" id="ins-row-daily">
+            <span class="insight-icon">&#129518;</span>
+            <span class="insight-text" id="ins-daily-hrs"></span>
+          </div>
+          <div class="insight-row" id="ins-row-week">
+            <span class="insight-icon">&#128197;</span>
+            <span class="insight-text" id="ins-week"></span>
+          </div>
+          <div class="insight-row" id="ins-row-fte">
+            <span class="insight-icon">&#128100;</span>
+            <span class="insight-text" id="ins-fte"></span>
+          </div>
+          <div class="insight-row hidden" id="ins-decision-row">
+            <span class="insight-icon">&#128336;</span>
+            <span class="insight-text" id="ins-decision"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Presentation overlay -->
+  <div id="pres-overlay">
+    <button type="button" class="pres-esc" onclick="exitPres()">ESC / Exit</button>
+    <div class="pres-sys"        id="pres-sys">SYSTEM</div>
+    <div class="pres-main-label" id="pres-label">ACCUMULATING AT CURRENT RATE</div>
+    <div class="pres-big"        id="pres-counter">$0.00</div>
+    <div class="pres-per-day"    id="pres-per-day"></div>
+    <div class="pres-breakdown-row">
+      <div class="pres-bk">
+        <div class="pres-bk-label">Per Hour</div>
+        <div class="pres-bk-value" id="pres-r-hour">--</div>
+      </div>
+      <div class="pres-bk">
+        <div class="pres-bk-label">Per Day</div>
+        <div class="pres-bk-value" id="pres-r-day">--</div>
+      </div>
+      <div class="pres-bk">
+        <div class="pres-bk-label">Per Year</div>
+        <div class="pres-bk-value" id="pres-r-year">--</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/coupa_spend.js"></script>
+  <script>
+    var annualCarry   = 0;
+    var annualSavings = 0;
+    var decisionDays  = 0;
+    var decisionDate  = null;
+    var accumulator   = 0;
+    var savingsAccum  = 0;
+    var showSavings   = false;
+    var tickTimer     = null;
+
+    var SECS_PER_YEAR = 365.25 * 24 * 3600;
+
+    function fmt(n, dec) {
+      if (n === null || n === undefined || isNaN(n)) return '--';
+      dec = (dec === undefined) ? 0 : dec;
+      var sign = n < 0 ? '-' : '';
+      var abs  = Math.abs(n);
+      return sign + '$' + abs.toLocaleString('en-US', {
+        minimumFractionDigits: dec,
+        maximumFractionDigits: dec
+      });
+    }
+
+    function fmtShort(n) {
+      if (n === null || isNaN(n)) return '--';
+      if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+      return fmt(n, 2);
+    }
+
+    function setText(id, val) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+
+    // Build an insight sentence with highlighted values using DOM — no innerHTML
+    function buildInsight(el, parts) {
+      while (el.firstChild) el.removeChild(el.firstChild);
+      parts.forEach(function(part) {
+        if (part.highlight) {
+          var span = document.createElement('span');
+          span.className = 'insight-val';
+          span.textContent = part.text;
+          el.appendChild(span);
+        } else {
+          el.appendChild(document.createTextNode(part.text));
+        }
+      });
+    }
+
+    function getDaysSince(dateStr) {
+      if (!dateStr) return 0;
+      var then = new Date(dateStr + 'T00:00:00');
+      var ms   = Date.now() - then.getTime();
+      return ms > 0 ? ms / (1000 * 60 * 60 * 24) : 0;
+    }
+
+    // ── Coupa integration ────────────────────────
+    function populateClockCoupaPicker() {
+      var sel = document.getElementById('clock-coupa-pick');
+      if (!sel || !window.VER_COUPA) return;
+      var sorted = window.VER_COUPA.vendors.slice().sort(function(a,b){ return b.fy27 - a.fy27; }).slice(0, 60);
+      sorted.forEach(function(v) {
+        var opt = document.createElement('option');
+        opt.value = JSON.stringify({ n: v.n, fy27: v.fy27 });
+        opt.textContent = v.n + ' — $' + v.fy27.toFixed(2) + 'M/yr';
+        sel.appendChild(opt);
+      });
+    }
+
+    function onClockCoupaPick() {
+      var sel = document.getElementById('clock-coupa-pick');
+      if (!sel || !sel.value) return;
+      try {
+        var v = JSON.parse(sel.value);
+        var nameEl  = document.getElementById('inp-name');
+        var carryEl = document.getElementById('inp-carry');
+        if (nameEl)  { nameEl.value  = v.n; }
+        if (carryEl) { carryEl.value = Math.round(v.fy27 * 1e6); }
+        onConfigChange();
+      } catch(e) {}
+    }
+
+    function onConfigChange() {
+      annualCarry  = Math.max(0, parseFloat(document.getElementById('inp-carry').value) || 0);
+      decisionDate = document.getElementById('inp-date').value || null;
+      decisionDays = getDaysSince(decisionDate);
+      var savInp   = parseFloat(document.getElementById('inp-savings').value) || 0;
+      annualSavings = savInp > 0 ? savInp : annualCarry;
+
+      var rawName = document.getElementById('inp-name').value || '';
+      var name    = rawName.trim() || 'UNNAMED SYSTEM';
+
+      var hasCarry = annualCarry > 0;
+
+      setHidden('rate-card',    !hasCarry);
+      setHidden('proj-section', !hasCarry);
+      setHidden('clock-empty',   hasCarry);
+      setHidden('clock-live',   !hasCarry);
+      setHidden('pres-btn',     !hasCarry);
+      document.getElementById('insight-strip').classList.toggle('visible', hasCarry);
+
+      if (!hasCarry) {
+        stopTick();
+        setHidden('urgency-pill', true);
+        return;
+      }
+
+      var perSec  = annualCarry / SECS_PER_YEAR;
+      var perMin  = perSec  * 60;
+      var perHour = perMin  * 60;
+      var perDay  = perHour * 24;
+
+      setText('r-sec',  fmt(perSec,  4));
+      setText('r-min',  fmt(perMin,  2));
+      setText('r-hour', fmt(perHour, 0));
+      setText('r-day',  fmt(perDay,  0));
+
+      setText('proj-1', fmtShort(annualCarry));
+      setText('proj-3', fmtShort(annualCarry * 3));
+      setText('proj-5', fmtShort(annualCarry * 5));
+
+      setText('disp-name', name.toUpperCase());
+
+      if (decisionDate && decisionDays > 0) {
+        setText('disp-label', 'TOTAL CARRY COST SINCE DECISION');
+        var daysWhole = Math.floor(decisionDays);
+        setText('disp-since', 'Decision pending for ' + daysWhole + ' day' + (daysWhole !== 1 ? 's' : ''));
+        accumulator  = (annualCarry   / 365.25) * decisionDays;
+        savingsAccum = (annualSavings / 365.25) * decisionDays;
+      } else {
+        setText('disp-label', 'DAILY BURN RATE');
+        setText('disp-since', 'Set a decision date to see total exposure');
+        accumulator  = perDay;
+        savingsAccum = 0;
+      }
+
+      // Urgency pill
+      var pill = document.getElementById('urgency-pill');
+      setHidden('urgency-pill', false);
+      if (annualCarry >= 2000000) {
+        pill.className   = 's-pill critical';
+        pill.textContent = 'Critical Burn';
+      } else if (annualCarry >= 500000) {
+        pill.className   = 's-pill high';
+        pill.textContent = 'High Carry';
+      } else {
+        pill.className   = 's-pill moderate';
+        pill.textContent = 'Moderate Carry';
+      }
+
+      // Insights
+      var loadedFTE = Math.round(annualCarry / 150 / 2000 * 10) / 10;
+      var weekCost  = fmt(perDay * 5, 0);
+
+      buildInsight(document.getElementById('ins-daily-hrs'), [
+        { text: 'This system costs ' },
+        { text: fmt(perHour, 0) + ' per hour', highlight: true },
+        { text: ' — that\'s ' },
+        { text: fmt(perDay, 0), highlight: true },
+        { text: ' every business day.' }
+      ]);
+
+      buildInsight(document.getElementById('ins-week'), [
+        { text: 'Every work week that passes costs ' },
+        { text: weekCost, highlight: true },
+        { text: ' in carry. Every quarter is ' },
+        { text: fmtShort(annualCarry / 4), highlight: true },
+        { text: '.' }
+      ]);
+
+      buildInsight(document.getElementById('ins-fte'), [
+        { text: 'At a $150/hr fully-loaded rate, this carry cost equals ' },
+        { text: loadedFTE + ' FTEs', highlight: true },
+        { text: ' consumed by this system every year.' }
+      ]);
+
+      if (decisionDate && decisionDays > 0) {
+        var decisionCost = (annualCarry / 365.25) * decisionDays;
+        buildInsight(document.getElementById('ins-decision'), [
+          { text: 'The ' },
+          { text: Math.floor(decisionDays) + ' days', highlight: true },
+          { text: ' since this was first flagged have cost ' },
+          { text: fmtShort(decisionCost), highlight: true },
+          { text: '. That decision latency is now a line item.' }
+        ]);
+        setHidden('ins-decision-row', false);
+      } else {
+        setHidden('ins-decision-row', true);
+      }
+
+      // Presentation values
+      setText('pres-sys',    name.toUpperCase());
+      setText('pres-r-hour', fmt(perHour, 0));
+      setText('pres-r-day',  fmt(perDay,  0));
+      setText('pres-r-year', fmtShort(annualCarry));
+      setText('pres-per-day', fmt(perDay, 0) + ' every day');
+
+      if (showSavings) {
+        if (decisionDate && decisionDays > 0) {
+          setText('disp-savings-sub', 'Value that could have been recaptured since ' + decisionDate);
+        } else {
+          setText('disp-savings-sub', 'Set a decision date to calculate foregone savings');
+        }
+      }
+
+      startTick();
+    }
+
+    function startTick() {
+      stopTick();
+      tickTimer = setInterval(tick, 100);
+    }
+
+    function stopTick() {
+      if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+    }
+
+    function tick() {
+      if (annualCarry <= 0) return;
+
+      var perTick = annualCarry / (SECS_PER_YEAR * 10);
+      var perSec  = annualCarry / SECS_PER_YEAR;
+
+      if (decisionDate && decisionDays > 0) {
+        accumulator  += perTick;
+        savingsAccum += (annualSavings / (SECS_PER_YEAR * 10));
+      }
+
+      var val = (decisionDate && decisionDays > 0)
+        ? accumulator
+        : (annualCarry / SECS_PER_YEAR * 86400);
+
+      setText('disp-counter', fmt(val, 2));
+      setText('disp-per-sec', fmt(perSec, 4));
+      setText('pres-counter', fmt(val, 2));
+
+      document.getElementById('pres-label').textContent = (decisionDate && decisionDays > 0)
+        ? 'TOTAL CARRY COST SINCE DECISION'
+        : 'DAILY BURN RATE';
+
+      if (showSavings && decisionDate && decisionDays > 0) {
+        setText('disp-savings', fmt(savingsAccum, 2));
+      }
+    }
+
+    function setHidden(id, hide) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (hide) el.classList.add('hidden');
+      else el.classList.remove('hidden');
+    }
+
+    function toggleTheme() {
+      var html = document.documentElement;
+      var isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      var btn = document.getElementById('theme-btn');
+      if (btn) btn.textContent = isDark ? '☽' : '☀';
+    }
+
+    function onSavingsToggle() {
+      showSavings = document.getElementById('chk-savings').checked;
+      setHidden('savings-input-wrap', !showSavings);
+      document.getElementById('savings-panel').classList.toggle('visible', showSavings);
+      if (!showSavings) savingsAccum = 0;
+      onConfigChange();
+    }
+
+    function resetAll() {
+      ['inp-name', 'inp-carry', 'inp-date', 'inp-savings'].forEach(function(id) {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('chk-savings').checked = false;
+      showSavings  = false;
+      accumulator  = 0;
+      savingsAccum = 0;
+      annualCarry  = 0;
+      setHidden('savings-input-wrap', true);
+      document.getElementById('savings-panel').classList.remove('visible');
+      stopTick();
+      onConfigChange();
+    }
+
+    function enterPres() {
+      document.getElementById('pres-overlay').classList.add('active');
+      document.addEventListener('keydown', presKeyHandler);
+    }
+
+    function exitPres() {
+      document.getElementById('pres-overlay').classList.remove('active');
+      document.removeEventListener('keydown', presKeyHandler);
+    }
+
+    function presKeyHandler(e) {
+      if (e.key === 'Escape') exitPres();
+    }
+
+    onConfigChange();
+    populateClockCoupaPicker();
+  </script>
+
+  <script>
+  (function(){
+    var c=document.getElementById('particles');
+    if(!c)return;
+    var ctx=c.getContext('2d');
+    var pts=[];
+    function resize(){c.width=innerWidth;c.height=innerHeight;}
+    resize();
+    window.addEventListener('resize',resize);
+    for(var i=0;i<60;i++) pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+      vx:(Math.random()-0.5)*0.15,vy:(Math.random()-0.5)*0.15,
+      r:Math.random()*1.2+0.4,a:Math.random()*0.4+0.1});
+    function frame(){
+      ctx.clearRect(0,0,c.width,c.height);
+      pts.forEach(function(p){
+        p.x+=p.vx;p.y+=p.vy;
+        if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;
+        if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(13,148,136,'+p.a+')';ctx.fill();
+      });
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+  </script>
+
+</body>
+</html>

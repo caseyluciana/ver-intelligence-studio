@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VER Intelligence Hub — Build Story</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  
+  * { margin:0; padding:0; box-sizing:border-box; }
+  
+  :root {
+    --navy: #0F1E3C;
+    --navy2: #1E3A5F;
+    --teal: #0D9488;
+    --green: #059669;
+    --ink: #111827;
+    --ink2: #1F2937;
+    --ink3: #374151;
+    --ink4: #6B7280;
+    --gray: #F9FAFB;
+    --border: #E5E7EB;
+  }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    background: #fff;
+    color: var(--ink2);
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px 64px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #1a4a7a 100%);
+    border-radius: 16px;
+    padding: 44px 48px;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 40%;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: rgba(13,148,136,0.12);
+  }
+  .hero-eye {
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 10px;
+  }
+  .hero-title {
+    font-size: 28pt;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 8px;
+    position: relative; z-index: 1;
+  }
+  .hero-sub {
+    font-size: 11pt;
+    color: rgba(255,255,255,0.75);
+    font-weight: 400;
+    margin-bottom: 24px;
+    position: relative; z-index: 1;
+  }
+  .hero-chips {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    position: relative; z-index: 1;
+  }
+  .chip {
+    font-size: 8pt;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.13);
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.02em;
+  }
+  .chip.green { background: rgba(16,185,129,0.22); color: #6EE7B7; }
+  .chip.teal { background: rgba(13,148,136,0.25); color: #5EEAD4; }
+
+  /* ── STAT ROW ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .stat {
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    border-top: 3px solid var(--navy2);
+  }
+  .stat.green { border-top-color: var(--green); }
+  .stat.teal  { border-top-color: var(--teal); }
+  .stat.gold  { border-top-color: #D97706; }
+  .stat-val {
+    font-size: 22pt;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat.green .stat-val { color: var(--green); }
+  .stat.teal  .stat-val { color: var(--teal); }
+  .stat.gold  .stat-val { color: #D97706; }
+  .stat-lbl {
+    font-size: 7.5pt;
+    font-weight: 600;
+    color: var(--ink4);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  /* ── SECTION ── */
+  .section-h {
+    font-size: 11pt;
+    font-weight: 800;
+    color: var(--navy);
+    margin: 32px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-h span { font-size: 14pt; }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 8px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--teal), var(--navy2), #D97706);
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 18px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--teal);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--teal);
+  }
+  .tl-item.phase2::before { background: var(--navy2); box-shadow: 0 0 0 2px var(--navy2); }
+  .tl-item.phase3::before { background: #D97706; box-shadow: 0 0 0 2px #D97706; }
+  .tl-day {
+    font-size: 7.5pt;
+    font-weight: 700;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .tl-item.phase2 .tl-day { color: var(--navy2); }
+  .tl-item.phase3 .tl-day { color: #D97706; }
+  .tl-title {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+  .tl-bullets {
+    list-style: none;
+    padding: 0;
+  }
+  .tl-bullets li {
+    font-size: 8.5pt;
+    color: var(--ink3);
+    padding: 2px 0 2px 14px;
+    position: relative;
+  }
+  .tl-bullets li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--ink4);
+    font-size: 9pt;
+  }
+
+  /* ── WHAT WAS BUILT GRID ── */
+  .built-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .built-card {
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    border-left: 3px solid var(--navy2);
+  }
+  .built-card.teal { border-left-color: var(--teal); }
+  .built-card.green { border-left-color: var(--green); }
+  .built-card.gold { border-left-color: #D97706; }
+  .built-card-title {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+  .built-card-list {
+    list-style: none;
+    padding: 0;
+  }
+  .built-card-list li {
+    font-size: 8pt;
+    color: var(--ink3);
+    padding: 2px 0;
+  }
+  .built-card-list li::before {
+    content: '· ';
+    color: var(--ink4);
+  }
+
+  /* ── HIGHLIGHT BOX ── */
+  .highlight {
+    background: linear-gradient(135deg, #F0FDF9 0%, #EFF6FF 100%);
+    border: 1px solid #A7F3D0;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+  .highlight-title {
+    font-size: 9pt;
+    font-weight: 800;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .highlight p {
+    font-size: 9pt;
+    color: var(--ink2);
+    line-height: 1.7;
+  }
+
+  /* ── DATA TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    margin-bottom: 8px;
+  }
+  .data-table th {
+    background: var(--navy);
+    color: #fff;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 7.5pt;
+    letter-spacing: 0.04em;
+  }
+  .data-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink2);
+    vertical-align: top;
+  }
+  .data-table tr:nth-child(even) td { background: var(--gray); }
+  .badge {
+    display: inline-block;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .badge.green { background: #D1FAE5; color: #065F46; }
+  .badge.blue  { background: #DBEAFE; color: #1E40AF; }
+  .badge.amber { background: #FEF3C7; color: #78350F; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 7.5pt;
+    color: var(--ink4);
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: #fff; }
+    .page { padding: 24px 28px 40px; max-width: 100%; }
+    .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .stat { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tl-item::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eye">Salesforce DET · Vendor Engagement &amp; Reliability · FY27</div>
+    <div class="hero-title">VER Intelligence Hub<br>Build Story</div>
+    <div class="hero-sub">How a $295M portfolio command center was designed, built, and delivered — in 3–5 days.</div>
+    <div class="hero-chips">
+      <span class="chip">Director: Casey Luciana Candelaria-Logan</span>
+      <span class="chip green">✅ Delivered April 2026</span>
+      <span class="chip teal">10 Pages · Self-Contained · No Engineering Required</span>
+    </div>
+  </div>
+
+  <!-- STAT ROW -->
+  <div class="stat-row">
+    <div class="stat green">
+      <div class="stat-val">3–5</div>
+      <div class="stat-lbl">Days to Build</div>
+    </div>
+    <div class="stat teal">
+      <div class="stat-val">10</div>
+      <div class="stat-lbl">Deliverable Pages</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">$295M</div>
+      <div class="stat-lbl">Portfolio Mapped</div>
+    </div>
+    <div class="stat gold">
+      <div class="stat-val">100%</div>
+      <div class="stat-lbl">Savings Realized</div>
+    </div>
+  </div>
+
+  <!-- THE CHALLENGE -->
+  <div class="section-h"><span>🎯</span> The Challenge</div>
+  <p style="font-size:9pt;color:var(--ink2);line-height:1.75;margin-bottom:14px">
+    The VER &amp; FinOps team manages a $295M portfolio of vendor engagements across Salesforce DET — spanning software, contractors, hardware, and professional services. Leadership needed a single, always-current view of savings performance, contract status, SLA health, and strategic direction — without relying on engineering resources, a dedicated BI team, or a weeks-long build cycle.
+  </p>
+  <p style="font-size:9pt;color:var(--ink2);line-height:1.75;margin-bottom:8px">
+    The existing approach — spreadsheets, static decks, and ad-hoc reporting — made it impossible to present a coherent, real-time picture to SVP, EVP, and President-level leadership on demand. The goal was to change that, fast.
+  </p>
+
+  <!-- HIGHLIGHT -->
+  <div class="highlight">
+    <div class="highlight-title">The Mandate</div>
+    <p>Build an executive-grade, interactive intelligence platform from raw Coupa export data — visually polished, fully editable, printable, and deployable as a live website — without a single line of engineering support. Delivered in 3–5 days.</p>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="section-h"><span>📅</span> Build Timeline</div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-day">Days 1–2 · Foundation</div>
+      <div class="tl-title">Data Architecture + Core Framework</div>
+      <ul class="tl-bullets">
+        <li>Ingested and parsed 9,121-row Coupa FY27 export ($295M portfolio)</li>
+        <li>Designed CSS design system: color tokens, typography, card components, badge system</li>
+        <li>Built Executive Snapshot with live KPI tiles, savings banner, and progress tracking</li>
+        <li>Established localStorage persistence layer for all editable fields</li>
+        <li>Integrated NTT SLA Report, Cognizant SLA Metrics, Tech Mahindra Scorecard data</li>
+      </ul>
+    </div>
+    <div class="tl-item phase2">
+      <div class="tl-day">Days 2–3 · Content Build</div>
+      <div class="tl-title">Engagement Cards, SOW Tracker, MFT Scenarios</div>
+      <ul class="tl-bullets">
+        <li>Built 6 collapsible engagement cards with real SLA data from source files</li>
+        <li>SOW &amp; PO Expiry Tracker: 885 POs mapped across 4 quarters with live filters</li>
+        <li>MFT Forecasted Spend: 4-scenario toggle ($9.5M approved → $94.8M full book)</li>
+        <li>Top 10 Vendors with YoY comparison and DET Pillar breakdown</li>
+        <li>M&amp;A Vendor Transition Tracker for Informatica acquisition</li>
+        <li>Iterative formatting, div-tree balancing, and localStorage bug resolution</li>
+      </ul>
+    </div>
+    <div class="tl-item phase3">
+      <div class="tl-day">Days 3–5 · Polish + Multi-Page Architecture</div>
+      <div class="tl-title">10-Page Hub, Strategic Roadmap, Manager Guide</div>
+      <ul class="tl-bullets">
+        <li>Broke single-page hub into 10 interconnected pages with shared nav system</li>
+        <li>Integrated VER Strategic Roadmap (4-phase, 5-pillar) and VER-Ready Manager Guide</li>
+        <li>Added Coming Soon section with 3 individually bordered development cards</li>
+        <li>Built printable landing page with 3×3 navigation tile grid</li>
+        <li>Finalized print CSS, edit mode, update data panel, and back-button navigation</li>
+        <li>Deployed as self-contained HTML — shareable via single link, no server required</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- WHAT WAS BUILT -->
+  <div class="section-h"><span>🏗️</span> What Was Built</div>
+  <div class="built-grid">
+    <div class="built-card">
+      <div class="built-card-title">📊 Executive Snapshot &amp; Key Engagements</div>
+      <ul class="built-card-list">
+        <li>$10.236M savings realized — 100% to target</li>
+        <li>6 collapsible vendor engagement cards</li>
+        <li>Real SLA data: NTT, Cognizant (ES + FINS), TechM</li>
+        <li>Cognizant PD termination tracking</li>
+      </ul>
+    </div>
+    <div class="built-card teal">
+      <div class="built-card-title">📋 SOW &amp; PO Expiry Tracker</div>
+      <ul class="built-card-list">
+        <li>885 active POs · $177.8M FY27 portfolio</li>
+        <li>Q1–Q4 quarter-by-quarter renewal planning</li>
+        <li>Category and DET pillar live filters</li>
+        <li>Top 10 per quarter by spend</li>
+      </ul>
+    </div>
+    <div class="built-card green">
+      <div class="built-card-title">📈 MFT Forecasted Spend</div>
+      <ul class="built-card-list">
+        <li>4-scenario toggle with live pillar charts</li>
+        <li>Approved ($9.5M) · New/Not Submitted ($10.2M)</li>
+        <li>Under Review ($7.4M) · Full Book ($94.8M)</li>
+        <li>Approved, pipeline &amp; review item tables</li>
+      </ul>
+    </div>
+    <div class="built-card gold">
+      <div class="built-card-title">🔄 M&amp;A + Coming Soon + Resources</div>
+      <ul class="built-card-list">
+        <li>Informatica acquisition: 5 vendors, $2.21M+ tracked</li>
+        <li>VER Intake Requests with editable tracker</li>
+        <li>Usage &amp; Consumption Forecasting (6 vendors)</li>
+        <li>Vendor Health Monitor (8 vendors, RAG status)</li>
+      </ul>
+    </div>
+    <div class="built-card teal">
+      <div class="built-card-title">🗺️ Strategic Roadmap</div>
+      <ul class="built-card-list">
+        <li>4-phase transformation journey with live status dropdowns</li>
+        <li>5 strategic pillars with change management approach</li>
+        <li>Fully editable in Edit Mode · Printable</li>
+      </ul>
+    </div>
+    <div class="built-card">
+      <div class="built-card-title">📖 VER-Ready Manager Guide</div>
+      <ul class="built-card-list">
+        <li>Pre-contract checklist and engagement process</li>
+        <li>What VER Reviews · Governance frameworks</li>
+        <li>Integrated into hub navigation system</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TECHNICAL SPECS -->
+  <div class="section-h"><span>⚙️</span> Technical Specifications</div>
+  <table class="data-table">
+    <thead>
+      <tr><th>Component</th><th>Specification</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Total deliverable pages</td><td>10 interconnected HTML pages + single-page backup</td><td><span class="badge green">Delivered</span></td></tr>
+      <tr><td>Source data ingested</td><td>9,121-row Coupa FY27 export · NTT SLA Report · Cognizant SLA Metrics XLSX · TechM Scorecard · MFT Analysis XLSX</td><td><span class="badge green">Integrated</span></td></tr>
+      <tr><td>Deployment model</td><td>100% self-contained HTML — no server, no database, no engineering required. Shareable via single file or URL.</td><td><span class="badge green">Live Ready</span></td></tr>
+      <tr><td>Edit Mode</td><td>140+ editable fields across all pages. Changes persist via browser localStorage per page.</td><td><span class="badge green">Active</span></td></tr>
+      <tr><td>Print / PDF export</td><td>Print CSS on every page hides nav, toolbar, and edit controls. Clean output from any browser.</td><td><span class="badge green">Active</span></td></tr>
+      <tr><td>Data refresh</td><td>Update Data panel accepts new Coupa CSV exports and refreshes all portfolio KPIs automatically.</td><td><span class="badge blue">Ready</span></td></tr>
+      <tr><td>Collapsible engagement cards</td><td>Smooth CSS transitions. Each of 6 cards collapses to header row with expand arrow.</td><td><span class="badge green">Active</span></td></tr>
+      <tr><td>MFT scenario toggle</td><td>4-button toggle updates quarterly tiles, pillar charts, and item tables simultaneously.</td><td><span class="badge green">Active</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- WHY IT MATTERS -->
+  <div class="section-h"><span>💡</span> Why This Matters</div>
+  <div class="highlight">
+    <div class="highlight-title">Speed + Quality at Executive Standard</div>
+    <p>
+      Most platforms of this complexity — interactive, multi-page, data-driven, print-ready — take weeks of engineering time and dedicated BI resources to produce. This was designed, built, iterated, and delivered by the VER &amp; FinOps team in 3–5 days, with zero engineering dependency. It demonstrates what's possible when domain expertise, strategic clarity, and modern AI tooling work together. The hub is not a prototype — it's a production-grade, leadership-ready platform that is already in use.
+    </p>
+  </div>
+
+  <!-- WHAT'S NEXT -->
+  <div class="section-h"><span>🚀</span> What's Next</div>
+  <table class="data-table">
+    <thead>
+      <tr><th>Capability</th><th>Description</th><th>Timeline</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Monthly data refresh</td><td>New Coupa export → all KPIs update in minutes via Update Data panel</td><td><span class="badge green">Now</span></td></tr>
+      <tr><td>VER Intake Requests</td><td>Live intake tracking replacing the development placeholder</td><td><span class="badge amber">Q3 FY27</span></td></tr>
+      <tr><td>Vendor Health Monitor</td><td>Automated RAG status from SLA source data</td><td><span class="badge amber">Q3 FY27</span></td></tr>
+      <tr><td>Consumption Forecasting</td><td>Live usage data for Gartner, Conviva, Sentry IO, AWS, New Relic, Claude</td><td><span class="badge amber">Q3 FY27</span></td></tr>
+      <tr><td>Additional vendor engagements</td><td>New contracts and restructurings added as they close</td><td><span class="badge green">Ongoing</span></td></tr>
+      <tr><td>AI-synthesized QBRs</td><td>Phase 4 roadmap item — automated quarterly business reviews</td><td><span class="badge blue">Q4 FY27</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>VER Intelligence Hub · Build Story · April 2026 · DET Leadership Confidential</span>
+    <span>Director: Casey Luciana Candelaria-Logan</span>
+  </div>
+
+</div>
+</body>
+</html>

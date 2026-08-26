@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M&amp;A Vendor Transition &middot; VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --orange:#EA580C;--orange3:#FFF7ED;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);
+  color:var(--ink2);font-size:9pt;-webkit-print-color-adjust:exact;}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 48px;}
+
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border);}
+.back{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;
+  border-radius:6px;background:var(--gray2);border:1px solid var(--border2);
+  color:var(--ink3);font-size:8pt;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;border:none;}
+.back:hover{background:var(--navy);color:#fff;}
+.pg-title{font-size:15pt;font-weight:900;color:var(--navy);}
+.pg-sub{font-size:8.5pt;color:var(--ink4);margin-top:2px;}
+.print-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;
+  border-radius:6px;background:var(--gray2);border:1px solid var(--border2);
+  color:var(--ink3);font-size:8pt;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;}
+.print-btn:hover{background:var(--navy);color:#fff;}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;margin-bottom:14px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.card-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.card-sub{font-size:8pt;color:var(--ink4);margin-bottom:12px;}
+
+/* STAT TILES */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.stat{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;border-top:3px solid var(--navy);}
+.stat.teal{border-top-color:var(--teal);}
+.stat.amber{border-top-color:var(--amber);}
+.stat.green{border-top-color:var(--green);}
+.stat.red{border-top-color:var(--red);}
+.stat.purple{border-top-color:var(--purple);}
+.stat-val{font-size:20pt;font-weight:900;color:var(--navy);line-height:1;margin-bottom:3px;}
+.stat.teal .stat-val{color:var(--teal);}
+.stat.amber .stat-val{color:var(--amber);}
+.stat.green .stat-val{color:var(--green);}
+.stat.red .stat-val{color:var(--red);}
+.stat.purple .stat-val{color:var(--purple);}
+.stat-lbl{font-size:7.5pt;font-weight:600;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.06em;}
+.stat-note{font-size:7pt;color:var(--ink4);margin-top:4px;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;
+  font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.bg{background:var(--green3);color:var(--green2);}
+.ba{background:var(--amber3);color:var(--amber2);}
+.br{background:var(--red3);color:var(--red2);}
+.bn{background:var(--navy3);color:var(--navy2);}
+.bt{background:var(--teal3);color:var(--teal2);}
+.bp{background:var(--purple3);color:var(--purple);}
+.bz{background:var(--gray2);color:var(--ink4);}
+.bo{background:var(--orange3);color:var(--orange);}
+
+/* SECTION HEADER */
+.shdr{font-size:10pt;font-weight:800;color:var(--navy);margin:20px 0 10px;
+  display:flex;align-items:center;gap:8px;padding-bottom:8px;
+  border-bottom:2px solid var(--gray3);}
+
+/* CALLOUT */
+.callout{border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;
+  border-left:4px solid;font-size:8.5pt;line-height:1.6;}
+.c-info{background:var(--navy3);border-color:var(--navy2);color:var(--navy2);}
+.c-teal{background:var(--teal3);border-color:var(--teal);color:var(--green2);}
+.c-amber{background:var(--amber3);border-color:var(--amber);color:var(--amber2);}
+.c-red{background:var(--red3);border-color:var(--red);color:var(--red2);}
+
+/* TIMELINE */
+.timeline-wrap{position:relative;padding:8px 0 8px 0;overflow-x:auto;}
+.timeline-track{position:relative;height:6px;background:var(--gray3);
+  border-radius:3px;margin:32px 0 12px;min-width:600px;}
+.timeline-bar{position:absolute;height:6px;border-radius:3px;top:0;}
+.timeline-label{position:absolute;font-size:7pt;font-weight:700;
+  white-space:nowrap;top:-22px;transform:translateX(-50%);}
+.timeline-dot{position:absolute;width:14px;height:14px;border-radius:50%;
+  top:-4px;transform:translateX(-50%);border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.timeline-milestone{position:absolute;top:14px;font-size:7pt;
+  white-space:nowrap;transform:translateX(-50%);color:var(--ink4);}
+
+/* ENGAGEMENT CARDS */
+.eng-card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  margin-bottom:12px;overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:box-shadow 0.15s;}
+.eng-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.10);}
+.eng-header{padding:14px 18px;display:flex;align-items:flex-start;
+  justify-content:space-between;gap:12px;cursor:pointer;}
+.eng-body{padding:0 18px 14px;border-top:1px solid var(--gray2);}
+.eng-body.collapsed{display:none;}
+
+/* DECISION REGISTER */
+.decision-card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;margin-bottom:10px;
+  display:flex;align-items:flex-start;gap:14px;}
+
+/* DONUT */
+.donut-wrap{position:relative;width:160px;height:160px;flex-shrink:0;}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;}
+
+/* PROGRESS */
+.prog{background:var(--gray2);border-radius:4px;height:8px;overflow:hidden;}
+.prog-bar{height:8px;border-radius:4px;}
+
+/* FOOTER */
+.footer{margin-top:24px;padding-top:12px;border-top:1px solid var(--border);
+  font-size:7.5pt;color:var(--ink4);text-align:center;font-style:italic;}
+
+@media print{
+  .back,.print-btn{display:none!important;}
+  .wrap{padding:12px!important;max-width:100%!important;}
+  .eng-body.collapsed{display:block!important;}
+  body{background:#fff!important;}
+}
+
+/* ── VER Dark Mode ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+  --purple3:rgba(124,58,237,0.15);--orange3:rgba(234,88,12,0.15);
+  --blue3:rgba(37,99,235,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .card,[data-theme="dark"] .stat{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .card-title,[data-theme="dark"] .stat-val{color:var(--ink);}
+[data-theme="dark"] .vp-table th{background:#162942;}
+[data-theme="dark"] .vp-table td,[data-theme="dark"] .vp-table tr:hover td{background:var(--gray2);}
+[data-theme="dark"] .vp-table tr:hover td{background:var(--gray3);}
+[data-theme="dark"] .callout.info,[data-theme="dark"] .c-info{background:#0F1E3C;border-left-color:var(--navy2);color:var(--ink3);}
+[data-theme="dark"] .callout.teal,[data-theme="dark"] .c-teal{background:rgba(13,148,136,0.12);}
+[data-theme="dark"] .callout.amber,[data-theme="dark"] .c-amber{background:rgba(217,119,6,0.12);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{
+  background:var(--gray2)!important;color:var(--ink2)!important;border-color:var(--border2)!important;}
+[data-theme="dark"] .back-btn,[data-theme="dark"] .back{
+  background:var(--gray2);border-color:var(--border2);color:var(--ink3);}
+[data-theme="dark"] .hub-nav,[data-theme="dark"] .page-wrap>.top-bar{border-bottom-color:var(--border);}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid var(--border2);background:var(--gray2);
+  color:var(--ink4);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── Hub Top Bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.45);line-height:1.4;}
+.htb-meta-sub{font-size:7pt;}
+
+/* ── Hero Stage ── */
+.stage{background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 60%,#061020 100%);
+  position:relative;overflow:hidden;padding:52px 0 40px;}
+.stage::before{content:'';position:absolute;top:-80px;right:-80px;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(13,148,136,0.07) 0%,transparent 70%);pointer-events:none;}
+.stage-inner{max-width:1100px;margin:0 auto;padding:0 48px;}
+.stage-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+.stage-title{font-size:28pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:6px;}
+.stage-accent{color:var(--teal);}
+.stage-pos{font-size:9pt;color:rgba(255,255,255,0.55);margin-bottom:28px;}
+.kpi-strip{display:flex;gap:24px;flex-wrap:wrap;}
+.kpi{min-width:100px;}
+.kpi-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;}
+.kpi.teal .kpi-val{color:var(--teal);}
+.kpi.green .kpi-val{color:#34D399;}
+.kpi.amber .kpi-val{color:#FBBF24;}
+.kpi.red .kpi-val{color:#F87171;}
+.kpi-lbl{font-size:7.5pt;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;}
+
+/* ── Engagement card named classes (replacing most-used inline styles) ── */
+.vendor-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.vendor-logo{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-size:12pt;font-weight:900;color:#fff;font-family:Arial;flex-shrink:0;}
+.vendor-logo-navy{background:#0F1E3C;}
+.vendor-logo-teal{background:var(--teal);}
+.vendor-logo-gray{background:var(--ink4);}
+.vendor-name{font-size:10pt;font-weight:800;color:var(--navy);}
+.vendor-name-gray{color:var(--ink4);}
+.vendor-sub{font-size:8pt;color:var(--ink4);}
+.vendor-badge-r{margin-left:auto;}
+
+.eng-card-navy{border-left:4px solid var(--navy);}
+.eng-card-teal{border-left:4px solid var(--teal);}
+.eng-card-red{border-left:4px solid var(--red);}
+.eng-card-gray{border-left:4px solid var(--gray3);opacity:0.85;}
+
+.eng-hdr-content{flex:1;}
+.eng-title-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.eng-title{font-size:9pt;font-weight:700;color:var(--navy);}
+.eng-title-red{color:var(--red);}
+.eng-title-gray{color:var(--ink4);}
+.eng-badge-row{display:flex;gap:6px;flex-wrap:wrap;}
+.eng-amount{text-align:right;flex-shrink:0;}
+.eng-amt-val{font-size:14pt;font-weight:900;color:var(--navy);}
+.eng-amt-val-teal{color:var(--teal);}
+.eng-amt-val-red{color:var(--red);}
+.eng-amt-val-gray{color:var(--ink4);}
+.eng-amt-unit{font-size:8pt;font-weight:400;color:var(--ink4);}
+.eng-amt-sub{font-size:7.5pt;color:var(--ink4);}
+.eng-chevron{font-size:14pt;color:var(--ink4);margin-left:8px;transition:transform 0.25s;}
+
+.eng-detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:12px 0;}
+.eng-detail-lbl{font-size:7.5pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.eng-detail-body{font-size:8.5pt;color:var(--ink3);line-height:1.6;}
+.eng-contract-list{font-size:8.5pt;line-height:1.8;}
+.eng-contract-key{color:var(--ink4);}
+.eng-contract-red{color:var(--red);}
+
+.eng-risk-wrap{background:var(--gray);border-radius:8px;padding:10px 12px;}
+.eng-risk-lbl{font-size:7.5pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+.eng-risk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.eng-risk-row{display:flex;justify-content:space-between;font-size:7.5pt;margin-bottom:3px;}
+.eng-risk-key{color:var(--ink4);}
+.eng-risk-amber{font-weight:700;color:#D97706;}
+.eng-risk-green{font-weight:700;color:#059669;}
+
+/* ── Timeline named classes ── */
+.tl-outer{min-width:700px;padding:0 20px;}
+.tl-month-labels{display:flex;justify-content:space-between;font-size:7pt;
+  color:var(--ink4);margin-bottom:4px;font-weight:600;}
+.tl-track{position:relative;height:8px;background:var(--gray3);border-radius:4px;margin:8px 0 40px;}
+.tl-fill{position:absolute;left:0;top:0;width:76%;height:8px;
+  background:linear-gradient(90deg,var(--navy) 0%,var(--teal) 100%);
+  border-radius:4px;opacity:0.35;}
+.tl-today{position:absolute;left:0%;top:-20px;transform:translateX(-50%);text-align:center;}
+.tl-today-line{width:2px;height:28px;background:var(--red);margin:0 auto;}
+.tl-today-lbl{font-size:7pt;font-weight:700;color:var(--red);white-space:nowrap;margin-top:2px;}
+.tl-dot{position:absolute;top:-8px;transform:translateX(-50%);}
+.tl-dot-inner{width:16px;height:16px;border-radius:50%;border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.tl-dot-red .tl-dot-inner{background:var(--red);}
+.tl-dot-gray .tl-dot-inner{background:var(--gray3);}
+.tl-dot-navy .tl-dot-inner{background:var(--navy);}
+.tl-dot-teal .tl-dot-inner{background:var(--teal);}
+.tl-lbl{position:absolute;top:14px;transform:translateX(-50%);text-align:center;width:120px;}
+.tl-lbl-wide{width:100px;}
+.tl-lbl-offset{margin-left:10px;}
+.tl-lbl-name{font-size:7pt;font-weight:700;}
+.tl-lbl-name-red{color:var(--red);}
+.tl-lbl-name-gray{color:var(--ink4);}
+.tl-lbl-name-navy{color:var(--navy);}
+.tl-lbl-name-teal{color:var(--teal);}
+.tl-lbl-sub{font-size:6.5pt;color:var(--ink4);}
+
+/* ── Timeline legend ── */
+.tl-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;font-size:7.5pt;}
+.tl-leg-item{display:flex;align-items:center;gap:5px;}
+.tl-leg-dot{width:10px;height:10px;border-radius:50%;}
+.tl-leg-red{background:var(--red);}
+.tl-leg-navy{background:var(--navy);}
+.tl-leg-teal{background:var(--teal);}
+.tl-leg-gray{background:var(--gray3);}
+
+/* ── Summary mini-stats ── */
+.ma-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.ma-mini-stat{background:var(--gray);border-radius:8px;padding:10px 12px;}
+.ma-mini-lbl{font-size:7.5pt;color:var(--ink4);margin-bottom:2px;}
+.ma-mini-val{font-size:13pt;font-weight:900;color:var(--navy);}
+.ma-mini-val-amber{color:var(--amber);}
+.ma-mini-val-gray{color:var(--ink4);}
+.ma-mini-sub{font-size:7.5pt;color:var(--ink3);}
+
+/* ── Acquisition header ── */
+.acq-hdr{display:inline-flex;align-items:center;gap:8px;margin-bottom:12px;}
+.acq-icon-wrap{width:40px;height:40px;border-radius:8px;background:var(--navy);
+  display:flex;align-items:center;justify-content:center;font-size:16pt;color:#fff;}
+.acq-title{font-size:11pt;font-weight:900;color:var(--navy);}
+.acq-sub{font-size:8pt;color:var(--ink4);}
+
+/* ── Overview card ── */
+.overview-grid{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:center;}
+.donut-legend-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:7.5pt;}
+.donut-leg-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.donut-leg-swatch-navy{background:#0F1E3C;}
+.donut-leg-swatch-teal{background:#0D9488;}
+.donut-leg-swatch-gray{background:#D1D5DB;}
+.donut-leg-vendor{color:var(--ink2);}
+.donut-leg-amt{font-weight:700;color:var(--ink2);margin-left:auto;}
+.donut-leg-amt-gray{color:var(--ink4);}
+.donut-center-val{font-size:12pt;font-weight:900;color:var(--navy);}
+.donut-center-lbl{font-size:7pt;color:var(--ink4);line-height:1.3;}
+
+/* ── Decision register ── */
+.dec-card-open{border-left:4px solid var(--red);border-radius:0 8px 8px 0;
+  background:var(--red3);margin-bottom:10px;}
+.dec-card-navy{border-left:4px solid var(--navy);}
+.dec-card-teal{border-left:4px solid var(--teal);}
+.dec-icon{font-size:22pt;}
+.dec-body{flex:1;}
+.dec-title-red{font-size:9.5pt;font-weight:800;color:var(--red2);margin-bottom:4px;}
+.dec-title-navy{font-size:9pt;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.dec-title-teal{font-size:9pt;font-weight:700;color:var(--teal);margin-bottom:3px;}
+.dec-desc{font-size:8.5pt;color:var(--ink3);line-height:1.6;margin-bottom:8px;}
+.dec-desc-sm{font-size:8.5pt;color:var(--ink3);line-height:1.5;margin-bottom:6px;}
+.dec-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.dec-upcoming-hdr{font-size:8pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.06em;margin:14px 0 8px;}
+
+/* Scroll fade */
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+/* Advisory close */
+.advisory-close{background:linear-gradient(135deg,var(--navy) 0%,#1a2f50 100%);
+  color:rgba(255,255,255,0.6);padding:32px 48px;margin-top:40px;}
+.advisory-close-inner{max-width:1100px;margin:0 auto;}
+.advisory-title{font-size:9pt;font-weight:800;color:rgba(255,255,255,0.9);margin-bottom:8px;}
+.advisory-text{font-size:8pt;line-height:1.7;}
+.advisory-meta{margin-top:12px;font-size:7.5pt;color:rgba(255,255,255,0.35);}
+
+/* Progress bar color variants */
+.pbc-amber{background:#D97706;}
+.pbc-green{background:#059669;}
+.pbc-navy{background:var(--navy);}
+.pbc-red{background:var(--red);}
+.pbc-teal{background:var(--teal);}
+
+/* Donut legend wrapper */
+.donut-legend-wrap{margin-top:10px;text-align:left;padding:0 8px;}
+.donut-leg-vendor-muted{color:var(--ink4);}
+
+/* Vendor section wrapper */
+.vendor-section{margin-bottom:14px;}
+.vendor-section-last{margin-bottom:20px;}
+
+/* Engagement card header right col */
+.eng-hdr-right{text-align:right;flex-shrink:0;}
+.eng-hdr-static{cursor:default;}
+
+/* Donut column centering */
+.donut-col{text-align:center;}
+.donut-wrap{margin:0 auto;}
+
+/* Dot colors inside badges */
+.dot-green{background:#059669;}
+.dot-red{background:#DC2626;}
+
+/* Progress bar widths */
+.pw-20{width:20%;}
+.pw-25{width:25%;}
+.pw-30{width:30%;}
+.pw-40{width:40%;}
+
+/* Timeline positions */
+.tl-pos-0{left:0%;}
+.tl-pos-8{left:8%;}
+.tl-pos-76{left:76%;}
+.tl-pos-92{left:92%;}
+.tl-pos-100{left:100%;}
+.tl-lbl-110{width:110px;}
+
+/* Callout / detail grid modifiers */
+.callout-mt{margin:12px 0 0;}
+.eng-detail-grid-pt{padding-top:12px;}
+.eng-title-mb{margin-bottom:5px;}
+
+/* Dot color variants (within badges) */
+.dot-green{background:#059669;}
+.dot-red{background:#DC2626;}
+
+/* Print button */
+.print-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.6);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.print-btn:hover{background:rgba(255,255,255,0.15);color:#fff;}
+
+@media print{
+  .hub-top-bar,.stage{display:none!important;}
+  .wrap{padding:12px!important;max-width:100%!important;}
+  .eng-body.collapsed{display:block!important;}
+  body{background:#fff!important;}
+}
+
+/* ── AI Augmentation Panel ── */
+.ai-panel{
+  background:#fff;
+  border-radius:12px;
+  border:1px solid #E5E7EB;
+  border-left:3px solid #7C3AED;
+  padding:16px;margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.ai-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.ai-panel-title-row{display:flex;align-items:center;gap:8px;}
+.ai-panel-icon{font-size:16px;}
+.ai-panel-title{font-size:10px;font-weight:800;color:#7C3AED;
+  text-transform:uppercase;letter-spacing:0.10em;}
+.ai-panel-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:rgba(124,58,237,0.10);color:#6D28D9;
+  border:1px solid rgba(124,58,237,0.35);}
+.ai-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:10px;color:#6B7280;font-weight:600;}
+.ai-toggle-track{width:28px;height:16px;border-radius:8px;
+  background:#F3F4F6;border:1px solid #D1D5DB;
+  position:relative;transition:background 200ms ease;cursor:pointer;}
+.ai-toggle-track.on{background:rgba(124,58,237,0.55);border-color:rgba(124,58,237,0.70);}
+.ai-toggle-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;
+  border-radius:50%;background:#fff;transition:transform 200ms ease,opacity 200ms ease;opacity:0.5;}
+.ai-toggle-track.on .ai-toggle-thumb{transform:translateX(12px);opacity:1;}
+.ai-toggle-label{font-size:10px;}
+.ai-body{display:none;}
+.ai-body.ai-on{display:block;}
+.ai-desc{font-size:11px;color:#6B7280;line-height:1.6;
+  margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.ai-assumption-block{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.ai-assumption-item{background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.20);
+  border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;}
+.ai-assumption-check{width:16px;height:16px;border-radius:4px;flex-shrink:0;margin-top:1px;
+  background:rgba(124,58,237,0.20);border:1px solid rgba(124,58,237,0.40);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;}
+.ai-assumption-check.checked{background:rgba(124,58,237,0.50);color:#fff;}
+.ai-assumption-text{}
+.ai-assumption-title{font-size:10px;font-weight:700;color:#6D28D9;margin-bottom:2px;}
+.ai-assumption-body{font-size:11px;color:#6B7280;line-height:1.5;}
+.ai-complexity-note{font-size:10px;color:#9CA3AF;
+  font-style:italic;line-height:1.5;margin-top:8px;padding-top:8px;
+  border-top:1px solid rgba(255,255,255,0.06);}
+</style>
+</head>
+<body>
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">M&amp;A Vendor Transition Tracker</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="print-btn" onclick="openMaHelp()" aria-label="How to use M&A Vendor Intelligence">&#63; How to Use</button>
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button>
+    <button type="button" class="print-btn" onclick="window.print()">&#128438; Print</button>
+    <div class="htb-meta">DET Portfolio Intelligence &mdash; Powered by VER<br><span class="htb-meta-sub">Updated: May 2026 &middot; Salesforce DET &middot; Confidential</span></div>
+  </div>
+</nav>
+
+<section class="stage">
+  <div class="stage-inner">
+    <div class="stage-eyebrow">VER Intelligence Hub · FY27</div>
+    <div class="stage-title">M&amp;A Vendor <span class="stage-accent">Transition Tracker</span></div>
+    <div class="stage-pos">Inherited vendor engagements · Informatica acquisition · VER advisory oversight</div>
+    <div class="kpi-strip">
+      <div class="kpi teal">
+        <div class="kpi-val" data-count="1">1</div>
+        <div class="kpi-lbl">Acquisition Event</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val" data-count="5">5</div>
+        <div class="kpi-lbl">Inherited Engagements</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-val">$2.2M</div>
+        <div class="kpi-lbl">Annual Inherited Spend</div>
+      </div>
+      <div class="kpi amber">
+        <div class="kpi-val" data-count="1">1</div>
+        <div class="kpi-lbl">Open Decisions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <!-- CALLOUT -->
+  <div class="callout c-info">
+    <strong>M&amp;A Vendor Governance &mdash; VER Advisory Scope.</strong>
+    VER monitors inherited vendor engagements from the Informatica acquisition to ensure
+    continuity, risk visibility, and timely decision-making. GSA re-assignment is underway
+    for active engagements. Spend and contract decisions rest with Pillar Leads and Procurement.
+  </div>
+
+  <!-- OVERVIEW: DONUT + ACQUISITION SUMMARY -->
+  <div class="card fade-in">
+    <div class="overview-grid">
+
+      <!-- Donut chart -->
+      <div class="donut-col">
+        <div class="donut-wrap">
+          <svg viewBox="0 0 160 160" width="160" height="160">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="var(--gray2)" stroke-width="28"/>
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#0F1E3C" stroke-width="28"
+              stroke-dasharray="273.7 113.2" stroke-dashoffset="0"
+              transform="rotate(-90 80 80)"/>
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#0D9488" stroke-width="28"
+              stroke-dasharray="103.2 283.7" stroke-dashoffset="-273.7"
+              transform="rotate(-90 80 80)"/>
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#D1D5DB" stroke-width="28"
+              stroke-dasharray="6 380.9" stroke-dashoffset="-376.9"
+              transform="rotate(-90 80 80)"/>
+            <circle cx="80" cy="80" r="44" fill="white"/>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-center-val">$2.2M</div>
+            <div class="donut-center-lbl">Annual<br>Inherited</div>
+          </div>
+        </div>
+        <div class="donut-legend-wrap">
+          <div class="donut-legend-row">
+            <div class="donut-leg-swatch donut-leg-swatch-navy"></div>
+            <span class="donut-leg-vendor">HCL Technologies</span>
+            <span class="donut-leg-amt">$1.59M</span>
+          </div>
+          <div class="donut-legend-row">
+            <div class="donut-leg-swatch donut-leg-swatch-teal"></div>
+            <span class="donut-leg-vendor">Sonata Software</span>
+            <span class="donut-leg-amt">$0.61M</span>
+          </div>
+          <div class="donut-legend-row">
+            <div class="donut-leg-swatch donut-leg-swatch-gray"></div>
+            <span class="donut-leg-vendor donut-leg-vendor-muted">ServiceBerry (Wind-down)</span>
+            <span class="donut-leg-amt donut-leg-amt-gray">$0.37M TCV</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acquisition details -->
+      <div>
+        <div class="acq-hdr">
+          <div class="acq-icon-wrap">&#128202;</div>
+          <div>
+            <div class="acq-title">Informatica Acquisition</div>
+            <div class="acq-sub">Closed FY26 &middot; Vendor relationships inherited by DET</div>
+          </div>
+        </div>
+
+        <div class="ma-mini-grid">
+          <div class="ma-mini-stat">
+            <div class="ma-mini-lbl">Active Vendors</div>
+            <div class="ma-mini-val">2</div>
+            <div class="ma-mini-sub">HCL Technologies &middot; Sonata Software</div>
+          </div>
+          <div class="ma-mini-stat">
+            <div class="ma-mini-lbl">Wind-Down</div>
+            <div class="ma-mini-val ma-mini-val-gray">1</div>
+            <div class="ma-mini-sub">ServiceBerry Technologies &middot; Natural expiry</div>
+          </div>
+          <div class="ma-mini-stat">
+            <div class="ma-mini-lbl">GSA Status</div>
+            <div class="ma-mini-val ma-mini-val-amber">In Progress</div>
+            <div class="ma-mini-sub">Re-assignment underway &middot; Both HCL SOWs</div>
+          </div>
+          <div class="ma-mini-stat">
+            <div class="ma-mini-lbl">Latest Expiry</div>
+            <div class="ma-mini-val">Jul 2028</div>
+            <div class="ma-mini-sub">Sonata Oracle Cloud L2 Support</div>
+          </div>
+        </div>
+
+        <div class="callout c-amber">
+          <strong>Open Decision Required:</strong> Sonata Software &mdash; Salesforce instance support
+          SOW expires May 15, 2026 (Year 3 end). VER and Procurement need a renewal or
+          wind-down decision immediately. 30-day notice period.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 24-MONTH TIMELINE -->
+  <div class="shdr">&#128197; 24-Month Transition Timeline</div>
+  <div class="card">
+    <div class="card-sub">Inherited engagement expiry dates &middot; May 2026 &ndash; Jul 2028</div>
+    <div class="timeline-wrap">
+      <div class="tl-outer">
+
+        <div class="tl-month-labels">
+          <span>May 2026</span><span>Nov 2026</span><span>May 2027</span>
+          <span>Nov 2027</span><span>Jul 2028</span>
+        </div>
+
+        <div class="tl-track">
+
+          <!-- Today marker -->
+          <div class="tl-today tl-pos-0">
+            <div class="tl-today-line"></div>
+            <div class="tl-today-lbl">Today</div>
+          </div>
+
+          <!-- Sonata SF Support: May 2026 = 0% -->
+          <div class="tl-dot tl-dot-red tl-pos-0">
+            <div class="tl-dot-inner"></div>
+          </div>
+          <div class="tl-lbl tl-lbl-offset tl-pos-0">
+            <div class="tl-lbl-name tl-lbl-name-red">Sonata SF Support</div>
+            <div class="tl-lbl-sub">May 15, 2026 &mdash; Decision Required</div>
+          </div>
+
+          <!-- ServiceBerry: ~8% -->
+          <div class="tl-dot tl-dot-gray tl-pos-8">
+            <div class="tl-dot-inner"></div>
+          </div>
+          <div class="tl-lbl tl-lbl-wide tl-pos-8">
+            <div class="tl-lbl-name tl-lbl-name-gray">ServiceBerry</div>
+            <div class="tl-lbl-sub">Natural Expiry &mdash; Wind-down</div>
+          </div>
+
+          <!-- HCL both SOWs: 76% -->
+          <div class="tl-dot tl-dot-navy tl-pos-76">
+            <div class="tl-dot-inner"></div>
+          </div>
+          <div class="tl-lbl tl-lbl-110 tl-pos-76">
+            <div class="tl-lbl-name tl-lbl-name-navy">HCL &mdash; Both SOWs</div>
+            <div class="tl-lbl-sub">Dec 31, 2027 &mdash; Renewal decision</div>
+          </div>
+
+          <!-- Sonata Oracle: 100% dot, label at 92% -->
+          <div class="tl-dot tl-dot-teal tl-pos-100">
+            <div class="tl-dot-inner"></div>
+          </div>
+          <div class="tl-lbl tl-pos-92">
+            <div class="tl-lbl-name tl-lbl-name-teal">Sonata Oracle Cloud</div>
+            <div class="tl-lbl-sub">Jul 14, 2028 &mdash; Yr 1 of 3</div>
+          </div>
+
+          <div class="tl-fill"></div>
+        </div>
+      </div>
+    </div>
+    <div class="tl-legend">
+      <div class="tl-leg-item"><div class="tl-leg-dot tl-leg-red"></div><span>Decision Required</span></div>
+      <div class="tl-leg-item"><div class="tl-leg-dot tl-leg-navy"></div><span>Active &mdash; Keep</span></div>
+      <div class="tl-leg-item"><div class="tl-leg-dot tl-leg-teal"></div><span>Active &mdash; Monitoring</span></div>
+      <div class="tl-leg-item"><div class="tl-leg-dot tl-leg-gray"></div><span>Wind-down</span></div>
+    </div>
+  </div>
+
+  <!-- ENGAGEMENT DETAIL CARDS -->
+  <div class="shdr">&#128203; Inherited Engagement Detail</div>
+
+  <!-- HCL Technologies -->
+  <div class="vendor-section">
+    <div class="vendor-hdr">
+      <div class="vendor-logo vendor-logo-navy">HC</div>
+      <div>
+        <div class="vendor-name">HCL Technologies</div>
+        <div class="vendor-sub">2 inherited SOWs &middot; Both expiring Dec 31, 2027 &middot; GSA re-assignment in progress</div>
+      </div>
+      <span class="badge bg vendor-badge-r">Keep &mdash; Both Engagements</span>
+    </div>
+
+    <!-- HCL SOW 1 -->
+    <div class="eng-card eng-card-navy">
+      <div class="eng-header" onclick="toggleEng(this)">
+        <div class="eng-hdr-content">
+          <div class="eng-title-row">
+            <div class="eng-title">GDC Managed Service &mdash; L1/L2 Service Desk &amp; Infrastructure Ops</div>
+            <span class="badge bn">SOW 1</span>
+          </div>
+          <div class="eng-badge-row">
+            <span class="badge bg"><span class="dot dot-green"></span>Keep</span>
+            <span class="badge ba">GSA Re-assignment In Progress</span>
+            <span class="badge bz">24x7 Coverage</span>
+            <span class="badge bz">Year 2 of 3</span>
+          </div>
+        </div>
+        <div class="eng-amount">
+          <div class="eng-amt-val">$1.16M<span class="eng-amt-unit">/yr</span></div>
+          <div class="eng-amt-sub">Expires Dec 31, 2027</div>
+          <div class="eng-amt-sub">60-day notice</div>
+        </div>
+        <div class="eng-chevron">&#8964;</div>
+      </div>
+      <div class="eng-body collapsed">
+        <div class="eng-detail-grid">
+          <div>
+            <div class="eng-detail-lbl">Scope</div>
+            <div class="eng-detail-body">L1/L2 Service Desk support for Informatica-inherited systems.
+              24x7 monitoring and infrastructure operations.
+              Mission-critical workloads requiring continuous coverage.</div>
+          </div>
+          <div>
+            <div class="eng-detail-lbl">Contract Details</div>
+            <div class="eng-contract-list">
+              <div><span class="eng-contract-key">TCV:</span> <strong>$3.48M</strong> (3yr)</div>
+              <div><span class="eng-contract-key">Annual:</span> <strong>$1.16M</strong></div>
+              <div><span class="eng-contract-key">Term:</span> <strong>Jan 2025 &mdash; Dec 2027</strong></div>
+              <div><span class="eng-contract-key">Notice:</span> <strong>60 days</strong></div>
+              <div><span class="eng-contract-key">Year:</span> <strong>2 of 3</strong></div>
+            </div>
+          </div>
+          <div>
+            <div class="eng-detail-lbl">VER Notes</div>
+            <div class="eng-detail-body">GSA re-assignment in progress. Mission-critical engagement &mdash;
+              no disruption recommended during transition period.
+              Renewal decision required by Q4 FY27.</div>
+          </div>
+        </div>
+        <div class="eng-risk-wrap">
+          <div class="eng-risk-lbl">Risk Profile</div>
+          <div class="eng-risk-grid">
+            <div>
+              <div class="eng-risk-row">
+                <span class="eng-risk-key">Concentration</span>
+                <span class="eng-risk-amber">40</span>
+              </div>
+              <div class="prog"><div class="prog-bar pbc-amber pw-40"></div></div>
+            </div>
+            <div>
+              <div class="eng-risk-row">
+                <span class="eng-risk-key">Financial</span>
+                <span class="eng-risk-green">25</span>
+              </div>
+              <div class="prog"><div class="prog-bar pbc-green pw-25"></div></div>
+            </div>
+            <div>
+              <div class="eng-risk-row">
+                <span class="eng-risk-key">Delivery</span>
+                <span class="eng-risk-green">30</span>
+              </div>
+              <div class="prog"><div class="prog-bar pbc-green pw-30"></div></div>
+            </div>
+            <div>
+              <div class="eng-risk-row">
+                <span class="eng-risk-key">Compliance</span>
+                <span class="eng-risk-green">20</span>
+              </div>
+              <div class="prog"><div class="prog-bar pbc-green pw-20"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HCL SOW 2 -->
+    <div class="eng-card eng-card-navy">
+      <div class="eng-header" onclick="toggleEng(this)">
+        <div class="eng-hdr-content">
+          <div class="eng-title-row">
+            <div class="eng-title">EDO Support Platform &amp; Enhancement</div>
+            <span class="badge bn">SOW 2</span>
+          </div>
+          <div class="eng-badge-row">
+            <span class="badge bg"><span class="dot dot-green"></span>Keep</span>
+            <span class="badge ba">GSA Re-assignment In Progress</span>
+            <span class="badge bz">L2 Support + QA</span>
+            <span class="badge bz">Year 2 of 3</span>
+          </div>
+        </div>
+        <div class="eng-amount">
+          <div class="eng-amt-val">$433K<span class="eng-amt-unit">/yr</span></div>
+          <div class="eng-amt-sub">Expires Dec 31, 2027</div>
+          <div class="eng-amt-sub">60-day notice</div>
+        </div>
+        <div class="eng-chevron">&#8964;</div>
+      </div>
+      <div class="eng-body collapsed">
+        <div class="eng-detail-grid">
+          <div>
+            <div class="eng-detail-lbl">Scope</div>
+            <div class="eng-detail-body">EDO platform L2 support and enhancement services.
+              QA testing for Informatica-inherited EDO workloads.
+              Enhancement work within existing capacity.</div>
+          </div>
+          <div>
+            <div class="eng-detail-lbl">Contract Details</div>
+            <div class="eng-contract-list">
+              <div><span class="eng-contract-key">TCV:</span> <strong>$1.34M</strong> (3yr)</div>
+              <div><span class="eng-contract-key">Annual:</span> <strong>$433K</strong></div>
+              <div><span class="eng-contract-key">Term:</span> <strong>Jan 2025 &mdash; Dec 2027</strong></div>
+              <div><span class="eng-contract-key">Notice:</span> <strong>60 days</strong></div>
+              <div><span class="eng-contract-key">Year:</span> <strong>2 of 3</strong></div>
+            </div>
+          </div>
+          <div>
+            <div class="eng-detail-lbl">VER Notes</div>
+            <div class="eng-detail-body">Mission-critical QA coverage for EDO systems.
+              GSA re-assignment in progress alongside SOW 1.
+              Both HCL engagements being managed as a paired unit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sonata Software -->
+  <div class="vendor-section">
+    <div class="vendor-hdr">
+      <div class="vendor-logo vendor-logo-teal">SO</div>
+      <div>
+        <div class="vendor-name">Sonata Software</div>
+        <div class="vendor-sub">2 inherited SOWs &middot; GSA establishment in progress &middot; 1 decision pending</div>
+      </div>
+      <span class="badge ba vendor-badge-r">1 Decision Required</span>
+    </div>
+
+    <!-- Sonata SOW 1: Oracle Cloud -->
+    <div class="eng-card eng-card-teal">
+      <div class="eng-header" onclick="toggleEng(this)">
+        <div class="eng-hdr-content">
+          <div class="eng-title-row">
+            <div class="eng-title">Oracle Cloud L2 Support + Test Automation</div>
+            <span class="badge bt">SOW 1</span>
+          </div>
+          <div class="eng-badge-row">
+            <span class="badge bg"><span class="dot dot-green"></span>Keep</span>
+            <span class="badge ba">GSA Establishment In Progress</span>
+            <span class="badge bz">Year 1 of 3</span>
+          </div>
+        </div>
+        <div class="eng-amount">
+          <div class="eng-amt-val eng-amt-val-teal">$613K<span class="eng-amt-unit">/yr</span></div>
+          <div class="eng-amt-sub">Expires Jul 14, 2028</div>
+          <div class="eng-amt-sub">30-day notice</div>
+        </div>
+        <div class="eng-chevron">&#8964;</div>
+      </div>
+      <div class="eng-body collapsed">
+        <div class="eng-detail-grid">
+          <div>
+            <div class="eng-detail-lbl">Scope</div>
+            <div class="eng-detail-body">Oracle Cloud Applications L2 support for IT workloads.
+              Automated test suite maintenance and test automation
+              services for inherited Oracle environment.</div>
+          </div>
+          <div>
+            <div class="eng-detail-lbl">Contract Details</div>
+            <div class="eng-contract-list">
+              <div><span class="eng-contract-key">TCV:</span> <strong>$1.45M</strong> (3yr)</div>
+              <div><span class="eng-contract-key">Annual:</span> <strong>$613K</strong></div>
+              <div><span class="eng-contract-key">Term:</span> <strong>Jul 2025 &mdash; Jul 2028</strong></div>
+              <div><span class="eng-contract-key">Notice:</span> <strong>30 days</strong></div>
+              <div><span class="eng-contract-key">Year:</span> <strong>1 of 3</strong></div>
+            </div>
+          </div>
+          <div>
+            <div class="eng-detail-lbl">VER Notes</div>
+            <div class="eng-detail-body">Sonata GSA establishment underway. Longest-dated
+              inherited engagement &mdash; year 1 of 3. Stable and
+              performing to scope. No near-term decisions required.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sonata SOW 2: SF Support — DECISION REQUIRED -->
+    <div class="eng-card eng-card-red">
+      <div class="eng-header" onclick="toggleEng(this)">
+        <div class="eng-hdr-content">
+          <div class="eng-title-row">
+            <div class="eng-title eng-title-red">Salesforce Instance Support &mdash; Informatica SF Org</div>
+            <span class="badge br">SOW 2</span>
+          </div>
+          <div class="eng-badge-row">
+            <span class="badge br"><span class="dot dot-red"></span>Decision Required</span>
+            <span class="badge ba">Year 3 End &mdash; May 15, 2026</span>
+            <span class="badge bz">TCV $1.77M</span>
+          </div>
+        </div>
+        <div class="eng-amount">
+          <div class="eng-amt-val eng-amt-val-red">Expired</div>
+          <div class="eng-amt-sub">May 15, 2026 &mdash; Year 3 End</div>
+          <div class="eng-amt-sub">30-day notice period</div>
+        </div>
+        <div class="eng-chevron">&#8964;</div>
+      </div>
+      <div class="eng-body collapsed">
+        <div class="callout c-red callout-mt">
+          <strong>&#9888; Decision Required Immediately.</strong>
+          This SOW reached the end of Year 3 on May 15, 2026. A Renew or Wind-Down decision
+          is required. 30-day notice period applies. VER recommends aligning with
+          Procurement and the responsible Pillar Lead before any extension is executed.
+        </div>
+        <div class="eng-detail-grid eng-detail-grid-pt">
+          <div>
+            <div class="eng-detail-lbl">Scope</div>
+            <div class="eng-detail-body">Production support for the Informatica Salesforce org instance.
+              L2 support and maintenance for inherited SF environment.</div>
+          </div>
+          <div>
+            <div class="eng-detail-lbl">Contract Details</div>
+            <div class="eng-contract-list">
+              <div><span class="eng-contract-key">TCV:</span> <strong>$1.77M</strong> (3yr)</div>
+              <div><span class="eng-contract-key">Year 3 End:</span> <strong>May 15, 2026</strong></div>
+              <div><span class="eng-contract-key">Notice:</span> <strong>30 days</strong></div>
+              <div><span class="eng-contract-key">Decision:</span> <strong class="eng-contract-red">TBD &mdash; Pending</strong></div>
+            </div>
+          </div>
+          <div>
+            <div class="eng-detail-lbl">Options</div>
+            <div class="eng-detail-body">
+              <div>&#10003; <strong>Renew</strong> &mdash; Extend with Sonata for defined period</div>
+              <div>&#10003; <strong>Transition</strong> &mdash; Move to existing SF vendor</div>
+              <div>&#10003; <strong>Wind-down</strong> &mdash; Discontinue SF org support</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ServiceBerry -->
+  <div class="vendor-section-last">
+    <div class="vendor-hdr">
+      <div class="vendor-logo vendor-logo-gray">SB</div>
+      <div>
+        <div class="vendor-name vendor-name-gray">ServiceBerry Technologies</div>
+        <div class="vendor-sub">ServiceNow administration &amp; development &middot; Wind-down confirmed &middot; No new agreement</div>
+      </div>
+      <span class="badge bz vendor-badge-r">Discontinue &mdash; Wind-down</span>
+    </div>
+    <div class="eng-card eng-card-gray">
+      <div class="eng-header eng-hdr-static">
+        <div class="eng-hdr-content">
+          <div class="eng-title eng-title-gray eng-title-mb">ServiceNow Platform Administration &amp; Development</div>
+          <div class="eng-badge-row">
+            <span class="badge bz">Wind-down Confirmed</span>
+            <span class="badge bz">No New Agreement</span>
+            <span class="badge bz">Natural Expiry</span>
+          </div>
+        </div>
+        <div class="eng-amount">
+          <div class="eng-amt-val eng-amt-val-gray">$365K<span class="eng-amt-unit"> TCV</span></div>
+          <div class="eng-amt-sub">Natural expiry &mdash; winding down</div>
+          <div class="eng-amt-sub">30-day notice</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECISION REGISTER -->
+  <div class="shdr">&#9989; Decision Register</div>
+  <div class="card fade-in">
+    <div class="card-sub">Open decisions requiring action &middot; All inherited engagements</div>
+
+    <!-- Open decision -->
+    <div class="decision-card dec-card-open">
+      <div class="dec-icon">&#9888;</div>
+      <div class="dec-body">
+        <div class="dec-title-red">Sonata SF Support &mdash; Renew or Wind-down Decision</div>
+        <div class="dec-desc">SOW reached Year 3 end May 15, 2026. Decision required to either renew the engagement,
+          transition the SF org support to an existing vendor, or wind down.
+          30-day notice period applies from decision date.</div>
+        <div class="dec-badges">
+          <span class="badge br">Immediate Action</span>
+          <span class="badge bz">Owner: VER + Procurement + Pillar Lead</span>
+          <span class="badge bz">Vendor: Sonata Software</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dec-upcoming-hdr">Upcoming Decisions &mdash; Required Before Expiry</div>
+
+    <div class="decision-card dec-card-navy">
+      <div class="dec-icon">&#128197;</div>
+      <div class="dec-body">
+        <div class="dec-title-navy">HCL Technologies &mdash; Both SOWs Renewal</div>
+        <div class="dec-desc-sm">Both HCL engagements expire Dec 31, 2027. 60-day notice required.
+          Renewal strategy needed by Q3 FY27 to allow proper preparation.
+          GSA re-assignment must be complete before renewal terms can be finalized.</div>
+        <div class="dec-badges">
+          <span class="badge bn">Decision by Q3 FY27</span>
+          <span class="badge bz">$1.59M annual combined</span>
+          <span class="badge bz">60-day notice</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-card dec-card-teal">
+      <div class="dec-icon">&#128197;</div>
+      <div class="dec-body">
+        <div class="dec-title-teal">Sonata Software &mdash; Oracle Cloud Support Renewal</div>
+        <div class="dec-desc-sm">Year 1 of 3. No near-term action required. Renewal planning should begin
+          in FY29 ahead of Jul 2028 expiry. VER will flag at the 12-month mark.</div>
+        <div class="dec-badges">
+          <span class="badge bt">Decision by Q2 FY29</span>
+          <span class="badge bz">$613K annual</span>
+          <span class="badge bz">30-day notice</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FUTURE M&A NOTE -->
+  <div class="callout c-teal">
+    <strong>Future M&amp;A Visibility:</strong>
+    This tracker is designed to expand as additional acquisition events occur.
+    Each new acquisition will appear as a separate section with its own
+    donut share, timeline markers, and engagement cards.
+    VER is positioned to onboard inherited vendor relationships quickly
+    and provide governance continuity from day one.
+  </div>
+
+  <!-- AI Augmentation Panel -->
+  <div class="ai-panel" id="ai-panel-ma">
+    <div class="ai-panel-head">
+      <div class="ai-panel-title-row">
+        <span class="ai-panel-icon">&#10024;</span>
+        <span class="ai-panel-title">AI Stack Assumptions</span>
+        <span class="ai-panel-badge">Beta</span>
+      </div>
+      <div class="ai-toggle" onclick="toggleAiMa()" aria-label="Toggle AI Stack Assumptions">
+        <span id="ai-ma-label" class="ai-toggle-label">Off</span>
+        <div class="ai-toggle-track" id="ai-ma-track">
+          <div class="ai-toggle-thumb"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ai-body" id="ai-ma-body">
+      <div class="ai-desc">For targets with AI or agentic tooling in their vendor stack, check the assumptions that apply. Each adds integration complexity and cost to the post-merger estimate.</div>
+      <div class="ai-assumption-block">
+        <div class="ai-assumption-item">
+          <div class="ai-assumption-check" onclick="toggleMaCheck(this)"></div>
+          <div class="ai-assumption-text">
+            <div class="ai-assumption-title">AI Model Licensing — Portability Risk</div>
+            <div class="ai-assumption-body">Target's AI platform licenses (OpenAI, Anthropic, Azure AI) may not be transferable under M&A. Verify portability before close — renegotiation at scale adds 15–25% to year-1 AI costs.</div>
+          </div>
+        </div>
+        <div class="ai-assumption-item">
+          <div class="ai-assumption-check" onclick="toggleMaCheck(this)"></div>
+          <div class="ai-assumption-text">
+            <div class="ai-assumption-title">Training Data Rights — Legal Review Required</div>
+            <div class="ai-assumption-body">If the target has trained custom models on proprietary data, ownership of those models and their training data must be explicitly addressed in the purchase agreement.</div>
+          </div>
+        </div>
+        <div class="ai-assumption-item">
+          <div class="ai-assumption-check" onclick="toggleMaCheck(this)"></div>
+          <div class="ai-assumption-text">
+            <div class="ai-assumption-title">Agentic Workflow Dependency</div>
+            <div class="ai-assumption-body">Agentic automations are tightly coupled to the target's infrastructure. Migration or decommission adds 3–6 months of integration overhead not captured in standard IT migration estimates.</div>
+          </div>
+        </div>
+        <div class="ai-assumption-item">
+          <div class="ai-assumption-check" onclick="toggleMaCheck(this)"></div>
+          <div class="ai-assumption-text">
+            <div class="ai-assumption-title">AI Vendor Concentration Risk</div>
+            <div class="ai-assumption-body">Post-merger, the combined entity may have excessive concentration with a single AI provider — triggering renegotiation leverage for the vendor, not for DET. Map combined spend before close.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-complexity-note" id="ai-ma-checked-note">Check applicable assumptions above to flag them for the due diligence workstream.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="advisory-close">
+  <div class="advisory-close-inner">
+    <div class="advisory-title">VER Intelligence Hub · Advisory Notice</div>
+    <div class="advisory-text">M&amp;A Vendor Transition Tracker monitors inherited vendor engagements from the Informatica acquisition.
+    VER's role is to provide governance continuity, risk visibility, and timely decision support.
+    All spend and contract decisions rest with the respective Pillar Lead and Procurement.</div>
+    <div class="advisory-meta">VER Intelligence Hub · M&amp;A Vendor Transition Tracker · Informatica Acquisition FY26 · DET Portfolio Intelligence — Powered by VER · Confidential</div>
+  </div>
+</footer>
+
+<script>
+function toggleEng(header) {
+  var card  = header.closest('.eng-card');
+  var body  = card.querySelector('.eng-body');
+  var chev  = header.querySelector('.eng-chevron');
+  var open  = !body.classList.contains('collapsed');
+  body.classList.toggle('collapsed');
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function _dmToggle(){
+  var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+}
+function animateCounter(el){
+  var target=parseFloat(el.dataset.count||0);
+  var prefix=el.dataset.prefix||'';
+  var suffix=el.dataset.suffix||'';
+  var duration=1200;var start=null;
+  function step(ts){
+    if(!start) start=ts;
+    var p=Math.min((ts-start)/duration,1);
+    var ease=1-Math.pow(1-p,3);
+    var val=Math.round(target*ease);
+    el.textContent=prefix+val+suffix;
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+(function(){
+  var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+  document.addEventListener('DOMContentLoaded',function(){
+    var kpiObs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting&&e.target.dataset.count){
+          animateCounter(e.target);kpiObs.unobserve(e.target);
+        }
+      });
+    },{threshold:0.3});
+    document.querySelectorAll('.kpi-val[data-count]').forEach(function(el){kpiObs.observe(el);});
+    var fadeObs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');fadeObs.unobserve(e.target);}});
+    },{threshold:0.1});
+    document.querySelectorAll('.fade-in').forEach(function(el){fadeObs.observe(el);});
+
+    // Dynamic today marker — timeline spans May 2026 to Jul 2028 (26 months)
+    var tlStart = new Date('2026-05-01');
+    var tlEnd   = new Date('2028-07-14');
+    var today   = new Date();
+    var totalMs = tlEnd - tlStart;
+    var pct     = Math.max(0, Math.min(100, ((today - tlStart) / totalMs) * 100));
+    var todayEl = document.querySelector('.tl-today');
+    if (todayEl) {
+      todayEl.style.left = pct.toFixed(1) + '%';
+      var lbl = todayEl.querySelector('.tl-today-lbl');
+      if (lbl) lbl.textContent = 'Today (' + today.toLocaleDateString('en-US',{month:'short',year:'numeric'}) + ')';
+    }
+  });
+})();
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openMaHelp(){
+  HelpModal.open({
+    title: 'M&A Vendor Intelligence',
+    what: 'The M&A Vendor Intelligence tool supports <strong>acquisition due diligence and post-merger integration</strong> from a vendor and technology spend perspective. It maps the target company\'s vendor landscape, identifies overlap with DET\'s existing contracts, and surfaces rationalization opportunities and integration risks.',
+    steps: [
+      '<strong>Load the target company profile</strong> — enter known vendor names or upload a vendor spend extract from the target. The tool maps against DET\'s existing vendor registry.',
+      '<strong>Review the overlap analysis</strong> — the tool identifies vendors the target shares with DET, potential consolidation opportunities, and any vendors on DET\'s restricted or risk-flagged list.',
+      '<strong>Examine the spend profile</strong> — the target\'s vendor spend is categorized by technology area, contract structure, and risk tier to surface integration complexity.',
+      '<strong>Check contract alignment</strong> — key acquisition assumptions (license portability, multi-entity clauses, change-of-control provisions) are flagged per vendor.',
+      '<strong>Generate the due diligence summary</strong> — the output is formatted for M&A workstream integration and can be included in the deal team\'s vendor risk annex.'
+    ],
+    tips: [
+      { icon: '&#x26A0;', title: 'Change-of-control clauses are critical', body: 'Many enterprise software vendors have CoC provisions that can trigger renegotiation or termination rights at acquisition. These are flagged in the contract alignment view.' },
+      { icon: '&#x1F4B0;', title: 'Consolidation savings are not guaranteed', body: 'Overlap doesn\'t automatically mean savings — license structures, seat counts, and contract timing all affect whether consolidation is feasible post-close.' },
+      { icon: '&#x1F512;', title: 'Data residency flags are deal risks', body: 'Vendors with data residency restrictions (GDPR, data sovereignty) are flagged — these can affect integration timelines significantly.' },
+      { icon: '&#x1F4CB;', title: 'Feed into the TCO Calculator', body: 'Vendor costs identified in M&A due diligence can be passed to the TCO Calculator to model the fully-loaded cost of inheriting each vendor relationship.' }
+    ],
+    ai: '<strong>AI Augmentation assumption panel:</strong> For targets with AI/agentic tooling in their stack, the tool surfaces additional assumptions: model licensing portability, training data rights, and agentic workflow integration complexity. These feed directly into the post-merger integration cost estimate.',
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+<script>
+function toggleAiMa(){
+  var on = document.getElementById('ai-ma-track').classList.toggle('on');
+  document.getElementById('ai-ma-label').textContent = on ? 'On' : 'Off';
+  document.getElementById('ai-ma-body').classList.toggle('ai-on', on);
+}
+function toggleMaCheck(el){
+  el.classList.toggle('checked');
+  el.textContent = el.classList.contains('checked') ? '✓' : '';
+  var total = document.querySelectorAll('.ai-assumption-check.checked').length;
+  var note = document.getElementById('ai-ma-checked-note');
+  if(note) note.textContent = total > 0
+    ? total + ' assumption' + (total>1?'s':'') + ' flagged for due diligence workstream.'
+    : 'Check applicable assumptions above to flag them for the due diligence workstream.';
+}
+</script>
+</body>
+</html>

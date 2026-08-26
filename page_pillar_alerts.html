@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pillar Action Alerts · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --orange:#EA580C;--orange3:#FFF7ED;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Hub top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.35);line-height:1.4;}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+.print-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.print-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+@media print{
+  .hub-top-bar,.print-btn,.dm-toggle,.htb-meta{display:none!important;}
+  .hero{background:#0F1E3C!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{background:#fff!important;color:#111!important;}
+  .card{box-shadow:none!important;}
+  .wrap,.content-wrap{max-width:100%!important;padding:12px!important;}
+}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#060D1A 0%,#0F1E3C 50%,#0C2236 100%);padding:28px 0 24px;position:relative;overflow:hidden;}
+.hero-inner-wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+.hero::before{content:'';position:absolute;top:-60px;right:80px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(220,38,38,0.10),transparent 70%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-30px;left:30%;width:360px;height:200px;
+  background:radial-gradient(ellipse,rgba(13,148,136,0.09),transparent 70%);pointer-events:none;}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;position:relative;z-index:1;}
+.hero-left{}
+.hero-eyebrow{font-size:6.5pt;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.15;margin-bottom:6px;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.58);line-height:1.6;max-width:540px;}
+.hero-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;position:relative;z-index:1;}
+.hkpi{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:13px 15px;}
+.hkpi-val{font-size:18pt;font-weight:900;color:#fff;line-height:1;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,0.45);margin-top:4px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.38);margin-top:2px;}
+.hkpi.red    .hkpi-val{color:#FCA5A5;}
+.hkpi.amber  .hkpi-val{color:#FCD34D;}
+.hkpi.green  .hkpi-val{color:#6EE7B7;}
+.hkpi.teal   .hkpi-val{color:#5EEAD4;}
+.hkpi.purple .hkpi-val{color:#C4B5FD;}
+
+/* ── CONTROLS ── */
+.controls{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;padding:0;}
+.controls-inner{max-width:1280px;margin:0 auto;padding:11px 48px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.fsel{font-size:8pt;padding:6px 10px;border:1px solid var(--border2);border-radius:6px;
+  background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;}
+.fsel:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.fbtn{font-size:8pt;padding:6px 14px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--border2);background:#fff;font-family:inherit;font-weight:600;transition:all .13s;}
+.fbtn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.fbtn:hover:not(.active){background:var(--gray2);}
+.ctrl-sep{width:1px;height:20px;background:var(--border);margin:0 2px;}
+.ctrl-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.dm-btn{font-size:7.5pt;padding:5px 12px;border-radius:20px;border:1px solid var(--border2);
+  background:var(--gray2);color:var(--ink4);font-weight:700;cursor:pointer;font-family:inherit;transition:all .13s;}
+.dm-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── MAIN ── */
+.main{max-width:1280px;margin:0 auto;padding:20px 48px 40px;}
+.section-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.section-hd-title{font-size:10.5pt;font-weight:900;color:var(--navy);}
+.section-hd-sub{font-size:8pt;color:var(--ink4);margin-left:auto;}
+.count-chip{font-size:7pt;font-weight:800;padding:2px 9px;border-radius:10px;
+  background:var(--red3);color:var(--red2);}
+
+/* ── ALERT TICKER ── */
+.ticker-wrap{background:linear-gradient(90deg,var(--navy),var(--navy2));border-radius:10px;
+  padding:0;overflow:hidden;margin-bottom:22px;display:flex;align-items:stretch;}
+.ticker-label{background:var(--red);color:#fff;font-size:7pt;font-weight:900;
+  text-transform:uppercase;letter-spacing:.1em;padding:10px 16px;
+  display:flex;align-items:center;white-space:nowrap;flex-shrink:0;}
+.ticker-inner{overflow:hidden;flex:1;position:relative;}
+.ticker-track{display:flex;gap:0;white-space:nowrap;animation:ticker 40s linear infinite;
+  padding:9px 0;}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{display:inline-flex;align-items:center;gap:6px;padding:0 28px;
+  font-size:7.5pt;color:rgba(255,255,255,0.80);border-right:1px solid rgba(255,255,255,.12);}
+.ticker-item .ti-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.ticker-item .ti-name{font-weight:700;color:#fff;}
+
+/* ── PILLAR GRID ── */
+.pillar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:1100px){.pillar-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:700px){.pillar-grid{grid-template-columns:1fr;}}
+
+/* ── PILLAR CARD — fixed height tile, click → modal ── */
+.pc{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;
+  cursor:pointer;transition:box-shadow .15s,transform .15s;display:flex;flex-direction:column;}
+.pc:hover{box-shadow:0 8px 28px rgba(0,0,0,.11);transform:translateY(-2px);}
+.pc-header{padding:16px 18px 14px;border-bottom:1px solid var(--gray2);display:flex;align-items:flex-start;gap:12px;}
+.pc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:15pt;flex-shrink:0;}
+.pc-name{font-size:10.5pt;font-weight:900;color:var(--ink);line-height:1.2;}
+.pc-meta{font-size:7pt;color:var(--ink4);margin-top:2px;}
+.pc-status{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.pc-health{font-size:7.5pt;font-weight:800;padding:3px 10px;border-radius:8px;white-space:nowrap;}
+.pc-spend{font-size:7pt;color:var(--ink4);white-space:nowrap;}
+
+/* Summary chips in card body */
+.pc-chips{padding:12px 18px;display:flex;flex-wrap:wrap;gap:6px;flex:1;}
+.pc-sum-chip{font-size:6.5pt;font-weight:800;padding:3px 9px;border-radius:8px;white-space:nowrap;}
+
+/* Top alerts preview */
+.pc-preview{padding:0 18px 4px;}
+.pc-preview-item{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--gray2);}
+.pc-preview-item:last-child{border-bottom:none;}
+.pc-preview-bar{width:3px;height:14px;border-radius:2px;flex-shrink:0;}
+.pc-preview-text{font-size:7.5pt;color:var(--ink2);line-height:1.3;flex:1;min-width:0;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.pc-preview-due{font-size:6.5pt;font-weight:700;white-space:nowrap;flex-shrink:0;}
+
+/* Footer */
+.pc-foot{padding:10px 18px;background:var(--gray);border-top:1px solid var(--gray2);
+  display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
+.pc-foot-stat{font-size:7.5pt;color:var(--ink4);}
+.pc-foot-stat strong{color:var(--ink2);font-weight:800;}
+.pc-view-hint{font-size:7pt;color:var(--teal2);font-weight:700;}
+
+/* ── PILLAR DETAIL MODAL ── */
+.pdm-bg{opacity:0;pointer-events:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.52);z-index:300;display:flex;
+  align-items:flex-start;justify-content:center;padding:32px 20px;overflow-y:auto;transition:opacity .2s;}
+.pdm-bg.open{opacity:1;pointer-events:all;}
+.pdm{background:#fff;border-radius:14px;max-width:760px;width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,.22);
+  transform:translateY(28px) scale(.97);transition:transform .25s ease;overflow:hidden;}
+.pdm-bg.open .pdm{transform:translateY(0) scale(1);}
+.pdm-hdr{padding:20px 24px 16px;display:flex;align-items:flex-start;gap:12px;
+  background:linear-gradient(135deg,#060D1A,#0F1E3C);}
+.pdm-icon{width:44px;height:44px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18pt;}
+.pdm-hdr-text{flex:1;min-width:0;}
+.pdm-title{font-size:13pt;font-weight:900;color:#fff;line-height:1.2;margin-bottom:3px;}
+.pdm-sub{font-size:8pt;color:rgba(255,255,255,.55);}
+.pdm-close{background:none;border:none;font-size:18pt;cursor:pointer;
+  color:rgba(255,255,255,.5);padding:0;line-height:1;flex-shrink:0;}
+.pdm-close:hover{color:#fff;}
+.pdm-kpis{display:flex;gap:10px;padding:14px 24px;background:rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.08);}
+.pdm-kpi{flex:1;text-align:center;}
+.pdm-kpi-val{font-size:15pt;font-weight:900;color:#fff;line-height:1;}
+.pdm-kpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:rgba(255,255,255,.4);margin-top:2px;}
+.pdm-body{padding:18px 24px 24px;max-height:60vh;overflow-y:auto;}
+.pdm-body::-webkit-scrollbar{width:4px;}
+.pdm-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* ── ALERT ITEMS ── */
+.pc-alerts{padding:4px 0;}
+.alert-item{padding:11px 18px;border-bottom:1px solid var(--gray2);cursor:pointer;
+  transition:background .12s;display:flex;align-items:flex-start;gap:10px;}
+.alert-item:last-child{border-bottom:none;}
+.alert-item:hover{background:var(--gray);}
+.alert-priority{width:4px;border-radius:2px;flex-shrink:0;align-self:stretch;min-height:40px;}
+.alert-body{flex:1;min-width:0;}
+.alert-title{font-size:8.5pt;font-weight:700;color:var(--ink);margin-bottom:3px;line-height:1.3;}
+.alert-sub{font-size:7.5pt;color:var(--ink4);line-height:1.4;}
+.alert-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.alert-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.alert-due{font-size:7pt;font-weight:700;white-space:nowrap;}
+.alert-vendor-chip{font-size:6.5pt;font-weight:700;padding:2px 7px;border-radius:6px;
+  background:var(--navy3);color:var(--navy2);white-space:nowrap;max-width:100px;
+  overflow:hidden;text-overflow:ellipsis;}
+
+/* ── PC FOOTER ── */
+.pc-foot{padding:10px 18px;background:var(--gray);border-top:1px solid var(--gray2);
+  display:flex;justify-content:space-between;align-items:center;}
+.pc-foot-stat{font-size:7.5pt;color:var(--ink4);}
+.pc-foot-stat strong{color:var(--ink2);font-weight:800;}
+.pc-view-btn{font-size:7.5pt;font-weight:700;color:var(--teal2);background:none;border:none;
+  cursor:pointer;font-family:inherit;padding:3px 0;}
+.pc-view-btn:hover{text-decoration:underline;}
+
+/* ── ALERT LIST VIEW (full table) ── */
+.alert-table-wrap{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px;}
+.alert-table-hd{padding:13px 18px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.at-table{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.at-table th{background:var(--navy);color:#fff;padding:8px 14px;text-align:left;
+  font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
+.at-table td{padding:10px 14px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.at-table tr:last-child td{border-bottom:none;}
+.at-table tr:hover td{background:var(--gray);cursor:pointer;}
+.pri-bar{width:3px;height:18px;border-radius:2px;display:inline-block;vertical-align:middle;margin-right:7px;}
+
+/* ── BADGE / DOT ── */
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:6.5pt;font-weight:700;
+  padding:2px 7px;border-radius:9px;white-space:nowrap;}
+.b-red   {background:var(--red3);color:var(--red2);}
+.b-amber {background:var(--amber3);color:var(--amber2);}
+.b-green {background:var(--green3);color:var(--green2);}
+.b-navy  {background:var(--navy3);color:var(--navy2);}
+.b-teal  {background:var(--teal3);color:var(--teal2);}
+.b-purple{background:var(--purple3);color:var(--purple2);}
+.b-gray  {background:var(--gray3);color:var(--ink3);}
+.b-orange{background:var(--orange3);color:var(--orange);}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
+/* ── MODAL ── */
+.modal-bg{opacity:0;pointer-events:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.52);z-index:200;display:flex;
+  align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;transition:opacity .2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:14px;max-width:660px;width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,.22);
+  transform:translateY(28px) scale(.97);transition:transform .25s ease;overflow:hidden;}
+.modal-bg.open .modal{transform:translateY(0) scale(1);}
+.modal-hdr{padding:22px 26px 18px;display:flex;align-items:flex-start;gap:14px;}
+.modal-hdr-icon{width:44px;height:44px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18pt;}
+.modal-hdr-title{font-size:13pt;font-weight:900;color:var(--navy);line-height:1.2;margin-bottom:4px;}
+.modal-hdr-sub{font-size:8pt;color:var(--ink4);}
+.modal-close{margin-left:auto;background:none;border:none;font-size:18pt;
+  cursor:pointer;color:var(--ink4);padding:0;line-height:1;flex-shrink:0;}
+.modal-close:hover{color:var(--ink);}
+.modal-body{padding:4px 26px 26px;}
+.m-sec{margin-bottom:18px;}
+.m-sec:last-child{margin-bottom:0;}
+.m-sec-title{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink4);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.m-tile{background:var(--gray);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+.m-tile-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink4);margin-bottom:4px;}
+.m-tile-val{font-size:9pt;font-weight:700;color:var(--ink2);}
+.m-actions{display:flex;flex-direction:column;gap:8px;}
+.m-action-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
+  background:var(--gray);border-radius:8px;border-left:3px solid var(--teal);}
+.m-action-num{font-size:8pt;font-weight:900;color:var(--teal2);flex-shrink:0;min-width:18px;}
+.m-action-text{font-size:8.5pt;color:var(--ink3);line-height:1.55;}
+.m-context{font-size:8.5pt;color:var(--ink3);line-height:1.65;background:var(--navy3);
+  border-radius:8px;padding:12px 14px;border-left:3px solid var(--navy2);}
+.m-owners{display:flex;flex-wrap:wrap;gap:6px;}
+.m-owner{display:flex;align-items:center;gap:5px;font-size:8pt;color:var(--ink2);
+  background:var(--gray);border:1px solid var(--border);border-radius:20px;padding:4px 10px;}
+.m-owner-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── EMPTY STATE ── */
+.empty{padding:48px 20px;text-align:center;color:var(--ink4);}
+.empty-icon{font-size:26pt;margin-bottom:8px;}
+
+/* ── DARK MODE ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,.15);--green3:rgba(5,150,105,.15);
+  --amber3:rgba(217,119,6,.15);--red3:rgba(220,38,38,.15);
+  --purple3:rgba(124,58,237,.15);--orange3:rgba(234,88,12,.15);
+  --blue3:rgba(37,99,235,.15);
+}
+[data-theme="dark"] body{background:var(--gray);}
+[data-theme="dark"] .controls{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .fsel,.fbtn{background:var(--gray2);color:var(--ink2);border-color:var(--border2);}
+[data-theme="dark"] .pc,.alert-table-wrap,.modal,.pdm{background:var(--gray2);}
+[data-theme="dark"] .pc-header{border-color:var(--border);}
+[data-theme="dark"] .pc-foot{background:var(--gray3);}
+[data-theme="dark"] .pc-preview-item{border-color:var(--border);}
+[data-theme="dark"] .alert-item:hover{background:var(--gray3);}
+[data-theme="dark"] .pdm-body::-webkit-scrollbar-thumb{background:var(--border2);}
+[data-theme="dark"] .m-tile{background:var(--gray3);}
+[data-theme="dark"] .m-context{background:var(--gray3);}
+[data-theme="dark"] .m-action-item{background:var(--gray3);}
+[data-theme="dark"] .m-owner{background:var(--gray3);}
+[data-theme="dark"] .section-hd-title{color:var(--ink);}
+[data-theme="dark"] .at-table td{border-color:var(--border);}
+[data-theme="dark"] .at-table tr:hover td{background:var(--gray3);}
+
+@media(max-width:900px){
+  .hero-kpis{grid-template-columns:repeat(2,1fr);}
+  .main{padding:14px 16px 28px;}
+}
+</style>
+</head>
+<body>
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">Pillar Action Alerts</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="print-btn" onclick="openAlertsHelp()">&#63; How to Read</button>
+    <button type="button" class="print-btn" onclick="window.print()">&#128438; Download PDF</button>
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="toggleDark()">&#9789; Dark Mode</button>
+    <div class="htb-meta">DET Portfolio Intelligence &mdash; Powered by VER<br>FY27 &middot; Confidential</div>
+  </div>
+</nav>
+<div id="modal-root"></div>
+<div id="pillar-modal-root"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner-wrap">
+    <div class="hero-top">
+      <div class="hero-left">
+        <div class="hero-eyebrow">VER Intelligence Hub · FY27</div>
+        <div class="hero-title">Pillar Action Alerts</div>
+        <div class="hero-sub">Time-sensitive vendor actions organized by DET pillar — renewals, SLA watchlist, governance escalations, and commercial decisions that need VER attention now.</div>
+      </div>
+    </div>
+    <div class="hero-kpis">
+      <div class="hkpi red">   <div class="hkpi-val" id="kpi-critical">—</div><div class="hkpi-lbl">Critical</div><div class="hkpi-note">Immediate action</div></div>
+      <div class="hkpi amber"> <div class="hkpi-val" id="kpi-watch">—</div><div class="hkpi-lbl">Watch</div><div class="hkpi-note">Action within 30d</div></div>
+      <div class="hkpi teal">  <div class="hkpi-val" id="kpi-plan">—</div><div class="hkpi-lbl">Planning</div><div class="hkpi-note">Horizon items</div></div>
+      <div class="hkpi purple"><div class="hkpi-val" id="kpi-pillars">—</div><div class="hkpi-lbl">Pillars Active</div><div class="hkpi-note">With open alerts</div></div>
+      <div class="hkpi green"> <div class="hkpi-val" id="kpi-spend-exp">—</div><div class="hkpi-lbl">Spend at Stake</div><div class="hkpi-note">Open alert total</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="controls-inner">
+  <select class="fsel" id="ctrl-pillar" title="Filter by pillar" onchange="applyFilters()">
+    <option value="">All Pillars</option>
+  </select>
+  <select class="fsel" id="ctrl-severity" title="Filter by severity" onchange="applyFilters()">
+    <option value="">All Severities</option>
+    <option value="critical">Critical</option>
+    <option value="watch">Watch</option>
+    <option value="planning">Planning</option>
+  </select>
+  <select class="fsel" id="ctrl-type" title="Filter by type" onchange="applyFilters()">
+    <option value="">All Types</option>
+    <option value="renewal">Renewal</option>
+    <option value="sla">SLA / Performance</option>
+    <option value="governance">Governance</option>
+    <option value="commercial">Commercial</option>
+    <option value="risk">Risk</option>
+  </select>
+  <div class="ctrl-sep"></div>
+  <button type="button" class="fbtn active" id="vt-card"  onclick="setView('card')">⊞ By Pillar</button>
+  <button type="button" class="fbtn"        id="vt-table" onclick="setView('table')">☰ All Alerts</button>
+  <button type="button" class="fbtn"        id="vt-clear" onclick="clearFilters()">✕ Clear</button>
+  <div class="ctrl-r">
+    <span style="font-size:7.5pt;color:var(--ink4)" id="alert-count-label"></span>
+    <button type="button" class="dm-btn" onclick="toggleDark()">☽ Dark Mode</button>
+  </div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- TICKER -->
+  <div class="ticker-wrap" id="ticker-wrap"></div>
+
+  <!-- PILLAR CARD VIEW -->
+  <div id="view-card">
+    <div class="section-hd">
+      <div class="section-hd-title">DET Pillar Alert Board</div>
+      <div class="section-hd-sub" id="card-sub">Active alerts · FY27 portfolio</div>
+    </div>
+    <div class="pillar-grid" id="pillar-grid"></div>
+  </div>
+
+  <!-- TABLE VIEW -->
+  <div id="view-table" style="display:none">
+    <div class="section-hd">
+      <div class="section-hd-title">All Open Alerts</div>
+      <div class="section-hd-sub" id="table-sub"></div>
+    </div>
+    <div class="alert-table-wrap">
+      <div class="alert-table-hd">
+        <span style="font-size:8.5pt;font-weight:700;color:var(--ink2)">Sorted by priority — most urgent first</span>
+      </div>
+      <table class="at-table">
+        <thead>
+          <tr>
+            <th>Priority</th><th>Pillar</th><th>Alert</th><th>Type</th>
+            <th>Vendor</th><th>Spend at Stake</th><th>Due / Deadline</th><th>Owner</th>
+          </tr>
+        </thead>
+        <tbody id="alert-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script src="assets/vendors.js"></script>
+<script src="assets/coupa_spend.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════════════
+// VER PILLAR ALERTS — DATA ENGINE
+// ══════════════════════════════════════════════════════════════════════════
+
+var PILLAR_META = {
+  'DA&O': {
+    label:'DA&O',
+    full:'Data, Analytics & Operations',
+    icon:'📊',
+    color:'#DC2626',
+    bg:'#FEE2E2',
+    spend:'$33.7M',
+    vendors:['NTT Data','Cognizant','Tech Mahindra']
+  },
+  'SF on SF': {
+    label:'SF on SF',
+    full:'Salesforce on Salesforce',
+    icon:'⚡',
+    color:'#0D9488',
+    bg:'#F0FDF9',
+    spend:'$42.5M',
+    vendors:['Workday','Certinia','Xactly','Conga']
+  },
+  'Engineering': {
+    label:'Engineering',
+    full:'Platform Engineering',
+    icon:'🔧',
+    color:'#2563EB',
+    bg:'#EFF6FF',
+    spend:'$37.8M',
+    vendors:['AWS','Google','Xebia','Rackspace']
+  },
+  'IT': {
+    label:'IT',
+    full:'Technology Services & IT',
+    icon:'🖥️',
+    color:'#7C3AED',
+    bg:'#F5F3FF',
+    spend:'$45.4M',
+    vendors:['IBM','WWT','JLL','StaffUp']
+  },
+  'Data': {
+    label:'Data',
+    full:'Data Platform & Intelligence',
+    icon:'🗄️',
+    color:'#059669',
+    bg:'#D1FAE5',
+    spend:'$29.1M',
+    vendors:['Snowflake','DBT Labs','Monte Carlo','Informatica']
+  },
+  'Digital Mktg': {
+    label:'Digital Mktg',
+    full:'Digital Marketing',
+    icon:'📣',
+    color:'#D97706',
+    bg:'#FEF3C7',
+    spend:'$18.9M',
+    vendors:['Figma','Demandbase','Adobe','Highspot']
+  },
+  'Agentic': {
+    label:'Agentic',
+    full:'Agentic AI & Automation',
+    icon:'🤖',
+    color:'#7C3AED',
+    bg:'#F5F3FF',
+    spend:'$24.7M',
+    vendors:['OpenAI','Deloitte','Fractal Analytics','Brillio']
+  },
+  'CDO': {
+    label:'CDO',
+    full:'Chief Data Office',
+    icon:'📐',
+    color:'#BE123C',
+    bg:'#FFF1F2',
+    spend:'$22.8M',
+    vendors:['D&B','Refinitiv','Anaplan','Coupa']
+  },
+  'Emerging': {
+    label:'Emerging',
+    full:'Emerging Technology & Strategy',
+    icon:'🚀',
+    color:'#EA580C',
+    bg:'#FFF7ED',
+    spend:'$27.5M',
+    vendors:['McKinsey & Company','BCG','Deloitte']
+  },
+};
+
+// Severity helpers
+function sevColor(s){ return s==='critical'?'var(--red)':s==='watch'?'var(--amber)':'var(--teal)'; }
+function sevBg(s)   { return s==='critical'?'var(--red3)':s==='watch'?'var(--amber3)':'var(--teal3)'; }
+function sevText(s) { return s==='critical'?'var(--red2)':s==='watch'?'var(--amber2)':'var(--teal2)'; }
+function sevLabel(s){ return s==='critical'?'Critical':s==='watch'?'Watch':'Planning'; }
+function typeLabel(t){
+  return {renewal:'Renewal',sla:'SLA / Performance',governance:'Governance',commercial:'Commercial',risk:'Risk'}[t]||t;
+}
+function typeBadgeCls(t){
+  return {renewal:'b-red',sla:'b-amber',governance:'b-navy',commercial:'b-purple',risk:'b-orange'}[t]||'b-gray';
+}
+function daysUntil(ds){
+  if(!ds) return null;
+  return Math.ceil((new Date(ds)-new Date())/86400000);
+}
+function dueFmt(ds){
+  if(!ds) return '—';
+  var d=daysUntil(ds);
+  if(d===null) return ds;
+  if(d<0) return 'Overdue';
+  if(d===0) return 'Today';
+  if(d<=7) return d+'d left';
+  if(d<=30) return d+'d';
+  var dt=new Date(ds);
+  return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function dueColor(ds){
+  var d=daysUntil(ds);
+  if(d===null) return 'var(--ink4)';
+  if(d<=0) return 'var(--red)';
+  if(d<=14) return 'var(--red)';
+  if(d<=30) return 'var(--amber)';
+  return 'var(--ink4)';
+}
+
+// ── MASTER ALERT DATA ──────────────────────────────────────────────────────
+// Built from: VER_DATA renewals + governance, Coupa actuals, VER_VENDORS risk scores
+var RAW_ALERTS = [
+
+  // ── DA&O PILLAR ──────────────────────────────────────────────────────────
+  {id:'dao-1', pillar:'DA&O', severity:'critical', type:'renewal',
+   title:'NTT Data AD Restructure — PO Model Transition Incomplete',
+   sub:'Master PO closed; individual POs active but renewal framework unconfirmed for FY28.',
+   vendor:'NTT Data', spend:'$10.0M', due:'2026-08-31',
+   owner:'VER Lead', ownerColor:'#DC2626',
+   context:'The AD engagement shifted from a Master PO to individual POs, reducing projected FY27 spend from ~$19M to ~$10M and removing restrictive resource floor language. The new model needs a documented renewal baseline before the Aug 2026 expiry or the engagement drifts without governance anchor.',
+   actions:[
+     'Confirm replacement PO model is the official renewal baseline document',
+     'Brief executive stakeholders on bridge coverage assumptions',
+     'Lock final PO transition timeline before Aug 31 expiry',
+   ],
+   tags:['180-day notice','SOW','PO transition']},
+
+  {id:'dao-2', pillar:'DA&O', severity:'critical', type:'governance',
+   title:'NTT Data AMS — Release Defect Rate Above Target',
+   sub:'Availability stable at 99.7% but Release Defects at 5 vs target < 4. GSA reassignment adds risk.',
+   vendor:'NTT Data', spend:'$22.8M', due:'2026-07-15',
+   owner:'VER Governance', ownerColor:'#DC2626',
+   context:'L1/L2/L3 AMS engagement is mission-critical. While availability SLA is green, release defect leakage is above threshold and transition ownership lacks a clear escalation path. Decentralization of AMS governance is ongoing — the next CQBR must address this.',
+   actions:[
+     'Request transition-specific SLA appendix before next CQBR (Jul 2026)',
+     'Escalate release defect rate formally — require remediation plan within 14 days',
+     'Confirm GSA reassignment timeline does not create coverage gap',
+   ],
+   tags:['CQBR','SLA','AMS']},
+
+  {id:'dao-3', pillar:'DA&O', severity:'watch', type:'sla',
+   title:'Tech Mahindra Service Desk — 3 SLA Metrics Below Target',
+   sub:'FCR 68% (target 72%), CSAT 4.2 (target 4.4), Aged Ticket Backlog 171 (target <125).',
+   vendor:'Tech Mahindra', spend:'$6.5M', due:'2026-07-31',
+   owner:'VER Advisory', ownerColor:'#D97706',
+   context:'Techforce Service Desk performance has been on VER advisory watch. Three metrics are concurrently below target: first-contact resolution is down, CSAT is soft, and aged ticket burn-down is uneven across towers. This pattern signals systemic process gaps rather than one-off incidents.',
+   actions:[
+     'Issue formal SLA improvement plan with 30-day recovery milestones',
+     'Add aged-ticket burn-down to the recurring governance scorecard',
+     'Separate service quality issues from commercial issues for clean renewal record',
+   ],
+   tags:['SLA watch','service desk','CQBR']},
+
+  {id:'dao-4', pillar:'DA&O', severity:'watch', type:'commercial',
+   title:'Cognizant AMS/AD — Year 3 Renewal Decision Window Opening',
+   sub:'ES Yr3 is the final year. Renewal decision required Q1 FY28 — strategy prep needed now.',
+   vendor:'Cognizant', spend:'$9.5M', due:'2027-02-14',
+   owner:'VER Sourcing', ownerColor:'#D97706',
+   context:'Cognizant is outperforming on SLA (97% actual vs 95% target) and savings ($9.0M vs $8.5M target). This is a strong negotiation position — use the benchmark story now to anchor FY28 terms favorably before the formal renewal window forces reactivity.',
+   actions:[
+     'Convert the savings narrative into a repeatable benchmark story',
+     'Begin FY28 commercial options analysis in Q3 FY27',
+     'Lock rate card escalators before Yr3 winds down',
+   ],
+   tags:['renewal','benchmark','SLA green']},
+
+  // ── SF ON SF PILLAR ──────────────────────────────────────────────────────
+  {id:'sfs-1', pillar:'SF on SF', severity:'critical', type:'renewal',
+   title:'Workday HCM/Financials — Renewal Due Nov 2026, Negotiations Overdue',
+   sub:'$23.7M (largest single vendor). Renewal Nov 30 — Q3 FY27 deadline to start negotiations.',
+   vendor:'Workday', spend:'$23.7M', due:'2026-11-30',
+   owner:'VER Lead + Finance', ownerColor:'#DC2626',
+   context:'Workday is the highest-spend vendor in the portfolio at $23.7M FY27 (down 4% from FY26). Concentration risk is 90/100 — it is mission-critical with no credible short-term alternative. This means Workday enters the negotiation from a position of strength. VER must build the best possible commercial case using consumption data, platform efficiency evidence, and multi-year commitment leverage.',
+   actions:[
+     'Build baseline TCO model separating platform license, support labor, and coordination cost',
+     'Commission utilization pull — validate active seat count vs licensed seats',
+     'Initiate formal negotiation no later than Sep 1 2026 — 90 days before expiry',
+     'Prepare multi-year commitment scenario for unit-price discount leverage',
+   ],
+   tags:['critical renewal','$23.7M','concentration risk 90']},
+
+  {id:'sfs-2', pillar:'SF on SF', severity:'watch', type:'sla',
+   title:'Workday Finance Support — Scope & Dependency Calibration Needed',
+   sub:'Release readiness Amber, backlog aging at 27d (target <21d), internal dependency not tracked.',
+   vendor:'Workday', spend:'$5.4M', due:'2026-07-31',
+   owner:'VER Governance', ownerColor:'#D97706',
+   context:'ADAMS Finance support scope needs clearer labor allocation between vendor action and internal dependency delay. This ambiguity makes the governance record look weak heading into renewal — both parties can point to the other as the root cause of backlog aging.',
+   actions:[
+     'Add internal dependency aging to the scorecard before renewal planning starts',
+     'Separate vendor-owned backlog from internally-blocked backlog in next CQBR',
+     'Set escalation threshold for items aged >28 days',
+   ],
+   tags:['ADAMS','governance','scope clarity']},
+
+  {id:'sfs-3', pillar:'SF on SF', severity:'critical', type:'renewal',
+   title:'Certinia — Active $8.8M Engagement, Renewal Terms Unconfirmed',
+   sub:'$8.8M FY27 spend (up 32% YoY). Renewal timeline and commercial terms not in VER tracker.',
+   vendor:'Certinia', spend:'$8.8M', due:'2026-12-31',
+   owner:'VER Sourcing', ownerColor:'#DC2626',
+   context:'Certinia jumped 32% YoY ($6.6M → $8.8M) and is now the 11th-largest vendor in the portfolio. It sits within Asset Management pillar and supports critical SF financial operations. The YoY growth and lack of documented renewal posture makes this a commercial blind spot heading into year-end.',
+   actions:[
+     'Confirm renewal date and contract expiry with Procurement',
+     'Request utilization report — validate 32% spend growth was authorized scope expansion',
+     'Benchmark Certinia pricing against competitive alternatives before renewal',
+   ],
+   tags:['spend growth +32%','renewal','untracked']},
+
+  {id:'sfs-4', pillar:'SF on SF', severity:'watch', type:'commercial',
+   title:'Xactly Commission Engine — Spend Declining, Renewal Posture Unclear',
+   sub:'FY27 spend $5.95M, down 42% from FY26 ($10.2M). Scope reduction or partial migration risk.',
+   vendor:'Xactly', spend:'$5.9M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#D97706',
+   context:'A 42% spend decline is a signal — either scope was intentionally reduced, a migration is in progress, or utilization has dropped. Any of these scenarios changes the renewal strategy significantly. VER needs to confirm the cause before the next commercial decision point.',
+   actions:[
+     'Confirm cause of 42% spend decline with business owner — planned or unplanned',
+     'Assess migration risk if scope reduction is tied to a platform transition',
+     'If platform is being retained, renegotiate to right-size license tier',
+   ],
+   tags:['spend decline -42%','commercial','scope review']},
+
+  // ── ENGINEERING PILLAR ───────────────────────────────────────────────────
+  {id:'eng-1', pillar:'Engineering', severity:'critical', type:'commercial',
+   title:'AWS — 721% Spend Spike, EDP Commitment Review Required',
+   sub:'FY27 $17.2M vs FY26 $2.1M (+721%). Commitment envelope must be validated against EDP terms.',
+   vendor:'AWS', spend:'$17.2M', due:'2026-09-01',
+   owner:'FinOps + VER', ownerColor:'#DC2626',
+   context:'AWS spend exploded 721% YoY — from $2.1M to $17.2M. This is likely tied to expanded engineering workloads and AI inference costs. The Enterprise Discount Program commitment may now be at risk of under-utilization (if the spike is one-time) or over-committed (if growth continues). Both scenarios have cost implications.',
+   actions:[
+     'Pull AWS cost explorer report and validate usage vs EDP commitment schedule',
+     'Confirm whether spike is structural (ongoing workloads) or one-time (migration)',
+     'Initiate EDP renegotiation conversation if committed usage has grown >50% vs baseline',
+     'Apply FinOps right-sizing on EC2/S3 — benchmark 8-12% savings opportunity',
+   ],
+   tags:['spend spike +721%','EDP','FinOps critical']},
+
+  {id:'eng-2', pillar:'Engineering', severity:'watch', type:'renewal',
+   title:'Google Cloud — $14M Renewal Jan 2027, Commercial Strategy Required',
+   sub:'$14M FY27 (down 6%). Jan 2027 renewal. CUD/committed-use discount renegotiation window open.',
+   vendor:'Google', spend:'$14.0M', due:'2027-01-15',
+   owner:'VER + Engineering', ownerColor:'#D97706',
+   context:'Google Cloud (GCP + Workspace + Gemini AI) is $14M FY27, slightly down. Gemini AI usage is growing, which gives VER leverage to negotiate a broader AI commitment that includes usage discounts. The renewal lands Jan 2027 — strategy needs to be in place by Oct 2026.',
+   actions:[
+     'Build CUD (committed use discount) analysis on GCP compute workloads',
+     'Incorporate Gemini AI growth trajectory into renewal commercial ask',
+     'Use AWS EDP growth as leverage — Google knows the competition',
+     'Target Oct 2026 for initial commercial conversation with Google',
+   ],
+   tags:['CUD','Gemini AI','renewal Jan 2027']},
+
+  {id:'eng-3', pillar:'Engineering', severity:'planning', type:'commercial',
+   title:'Xebia AWS SOW — Milestone Acceptance Gates Not Formalized',
+   sub:'$0.3M FY27. Milestone-based SOW model is good template — acceptance criteria need hardening.',
+   vendor:'Xebia', spend:'$0.3M', due:'2026-10-01',
+   owner:'VER Advisory', ownerColor:'#0D9488',
+   context:'Xebia\'s AWS environment delivery SOW is milestone-based, which is the right commercial structure. However, the acceptance criteria for each milestone are not formally documented, creating T&M drift risk as the engagement extends. This is an opportunity to use Xebia as the reference model for all future SOW structures.',
+   actions:[
+     'Formalize deliverable acceptance gates for all remaining milestones',
+     'Document the Xebia SOW as the VER reference template for milestone-based engagements',
+     'Ensure offboarding assumptions are explicit before Oct 2026 expiry',
+   ],
+   tags:['SOW template','milestone','best practice']},
+
+  // ── IT PILLAR ────────────────────────────────────────────────────────────
+  {id:'it-1', pillar:'IT', severity:'critical', type:'renewal',
+   title:'IBM — $14.3M Renewal Aug 2026, Active Procurement Review',
+   sub:'$14.3M FY27 (down 57% from $33M). Renewal Aug 1. Active review with Procurement underway.',
+   vendor:'IBM', spend:'$14.3M', due:'2026-08-01',
+   owner:'VER + Procurement', ownerColor:'#DC2626',
+   context:'IBM spend dropped 57% YoY — a significant reduction that reflects either scope consolidation or partial offload. The renewal is August 1 and Procurement is actively reviewing. VER must ensure the commercial strategy reflects the new (lower) baseline and does not auto-extend at historical pricing.',
+   actions:[
+     'Confirm scope of Aug 2026 renewal — what is retained vs offloaded',
+     'Ensure Procurement review outputs a rate card aligned to new lower baseline',
+     'Do not auto-renew at FY26 pricing — the 57% decline creates a new benchmark',
+     'Validate video streaming platform component separately from application services',
+   ],
+   tags:['critical renewal','spend decline -57%','Procurement review']},
+
+  {id:'it-2', pillar:'IT', severity:'watch', type:'commercial',
+   title:'WWT — $12.5M Spend Growing, Contract Structure Review Due',
+   sub:'WWT up 39% YoY ($9.0M → $12.5M). Technology Services hardware + integration scope expanding.',
+   vendor:'WWT', spend:'$12.5M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#D97706',
+   context:'WWT grew 39% YoY and is now the 6th-largest vendor. Hardware procurement and ATC lab integration services are the growth drivers. Without a structured rate card review, uncapped growth becomes a commercial risk.',
+   actions:[
+     'Commission a rate card benchmark for WWT hardware procurement vs spot market',
+     'Confirm ATC lab integration services have defined scope and acceptance criteria',
+     'Review whether WWT growth is authorized expansion or undocumented scope creep',
+   ],
+   tags:['spend growth +39%','hardware','rate card']},
+
+  {id:'it-3', pillar:'IT', severity:'critical', type:'commercial',
+   title:'JLL — $10.9M Spend Spike, Cabling/Facilities Contract Exposure',
+   sub:'JLL spiked 590% YoY ($1.6M → $10.9M). Facilities and cabling — largest non-software single jump.',
+   vendor:'JLL', spend:'$10.9M', due:'2026-12-31',
+   owner:'VER + Real Estate', ownerColor:'#DC2626',
+   context:'JLL\'s 590% spend spike is the most extreme YoY movement in the portfolio. This is almost certainly tied to a large facilities or cabling project (region: India). VER needs to determine if this is a one-time capital project or an ongoing managed services commitment, as the renewal posture is completely different in each case.',
+   actions:[
+     'Obtain project scope documentation — is this capital project or ongoing managed services?',
+     'Confirm whether India cabling project is complete or has remaining phases',
+     'If ongoing — establish formal SOW with milestone payments and acceptance gates',
+     'Flag to Finance: $10.9M in Cabling/Facilities may require separate budget treatment',
+   ],
+   tags:['spend spike +590%','cabling','facilities','India']},
+
+  {id:'it-4', pillar:'IT', severity:'watch', type:'commercial',
+   title:'Insight Direct — Hardware Spend Down 82%, Supplier Consolidation Opportunity',
+   sub:'$10.7M FY27 vs $59.5M FY26 (-82%). Portfolio\'s biggest absolute spend reduction.',
+   vendor:'Insight Direct', spend:'$10.7M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#D97706',
+   context:'Insight Direct dropped from $59.5M to $10.7M — the largest absolute spend reduction in the portfolio. This may reflect a shift to direct procurement, a hardware refresh cycle ending, or competitive displacement. The new baseline is the right moment to consolidate hardware procurement terms.',
+   actions:[
+     'Confirm cause of $48.8M spend reduction — strategic or one-time cycle',
+     'If Insight Direct is the retained supplier, renegotiate at the new lower volume tier',
+     'Benchmark against SHI, CDW, and WWT for hardware procurement alternatives',
+   ],
+   tags:['spend decline -82%','hardware','consolidation']},
+
+  // ── DATA PILLAR ───────────────────────────────────────────────────────────
+  {id:'dat-1', pillar:'Data', severity:'watch', type:'renewal',
+   title:'DBT Labs — $1.9M Spend Growing (+27%), Renewal Framework Needed',
+   sub:'Data transformation platform growing. No formal renewal governance documented.',
+   vendor:'DBT Labs', spend:'$1.9M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#D97706',
+   context:'DBT Labs grew 27% YoY and is embedded in the data platform stack. As usage grows, the lack of a formal renewal governance framework means VER is at risk of reactive auto-renewal at list pricing. The time to build the commercial position is now, before utilization deepens further.',
+   actions:[
+     'Establish a utilization baseline — active users, pipeline volume, workspace usage',
+     'Confirm if DBT Labs is on a usage-based or seat-based contract',
+     'Build renewal position based on actual usage vs committed tiers',
+   ],
+   tags:['spend growth +27%','data platform','governance gap']},
+
+  {id:'dat-2', pillar:'Data', severity:'watch', type:'commercial',
+   title:'Informatica — $0.6M Spend, Down 71% — Migration or Consolidation Signal',
+   sub:'FY26 $2.0M → FY27 $0.6M (-71%). May indicate partial migration to alternative platform.',
+   vendor:'Informatica', spend:'$0.6M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#D97706',
+   context:'A 71% spend decline on a data integration platform typically signals either a planned migration to an alternative (e.g., Fivetran, Airbyte) or a deliberate de-scoping. If migration is underway, VER should track the exit to ensure contractual termination is clean and no auto-renewal locks in unused capacity.',
+   actions:[
+     'Confirm with Data Engineering: is Informatica being migrated away or retained at lower usage?',
+     'If migrating — ensure contract termination notice is served before auto-renewal date',
+     'If retaining — renegotiate down to actual usage tier, target 30-40% cost reduction',
+   ],
+   tags:['spend decline -71%','migration risk','data platform']},
+
+  {id:'dat-3', pillar:'Data', severity:'planning', type:'commercial',
+   title:'Monte Carlo Data Observability — Spend Surging, Governance Framework Needed',
+   sub:'$0.9M FY27 vs $0.075M FY26 (+1092%). Fastest-growing platform in Data pillar.',
+   vendor:'Monte Carlo', spend:'$0.9M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#0D9488',
+   context:'Monte Carlo grew 1,092% YoY — from $75K to $900K. This pace of growth without a governance framework is a commercial risk. Data observability is a sticky platform; VER should lock commercial terms now before growth embeds the vendor more deeply and shifts negotiating power.',
+   actions:[
+     'Document Monte Carlo use case and data pipeline coverage scope',
+     'Negotiate multi-year pricing before the platform is considered mission-critical',
+     'Benchmark against Great Expectations, Soda, and other observability alternatives',
+   ],
+   tags:['spend spike +1092%','data observability','early lock-in']},
+
+  // ── DIGITAL MARKETING PILLAR ──────────────────────────────────────────────
+  {id:'dmk-1', pillar:'Digital Mktg', severity:'watch', type:'renewal',
+   title:'Figma — $3.2M Renewal Jan 2027, Seat Utilization Audit Overdue',
+   sub:'$3.1M FY27 (down 3%). Renewal Jan 2027. Seat hygiene required before baseline is set.',
+   vendor:'Figma', spend:'$3.2M', due:'2027-01-31',
+   owner:'VER Sourcing', ownerColor:'#D97706',
+   context:'Figma\'s design platform is embedded across DET teams. The renewal is Jan 2027 and the primary value lever is seat utilization — inactive seats at enterprise pricing represent recoverable cost. Industry average for SaaS platforms is 15-25% inactive seats at any given time.',
+   actions:[
+     'Pull active user report from Figma admin console — identify inactive seats',
+     'Validate license tier — are all seats at the correct plan level?',
+     'Build renewal baseline on actual active seat count, not licensed count',
+     'Target 10-15% seat reduction before submitting renewal proposal',
+   ],
+   tags:['renewal Jan 2027','seat hygiene','SaaS']},
+
+  {id:'dmk-2', pillar:'Digital Mktg', severity:'watch', type:'commercial',
+   title:'Highspot — Sales Enablement Spend Down 67%, Platform Retention Decision',
+   sub:'$0.95M FY27 vs $2.9M FY26 (-67%). Is this a deliberate de-scope or platform performance issue?',
+   vendor:'Highspot', spend:'$0.95M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#D97706',
+   context:'Highspot dropped 67% — a significant decline for a sales enablement platform. This level of reduction typically reflects either a business decision to reduce scope, platform performance concerns, or a migration to Seismic or Salesforce-native enablement. VER needs a clear signal to determine renewal strategy.',
+   actions:[
+     'Confirm with Digital Marketing: retention decision or planned exit?',
+     'If retaining — right-size to actual usage, aim for 30% cost reduction',
+     'If exiting — ensure notice terms are met and data export is completed',
+   ],
+   tags:['spend decline -67%','enablement','decision required']},
+
+  {id:'dmk-3', pillar:'Digital Mktg', severity:'planning', type:'commercial',
+   title:'Demandbase ABM — New $1.1M Spend, Governance Framework Required',
+   sub:'New in FY27 at $1.1M. ABM platform — no VER governance or renewal baseline established.',
+   vendor:'Demandbase', spend:'$1.1M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#0D9488',
+   context:'Demandbase appeared in the portfolio for the first time in FY27 at $1.1M. It\'s an ABM (account-based marketing) platform with usage-based pricing sensitivity. Getting governance in place now — before the platform is embedded in campaign workflows — protects future negotiating position.',
+   actions:[
+     'Onboard Demandbase into VER vendor registry with full contract and rate card documentation',
+     'Confirm who owns the business relationship and renewal authority',
+     'Set 30-day review at month 6 to validate usage vs committed spend',
+   ],
+   tags:['new vendor FY27','ABM','governance gap']},
+
+  // ── AGENTIC AI PILLAR ─────────────────────────────────────────────────────
+  {id:'agt-1', pillar:'Agentic', severity:'critical', type:'commercial',
+   title:'OpenAI — $3.5M Spend (+390% YoY), No Enterprise Agreement in Place',
+   sub:'From $0.7M to $3.5M. Fastest-growing platform in portfolio. Contractual terms need hardening.',
+   vendor:'OpenAI', spend:'$3.5M', due:'2026-09-30',
+   owner:'VER + Engineering', ownerColor:'#DC2626',
+   context:'OpenAI grew 390% YoY and will almost certainly grow further as Agentic AI workloads scale. At $3.5M and growing, VER should be negotiating an enterprise agreement with committed spend discounts, SLA terms, and data governance protections. Operating on pay-as-you-go at this volume is a commercial and compliance risk.',
+   actions:[
+     'Initiate enterprise agreement negotiation with OpenAI immediately',
+     'Define committed spend tier — $5M annual commitment likely unlocks 15-20% discount',
+     'Include data residency, privacy, and IP terms in the enterprise agreement',
+     'Establish quarterly usage reviews tied to pillar budgets',
+   ],
+   tags:['spend spike +390%','AI','enterprise agreement required']},
+
+  {id:'agt-2', pillar:'Agentic', severity:'watch', type:'renewal',
+   title:'Deloitte Agentic SOW — Scope Must Tie to Transformation Outcomes',
+   sub:'$9.1M. Renewal Feb 2027. Advisory work not yet tied to defined deliverables.',
+   vendor:'Deloitte', spend:'$9.1M', due:'2027-02-18',
+   owner:'VER Lead', ownerColor:'#D97706',
+   context:'Deloitte\'s $9.1M advisory engagement (up 32% YoY) is the anchor partner for Agentic AI transformation work. The renewal is Feb 2027, and VER\'s advisory is to tie next-phase scope to defined outcomes before extension language is accepted. Advisory engagements without milestone gates tend to auto-extend without value validation.',
+   actions:[
+     'Convert advisory scope to milestone-based deliverables before renewal docs are drafted',
+     'Define explicit acceptance criteria for each workstream',
+     'Build FY28 scope based on FY27 delivery evidence — do not extend on effort alone',
+   ],
+   tags:['renewal Feb 2027','advisory','outcome-based']},
+
+  {id:'agt-3', pillar:'Agentic', severity:'watch', type:'commercial',
+   title:'Fractal Analytics — New $1.2M AI Analytics Engagement, Structure Needed',
+   sub:'New in FY27 at $1.2M. AI analytics firm. No formal SOW governance or renewal baseline.',
+   vendor:'Fractal Analytics', spend:'$1.2M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#D97706',
+   context:'Fractal Analytics appeared as a new vendor in FY27 with $1.2M spend. The firm specializes in AI-driven analytics and is likely tied to the Agentic pillar\'s data intelligence workstreams. Without a formal SOW structure, scope can drift and renewals become reactive.',
+   actions:[
+     'Obtain and review current SOW — confirm deliverables and acceptance criteria',
+     'Register in VER vendor governance cadence',
+     'Set renewal review no later than Q3 FY27',
+   ],
+   tags:['new vendor FY27','AI analytics','governance gap']},
+
+  // ── CDO PILLAR ────────────────────────────────────────────────────────────
+  {id:'cdo-1', pillar:'CDO', severity:'watch', type:'renewal',
+   title:'Coupa BSM Platform — $2.5M, Renewal and Competitive Benchmark Due',
+   sub:'$2.5M FY27 (down 4%). BSM platform renewal posture not documented in VER tracker.',
+   vendor:'Coupa', spend:'$2.5M', due:'2026-12-31',
+   owner:'VER Sourcing', ownerColor:'#D97706',
+   context:'Coupa is VER\'s own BSM platform and the source system for this portfolio\'s spend data. Renewing Coupa requires a competitive benchmark even if switching is unlikely — the process itself creates negotiating leverage. A 4% spend decline suggests utilization may be below licensed capacity.',
+   actions:[
+     'Commission competitive benchmark (SAP Ariba, Jaggaer) before renewal conversation',
+     'Validate Coupa seat and module utilization vs licensed capacity',
+     'Use benchmark data to negotiate flat or reduced renewal pricing',
+   ],
+   tags:['renewal','BSM platform','benchmark leverage']},
+
+  {id:'cdo-2', pillar:'CDO', severity:'planning', type:'commercial',
+   title:'Anaplan — $0.8M Spend Surging (+36,303% — New Platform Adoption)',
+   sub:'Near-zero in FY26 ($2K) to $797K FY27. Planning platform rollout — governance needed.',
+   vendor:'Anaplan', spend:'$0.8M', due:'2026-12-31',
+   owner:'VER Advisory', ownerColor:'#0D9488',
+   context:'Anaplan effectively launched as a net-new platform in FY27. The near-infinite growth rate reflects a new deployment rather than organic expansion. VER\'s task is to establish governance early — before the platform is embedded in financial planning workflows and switching costs rise.',
+   actions:[
+     'Confirm deployment scope and user base',
+     'Negotiate multi-year terms before adoption deepens',
+     'Set quarterly utilization reviews as the platform matures',
+   ],
+   tags:['new platform','planning','early governance']},
+
+  // ── EMERGING PILLAR ───────────────────────────────────────────────────────
+  {id:'emg-1', pillar:'Emerging', severity:'watch', type:'renewal',
+   title:'BCG — $6.0M Spend Up 512%, Advisory Scope Unstructured',
+   sub:'$6.0M FY27 vs $0.97M FY26 (+512%). Advisory engagement lacks milestone governance.',
+   vendor:'BCG', spend:'$6.0M', due:'2026-06-30',
+   owner:'VER Director', ownerColor:'#D97706',
+   context:'BCG jumped 512% YoY — from under $1M to $6M. This pace of growth in advisory spend without a milestone-based structure represents one of the highest commercial governance risks in the portfolio. VER Director is engaged with business owner. The June 2026 renewal is effectively now.',
+   actions:[
+     'Immediate: confirm Jun 2026 renewal decision — retain, restructure, or exit',
+     'If retaining — convert to milestone deliverable model before any extension is signed',
+     'Brief VER Director on commercial terms and SLA expectations for FY28',
+     'Benchmark BCG advisory rates against McKinsey and Deloitte equivalents',
+   ],
+   tags:['spend spike +512%','advisory','renewal now']},
+
+  {id:'emg-2', pillar:'Emerging', severity:'planning', type:'commercial',
+   title:'Sycomp — $7.7M FY27, Investigate Anomalous FY26 Baseline',
+   sub:'FY27 $7.7M appears normal — but FY26 shows $1,377M which is almost certainly a data artifact.',
+   vendor:'Sycomp', spend:'$7.7M', due:'2026-12-31',
+   owner:'VER Analytics', ownerColor:'#0D9488',
+   context:'Sycomp shows a $1,377M FY26 figure in Coupa which is almost certainly a data entry error (likely a currency conversion artifact or a test transaction). The FY27 figure of $7.7M for hardware and infrastructure services appears credible. VER should clean the record and validate the true FY26 baseline.',
+   actions:[
+     'Flag Sycomp FY26 figure ($1,377M) to Finance/Procurement for data correction',
+     'Obtain true FY26 actuals from alternative source to establish YoY trend',
+     'Validate $7.7M FY27 figure is accurate before using in executive reporting',
+   ],
+   tags:['data quality','anomaly','Coupa artifact']},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+var FILTER_PILLAR   = '';
+var FILTER_SEVERITY = '';
+var FILTER_TYPE     = '';
+var VIEW_MODE       = 'card';
+
+function filteredAlerts() {
+  return RAW_ALERTS.filter(function(a) {
+    if (FILTER_PILLAR   && a.pillar !== FILTER_PILLAR)     return false;
+    if (FILTER_SEVERITY && a.severity !== FILTER_SEVERITY) return false;
+    if (FILTER_TYPE     && a.type !== FILTER_TYPE)         return false;
+    return true;
+  });
+}
+
+// ── BUILD PILLAR DROPDOWN ─────────────────────────────────────────────────
+function buildPillarDropdown() {
+  var sel = document.getElementById('ctrl-pillar');
+  Object.keys(PILLAR_META).forEach(function(k) {
+    var o = document.createElement('option');
+    o.value = k; o.textContent = PILLAR_META[k].label;
+    sel.appendChild(o);
+  });
+}
+
+// ── HERO KPIs ─────────────────────────────────────────────────────────────
+function renderHeroKPIs() {
+  var all = RAW_ALERTS;
+  var critical = all.filter(function(a){return a.severity==='critical';}).length;
+  var watch    = all.filter(function(a){return a.severity==='watch';}).length;
+  var planning = all.filter(function(a){return a.severity==='planning';}).length;
+  var pillarsActive = Object.keys(PILLAR_META).filter(function(p){
+    return all.some(function(a){return a.pillar===p;});
+  }).length;
+  // Rough spend sum from alerts with clean numbers
+  var spendSum = 0;
+  all.forEach(function(a){
+    var m = (a.spend||'').match(/\$([\d.]+)([MK]?)/);
+    if(m){var n=parseFloat(m[1]);if(m[2]==='M')spendSum+=n;else if(m[2]==='K')spendSum+=n/1000;}
+  });
+  document.getElementById('kpi-critical').textContent  = critical;
+  document.getElementById('kpi-watch').textContent     = watch;
+  document.getElementById('kpi-plan').textContent      = planning;
+  document.getElementById('kpi-pillars').textContent   = pillarsActive;
+  document.getElementById('kpi-spend-exp').textContent = '$' + spendSum.toFixed(0) + 'M';
+}
+
+// ── TICKER ────────────────────────────────────────────────────────────────
+function renderTicker() {
+  var urgent = RAW_ALERTS.filter(function(a){return a.severity==='critical';});
+  if (!urgent.length) { document.getElementById('ticker-wrap').style.display='none'; return; }
+  var items = urgent.concat(urgent).map(function(a) {
+    var col = sevColor(a.severity);
+    return '<span class="ticker-item"><span class="ti-dot" style="background:'+col+'"></span>' +
+      '<span class="ti-name">'+a.vendor+'</span>' +
+      '<span style="color:rgba(255,255,255,.55)">'+a.title.slice(0,50)+(a.title.length>50?'…':'')+'</span>' +
+      '</span>';
+  }).join('');
+  document.getElementById('ticker-wrap').innerHTML =
+    '<div class="ticker-label">🔴 Critical</div>' +
+    '<div class="ticker-inner"><div class="ticker-track">'+items+'</div></div>';
+}
+
+// ── PILLAR CARD VIEW ──────────────────────────────────────────────────────
+var SEV_ORDER = {critical:0,watch:1,planning:2};
+
+function pillarHealthStatus(alerts) {
+  if (alerts.some(function(a){return a.severity==='critical';}))
+    return {label:'Critical Action',color:'var(--red2)',bg:'var(--red3)'};
+  if (alerts.some(function(a){return a.severity==='watch';}))
+    return {label:'Watch',color:'var(--amber2)',bg:'var(--amber3)'};
+  return {label:'Stable',color:'var(--green2)',bg:'var(--green3)'};
+}
+
+function renderAlertItem(a) {
+  var col = sevColor(a.severity);
+  var dc  = dueColor(a.due);
+  return '<div class="alert-item" onclick="openModal(\''+a.id+'\')">' +
+    '<div class="alert-priority" style="background:'+col+'"></div>' +
+    '<div class="alert-body">' +
+      '<div class="alert-title">'+a.title+'</div>' +
+      '<div class="alert-sub">'+a.sub+'</div>' +
+      '<div class="alert-tags">'+
+        '<span class="badge '+typeBadgeCls(a.type)+'">'+typeLabel(a.type)+'</span>' +
+        a.tags.slice(0,2).map(function(t){return '<span class="badge b-gray">'+t+'</span>';}).join('') +
+      '</div>' +
+    '</div>' +
+    '<div class="alert-meta">' +
+      '<div class="alert-due" style="color:'+dc+'">'+dueFmt(a.due)+'</div>' +
+      '<div class="alert-vendor-chip" title="'+a.vendor+'">'+a.vendor+'</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderPillarCards(alerts) {
+  var grid = document.getElementById('pillar-grid');
+  var byPillar = {};
+  alerts.forEach(function(a) {
+    if (!byPillar[a.pillar]) byPillar[a.pillar] = [];
+    byPillar[a.pillar].push(a);
+  });
+
+  var pillarKeys = Object.keys(byPillar).sort(function(a,b) {
+    var as = Math.min.apply(null, byPillar[a].map(function(x){return SEV_ORDER[x.severity];}));
+    var bs = Math.min.apply(null, byPillar[b].map(function(x){return SEV_ORDER[x.severity];}));
+    return as - bs;
+  });
+
+  if (!pillarKeys.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div style="font-size:11pt;font-weight:700;color:var(--ink3)">No alerts match current filters</div><div>Try clearing a filter.</div></div>';
+    return;
+  }
+
+  grid.innerHTML = pillarKeys.map(function(pk) {
+    var pm      = PILLAR_META[pk] || {label:pk,full:pk,icon:'📋',color:'#6B7280',bg:'#F3F4F6',spend:'—'};
+    var palerts = byPillar[pk].slice().sort(function(a,b){return SEV_ORDER[a.severity]-SEV_ORDER[b.severity];});
+    var hs      = pillarHealthStatus(palerts);
+    var cCount  = palerts.filter(function(a){return a.severity==='critical';}).length;
+    var wCount  = palerts.filter(function(a){return a.severity==='watch';}).length;
+    var pCount  = palerts.filter(function(a){return a.severity==='planning';}).length;
+
+    var chips = '';
+    if(cCount) chips += '<span class="pc-sum-chip" style="background:var(--red3);color:var(--red2)">'+cCount+' Critical</span>';
+    if(wCount) chips += '<span class="pc-sum-chip" style="background:var(--amber3);color:var(--amber2)">'+wCount+' Watch</span>';
+    if(pCount) chips += '<span class="pc-sum-chip" style="background:var(--teal3);color:var(--teal2)">'+pCount+' Planning</span>';
+
+    var preview = palerts.slice(0,3).map(function(a) {
+      return '<div class="pc-preview-item">' +
+        '<div class="pc-preview-bar" style="background:'+sevColor(a.severity)+'"></div>' +
+        '<div class="pc-preview-text" title="'+a.title+'">'+a.title+'</div>' +
+        '<div class="pc-preview-due" style="color:'+dueColor(a.due)+'">'+dueFmt(a.due)+'</div>' +
+      '</div>';
+    }).join('');
+
+    return '<div class="pc" onclick="openPillarModal(\''+pk+'\')">' +
+      '<div class="pc-header">' +
+        '<div class="pc-icon" style="background:'+pm.bg+'">'+pm.icon+'</div>' +
+        '<div>' +
+          '<div class="pc-name">'+pm.label+'</div>' +
+          '<div class="pc-meta">'+pm.full+'</div>' +
+        '</div>' +
+        '<div class="pc-status">' +
+          '<span class="pc-health" style="background:'+hs.bg+';color:'+hs.color+'">'+hs.label+'</span>' +
+          '<span class="pc-spend">'+pm.spend+'</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pc-chips">'+chips+'</div>' +
+      '<div class="pc-preview">'+preview+'</div>' +
+      '<div class="pc-foot">' +
+        '<span class="pc-foot-stat"><strong>'+palerts.length+'</strong> alert'+(palerts.length!==1?'s':'')+
+          (cCount?' · <strong style="color:var(--red)">'+cCount+' critical</strong>':'')+
+          (wCount?' · '+wCount+' watch':'')+
+        '</span>' +
+        '<span class="pc-view-hint">View all ›</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ── PILLAR DETAIL MODAL ───────────────────────────────────────────────────
+function openPillarModal(pk) {
+  var pm      = PILLAR_META[pk] || {label:pk,full:pk,icon:'📋',color:'#6B7280',bg:'#F3F4F6',spend:'—'};
+  var palerts = RAW_ALERTS.filter(function(a){
+    if(a.pillar!==pk) return false;
+    if(FILTER_SEVERITY && a.severity!==FILTER_SEVERITY) return false;
+    if(FILTER_TYPE     && a.type!==FILTER_TYPE)         return false;
+    return true;
+  }).sort(function(a,b){return SEV_ORDER[a.severity]-SEV_ORDER[b.severity];});
+
+  var cCount = palerts.filter(function(a){return a.severity==='critical';}).length;
+  var wCount = palerts.filter(function(a){return a.severity==='watch';}).length;
+  var pCount = palerts.filter(function(a){return a.severity==='planning';}).length;
+
+  var html = '<div class="pdm-bg open" id="pdm-overlay" onclick="pdmOverlayClick(event)">' +
+    '<div class="pdm">' +
+      '<div class="pdm-hdr">' +
+        '<div class="pdm-icon" style="background:'+pm.bg+'">'+pm.icon+'</div>' +
+        '<div class="pdm-hdr-text">' +
+          '<div class="pdm-title">'+pm.label+' · '+pm.full+'</div>' +
+          '<div class="pdm-sub">'+pm.spend+' FY27 spend &middot; click any alert for full detail</div>' +
+        '</div>' +
+        '<button type="button" class="pdm-close" onclick="closePillarModal()">×</button>' +
+      '</div>' +
+      '<div class="pdm-kpis" style="background:linear-gradient(135deg,#060D1A,#0F1E3C)">' +
+        '<div class="pdm-kpi"><div class="pdm-kpi-val" style="color:#FCA5A5">'+cCount+'</div><div class="pdm-kpi-lbl">Critical</div></div>' +
+        '<div class="pdm-kpi"><div class="pdm-kpi-val" style="color:#FCD34D">'+wCount+'</div><div class="pdm-kpi-lbl">Watch</div></div>' +
+        '<div class="pdm-kpi"><div class="pdm-kpi-val" style="color:#5EEAD4">'+pCount+'</div><div class="pdm-kpi-lbl">Planning</div></div>' +
+        '<div class="pdm-kpi"><div class="pdm-kpi-val" style="color:#fff">'+palerts.length+'</div><div class="pdm-kpi-lbl">Total Alerts</div></div>' +
+      '</div>' +
+      '<div class="pdm-body">' +
+        '<div class="pc-alerts" style="padding:4px 0">' +
+          palerts.map(renderAlertItem).join('') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  document.getElementById('pillar-modal-root').innerHTML = html;
+  document.body.style.overflow = 'hidden';
+}
+
+function closePillarModal() {
+  document.getElementById('pillar-modal-root').innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+function pdmOverlayClick(e) {
+  if(e.target.id === 'pdm-overlay') closePillarModal();
+}
+
+// ── JUMP TO TABLE FOR PILLAR ──────────────────────────────────────────────
+function expandPillar(pk) {
+  FILTER_PILLAR = pk;
+  document.getElementById('ctrl-pillar').value = pk;
+  setView('table');
+}
+
+// ── TABLE VIEW ────────────────────────────────────────────────────────────
+function renderTable(alerts) {
+  var sorted = alerts.slice().sort(function(a,b){
+    if(SEV_ORDER[a.severity]!==SEV_ORDER[b.severity]) return SEV_ORDER[a.severity]-SEV_ORDER[b.severity];
+    return (daysUntil(a.due)||999)-(daysUntil(b.due)||999);
+  });
+  document.getElementById('table-sub').textContent = sorted.length + ' alert' + (sorted.length!==1?'s':'') + ' · sorted by priority';
+  var pm = PILLAR_META;
+  document.getElementById('alert-tbody').innerHTML = sorted.map(function(a) {
+    var col = sevColor(a.severity);
+    var dc  = dueColor(a.due);
+    var p   = pm[a.pillar]||{icon:'📋',color:'#6B7280'};
+    return '<tr onclick="openModal(\''+a.id+'\')">' +
+      '<td><span class="pri-bar" style="background:'+col+'"></span>' +
+        '<span class="badge" style="background:'+sevBg(a.severity)+';color:'+sevText(a.severity)+'">'+sevLabel(a.severity)+'</span></td>' +
+      '<td><span style="margin-right:5px">'+p.icon+'</span>'+a.pillar+'</td>' +
+      '<td style="max-width:280px"><strong style="font-size:8.5pt">'+a.title+'</strong><br>' +
+        '<span style="font-size:7.5pt;color:var(--ink4)">'+a.sub.slice(0,80)+(a.sub.length>80?'…':'')+'</span></td>' +
+      '<td><span class="badge '+typeBadgeCls(a.type)+'">'+typeLabel(a.type)+'</span></td>' +
+      '<td><strong>'+a.vendor+'</strong></td>' +
+      '<td style="font-weight:800">'+a.spend+'</td>' +
+      '<td style="font-weight:700;color:'+dc+'">'+dueFmt(a.due)+'</td>' +
+      '<td style="font-size:8pt">'+a.owner+'</td>' +
+    '</tr>';
+  }).join('') || '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--ink4)">No alerts match current filters</td></tr>';
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────
+function openModal(id) {
+  closePillarModal();
+  var a = RAW_ALERTS.find(function(x){return x.id===id;});
+  if (!a) return;
+  var pm = PILLAR_META[a.pillar]||{icon:'📋',color:'#6B7280',bg:'#F3F4F6'};
+  var col = sevColor(a.severity);
+  var dc  = dueColor(a.due);
+
+  var html = '<div class="modal-bg open" id="modal-overlay" onclick="overlayClick(event)">' +
+    '<div class="modal">' +
+      '<div class="modal-hdr" style="background:linear-gradient(135deg,#060D1A,#0F1E3C);border-radius:14px 14px 0 0">' +
+        '<div class="modal-hdr-icon" style="background:'+pm.bg+'">'+pm.icon+'</div>' +
+        '<div>' +
+          '<div class="modal-hdr-title" style="color:#fff">'+a.title+'</div>' +
+          '<div class="modal-hdr-sub">'+a.pillar+' · '+a.vendor+' · '+typeLabel(a.type)+'</div>' +
+        '</div>' +
+        '<button class="modal-close" style="color:rgba(255,255,255,.6)" onclick="closeModal()">×</button>' +
+      '</div>' +
+      '<div class="modal-body">' +
+
+        '<div class="m-sec">' +
+          '<div class="m-sec-title">Alert Details</div>' +
+          '<div class="m-grid">' +
+            '<div class="m-tile"><div class="m-tile-lbl">Severity</div>' +
+              '<div class="m-tile-val"><span style="color:'+col+';font-weight:900">'+sevLabel(a.severity).toUpperCase()+'</span></div></div>' +
+            '<div class="m-tile"><div class="m-tile-lbl">Type</div>' +
+              '<div class="m-tile-val">'+typeLabel(a.type)+'</div></div>' +
+            '<div class="m-tile"><div class="m-tile-lbl">Spend at Stake</div>' +
+              '<div class="m-tile-val" style="color:var(--navy);font-size:11pt">'+a.spend+'</div></div>' +
+            '<div class="m-tile"><div class="m-tile-lbl">Due / Deadline</div>' +
+              '<div class="m-tile-val" style="color:'+dc+'">'+dueFmt(a.due)+' <span style="font-size:7.5pt;font-weight:400;color:var(--ink4)">('+a.due+')</span></div></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="m-sec"><div class="m-sec-title">Context</div>' +
+          '<div class="m-context">'+a.context+'</div>' +
+        '</div>' +
+
+        '<div class="m-sec"><div class="m-sec-title">Recommended Actions</div>' +
+          '<div class="m-actions">'+
+            a.actions.map(function(act,i){
+              return '<div class="m-action-item">' +
+                '<span class="m-action-num">'+(i+1)+'</span>' +
+                '<span class="m-action-text">'+act+'</span>' +
+              '</div>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+
+        '<div class="m-sec"><div class="m-sec-title">Owner</div>' +
+          '<div class="m-owners"><div class="m-owner">' +
+            '<span class="m-owner-dot" style="background:'+a.ownerColor+'"></span>' +
+            a.owner +
+          '</div></div>' +
+        '</div>' +
+
+        '<div class="m-sec"><div class="m-sec-title">Tags</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:5px">'+
+            a.tags.map(function(t){return '<span class="badge b-navy">'+t+'</span>';}).join('') +
+          '</div>' +
+        '</div>' +
+
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  document.getElementById('modal-root').innerHTML = html;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-root').innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+function overlayClick(e) {
+  if (e.target.id === 'modal-overlay') closeModal();
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){
+    if(document.getElementById('modal-root').innerHTML) closeModal();
+    else closePillarModal();
+  }
+});
+
+// ── FILTER / VIEW ─────────────────────────────────────────────────────────
+function applyFilters() {
+  FILTER_PILLAR   = document.getElementById('ctrl-pillar').value;
+  FILTER_SEVERITY = document.getElementById('ctrl-severity').value;
+  FILTER_TYPE     = document.getElementById('ctrl-type').value;
+  var alerts = filteredAlerts();
+  document.getElementById('alert-count-label').textContent = alerts.length + ' alert' + (alerts.length!==1?'s':'');
+  if (VIEW_MODE === 'card') renderPillarCards(alerts);
+  else renderTable(alerts);
+}
+
+function clearFilters() {
+  FILTER_PILLAR = FILTER_SEVERITY = FILTER_TYPE = '';
+  ['ctrl-pillar','ctrl-severity','ctrl-type'].forEach(function(id){
+    document.getElementById(id).value='';
+  });
+  applyFilters();
+}
+
+function setView(mode) {
+  VIEW_MODE = mode;
+  document.getElementById('vt-card').className  = 'fbtn'+(mode==='card' ?' active':'');
+  document.getElementById('vt-table').className = 'fbtn'+(mode==='table'?' active':'');
+  document.getElementById('view-card').style.display  = mode==='card' ?'block':'none';
+  document.getElementById('view-table').style.display = mode==='table'?'block':'none';
+  applyFilters();
+}
+
+// ── DARK MODE ─────────────────────────────────────────────────────────────
+function toggleDark() {
+  var t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  document.getElementById('dm-btn').textContent = t==='dark'?'☀ Light Mode':'☽ Dark Mode';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+(function(){
+  var t; try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('dm-btn').textContent=t==='dark'?'☀ Light Mode':'☽ Dark Mode';
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+  buildPillarDropdown();
+  renderHeroKPIs();
+  renderTicker();
+  applyFilters();
+  document.getElementById('alert-count-label').textContent = RAW_ALERTS.length + ' alerts';
+});
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openAlertsHelp(){
+  HelpModal.open({
+    title: 'Pillar Action Alerts',
+    what: 'Pillar Action Alerts surfaces <strong>active risk and action signals across all DET engineering pillars</strong> — renewal risk, governance flags, commercial signals, and budget alerts — organized by pillar so the right people can act on the right items.',
+    steps: [
+      '<strong>Scan the alert severity distribution</strong> at the top — Critical, High, Medium, and Low counts give you the overall risk posture at a glance.',
+      '<strong>Filter by pillar</strong> to see only alerts relevant to your area of ownership. Pillar leaders should review their pillar\'s alerts weekly.',
+      '<strong>Filter by alert type</strong> — Renewal Risk, Governance, Commercial, or Budget — to focus your attention on a specific risk category.',
+      '<strong>Click any alert card</strong> to open the full alert detail — context, recommended action, deadline, and direct link to the relevant tool for resolution.',
+      '<strong>Acknowledge or escalate</strong> alerts from the detail view. Unacknowledged Critical alerts escalate automatically to the pillar leader after 48 hours.'
+    ],
+    tips: [
+      { icon: '&#x1F6A8;', title: 'Critical alerts require same-day acknowledgement', body: 'Any Critical alert that is not acknowledged within 24 hours triggers an automatic notification to the pillar VP.' },
+      { icon: '&#x1F4C5;', title: 'Renewal alerts have lead time built in', body: 'Renewal alerts fire 120 days before expiry — not 30. The lead time is intentional. Use it.' },
+      { icon: '&#x1F4CB;', title: 'Alert resolution feeds Decision Ledger', body: 'When you resolve an alert with a decision, it creates a Decision Ledger entry automatically.' },
+      { icon: '&#x1F501;', title: 'Alerts refresh daily', body: 'New signals from Coupa, MFT, and the governance queue are processed overnight. Check first thing each morning.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

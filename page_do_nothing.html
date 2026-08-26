@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>If We Did Nothing — Org Simulation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --body-bg:    #020B18;
+      --bg:         #020B18;
+      --surface:    rgba(255,255,255,0.03);
+      --surface-2:  rgba(255,255,255,0.05);
+      --surface-3:  rgba(255,255,255,0.07);
+      --border:     rgba(255,255,255,0.07);
+      --card-bg:    rgba(255,255,255,0.03);
+      --card-border:rgba(255,255,255,0.07);
+      --teal:       #0D9488;
+      --teal2:      #0F766E;
+      --red:        #DC2626;
+      --amber:      #D97706;
+      --green:      #059669;
+      --blue:       #3b82f6;
+      --purple:     #8b5cf6;
+      --text:       #fff;
+      --text-primary:#fff;
+      --text-muted: rgba(255,255,255,0.55);
+      --text-faint: rgba(255,255,255,0.35);
+      --text-dim:   rgba(255,255,255,0.25);
+      --divider:    rgba(13,148,136,0.2);
+      --top-bar-bg: rgba(2,11,24,0.88);
+      --top-bar-border:rgba(13,148,136,0.15);
+      --mono:       'SF Mono','Fira Code','Cascadia Code','Consolas',monospace;
+    }
+    [data-theme="light"] {
+      --body-bg:    #F0F4FA;
+      --bg:         #F0F4FA;
+      --surface:    #fff;
+      --surface-2:  #F9FAFB;
+      --surface-3:  #E5E7EB;
+      --border:     #E5E7EB;
+      --card-bg:    #fff;
+      --card-border:#E5E7EB;
+      --text:       #111827;
+      --text-primary:#111827;
+      --text-muted: #374151;
+      --text-faint: #6B7280;
+      --text-dim:   #9CA3AF;
+      --top-bar-bg: rgba(15,30,60,0.97);
+      --top-bar-border:rgba(13,148,136,0.2);
+    }
+    [data-theme="light"] .chart-surface { background: #eef2f8; }
+    [data-theme="light"] .year-row.crossover { background: rgba(16,185,129,0.06); }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      padding-top: 50px;
+    }
+    .hidden { display: none !important; }
+
+    /* ── Top bar ── */
+    .top-bar{position:fixed;top:0;left:0;right:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 40px;height:50px;
+      background:var(--top-bar-bg);
+      border-bottom:1px solid var(--top-bar-border);
+      -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+      transition:background 0.3s;}
+    .tb-left{display:flex;align-items:center;gap:16px;}
+    .tb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;
+      display:flex;align-items:center;gap:5px;transition:color 0.2s;}
+    .tb-back:hover{color:#0D9488;}
+    .tb-sep{width:1px;height:14px;background:rgba(255,255,255,0.12);}
+    .tb-brand{font-size:8.5pt;font-weight:800;letter-spacing:0.06em;color:rgba(255,255,255,0.65);}
+    .tb-right{display:flex;align-items:center;gap:10px;}
+    .tb-live{display:flex;align-items:center;gap:6px;font-size:8pt;font-weight:700;color:#0D9488;}
+    .live-dot{width:6px;height:6px;border-radius:50%;background:#0D9488;animation:pulse 1.8s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(13,148,136,0.4);}
+      50%{opacity:0.6;box-shadow:0 0 0 5px rgba(13,148,136,0);}}
+    .tb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+      border-radius:6px;font-size:8pt;font-weight:700;cursor:pointer;
+      font-family:inherit;transition:all 0.18s;letter-spacing:0.04em;border:none;}
+    .tb-theme{background:transparent;border:1px solid rgba(255,255,255,0.12);
+      color:rgba(255,255,255,0.45);padding:5px 12px;border-radius:6px;
+      font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.18s;}
+    .tb-theme:hover{border-color:#0D9488;color:#0D9488;}
+
+    /* ── Scanline + particles ── */
+    .scanline{position:fixed;left:0;right:0;height:140px;pointer-events:none;z-index:1;
+      background:linear-gradient(180deg,transparent,rgba(13,148,136,0.04),transparent);
+      top:0;will-change:transform;animation:scan 7s linear infinite;}
+    @keyframes scan{from{transform:translateY(-140px)}to{transform:translateY(100vh)}}
+    #particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.6;}
+    [data-theme="light"] .scanline{opacity:0.3;}
+    [data-theme="light"] #particles{opacity:0.15;}
+
+    /* ── Animations ── */
+    @keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── Buttons ───────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border); font-family: inherit;
+      background: transparent; color: var(--text-muted); transition: all 0.15s;
+    }
+    .btn:hover { background: var(--surface-2); color: var(--text); }
+    .btn-teal  { background: rgba(45,212,191,0.14); color: var(--teal); border-color: rgba(45,212,191,0.3); }
+    .btn-teal:hover { background: rgba(45,212,191,0.24); }
+    .theme-toggle {
+      background: transparent; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+      color: rgba(255,255,255,0.45); font-size: 13px; padding: 5px 9px;
+      cursor: pointer; font-family: inherit; transition: all 0.15s; line-height: 1;
+    }
+    .theme-toggle:hover { border-color: #0D9488; color: #0D9488; }
+
+    /* ── Page wrap ─────────────────────── */
+    .page-wrap { max-width: 1380px; margin: 0 auto; padding: 36px 24px 80px; }
+    .page-hero { margin-bottom: 28px; }
+    .page-title { font-size: clamp(20pt, 3vw, 28pt); font-weight: 900; letter-spacing: -0.02em; margin-bottom: 6px; animation: fadeup 0.7s 0.3s both; }
+    .page-sub   { font-size: 10pt; color: var(--text-muted); line-height: 1.7; animation: fadeup 0.7s 0.5s both; }
+
+    /* ── Headline banner ───────────────── */
+    .headline-banner {
+      background: var(--surface);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 16px;
+      padding: 32px 40px;
+      margin-bottom: 24px;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; gap: 48px;
+      flex-wrap: wrap;
+    }
+    .headline-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 0% 50%, rgba(239,68,68,0.05) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .hl-main { flex-shrink: 0; }
+    .hl-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(239,68,68,0.7); margin-bottom: 6px; }
+    .hl-number {
+      font-size: clamp(36px, 5vw, 64px); font-weight: 800;
+      font-family: var(--mono); font-variant-numeric: tabular-nums;
+      background: linear-gradient(135deg, #b91c1c 0%, #ef4444 50%, #f87171 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1; letter-spacing: -0.02em;
+    }
+    .hl-sub { font-size: 13px; color: var(--text-faint); margin-top: 6px; }
+
+    .hl-divider { width: 1px; height: 72px; background: var(--border); flex-shrink: 0; }
+
+    .hl-stats { display: flex; gap: 36px; flex-wrap: wrap; }
+    .hl-stat { text-align: center; }
+    .hl-stat-label { font-size: 9px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 5px; }
+    .hl-stat-val { font-size: 22px; font-weight: 800; font-family: var(--mono); }
+    .hl-stat-val.red   { color: #f87171; }
+    .hl-stat-val.amber { color: var(--amber); }
+    .hl-stat-val.green { color: #34d399; }
+    .hl-stat-val.teal  { color: var(--teal); }
+
+    /* Health badge */
+    .health-badge {
+      margin-left: auto; text-align: center; flex-shrink: 0;
+    }
+    .health-grade {
+      font-size: 56px; font-weight: 900; font-family: var(--mono); line-height: 1;
+    }
+    .hg-a { color: #34d399; } .hg-b { color: var(--teal); }
+    .hg-c { color: var(--amber); } .hg-d { color: #f97316; } .hg-f { color: #f87171; }
+    .health-label { font-size: 10px; color: var(--text-faint); margin-top: 4px; }
+
+    /* ── Two-col layout ────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 380px; gap: 24px; margin-bottom: 24px; }
+    @media (max-width: 1000px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Cards ─────────────────────────── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .card-title { font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 16px; }
+
+    /* ── Divergence chart ──────────────── */
+    .chart-surface {
+      background: #0d1829; border-radius: 10px;
+      padding: 16px 16px 8px; margin-bottom: 12px;
+      position: relative; overflow: hidden;
+    }
+    #diverge-svg { width: 100%; display: block; }
+    .chart-legend { display: flex; gap: 20px; margin-top: 8px; }
+    .chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+    .cl-line { width: 24px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── Year table ────────────────────── */
+    .year-table { width: 100%; border-collapse: collapse; }
+    .year-table th {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-faint); padding: 8px 12px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .year-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .year-table tr:last-child td { border-bottom: none; }
+    .year-row { transition: background 0.12s; }
+    .year-row:hover { background: var(--surface-2); }
+    .year-row.crossover { background: rgba(16,185,129,0.05); }
+    .year-row.crossover td:first-child::after { content: ' ✓ Break-even'; font-size: 9px; font-weight: 700; color: #34d399; margin-left: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .col-year  { font-weight: 700; color: var(--text); font-family: var(--mono); }
+    .col-money { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .col-red   { color: #f87171; font-weight: 700; }
+    .col-green { color: #34d399; font-weight: 700; }
+    .col-amber { color: var(--amber); font-weight: 700; }
+    .col-faint { color: var(--text-faint); }
+    .health-cell { font-weight: 800; font-family: var(--mono); }
+
+    /* ── Right panel ───────────────────── */
+    .right-col { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Portfolio add form */
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+    .field:last-of-type { margin-bottom: 0; }
+    .field label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .field input, .field select {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 7px; color: var(--text); font-size: 13px;
+      padding: 8px 11px; outline: none; font-family: inherit;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .field input:focus, .field select:focus { border-color: rgba(13,148,136,0.45); }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field-note { font-size: 11px; color: var(--text-faint); }
+
+    /* Portfolio item list */
+    .portfolio-list { display: flex; flex-direction: column; gap: 6px; }
+    .portfolio-item {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .pi-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .pi-body { flex: 1; min-width: 0; }
+    .pi-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pi-meta { font-size: 10px; color: var(--text-faint); }
+    .pi-meta span { color: var(--text-muted); font-weight: 600; }
+    .pi-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 14px; padding: 2px 4px; flex-shrink: 0; }
+    .pi-del:hover { color: #f87171; }
+
+    /* Insight callouts */
+    .insight-list { display: flex; flex-direction: column; gap: 8px; }
+    .insight-item {
+      background: var(--surface-2); border-left: 3px solid var(--border);
+      border-radius: 0 8px 8px 0; padding: 10px 14px;
+      font-size: 12px; color: var(--text-muted); line-height: 1.6;
+    }
+    .insight-item.red    { border-left-color: #ef4444; }
+    .insight-item.amber  { border-left-color: var(--amber); }
+    .insight-item.green  { border-left-color: #10b981; }
+    .insight-item.teal   { border-left-color: var(--teal); }
+    .insight-hi  { color: var(--text); font-weight: 600; }
+    .insight-warn { color: #f87171; font-weight: 600; }
+
+    /* Config row */
+    .config-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
+    }
+    .config-item { display: flex; align-items: center; gap: 6px; }
+    .config-item label { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    .config-item input, .config-item select {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 12px;
+      padding: 5px 9px; outline: none; font-family: inherit; width: 90px;
+    }
+    .config-item input:focus, .config-item select:focus { border-color: rgba(13,148,136,0.4); }
+
+    /* Section spacer */
+    .section-gap { margin-bottom: 20px; }
+
+    /* Type pills */
+    .type-pill {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 20px;
+    }
+    .t-legacy     { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+    .t-renewal    { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+    .t-governance { background: rgba(139,92,246,0.12); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.25); }
+    .t-hc         { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+  <canvas id="particles"></canvas>
+
+  <nav class="top-bar">
+    <div class="tb-left">
+      <a href="index.html" class="tb-back">← Hub</a>
+      <div class="tb-sep"></div>
+      <span class="tb-brand">VER INTELLIGENCE HUB</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-live"><div class="live-dot"></div>LIVE</div>
+      <button class="tb-btn tb-theme" onclick="toggleTheme()">◐ Theme</button>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <div class="page-hero">
+      <div class="page-title">If We Did Nothing</div>
+      <div class="page-sub">A portfolio-level simulation of what happens when every open issue, legacy system, and deferred decision is left untouched. The org you'll have in 5 years if nothing changes — priced out, year by year.</div>
+    </div>
+
+    <!-- Config row -->
+    <div class="config-row">
+      <div class="config-item">
+        <label for="cfg-years">Horizon</label>
+        <select id="cfg-years" onchange="simulate()">
+          <option value="3">3 Years</option>
+          <option value="5" selected>5 Years</option>
+          <option value="7">7 Years</option>
+          <option value="10">10 Years</option>
+        </select>
+      </div>
+      <div class="config-item">
+        <label for="cfg-legacy-growth">Legacy growth/yr</label>
+        <select id="cfg-legacy-growth" onchange="simulate()">
+          <option value="0.06">6%</option>
+          <option value="0.08">8%</option>
+          <option value="0.10" selected>10%</option>
+          <option value="0.12">12%</option>
+          <option value="0.15">15%</option>
+        </select>
+      </div>
+      <div class="config-item">
+        <label for="cfg-renewal-growth">Renewal escalation/yr</label>
+        <select id="cfg-renewal-growth" onchange="simulate()">
+          <option value="0.04">4%</option>
+          <option value="0.06">6%</option>
+          <option value="0.08" selected>8%</option>
+          <option value="0.10">10%</option>
+        </select>
+      </div>
+      <div class="config-item">
+        <label for="cfg-gov-risk">Gov risk multiplier/yr</label>
+        <select id="cfg-gov-risk" onchange="simulate()">
+          <option value="1.15">1.15×</option>
+          <option value="1.25" selected>1.25×</option>
+          <option value="1.40">1.40×</option>
+        </select>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button type="button" class="btn" onclick="loadDemo()">Load Coupa Spend Data</button>
+        <button type="button" class="btn" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+
+    <!-- Headline banner -->
+    <div class="headline-banner" id="headline-banner">
+      <div class="hl-main">
+        <div class="hl-label">5-Year "Do Nothing" Total Cost</div>
+        <div class="hl-number" id="hl-number">$0</div>
+        <div class="hl-sub" id="hl-sub">Add portfolio items to see your simulation</div>
+      </div>
+      <div class="hl-divider"></div>
+      <div class="hl-stats">
+        <div class="hl-stat">
+          <div class="hl-stat-label">Year 1 Burn</div>
+          <div class="hl-stat-val red" id="hl-y1">--</div>
+        </div>
+        <div class="hl-stat">
+          <div class="hl-stat-label">Savings if Act Now</div>
+          <div class="hl-stat-val green" id="hl-savings">--</div>
+        </div>
+        <div class="hl-stat">
+          <div class="hl-stat-label">Break-Even</div>
+          <div class="hl-stat-val teal" id="hl-breakeven">--</div>
+        </div>
+        <div class="hl-stat">
+          <div class="hl-stat-label">Items in Simulation</div>
+          <div class="hl-stat-val amber" id="hl-items">0</div>
+        </div>
+      </div>
+      <div class="health-badge">
+        <div class="health-grade" id="health-grade">--</div>
+        <div class="health-label">Org Health<br>Year <span id="health-year">5</span></div>
+      </div>
+    </div>
+
+    <!-- Main grid -->
+    <div class="two-col">
+
+      <!-- Left: chart + table -->
+      <div>
+        <!-- Divergence chart -->
+        <div class="card section-gap">
+          <div class="card-title">Cost Divergence — Do Nothing vs. Act Now</div>
+          <div class="chart-surface">
+            <svg id="diverge-svg" height="220"></svg>
+          </div>
+          <div class="chart-legend">
+            <div class="chart-legend-item"><div class="cl-line" style="background:#ef4444;"></div>Do Nothing (cumulative)</div>
+            <div class="chart-legend-item"><div class="cl-line" style="background:#10b981;"></div>Act Now (one-time cost + savings)</div>
+            <div class="chart-legend-item"><div class="cl-line" style="background:rgba(13,148,136,0.5);border-top:2px dashed rgba(13,148,136,0.5);height:0;"></div>Break-even point</div>
+          </div>
+        </div>
+
+        <!-- Year-by-year table -->
+        <div class="card section-gap">
+          <div class="card-title">Year-by-Year Projection</div>
+          <div style="overflow-x:auto;">
+            <table class="year-table">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Annual Burn</th>
+                  <th>Cumulative Cost</th>
+                  <th>vs. Act Now</th>
+                  <th>Legacy Carry</th>
+                  <th>Renewal Stack</th>
+                  <th>Org Health</th>
+                </tr>
+              </thead>
+              <tbody id="year-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Key insights -->
+        <div class="card">
+          <div class="card-title">Key Inflection Points</div>
+          <div class="insight-list" id="insight-list">
+            <div class="insight-item" style="color:var(--text-faint);">Add portfolio items and run the simulation to see inflection points.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: portfolio input -->
+      <div class="right-col">
+
+        <!-- Add item form -->
+        <div class="card">
+          <div class="card-title">Add Portfolio Item</div>
+          <div style="margin-bottom:8px;">
+            <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-faint);display:block;margin-bottom:4px;">Quick Pick from Coupa</label>
+            <select id="pi-coupa-pick" onchange="onCoupaPick()" style="width:100%;background:var(--surface-3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 10px;font-size:12px;outline:none;">
+              <option value="">— select a vendor to auto-fill —</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pi-name">Item Name</label>
+            <input type="text" id="pi-name" placeholder="e.g. Legacy ERP, Salesforce renewal…" />
+          </div>
+          <div class="field-row" style="margin-bottom:12px;">
+            <div class="field" style="margin-bottom:0;">
+              <label for="pi-type">Type</label>
+              <select id="pi-type">
+                <option value="legacy">Legacy System</option>
+                <option value="renewal">Renewal</option>
+                <option value="governance">Governance Finding</option>
+                <option value="hc">HC / Workforce</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label for="pi-priority">Priority</label>
+              <select id="pi-priority">
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="moderate" selected>Moderate</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="pi-annual">Annual Cost ($)</label>
+            <input type="number" id="pi-annual" placeholder="Current annual spend" min="0" step="10000" />
+            <div class="field-note">The cost you pay per year today if nothing changes.</div>
+          </div>
+          <div class="field">
+            <label for="pi-resolve">Resolution Cost ($)</label>
+            <input type="number" id="pi-resolve" placeholder="One-time cost to fix / exit" min="0" step="10000" />
+            <div class="field-note">What it costs to actually solve this — used for the Act Now comparison.</div>
+          </div>
+          <button type="button" class="btn btn-teal" style="width:100%;justify-content:center;margin-top:4px;" onclick="addItem()">+ Add to Simulation</button>
+        </div>
+
+        <!-- Portfolio list -->
+        <div class="card">
+          <div class="card-title">Portfolio <span id="pi-count" style="font-weight:400;">(0 items)</span></div>
+          <div class="portfolio-list" id="portfolio-list">
+            <div style="font-size:12px;color:var(--text-faint);text-align:center;padding:16px 0;">No items yet. Add above or load Coupa vendor data.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="assets/coupa_spend.js"></script>
+  <script>
+    var ITEMS = [];
+    var SIM_CACHE = null;
+
+    var TYPE_META = {
+      legacy:     { icon: '🪦', label: 'Legacy',     cls: 't-legacy' },
+      renewal:    { icon: '🔄', label: 'Renewal',    cls: 't-renewal' },
+      governance: { icon: '⚖️', label: 'Governance', cls: 't-governance' },
+      hc:         { icon: '👥', label: 'HC',          cls: 't-hc' },
+    };
+
+    // ── Persistence ──────────────────────
+    function save() {
+      try { localStorage.setItem('idn_items', JSON.stringify(ITEMS)); } catch(e) {}
+    }
+    function load() {
+      try {
+        var r = localStorage.getItem('idn_items');
+        if (r) ITEMS = JSON.parse(r);
+      } catch(e) { ITEMS = []; }
+    }
+
+    function genId() {
+      return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    }
+
+    // ── Coupa integration ─────────────────
+    function populateCoupaPicker() {
+      var sel = document.getElementById('pi-coupa-pick');
+      if (!sel || !window.VER_COUPA) return;
+      var sorted = window.VER_COUPA.vendors.slice().sort(function(a,b){ return b.fy27 - a.fy27; }).slice(0, 50);
+      sorted.forEach(function(v) {
+        var opt = document.createElement('option');
+        opt.value = JSON.stringify({ n: v.n, fy27: v.fy27, cat: v.cat });
+        opt.textContent = v.n + ' — $' + (v.fy27).toFixed(2) + 'M';
+        sel.appendChild(opt);
+      });
+    }
+
+    function onCoupaPick() {
+      var sel = document.getElementById('pi-coupa-pick');
+      if (!sel || !sel.value) return;
+      try {
+        var v = JSON.parse(sel.value);
+        var nameEl   = document.getElementById('pi-name');
+        var annualEl = document.getElementById('pi-annual');
+        if (nameEl)   nameEl.value   = v.n;
+        if (annualEl) annualEl.value = Math.round(v.fy27 * 1e6);
+        var typeEl = document.getElementById('pi-type');
+        if (typeEl) {
+          if (v.cat === 'CWF' || v.cat === 'CWF - Maintenance') typeEl.value = 'hc';
+          else if (v.cat === 'Software') typeEl.value = 'renewal';
+          else typeEl.value = 'renewal';
+        }
+      } catch(e) {}
+    }
+
+    // ── Config helpers ────────────────────
+    function cfgNum(id) { return parseFloat(document.getElementById(id).value) || 0; }
+    function cfgInt(id) { return parseInt(document.getElementById(id).value, 10) || 5; }
+
+    // ── Simulation engine ─────────────────
+    function simulate() {
+      var years         = cfgInt('cfg-years');
+      var legacyGrowth  = cfgNum('cfg-legacy-growth');
+      var renewalGrowth = cfgNum('cfg-renewal-growth');
+      var govMultiplier = cfgNum('cfg-gov-risk');
+
+      var legacy     = ITEMS.filter(function(i) { return i.type === 'legacy'; });
+      var renewals   = ITEMS.filter(function(i) { return i.type === 'renewal'; });
+      var governance = ITEMS.filter(function(i) { return i.type === 'governance'; });
+      var hc         = ITEMS.filter(function(i) { return i.type === 'hc'; });
+
+      // Year 0 annual totals
+      var baseAnnual = ITEMS.reduce(function(s, i) { return s + (i.annual || 0); }, 0);
+      var totalResolve = ITEMS.reduce(function(s, i) { return s + (i.resolve || 0); }, 0);
+
+      var rows = [];
+      var cumDoNothing = 0;
+      var cumActNow    = totalResolve; // pay resolution in year 1
+      var crossoverYear = null;
+
+      for (var y = 1; y <= years; y++) {
+        var legacyAnnual = legacy.reduce(function(s, i) {
+          return s + (i.annual || 0) * Math.pow(1 + legacyGrowth, y - 1);
+        }, 0);
+        var renewalAnnual = renewals.reduce(function(s, i) {
+          return s + (i.annual || 0) * Math.pow(1 + renewalGrowth, y - 1);
+        }, 0);
+        var govAnnual = governance.reduce(function(s, i) {
+          return s + (i.annual || 0) * Math.pow(govMultiplier, y - 1);
+        }, 0);
+        var hcAnnual = hc.reduce(function(s, i) {
+          return s + (i.annual || 0) * (1 + 0.05 * (y - 1));
+        }, 0);
+
+        var annualBurn = legacyAnnual + renewalAnnual + govAnnual + hcAnnual;
+        cumDoNothing += annualBurn;
+
+        // Act Now: resolution cost in Y1, zero ongoing (savings realized)
+        // Cumulative act-now stays flat at totalResolve after Y1
+        var savingsVsDoNothing = cumDoNothing - cumActNow;
+        if (crossoverYear === null && savingsVsDoNothing > 0) crossoverYear = y;
+
+        // Org health score (degrades as % over baseline)
+        var degradation = (annualBurn - baseAnnual) / Math.max(baseAnnual, 1);
+        var healthScore = Math.max(0, 100 - Math.round(degradation * 60) - (y - 1) * 5);
+        var healthGrade = scoreToGrade(healthScore);
+
+        rows.push({
+          year:          y,
+          annualBurn:    annualBurn,
+          cumDoNothing:  cumDoNothing,
+          cumActNow:     cumActNow,
+          savings:       savingsVsDoNothing,
+          legacyAnnual:  legacyAnnual,
+          renewalAnnual: renewalAnnual,
+          healthScore:   healthScore,
+          healthGrade:   healthGrade,
+          isCrossover:   crossoverYear === y,
+        });
+      }
+
+      SIM_CACHE = {
+        rows:         rows,
+        totalDoNothing: cumDoNothing,
+        totalResolve: totalResolve,
+        totalSavings: cumDoNothing - totalResolve,
+        crossoverYear: crossoverYear,
+        years:        years,
+        baseAnnual:   baseAnnual,
+      };
+
+      renderAll();
+    }
+
+    function scoreToGrade(score) {
+      if (score >= 85) return { g: 'A', cls: 'hg-a' };
+      if (score >= 70) return { g: 'B', cls: 'hg-b' };
+      if (score >= 55) return { g: 'C', cls: 'hg-c' };
+      if (score >= 35) return { g: 'D', cls: 'hg-d' };
+      return { g: 'F', cls: 'hg-f' };
+    }
+
+    // ── Rendering ─────────────────────────
+    function renderAll() {
+      renderPortfolio();
+      renderHeadline();
+      renderTable();
+      renderChart();
+      renderInsights();
+    }
+
+    function renderPortfolio() {
+      var list  = document.getElementById('portfolio-list');
+      var count = document.getElementById('pi-count');
+      if (!list) return;
+      if (count) count.textContent = '(' + ITEMS.length + ' item' + (ITEMS.length !== 1 ? 's' : '') + ')';
+      while (list.firstChild) list.removeChild(list.firstChild);
+
+      if (ITEMS.length === 0) {
+        var msg = document.createElement('div');
+        msg.style.cssText = 'font-size:12px;color:var(--text-faint);text-align:center;padding:16px 0;';
+        msg.textContent = 'No items yet. Add above or load Coupa vendor data.';
+        list.appendChild(msg);
+        return;
+      }
+
+      ITEMS.forEach(function(item) {
+        var meta = TYPE_META[item.type] || { icon: '?', label: item.type, cls: '' };
+        var row  = document.createElement('div');
+        row.className = 'portfolio-item';
+
+        var icon  = document.createElement('span');
+        icon.className = 'pi-icon';
+        icon.textContent = meta.icon;
+
+        var body  = document.createElement('div');
+        body.className = 'pi-body';
+
+        var nameLine = document.createElement('div');
+        nameLine.className = 'pi-name';
+
+        var nameText = document.createElement('span');
+        nameText.textContent = item.name;
+        nameLine.appendChild(nameText);
+
+        var pill = document.createElement('span');
+        pill.className = 'type-pill ' + meta.cls;
+        pill.textContent = meta.label;
+        pill.style.marginLeft = '6px';
+        nameLine.appendChild(pill);
+
+        var metaLine = document.createElement('div');
+        metaLine.className = 'pi-meta';
+        var annualSpan = document.createElement('span');
+        annualSpan.textContent = fmtShort(item.annual) + '/yr';
+        metaLine.appendChild(annualSpan);
+        if (item.resolve > 0) {
+          metaLine.appendChild(document.createTextNode('  ·  Fix: '));
+          var resolveSpan = document.createElement('span');
+          resolveSpan.textContent = fmtShort(item.resolve);
+          metaLine.appendChild(resolveSpan);
+        }
+
+        body.appendChild(nameLine);
+        body.appendChild(metaLine);
+
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'pi-del';
+        del.textContent = '×';
+        del.title = 'Remove';
+        (function(id) { del.onclick = function() { deleteItem(id); }; }(item.id));
+
+        row.appendChild(icon);
+        row.appendChild(body);
+        row.appendChild(del);
+        list.appendChild(row);
+      });
+    }
+
+    function renderHeadline() {
+      var years = cfgInt('cfg-years');
+      setText('health-year', years);
+      setText('hl-items', ITEMS.length);
+
+      if (!SIM_CACHE || ITEMS.length === 0) {
+        setText('hl-number',   '$0');
+        setText('hl-sub',      'Add portfolio items to see your simulation');
+        setText('hl-y1',       '--');
+        setText('hl-savings',  '--');
+        setText('hl-breakeven','--');
+        var gradeEl = document.getElementById('health-grade');
+        if (gradeEl) { gradeEl.className = 'health-grade'; gradeEl.textContent = '--'; }
+        return;
+      }
+
+      var sc = SIM_CACHE;
+      setText('hl-number',    fmtShort(sc.totalDoNothing));
+      var pctOfTotal = window.VER_COUPA ? ' (' + ((sc.baseAnnual / (window.VER_COUPA.total_fy27 * 1e6)) * 100).toFixed(1) + '% of $295M Coupa portfolio)' : '';
+      setText('hl-sub',       years + '-year cumulative cost of doing nothing across ' + ITEMS.length + ' portfolio item' + (ITEMS.length !== 1 ? 's' : '') + pctOfTotal);
+      setText('hl-y1',        fmtShort(sc.rows[0] ? sc.rows[0].annualBurn : 0));
+      setText('hl-savings',   sc.totalSavings > 0 ? fmtShort(sc.totalSavings) : '$0');
+      setText('hl-breakeven', sc.crossoverYear ? 'Year ' + sc.crossoverYear : 'Never');
+
+      var lastRow = sc.rows[sc.rows.length - 1];
+      var gradeEl = document.getElementById('health-grade');
+      if (gradeEl && lastRow) {
+        gradeEl.className = 'health-grade ' + lastRow.healthGrade.cls;
+        gradeEl.textContent = lastRow.healthGrade.g;
+      }
+    }
+
+    function renderTable() {
+      var tbody = document.getElementById('year-tbody');
+      if (!tbody) return;
+      while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+      if (!SIM_CACHE || ITEMS.length === 0) {
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        td.colSpan = 7;
+        td.style.cssText = 'text-align:center;color:var(--text-faint);padding:24px;font-size:13px;';
+        td.textContent = 'Add portfolio items to generate the simulation.';
+        tr.appendChild(td); tbody.appendChild(tr);
+        return;
+      }
+
+      SIM_CACHE.rows.forEach(function(row) {
+        var tr = document.createElement('tr');
+        tr.className = 'year-row' + (row.isCrossover ? ' crossover' : '');
+
+        function cell(text, cls) {
+          var td = document.createElement('td');
+          td.className = cls || '';
+          td.textContent = text;
+          return td;
+        }
+
+        tr.appendChild(cell('Year ' + row.year, 'col-year'));
+        tr.appendChild(cell(fmtShort(row.annualBurn), 'col-money col-red'));
+        tr.appendChild(cell(fmtShort(row.cumDoNothing), 'col-money col-red'));
+
+        var savTd = document.createElement('td');
+        savTd.className = 'col-money ' + (row.savings > 0 ? 'col-green' : 'col-amber');
+        savTd.textContent = row.savings > 0 ? '+' + fmtShort(row.savings) + ' saved' : '-' + fmtShort(Math.abs(row.savings)) + ' behind';
+        tr.appendChild(savTd);
+
+        tr.appendChild(cell(fmtShort(row.legacyAnnual), 'col-money col-faint'));
+        tr.appendChild(cell(fmtShort(row.renewalAnnual), 'col-money col-faint'));
+
+        var hTd = document.createElement('td');
+        hTd.className = 'health-cell ' + row.healthGrade.cls;
+        hTd.textContent = row.healthGrade.g;
+        tr.appendChild(hTd);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderChart() {
+      var svg = document.getElementById('diverge-svg');
+      if (!svg) return;
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      var W = svg.parentElement.clientWidth - 32 || 600;
+      var H = 220;
+      svg.setAttribute('width', W);
+      svg.setAttribute('height', H);
+
+      if (!SIM_CACHE || ITEMS.length === 0) {
+        var msg = svgText(W / 2, H / 2, 'Add portfolio items to generate chart', '13', 'var(--text-faint)', 'middle');
+        svg.appendChild(msg);
+        return;
+      }
+
+      var pad = { top: 16, right: 20, bottom: 28, left: 68 };
+      var cW  = W - pad.left - pad.right;
+      var cH  = H - pad.top  - pad.bottom;
+
+      var rows = SIM_CACHE.rows;
+      var n    = rows.length;
+
+      var maxVal = Math.max(
+        rows[rows.length - 1].cumDoNothing,
+        SIM_CACHE.totalResolve,
+        1
+      ) * 1.08;
+
+      function xPos(i) { return pad.left + (i / n) * cW; }
+      function yPos(v) { return pad.top + cH - (v / maxVal) * cH; }
+
+      // Y-axis grid + labels
+      var ticks = 4;
+      for (var t = 0; t <= ticks; t++) {
+        var val  = (maxVal / ticks) * t;
+        var yy   = yPos(val);
+        var line = svgEl('line', { x1: pad.left, y1: yy, x2: pad.left + cW, y2: yy, stroke: 'var(--border)', 'stroke-width': '1' });
+        svg.appendChild(line);
+        var lbl = svgText(pad.left - 6, yy + 4, fmtShort(val), '9', 'var(--text-faint)', 'end');
+        svg.appendChild(lbl);
+      }
+
+      // X-axis labels
+      rows.forEach(function(row, i) {
+        var xx = xPos(i + 0.5);
+        var lbl = svgText(xx, H - 6, 'Y' + row.year, '9', 'var(--text-faint)', 'middle');
+        svg.appendChild(lbl);
+      });
+
+      // Shade area between curves
+      var areaPoints = [];
+      rows.forEach(function(row, i) {
+        areaPoints.push([xPos(i + 0.5), yPos(row.cumDoNothing)]);
+      });
+      var actY = yPos(SIM_CACHE.totalResolve);
+      var areaPath = 'M' + xPos(0.5) + ',' + yPos(rows[0].cumDoNothing);
+      rows.forEach(function(row, i) {
+        if (i > 0) areaPath += ' L' + xPos(i + 0.5) + ',' + yPos(row.cumDoNothing);
+      });
+      areaPath += ' L' + xPos(n - 0.5) + ',' + actY + ' L' + xPos(0.5) + ',' + actY + ' Z';
+      var area = svgEl('path', { d: areaPath, fill: 'rgba(239,68,68,0.06)', stroke: 'none' });
+      svg.appendChild(area);
+
+      // Act Now line (flat)
+      var actLine = svgEl('line', {
+        x1: xPos(0.5), y1: actY, x2: xPos(n - 0.5), y2: actY,
+        stroke: '#10b981', 'stroke-width': '2', 'stroke-dasharray': '6,4',
+      });
+      svg.appendChild(actLine);
+
+      // Act Now label
+      var actLbl = svgText(xPos(n - 0.5) - 4, actY - 6, fmtShort(SIM_CACHE.totalResolve), '10', '#10b981', 'end');
+      svg.appendChild(actLbl);
+
+      // Do Nothing line
+      var dnPath = 'M' + xPos(0.5) + ',' + yPos(rows[0].cumDoNothing);
+      rows.forEach(function(row, i) {
+        if (i > 0) dnPath += ' L' + xPos(i + 0.5) + ',' + yPos(row.cumDoNothing);
+      });
+      var dnLine = svgEl('path', { d: dnPath, fill: 'none', stroke: '#ef4444', 'stroke-width': '2.5' });
+      svg.appendChild(dnLine);
+
+      // Crossover marker
+      if (SIM_CACHE.crossoverYear) {
+        var cx = xPos(SIM_CACHE.crossoverYear - 0.5);
+        var crossLine = svgEl('line', {
+          x1: cx, y1: pad.top, x2: cx, y2: pad.top + cH,
+          stroke: 'rgba(13,148,136,0.4)', 'stroke-width': '1', 'stroke-dasharray': '4,3',
+        });
+        svg.appendChild(crossLine);
+        var crossDot = svgEl('circle', { cx: cx, cy: actY, r: '4', fill: '#0D9488' });
+        svg.appendChild(crossDot);
+        var crossLbl = svgText(cx + 6, actY - 8, 'Break-even', '9', 'var(--teal)', 'start');
+        svg.appendChild(crossLbl);
+      }
+
+      // Data point dots on do-nothing line
+      rows.forEach(function(row, i) {
+        var dot = svgEl('circle', { cx: xPos(i + 0.5), cy: yPos(row.cumDoNothing), r: '3.5', fill: '#ef4444' });
+        svg.appendChild(dot);
+      });
+    }
+
+    function renderInsights() {
+      var list = document.getElementById('insight-list');
+      if (!list) return;
+      while (list.firstChild) list.removeChild(list.firstChild);
+
+      if (!SIM_CACHE || ITEMS.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'insight-item';
+        empty.style.color = 'var(--text-faint)';
+        empty.textContent = 'Add portfolio items and run the simulation to see inflection points.';
+        list.appendChild(empty);
+        return;
+      }
+
+      var sc    = SIM_CACHE;
+      var rows  = sc.rows;
+      var years = sc.years;
+
+      addInsight(list, 'red',
+        'Doing nothing costs ',
+        fmtShort(sc.totalDoNothing),
+        ' over ' + years + ' years — vs. ' + fmtShort(sc.totalResolve) + ' to resolve everything today.'
+      );
+
+      if (sc.crossoverYear) {
+        addInsight(list, 'green',
+          'Acting now breaks even in ',
+          'Year ' + sc.crossoverYear,
+          '. Every year after that is pure savings.'
+        );
+      } else {
+        addInsight(list, 'amber',
+          'Resolution cost exceeds ',
+          years + '-year carry',
+          ' — but risk and org health still degrade. Consider phased action.'
+        );
+      }
+
+      var y3row = rows.find(function(r) { return r.year === 3; });
+      if (y3row) {
+        addInsight(list, 'amber',
+          'By Year 3, annual burn reaches ',
+          fmtShort(y3row.annualBurn),
+          ' — up from ' + fmtShort(rows[0].annualBurn) + ' today. Compounding makes this worse every year.'
+        );
+      }
+
+      var lastRow = rows[rows.length - 1];
+      if (lastRow && (lastRow.healthGrade.g === 'D' || lastRow.healthGrade.g === 'F')) {
+        addInsight(list, 'red',
+          'Org health degrades to grade ',
+          lastRow.healthGrade.g,
+          ' by Year ' + lastRow.year + '. At this stage, talent retention, audit risk, and budget credibility are all in jeopardy.'
+        );
+      }
+
+      var legacy = ITEMS.filter(function(i) { return i.type === 'legacy'; });
+      if (legacy.length > 0) {
+        var legacyTotal = legacy.reduce(function(s, i) { return s + i.annual; }, 0);
+        addInsight(list, 'teal',
+          legacy.length + ' legacy system' + (legacy.length > 1 ? 's' : '') + ' account for ',
+          fmtShort(legacyTotal) + '/yr',
+          ' of carry today. At 10% annual growth, that\'s ' + fmtShort(legacyTotal * Math.pow(1.1, years)) + '/yr by Year ' + years + '.'
+        );
+      }
+    }
+
+    function addInsight(container, cls, before, highlight, after) {
+      var item = document.createElement('div');
+      item.className = 'insight-item ' + cls;
+
+      item.appendChild(document.createTextNode(before));
+      var hi = document.createElement('span');
+      hi.className = cls === 'red' ? 'insight-warn' : 'insight-hi';
+      hi.textContent = highlight;
+      item.appendChild(hi);
+      item.appendChild(document.createTextNode(after));
+
+      container.appendChild(item);
+    }
+
+    // ── SVG helpers ───────────────────────
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    function svgEl(tag, attrs) {
+      var el = document.createElementNS(SVG_NS, tag);
+      Object.keys(attrs).forEach(function(k) { el.setAttribute(k, attrs[k]); });
+      return el;
+    }
+    function svgText(x, y, text, size, fill, anchor) {
+      var el = document.createElementNS(SVG_NS, 'text');
+      el.setAttribute('x', x); el.setAttribute('y', y);
+      el.setAttribute('font-size', size);
+      el.setAttribute('font-family', '-apple-system,BlinkMacSystemFont,Inter,sans-serif');
+      el.setAttribute('fill', fill);
+      if (anchor) el.setAttribute('text-anchor', anchor);
+      el.textContent = text;
+      return el;
+    }
+
+    // ── CRUD ──────────────────────────────
+    function addItem() {
+      var name = (document.getElementById('pi-name').value || '').trim();
+      if (!name) { alert('Enter an item name.'); return; }
+      var annual  = Math.max(0, parseFloat(document.getElementById('pi-annual').value)  || 0);
+      var resolve = Math.max(0, parseFloat(document.getElementById('pi-resolve').value) || 0);
+
+      ITEMS.push({
+        id:       genId(),
+        name:     name,
+        type:     document.getElementById('pi-type').value,
+        priority: document.getElementById('pi-priority').value,
+        annual:   annual,
+        resolve:  resolve,
+      });
+      save();
+      ['pi-name', 'pi-annual', 'pi-resolve'].forEach(function(id) {
+        document.getElementById(id).value = '';
+      });
+      simulate();
+    }
+
+    function deleteItem(id) {
+      ITEMS = ITEMS.filter(function(i) { return i.id !== id; });
+      save();
+      simulate();
+    }
+
+    // ── Formatting ────────────────────────
+    function fmtShort(n) {
+      if (!n && n !== 0) return '--';
+      if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+      return '$' + Math.round(n).toLocaleString();
+    }
+
+    function setText(id, val) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+
+    // ── Theme ─────────────────────────────
+    function toggleTheme() {
+      var html = document.documentElement;
+      var isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      var btn = document.getElementById('theme-btn');
+      if (btn) btn.textContent = isDark ? '☽' : '☀';
+      renderChart();
+    }
+
+    // ── Demo data ──────────────────────────
+    function loadDemo() {
+      ITEMS = [
+        { id:'d1', name:'Legacy ERP (SAP ECC 6.0)',          type:'legacy',     priority:'critical', annual:1800000, resolve:3200000 },
+        { id:'d2', name:'Legacy CRM (on-prem Siebel)',        type:'legacy',     priority:'critical', annual:1200000, resolve:2100000 },
+        { id:'d3', name:'Salesforce Enterprise Renewal',      type:'renewal',    priority:'high',     annual:2400000, resolve:200000  },
+        { id:'d4', name:'ServiceNow ITSM Renewal',            type:'renewal',    priority:'high',     annual:480000,  resolve:80000   },
+        { id:'d5', name:'SOX Access Control Findings',        type:'governance', priority:'critical', annual:320000,  resolve:150000  },
+        { id:'d6', name:'HIPAA Data Residency Gap',           type:'governance', priority:'high',     annual:180000,  resolve:90000   },
+        { id:'d7', name:'CW Overrun vs. 70/30 HC Policy',     type:'hc',         priority:'moderate', annual:640000,  resolve:0       },
+      ];
+      save();
+      simulate();
+    }
+
+    // ── Clear ──────────────────────────────
+    function clearAll() {
+      ITEMS = []; SIM_CACHE = null; save(); renderAll();
+    }
+
+    // ── Init ──────────────────────────────
+    load();
+    simulate();
+    populateCoupaPicker();
+
+    window.addEventListener('resize', function() { renderChart(); });
+  </script>
+
+  <script>
+(function(){
+  var c=document.getElementById('particles');
+  if(!c)return;
+  var ctx=c.getContext('2d');
+  var pts=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  for(var i=0;i<60;i++) pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    vx:(Math.random()-0.5)*0.15,vy:(Math.random()-0.5)*0.15,
+    r:Math.random()*1.2+0.4,a:Math.random()*0.4+0.1});
+  function frame(){
+    ctx.clearRect(0,0,c.width,c.height);
+    pts.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(13,148,136,'+p.a+')';ctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Category Intelligence · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --orange:#EA580C;--orange2:#7C2D12;--orange3:#FFF7ED;
+  --blue:#2563EB;--blue2:#1E40AF;--blue3:#EFF6FF;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F3F4F6;--gray2:#F9FAFB;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Hub Top Bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;
+  justify-content:space-between;padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-div{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:8pt;color:rgba(255,255,255,0.5);line-height:1.4;}
+
+/* ── Stage ── */
+.stage{background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 60%,#061020 100%);
+  position:relative;overflow:hidden;padding:48px 0 36px;}
+.stage::before{content:'';position:absolute;top:-80px;right:-80px;width:560px;height:560px;
+  background:radial-gradient(circle,rgba(37,99,235,0.08) 0%,transparent 70%);pointer-events:none;}
+.stage::after{content:'';position:absolute;bottom:-60px;left:-60px;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(124,58,237,0.06) 0%,transparent 70%);pointer-events:none;}
+.stage-inner{max-width:1200px;margin:0 auto;padding:0 48px;}
+.stage-eyebrow{font-size:8.5pt;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:#60A5FA;display:inline-block;}
+.stage-title{font-size:26pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:4px;}
+.stage-accent{color:#60A5FA;}
+.stage-pos{font-size:8.5pt;color:rgba(255,255,255,0.55);margin-bottom:28px;}
+.kpi-strip{display:flex;gap:28px;flex-wrap:wrap;}
+.kpi{min-width:110px;}
+.kpi-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;}
+.kpi.blue .kpi-val{color:#60A5FA;}
+.kpi.teal .kpi-val{color:#2DD4BF;}
+.kpi.green .kpi-val{color:#34D399;}
+.kpi.amber .kpi-val{color:#FBBF24;}
+.kpi.red .kpi-val{color:#F87171;}
+.kpi.purple .kpi-val{color:#C4B5FD;}
+.kpi-lbl{font-size:8pt;font-weight:600;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;}
+.kpi-sub{font-size:8pt;color:rgba(255,255,255,0.35);margin-top:2px;}
+
+/* ── Alert banner ── */
+.alert-bar{background:#FEF3C7;border-bottom:1px solid #FDE68A;padding:10px 48px;
+  display:flex;align-items:center;gap:10px;max-width:100%;}
+.alert-bar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:10px;width:100%;}
+.alert-icon{font-size:11pt;}
+.alert-text{font-size:8.5pt;color:#78350F;font-weight:600;}
+.alert-text span{font-weight:800;}
+
+/* ── Main wrapper ── */
+.cat-main{max-width:1200px;margin:0 auto;padding:24px 48px 48px;}
+
+/* ── Tab bar ── */
+.tab-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.tab{font-size:8pt;padding:6px 14px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--border2);background:#fff;font-family:inherit;
+  transition:all 0.15s;font-weight:600;color:var(--ink4);}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+
+/* ── View containers ── */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── Section headers ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-title{font-size:10pt;font-weight:900;color:var(--navy);}
+.sec-sub{font-size:8.5pt;color:var(--ink4);}
+.sec-badge{font-size:7.5pt;font-weight:700;padding:3px 10px;border-radius:99px;}
+
+/* ── Two-col layout ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;}
+
+/* ── Cards ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.card.full{grid-column:1/-1;}
+
+/* ── Category summary table ── */
+.cat-table{width:100%;border-collapse:collapse;}
+.cat-table th{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;
+  color:var(--ink4);padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);}
+.cat-table td{font-size:8.5pt;color:var(--ink2);padding:10px 12px;border-bottom:1px solid var(--gray3);vertical-align:middle;}
+.cat-table tr:last-child td{border-bottom:none;}
+.cat-table tr:hover td{background:var(--gray2);}
+.cat-bar-wrap{width:120px;height:6px;background:var(--gray3);border-radius:99px;display:inline-block;}
+.cat-bar{height:6px;border-radius:99px;}
+.cat-name-cell{display:flex;align-items:center;gap:10px;}
+.cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.cat-name{font-weight:700;font-size:9pt;}
+
+/* ── Trend indicator ── */
+.trend{display:inline-flex;align-items:center;gap:3px;font-size:8.5pt;font-weight:700;}
+.trend.up{color:var(--red);}
+.trend.down{color:var(--green);}
+.trend.flat{color:var(--ink4);}
+
+/* ── Risk pill ── */
+.risk{font-size:7.5pt;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.risk.high{background:var(--red3);color:var(--red2);}
+.risk.med{background:var(--amber3);color:var(--amber2);}
+.risk.low{background:var(--green3);color:var(--green2);}
+
+/* ── Donut chart (CSS) ── */
+.donut-wrap{display:flex;align-items:center;gap:28px;}
+.donut-svg{flex-shrink:0;}
+.donut-legend{display:flex;flex-direction:column;gap:8px;}
+.legend-row{display:flex;align-items:center;gap:8px;}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.legend-name{font-size:8.5pt;font-weight:600;color:var(--ink2);}
+.legend-pct{font-size:8.5pt;color:var(--ink4);margin-left:auto;}
+.legend-val{font-size:8pt;color:var(--ink4);}
+
+/* ── Category header strip ── */
+.cat-stage{border-radius:12px;padding:20px 24px;margin-bottom:20px;color:#fff;display:flex;align-items:center;justify-content:space-between;}
+.cat-stage-left{}
+.cat-stage-eyebrow{font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;opacity:0.75;margin-bottom:6px;}
+.cat-stage-title{font-size:16pt;font-weight:900;margin-bottom:4px;}
+.cat-stage-sub{font-size:8.5pt;opacity:0.75;}
+.cat-stage-kpis{display:flex;gap:24px;margin-top:16px;}
+.cat-kpi-val{font-size:16pt;font-weight:900;line-height:1;}
+.cat-kpi-lbl{font-size:8pt;opacity:0.65;text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;}
+.cat-stage-icon{font-size:42pt;opacity:0.25;}
+
+/* ── Vendor rows ── */
+.vendor-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray3);}
+.vendor-row:last-child{border-bottom:none;}
+.vendor-rank{font-size:8pt;font-weight:800;color:var(--ink4);width:20px;flex-shrink:0;text-align:center;}
+.vendor-name{font-size:9pt;font-weight:700;color:var(--navy);flex:1;}
+.vendor-spend{font-size:9pt;font-weight:700;color:var(--ink2);white-space:nowrap;}
+.vendor-pct{font-size:8pt;color:var(--ink4);white-space:nowrap;width:36px;text-align:right;}
+.vendor-bar-wrap{width:80px;height:5px;background:var(--gray3);border-radius:99px;flex-shrink:0;}
+.vendor-bar{height:5px;border-radius:99px;}
+
+/* ── Insight cards ── */
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.insight-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px;border-left:4px solid;}
+.ic-type{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.ic-title{font-size:9.5pt;font-weight:800;color:var(--navy);margin-bottom:5px;line-height:1.3;}
+.ic-body{font-size:8.5pt;color:var(--ink3);line-height:1.55;margin-bottom:10px;}
+.ic-action{font-size:8pt;font-weight:700;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;}
+
+/* ── Stat tiles ── */
+.stat-tile{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px;text-align:center;}
+.st-val{font-size:18pt;font-weight:900;color:var(--navy);line-height:1;}
+.st-lbl{font-size:8.5pt;color:var(--ink4);margin-top:4px;font-weight:600;}
+.st-sub{font-size:8pt;color:var(--ink4);margin-top:2px;}
+
+/* ── Rate benchmark rows ── */
+.bench-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--gray3);}
+.bench-row:last-child{border-bottom:none;}
+.bench-role{font-size:8.5pt;font-weight:600;color:var(--ink2);}
+.bench-rates{display:flex;gap:16px;align-items:center;}
+.bench-range{font-size:8.5pt;color:var(--ink4);}
+.bench-mid{font-size:9pt;font-weight:700;color:var(--navy);}
+.bench-status{font-size:8pt;font-weight:700;padding:2px 8px;border-radius:99px;}
+.bench-status.ok{background:var(--green3);color:var(--green2);}
+.bench-status.over{background:var(--red3);color:var(--red2);}
+.bench-status.watch{background:var(--amber3);color:var(--amber2);}
+
+/* ── Timeline / action rows ── */
+.action-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray3);}
+.action-row:last-child{border-bottom:none;}
+.action-icon{font-size:14pt;flex-shrink:0;margin-top:1px;}
+.action-body{flex:1;}
+.action-title{font-size:9pt;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.action-sub{font-size:8.5pt;color:var(--ink3);line-height:1.5;}
+.action-badge{font-size:8pt;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+</style>
+</head>
+<body>
+
+<!-- Hub Top Bar -->
+<div class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-div"></div>
+    <span class="htb-brand">VER Intelligence Hub</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" style="padding:5px 12px;border-radius:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.70);font-size:8pt;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;" onclick="openCategoryHelp()" aria-label="How to use Category Intelligence">&#63; How to Use</button>
+    <div class="htb-meta">Salesforce DET &middot; FY27<br><span style="font-size:7.5pt;">Category Intelligence</span></div>
+  </div>
+</div>
+
+<!-- Stage -->
+<div class="stage">
+  <div class="stage-inner">
+    <div class="stage-eyebrow" style="color:#93C5FD;">
+      <span class="eyebrow-dot"></span>FinOps &middot; Category Intelligence
+    </div>
+    <div class="stage-title">Category <span class="stage-accent">Intelligence</span></div>
+    <div class="stage-pos">DET Vendor Portfolio &mdash; All Spend Categories &mdash; FY27 YTD</div>
+    <div class="kpi-strip">
+      <div class="kpi blue">
+        <div class="kpi-val">$847M</div>
+        <div class="kpi-lbl">Total DET Spend</div>
+        <div class="kpi-sub">FY27 YTD (Q1–Q2)</div>
+      </div>
+      <div class="kpi teal">
+        <div class="kpi-val">6</div>
+        <div class="kpi-lbl">Spend Categories</div>
+        <div class="kpi-sub">Monitored by VER</div>
+      </div>
+      <div class="kpi amber">
+        <div class="kpi-val">1,375</div>
+        <div class="kpi-lbl">Active Vendors</div>
+        <div class="kpi-sub">Across all categories</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-val">$38.4M</div>
+        <div class="kpi-lbl">Savings Identified</div>
+        <div class="kpi-sub">FY27 YTD pipeline</div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-val">14</div>
+        <div class="kpi-lbl">High-Risk Vendors</div>
+        <div class="kpi-sub">Requiring intervention</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert -->
+<div class="alert-bar">
+  <div class="alert-bar-inner">
+    <span class="alert-icon">&#9888;</span>
+    <span class="alert-text"><span>Concentration risk alert:</span> Top 5 vendors represent 41% of total DET spend. Contingent Workforce is running 8% above FY27 plan. 3 categories lack benchmark coverage — gaps flagged for Q3 resolution.</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="cat-main">
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('overview',this)">&#127914; Overview</button>
+    <button class="tab" onclick="switchTab('cw',this)">&#128101; Contingent Workforce</button>
+    <button class="tab" onclick="switchTab('proserve',this)">&#128203; Professional Services</button>
+    <button class="tab" onclick="switchTab('saas',this)">&#128187; Software &amp; SaaS</button>
+    <button class="tab" onclick="switchTab('cloud',this)">&#9729; Cloud &amp; Infrastructure</button>
+    <button class="tab" onclick="switchTab('emerging',this)">&#128640; Emerging &amp; AI</button>
+  </div>
+
+  <!-- ── OVERVIEW ── -->
+  <div class="view active" id="view-overview">
+
+    <div class="two-col">
+      <!-- Spend breakdown donut -->
+      <div class="card">
+        <div class="sec-hdr">
+          <div>
+            <div class="sec-title">Spend by Category</div>
+            <div class="sec-sub">FY27 YTD &mdash; $847M total</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="140" height="140" viewBox="0 0 140 140">
+            <!-- CW 38% = 136.8deg, ProServe 23%, SaaS 20%, Cloud 13%, Hardware 4%, Emerging 2% -->
+            <!-- Using stroke-dasharray on circle r=50, circumference=314.16 -->
+            <circle cx="70" cy="70" r="50" fill="none" stroke="#E5E7EB" stroke-width="22"/>
+            <!-- CW 38% = 119.4 -->
+            <circle cx="70" cy="70" r="50" fill="none" stroke="#0D9488" stroke-width="22"
+              stroke-dasharray="119.4 194.8" stroke-dashoffset="78.5" transform="rotate(-90 70 70)"/>
+            <!-- ProServe 23% = 72.3 -->
+            <circle cx="70" cy="70" r="50" fill="none" stroke="#2563EB" stroke-width="22"
+              stroke-dasharray="72.3 241.9" stroke-dashoffset="-40.9" transform="rotate(-90 70 70)"/>
+            <!-- SaaS 20% = 62.8 -->
+            <circle cx="70" cy="70" r="50" fill="none" stroke="#7C3AED" stroke-width="22"
+              stroke-dasharray="62.8 251.4" stroke-dashoffset="-113.2" transform="rotate(-90 70 70)"/>
+            <!-- Cloud 13% = 40.8 -->
+            <circle cx="70" cy="70" r="50" fill="none" stroke="#EA580C" stroke-width="22"
+              stroke-dasharray="40.8 273.4" stroke-dashoffset="-176.0" transform="rotate(-90 70 70)"/>
+            <!-- Hardware 4% = 12.6 -->
+            <circle cx="70" cy="70" r="50" fill="none" stroke="#D97706" stroke-width="22"
+              stroke-dasharray="12.6 301.6" stroke-dashoffset="-216.8" transform="rotate(-90 70 70)"/>
+            <!-- Emerging 2% = 6.3 -->
+            <circle cx="70" cy="70" r="50" fill="none" stroke="#059669" stroke-width="22"
+              stroke-dasharray="6.3 307.9" stroke-dashoffset="-229.4" transform="rotate(-90 70 70)"/>
+            <text x="70" y="65" text-anchor="middle" font-size="11" font-weight="900" fill="#0F1E3C">$847M</text>
+            <text x="70" y="80" text-anchor="middle" font-size="7" fill="#6B7280">Total Spend</text>
+          </svg>
+          <div class="donut-legend" style="flex:1;">
+            <div class="legend-row"><span class="legend-dot" style="background:#0D9488"></span><span class="legend-name">Contingent Workforce</span><span class="legend-pct">38%</span><span class="legend-val" style="margin-left:8px;">$321M</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#2563EB"></span><span class="legend-name">Professional Services</span><span class="legend-pct">23%</span><span class="legend-val" style="margin-left:8px;">$195M</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#7C3AED"></span><span class="legend-name">Software &amp; SaaS</span><span class="legend-pct">20%</span><span class="legend-val" style="margin-left:8px;">$169M</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#EA580C"></span><span class="legend-name">Cloud &amp; Infrastructure</span><span class="legend-pct">13%</span><span class="legend-val" style="margin-left:8px;">$110M</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#D97706"></span><span class="legend-name">Hardware &amp; Equipment</span><span class="legend-pct">4%</span><span class="legend-val" style="margin-left:8px;">$34M</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#059669"></span><span class="legend-name">Emerging &amp; AI</span><span class="legend-pct">2%</span><span class="legend-val" style="margin-left:8px;">$18M</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- YoY trend bars -->
+      <div class="card">
+        <div class="sec-hdr">
+          <div>
+            <div class="sec-title">YoY Spend Trend</div>
+            <div class="sec-sub">FY26 vs FY27 YTD by category</div>
+          </div>
+        </div>
+        <div id="yoy-chart" style="margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <!-- Full-width category table -->
+    <div class="card full" style="margin-bottom:20px;">
+      <div class="sec-hdr">
+        <div>
+          <div class="sec-title">Category Scorecard</div>
+          <div class="sec-sub">Spend, vendor count, risk posture, and VER coverage for FY27 YTD</div>
+        </div>
+      </div>
+      <table class="cat-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>FY27 Spend</th>
+            <th>Share</th>
+            <th>Vendors</th>
+            <th>YoY</th>
+            <th>Risk</th>
+            <th>Benchmarked</th>
+            <th>Savings Found</th>
+          </tr>
+        </thead>
+        <tbody id="cat-scorecard"></tbody>
+      </table>
+    </div>
+
+    <!-- Overview insights -->
+    <div class="sec-hdr"><div class="sec-title">Portfolio-Level Insights</div></div>
+    <div class="insight-grid" id="overview-insights"></div>
+  </div>
+
+  <!-- ── CONTINGENT WORKFORCE ── -->
+  <div class="view" id="view-cw">
+    <div class="cat-stage" style="background:linear-gradient(135deg,#0F766E,#0D9488);">
+      <div class="cat-stage-left">
+        <div class="cat-stage-eyebrow">Category Deep Dive</div>
+        <div class="cat-stage-title">Contingent Workforce</div>
+        <div class="cat-stage-sub">Staff Aug, MSP, IT Labor, Temp — 614 active vendors</div>
+        <div class="cat-stage-kpis">
+          <div><div class="cat-kpi-val">$321M</div><div class="cat-kpi-lbl">FY27 Spend</div></div>
+          <div><div class="cat-kpi-val">614</div><div class="cat-kpi-lbl">Vendors</div></div>
+          <div><div class="cat-kpi-val">+8%</div><div class="cat-kpi-lbl">vs Plan</div></div>
+          <div><div class="cat-kpi-val">$14.2M</div><div class="cat-kpi-lbl">Savings Pipeline</div></div>
+        </div>
+      </div>
+      <div class="cat-stage-icon">&#128101;</div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Top Vendors by Spend</div></div>
+        <div id="cw-vendors"></div>
+      </div>
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Rate Benchmark Snapshot</div><div class="sec-sub">AMER — Q2 FY27</div></div>
+        <div id="cw-benchmarks"></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Spend by Pillar</div></div>
+        <div id="cw-pillars"></div>
+      </div>
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">VER Actions &amp; Flags</div></div>
+        <div id="cw-actions"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROFESSIONAL SERVICES ── -->
+  <div class="view" id="view-proserve">
+    <div class="cat-stage" style="background:linear-gradient(135deg,#1E40AF,#2563EB);">
+      <div class="cat-stage-left">
+        <div class="cat-stage-eyebrow">Category Deep Dive</div>
+        <div class="cat-stage-title">Professional Services</div>
+        <div class="cat-stage-sub">SOW, Consulting, Managed Services — 287 active vendors</div>
+        <div class="cat-stage-kpis">
+          <div><div class="cat-kpi-val">$195M</div><div class="cat-kpi-lbl">FY27 Spend</div></div>
+          <div><div class="cat-kpi-val">287</div><div class="cat-kpi-lbl">Vendors</div></div>
+          <div><div class="cat-kpi-val">-3%</div><div class="cat-kpi-lbl">vs Plan</div></div>
+          <div><div class="cat-kpi-val">$9.1M</div><div class="cat-kpi-lbl">Savings Pipeline</div></div>
+        </div>
+      </div>
+      <div class="cat-stage-icon">&#128203;</div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Top Vendors by Spend</div></div>
+        <div id="ps-vendors"></div>
+      </div>
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">SOW Pipeline &amp; Exposure</div></div>
+        <div id="ps-sow"></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Delivery Risk Indicators</div></div>
+        <div id="ps-risk"></div>
+      </div>
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">VER Actions &amp; Flags</div></div>
+        <div id="ps-actions"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SOFTWARE / SAAS ── -->
+  <div class="view" id="view-saas">
+    <div class="cat-stage" style="background:linear-gradient(135deg,#5B21B6,#7C3AED);">
+      <div class="cat-stage-left">
+        <div class="cat-stage-eyebrow">Category Deep Dive</div>
+        <div class="cat-stage-title">Software &amp; SaaS</div>
+        <div class="cat-stage-sub">Enterprise licenses, productivity, dev tools, security — 312 active vendors</div>
+        <div class="cat-stage-kpis">
+          <div><div class="cat-kpi-val">$169M</div><div class="cat-kpi-lbl">FY27 Spend</div></div>
+          <div><div class="cat-kpi-val">312</div><div class="cat-kpi-lbl">Vendors</div></div>
+          <div><div class="cat-kpi-val">+12%</div><div class="cat-kpi-lbl">vs Plan</div></div>
+          <div><div class="cat-kpi-val">$8.8M</div><div class="cat-kpi-lbl">Savings Pipeline</div></div>
+        </div>
+      </div>
+      <div class="cat-stage-icon">&#128187;</div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Top Vendors by Spend</div></div>
+        <div id="saas-vendors"></div>
+      </div>
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">License Utilization</div></div>
+        <div id="saas-util"></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Renewal Horizon</div></div>
+        <div id="saas-renewals"></div>
+      </div>
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">VER Actions &amp; Flags</div></div>
+        <div id="saas-actions"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CLOUD & INFRASTRUCTURE ── -->
+  <div class="view" id="view-cloud">
+    <div class="cat-stage" style="background:linear-gradient(135deg,#7C2D12,#EA580C);">
+      <div class="cat-stage-left">
+        <div class="cat-stage-eyebrow">Category Deep Dive</div>
+        <div class="cat-stage-title">Cloud &amp; Infrastructure</div>
+        <div class="cat-stage-sub">Hyperscalers, networking, data center, managed infra — 89 active vendors</div>
+        <div class="cat-stage-kpis">
+          <div><div class="cat-kpi-val">$110M</div><div class="cat-kpi-lbl">FY27 Spend</div></div>
+          <div><div class="cat-kpi-val">89</div><div class="cat-kpi-lbl">Vendors</div></div>
+          <div><div class="cat-kpi-val">+19%</div><div class="cat-kpi-lbl">vs Plan</div></div>
+          <div><div class="cat-kpi-val">$4.9M</div><div class="cat-kpi-lbl">Savings Pipeline</div></div>
+        </div>
+      </div>
+      <div class="cat-stage-icon">&#9729;</div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Top Vendors by Spend</div></div>
+        <div id="cloud-vendors"></div>
+      </div>
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Consumption vs Commit</div></div>
+        <div id="cloud-commit"></div>
+      </div>
+    </div>
+
+    <div class="card full" style="margin-bottom:20px;">
+      <div class="sec-hdr"><div class="sec-title">VER Actions &amp; Flags</div></div>
+      <div id="cloud-actions"></div>
+    </div>
+  </div>
+
+  <!-- ── EMERGING & AI ── -->
+  <div class="view" id="view-emerging">
+    <div class="cat-stage" style="background:linear-gradient(135deg,#065F46,#059669);">
+      <div class="cat-stage-left">
+        <div class="cat-stage-eyebrow">Category Deep Dive</div>
+        <div class="cat-stage-title">Emerging &amp; AI</div>
+        <div class="cat-stage-sub">Generative AI, ML platforms, automation, experimental — 73 active vendors</div>
+        <div class="cat-stage-kpis">
+          <div><div class="cat-kpi-val">$18M</div><div class="cat-kpi-lbl">FY27 Spend</div></div>
+          <div><div class="cat-kpi-val">73</div><div class="cat-kpi-lbl">Vendors</div></div>
+          <div><div class="cat-kpi-val">+62%</div><div class="cat-kpi-lbl">YoY Growth</div></div>
+          <div><div class="cat-kpi-val">$1.4M</div><div class="cat-kpi-lbl">Savings Pipeline</div></div>
+        </div>
+      </div>
+      <div class="cat-stage-icon">&#128640;</div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Top Vendors by Spend</div></div>
+        <div id="em-vendors"></div>
+      </div>
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">Category Maturity &amp; Coverage</div></div>
+        <div id="em-maturity"></div>
+      </div>
+    </div>
+
+    <div class="card full" style="margin-bottom:20px;">
+      <div class="sec-hdr"><div class="sec-title">VER Actions &amp; Flags</div><div class="sec-sub">Emerging category requires proactive governance — no legacy contracts, first-mover leverage available</div></div>
+      <div id="em-actions"></div>
+    </div>
+  </div>
+
+</div><!-- /cat-main -->
+
+<script>
+/* ══════════════════════════════════════════
+   DATA
+══════════════════════════════════════════ */
+var CATEGORIES = [
+  { name:'Contingent Workforce', color:'#0D9488', spend:'$321M', share:38, vendors:614, yoy:'+11%', trend:'up', risk:'med', benchmarked:'Yes', savings:'$14.2M' },
+  { name:'Professional Services', color:'#2563EB', spend:'$195M', share:23, vendors:287, yoy:'+4%',  trend:'up', risk:'low', benchmarked:'Yes', savings:'$9.1M' },
+  { name:'Software & SaaS',       color:'#7C3AED', spend:'$169M', share:20, vendors:312, yoy:'+12%', trend:'up', risk:'med', benchmarked:'Partial', savings:'$8.8M' },
+  { name:'Cloud & Infrastructure',color:'#EA580C', spend:'$110M', share:13, vendors:89,  yoy:'+19%', trend:'up', risk:'high',benchmarked:'Partial', savings:'$4.9M' },
+  { name:'Hardware & Equipment',  color:'#D97706', spend:'$34M',  share:4,  vendors:73,  yoy:'-2%',  trend:'down',risk:'low', benchmarked:'No',      savings:'$0.4M' },
+  { name:'Emerging & AI',         color:'#059669', spend:'$18M',  share:2,  vendors:73,  yoy:'+62%', trend:'up', risk:'med', benchmarked:'No',      savings:'$1.4M' }
+];
+
+var CW_VENDORS = [
+  { name:'Cognizant',           spend:'$54.2M', pct:17 },
+  { name:'Infosys BPM',         spend:'$41.8M', pct:13 },
+  { name:'Wipro',               spend:'$38.5M', pct:12 },
+  { name:'HCLTech',             spend:'$31.2M', pct:10 },
+  { name:'Tech Mahindra',       spend:'$24.7M', pct:8  },
+  { name:'Collabera',           spend:'$18.3M', pct:6  },
+  { name:'Apex Group',          spend:'$14.9M', pct:5  }
+];
+
+var CW_BENCHMARKS = [
+  { role:'Senior Software Engineer', range:'$85–$110/hr', mid:'$97', status:'ok' },
+  { role:'Solutions Architect',      range:'$105–$135/hr',mid:'$118',status:'watch'},
+  { role:'Data Engineer (L4)',        range:'$88–$118/hr', mid:'$103',status:'ok' },
+  { role:'QA Automation Engineer',   range:'$65–$90/hr',  mid:'$75', status:'over'},
+  { role:'Scrum Master',             range:'$75–$100/hr', mid:'$87', status:'ok' },
+  { role:'BA / Product Analyst',     range:'$60–$85/hr',  mid:'$72', status:'ok' }
+];
+
+var CW_PILLARS = [
+  { name:'AMER Corporate', val:136, pct:42, color:'#0D9488' },
+  { name:'AMER Tech',      val:89,  pct:28, color:'#0F766E' },
+  { name:'APAC',           val:54,  pct:17, color:'#2DD4BF' },
+  { name:'EMEA',           val:42,  pct:13, color:'#99F6E4' }
+];
+
+var CW_ACTIONS = [
+  { icon:'&#9888;', title:'Rate Normalization — AMER Pillars', body:'QA Automation rates are 14% above benchmark across 3 MSP suppliers. Rate renegotiation in progress with Cognizant and Infosys.', badge:'In Progress', badgeColor:'#FEF3C7', badgeText:'#78350F' },
+  { icon:'&#128197;', title:'Cognizant CQBR — FY26 Q4 Complete', body:'3 open governance items identified. 2 rate renegotiations require contract amendments by July 15.', badge:'Action Required', badgeColor:'#FEE2E2', badgeText:'#7F1D1D' },
+  { icon:'&#128203;', title:'MSP Program Review — Q3 FY27', body:'Annual MSP performance review scheduled for August. Collabera and Apex flagged for quality score review.', badge:'Upcoming', badgeColor:'#EFF6FF', badgeText:'#1E40AF' }
+];
+
+var PS_VENDORS = [
+  { name:'Deloitte Consulting',  spend:'$38.4M', pct:20 },
+  { name:'Accenture Federal',    spend:'$29.7M', pct:15 },
+  { name:'McKinsey & Company',   spend:'$22.1M', pct:11 },
+  { name:'KPMG Advisory',        spend:'$18.6M', pct:10 },
+  { name:'PwC Technology',       spend:'$15.9M', pct:8  },
+  { name:'Booz Allen Hamilton',  spend:'$13.4M', pct:7  }
+];
+
+var PS_SOW = [
+  { name:'Active SOWs',       val:'2,397', note:'Total Coupa POs tracked' },
+  { name:'Expiring in 90 days',val:'184',  note:'Require renewal or closure' },
+  { name:'Over-run risk',     val:'$22.4M',note:'SOWs tracking above budget' },
+  { name:'Avg contract value', val:'$81K', note:'Per active SOW' },
+  { name:'Fixed-price SOWs',  val:'64%',   note:'Lower delivery risk profile' }
+];
+
+var PS_RISK = [
+  { icon:'&#128683;', title:'Deliverable milestone slippage — Deloitte Cloud Migration', body:'Phase 2 milestone delayed by 6 weeks. $4.2M at risk. Escalation meeting scheduled June 30.', badge:'Escalated', badgeColor:'#FEE2E2', badgeText:'#7F1D1D' },
+  { icon:'&#9888;', title:'Single-vendor dependency — McKinsey Data Strategy', body:'Program relies solely on McKinsey for 3 workstreams. Recommending backup supplier qualification.', badge:'Flag', badgeColor:'#FEF3C7', badgeText:'#78350F' },
+  { icon:'&#9989;', title:'Accenture Federal — Governance Review Complete', body:'Annual vendor scorecard complete. Overall rating: 87/100. No critical findings.', badge:'Closed', badgeColor:'#D1FAE5', badgeText:'#065F46' }
+];
+
+var PS_ACTIONS = [
+  { icon:'&#128203;', title:'SOW Consolidation — Q3 FY27', body:'38 micro-SOWs under $50K identified for consolidation into master agreements. Estimated admin savings: $180K.', badge:'Planning', badgeColor:'#EFF6FF', badgeText:'#1E40AF' },
+  { icon:'&#128197;', title:'Deloitte Contract Renewal — Aug 2026', body:'Master services agreement expires August 14. Renewal negotiation should begin by July 1 to capture benchmark leverage.', badge:'Urgent', badgeColor:'#FEE2E2', badgeText:'#7F1D1D' }
+];
+
+var SAAS_VENDORS = [
+  { name:'ServiceNow',     spend:'$28.4M', pct:17 },
+  { name:'Workday',        spend:'$22.1M', pct:13 },
+  { name:'Splunk',         spend:'$18.7M', pct:11 },
+  { name:'Snowflake',      spend:'$16.3M', pct:10 },
+  { name:'Tableau / CRM',  spend:'$14.8M', pct:9  },
+  { name:'Atlassian',      spend:'$11.2M', pct:7  },
+  { name:'Okta',           spend:'$9.7M',  pct:6  }
+];
+
+var SAAS_UTIL = [
+  { name:'GitHub Enterprise',  active:2840, licensed:3200, pct:89, color:'#7C3AED' },
+  { name:'Tableau Cloud',      active:1420, licensed:2000, pct:71, color:'#7C3AED' },
+  { name:'Atlassian Suite',    active:3180, licensed:3500, pct:91, color:'#7C3AED' },
+  { name:'Okta Workforce',     active:5200, licensed:5200, pct:100,color:'#DC2626' },
+  { name:'Splunk SIEM',        active:88,   licensed:150,  pct:59, color:'#D97706' }
+];
+
+var SAAS_RENEWALS = [
+  { icon:'&#128680;', title:'ServiceNow — Enterprise License Renewal', body:'$28.4M contract expires September 30, 2026. Benchmark shows 12% reduction achievable. Begin negotiations July 1.', badge:'Critical', badgeColor:'#FEE2E2', badgeText:'#7F1D1D' },
+  { icon:'&#9888;', title:'Snowflake — Commitment Overage Risk', body:'Current consumption trending 18% above contracted commitment. Overage charges projected at $410K unless workloads optimized.', badge:'Watch', badgeColor:'#FEF3C7', badgeText:'#78350F' },
+  { icon:'&#128197;', title:'Workday Expansion — People Analytics Module', body:'Business request for additional module. VER review required before approval. Est. $1.2M annual uplift.', badge:'Pending VER', badgeColor:'#F5F3FF', badgeText:'#5B21B6' }
+];
+
+var SAAS_ACTIONS = [
+  { icon:'&#128203;', title:'License Right-sizing — 5 Vendors', body:'Tableau, GitHub, and Splunk showing utilization below 75%. Right-sizing could save $1.4M annually.', badge:'In Progress', badgeColor:'#FEF3C7', badgeText:'#78350F' },
+  { icon:'&#128187;', title:'SaaS Inventory Audit — Q3 FY27', body:'312 SaaS vendors active. Full audit to identify shadow IT, duplicates, and unused contracts. Target: 10% reduction.', badge:'Planning', badgeColor:'#EFF6FF', badgeText:'#1E40AF' }
+];
+
+var CLOUD_VENDORS = [
+  { name:'AWS',           spend:'$38.2M', pct:35 },
+  { name:'Microsoft Azure',spend:'$28.7M',pct:26 },
+  { name:'Google Cloud',  spend:'$16.4M', pct:15 },
+  { name:'Equinix',       spend:'$12.1M', pct:11 },
+  { name:'Rackspace',     spend:'$8.3M',  pct:8  },
+  { name:'CenturyLink',   spend:'$6.3M',  pct:6  }
+];
+
+var CLOUD_COMMIT = [
+  { vendor:'AWS',            committed:'$35M', consumed:'$38.2M', pct:109, over:true },
+  { vendor:'Azure',          committed:'$26M', consumed:'$28.7M', pct:110, over:true },
+  { vendor:'Google Cloud',   committed:'$18M', consumed:'$16.4M', pct:91,  over:false },
+  { vendor:'Equinix Colocation',committed:'$12M',consumed:'$12.1M',pct:101,over:true }
+];
+
+var CLOUD_ACTIONS = [
+  { icon:'&#128683;', title:'AWS Commitment Overage — $3.2M Projected', body:'Current consumption trending 9% above committed spend. Reserved instance coverage at 61% — target 75%+ to reduce overage exposure.', badge:'Escalated', badgeColor:'#FEE2E2', badgeText:'#7F1D1D' },
+  { icon:'&#9888;', title:'Azure Cost Optimization Review', body:'Azure FinOps review identified $1.8M in idle/oversized resources. Joint workstream with DET Cloud Engineering team required.', badge:'In Progress', badgeColor:'#FEF3C7', badgeText:'#78350F' },
+  { icon:'&#128197;', title:'Multi-Cloud Strategy Alignment — Q3 FY27', body:'Current architecture splits workloads across 3 hyperscalers without documented rationale. VER recommending cloud spend governance framework.', badge:'Planning', badgeColor:'#EFF6FF', badgeText:'#1E40AF' }
+];
+
+var EM_VENDORS = [
+  { name:'OpenAI',          spend:'$5.1M', pct:28 },
+  { name:'Azure OpenAI',    spend:'$3.8M', pct:21 },
+  { name:'GitHub Copilot',  spend:'$2.4M', pct:13 },
+  { name:'Anthropic',       spend:'$1.9M', pct:11 },
+  { name:'SF Einstein AI',  spend:'$1.6M', pct:9  },
+  { name:'Google Vertex AI',spend:'$1.2M', pct:7  },
+  { name:'DataRobot',       spend:'$0.9M', pct:5  }
+];
+
+var EM_MATURITY = [
+  { dim:'Contract Coverage',   val:4,  max:10, note:'Most AI contracts are API T&C only — no enterprise terms' },
+  { dim:'Benchmark Data',      val:3,  max:10, note:'AI cost benchmarks newly established FY27 Q1' },
+  { dim:'Usage Monitoring',    val:6,  max:10, note:'Token/seat monitoring in place for top 5 vendors' },
+  { dim:'Governance Process',  val:5,  max:10, note:'AI intake process live; approval workflow in development' },
+  { dim:'Risk Assessment',     val:7,  max:10, note:'Data privacy and model risk assessments complete for major vendors' }
+];
+
+var EM_ACTIONS = [
+  { icon:'&#128680;', title:'OpenAI Enterprise Contract — Expires July 31', body:'Current enterprise agreement expires in 5 weeks. Consumption trending 28% above contracted tier. Negotiate before expiry to avoid 40% rate increase.', badge:'Critical', badgeColor:'#FEE2E2', badgeText:'#7F1D1D' },
+  { icon:'&#9888;', title:'AI Governance Framework — Draft in Review', body:'VER AI intake process launched. 12 new AI tool requests pending review. Framework needs sign-off from Legal and Privacy by July 15.', badge:'In Progress', badgeColor:'#FEF3C7', badgeText:'#78350F' },
+  { icon:'&#128203;', title:'GitHub Copilot — License Waste Identified', body:'847 licensed seats, 312 active in past 30 days (37% utilization). Reclaim 500 seats for $890K annual savings.', badge:'Action Required', badgeColor:'#FEF3C7', badgeText:'#78350F' },
+  { icon:'&#128640;', title:'Emerging Category Benchmarking — Q3 Priority', body:'No market benchmarks exist for 68% of AI vendors. VER building first-party benchmark dataset from Gartner, Forrester, and Coupa peer data.', badge:'Planning', badgeColor:'#EFF6FF', badgeText:'#1E40AF' }
+];
+
+var OVERVIEW_INSIGHTS = [
+  { type:'Concentration Risk', typeColor:'#DC2626', borderColor:'#DC2626',
+    title:'Top 5 vendors = 41% of total DET spend',
+    body:'Cognizant, Deloitte, AWS, Infosys, and ServiceNow represent $347M of $847M total spend. Single-vendor events carry portfolio-level risk.',
+    action:'View Dependency Map', actionBg:'#FEE2E2', actionColor:'#7F1D1D' },
+  { type:'Budget Variance', typeColor:'#D97706', borderColor:'#D97706',
+    title:'2 of 6 categories tracking above plan',
+    body:'Contingent Workforce (+8%) and Cloud & Infrastructure (+19%) are the primary variance drivers. Combined overage projected at $31M for FY27.',
+    action:'Review FinOps Dashboard', actionBg:'#FEF3C7', actionColor:'#78350F' },
+  { type:'Benchmark Gaps', typeColor:'#7C3AED', borderColor:'#7C3AED',
+    title:'Hardware & Emerging categories lack benchmark data',
+    body:'2 of 6 categories have no benchmark coverage. VER cannot assess market positioning or negotiation leverage without this data.',
+    action:'Prioritize Coverage Build', actionBg:'#F5F3FF', actionColor:'#5B21B6' },
+  { type:'Savings Opportunity', typeColor:'#059669', borderColor:'#059669',
+    title:'$38.4M savings pipeline across all categories',
+    body:'CW ($14.2M), ProServe ($9.1M), and SaaS ($8.8M) lead the savings pipeline. Cloud optimization adds $4.9M if committed resource coverage improves.',
+    action:'View Savings Tracker', actionBg:'#D1FAE5', actionColor:'#065F46' },
+  { type:'Renewal Risk', typeColor:'#2563EB', borderColor:'#2563EB',
+    title:'$74M in contracts renewing in next 90 days',
+    body:'ServiceNow ($28.4M), Deloitte ($38.4M MSA), and OpenAI ($5.1M) are the highest-stakes upcoming renewals. All require VER-led benchmark preparation.',
+    action:'Open Renewal Horizon', actionBg:'#EFF6FF', actionColor:'#1E40AF' },
+  { type:'Governance', typeColor:'#0D9488', borderColor:'#0D9488',
+    title:'CQBR cadence expanded to 6 vendors in FY27',
+    body:'Quarterly business reviews now active for Cognizant, Infosys, Wipro, Deloitte, AWS, and ServiceNow. Next round: FY27 Q3, starting August.',
+    action:'View CQBR Library', actionBg:'#F0FDF9', actionColor:'#0F766E' }
+];
+
+/* ══════════════════════════════════════════
+   RENDER FUNCTIONS
+══════════════════════════════════════════ */
+
+function renderScorecard() {
+  var tbody = document.getElementById('cat-scorecard');
+  tbody.innerHTML = CATEGORIES.map(function(c){
+    var riskClass = c.risk === 'high' ? 'high' : c.risk === 'med' ? 'med' : 'low';
+    var trendClass = c.trend === 'up' ? 'up' : 'down';
+    var trendArrow = c.trend === 'up' ? '&#9650;' : '&#9660;';
+    var benchColor = c.benchmarked === 'Yes' ? 'color:#059669;font-weight:700;'
+                   : c.benchmarked === 'Partial' ? 'color:#D97706;font-weight:700;'
+                   : 'color:#DC2626;font-weight:700;';
+    return '<tr>'
+      + '<td><div class="cat-name-cell"><span class="cat-dot" style="background:'+c.color+'"></span><span class="cat-name">'+c.name+'</span></div></td>'
+      + '<td style="font-weight:700;">'+c.spend+'</td>'
+      + '<td><span class="cat-bar-wrap"><span class="cat-bar" style="width:'+c.share+'%;background:'+c.color+'"></span></span> <span style="font-size:8pt;color:var(--ink4);">'+c.share+'%</span></td>'
+      + '<td>'+c.vendors+'</td>'
+      + '<td><span class="trend '+trendClass+'">'+trendArrow+' '+c.yoy+'</span></td>'
+      + '<td><span class="risk '+riskClass+'">'+c.risk.charAt(0).toUpperCase()+c.risk.slice(1)+'</span></td>'
+      + '<td style="'+benchColor+'">'+c.benchmarked+'</td>'
+      + '<td style="font-weight:700;color:var(--green2);">'+c.savings+'</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function renderYoY() {
+  var items = [
+    { label:'CW',    fy26:289, fy27:321, color:'#0D9488' },
+    { label:'ProSvc', fy26:187, fy27:195, color:'#2563EB' },
+    { label:'SaaS',  fy26:151, fy27:169, color:'#7C3AED' },
+    { label:'Cloud', fy26:92,  fy27:110, color:'#EA580C' },
+    { label:'HW',    fy26:35,  fy27:34,  color:'#D97706' },
+    { label:'AI',    fy26:11,  fy27:18,  color:'#059669' }
+  ];
+  var maxVal = 340;
+  var el = document.getElementById('yoy-chart');
+  el.innerHTML = items.map(function(it){
+    var w26 = Math.round((it.fy26/maxVal)*100);
+    var w27 = Math.round((it.fy27/maxVal)*100);
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
+      + '<div style="width:44px;font-size:8pt;font-weight:600;color:var(--ink3);text-align:right;flex-shrink:0;">'+it.label+'</div>'
+      + '<div style="flex:1;">'
+      + '<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">'
+      + '<div style="height:8px;width:'+w26+'%;background:'+it.color+'50;border-radius:2px;min-width:4px;"></div>'
+      + '<span style="font-size:7.5pt;color:var(--ink4);">FY26 $'+it.fy26+'M</span>'
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:4px;">'
+      + '<div style="height:8px;width:'+w27+'%;background:'+it.color+';border-radius:2px;min-width:4px;"></div>'
+      + '<span style="font-size:7.5pt;color:var(--ink2);font-weight:700;">FY27 $'+it.fy27+'M</span>'
+      + '</div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function renderOverviewInsights() {
+  var el = document.getElementById('overview-insights');
+  el.innerHTML = OVERVIEW_INSIGHTS.map(function(ic){
+    return '<div class="insight-card" style="border-left-color:'+ic.borderColor+'">'
+      + '<div class="ic-type" style="color:'+ic.typeColor+'">'+ic.type+'</div>'
+      + '<div class="ic-title">'+ic.title+'</div>'
+      + '<div class="ic-body">'+ic.body+'</div>'
+      + '<button class="ic-action" style="background:'+ic.actionBg+';color:'+ic.actionColor+'">'+ic.action+' &#8594;</button>'
+      + '</div>';
+  }).join('');
+}
+
+function renderVendorList(containerId, vendors, color) {
+  var el = document.getElementById(containerId);
+  var max = vendors[0] ? vendors[0].pct : 100;
+  el.innerHTML = vendors.map(function(v, i){
+    return '<div class="vendor-row">'
+      + '<span class="vendor-rank">'+(i+1)+'</span>'
+      + '<span class="vendor-name">'+v.name+'</span>'
+      + '<div class="vendor-bar-wrap"><div class="vendor-bar" style="width:'+(v.pct/max*100)+'%;background:'+color+'"></div></div>'
+      + '<span class="vendor-pct">'+v.pct+'%</span>'
+      + '<span class="vendor-spend">'+v.spend+'</span>'
+      + '</div>';
+  }).join('');
+}
+
+function renderBenchmarks() {
+  var el = document.getElementById('cw-benchmarks');
+  el.innerHTML = CW_BENCHMARKS.map(function(b){
+    return '<div class="bench-row">'
+      + '<span class="bench-role">'+b.role+'</span>'
+      + '<div class="bench-rates">'
+      + '<span class="bench-range">'+b.range+'</span>'
+      + '<span class="bench-mid">'+b.mid+'/hr</span>'
+      + '<span class="bench-status '+b.status+'">'+(b.status==='ok'?'At Market':b.status==='over'?'Above Market':'Watch')+'</span>'
+      + '</div></div>';
+  }).join('');
+}
+
+function renderPillars() {
+  var el = document.getElementById('cw-pillars');
+  el.innerHTML = CW_PILLARS.map(function(p){
+    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
+      + '<div style="width:110px;font-size:8.5pt;font-weight:600;color:var(--ink2);flex-shrink:0;">'+p.name+'</div>'
+      + '<div style="flex:1;height:8px;background:var(--gray3);border-radius:99px;overflow:hidden;">'
+      + '<div style="height:8px;width:'+p.pct+'%;background:'+p.color+';border-radius:99px;"></div>'
+      + '</div>'
+      + '<div style="width:36px;font-size:8.5pt;font-weight:700;color:var(--ink2);text-align:right;">'+p.pct+'%</div>'
+      + '<div style="width:42px;font-size:8.5pt;color:var(--ink4);">$'+p.val+'M</div>'
+      + '</div>';
+  }).join('');
+}
+
+function renderActions(containerId, actions) {
+  var el = document.getElementById(containerId);
+  el.innerHTML = actions.map(function(a){
+    return '<div class="action-row">'
+      + '<span class="action-icon">'+a.icon+'</span>'
+      + '<div class="action-body">'
+      + '<div class="action-title">'+a.title+'</div>'
+      + '<div class="action-sub">'+a.body+'</div>'
+      + '</div>'
+      + '<span class="action-badge" style="background:'+a.badgeColor+';color:'+a.badgeText+'">'+a.badge+'</span>'
+      + '</div>';
+  }).join('');
+}
+
+function renderSOW() {
+  var el = document.getElementById('ps-sow');
+  el.innerHTML = PS_SOW.map(function(s){
+    return '<div style="display:flex;align-items:baseline;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray3);">'
+      + '<div><div style="font-size:8.5pt;font-weight:600;color:var(--ink3);">'+s.name+'</div>'
+      + '<div style="font-size:8pt;color:var(--ink4);margin-top:2px;">'+s.note+'</div></div>'
+      + '<div style="font-size:11pt;font-weight:900;color:var(--navy);">'+s.val+'</div>'
+      + '</div>';
+  }).join('').replace(/border-bottom:1px solid var\(--gray3\);"><\/div>$/, 'border-bottom:none;"></div>');
+}
+
+function renderSaaSUtil() {
+  var el = document.getElementById('saas-util');
+  el.innerHTML = SAAS_UTIL.map(function(u){
+    var over = u.pct > 95;
+    var under = u.pct < 70;
+    var barColor = over ? '#DC2626' : under ? '#D97706' : '#7C3AED';
+    return '<div style="margin-bottom:12px;">'
+      + '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
+      + '<span style="font-size:8.5pt;font-weight:600;color:var(--ink2);">'+u.name+'</span>'
+      + '<span style="font-size:8.5pt;font-weight:700;color:'+(over?'#DC2626':under?'#D97706':'#059669')+'">'+u.pct+'%</span>'
+      + '</div>'
+      + '<div style="height:6px;background:var(--gray3);border-radius:99px;overflow:hidden;">'
+      + '<div style="height:6px;width:'+u.pct+'%;background:'+barColor+';border-radius:99px;max-width:100%;"></div>'
+      + '</div>'
+      + '<div style="font-size:8pt;color:var(--ink4);margin-top:3px;">'+u.active.toLocaleString()+' active / '+u.licensed.toLocaleString()+' licensed</div>'
+      + '</div>';
+  }).join('');
+}
+
+function renderCloudCommit() {
+  var el = document.getElementById('cloud-commit');
+  el.innerHTML = CLOUD_COMMIT.map(function(c){
+    var barColor = c.over ? '#DC2626' : '#059669';
+    var pctCapped = Math.min(c.pct, 100);
+    return '<div style="margin-bottom:14px;">'
+      + '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
+      + '<span style="font-size:8.5pt;font-weight:600;color:var(--ink2);">'+c.vendor+'</span>'
+      + '<span style="font-size:8.5pt;font-weight:700;color:'+(c.over?'#DC2626':'#059669')+'">'+c.pct+'% of commit</span>'
+      + '</div>'
+      + '<div style="height:7px;background:var(--gray3);border-radius:99px;overflow:hidden;position:relative;">'
+      + '<div style="height:7px;width:'+pctCapped+'%;background:'+barColor+';border-radius:99px;"></div>'
+      + '</div>'
+      + '<div style="display:flex;justify-content:space-between;font-size:8pt;color:var(--ink4);margin-top:3px;">'
+      + '<span>Commit: '+c.committed+'</span><span>Consumed: '+c.consumed+'</span>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function renderMaturity() {
+  var el = document.getElementById('em-maturity');
+  el.innerHTML = EM_MATURITY.map(function(m){
+    var pct = (m.val / m.max) * 100;
+    var barColor = pct < 40 ? '#DC2626' : pct < 60 ? '#D97706' : '#059669';
+    return '<div style="margin-bottom:12px;">'
+      + '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
+      + '<span style="font-size:8.5pt;font-weight:600;color:var(--ink2);">'+m.dim+'</span>'
+      + '<span style="font-size:8.5pt;font-weight:700;color:'+barColor+'">'+m.val+'/'+m.max+'</span>'
+      + '</div>'
+      + '<div style="height:6px;background:var(--gray3);border-radius:99px;overflow:hidden;">'
+      + '<div style="height:6px;width:'+pct+'%;background:'+barColor+';border-radius:99px;"></div>'
+      + '</div>'
+      + '<div style="font-size:8pt;color:var(--ink4);margin-top:3px;">'+m.note+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   TAB SWITCHER
+══════════════════════════════════════════ */
+function switchTab(key, btn) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('view-'+key).classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+renderScorecard();
+renderYoY();
+renderOverviewInsights();
+renderVendorList('cw-vendors', CW_VENDORS, '#0D9488');
+renderBenchmarks();
+renderPillars();
+renderActions('cw-actions', CW_ACTIONS);
+renderVendorList('ps-vendors', PS_VENDORS, '#2563EB');
+renderSOW();
+renderActions('ps-risk', PS_RISK);
+renderActions('ps-actions', PS_ACTIONS);
+renderVendorList('saas-vendors', SAAS_VENDORS, '#7C3AED');
+renderSaaSUtil();
+renderActions('saas-renewals', SAAS_RENEWALS);
+renderActions('saas-actions', SAAS_ACTIONS);
+renderVendorList('cloud-vendors', CLOUD_VENDORS, '#EA580C');
+renderCloudCommit();
+renderActions('cloud-actions', CLOUD_ACTIONS);
+renderVendorList('em-vendors', EM_VENDORS, '#059669');
+renderMaturity();
+renderActions('em-actions', EM_ACTIONS);
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openCategoryHelp(){
+  HelpModal.open({
+    title: 'Category Intelligence',
+    what: 'Category Intelligence gives you a <strong>portfolio-wide view of vendor spend broken down by category</strong> — SaaS, Contingent Workforce, Infrastructure, Cloud, Professional Services, and Emerging Tech. It is the starting point for category strategy, sourcing decisions, and budget allocation conversations.',
+    steps: [
+      '<strong>Select a category</strong> from the grid to drill into its vendor composition, spend trend, benchmark comparison, and savings opportunity.',
+      '<strong>Review category health scores</strong> — each category is rated on spend governance, benchmark alignment, supplier diversity, and renewal risk.',
+      '<strong>Compare categories</strong> using the side-by-side view to identify where DET is over-concentrated or under-governed relative to portfolio benchmarks.',
+      '<strong>Check the emerging categories panel</strong> — AI tooling, agentic platforms, and edge compute are tracked separately given their rapid growth trajectory.',
+      '<strong>Export category profiles</strong> for sourcing strategy documents, budget submissions, or leadership briefings.'
+    ],
+    tips: [
+      { icon: '&#x1F4CA;', title: 'Concentration risk by category', body: 'If one vendor represents more than 40% of a category\'s spend, that\'s flagged as concentration risk — regardless of the rate.' },
+      { icon: '&#x1F4B0;', title: 'CW is the largest category', body: 'Contingent Workforce typically represents 35-45% of total DET vendor spend. It has the most savings opportunity and the most governance complexity.' },
+      { icon: '&#x1F4C5;', title: 'Emerging categories need governance now', body: 'AI/ML and agentic tooling are growing fastest with the least governance infrastructure. The time to govern is before scale, not after.' },
+      { icon: '&#x1F517;', title: 'Feeds sourcing strategy', body: 'Category profiles link directly to Rate Benchmarks, SOW Builder, and Scenario Planning for full sourcing cycle support.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

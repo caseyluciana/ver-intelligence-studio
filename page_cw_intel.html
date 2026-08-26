@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Contingent Workforce Intelligence · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+  --font-sans:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --text-xs:11px;--text-sm:12px;--text-base:14px;--text-md:15px;
+}
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+  --purple3:rgba(124,58,237,0.15);--blue3:rgba(37,99,235,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .card,[data-theme="dark"] .stat{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .card-title{color:var(--ink);}
+[data-theme="dark"] input,[data-theme="dark"] select{background:var(--gray2)!important;color:var(--ink2)!important;border-color:var(--border2)!important;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-sans);background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── HUB TOP BAR ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.45);line-height:1.4;}
+.btn-bar{padding:6px 14px;border-radius:6px;background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);
+  font-size:8pt;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.btn-bar:hover{background:rgba(255,255,255,0.15);color:#fff;}
+.btn-bar.teal{background:rgba(13,148,136,0.25);border-color:rgba(13,148,136,0.45);color:#2DD4BF;}
+.btn-bar.teal:hover{background:var(--teal);color:#fff;border-color:var(--teal);}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);
+  color:rgba(255,255,255,0.6);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:rgba(255,255,255,0.15);color:#fff;}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── STAGE ── */
+.stage{background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 60%,#061020 100%);
+  position:relative;overflow:hidden;padding:40px 0 32px;}
+.stage::before{content:'';position:absolute;top:-60px;right:-60px;width:480px;height:480px;
+  background:radial-gradient(circle,rgba(13,148,136,0.08) 0%,transparent 70%);pointer-events:none;}
+.stage-inner{max-width:1100px;margin:0 auto;padding:0 48px;position:relative;z-index:1;}
+.stage-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}
+.stage-title{font-size:22pt;font-weight:900;color:rgba(255,255,255,0.95);line-height:1.15;margin-bottom:6px;}
+.stage-sub{font-size:9pt;color:rgba(255,255,255,0.5);margin-bottom:24px;}
+.stage-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.skpi{background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.09);
+  border-radius:10px;padding:14px 16px;}
+.skpi-lbl{font-size:7pt;font-weight:700;color:rgba(255,255,255,0.4);
+  text-transform:uppercase;letter-spacing:0.09em;margin-bottom:6px;}
+.skpi-val{font-size:18pt;font-weight:900;color:rgba(255,255,255,0.92);line-height:1;}
+.skpi-val.teal{color:#2DD4BF;}
+.skpi-val.amber{color:#FCD34D;}
+.skpi-val.green{color:#34D399;}
+.skpi-val.purple{color:#A78BFA;}
+.skpi-note{font-size:7pt;color:rgba(255,255,255,0.3);margin-top:3px;}
+
+/* ── BODY ── */
+.wrap{max-width:1100px;margin:0 auto;padding:24px 48px 48px;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  padding:12px 16px;background:var(--white);border:1px solid var(--border);
+  border-radius:10px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.toolbar input,.toolbar select{padding:6px 11px;border:1px solid var(--border2);
+  border-radius:6px;font-size:8.5pt;font-family:inherit;color:var(--ink2);
+  background:var(--white);outline:none;transition:border-color 0.15s;}
+.toolbar input{min-width:220px;}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--teal);}
+.tab-bar{display:flex;gap:4px;background:var(--gray2);border-radius:7px;padding:3px;margin-left:auto;}
+.vtab{padding:5px 12px;border:none;background:transparent;border-radius:5px;
+  font-size:8pt;font-weight:600;color:var(--ink4);cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.vtab.active{background:var(--white);color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+[data-theme="dark"] .tab-bar{background:var(--gray3);}
+[data-theme="dark"] .vtab.active{background:var(--gray2);color:var(--ink);}
+.result-count{font-size:8pt;color:var(--ink4);white-space:nowrap;}
+.view-hidden{display:none;}
+
+/* ── PILLAR SECTION ── */
+.pillar-section{margin-bottom:28px;}
+.pillar-header{display:flex;align-items:center;gap:10px;padding:10px 0 8px;
+  border-bottom:2px solid var(--border);margin-bottom:12px;}
+.pillar-accent{width:4px;height:18px;border-radius:2px;flex-shrink:0;}
+.pillar-name{font-size:10.5pt;font-weight:900;color:var(--navy);flex:1;}
+[data-theme="dark"] .pillar-name{color:var(--ink);}
+.pillar-stats{display:flex;gap:16px;font-size:8pt;color:var(--ink4);}
+.pillar-stats strong{color:var(--ink2);font-weight:700;}
+
+/* ── LEADER CARDS ── */
+.leader-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.ldr-card{background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:14px 15px;cursor:pointer;transition:all 0.15s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.ldr-card:hover{border-color:var(--teal);box-shadow:0 3px 10px rgba(13,148,136,0.12);transform:translateY(-1px);}
+.ldr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.ldr-name{font-size:9pt;font-weight:800;color:var(--ink2);line-height:1.3;flex:1;}
+.ldr-badge{display:inline-flex;align-items:center;justify-content:center;
+  min-width:26px;height:20px;padding:0 6px;background:var(--navy3);
+  color:var(--navy);border-radius:10px;font-size:8pt;font-weight:800;flex-shrink:0;}
+.ldr-cc{font-size:7.5pt;color:var(--ink4);margin-bottom:7px;line-height:1.3;}
+.ldr-chips{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;}
+.chip{display:inline-block;padding:2px 7px;border-radius:9px;font-size:7.5pt;
+  font-weight:600;white-space:nowrap;}
+.chip.teal{background:var(--teal3);color:var(--teal2);}
+.chip.navy{background:var(--navy3);color:var(--navy);}
+.chip.amber{background:var(--amber3);color:var(--amber2);}
+.chip.green{background:var(--green3);color:var(--green2);}
+.chip.purple{background:var(--purple3);color:var(--purple);}
+.ldr-footer{display:flex;gap:12px;padding-top:7px;border-top:1px solid var(--border);}
+.ldr-stat{display:flex;flex-direction:column;gap:1px;}
+.ldr-stat-val{font-size:9pt;font-weight:700;color:var(--ink2);}
+.ldr-stat-lbl{font-size:7pt;color:var(--ink4);text-transform:uppercase;letter-spacing:0.04em;}
+
+/* ── SUPPLIER CARDS ── */
+.sup-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.sup-card{background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:14px 15px;cursor:pointer;transition:all 0.15s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.sup-card:hover{border-color:var(--teal);box-shadow:0 3px 10px rgba(13,148,136,0.12);transform:translateY(-1px);}
+.sup-name{font-size:9pt;font-weight:800;color:var(--ink2);line-height:1.3;margin-bottom:2px;}
+.sup-full{font-size:7pt;color:var(--ink4);margin-bottom:8px;line-height:1.3;}
+.sup-bar-wrap{background:var(--gray2);border-radius:4px;height:5px;margin-bottom:8px;overflow:hidden;}
+.sup-bar{height:5px;border-radius:4px;background:var(--teal);transition:width 0.6s;}
+.sup-footer{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* ── ROSTER TABLE ── */
+.vt{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.vt th{background:var(--navy);color:#fff;padding:8px 12px;text-align:left;
+  font-size:7.5pt;font-weight:700;letter-spacing:0.03em;white-space:nowrap;}
+.vt td{padding:8px 12px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.vt tr:last-child td{border-bottom:none;}
+.vt tr:hover td{background:var(--gray);}
+.type-pill{display:inline-block;padding:2px 7px;border-radius:9px;font-size:7pt;font-weight:700;white-space:nowrap;}
+.tp-jp{background:var(--teal3);color:var(--teal2);}
+.tp-pw{background:var(--gray2);color:var(--ink4);}
+.tp-sow{background:var(--amber3);color:var(--amber2);}
+.rate-val{font-weight:700;color:var(--green2);}
+.table-wrap{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+
+/* ── PAGINATION ── */
+.pagination{display:flex;align-items:center;gap:4px;padding:12px 0;justify-content:center;}
+.pg-btn{padding:5px 10px;border:1px solid var(--border2);border-radius:5px;
+  background:var(--white);color:var(--ink3);font-size:8pt;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all 0.12s;}
+.pg-btn:hover:not(:disabled):not(.active){border-color:var(--teal);color:var(--teal);}
+.pg-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.pg-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.pg-info{font-size:8pt;color:var(--ink4);padding:0 6px;}
+
+/* ── SHOW MORE ── */
+.show-more{text-align:center;padding:12px 0 4px;}
+.show-more-btn{padding:7px 20px;background:var(--gray2);color:var(--ink3);
+  border:1px solid var(--border2);border-radius:6px;font-size:8pt;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.show-more-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── SECTION DIVIDER ── */
+.shdr{font-size:10pt;font-weight:800;color:var(--navy);margin:20px 0 10px;
+  display:flex;align-items:center;gap:8px;padding-bottom:8px;
+  border-bottom:2px solid var(--gray3);}
+[data-theme="dark"] .shdr{color:var(--ink);border-bottom-color:var(--gray3);}
+
+/* ── STAT CARDS ── */
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:13px 15px;border-top:3px solid var(--navy);}
+.stat.teal{border-top-color:var(--teal);}
+.stat.green{border-top-color:var(--green);}
+.stat.amber{border-top-color:var(--amber);}
+.stat.purple{border-top-color:var(--purple);}
+.stat-val{font-size:18pt;font-weight:900;color:var(--navy);line-height:1;margin-bottom:2px;}
+.stat.teal .stat-val{color:var(--teal);}
+.stat.green .stat-val{color:var(--green);}
+.stat.amber .stat-val{color:var(--amber);}
+.stat.purple .stat-val{color:var(--purple);}
+.stat-lbl{font-size:7.5pt;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.06em;}
+.stat-note{font-size:7pt;color:var(--ink4);margin-top:3px;}
+[data-theme="dark"] .stat{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .stat-val{color:var(--ink);}
+[data-theme="dark"] .stat.teal .stat-val{color:#2DD4BF;}
+[data-theme="dark"] .stat.green .stat-val{color:#34D399;}
+[data-theme="dark"] .stat.amber .stat-val{color:#FCD34D;}
+[data-theme="dark"] .stat.purple .stat-val{color:#A78BFA;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 24px;color:var(--ink4);}
+.empty-icon{font-size:32px;margin-bottom:10px;}
+.empty-title{font-size:10pt;font-weight:700;margin-bottom:4px;}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;
+  display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;
+  opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border-radius:12px;width:100%;max-width:860px;
+  max-height:85vh;overflow:hidden;display:flex;flex-direction:column;
+  transform:translateY(16px) scale(0.97);transition:transform 0.2s;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+[data-theme="dark"] .modal{background:var(--gray2);}
+.modal-bg.open .modal{transform:translateY(0) scale(1);}
+.modal-stripe{height:5px;border-radius:12px 12px 0 0;flex-shrink:0;}
+.modal-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:12px;}
+.modal-head-info{flex:1;}
+.modal-title{font-size:13pt;font-weight:900;color:var(--ink2);}
+[data-theme="dark"] .modal-title{color:var(--ink);}
+.modal-sub{font-size:8.5pt;color:var(--ink4);margin-top:3px;}
+.modal-close{width:30px;height:30px;border:none;background:var(--gray2);border-radius:50%;
+  cursor:pointer;font-size:16px;color:var(--ink4);display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;transition:all 0.15s;}
+.modal-close:hover{background:var(--red3);color:var(--red);}
+.modal-body{padding:18px 22px;overflow-y:auto;flex:1;}
+.modal-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.mkpi{background:var(--gray2);border-radius:7px;padding:11px 13px;}
+[data-theme="dark"] .mkpi{background:var(--gray3);}
+.mkpi-val{font-size:14pt;font-weight:900;color:var(--navy);}
+[data-theme="dark"] .mkpi-val{color:var(--ink);}
+.mkpi-lbl{font-size:7pt;color:var(--ink4);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
+.modal-sec{font-size:8pt;font-weight:800;color:var(--ink3);text-transform:uppercase;
+  letter-spacing:0.07em;margin:14px 0 8px;display:flex;align-items:center;gap:6px;}
+.modal-note{background:var(--teal3);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;
+  padding:9px 13px;font-size:8pt;color:var(--ink3);line-height:1.6;margin-top:12px;}
+[data-theme="dark"] .modal-note{background:rgba(13,148,136,0.1);color:var(--ink3);}
+.modal-actions{display:flex;gap:8px;padding:12px 22px;border-top:1px solid var(--border);flex-shrink:0;}
+.modal-btn{padding:7px 16px;border-radius:6px;font-size:8.5pt;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:all 0.15s;border:1px solid;}
+.modal-btn.primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+.modal-btn.primary:hover{background:var(--navy2);}
+.modal-btn.ghost{background:transparent;color:var(--ink3);border-color:var(--border2);}
+.modal-btn.ghost:hover{background:var(--gray2);}
+
+/* ── PRINT ── */
+@media print{
+  .hub-top-bar,.toolbar,.modal-actions,.htb-right,.show-more,.pagination{display:none!important;}
+  .modal-bg{position:static!important;opacity:1!important;pointer-events:all!important;
+    padding:0!important;background:none!important;display:block!important;}
+  .modal{max-height:none!important;transform:none!important;box-shadow:none!important;
+    border-radius:0!important;max-width:100%!important;}
+  .modal-body{overflow:visible!important;}
+  body.printing .wf-body,.stage{display:none!important;}
+  @page{margin:18mm 14mm;}
+}
+</style>
+</head>
+<body>
+<div id="modal-root"></div>
+
+<!-- ── HUB TOP BAR ── -->
+<div class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; VER Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">Contingent Workforce Intelligence</span>
+  </div>
+  <div class="htb-right">
+    <div class="htb-meta" id="as-of-meta">As of Jun 18, 2026</div>
+    <button type="button" class="btn-bar" onclick="openCwHelp()">&#63; How to Use</button>
+    <button type="button" class="btn-bar teal" onclick="exportCSV()">&#8681; Export CSV</button>
+    <button type="button" class="dm-toggle" id="theme-toggle-btn" onclick="toggleTheme()">&#9789; Dark</button>
+  </div>
+</div>
+
+<!-- ── STAGE ── -->
+<div class="stage">
+  <div class="stage-inner">
+    <div class="stage-eyebrow">DET &middot; FY27 &middot; VER Intelligence Hub</div>
+    <div class="stage-title">Contingent Workforce Intelligence</div>
+    <div class="stage-sub" id="stage-sub">Loading...</div>
+    <div class="stage-kpis" id="stage-kpis">
+      <div class="skpi"><div class="skpi-lbl">Active Workers</div><div class="skpi-val">—</div></div>
+      <div class="skpi"><div class="skpi-lbl">Unique Suppliers</div><div class="skpi-val teal">—</div></div>
+      <div class="skpi"><div class="skpi-lbl">Committed Spend</div><div class="skpi-val amber">—</div></div>
+      <div class="skpi"><div class="skpi-lbl">Spend to Date</div><div class="skpi-val green">—</div></div>
+      <div class="skpi"><div class="skpi-lbl">Active Leaders</div><div class="skpi-val purple">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BODY ── -->
+<div class="wrap">
+  <!-- toolbar -->
+  <div class="toolbar">
+    <input type="text" id="search-input" placeholder="&#128269; Search worker, supervisor, title..." oninput="applyFilters()">
+    <select id="pillar-filter" title="Pillar filter" onchange="applyFilters()">
+      <option value="all">All Pillars</option>
+    </select>
+    <select id="supplier-filter" title="Supplier filter" onchange="applyFilters()">
+      <option value="all">All Suppliers</option>
+    </select>
+    <select id="type-filter" title="Worker type filter" onchange="applyFilters()">
+      <option value="all">All Types</option>
+      <option value="Profile Worker">Profile Worker</option>
+      <option value="Job Posting">Job Posting</option>
+      <option value="Statement of Work">SOW</option>
+    </select>
+    <select id="region-filter" title="Region filter" onchange="applyFilters()">
+      <option value="all">All Regions</option>
+      <option value="US">United States</option>
+      <option value="AMER">AMER (excl. US)</option>
+      <option value="India">India (Offshore)</option>
+      <option value="EMEA">EMEA</option>
+      <option value="LATAM">LATAM</option>
+      <option value="APAC">APAC</option>
+      <option value="JAPAC">JAPAC</option>
+    </select>
+    <span class="result-count" id="result-count"></span>
+    <div class="tab-bar">
+      <button type="button" class="vtab active" id="tab-pillar" onclick="setView('pillar')">By Pillar</button>
+      <button type="button" class="vtab" id="tab-supplier" onclick="setView('supplier')">By Supplier</button>
+      <button type="button" class="vtab" id="tab-roster" onclick="setView('roster')">Full Roster</button>
+    </div>
+  </div>
+
+  <!-- views -->
+  <div id="view-pillar"></div>
+  <div id="view-supplier" class="view-hidden"></div>
+  <div id="view-roster" class="view-hidden"></div>
+</div>
+
+<script src="assets/workforce_data.js"></script>
+<script>
+/* ── CONSTANTS ── */
+var PILLAR_MAP = {
+  'Finance':               ['7431 CIO Finance BPG'],
+  'Security':              ['7984 G&A - Security'],
+  'Revenue Operations':    ['7427 CIO Revenue Operations BPG'],
+  'Techforce & Infra':     ['7982 CIO Allocation - Techforce','7403 CIO Allocation - Infrastructure','7409 CIO Allocation - Hardware Asset Management','7402 CIO Allocation - Global Office Technology','7425 CIO Allocation - Collaboration','7408 CIO Allocation - Site Reliability'],
+  'Engineering & Delivery':['7439 CIO Engineering Development and Delivery','7404 CIO Data & Integration Services'],
+  'Partner & Sales BPG':   ['7434 CIO Partner BPG','7424 CIO CSG BPG','7426 CIO Sales BPG','7420 CIO Professional Services BPG','7423 CIO GTM NextGen','7997 CIO GTM Shared Services'],
+  'Employee Success':      ['7428 CIO Employee Success BPG'],
+  'M&A':                   ['7009 CIO M&A BPG'],
+  'Strategy & Enablement': ['7421 CIO Strategy & Enablement Portfolio','7422 Business Strategy','7985 CIO Operational Excellence','7996 CIO Software Asset Management','7405 CIO Emerging Technology','7443 CIO TS: GOTS and ESO Portfolio','7430 CIO TS: P&IS Portfolio','7406 DET Admin','7418 CIO Customer Zero','7400 CIO Office of CDO','7401 DET Allocation - Mobility Asset Management','7432 CIO Legal BPG']
+};
+var PILLAR_COLORS = {
+  'Finance':'#0D9488','Security':'#DC2626','Revenue Operations':'#2563EB',
+  'Techforce & Infra':'#7C3AED','Engineering & Delivery':'#059669',
+  'Partner & Sales BPG':'#D97706','Employee Success':'#EA580C',
+  'M&A':'#0F1E3C','Strategy & Enablement':'#6B7280'
+};
+var CC_TO_PILLAR = {};
+Object.keys(PILLAR_MAP).forEach(function(p){PILLAR_MAP[p].forEach(function(cc){CC_TO_PILLAR[cc]=p;});});
+
+var filteredData = [];
+var currentView = 'pillar';
+var rosterPage = 1;
+var ROSTER_PER_PAGE = 50;
+var leaderShownByPillar = {};
+
+/* ── HELPERS ── */
+function getPillar(w){ return CC_TO_PILLAR[w.cost_center]||'Other'; }
+function getRegion(w){
+  var loc=(w.location||'').toLowerCase(), country=(w.country||'').toLowerCase();
+
+  // ── US — catch "USA-XX-Remote" and country field first (before India to avoid "indiana"/"indianapolis" false match) ──
+  if(country==='united states of america'||country==='united states'||country==='usa') return 'US';
+  if(/^usa[-/]/.test(loc)||loc.startsWith('usa ')) return 'US';
+
+  // ── India — use word boundary so "indianapolis"/"indiana" don't match ─
+  if(country==='india'||/(^|[^a-z])india([^a-z]|$)/.test(loc)||
+     loc.includes('hyderabad')||loc.includes('bangalore')||loc.includes('bengaluru')||
+     loc.includes('chennai')||loc.includes('pune')||loc.includes('mumbai')||
+     loc.includes('divyasree')||loc.includes('ub city')||loc.includes('plot no')||
+     loc.includes('horizon center')||loc.includes('ecospace')) return 'India';
+
+  // ── US — explicit state names in location ──────────────────────────
+  var usStates=['alabama','alaska','arizona','arkansas','california','colorado','connecticut',
+    'delaware','district of columbia','florida','georgia','hawaii','idaho','illinois',
+    'indiana','iowa','kansas','kentucky','louisiana','maine','maryland','massachusetts',
+    'michigan','minnesota','mississippi','missouri','montana','nebraska','nevada',
+    'new hampshire','new jersey','new mexico','new york','north carolina','north dakota',
+    'ohio','oklahoma','oregon','pennsylvania','rhode island','south carolina','south dakota',
+    'tennessee','texas','utah','vermont','virginia','washington','west virginia',
+    'wisconsin','wyoming'];
+  for(var i=0;i<usStates.length;i++){ if(loc.includes(usStates[i])) return 'US'; }
+
+  // ── US — state abbreviation prefix (e.g. "CA - San Francisco", "TX - Dallas") ─
+  if(/^(al|ak|az|ar|ca|co|ct|de|dc|fl|ga|hi|id|il|in|ia|ks|ky|la|me|md|ma|mi|mn|ms|mo|mt|ne|nv|nh|nj|nm|ny|nc|nd|oh|ok|or|pa|ri|sc|sd|tn|tx|ut|vt|va|wa|wv|wi|wy)\s*[-–]/.test(loc)) return 'US';
+
+  // ── US — major US cities not captured above ────────────────────────
+  var usCities=['san francisco','san jose','los angeles','new york','chicago','dallas','houston',
+    'seattle','boston','denver','atlanta','austin','portland','phoenix','las vegas',
+    'minneapolis','detroit','miami','charlotte','raleigh','indianapolis','columbus',
+    'san diego','salt lake city','nashville','mclean','reston','herndon','tysons'];
+  for(var j=0;j<usCities.length;j++){ if(loc.includes(usCities[j])) return 'US'; }
+
+  // ── US — generic US remote patterns ────────────────────────────────
+  if(loc.includes('usa')||loc.includes('united states')||loc.includes('usa-')||
+     loc.includes('-remote')&&!loc.includes('ireland')&&
+     (loc.includes('usa')||loc.includes('remote')&&country==='united states of america')) return 'US';
+
+  // ── EMEA — Europe ──────────────────────────────────────────────────
+  if(loc.includes('ireland')||loc.includes('irl-')||
+     loc.includes('united kingdom')||loc.includes('england')||loc.includes('scotland')||loc.includes('london')||
+     loc.includes('france')||loc.includes('paris')||
+     loc.includes('germany')||loc.includes('frankfurt')||
+     loc.includes('spain')||loc.includes('madrid')||loc.includes('barcelona')||
+     loc.includes('netherlands')||loc.includes('amsterdam')||
+     loc.includes('poland')||loc.includes('warsaw')||loc.includes('krakow')||
+     loc.includes('italy')||loc.includes('milan')||loc.includes('rome')||
+     loc.includes('belgium')||loc.includes('brussels')||
+     loc.includes('portugal')||loc.includes('lisbon')||
+     loc.includes('sweden')||loc.includes('stockholm')||
+     loc.includes('denmark')||loc.includes('copenhagen')||
+     loc.includes('switzerland')||loc.includes('zurich')||
+     loc.includes('norway')||loc.includes('oslo')||
+     loc.includes('israel')||loc.includes('tel aviv')||
+     loc.includes('dubai')||loc.includes('united arab emirates')||loc.includes('uae')) return 'EMEA';
+
+  // ── LATAM ──────────────────────────────────────────────────────────
+  if(loc.includes('mexico')||loc.includes('brazil')||loc.includes('colombia')||
+     loc.includes('argentina')||loc.includes('chile')||loc.includes('peru')||
+     loc.includes('uruguay')||loc.includes('costa rica')||loc.includes('latam')) return 'LATAM';
+
+  // ── JAPAC — Japan ──────────────────────────────────────────────────
+  if(loc.includes('japan')||loc.includes('jpn-')||loc.includes('tokyo')||loc.includes('osaka')) return 'JAPAC';
+
+  // ── APAC — Australia / ANZ ─────────────────────────────────────────
+  if(country==='australia'||loc.includes('australia')||loc.includes('aus-')||
+     loc.includes('sydney')||loc.includes('melbourne')||loc.includes('brisbane')||
+     loc.includes('new zealand')||loc.includes('auckland')) return 'APAC';
+
+  // ── APAC — broader APAC ────────────────────────────────────────────
+  if(loc.includes('singapore')||loc.includes('sgp-')||
+     loc.includes('malaysia')||loc.includes('philippines')||
+     loc.includes('korea')||loc.includes('seoul')||
+     loc.includes('hong kong')||loc.includes('taiwan')||
+     loc.includes('china')||loc.includes('beijing')||loc.includes('shanghai')||
+     loc.includes('thailand')||loc.includes('indonesia')||loc.includes('vietnam')) return 'APAC';
+
+  // ── Canada ─────────────────────────────────────────────────────────
+  if(loc.includes('canada')||loc.includes('toronto')||loc.includes('vancouver')||
+     loc.includes('montreal')||loc.includes('can-')||loc.includes('ontario')) return 'AMER';
+
+  return 'Other';
+}
+function fmtM(v){ if(!v||v===0) return '—'; if(v>=1e6) return '$'+(v/1e6).toFixed(1)+'M'; if(v>=1000) return '$'+(v/1000).toFixed(0)+'K'; return '$'+v.toFixed(0); }
+function fmtRate(v){ return (v&&v>0)?'$'+v.toFixed(2)+'/hr':'—'; }
+function fmtDate(d){ if(!d) return '—'; var p=d.split('-'); return p[1]+'/'+p[2]+'/'+p[0].slice(2); }
+function supShort(s){
+  var m={'Accenture Solutions Pvt. Ltd':'Accenture','Slalom LLC. DBA Slalom Consulting':'Slalom',
+    'Cognizant Worldwide Limited':'Cognizant','Cognizant Technology Solutions US Corp':'Cognizant US',
+    'HCL Technologies Corporate Services Limited':'HCL','THE BOSTON CONSULTING GROUP INC':'BCG',
+    'Deloitte Consulting LLP':'Deloitte','PwC US Consulting LLP':'PwC',
+    'McKinsey & Company, Inc.':'McKinsey','Thinkvibes Software Private Limited':'Thinkvibes',
+    'Deep Armor Technologies Pvt Ltd':'Deep Armor','Eximius tech innovations LLC':'Eximius',
+    'Global Infotech Corporation':'Global Infotech'};
+  return m[s]||s;
+}
+function esc(s){ return encodeURIComponent(s).replace(/'/g,'%27'); }
+function unesc(s){ return decodeURIComponent(s); }
+function emptyState(icon,t,s){ return '<div class="empty"><div class="empty-icon">'+icon+'</div><div class="empty-title">'+t+'</div><div style="font-size:8pt;color:var(--ink4);">'+s+'</div></div>'; }
+
+/* ── FILTERS ── */
+function applyFilters(){
+  var q=(document.getElementById('search-input').value||'').toLowerCase();
+  var pillar=document.getElementById('pillar-filter').value;
+  var sup=document.getElementById('supplier-filter').value;
+  var type=document.getElementById('type-filter').value;
+  var reg=document.getElementById('region-filter').value;
+  var source=window._dedupedData||WORKFORCE_DATA;
+  filteredData=source.filter(function(w){
+    if(pillar!=='all'&&getPillar(w)!==pillar) return false;
+    if(sup!=='all'&&w.supplier!==sup) return false;
+    if(type!=='all'&&w.type!==type) return false;
+    if(reg!=='all'&&getRegion(w)!==reg) return false;
+    if(q){ var h=(w.worker+' '+w.supervisor+' '+w.title+' '+w.supplier).toLowerCase(); if(!h.includes(q)) return false; }
+    return true;
+  });
+  leaderShownByPillar={};
+  rosterPage=1;
+  renderStageKPIs();
+  renderCurrentView();
+  document.getElementById('result-count').textContent=filteredData.length.toLocaleString()+' workers';
+}
+
+/* ── STAGE KPIs ── */
+function renderStageKPIs(){
+  var workers=filteredData.length;
+  var suppliers=[...new Set(filteredData.map(function(w){return w.supplier;}))].filter(Boolean).length;
+  var committed=filteredData.reduce(function(s,w){return s+(w.committed||0);},0);
+  var spent=filteredData.reduce(function(s,w){return s+(w.spend||0);},0);
+  var leaders=[...new Set(filteredData.map(function(w){return w.supervisor;}))].filter(Boolean).length;
+  document.getElementById('stage-kpis').innerHTML=
+    '<div class="skpi"><div class="skpi-lbl">Active Workers</div><div class="skpi-val">'+workers.toLocaleString()+'</div><div class="skpi-note">Open engagements</div></div>'+
+    '<div class="skpi"><div class="skpi-lbl">Unique Suppliers</div><div class="skpi-val teal">'+suppliers+'</div><div class="skpi-note">Active vendors</div></div>'+
+    '<div class="skpi"><div class="skpi-lbl">Committed Spend</div><div class="skpi-val amber">'+fmtM(committed)+'</div><div class="skpi-note">Total authorized</div></div>'+
+    '<div class="skpi"><div class="skpi-lbl">Spend to Date</div><div class="skpi-val green">'+fmtM(spent)+'</div><div class="skpi-note">Billed against POs</div></div>'+
+    '<div class="skpi"><div class="skpi-lbl">Active Leaders</div><div class="skpi-val purple">'+leaders+'</div><div class="skpi-note">Supervisors in scope</div></div>';
+}
+
+/* ── VIEW SWITCHING ── */
+function setView(v){
+  currentView=v;
+  ['pillar','supplier','roster'].forEach(function(n){
+    var el=document.getElementById('view-'+n);
+    if(n===v){el.classList.remove('view-hidden');}else{el.classList.add('view-hidden');}
+    document.getElementById('tab-'+n).classList.toggle('active',n===v);
+  });
+  renderCurrentView();
+}
+function renderCurrentView(){
+  if(currentView==='pillar') renderPillarView();
+  else if(currentView==='supplier') renderSupplierView();
+  else renderRosterView();
+}
+
+/* ── PILLAR VIEW ── */
+function renderPillarView(){
+  var container=document.getElementById('view-pillar');
+  if(!filteredData.length){container.innerHTML=emptyState('&#128101;','No workers match your filters','Try adjusting the filters above');return;}
+
+  // Group by pillar, then by leader within each pillar
+  var byPillar={};
+  filteredData.forEach(function(w){
+    var p=getPillar(w);
+    if(!byPillar[p]) byPillar[p]={workers:[],byLeader:{}};
+    byPillar[p].workers.push(w);
+    var sup=w.supervisor||'Unassigned';
+    if(!byPillar[p].byLeader[sup]) byPillar[p].byLeader[sup]={name:sup,workers:[],suppliers:{},cost_centers:{}};
+    byPillar[p].byLeader[sup].workers.push(w);
+    if(w.supplier) byPillar[p].byLeader[sup].suppliers[w.supplier]=(byPillar[p].byLeader[sup].suppliers[w.supplier]||0)+1;
+    if(w.cost_center) byPillar[p].byLeader[sup].cost_centers[w.cost_center]=(byPillar[p].byLeader[sup].cost_centers[w.cost_center]||0)+1;
+  });
+
+  // Sort pillars by worker count
+  var pillarOrder=Object.keys(PILLAR_MAP);
+  var pillars=pillarOrder.filter(function(p){return byPillar[p];})
+    .sort(function(a,b){return byPillar[b].workers.length-byPillar[a].workers.length;});
+
+  var html='';
+  pillars.forEach(function(pillarName){
+    var pd=byPillar[pillarName];
+    var leaders=Object.values(pd.byLeader).sort(function(a,b){return b.workers.length-a.workers.length;});
+    var color=PILLAR_COLORS[pillarName]||'#6B7280';
+    var committed=pd.workers.reduce(function(s,w){return s+(w.committed||0);},0);
+    var spent=pd.workers.reduce(function(s,w){return s+(w.spend||0);},0);
+    var sups=[...new Set(pd.workers.map(function(w){return w.supplier;}))].filter(Boolean).length;
+    var shown=leaderShownByPillar[pillarName]||12;
+
+    html+='<div class="pillar-section" id="ps-'+esc(pillarName)+'">';
+    html+='<div class="pillar-header">';
+    html+='<div class="pillar-accent" style="background:'+color+';"></div>';
+    html+='<div class="pillar-name">'+pillarName+'</div>';
+    html+='<div class="pillar-stats">';
+    html+='<span><strong>'+pd.workers.length+'</strong> workers</span>';
+    html+='<span><strong>'+sups+'</strong> suppliers</span>';
+    if(committed>0) html+='<span><strong>'+fmtM(committed)+'</strong> committed</span>';
+    html+='<span><strong>'+leaders.length+'</strong> leaders</span>';
+    html+='</div></div>';
+
+    html+='<div class="leader-grid" id="lg-'+esc(pillarName)+'">';
+    leaders.slice(0,shown).forEach(function(ldr){
+      var topSups=Object.entries(ldr.suppliers).sort(function(a,b){return b[1]-a[1];}).slice(0,3).map(function(e){return e[0];});
+      var rates=ldr.workers.filter(function(w){return w.rate_hr>0;}).map(function(w){return w.rate_hr;});
+      var avgRate=rates.length?rates.reduce(function(s,r){return s+r;},0)/rates.length:0;
+      var avgTenure=ldr.workers.reduce(function(s,w){return s+(w.tenure||0);},0)/ldr.workers.length;
+      var lCommitted=ldr.workers.reduce(function(s,w){return s+(w.committed||0);},0);
+      var topCC=Object.entries(ldr.cost_centers).sort(function(a,b){return b[1]-a[1];})[0];
+      var ccShort=topCC?topCC[0].replace(/^\d+\s+/,'').replace(/^CIO\s+/,''):'';
+      var regionBreak={};
+      ldr.workers.forEach(function(w){var r=getRegion(w);regionBreak[r]=(regionBreak[r]||0)+1;});
+      var topRegions=Object.entries(regionBreak).sort(function(a,b){return b[1]-a[1];}).slice(0,2);
+
+      html+='<div class="ldr-card" onclick="openLeaderModal(\''+esc(ldr.name)+'\',\''+esc(pillarName)+'\')">';
+      html+='<div class="ldr-top"><div class="ldr-name">'+ldr.name+'</div><div class="ldr-badge" style="background:'+color+'22;color:'+color+';">'+ldr.workers.length+'</div></div>';
+      if(ccShort) html+='<div class="ldr-cc">'+ccShort+'</div>';
+      html+='<div class="ldr-chips">';
+      topSups.slice(0,2).forEach(function(s){html+='<span class="chip teal">'+supShort(s)+'</span>';});
+      topRegions.forEach(function(r){html+='<span class="chip navy">'+r[0]+'</span>';});
+      html+='</div>';
+      html+='<div class="ldr-footer">';
+      html+='<div class="ldr-stat"><div class="ldr-stat-val">'+ldr.workers.length+'</div><div class="ldr-stat-lbl">Workers</div></div>';
+      if(lCommitted>0) html+='<div class="ldr-stat"><div class="ldr-stat-val">'+fmtM(lCommitted)+'</div><div class="ldr-stat-lbl">Committed</div></div>';
+      if(avgRate>0) html+='<div class="ldr-stat"><div class="ldr-stat-val">'+fmtRate(avgRate)+'</div><div class="ldr-stat-lbl">Avg Rate</div></div>';
+      html+='<div class="ldr-stat"><div class="ldr-stat-val">'+Math.round(avgTenure)+'d</div><div class="ldr-stat-lbl">Avg Tenure</div></div>';
+      html+='</div></div>';
+    });
+    html+='</div>';
+
+    if(shown<leaders.length){
+      var more=leaders.length-shown;
+      html+='<div class="show-more"><button type="button" class="show-more-btn" onclick="showMoreLeaders(\''+esc(pillarName)+'\')">Show '+Math.min(12,more)+' more ('+more+' remaining)</button></div>';
+    }
+    html+='</div>';
+  });
+
+  container.innerHTML=html;
+}
+
+function showMoreLeaders(encodedPillar){
+  var p=unesc(encodedPillar);
+  leaderShownByPillar[p]=(leaderShownByPillar[p]||12)+12;
+  renderPillarView();
+  // Scroll back to the pillar section
+  var el=document.getElementById('ps-'+encodedPillar);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ── SUPPLIER VIEW ── */
+function renderSupplierView(){
+  var container=document.getElementById('view-supplier');
+  if(!filteredData.length){container.innerHTML=emptyState('&#127970;','No suppliers match your filters','Try adjusting the filters above');return;}
+  var bySupplier={};
+  filteredData.forEach(function(w){
+    var s=w.supplier||'Unknown';
+    if(!bySupplier[s]) bySupplier[s]={name:s,workers:[],leaders:{},pillars:{}};
+    bySupplier[s].workers.push(w);
+    if(w.supervisor) bySupplier[s].leaders[w.supervisor]=(bySupplier[s].leaders[w.supervisor]||0)+1;
+    var p=getPillar(w);
+    bySupplier[s].pillars[p]=(bySupplier[s].pillars[p]||0)+1;
+  });
+  var total=filteredData.length;
+  var suppliers=Object.values(bySupplier).sort(function(a,b){return b.workers.length-a.workers.length;});
+
+  var html='<div class="shdr">&#127970; '+suppliers.length+' Active Suppliers</div>';
+  html+='<div class="sup-grid">';
+  suppliers.forEach(function(sup){
+    var pct=((sup.workers.length/total)*100);
+    var rates=sup.workers.filter(function(w){return w.rate_hr>0;}).map(function(w){return w.rate_hr;});
+    var avgRate=rates.length?rates.reduce(function(s,r){return s+r;},0)/rates.length:0;
+    var committed=sup.workers.reduce(function(s,w){return s+(w.committed||0);},0);
+    var avgTenure=sup.workers.reduce(function(s,w){return s+(w.tenure||0);},0)/sup.workers.length;
+    var topPillars=Object.entries(sup.pillars).sort(function(a,b){return b[1]-a[1];}).slice(0,2);
+
+    html+='<div class="sup-card" onclick="openSupplierModal(\''+esc(sup.name)+'\')">';
+    html+='<div class="sup-name">'+supShort(sup.name)+'</div>';
+    if(supShort(sup.name)!==sup.name) html+='<div class="sup-full">'+sup.name+'</div>';
+    html+='<div class="sup-bar-wrap"><div class="sup-bar" style="width:'+Math.min(pct*2,100)+'%;"></div></div>';
+    html+='<div class="ldr-chips" style="margin-bottom:8px;">';
+    topPillars.forEach(function(p){html+='<span class="chip navy" style="font-size:7pt;">'+p[0]+'</span>';});
+    html+='</div>';
+    html+='<div class="sup-footer">';
+    html+='<div class="ldr-stat"><div class="ldr-stat-val">'+sup.workers.length+'</div><div class="ldr-stat-lbl">Workers</div></div>';
+    html+='<div class="ldr-stat"><div class="ldr-stat-val">'+pct.toFixed(1)+'%</div><div class="ldr-stat-lbl">of CW</div></div>';
+    if(committed>0) html+='<div class="ldr-stat"><div class="ldr-stat-val">'+fmtM(committed)+'</div><div class="ldr-stat-lbl">Committed</div></div>';
+    if(avgRate>0) html+='<div class="ldr-stat"><div class="ldr-stat-val">'+fmtRate(avgRate)+'</div><div class="ldr-stat-lbl">Avg Rate</div></div>';
+    html+='<div class="ldr-stat"><div class="ldr-stat-val">'+Math.round(avgTenure)+'d</div><div class="ldr-stat-lbl">Avg Tenure</div></div>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+  container.innerHTML=html;
+}
+
+/* ── ROSTER VIEW ── */
+function renderRosterView(){
+  var container=document.getElementById('view-roster');
+  if(!filteredData.length){container.innerHTML=emptyState('&#128203;','No workers match','Try adjusting the filters above');return;}
+  var start=(rosterPage-1)*ROSTER_PER_PAGE;
+  var end=Math.min(start+ROSTER_PER_PAGE,filteredData.length);
+  var page=filteredData.slice(start,end);
+  var totalPages=Math.ceil(filteredData.length/ROSTER_PER_PAGE);
+
+  var html='<div class="shdr">&#128203; Full Roster</div>';
+  html+='<div class="table-wrap"><table class="vt"><thead><tr>';
+  html+='<th>Worker</th><th>Pillar</th><th>Supervisor</th><th>Supplier</th><th>Type</th><th>Rate</th><th>Start</th><th>End</th><th>Tenure</th><th>Region</th>';
+  html+='</tr></thead><tbody>';
+  page.forEach(function(w){
+    var typeCls=w.type==='Job Posting'?'tp-jp':w.type==='Statement of Work'?'tp-sow':'tp-pw';
+    var typeLabel=w.type==='Job Posting'?'Job Posting':w.type==='Statement of Work'?'SOW':'Profile';
+    var pillar=getPillar(w);
+    var pc=PILLAR_COLORS[pillar]||'#6B7280';
+    html+='<tr>';
+    html+='<td><strong>'+w.worker+'</strong><br><span style="font-size:7.5pt;color:var(--ink4);">'+w.title+'</span></td>';
+    html+='<td><span style="font-size:7.5pt;font-weight:700;color:'+pc+';">'+pillar+'</span></td>';
+    html+='<td>'+w.supervisor+'</td>';
+    html+='<td>'+supShort(w.supplier)+'</td>';
+    html+='<td><span class="type-pill '+typeCls+'">'+typeLabel+'</span></td>';
+    html+='<td>'+(w.rate_hr>0?'<span class="rate-val">'+fmtRate(w.rate_hr)+'</span>':'<span style="color:var(--ink4);">—</span>')+'</td>';
+    html+='<td>'+fmtDate(w.start)+'</td>';
+    html+='<td>'+fmtDate(w.end)+'</td>';
+    html+='<td>'+(w.tenure||'—')+'d</td>';
+    html+='<td>'+getRegion(w)+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div>';
+
+  html+='<div class="pagination">';
+  html+='<button type="button" class="pg-btn" onclick="rosterPage--;renderRosterView();" '+(rosterPage===1?'disabled:disabled':'')+'>&#8592;</button>';
+  var sp=Math.max(1,rosterPage-2);
+  var ep=Math.min(totalPages,sp+4);
+  for(var p=sp;p<=ep;p++){
+    html+='<button type="button" class="pg-btn'+(p===rosterPage?' active':'')+'" onclick="rosterPage='+p+';renderRosterView();">'+p+'</button>';
+  }
+  html+='<button type="button" class="pg-btn" onclick="rosterPage++;renderRosterView();" '+(rosterPage===totalPages?'disabled:disabled':'')+'>&#8594;</button>';
+  html+='<span class="pg-info">'+(start+1)+'–'+end+' of '+filteredData.length.toLocaleString()+'</span>';
+  html+='</div>';
+
+  container.innerHTML=html;
+}
+
+/* ── LEADER MODAL ── */
+function openLeaderModal(encodedName,encodedPillar){
+  var name=unesc(encodedName);
+  var pillarCtx=encodedPillar?unesc(encodedPillar):null;
+  var workers=filteredData.filter(function(w){
+    if(w.supervisor!==name) return false;
+    if(pillarCtx) return getPillar(w)===pillarCtx;
+    return true;
+  });
+  if(!workers.length) return;
+  var pillar=pillarCtx||getPillar(workers[0]);
+  var color=PILLAR_COLORS[pillar]||'#0F1E3C';
+  var suppliers=[...new Set(workers.map(function(w){return w.supplier;}))].filter(Boolean);
+  var committed=workers.reduce(function(s,w){return s+(w.committed||0);},0);
+  var rates=workers.filter(function(w){return w.rate_hr>0;}).map(function(w){return w.rate_hr;});
+  var avgRate=rates.length?rates.reduce(function(s,r){return s+r;},0)/rates.length:0;
+  var avgTenure=workers.reduce(function(s,w){return s+(w.tenure||0);},0)/workers.length;
+  var topCC=workers[0]?workers[0].cost_center.replace(/^\d+\s+/,''):'';
+  var regBreak={};
+  workers.forEach(function(w){var r=getRegion(w);regBreak[r]=(regBreak[r]||0)+1;});
+  var regStr=Object.entries(regBreak).sort(function(a,b){return b[1]-a[1];}).map(function(e){return e[0]+' ('+e[1]+')';}).join(' · ');
+
+  var rows='';
+  workers.sort(function(a,b){return (b.tenure||0)-(a.tenure||0);}).forEach(function(w){
+    var tc=w.type==='Job Posting'?'tp-jp':w.type==='Statement of Work'?'tp-sow':'tp-pw';
+    var tl=w.type==='Job Posting'?'Job Posting':w.type==='Statement of Work'?'SOW':'Profile';
+    rows+='<tr><td><strong>'+w.worker+'</strong><br><span style="font-size:7.5pt;color:var(--ink4);">'+w.title+'</span></td>';
+    rows+='<td>'+supShort(w.supplier)+'</td>';
+    rows+='<td><span class="type-pill '+tc+'">'+tl+'</span></td>';
+    rows+='<td>'+(w.rate_hr>0?'<span class="rate-val">'+fmtRate(w.rate_hr)+'</span>':'—')+'</td>';
+    rows+='<td>'+fmtDate(w.start)+'</td><td>'+fmtDate(w.end)+'</td>';
+    rows+='<td>'+(w.tenure||'—')+'d</td><td>'+getRegion(w)+'</td></tr>';
+  });
+
+  var html='<div class="modal-bg open" id="modal-overlay" onclick="closeModalIfBg(event)">';
+  html+='<div class="modal">';
+  html+='<div class="modal-stripe" style="background:'+color+';"></div>';
+  html+='<div class="modal-head"><div class="modal-head-info">';
+  html+='<div class="modal-title">'+name+'</div>';
+  html+='<div class="modal-sub">'+pillar+' &middot; '+topCC+' &middot; '+workers.length+' workers &middot; '+suppliers.length+' suppliers</div>';
+  html+='</div><button type="button" class="modal-close" onclick="closeModal()">&#10005;</button></div>';
+  html+='<div class="modal-body">';
+  html+='<div class="modal-kpis">';
+  html+='<div class="mkpi"><div class="mkpi-val">'+workers.length+'</div><div class="mkpi-lbl">Workers</div></div>';
+  html+='<div class="mkpi"><div class="mkpi-val">'+suppliers.length+'</div><div class="mkpi-lbl">Suppliers</div></div>';
+  html+='<div class="mkpi"><div class="mkpi-val">'+(committed>0?fmtM(committed):Math.round(avgTenure)+'d')+'</div><div class="mkpi-lbl">'+(committed>0?'Committed':'Avg Tenure')+'</div></div>';
+  html+='<div class="mkpi"><div class="mkpi-val">'+(avgRate>0?fmtRate(avgRate):'—')+'</div><div class="mkpi-lbl">Avg Rate</div></div>';
+  html+='</div>';
+  if(regStr) html+='<div style="font-size:7.5pt;color:var(--ink4);margin-bottom:12px;">&#127758; '+regStr+'</div>';
+  html+='<div class="modal-sec">&#128101; Worker Roster</div>';
+  html+='<div class="table-wrap" style="margin-bottom:12px;"><table class="vt"><thead><tr><th>Worker</th><th>Supplier</th><th>Type</th><th>Rate</th><th>Start</th><th>End</th><th>Tenure</th><th>Region</th></tr></thead>';
+  html+='<tbody>'+rows+'</tbody></table></div>';
+  html+='<div class="modal-note">&#128202; Full vendor profiles and risk scores are in <a href="vendor_risk.html" style="color:var(--teal);font-weight:700;">VER Risk Intelligence</a>.</div>';
+  html+='</div>';
+  html+='<div class="modal-actions">';
+  html+='<button type="button" class="modal-btn primary" onclick="printModal(\''+encodedName+'\',\'leader\')">&#128438; Print / Save PDF</button>';
+  html+='<button type="button" class="modal-btn ghost" onclick="closeModal()">Close</button>';
+  html+='</div></div></div>';
+  document.getElementById('modal-root').innerHTML=html;
+}
+
+/* ── SUPPLIER MODAL ── */
+function openSupplierModal(encodedName){
+  var name=unesc(encodedName);
+  var workers=filteredData.filter(function(w){return w.supplier===name;});
+  if(!workers.length) return;
+  var leaders=[...new Set(workers.map(function(w){return w.supervisor;}))].filter(Boolean);
+  var committed=workers.reduce(function(s,w){return s+(w.committed||0);},0);
+  var rates=workers.filter(function(w){return w.rate_hr>0;}).map(function(w){return w.rate_hr;});
+  var avgRate=rates.length?rates.reduce(function(s,r){return s+r;},0)/rates.length:0;
+  var avgTenure=workers.reduce(function(s,w){return s+(w.tenure||0);},0)/workers.length;
+  var regBreak={};
+  workers.forEach(function(w){var r=getRegion(w);regBreak[r]=(regBreak[r]||0)+1;});
+  var regStr=Object.entries(regBreak).sort(function(a,b){return b[1]-a[1];}).map(function(e){return e[0]+' ('+e[1]+')';}).join(' · ');
+  var pillarBreak={};
+  workers.forEach(function(w){var p=getPillar(w);pillarBreak[p]=(pillarBreak[p]||0)+1;});
+
+  var rows='';
+  workers.sort(function(a,b){return (b.tenure||0)-(a.tenure||0);}).slice(0,100).forEach(function(w){
+    var tc=w.type==='Job Posting'?'tp-jp':w.type==='Statement of Work'?'tp-sow':'tp-pw';
+    var tl=w.type==='Job Posting'?'Job Posting':w.type==='Statement of Work'?'SOW':'Profile';
+    var pc=PILLAR_COLORS[getPillar(w)]||'#6B7280';
+    rows+='<tr><td><strong>'+w.worker+'</strong><br><span style="font-size:7.5pt;color:var(--ink4);">'+w.title+'</span></td>';
+    rows+='<td><span style="font-size:7.5pt;font-weight:700;color:'+pc+';">'+getPillar(w)+'</span></td>';
+    rows+='<td>'+w.supervisor+'</td>';
+    rows+='<td><span class="type-pill '+tc+'">'+tl+'</span></td>';
+    rows+='<td>'+(w.rate_hr>0?'<span class="rate-val">'+fmtRate(w.rate_hr)+'</span>':'—')+'</td>';
+    rows+='<td>'+fmtDate(w.start)+'</td><td>'+fmtDate(w.end)+'</td>';
+    rows+='<td>'+(w.tenure||'—')+'d</td><td>'+getRegion(w)+'</td></tr>';
+  });
+  var moreNote=workers.length>100?'<tr><td colspan="9" style="text-align:center;font-size:7.5pt;color:var(--ink4);padding:10px;">Showing 100 of '+workers.length+' workers. Export CSV for full list.</td></tr>':'';
+
+  var html='<div class="modal-bg open" id="modal-overlay" onclick="closeModalIfBg(event)">';
+  html+='<div class="modal">';
+  html+='<div class="modal-stripe" style="background:var(--teal);"></div>';
+  html+='<div class="modal-head"><div class="modal-head-info">';
+  html+='<div class="modal-title">'+supShort(name)+'</div>';
+  html+='<div class="modal-sub">'+name+'</div>';
+  html+='</div><button type="button" class="modal-close" onclick="closeModal()">&#10005;</button></div>';
+  html+='<div class="modal-body">';
+  html+='<div class="modal-kpis">';
+  html+='<div class="mkpi"><div class="mkpi-val">'+workers.length+'</div><div class="mkpi-lbl">Workers</div></div>';
+  html+='<div class="mkpi"><div class="mkpi-val">'+leaders.length+'</div><div class="mkpi-lbl">Leaders</div></div>';
+  html+='<div class="mkpi"><div class="mkpi-val">'+(committed>0?fmtM(committed):Math.round(avgTenure)+'d')+'</div><div class="mkpi-lbl">'+(committed>0?'Committed':'Avg Tenure')+'</div></div>';
+  html+='<div class="mkpi"><div class="mkpi-val">'+(avgRate>0?fmtRate(avgRate):'—')+'</div><div class="mkpi-lbl">Avg Rate</div></div>';
+  html+='</div>';
+  if(regStr) html+='<div style="font-size:7.5pt;color:var(--ink4);margin-bottom:4px;">&#127758; '+regStr+'</div>';
+  var pillarChips=Object.entries(pillarBreak).sort(function(a,b){return b[1]-a[1];}).map(function(e){
+    var c=PILLAR_COLORS[e[0]]||'#6B7280';
+    return '<span style="display:inline-block;padding:2px 7px;border-radius:9px;font-size:7.5pt;font-weight:700;background:'+c+'22;color:'+c+';margin:2px 3px 2px 0;">'+e[0]+' ('+e[1]+')</span>';
+  }).join('');
+  html+='<div style="margin-bottom:12px;">'+pillarChips+'</div>';
+  html+='<div class="modal-sec">&#128101; Workers Under This Supplier</div>';
+  html+='<div class="table-wrap" style="margin-bottom:12px;"><table class="vt"><thead><tr><th>Worker</th><th>Pillar</th><th>Supervisor</th><th>Type</th><th>Rate</th><th>Start</th><th>End</th><th>Tenure</th><th>Region</th></tr></thead>';
+  html+='<tbody>'+rows+moreNote+'</tbody></table></div>';
+  html+='<div class="modal-note">&#128202; Full vendor profile and risk score for this supplier are in <a href="vendor_risk.html" style="color:var(--teal);font-weight:700;">VER Risk Intelligence</a>.</div>';
+  html+='</div>';
+  html+='<div class="modal-actions">';
+  html+='<button type="button" class="modal-btn primary" onclick="printModal(\''+esc(name)+'\',\'supplier\')">&#128438; Print / Save PDF</button>';
+  html+='<button type="button" class="modal-btn ghost" onclick="closeModal()">Close</button>';
+  html+='</div></div></div>';
+  document.getElementById('modal-root').innerHTML=html;
+}
+
+/* ── PRINT ── */
+function printModal(encodedName, type){
+  document.body.classList.add('printing');
+  window.print();
+  document.body.classList.remove('printing');
+}
+
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+function closeModalIfBg(e){ if(e.target.id==='modal-overlay') closeModal(); }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
+
+/* ── EXPORT ── */
+function exportCSV(){
+  var h=['worker','title','pillar','supervisor','cost_center','supplier','type','rate_hr','start','end','tenure','location','country','committed','spend','work_order'];
+  var rows=[h.join(',')];
+  filteredData.forEach(function(w){
+    var rowData=h.map(function(k){
+      var v=k==='pillar'?getPillar(w):String(w[k]||'');
+      return v.includes(',')? '"'+v+'"':v;
+    });
+    rows.push(rowData.join(','));
+  });
+  var b=new Blob([rows.join('\n')],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='VER_CW_Roster_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+}
+
+/* ── DROPDOWNS ── */
+function populateDropdowns(){
+  var pillars=Object.keys(PILLAR_MAP);
+  var pSel=document.getElementById('pillar-filter');
+  pillars.forEach(function(p){var o=document.createElement('option');o.value=p;o.textContent=p;pSel.appendChild(o);});
+
+  var sups=[...new Set((window._dedupedData||WORKFORCE_DATA).map(function(w){return w.supplier;}))].filter(Boolean).sort();
+  var sSel=document.getElementById('supplier-filter');
+  sups.forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=supShort(s);sSel.appendChild(o);});
+}
+
+/* ── THEME ── */
+(function(){
+  var saved=localStorage.getItem('ver-theme');
+  var theme=saved||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',theme);
+  updateToggle(theme);
+})();
+function toggleTheme(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('ver-theme',next);updateToggle(next);
+}
+function updateToggle(theme){
+  var btn=document.getElementById('theme-toggle-btn');
+  if(btn) btn.textContent=theme==='dark'?'☀ Light':'☾ Dark';
+}
+
+/* ── APPS SCRIPT URL REWRITER ── */
+(function(){
+  var isAppsScript=window.location.href.indexOf('script.google.com')>-1||window.location.href.indexOf('googleusercontent.com')>-1;
+  if(!isAppsScript)return;
+  function rewriteLinks(){document.querySelectorAll('a[href]').forEach(function(a){var href=a.getAttribute('href');if(!href||href.startsWith('http')||href.startsWith('#')||href.startsWith('mailto')||!href.match(/\.html/))return;var page=href.replace(/\.html.*$/,'').replace(/^.*\//,'');var qs=href.indexOf('?')>-1?href.slice(href.indexOf('?')+1):'';var base=window.location.href.split('?')[0];a.setAttribute('href',base+'?page='+page+(qs?'&'+qs:''));});}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',rewriteLinks);}else{rewriteLinks();}
+  new MutationObserver(rewriteLinks).observe(document.body,{childList:true,subtree:true});
+})();
+
+/* ── DEDUP: keep one record per worker (highest tenure wins) ── */
+function deduplicateWorkers(data){
+  var byName={};
+  data.forEach(function(w){
+    var key=(w.worker||'').toLowerCase().trim();
+    if(!byName[key]||((w.tenure||0)>(byName[key].tenure||0))){
+      byName[key]=w;
+    }
+  });
+  return Object.values(byName);
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded',function(){
+  var deduped=deduplicateWorkers(WORKFORCE_DATA);
+  window._dedupedData=deduped;
+  populateDropdowns();
+  filteredData=deduped.slice();
+  var suppliers=[...new Set(deduped.map(function(w){return w.supplier;}))].filter(Boolean).length;
+  var committed=deduped.reduce(function(s,w){return s+(w.committed||0);},0);
+  var fmtC=committed>=1e6?'$'+(committed/1e6).toFixed(1)+'M':committed>=1000?'$'+(committed/1000).toFixed(0)+'K':'$'+committed.toFixed(0);
+  document.getElementById('stage-sub').textContent=deduped.length.toLocaleString()+' active contractors across 9 pillars · '+suppliers+' suppliers · '+fmtC+' committed · As of Jun 18, 2026';
+  document.getElementById('result-count').textContent=deduped.length.toLocaleString()+' workers';
+
+  renderStageKPIs();
+  renderPillarView();
+});
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openCwHelp(){
+  HelpModal.open({
+    title: 'CW Intelligence',
+    what: 'The CW (Contingent Workforce) Intelligence page gives you an <strong>integrated view of contractor spend, supplier performance, rate compliance, and HC policy adherence</strong> across the DET contingent workforce programme. It is the primary operational dashboard for CW programme managers.',
+    steps: [
+      '<strong>Review the HC ratio indicator</strong> — the 70/30 FTE/CW policy is tracked live. The ratio card shows the current split and flags if you are approaching or breaching the CW ceiling.',
+      '<strong>Scan the supplier scorecard</strong> — each tier-1 supplier is rated on rate compliance, fill speed, quality, and programme participation. Underperforming suppliers are flagged for review.',
+      '<strong>Review spend by job family</strong> — the breakdown shows which CW roles are driving cost and whether spend per category is within benchmark bands.',
+      '<strong>Check the compliance queue</strong> — tenure breaches, rate exceptions, and missing SOW linkages are surfaced here for action.',
+      '<strong>Use the demand vs. supply view</strong> to understand where open requisitions are aging, which suppliers are filling fastest, and where rate pressure is highest.'
+    ],
+    tips: [
+      { icon: '&#x2696;', title: '70/30 is a hard ceiling', body: 'Leadership has mandated the 70% FTE / 30% CW split. Breaching this requires CPO approval and a remediation plan. The CW Intel page flags you before you breach.' },
+      { icon: '&#x1F3C6;', title: 'Supplier tier affects negotiation', body: 'Tier 1 suppliers have preferred rate agreements. If a Tier 1 supplier is billing above-agreement rates, that\'s a contract breach — not just a flag.' },
+      { icon: '&#x1F4C8;', title: 'Fill speed = programme health', body: 'Average days-to-fill above 30 days indicates either demand forecasting failure or supplier performance issues — both need different responses.' },
+      { icon: '&#x1F517;', title: 'Links to MFT and Rate Benchmarks', body: 'Individual CW records link directly to MFT for tenure and compliance detail, and to Rate Benchmarks for rate validation.' }
+    ],
+    ai: '<strong>AI Augmentation consideration:</strong> The CW Intelligence dashboard tracks AI/agentic role adoption as a separate workforce category. As agentic tools take on tasks previously done by CW, the effective CW headcount equivalent shifts — the HC ratio calculation will need to account for AI agents as a third workforce type in future policy updates.',
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

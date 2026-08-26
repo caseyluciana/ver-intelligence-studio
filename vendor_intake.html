@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Request VER Support · Stakeholder Intake</title>
+<style>
+:root{
+  --teal:#0D9488;--teal-dim:#0F766E;--teal-bright:#14B8A6;
+  --green:#059669;--amber:#D97706;--red:#DC2626;--purple:#7C3AED;
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── Content-area theme tokens (only tab-pane area) ── */
+[data-theme="dark"]{
+  --content-bg:#060D1A;
+  --card-bg:rgba(255,255,255,0.034);--card-border:rgba(255,255,255,0.09);
+  --content-ink:#E5E7EB;--content-ink-dim:#9CA3AF;--content-ink-muted:#6B7280;
+  --field-bg:rgba(255,255,255,0.05);--field-border:rgba(255,255,255,0.12);
+  --teal-status:rgba(13,148,136,0.12);--teal-border:rgba(13,148,136,0.28);
+  --filter-btn-bg:rgba(255,255,255,0.034);
+  --step-pending-border:rgba(255,255,255,0.14);--step-line-pending:rgba(255,255,255,0.08);
+  --row-border:rgba(255,255,255,0.06);
+  --ini-bg:#0F1829;--ini-border:rgba(255,255,255,0.12);
+  --ini-id-color:#14B8A6;--ini-title-color:#E5E7EB;--ini-meta-color:rgba(255,255,255,0.45);
+  --ini-hover:rgba(13,148,136,0.12);--ini-empty-color:rgba(255,255,255,0.38);
+}
+[data-theme="light"]{
+  --content-bg:#F3F4F6;
+  --card-bg:#FFFFFF;--card-border:#E5E7EB;
+  --content-ink:#111827;--content-ink-dim:#374151;--content-ink-muted:#6B7280;
+  --field-bg:#F9FAFB;--field-border:#D1D5DB;
+  --teal-status:rgba(13,148,136,0.08);--teal-border:rgba(13,148,136,0.25);
+  --filter-btn-bg:#FFFFFF;
+  --step-pending-border:#D1D5DB;--step-line-pending:#E5E7EB;
+  --row-border:#E5E7EB;
+  --ini-bg:#FFFFFF;--ini-border:#D1D5DB;
+  --ini-id-color:#0F766E;--ini-title-color:#111827;--ini-meta-color:#6B7280;
+  --ini-hover:rgba(13,148,136,0.07);--ini-empty-color:#6B7280;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+
+/* ── TOP BAR — always dark ── */
+.hub-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;
+  justify-content:space-between;padding:0 28px;height:52px;
+  background:rgba(6,13,26,0.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,0.07);}
+.hub-back{display:inline-flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:700;color:rgba(255,255,255,0.55);text-decoration:none;
+  letter-spacing:0.04em;transition:color 0.15s;}
+.hub-back:hover{color:#14B8A6;}
+.hub-bar-title{font-size:11px;font-weight:800;letter-spacing:0.10em;
+  text-transform:uppercase;color:rgba(255,255,255,0.35);}
+
+/* ── HERO STAGE — always dark navy ── */
+.hero-stage{background:linear-gradient(145deg,#0D2137 0%,#0F1E3C 45%,#091220 100%);
+  position:relative;overflow:hidden;}
+.hero-stage::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 80% 20%,rgba(13,148,136,0.18) 0%,transparent 52%),
+    radial-gradient(ellipse at 5% 90%,rgba(124,58,237,0.10) 0%,transparent 48%);}
+.hero-stage::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(13,148,136,0.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(13,148,136,0.022) 1px,transparent 1px);
+  background-size:52px 52px;}
+.hero{position:relative;z-index:2;padding:36px 32px 28px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:32px;
+  flex-wrap:wrap;max-width:1200px;margin:0 auto;}
+.hero-text{flex:1;min-width:260px;}
+.hero-eyebrow{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.18em;
+  color:#14B8A6;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:#14B8A6;
+  animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.hero-title{font-size:32px;font-weight:900;letter-spacing:-0.025em;line-height:1.1;
+  background:linear-gradient(100deg,#fff 0%,#14B8A6 60%,#34D399 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:inline-block;margin-bottom:10px;}
+.hero-sub{font-size:12.5px;color:rgba(255,255,255,0.55);line-height:1.65;max-width:480px;}
+.hero-kpi{display:flex;gap:12px;flex-shrink:0;}
+.kpi-tile{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);
+  border-radius:14px;padding:16px 20px;min-width:110px;position:relative;overflow:hidden;
+  text-align:center;}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kpi-tile.t-teal::before{background:linear-gradient(90deg,#0D9488,#14B8A6);}
+.kpi-tile.t-green::before{background:linear-gradient(90deg,#059669,#34D399);}
+.kpi-tile.t-purple::before{background:linear-gradient(90deg,#7C3AED,#A78BFA);}
+.kpi-val{font-size:30px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:5px;}
+.kpi-tile.t-teal .kpi-val{color:#14B8A6;}
+.kpi-tile.t-green .kpi-val{color:#34D399;}
+.kpi-tile.t-purple .kpi-val{color:#A78BFA;}
+.kpi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;
+  color:rgba(255,255,255,0.38);}
+
+/* ── TAB BAR — always dark ── */
+.tab-bar-wrap{background:linear-gradient(145deg,#0D2137 0%,#0F1E3C 100%);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.tab-bar{position:relative;z-index:2;display:flex;gap:4px;
+  padding:0 32px;max-width:1200px;margin:0 auto;}
+.tab-btn{font-size:11.5px;font-weight:700;padding:10px 20px;border:none;background:none;
+  color:rgba(255,255,255,0.42);cursor:pointer;font-family:var(--font);
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;}
+.tab-btn:hover{color:rgba(255,255,255,0.85);}
+.tab-btn.active{color:#14B8A6;border-bottom-color:#0D9488;}
+
+/* ── CONTENT AREA (theme-aware) ── */
+.content-body{background:var(--content-bg);color:var(--content-ink);transition:background 0.3s;}
+.tab-pane{position:relative;z-index:2;padding:28px 32px 56px;max-width:1200px;margin:0 auto;}
+.hidden{display:none!important;}
+
+/* ── FORM LAYOUT ── */
+.form-layout{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:stretch;}
+.form-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;
+  padding:28px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);height:100%;}
+.form-card-title{font-size:15px;font-weight:800;color:var(--content-ink);margin-bottom:4px;}
+.form-card-sub{font-size:11px;color:var(--content-ink-muted);margin-bottom:24px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.field{margin-bottom:14px;}
+.field-label-opt{font-weight:500;opacity:0.6;font-size:10px;}
+#ni-initiative-status{font-size:10px;margin-top:4px;min-height:14px;color:var(--content-ink-muted);}
+#ni-initiative-status.linked{color:#34D399;}
+/* ── Initiative combo ── */
+.ini-wrap{position:relative;}
+.ini-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;
+  background:var(--ini-bg);border:1px solid var(--ini-border);border-radius:10px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.20);overflow:hidden;max-height:280px;overflow-y:auto;}
+.ini-dropdown.open{display:block;}
+.ini-item{display:flex;align-items:baseline;gap:10px;padding:9px 14px;cursor:pointer;
+  border-bottom:1px solid var(--ini-border);transition:background 0.1s;}
+.ini-item:last-child{border-bottom:none;}
+.ini-item:hover,.ini-item.focused{background:var(--ini-hover);}
+.ini-id{font-size:10px;font-weight:800;color:var(--ini-id-color);white-space:nowrap;flex-shrink:0;min-width:72px;}
+.ini-title{font-size:11.5px;color:var(--ini-title-color);line-height:1.3;}
+.ini-meta{font-size:9.5px;color:var(--ini-meta-color);white-space:nowrap;margin-left:auto;flex-shrink:0;}
+.ini-empty{padding:14px;text-align:center;font-size:11px;color:var(--ini-empty-color);}
+.ini-loading{padding:12px 14px;font-size:11px;color:var(--ini-empty-color);}
+.field-label{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--content-ink-muted);margin-bottom:6px;display:block;}
+.field-input{width:100%;padding:10px 13px;border-radius:9px;
+  background:var(--field-bg);border:1px solid var(--field-border);
+  color:var(--content-ink);font-family:var(--font);font-size:13px;outline:none;
+  transition:border-color 0.15s;}
+.field-input option{background:#1a1030;color:#E5E7EB;}
+.field-input:focus{border-color:var(--teal-border);}
+.field-input::placeholder{color:var(--content-ink-muted);}
+.field-input.invalid{border-color:rgba(220,38,38,0.7)!important;background:rgba(220,38,38,0.04);}
+textarea.field-input{resize:vertical;min-height:180px;line-height:1.55;}
+.form-error{display:none;background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.22);
+  border-radius:8px;padding:9px 13px;font-size:11px;color:#DC2626;margin-bottom:14px;}
+[data-theme="dark"] .form-error{color:#F87171;}
+.submit-btn{background:linear-gradient(90deg,#0F766E,#0D9488);
+  color:#fff;border:none;padding:12px 28px;border-radius:99px;font-size:12px;
+  font-weight:800;letter-spacing:0.06em;cursor:pointer;font-family:var(--font);
+  transition:opacity 0.15s,transform 0.15s;box-shadow:0 0 24px rgba(13,148,136,0.30);}
+.submit-btn:hover{opacity:0.88;transform:translateY(-1px);}
+
+/* ── INFO SIDEBAR ── */
+.info-sidebar{display:flex;flex-direction:column;gap:14px;}
+.info-card{background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+.info-card-title{font-size:10px;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.12em;color:#0D9488;margin-bottom:14px;}
+.process-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;}
+.process-step:last-child{margin-bottom:0;}
+.ps-num{width:22px;height:22px;border-radius:50%;background:var(--teal-status);
+  border:1px solid var(--teal-border);display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;color:#0D9488;flex-shrink:0;margin-top:1px;}
+.ps-body{flex:1;}
+.ps-title{font-size:11px;font-weight:700;color:var(--content-ink);margin-bottom:2px;}
+.ps-sub{font-size:10px;color:var(--content-ink-muted);line-height:1.55;}
+.sla-row{display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--row-border);font-size:11px;}
+.sla-row:last-child{border-bottom:none;}
+.sla-label{color:var(--content-ink-dim);}
+.sla-val{font-weight:700;color:#0D9488;}
+.info-tip{background:var(--teal-status);border:1px solid var(--teal-border);
+  border-radius:9px;padding:12px;font-size:10.5px;color:var(--content-ink-dim);line-height:1.6;}
+.info-tip strong{color:#0D9488;}
+
+/* ── TRACKER FILTERS ── */
+.filter-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+.filter-btn{font-size:11px;padding:6px 15px;border-radius:99px;cursor:pointer;
+  border:1px solid var(--card-border);background:var(--filter-btn-bg);
+  color:var(--content-ink-muted);font-family:var(--font);font-weight:600;transition:all 0.15s;}
+.filter-btn:hover{color:var(--content-ink);}
+.filter-btn.active{background:var(--teal-status);border-color:var(--teal-border);color:#0D9488;}
+[data-theme="dark"] .filter-btn.active{color:#14B8A6;}
+.filter-count{font-size:10px;color:var(--content-ink-muted);margin-left:4px;}
+
+/* ── REQUEST CARDS ── */
+.req-list{display:flex;flex-direction:column;gap:12px;}
+.req-card{background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:16px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.req-card:hover{border-color:rgba(13,148,136,0.30);box-shadow:0 4px 16px rgba(13,148,136,0.10);}
+.req-card.has-decision{border-color:rgba(13,148,136,0.25);}
+.rc-header{padding:18px 22px 14px;border-bottom:1px solid var(--row-border);}
+.rc-title-row{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;margin-bottom:6px;}
+.rc-title{font-size:14px;font-weight:800;color:var(--content-ink);flex:1;line-height:1.3;}
+.rc-badges{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.rc-badge{font-size:8.5px;font-weight:700;padding:3px 10px;border-radius:99px;
+  display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+.rb-review {background:rgba(217,119,6,0.10);color:#D97706;border:1px solid rgba(217,119,6,0.25);}
+.rb-approved{background:rgba(5,150,105,0.10);color:#059669;border:1px solid rgba(5,150,105,0.25);}
+.rb-hold   {background:rgba(124,58,237,0.10);color:#7C3AED;border:1px solid rgba(124,58,237,0.25);}
+.rb-declined{background:rgba(220,38,38,0.10);color:#DC2626;border:1px solid rgba(220,38,38,0.25);}
+[data-theme="dark"] .rb-review  {background:rgba(251,191,36,0.12);color:#FBBF24;border-color:rgba(251,191,36,0.24);}
+[data-theme="dark"] .rb-approved{background:rgba(52,211,153,0.12);color:#34D399;border-color:rgba(52,211,153,0.24);}
+[data-theme="dark"] .rb-hold    {background:rgba(167,139,250,0.12);color:#A78BFA;border-color:rgba(167,139,250,0.24);}
+[data-theme="dark"] .rb-declined{background:rgba(248,113,113,0.12);color:#F87171;border-color:rgba(248,113,113,0.24);}
+.rb-type   {background:var(--field-bg);color:var(--content-ink-muted);border:1px solid var(--card-border);}
+.rc-meta{font-size:10.5px;color:var(--content-ink-muted);}
+
+/* ── PROGRESS STEPPER ── */
+.stepper{padding:16px 22px;display:flex;align-items:center;
+  border-bottom:1px solid var(--row-border);}
+.step-node{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;z-index:1;}
+.step-circle{width:28px;height:28px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  border:2px solid;transition:all 0.2s;}
+.step-circle.done    {background:#059669;border-color:#059669;color:#fff;}
+.step-circle.active  {background:var(--teal-status);border-color:#0D9488;color:#0D9488;}
+[data-theme="dark"] .step-circle.active{color:#14B8A6;}
+.step-circle.approved{background:rgba(5,150,105,0.12);border-color:#059669;color:#059669;}
+.step-circle.declined{background:rgba(220,38,38,0.10);border-color:#DC2626;color:#DC2626;}
+.step-circle.hold    {background:rgba(124,58,237,0.10);border-color:#7C3AED;color:#7C3AED;}
+.step-circle.pending {background:transparent;border-color:var(--step-pending-border);color:var(--content-ink-muted);}
+[data-theme="dark"] .step-circle.approved{border-color:#34D399;color:#34D399;}
+[data-theme="dark"] .step-circle.declined{border-color:#F87171;color:#F87171;}
+[data-theme="dark"] .step-circle.hold    {border-color:#A78BFA;color:#A78BFA;}
+.step-label{font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  text-align:center;color:var(--content-ink-muted);}
+.step-label.active  {color:#0D9488;}
+[data-theme="dark"] .step-label.active{color:#14B8A6;}
+.step-label.done    {color:#059669;}
+.step-label.approved{color:#059669;}
+.step-label.declined{color:#DC2626;}
+.step-label.hold    {color:#7C3AED;}
+[data-theme="dark"] .step-label.done    {color:#34D399;}
+[data-theme="dark"] .step-label.approved{color:#34D399;}
+[data-theme="dark"] .step-label.declined{color:#F87171;}
+[data-theme="dark"] .step-label.hold    {color:#A78BFA;}
+.step-line{flex:1;height:2px;margin:0 6px;margin-bottom:18px;}
+.step-line.done  {background:#059669;}
+.step-line.active{background:linear-gradient(90deg,#059669,#0D9488);}
+.step-line.pending{background:var(--step-line-pending);}
+
+/* ── DETAIL ROW ── */
+.rc-detail{padding:10px 22px;display:flex;gap:24px;flex-wrap:wrap;
+  border-bottom:1px solid var(--row-border);font-size:11px;}
+.rc-kv{color:var(--content-ink-muted);}
+.rc-kv span{color:var(--content-ink-dim);font-weight:600;}
+
+/* ── VER RESPONSE ── */
+.ver-response{padding:16px 22px;}
+.vr-inner{border-radius:11px;padding:14px 18px;}
+.vr-inner.approved{background:rgba(5,150,105,0.07);border:1px solid rgba(5,150,105,0.20);}
+.vr-inner.declined{background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.18);}
+.vr-inner.hold    {background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.18);}
+.vr-inner.default {background:var(--teal-status);border:1px solid var(--teal-border);}
+.vr-label{font-size:8.5px;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.12em;margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+.vr-inner.approved .vr-label{color:#059669;}
+.vr-inner.declined .vr-label{color:#DC2626;}
+.vr-inner.hold     .vr-label{color:#7C3AED;}
+.vr-inner.default  .vr-label{color:#0D9488;}
+[data-theme="dark"] .vr-inner.approved .vr-label{color:#34D399;}
+[data-theme="dark"] .vr-inner.declined .vr-label{color:#F87171;}
+[data-theme="dark"] .vr-inner.hold     .vr-label{color:#A78BFA;}
+[data-theme="dark"] .vr-inner.default  .vr-label{color:#14B8A6;}
+.vr-path{font-size:12px;font-weight:700;color:var(--content-ink);margin-bottom:5px;}
+.vr-notes{font-size:11px;color:var(--content-ink-dim);line-height:1.6;}
+.vr-date{font-size:10px;color:var(--content-ink-muted);margin-top:6px;}
+
+/* ── ATTACHMENT SECTION ── */
+.attach-section{margin-top:20px;padding:18px 20px;border:1px dashed var(--field-border);
+  border-radius:12px;background:rgba(13,148,136,0.03);}
+.attach-section-title{font-size:10px;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.12em;color:#0D9488;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.attach-section-title::before{content:'📎';}
+.attach-url-row{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.attach-or{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:10px;
+  color:var(--content-ink-muted);text-transform:uppercase;letter-spacing:0.08em;}
+.attach-or::before,.attach-or::after{content:'';flex:1;height:1px;background:var(--field-border);}
+.attach-file-area{position:relative;}
+.attach-file-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.attach-file-btn{display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 16px;border:1px dashed var(--field-border);border-radius:9px;
+  background:var(--field-bg);cursor:pointer;transition:all 0.15s;font-size:11px;
+  color:var(--content-ink-muted);font-family:var(--font);}
+.attach-file-btn:hover{border-color:rgba(13,148,136,0.45);color:#0D9488;background:rgba(13,148,136,0.05);}
+.attach-file-btn.has-file{border-color:rgba(13,148,136,0.45);background:rgba(13,148,136,0.06);color:#0D9488;}
+.attach-limit-note{font-size:9.5px;color:var(--content-ink-muted);margin-top:8px;line-height:1.5;}
+.attach-limit-note strong{color:var(--amber);}
+.attach-preview{display:none;margin-top:10px;padding:9px 14px;border-radius:8px;
+  background:rgba(13,148,136,0.08);border:1px solid rgba(13,148,136,0.20);
+  font-size:10.5px;color:#0D9488;display:flex;align-items:center;gap:8px;}
+.attach-preview.show{display:flex;}
+.attach-preview-name{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.attach-remove{cursor:pointer;font-size:13px;color:var(--content-ink-muted);
+  transition:color 0.15s;flex-shrink:0;background:none;border:none;font-family:var(--font);padding:0;}
+.attach-remove:hover{color:var(--red);}
+
+/* ── ATTACHMENT DISPLAY IN TRACKER ── */
+.rc-attach{display:flex;align-items:center;gap:7px;font-size:10.5px;
+  color:#0D9488;margin-top:4px;flex-wrap:wrap;}
+.rc-attach a{color:#0D9488;text-decoration:none;font-weight:600;}
+.rc-attach a:hover{text-decoration:underline;}
+.rc-attach-file{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;
+  border-radius:7px;background:rgba(13,148,136,0.09);border:1px solid rgba(13,148,136,0.20);
+  font-size:9.5px;font-weight:700;color:#0D9488;}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:56px 20px;color:var(--content-ink-muted);}
+.empty-ico{font-size:36px;margin-bottom:14px;}
+.empty-txt{font-size:12px;line-height:1.6;}
+
+/* ── CONFIRMATION MODAL ── */
+.conf-overlay{display:none;position:fixed;inset:0;z-index:800;
+  background:rgba(4,8,20,0.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  align-items:center;justify-content:center;padding:24px;}
+.conf-overlay.open{display:flex;}
+.conf-panel{background:linear-gradient(160deg,#0D2137 0%,#0F1E3C 55%,#091220 100%);
+  border:1px solid rgba(13,148,136,0.28);border-radius:18px;
+  max-width:600px;width:100%;box-shadow:0 32px 80px rgba(0,0,0,0.6);overflow:hidden;
+  position:relative;}
+.conf-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#0D9488,#14B8A6,#34D399);}
+.conf-head{padding:26px 28px 16px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.conf-check{width:44px;height:44px;border-radius:50%;background:rgba(13,148,136,0.15);
+  border:2px solid rgba(13,148,136,0.35);display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:14px;}
+.conf-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;}
+.conf-id{font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:0.06em;}
+.conf-body{padding:20px 28px;}
+.conf-section{margin-bottom:18px;}
+.conf-section-title{font-size:9px;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.14em;color:#0D9488;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.conf-section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06);}
+.conf-timeline{display:flex;flex-direction:column;gap:7px;}
+.conf-tl-row{display:flex;align-items:flex-start;gap:12px;font-size:12px;}
+.conf-tl-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.conf-tl-text{color:rgba(255,255,255,0.70);line-height:1.55;flex:1;}
+.conf-tl-text strong{color:rgba(255,255,255,0.92);}
+.conf-tl-sla{font-size:10px;font-weight:700;color:#14B8A6;white-space:nowrap;padding-top:2px;flex-shrink:0;}
+.conf-warning{background:rgba(217,119,6,0.09);border:1px solid rgba(217,119,6,0.22);
+  border-radius:9px;padding:12px 14px;font-size:11.5px;color:rgba(255,255,255,0.70);
+  line-height:1.65;margin-bottom:18px;}
+.conf-warning strong{color:#FBBF24;}
+.conf-note{background:rgba(255,255,255,0.04);border-radius:9px;padding:12px 14px;
+  font-size:11px;color:rgba(255,255,255,0.55);line-height:1.65;margin-bottom:18px;
+  border:1px solid rgba(255,255,255,0.07);}
+.conf-foot{padding:16px 28px;border-top:1px solid rgba(255,255,255,0.07);
+  display:flex;gap:10px;justify-content:flex-end;}
+.conf-btn-primary{background:linear-gradient(90deg,#0F766E,#0D9488);color:#fff;
+  border:none;padding:10px 24px;border-radius:99px;font-size:12px;font-weight:800;
+  cursor:pointer;font-family:var(--font);transition:opacity 0.15s;}
+.conf-btn-primary:hover{opacity:0.88;}
+.conf-btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.14);
+  color:rgba(255,255,255,0.55);padding:10px 20px;border-radius:99px;font-size:12px;
+  font-weight:700;cursor:pointer;font-family:var(--font);transition:all 0.15s;}
+.conf-btn-ghost:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);}
+.conf-tl-note{margin-top:10px;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.6;}
+.conf-note-hidden{display:none;}
+.conf-note strong{color:rgba(255,255,255,0.80);}
+
+/* ── MODAL LIGHT MODE ── */
+[data-theme="light"] .conf-panel{background:#FFFFFF;border-color:#E5E7EB;box-shadow:0 32px 80px rgba(0,0,0,0.15);}
+[data-theme="light"] .conf-head{border-bottom-color:#E5E7EB;}
+[data-theme="light"] .conf-title{color:#111827;}
+[data-theme="light"] .conf-id{color:#6B7280;}
+[data-theme="light"] .conf-check{background:rgba(13,148,136,0.08);border-color:rgba(13,148,136,0.22);}
+[data-theme="light"] .conf-section-title::after{background:#E5E7EB;}
+[data-theme="light"] .conf-tl-text{color:#374151;}
+[data-theme="light"] .conf-tl-text strong{color:#111827;}
+[data-theme="light"] .conf-tl-sla{color:#0D9488;}
+[data-theme="light"] .conf-warning{background:rgba(217,119,6,0.06);border-color:rgba(217,119,6,0.20);color:#374151;}
+[data-theme="light"] .conf-warning strong{color:#B45309;}
+[data-theme="light"] .conf-note{background:#F9FAFB;border-color:#E5E7EB;color:#6B7280;}
+[data-theme="light"] .conf-note strong{color:#374151;}
+[data-theme="light"] .conf-tl-note{color:#9CA3AF;}
+[data-theme="light"] .conf-foot{border-top-color:#E5E7EB;}
+[data-theme="light"] .conf-btn-ghost{border-color:#D1D5DB;color:#6B7280;}
+[data-theme="light"] .conf-btn-ghost:hover{background:#F3F4F6;color:#374151;}
+
+/* ── QUICK LINKS ROW (post-approval) ── */
+.rc-quick-links{padding:12px 22px;border-top:1px solid var(--row-border);display:flex;gap:10px;align-items:center;}
+.rc-quick-label{font-size:10px;color:var(--content-ink-muted);font-weight:600;margin-right:4px;}
+.rc-quick-btn{font-size:11px;font-weight:700;padding:7px 16px;border-radius:99px;
+  background:var(--teal-status);border:1px solid var(--teal-border);color:#0D9488;
+  text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s;}
+[data-theme="dark"] .rc-quick-btn{color:#14B8A6;}
+.rc-quick-btn:hover{opacity:0.80;}
+
+/* ── SUCCESS TOAST ── */
+#success-toast{display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  z-index:9999;border-radius:12px;padding:13px 22px;font-size:11.5px;font-weight:700;
+  align-items:center;gap:10px;
+  background:rgba(13,148,136,0.16);border:1px solid rgba(13,148,136,0.35);
+  color:#14B8A6;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.toast-dismiss{background:rgba(255,255,255,0.10);border:none;color:rgba(255,255,255,0.55);
+  border-radius:6px;padding:2px 8px;cursor:pointer;font-size:14px;margin-left:6px;}
+
+@media(max-width:860px){
+  .form-layout{grid-template-columns:1fr;}
+  .info-sidebar{display:none;}
+  .hero-kpi{flex-wrap:wrap;}
+  .tab-pane{padding:20px 16px 40px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<nav class="hub-bar">
+  <a href="index.html" class="hub-back">&#8592; VER Intelligence Hub</a>
+  <span class="hub-bar-title">VER Intake Request</span>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <span id="bar-count" style="font-size:10px;color:rgba(255,255,255,0.35);"></span>
+    <button type="button" id="dm-toggle" onclick="_dmToggle()" style="
+      display:inline-flex;align-items:center;gap:7px;padding:5px 13px;
+      border-radius:99px;border:1px solid rgba(255,255,255,0.14);
+      background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.60);
+      font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+      cursor:pointer;font-family:var(--font);transition:all 0.15s;">
+      <span id="dm-icon">&#9790;</span><span id="dm-label">Dark</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── HERO STAGE (always dark) ── -->
+<div class="hero-stage">
+<div class="hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow">
+      <span class="hero-dot"></span>
+      VENDOR ENGAGEMENT &amp; RELIABILITY &middot; STAKEHOLDER SUPPORT
+    </div>
+    <div class="hero-title">Request VER Support</div>
+    <div class="hero-sub">Submit a request for vendor analysis, rate validation, new engagement review, or renewal support. Your VER team will review and respond within defined SLAs.</div>
+  </div>
+  <div class="hero-kpi">
+    <div class="kpi-tile t-teal">
+      <div class="kpi-val" id="kpi-review">—</div>
+      <div class="kpi-lbl">Under Review</div>
+    </div>
+    <div class="kpi-tile t-green">
+      <div class="kpi-val" id="kpi-approved">—</div>
+      <div class="kpi-lbl">Approved</div>
+    </div>
+    <div class="kpi-tile t-purple">
+      <div class="kpi-val" id="kpi-hold">—</div>
+      <div class="kpi-lbl">On Hold</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /hero -->
+<!-- ── TAB BAR (always dark) ── -->
+<div class="tab-bar-wrap">
+  <div class="tab-bar">
+    <button type="button" class="tab-btn active" id="tab-form-btn" onclick="switchTab('form')">+ New Request</button>
+    <button type="button" class="tab-btn" id="tab-track-btn" onclick="switchTab('tracker')">&#x1F4CB; Track My Requests</button>
+  </div>
+</div>
+</div><!-- /hero-stage -->
+
+<!-- ── CONTENT BODY (theme-aware) ── -->
+<div class="content-body">
+<!-- ── NEW REQUEST TAB ── -->
+<div class="tab-pane" id="pane-form">
+  <div class="form-layout">
+    <div>
+      <div class="form-card">
+        <div class="form-card-title">New Intake Request</div>
+        <div class="form-card-sub">Complete the fields below. VER will review and respond within the listed SLAs.</div>
+
+        <div class="field" id="ni-initiative-field">
+          <label class="field-label" for="ni-initiative">Linked Initiative <span class="field-label-opt">(optional — type 2+ characters to search)</span></label>
+          <div class="ini-wrap">
+            <input class="field-input" id="ni-initiative" autocomplete="off"
+              placeholder="Search by ID (SI-00151) or title keyword…">
+            <div class="ini-dropdown" id="ini-dropdown"></div>
+          </div>
+          <div id="ni-initiative-status"></div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="ni-title">Request Title *</label>
+            <input class="field-input" id="ni-title" placeholder="e.g. New staff aug — DevOps engineers">
+          </div>
+          <div>
+            <label class="field-label" for="ni-type">Request Type *</label>
+            <select class="field-input" id="ni-type">
+              <option>New Vendor Onboarding Guidance</option>
+              <option>SOW Guidance</option>
+              <option>Staff Aug Guidance</option>
+              <option>Change Order Review</option>
+              <option>Software Purchase Support</option>
+              <option>Renewal Support</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="ni-submitter">Your Name *</label>
+            <input class="field-input" id="ni-submitter" placeholder="Full name">
+          </div>
+          <div>
+            <label class="field-label" for="ni-team">Business Unit / Team *</label>
+            <input class="field-input" id="ni-team" placeholder="e.g. Platform Engineering">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="ni-vendor">Vendor (if known)</label>
+            <input class="field-input" id="ni-vendor" placeholder="Vendor name or TBD">
+          </div>
+          <div>
+            <label class="field-label" for="ni-date">Target Date</label>
+            <input class="field-input" type="date" id="ni-date">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="ni-budget">Approved Budget Range</label>
+            <select class="field-input" id="ni-budget">
+              <option>Unknown / TBD</option>
+              <option>Under $100K</option>
+              <option>$100K – $500K</option>
+              <option>$500K – $1M</option>
+              <option>$1M – $5M</option>
+              <option>Over $5M</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="ni-project-code">Approved Project Code</label>
+            <input class="field-input" id="ni-project-code" placeholder="e.g. PC-2026-0142 or TBD">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="ni-desc">Description / Context *</label>
+          <textarea class="field-input" id="ni-desc" rows="4" placeholder="Describe the business need, scope, and any context that will help VER review this request..."></textarea>
+        </div>
+
+        <!-- ── ATTACHMENTS ── -->
+        <div class="attach-section">
+          <div class="attach-section-title">Supporting Documents &amp; Links</div>
+
+          <div class="attach-url-row">
+            <label class="field-label" for="ni-attach-url">Document Link <span class="field-label-opt">(SharePoint, Google Drive, Confluence, etc.)</span></label>
+            <input class="field-input" id="ni-attach-url" type="url"
+              placeholder="https://sharepoint.com/… or https://drive.google.com/…">
+          </div>
+
+          <div class="attach-or">or attach a file</div>
+
+          <div class="attach-file-area">
+            <input type="file" class="attach-file-input" id="ni-attach-file"
+              title="Attach a supporting document (PDF, Word, Excel, PowerPoint, PNG, JPG, CSV, TXT — max 1 MB)"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.csv"
+              onchange="handleFileAttach(this)">
+            <div class="attach-file-btn" id="attach-file-btn">
+              <span>📁</span> Click to browse or drag a file here
+            </div>
+          </div>
+          <div class="attach-preview" id="attach-preview">
+            <span>📄</span>
+            <span class="attach-preview-name" id="attach-preview-name"></span>
+            <button type="button" class="attach-remove" onclick="clearFileAttach()" title="Remove file">✕</button>
+          </div>
+          <div class="attach-limit-note">
+            ⚠ <strong>File size limit: 1 MB.</strong> Files above this limit cannot be stored locally — use a document link instead. Accepted: PDF, Word, Excel, PowerPoint, PNG, JPG, CSV, TXT.
+          </div>
+        </div>
+
+        <div class="form-error" id="ni-error"></div>
+        <button type="button" class="submit-btn" onclick="submitIntake()">Submit Request &#8594;</button>
+      </div>
+    </div>
+
+    <div class="info-sidebar">
+      <div class="info-card">
+        <div class="info-card-title">What Happens Next</div>
+        <div class="process-step">
+          <div class="ps-num">1</div>
+          <div class="ps-body">
+            <div class="ps-title">Request Received</div>
+            <div class="ps-sub">Your request is logged and visible to the VER team immediately. You will see it appear in Track My Requests.</div>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="ps-num">2</div>
+          <div class="ps-body">
+            <div class="ps-title">VER Review</div>
+            <div class="ps-sub">A VER team member is assigned and reviews your request. They may reach out directly with questions.</div>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="ps-num">3</div>
+          <div class="ps-body">
+            <div class="ps-title">Decision &amp; Routing</div>
+            <div class="ps-sub">VER responds with a path decision — Approved, On Hold, or a request for more information. Check Track My Requests for status updates.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">VER SLA Timeframe</div>
+        <div class="sla-row"><span class="sla-label">New Vendor Onboarding Guidance</span><span class="sla-val">5 days</span></div>
+        <div class="sla-row"><span class="sla-label">SOW Guidance</span><span class="sla-val">3 days</span></div>
+        <div class="sla-row"><span class="sla-label">Staff Aug Guidance</span><span class="sla-val">3 days</span></div>
+        <div class="sla-row"><span class="sla-label">Change Order Review</span><span class="sla-val">3 days</span></div>
+        <div class="sla-row"><span class="sla-label">Software Purchase Support</span><span class="sla-val">5 days</span></div>
+        <div class="sla-row"><span class="sla-label">Renewal Support</span><span class="sla-val">5 days</span></div>
+      </div>
+
+      <div class="info-tip">
+        <strong>Tip:</strong> Submit to VER at least 45 days before your target start date. VER is one step in a multi-team approval chain — the full procurement cycle begins <em>after</em> VER clears. Details on downstream timelines will appear when you submit your request.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TRACKER TAB ── -->
+<div class="tab-pane hidden" id="pane-tracker">
+  <div class="filter-bar">
+    <button type="button" class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button type="button" class="filter-btn" onclick="setFilter('Under Review',this)">Under Review</button>
+    <button type="button" class="filter-btn" onclick="setFilter('Approved',this)">Approved</button>
+    <button type="button" class="filter-btn" onclick="setFilter('On Hold',this)">On Hold</button>
+    <button type="button" class="filter-btn" onclick="setFilter('Declined',this)">Declined</button>
+    <span class="filter-count" id="tracker-count"></span>
+  </div>
+  <div class="req-list" id="req-list"></div>
+</div>
+
+</div><!-- /content-body -->
+
+<!-- ── SUBMISSION CONFIRMATION MODAL ── -->
+<div class="conf-overlay" id="conf-modal">
+  <div class="conf-panel">
+    <div class="conf-head">
+      <div class="conf-check">&#10003;</div>
+      <div class="conf-title">Request Submitted</div>
+      <div class="conf-id" id="conf-req-id"></div>
+    </div>
+    <div class="conf-body">
+
+      <div class="conf-section">
+        <div class="conf-section-title">VER Review Timeline</div>
+        <div class="conf-timeline">
+          <div class="conf-tl-row">
+            <span class="conf-tl-icon">&#x1F50D;</span>
+            <span class="conf-tl-text"><strong>Initial triage</strong> — your request is in the VER queue and will be assigned to a team member.</span>
+            <span class="conf-tl-sla">Same day</span>
+          </div>
+          <div class="conf-tl-row">
+            <span class="conf-tl-icon">&#x2705;</span>
+            <span class="conf-tl-text"><strong>VER decision</strong> — review, analysis, and path decision returned to you.</span>
+            <span class="conf-tl-sla" id="conf-ver-sla">2–5 days</span>
+          </div>
+        </div>
+        <div class="conf-tl-note">
+          Complex requests or high-volume periods may extend our review time. We'll keep you updated in the tracker if that happens.
+        </div>
+      </div>
+
+      <div class="conf-note conf-note-hidden" id="conf-onboarding-note">
+        &#x2139;&#xFE0F; <strong>Heads up on Vendor Onboarding:</strong> VER does not manage vendor onboarding — that process is owned by Procurement and IT. VER can provide <strong>guidance and best practices</strong> to help you navigate the process, understand requirements, and prepare your submission. We'll follow up within our SLA with what you need to know.
+      </div>
+
+      <div class="conf-section">
+        <div class="conf-section-title">Downstream Procurement Timelines</div>
+        <div class="conf-warning">
+          <strong>Not a VER process</strong> — the following steps are owned by Procurement and run after VER clears. Plan accordingly.
+        </div>
+        <div class="conf-timeline">
+          <div class="conf-tl-row">
+            <span class="conf-tl-icon">&#x1F4CB;</span>
+            <span class="conf-tl-text"><strong>Agreement Management, F&amp;S BT, Sourcing, FT Order Admin &amp; Order Admin</strong> — each team carries a minimum 5-business-day SLA for non-complex, standard-risk, standard-dollar engagements.</span>
+            <span class="conf-tl-sla">5 days ea.</span>
+          </div>
+          <div class="conf-tl-row">
+            <span class="conf-tl-icon">&#x26A0;&#xFE0F;</span>
+            <span class="conf-tl-text"><strong>Complex, high-risk, or high-dollar engagements</strong> — each of those steps can take significantly longer. No fixed SLA applies.</span>
+            <span class="conf-tl-sla">Varies</span>
+          </div>
+          <div class="conf-tl-row">
+            <span class="conf-tl-icon">&#x1F512;</span>
+            <span class="conf-tl-text"><strong>Security review</strong> — required for most software purchases. Timeline is separate and not included in Procurement's 30-day estimate.</span>
+            <span class="conf-tl-sla">Varies</span>
+          </div>
+          <div class="conf-tl-row">
+            <span class="conf-tl-icon">&#x1F4B0;</span>
+            <span class="conf-tl-text"><strong>Budget approvals &amp; leadership sign-off</strong> — these are not included in Procurement's SLA estimates and run on their own timelines outside the standard process.</span>
+            <span class="conf-tl-sla">Not included</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="conf-note">
+        &#x1F4A1; <strong>Procurement recommends</strong> starting the full approval cycle at least <strong>30 days before your target start date</strong> — and that clock starts after VER clears. If you haven't submitted yet, submit to VER at least <strong>45 days out</strong>.
+      </div>
+
+    </div>
+    <div class="conf-foot">
+      <button type="button" class="conf-btn-ghost" onclick="closeConfModal()">Close</button>
+      <button type="button" class="conf-btn-primary" onclick="closeConfModal();switchTab('tracker')">View My Requests &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUCCESS TOAST ── -->
+<div id="success-toast">
+  <span id="toast-msg"></span>
+  <button type="button" class="toast-dismiss" onclick="document.getElementById('success-toast').style.display='none'">&#215;</button>
+</div>
+
+<script>
+var INTAKE_KEY = 'verVP_intake_requests';
+var CURRENT_FILTER = 'all';
+var ACTIVE_TAB = 'form';
+var _attachedFileData = null; // { name, size, type, data } — base64 encoded, max 1MB
+
+/* ── FILE ATTACH HANDLERS ── */
+function handleFileAttach(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var MAX = 1 * 1024 * 1024; // 1 MB
+  if (file.size > MAX) {
+    clearFileAttach();
+    var errEl = document.getElementById('ni-error');
+    errEl.textContent = 'File "' + file.name + '" is ' + (file.size / 1024 / 1024).toFixed(1) + ' MB — exceeds the 1 MB limit. Please use a document link instead.';
+    errEl.style.display = 'block';
+    input.value = '';
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _attachedFileData = { name: file.name, size: file.size, type: file.type, data: e.target.result };
+    document.getElementById('attach-preview-name').textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
+    document.getElementById('attach-preview').classList.add('show');
+    document.getElementById('attach-file-btn').classList.add('has-file');
+    document.getElementById('attach-file-btn').innerHTML = '<span>📄</span> ' + file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearFileAttach() {
+  _attachedFileData = null;
+  var input = document.getElementById('ni-attach-file');
+  if (input) input.value = '';
+  document.getElementById('attach-preview').classList.remove('show');
+  document.getElementById('attach-file-btn').classList.remove('has-file');
+  document.getElementById('attach-file-btn').innerHTML = '<span>📁</span> Click to browse or drag a file here';
+}
+
+var SAMPLE_INTAKES = [
+  { id:'I001', title:'Rubber Duck — New Vendor Review', type:'New Vendor Assessment',
+    submitter:'Matthew Gelbman', team:'DET Engineering', vendor:'Rubber Duck',
+    status:'Under Review', submitted:'2026-06-15', target:'2026-07-01',
+    budget:'Unknown / TBD', desc:'Security questionnaire sent 6/15. Evaluating for potential AI tooling engagement.',
+    assigned:'VER Team' },
+  { id:'I003', title:'Gartner Renewal — FY28', type:'Renewal Support',
+    submitter:'VER Team', team:'VER', vendor:'Gartner',
+    status:'Approved', submitted:'2026-06-15', target:'2026-09-01',
+    budget:'$100K – $500K', desc:'Standard annual renewal. Terms review complete. Approved for renewal at current scope.',
+    assigned:'Erin', ver_path:'Approved — New SOW', ver_notes:'Terms reviewed. Scope unchanged. Stakeholder notified.', ver_decision_date:'2026-06-18' },
+  { id:'I004', title:'Capgemini — Compliance Gap Assessment', type:'New Vendor Assessment',
+    submitter:'Risk & Compliance', team:'Legal & Compliance', vendor:'Capgemini',
+    status:'On Hold', submitted:'2026-06-28', target:'2026-07-15',
+    budget:'$100K – $500K', desc:'Stakeholder requesting Capgemini engagement for compliance gap assessment. VER flagged active compliance risk.',
+    assigned:'Casey', ver_path:'Escalated to Director', ver_notes:'Capgemini has active compliance risk flag. Director review required before approval.', ver_decision_date:'2026-06-30' },
+  { id:'I005', title:'Informatica Rate Validation — Q3', type:'Rate Validation',
+    submitter:'Debs', team:'VER', vendor:'Informatica',
+    status:'Under Review', submitted:'2026-07-05', target:'2026-07-12',
+    budget:'Unknown / TBD', desc:'Q3 rate validation for Informatica. Compare against current ISG and Gartner benchmarks.',
+    assigned:'VER Team' },
+  { id:'I006', title:'Adobe CC — Seat Expansion', type:'New SOW Request',
+    submitter:'Digital Marketing', team:'DET Marketing Ops', vendor:'Adobe',
+    status:'Approved', submitted:'2026-06-20', target:'2026-07-01',
+    budget:'Under $100K', desc:'Adding 12 seats to existing Adobe CC enterprise agreement. Within current MSA terms.',
+    assigned:'Aditya', ver_path:'Approved — New SOW', ver_notes:'Within existing MSA. Procurement can proceed directly. Stakeholder notified.', ver_decision_date:'2026-06-22' }
+];
+
+function loadIntakes() {
+  try {
+    var saved = localStorage.getItem(INTAKE_KEY);
+    return saved ? JSON.parse(saved) : SAMPLE_INTAKES;
+  } catch(e) { return SAMPLE_INTAKES; }
+}
+
+function saveIntakes(intakes) {
+  try { localStorage.setItem(INTAKE_KEY, JSON.stringify(intakes)); } catch(e){}
+}
+
+/* ── TAB SWITCH ── */
+function switchTab(tab) {
+  ACTIVE_TAB = tab;
+  document.getElementById('pane-form').classList.toggle('hidden', tab !== 'form');
+  document.getElementById('pane-tracker').classList.toggle('hidden', tab !== 'tracker');
+  document.getElementById('tab-form-btn').classList.toggle('active', tab === 'form');
+  document.getElementById('tab-track-btn').classList.toggle('active', tab === 'tracker');
+  if (tab === 'tracker') { renderTracker(); }
+}
+
+/* ── FILTER ── */
+function setFilter(status, btn) {
+  CURRENT_FILTER = status;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderTracker();
+}
+
+/* ── KPI UPDATE ── */
+function updateKPIs() {
+  var all = loadIntakes();
+  document.getElementById('kpi-review').textContent = all.filter(function(i){ return i.status === 'Under Review'; }).length;
+  document.getElementById('kpi-approved').textContent = all.filter(function(i){ return i.status === 'Approved'; }).length;
+  document.getElementById('kpi-hold').textContent = all.filter(function(i){ return i.status === 'On Hold'; }).length;
+  document.getElementById('bar-count').textContent = all.length + ' total requests';
+}
+
+/* ── STATUS BADGE ── */
+function makeBadge(status) {
+  var map = {
+    'Under Review': 'rb-review',
+    'Approved':     'rb-approved',
+    'On Hold':      'rb-hold',
+    'Declined':     'rb-declined'
+  };
+  var badge = document.createElement('span');
+  badge.className = 'rc-badge ' + (map[status] || 'rb-type');
+  badge.textContent = status;
+  return badge;
+}
+
+function makeTypeBadge(type) {
+  var badge = document.createElement('span');
+  badge.className = 'rc-badge rb-type';
+  badge.textContent = type;
+  return badge;
+}
+
+/* ── STEPPER ── */
+function buildStepper(container, req) {
+  var status = req.status;
+  var hasDecision = !!(req.ver_path);
+
+  /* step 1 — Submitted (always done) */
+  var n1 = document.createElement('div'); n1.className = 'step-node';
+  var c1 = document.createElement('div'); c1.className = 'step-circle done'; c1.textContent = '✓';
+  var l1 = document.createElement('div'); l1.className = 'step-label done'; l1.textContent = 'Submitted';
+  n1.appendChild(c1); n1.appendChild(l1);
+
+  /* line 1 */
+  var line1 = document.createElement('div');
+  line1.className = 'step-line ' + (hasDecision || status !== 'Under Review' ? 'done' : 'active');
+
+  /* step 2 — Under Review */
+  var n2 = document.createElement('div'); n2.className = 'step-node';
+  var step2cls = hasDecision ? 'done' : (status === 'Under Review' ? 'active' : 'pending');
+  var c2 = document.createElement('div'); c2.className = 'step-circle ' + step2cls;
+  c2.textContent = hasDecision ? '✓' : (status === 'Under Review' ? '●' : '○');
+  var l2 = document.createElement('div'); l2.className = 'step-label ' + step2cls; l2.textContent = 'Under Review';
+  n2.appendChild(c2); n2.appendChild(l2);
+
+  /* line 2 */
+  var line2 = document.createElement('div');
+  line2.className = 'step-line ' + (hasDecision ? 'done' : 'pending');
+
+  /* step 3 — Decision */
+  var n3 = document.createElement('div'); n3.className = 'step-node';
+  var step3cls = 'pending';
+  var step3sym = '○';
+  var step3lbl = 'Decision';
+  if (hasDecision) {
+    if (status === 'Approved') { step3cls = 'approved'; step3sym = '✓'; step3lbl = 'Approved'; }
+    else if (status === 'Declined') { step3cls = 'declined'; step3sym = '✕'; step3lbl = 'Declined'; }
+    else { step3cls = 'hold'; step3sym = '⊙'; step3lbl = 'On Hold'; }
+  }
+  var c3 = document.createElement('div'); c3.className = 'step-circle ' + step3cls; c3.textContent = step3sym;
+  var l3 = document.createElement('div'); l3.className = 'step-label ' + step3cls; l3.textContent = step3lbl;
+  n3.appendChild(c3); n3.appendChild(l3);
+
+  container.appendChild(n1);
+  container.appendChild(line1);
+  container.appendChild(n2);
+  container.appendChild(line2);
+  container.appendChild(n3);
+}
+
+/* ── VER RESPONSE PANEL ── */
+function buildVERResponse(container, req) {
+  var status = req.status;
+  var cls = 'default';
+  if (status === 'Approved') cls = 'approved';
+  else if (status === 'Declined') cls = 'declined';
+  else if (status === 'On Hold') cls = 'hold';
+
+  var inner = document.createElement('div'); inner.className = 'vr-inner ' + cls;
+  var label = document.createElement('div'); label.className = 'vr-label';
+  label.textContent = 'VER RESPONSE';
+  var pathEl = document.createElement('div'); pathEl.className = 'vr-path';
+  pathEl.textContent = req.ver_path;
+  inner.appendChild(label); inner.appendChild(pathEl);
+
+  if (req.ver_notes) {
+    var notes = document.createElement('div'); notes.className = 'vr-notes';
+    notes.textContent = req.ver_notes;
+    inner.appendChild(notes);
+  }
+  if (req.ver_decision_date) {
+    var dateEl = document.createElement('div'); dateEl.className = 'vr-date';
+    dateEl.textContent = 'Decision date: ' + req.ver_decision_date;
+    inner.appendChild(dateEl);
+  }
+  container.appendChild(inner);
+}
+
+/* ── RENDER CARD ── */
+function buildCard(req) {
+  var card = document.createElement('div');
+  card.className = 'req-card' + (req.ver_path ? ' has-decision' : '');
+
+  /* header */
+  var header = document.createElement('div'); header.className = 'rc-header';
+  var titleRow = document.createElement('div'); titleRow.className = 'rc-title-row';
+  var title = document.createElement('div'); title.className = 'rc-title';
+  title.textContent = req.title;
+  var badges = document.createElement('div'); badges.className = 'rc-badges';
+  badges.appendChild(makeBadge(req.status));
+  badges.appendChild(makeTypeBadge(req.type));
+  titleRow.appendChild(title); titleRow.appendChild(badges);
+  var meta = document.createElement('div'); meta.className = 'rc-meta';
+  var metaParts = [req.submitter];
+  if (req.team) metaParts.push(req.team);
+  if (req.submitted) metaParts.push('Submitted ' + req.submitted);
+  meta.textContent = metaParts.join(' · ');
+  header.appendChild(titleRow); header.appendChild(meta);
+
+  /* stepper */
+  var stepperWrap = document.createElement('div'); stepperWrap.className = 'stepper';
+  buildStepper(stepperWrap, req);
+
+  /* detail row */
+  var detail = document.createElement('div'); detail.className = 'rc-detail';
+  var kv1 = document.createElement('div'); kv1.className = 'rc-kv';
+  kv1.textContent = 'Vendor: '; var s1 = document.createElement('span'); s1.textContent = req.vendor || 'TBD'; kv1.appendChild(s1);
+  var kv2 = document.createElement('div'); kv2.className = 'rc-kv';
+  kv2.textContent = 'Budget: '; var s2 = document.createElement('span'); s2.textContent = req.budget || 'TBD'; kv2.appendChild(s2);
+  var kv3 = document.createElement('div'); kv3.className = 'rc-kv';
+  kv3.textContent = 'Target: '; var s3 = document.createElement('span'); s3.textContent = req.target || '—'; kv3.appendChild(s3);
+  var kv4 = document.createElement('div'); kv4.className = 'rc-kv';
+  kv4.textContent = 'Project Code: '; var s4 = document.createElement('span'); s4.textContent = req.project_code || 'TBD'; kv4.appendChild(s4);
+  detail.appendChild(kv1); detail.appendChild(kv2); detail.appendChild(kv3); detail.appendChild(kv4);
+
+  // Attachments row
+  if (req.attach_url || req.attach_file) {
+    var attachRow = document.createElement('div'); attachRow.className = 'rc-attach';
+    var attachIcon = document.createElement('span'); attachIcon.textContent = '📎 Attachments:';
+    attachRow.appendChild(attachIcon);
+    if (req.attach_url) {
+      var aLink = document.createElement('a');
+      aLink.href = req.attach_url; aLink.target = '_blank'; aLink.rel = 'noopener noreferrer';
+      var urlLabel = req.attach_url.replace(/^https?:\/\//, '').split('/')[0];
+      aLink.textContent = urlLabel;
+      attachRow.appendChild(aLink);
+    }
+    if (req.attach_file) {
+      var aFile = document.createElement('span'); aFile.className = 'rc-attach-file';
+      if (req.attach_url) { var sep = document.createElement('span'); sep.textContent = '·'; attachRow.appendChild(sep); }
+      var dlLink = document.createElement('a');
+      dlLink.href = req.attach_file.data; dlLink.download = req.attach_file.name;
+      dlLink.textContent = '📄 ' + req.attach_file.name + ' (' + (req.attach_file.size / 1024).toFixed(0) + ' KB)';
+      dlLink.style.color = 'inherit';
+      aFile.appendChild(dlLink);
+      attachRow.appendChild(aFile);
+    }
+    detail.appendChild(attachRow);
+  }
+
+  card.appendChild(header);
+  card.appendChild(stepperWrap);
+  card.appendChild(detail);
+
+  /* VER response */
+  if (req.ver_path) {
+    var respWrap = document.createElement('div'); respWrap.className = 'ver-response';
+    buildVERResponse(respWrap, req);
+    card.appendChild(respWrap);
+  }
+
+  /* quick links — only on Approved SOW / Staff Aug / CO requests */
+  var QUICK_LINK_MAP = {
+    'New SOW Review':       { label: 'Create SOW', href: 'vendor_sow.html' },
+    'New Staff Aug Review': { label: 'Create SOW', href: 'vendor_sow.html' },
+    'Change Order Review':  { label: 'Create CO',  href: 'vendor_co.html'  }
+  };
+  if (req.status === 'Approved' && QUICK_LINK_MAP[req.type]) {
+    var ql = QUICK_LINK_MAP[req.type];
+    var qlRow = document.createElement('div'); qlRow.className = 'rc-quick-links';
+    var qlLabel = document.createElement('span'); qlLabel.className = 'rc-quick-label';
+    qlLabel.textContent = 'Next step:';
+    var qlBtn = document.createElement('a'); qlBtn.className = 'rc-quick-btn';
+    qlBtn.href = ql.href; qlBtn.textContent = ql.label + ' →';
+    qlRow.appendChild(qlLabel); qlRow.appendChild(qlBtn);
+    card.appendChild(qlRow);
+  }
+
+  return card;
+}
+
+/* ── RENDER TRACKER ── */
+function renderTracker() {
+  var all = loadIntakes();
+  var filtered = CURRENT_FILTER === 'all' ? all
+    : all.filter(function(i){ return i.status === CURRENT_FILTER; });
+
+  var countEl = document.getElementById('tracker-count');
+  countEl.textContent = filtered.length + ' request' + (filtered.length !== 1 ? 's' : '');
+
+  var list = document.getElementById('req-list');
+  while (list.firstChild) { list.removeChild(list.firstChild); }
+
+  if (filtered.length === 0) {
+    var empty = document.createElement('div'); empty.className = 'empty-state';
+    var ico = document.createElement('div'); ico.className = 'empty-ico'; ico.textContent = '📋';
+    var txt = document.createElement('div'); txt.className = 'empty-txt';
+    txt.textContent = 'No requests found for this filter.';
+    empty.appendChild(ico); empty.appendChild(txt);
+    list.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(function(req) {
+    list.appendChild(buildCard(req));
+  });
+}
+
+/* ── SUBMIT ── */
+function submitIntake() {
+  var REQUIRED = [
+    ['ni-title',     'Request Title'],
+    ['ni-submitter', 'Your Name'],
+    ['ni-team',      'Business Unit / Team'],
+    ['ni-desc',      'Description'],
+  ];
+  REQUIRED.forEach(function(r){ document.getElementById(r[0]).classList.remove('invalid'); });
+  var errEl = document.getElementById('ni-error');
+  errEl.style.display = 'none';
+
+  var missing = REQUIRED.filter(function(r){ return !document.getElementById(r[0]).value.trim(); });
+  if (missing.length) {
+    missing.forEach(function(r){ document.getElementById(r[0]).classList.add('invalid'); });
+    errEl.textContent = 'Please complete: ' + missing.map(function(r){ return r[1]; }).join(', ');
+    errEl.style.display = 'block';
+    return;
+  }
+
+  var intakes = loadIntakes();
+  var newId = 'I' + String(intakes.length + 1).padStart(3, '0');
+  intakes.unshift({
+    id:        newId,
+    title:     document.getElementById('ni-title').value.trim(),
+    type:      document.getElementById('ni-type').value,
+    submitter: document.getElementById('ni-submitter').value.trim(),
+    team:      document.getElementById('ni-team').value.trim(),
+    vendor:    document.getElementById('ni-vendor').value.trim() || 'TBD',
+    status:    'Under Review',
+    submitted: new Date().toISOString().slice(0, 10),
+    target:    document.getElementById('ni-date').value || 'TBD',
+    budget:       document.getElementById('ni-budget').value,
+    project_code: document.getElementById('ni-project-code').value.trim() || 'TBD',
+    desc:         document.getElementById('ni-desc').value.trim(),
+    assigned:  'VER Team',
+    attach_url:   (document.getElementById('ni-attach-url').value.trim() || null),
+    attach_file:  _attachedFileData || null,
+  });
+  saveIntakes(intakes);
+
+  var reqType = document.getElementById('ni-type').value;
+
+  ['ni-title','ni-submitter','ni-team','ni-vendor','ni-date','ni-desc','ni-project-code','ni-initiative','ni-attach-url'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  clearFileAttach();
+  var sEl = document.getElementById('ni-initiative-status');
+  if (sEl) { sEl.textContent = ''; sEl.className = ''; }
+  ['ni-type','ni-budget'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.selectedIndex = 0;
+  });
+  errEl.style.display = 'none';
+
+  updateKPIs();
+
+  openConfModal(newId, reqType);
+}
+
+/* ── CONFIRMATION MODAL ── */
+var SLA_MAP = {
+  'New Vendor Onboarding Guidance': '5 business days',
+  'SOW Guidance':                   '3 business days',
+  'Staff Aug Guidance':             '3 business days',
+  'Change Order Review':            '3 business days',
+  'Software Purchase Support':      '5 business days',
+  'Renewal Support':                '5 business days',
+  'Other':                          '3–5 business days'
+};
+
+function openConfModal(reqId, reqType) {
+  var idEl = document.getElementById('conf-req-id');
+  var slaEl = document.getElementById('conf-ver-sla');
+  if (idEl) idEl.textContent = 'Request ID: ' + reqId;
+  if (slaEl) slaEl.textContent = SLA_MAP[reqType] || '3–5 business days';
+
+  // Onboarding guidance caveat — only for that type
+  var caveatEl = document.getElementById('conf-onboarding-note');
+  if (caveatEl) caveatEl.classList.toggle('conf-note-hidden', reqType !== 'New Vendor Onboarding Guidance');
+
+  var overlay = document.getElementById('conf-modal');
+  if (overlay) overlay.classList.add('open');
+}
+
+function closeConfModal() {
+  var overlay = document.getElementById('conf-modal');
+  if (overlay) overlay.classList.remove('open');
+}
+
+/* ── INITIATIVE COMBO ── */
+var _INITIATIVES = [];
+var _iniFocusIdx = -1;
+
+var _INITIATIVES_FALLBACK = [
+  {id:'SI-00394',title:'[DPS] Trust & Quality Platform',          cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'Data Platform Services'},
+  {id:'SI-00395',title:'[DPS] Visualization Platform',            cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'Data Platform Services'},
+  {id:'SI-00398',title:'[MDS] Campaign Data Transformation (CDT)',cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'DS Marketing'},
+  {id:'SI-00151',title:'[MDS] Campaign Targeting & Optimization', cost:'$2.4M', pillar:'Data Solutions', sub_pillar:'DS Marketing'},
+  {id:'SI-00400',title:'[MDS] Content/PLG/Paid Media',            cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'DS Marketing'},
+  {id:'SI-00146',title:'[MDS] Digital Analytics Platform',        cost:'$1.5M', pillar:'Data Solutions', sub_pillar:'DS Marketing'},
+  {id:'SI-00399',title:'[MDS] Email/PMM/Events',                  cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'DS Marketing'},
+  {id:'SI-00147',title:'[MDS] Marketing Domain Data Products',    cost:'$1.6M', pillar:'Data Solutions', sub_pillar:'DS Marketing'},
+  {id:'SI-00149',title:'[MDS] Marketing Performance Measurement', cost:'$1.4M', pillar:'Data Solutions', sub_pillar:'DS Marketing'},
+  {id:'SI-00144',title:'[MDS] Web Analytics and Priority Agents', cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'DS Marketing'},
+  {id:'SI-00180',title:'[MLP] Agent Flywheel',                    cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'ML Platform Services'},
+  {id:'SI-00379',title:'[MLP] AI Governance',                     cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'ML Platform Services'},
+  {id:'SI-00183',title:'[MLP] Attrition & Adoption Algorithms',   cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'ML Platform Services'},
+  {id:'SI-00140',title:'[MLP] ML Platform',                       cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'ML Platform Services'},
+  {id:'SI-00188',title:'[MLP] Revenue Algorithms (ACV Forecast)', cost:'$0.0M', pillar:'Data Solutions', sub_pillar:'ML Platform Services'},
+];
+
+function _costToBudgetBracket(costStr) {
+  if (!costStr) return null;
+  var raw = costStr.toString().replace(/[$,\s]/g,'');
+  var n = parseFloat(raw) || 0;
+  if (raw.toUpperCase().indexOf('M') >= 0) n = n * 1000000;
+  else if (raw.toUpperCase().indexOf('K') >= 0) n = n * 1000;
+  if (n <= 0)      return null;
+  if (n < 100000)  return 'Under $100K';
+  if (n < 500000)  return '$100K – $500K';
+  if (n < 1000000) return '$500K – $1M';
+  if (n < 5000000) return '$1M – $5M';
+  return 'Over $5M';
+}
+
+function _iniClose() {
+  var dd = document.getElementById('ini-dropdown');
+  if (dd) dd.classList.remove('open');
+  _iniFocusIdx = -1;
+}
+
+function _iniSelect(program) {
+  var inp     = document.getElementById('ni-initiative');
+  var titleEl = document.getElementById('ni-title');
+  var codeEl  = document.getElementById('ni-project-code');
+  var budgetEl= document.getElementById('ni-budget');
+  var statusEl= document.getElementById('ni-initiative-status');
+
+  var teamEl  = document.getElementById('ni-team');
+
+  if (inp) inp.value = program.id + ' — ' + program.title;
+  if (titleEl && !titleEl.value.trim()) titleEl.value = program.title;
+  if (codeEl)  codeEl.value = program.id;
+
+  if (teamEl && !teamEl.value.trim()) {
+    var teamStr = program.pillar || '';
+    if (program.sub_pillar) teamStr += (teamStr ? ' — ' : '') + program.sub_pillar;
+    if (teamStr) teamEl.value = teamStr;
+  }
+
+  var bracket = _costToBudgetBracket(program.cost);
+  if (budgetEl && bracket) {
+    for (var i = 0; i < budgetEl.options.length; i++) {
+      if (budgetEl.options[i].text.trim() === bracket) { budgetEl.selectedIndex = i; break; }
+    }
+  }
+
+  if (statusEl) {
+    statusEl.className = 'linked';
+    var statusParts = ['✓ Linked: ' + program.id];
+    if (program.pillar) statusParts.push(program.pillar);
+    if (program.sub_pillar) statusParts.push(program.sub_pillar);
+    if (program.cost && program.cost !== '$0.0M') statusParts.push(program.cost);
+    statusEl.textContent = statusParts.join(' · ');
+  }
+  _iniClose();
+}
+
+function _iniRenderDropdown(results) {
+  var dd = document.getElementById('ini-dropdown');
+  if (!dd) return;
+  if (!results.length) {
+    dd.innerHTML = '<div class="ini-empty">No matching initiatives found.</div>';
+  } else {
+    dd.innerHTML = results.map(function(p, i) {
+      var costDisp = (p.cost && p.cost !== '$0.0M') ? p.cost : '';
+      var metaParts = [];
+      if (p.pillar) metaParts.push(p.pillar);
+      if (p.sub_pillar) metaParts.push(p.sub_pillar);
+      if (costDisp) metaParts.push(costDisp);
+      return '<div class="ini-item" data-idx="' + i + '">'
+        + '<span class="ini-id">' + p.id + '</span>'
+        + '<span class="ini-title">' + p.title + '</span>'
+        + (metaParts.length ? '<span class="ini-meta">' + metaParts.join(' · ') + '</span>' : '')
+        + '</div>';
+    }).join('');
+    dd.querySelectorAll('.ini-item').forEach(function(el, i) {
+      el.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        _iniSelect(results[i]);
+      });
+    });
+  }
+  dd.classList.add('open');
+  _iniFocusIdx = -1;
+}
+
+function _iniSearch(query) {
+  var q = query.toLowerCase().trim();
+  if (q.length < 2) { _iniClose(); return; }
+  var results = _INITIATIVES.filter(function(p) {
+    return p.id.toLowerCase().indexOf(q) >= 0 || p.title.toLowerCase().indexOf(q) >= 0;
+  }).slice(0, 10);
+  _iniRenderDropdown(results);
+}
+
+function _iniKeydown(e) {
+  var dd = document.getElementById('ini-dropdown');
+  if (!dd || !dd.classList.contains('open')) return;
+  var items = dd.querySelectorAll('.ini-item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _iniFocusIdx = Math.min(_iniFocusIdx + 1, items.length - 1);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _iniFocusIdx = Math.max(_iniFocusIdx - 1, 0);
+  } else if (e.key === 'Enter' && _iniFocusIdx >= 0) {
+    e.preventDefault();
+    items[_iniFocusIdx].dispatchEvent(new MouseEvent('mousedown'));
+    return;
+  } else if (e.key === 'Escape') {
+    _iniClose(); return;
+  } else { return; }
+  items.forEach(function(el, i) { el.classList.toggle('focused', i === _iniFocusIdx); });
+  if (items[_iniFocusIdx]) items[_iniFocusIdx].scrollIntoView({ block:'nearest' });
+}
+
+function _initIniCombo() {
+  var inp = document.getElementById('ni-initiative');
+  if (!inp) return;
+  inp.addEventListener('input',   function() { _iniSearch(this.value); });
+  inp.addEventListener('keydown', _iniKeydown);
+  inp.addEventListener('blur',    function() { setTimeout(_iniClose, 150); });
+}
+
+function _loadInitiatives() {
+  _INITIATIVES = _INITIATIVES_FALLBACK;
+  var GAS_URL = 'https://script.google.com/a/macros/salesforce.com/s/AKfycbxYmQGTEc_HCjhsXVPj1OYXwXAQ7coguNTzSXLl-hQ8vmrNNoKRltOjF46IosW8f9mONA/exec';
+  fetch(GAS_URL, { mode:'cors' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var rows = data.initiatives || data.data || (Array.isArray(data) ? data : []);
+      var programs = rows.map(function(row) {
+        return {
+          id:        row.id        || row.ID        || row['ID']           || '',
+          title:     row.title     || row.TITLE     || row['Title']        || '',
+          cost:      row.total_cost || row['TOTAL COST'] || row.cost       || '',
+          pillar:    row.pillar    || row.PILLAR    || row['Pillar']        || '',
+          sub_pillar:row.sub_pillar || row['SUB-PILLAR'] || row['Sub-Pillar'] || row.subpillar || ''
+        };
+      }).filter(function(p){ return p.id && p.title; });
+      if (programs.length) _INITIATIVES = programs;
+    })
+    .catch(function() { /* stay on fallback */ });
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', function() {
+  updateKPIs();
+  _loadInitiatives();
+  _initIniCombo();
+});
+
+/* ── THEME ── */
+(function(){
+  var saved = null;
+  try{ saved = localStorage.getItem('ver-theme'); }catch(e){}
+  var prefersDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  var t = saved || (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', t);
+  _updateDMToggle(t);
+})();
+function _dmToggle(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try{ localStorage.setItem('ver-theme', next); }catch(e){}
+  _updateDMToggle(next);
+}
+function _updateDMToggle(t){
+  var icon  = document.getElementById('dm-icon');
+  var label = document.getElementById('dm-label');
+  if(icon)  icon.innerHTML    = t === 'dark' ? '&#9790;' : '&#9789;';
+  if(label) label.textContent = t === 'dark' ? 'Dark' : 'Light';
+}
+</script>
+</body>
+</html>

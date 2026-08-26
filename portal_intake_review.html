@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Intake Review · VER Team Portal</title>
+<style>
+:root {
+  --bloom:#F43F5E; --bloom-dim:#E11D48; --bloom-bright:#FB7185;
+  --bloom-glow:rgba(244,63,94,0.16); --bloom-border:rgba(244,63,94,0.30);
+  --bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3; --magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14); --mag-border:rgba(192,38,211,0.28);
+  --violet:#A855F7; --violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12); --vio-border:rgba(168,85,247,0.28);
+  --rose-gold:#E8A598;
+  --bg:#070411; --bg-side:#130D26; --bg-surface:rgba(255,255,255,0.034);
+  --bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96); --ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52); --ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06); --border-soft:rgba(255,255,255,0.10);
+  --green:#34D399; --amber:#FBBF24; --red-dim:#F43F5E;
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);
+  font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.22) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.18) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 48%,rgba(168,85,247,0.07) 0%,transparent 60%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(244,63,94,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,63,94,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+
+/* ── SIDEBAR ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sb-gem{width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  box-shadow:0 0 24px rgba(244,63,94,0.42),0 0 8px rgba(192,38,211,0.28);}
+.sb-logo-title{font-size:13.5px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.55);margin-top:2px;}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;font-size:8px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);
+  animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.sb-nav{flex:1;padding:10px 0;}
+.sb-section{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.42);padding:12px 20px 5px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:8px 0;}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;
+  font-size:9px;color:rgba(255,255,255,0.50);line-height:1.7;}
+.sb-user{margin:0 12px 10px;padding:10px 14px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:20px;line-height:1;}
+.sb-user-name{font-size:11.5px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:9px;color:rgba(255,255,255,0.55);}
+body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.80);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-actions{display:flex;align-items:center;gap:8px;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;white-space:nowrap;}
+.tb-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.tb-btn.primary{background:linear-gradient(90deg,var(--bloom-dim),var(--magenta));
+  border-color:transparent;color:#fff;box-shadow:0 0 16px rgba(244,63,94,0.24);}
+.tb-btn.primary:hover{opacity:0.88;}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── PAGE HEADER ── */
+.page-head{margin-bottom:22px;}
+.page-eyebrow{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.18em;
+  color:var(--bloom-bright);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.page-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--bloom);
+  animation:pulse 2.5s ease-in-out infinite;}
+.page-title{font-size:26px;font-weight:900;letter-spacing:-0.02em;
+  background:linear-gradient(92deg,var(--bloom) 0%,var(--magenta) 55%,var(--violet) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:inline-block;margin-bottom:5px;}
+.page-sub{font-size:12px;color:var(--ink-muted);line-height:1.55;}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.kpi-tile{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;
+  padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0;}
+.t-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.t-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.t-amber::before  {background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.t-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.kpi-ico-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico{font-size:18px;}
+.kpi-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.kb-bloom  {background:rgba(244,63,94,0.14);color:var(--bloom-bright);}
+.kb-green  {background:rgba(168,85,247,0.12);color:var(--violet-bright);}
+.kb-amber  {background:rgba(192,38,211,0.12);color:var(--magenta-bright);}
+.kb-violet {background:rgba(168,85,247,0.12);color:var(--violet-bright);}
+.kpi-val{font-size:32px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.t-bloom   .kpi-val{color:var(--bloom-bright);}
+.t-magenta .kpi-val{color:var(--magenta-bright);}
+.t-amber   .kpi-val{color:var(--magenta-bright);}
+.t-violet  .kpi-val{color:var(--violet-bright);}
+.kpi-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:var(--ink-muted);}
+
+/* ── CALLOUT ── */
+.callout{padding:13px 18px;border-radius:10px;margin-bottom:20px;
+  background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.18);
+  border-left:3px solid var(--bloom);font-size:12px;color:var(--ink-dim);line-height:1.65;}
+.callout strong{color:var(--bloom-bright);}
+
+/* ── FILTER STRIP ── */
+.filter-strip{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;align-items:center;}
+.filter-btn{font-size:10.5px;padding:6px 14px;border-radius:99px;cursor:pointer;
+  border:1px solid var(--border-soft);background:var(--bg-surface);
+  color:var(--ink-dim);font-family:var(--font);font-weight:600;transition:all 0.15s;}
+.filter-btn:hover{background:var(--bg-hover);color:var(--ink);}
+.filter-btn.active{background:var(--bloom-status);border-color:var(--bloom-border);
+  color:var(--bloom-bright);}
+.filter-count{font-size:10px;color:var(--ink-muted);margin-left:4px;}
+
+/* ── INTAKE CARDS ── */
+.intake-list{display:flex;flex-direction:column;gap:10px;}
+.ir-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:14px;
+  overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;}
+.ir-card:hover{border-color:rgba(244,63,94,0.22);box-shadow:0 4px 20px rgba(244,63,94,0.08);}
+.ir-card.has-decision{border-color:rgba(168,85,247,0.22);}
+.ir-card.has-decision .ir-card-top{border-left:3px solid var(--violet);}
+.ir-card-top{padding:16px 20px;display:flex;align-items:flex-start;gap:14px;
+  border-bottom:1px solid var(--border);}
+.ir-logo-wrap{flex-shrink:0;}
+.ir-logo{width:40px;height:40px;border-radius:10px;object-fit:contain;
+  background:rgba(255,255,255,0.06);border:1px solid var(--border);padding:2px;}
+.ir-logo-fb{width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:#fff;flex-shrink:0;
+  border:1px solid var(--border);}
+.ir-info{flex:1;min-width:0;}
+.ir-title{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ir-meta{font-size:10px;color:var(--ink-muted);margin-bottom:7px;}
+.ir-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ir-badge{font-size:8.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+  display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+.ib-review  {background:rgba(192,38,211,0.12);color:var(--magenta-bright);border:1px solid rgba(192,38,211,0.24);}
+.ib-approved{background:rgba(168,85,247,0.12);color:var(--violet-bright);border:1px solid rgba(168,85,247,0.24);}
+.ib-hold    {background:rgba(168,85,247,0.12);color:var(--violet-bright);border:1px solid rgba(168,85,247,0.24);}
+.ib-declined{background:rgba(244,63,94,0.12);color:var(--bloom-bright);border:1px solid rgba(244,63,94,0.24);}
+.ib-info    {background:rgba(96,165,250,0.12);color:#60A5FA;border:1px solid rgba(96,165,250,0.24);}
+.ib-type    {background:var(--bg-surface);color:var(--ink-muted);border:1px solid var(--border-soft);}
+.ir-status-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.ir-body{padding:12px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;
+  border-bottom:1px solid var(--border);}
+.ir-kv{font-size:10.5px;color:var(--ink-dim);}
+.ir-kv strong{color:var(--ink);font-size:10px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-weight:700;
+  color:var(--ink-muted);margin-bottom:2px;}
+.ir-desc{padding:10px 20px;font-size:11.5px;color:var(--ink-dim);line-height:1.6;
+  border-bottom:1px solid var(--border);}
+.ir-actions{padding:12px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.ir-btn{font-size:10.5px;font-weight:700;padding:6px 14px;border-radius:8px;
+  cursor:pointer;font-family:var(--font);border:1px solid;transition:all 0.15s;}
+.ir-btn-path{
+  background:linear-gradient(135deg,rgba(244,63,94,0.16),rgba(192,38,211,0.12));
+  border-color:rgba(244,63,94,0.32);color:var(--bloom-bright);}
+.ir-btn-path:hover{background:linear-gradient(135deg,rgba(244,63,94,0.26),rgba(192,38,211,0.22));}
+.ir-btn-ghost{background:transparent;border-color:var(--border-soft);color:var(--ink-muted);}
+.ir-btn-ghost:hover{background:var(--bg-surface);color:var(--ink);}
+.ir-decision-badge{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;
+  font-weight:700;padding:3px 10px;border-radius:99px;
+  background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);color:var(--violet-bright);}
+.ir-decision-note{font-size:10px;color:var(--ink-muted);margin-left:2px;}
+
+/* ── MODALS ── */
+.modal-bg{position:fixed;inset:0;z-index:600;
+  background:rgba(4,2,16,0.88);backdrop-filter:blur(16px);
+  display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;}
+.modal-bg.open{display:flex;}
+.modal-panel{width:100%;max-width:660px;
+  background:linear-gradient(160deg,#0D0420 0%,#160829 45%,#0A0318 100%);
+  border:1px solid rgba(244,63,94,0.18);border-radius:18px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.7);overflow:hidden;position:relative;}
+.modal-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--bloom) 0%,var(--magenta) 50%,var(--violet) 100%);}
+.modal-head{padding:24px 28px 18px;border-bottom:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-size:18px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;}
+.modal-sub{font-size:10px;color:var(--ink-muted);margin-top:3px;}
+.modal-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.10);color:rgba(255,255,255,0.50);
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font);transition:background 0.15s,color 0.15s;}
+.modal-close:hover{background:rgba(244,63,94,0.14);color:#fff;}
+.modal-body{padding:22px 28px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-full{margin-bottom:14px;}
+.form-label{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink-muted);margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:9px 13px;border-radius:8px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  color:var(--ink);font-family:var(--font);font-size:12.5px;outline:none;
+  transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--bloom-border);}
+.form-input::placeholder{color:var(--ink-muted);}
+.form-input.invalid{border-color:var(--bloom)!important;background:rgba(244,63,94,0.05);}
+.form-error{display:none;background:rgba(244,63,94,0.10);border:1px solid rgba(244,63,94,0.24);
+  border-radius:7px;padding:8px 12px;font-size:10.5px;color:var(--bloom-bright);margin-bottom:12px;}
+.modal-foot{padding:16px 28px;border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;}
+.modal-btn{font-size:11px;font-weight:700;padding:9px 22px;border-radius:99px;
+  cursor:pointer;font-family:var(--font);transition:all 0.15s;}
+.modal-btn-primary{background:linear-gradient(90deg,var(--bloom),var(--magenta));
+  border:none;color:#fff;box-shadow:0 0 20px rgba(244,63,94,0.28);}
+.modal-btn-primary:hover{opacity:0.88;transform:translateY(-1px);}
+.modal-btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--ink-muted);}
+.modal-btn-ghost:hover{background:var(--bg-surface);color:var(--ink);}
+
+/* Path choice chips */
+.path-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;}
+.path-chip{padding:10px 14px;border-radius:10px;cursor:pointer;
+  border:1px solid var(--border-soft);background:var(--bg-surface);
+  font-family:var(--font);text-align:left;transition:all 0.15s;}
+.path-chip:hover{background:var(--bg-hover);border-color:rgba(244,63,94,0.28);}
+.path-chip.selected{background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.36);}
+.path-chip-label{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.path-chip-sub{font-size:9.5px;color:var(--ink-muted);}
+.path-chip.approved .path-chip-label{color:#34D399;}
+.path-chip.hold     .path-chip-label{color:var(--violet-bright);}
+.path-chip.decline  .path-chip-label{color:var(--bloom-bright);}
+.path-chip.info     .path-chip-label{color:#60A5FA;}
+
+/* Success toast */
+.success-toast{display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  z-index:9999;border-radius:12px;padding:13px 22px;font-size:11px;font-weight:700;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);align-items:center;gap:10px;
+  background:linear-gradient(135deg,rgba(52,211,153,0.18),rgba(52,211,153,0.10));
+  border:1px solid rgba(52,211,153,0.32);color:#34D399;
+  backdrop-filter:blur(12px);}
+.toast-dismiss{background:rgba(255,255,255,0.10);border:none;color:rgba(255,255,255,0.60);
+  border-radius:6px;padding:2px 8px;cursor:pointer;font-size:13px;margin-left:6px;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:48px 20px;color:var(--ink-muted);}
+.empty-ico{font-size:32px;margin-bottom:12px;}
+.empty-txt{font-size:12px;}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-head{animation:rise 0.45s var(--ease) 0.05s both;}
+.kpi-strip{animation:rise 0.45s var(--ease) 0.12s both;}
+.callout{animation:rise 0.45s var(--ease) 0.18s both;}
+.filter-strip{animation:rise 0.45s var(--ease) 0.22s both;}
+.intake-list{animation:rise 0.45s var(--ease) 0.26s both;}
+
+@media(max-width:1100px){.kpi-strip{grid-template-columns:1fr 1fr;}}
+@media(max-width:760px){.ir-body{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.sidebar{display:none;}.content{padding:16px 16px 40px;}
+  .kpi-strip{grid-template-columns:1fr 1fr;}}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode::before{background:radial-gradient(ellipse at 80% 0%,rgba(192,38,211,0.12) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.10) 0%,transparent 50%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title{color:#1A0818;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover,body.light-mode .tb-btn.primary{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .page-title,body.light-mode .ir-vendor-name{color:#1A0818;}
+body.light-mode .page-eyebrow,body.light-mode .ir-meta,body.light-mode .ir-req-label{color:#7A4055;}
+body.light-mode .kpi-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .kpi-val{color:#E11D48;}
+body.light-mode .kpi-label,body.light-mode .kpi-note{color:#7A4055;}
+body.light-mode .ir-card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .ir-req{background:rgba(26,8,24,0.04);color:#3D1028;}
+body.light-mode .path-modal{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .path-modal input,body.light-mode .path-modal textarea,body.light-mode .path-modal select{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .path-modal label{color:#7A4055;}
+body.light-mode .modal-bg{background:rgba(255,240,244,0.85);backdrop-filter:blur(14px);}
+body.light-mode .modal-panel{background:linear-gradient(160deg,#FEE8F0 0%,#FDF0F6 60%,#FFF8FA 100%);border-color:#F5C6D3;}
+body.light-mode .modal-panel::before{background:linear-gradient(90deg,var(--bloom),var(--magenta),var(--violet));}
+body.light-mode .modal-head{border-bottom-color:#F5C6D3;}
+body.light-mode .modal-title{color:#1A0818;}
+body.light-mode .modal-sub{color:#7A4055;}
+body.light-mode .modal-close{background:rgba(26,8,24,0.06);border-color:#F5C6D3;color:#7A4055;}
+body.light-mode .modal-close:hover{background:rgba(244,63,94,0.10);color:#C0143C;}
+body.light-mode .modal-body{color:#1A0818;}
+body.light-mode .form-label{color:#7A4055;}
+body.light-mode .form-input{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .form-input:focus{border-color:var(--bloom-border);}
+body.light-mode .form-input::placeholder{color:#B06080;}
+body.light-mode .form-error{background:rgba(192,20,60,0.08);border-color:rgba(192,20,60,0.24);}
+body.light-mode .modal-foot{border-top-color:#F5C6D3;}
+body.light-mode .modal-btn-ghost{border-color:#F5C6D3;color:#7A4055;}
+body.light-mode .modal-btn-ghost:hover{background:rgba(26,8,24,0.04);color:#1A0818;}
+body.light-mode .path-chip{background:#FFF0F4;border-color:#F5C6D3;}
+body.light-mode .path-chip:hover{background:rgba(244,63,94,0.06);border-color:rgba(244,63,94,0.24);}
+body.light-mode .path-chip.selected{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.30);}
+body.light-mode .path-chip-label{color:#1A0818;}
+body.light-mode .path-chip-sub{color:#7A4055;}
+body.light-mode .path-chip.approved .path-chip-label{color:#6D28D9;}
+body.light-mode .path-chip.hold     .path-chip-label{color:#6D28D9;}
+body.light-mode .path-chip.decline  .path-chip-label{color:#C0143C;}
+body.light-mode .path-chip.info     .path-chip-label{color:#2563EB;}
+body.light-mode .scan{opacity:0.12;}
+body.light-mode .hero-eyebrow{color:#7A4055;}
+body.light-mode .hero-sub{color:#3D1028;}
+body.light-mode .hero-stat-label{color:#7A4055;}
+body.light-mode .hero-stat-val{background:linear-gradient(135deg,#C0143C,#9A0DAF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+</style>
+</head>
+<body data-portal="true">
+
+<div class="success-toast" id="toast">
+  <span>&#10003; Decision recorded &mdash; vendor platform updated.</span>
+  <button type="button" class="toast-dismiss" onclick="document.getElementById('toast').style.display='none'">&#215;</button>
+</div>
+
+<!-- NEW INTAKE MODAL -->
+<div class="modal-bg" id="intake-modal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">New Intake Request</div>
+        <div class="modal-sub">Submitted requests are immediately visible to VER for review and path determination.</div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('intake-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div>
+          <label class="form-label">Request Title *</label>
+          <input class="form-input" id="ni-title" placeholder="e.g. New staff aug — DevOps engineers">
+        </div>
+        <div>
+          <label class="form-label">Request Type *</label>
+          <select class="form-input" id="ni-type">
+            <option>New Vendor Assessment</option>
+            <option>New SOW Request</option>
+            <option>Staff Augmentation Request</option>
+            <option>Renewal Support</option>
+            <option>Rate Validation</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label class="form-label">Submitted By *</label>
+          <input class="form-input" id="ni-submitter" placeholder="Stakeholder name">
+        </div>
+        <div>
+          <label class="form-label">Business Unit / Team *</label>
+          <input class="form-input" id="ni-team" placeholder="e.g. Platform Engineering">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label class="form-label">Vendor (if known)</label>
+          <input class="form-input" id="ni-vendor" placeholder="Vendor name or TBD">
+        </div>
+        <div>
+          <label class="form-label">Target Date</label>
+          <input class="form-input" type="date" id="ni-date">
+        </div>
+      </div>
+      <div class="form-full">
+        <label class="form-label">Description / Context *</label>
+        <textarea class="form-input" id="ni-desc" rows="3" placeholder="Business need, scope, and context for VER review..."></textarea>
+      </div>
+      <div class="form-full">
+        <label class="form-label">Estimated Budget Range</label>
+        <select class="form-input" id="ni-budget">
+          <option>Unknown / TBD</option>
+          <option>Under $100K</option><option>$100K – $500K</option>
+          <option>$500K – $1M</option><option>$1M – $5M</option><option>Over $5M</option>
+        </select>
+      </div>
+      <div class="form-error" id="ni-error"></div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="modal-btn modal-btn-ghost" onclick="closeModal('intake-modal')">Cancel</button>
+      <button type="button" class="modal-btn modal-btn-primary" onclick="submitIntake()">Submit Request &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- PATH DECISION MODAL -->
+<div class="modal-bg" id="path-modal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">&#9889; Determine Path</div>
+        <div class="modal-sub" id="path-modal-sub">Review intake and assign a path decision</div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('path-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-full" style="margin-bottom:18px;">
+        <label class="form-label">VER Path Decision *</label>
+        <div class="path-grid" id="path-grid">
+          <button type="button" class="path-chip approved" data-path="Approved — New SOW" data-status="Approved" onclick="selectPath(this)">
+            <div class="path-chip-label">&#10003; Approve — New SOW</div>
+            <div class="path-chip-sub">Route to SOW build process</div>
+          </button>
+          <button type="button" class="path-chip approved" data-path="Approved — New Vendor" data-status="Approved" onclick="selectPath(this)">
+            <div class="path-chip-label">&#10003; Approve — New Vendor</div>
+            <div class="path-chip-sub">Route to vendor onboarding</div>
+          </button>
+          <button type="button" class="path-chip approved" data-path="Approved — Staff Augmentation" data-status="Approved" onclick="selectPath(this)">
+            <div class="path-chip-label">&#10003; Approve — Staff Aug</div>
+            <div class="path-chip-sub">Route to CW requisition</div>
+          </button>
+          <button type="button" class="path-chip info" data-path="Needs More Information" data-status="Under Review" onclick="selectPath(this)">
+            <div class="path-chip-label">&#128196; Needs More Info</div>
+            <div class="path-chip-sub">Request stakeholder clarification</div>
+          </button>
+          <button type="button" class="path-chip hold" data-path="Escalated to Director" data-status="On Hold" onclick="selectPath(this)">
+            <div class="path-chip-label">&#9650; Escalate to Director</div>
+            <div class="path-chip-sub">Director review required</div>
+          </button>
+          <button type="button" class="path-chip decline" data-path="Declined" data-status="Declined" onclick="selectPath(this)">
+            <div class="path-chip-label">&#10005; Decline Request</div>
+            <div class="path-chip-sub">Not aligned / no path forward</div>
+          </button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label class="form-label">Assigned to</label>
+          <select class="form-input" id="path-assignee">
+            <option>VER Team</option>
+            <option>Casey (Director)</option>
+            <option>Debs (Manager)</option>
+            <option>Erin (Sr. Manager)</option>
+            <option>Mahesh (Sr. Manager)</option>
+            <option>Aditya (Sr. Manager)</option>
+            <option>Justin (Sr. Analyst)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Target Resolution</label>
+          <input class="form-input" type="date" id="path-target">
+        </div>
+      </div>
+      <div class="form-full">
+        <label class="form-label">VER Notes &amp; Action Items</label>
+        <textarea class="form-input" id="path-notes" rows="3" placeholder="Rationale for decision, stakeholder communication notes, action items..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot" style="justify-content:space-between;">
+      <span style="font-size:9.5px;color:var(--ink-muted);">&#9889; Decision auto-injects to vendor platform on save.</span>
+      <div style="display:flex;gap:10px;">
+        <button type="button" class="modal-btn modal-btn-ghost" onclick="closeModal('path-modal')">Cancel</button>
+        <button type="button" class="modal-btn modal-btn-primary" onclick="savePath()">Record Decision &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-user">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+      <div class="sb-section">Director</div>
+      <a href="assignments.html" class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"      class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"          class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"       class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"    class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"  class="sb-item active"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"  class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html" class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html"    class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html" class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"            class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Intake Review</span>
+      </div>
+      <div class="tb-actions">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button type="button" class="tb-btn" onclick="openHelp()">&#63; How to Use</button>
+        <button type="button" class="tb-btn primary" onclick="openModal('intake-modal')">+ New Request</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <div class="page-head">
+        <div class="page-eyebrow"><span class="page-eyebrow-dot"></span>VER Operations &nbsp;&middot;&nbsp; FY27 Q3</div>
+        <div class="page-title">Intake Review</div>
+        <div class="page-sub">VER reviews every stakeholder request &mdash; assess, determine the path, and inject decisions directly to the vendor platform. We route so stakeholders can act.</div>
+      </div>
+
+      <div class="kpi-strip" id="kpi-strip">
+        <div class="kpi-tile t-bloom">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128229;</span><span class="kpi-badge kb-bloom">Needs action</span></div>
+          <div class="kpi-val" id="kpi-pending">0</div>
+          <div class="kpi-label">Pending Review</div>
+        </div>
+        <div class="kpi-tile t-amber">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#9201;</span><span class="kpi-badge kb-amber" id="kpi-aging-badge">—</span></div>
+          <div class="kpi-val" id="kpi-aging">0</div>
+          <div class="kpi-label">Aged &gt; 5 Days</div>
+        </div>
+        <div class="kpi-tile t-violet">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#9889;</span><span class="kpi-badge kb-violet" id="kpi-decided-badge">this week</span></div>
+          <div class="kpi-val" id="kpi-decided">0</div>
+          <div class="kpi-label">Path Decisions Made</div>
+        </div>
+        <div class="kpi-tile t-magenta">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128200;</span><span class="kpi-badge kb-green">FY27 Q3</span></div>
+          <div class="kpi-val" id="kpi-total">0</div>
+          <div class="kpi-label">Total This Quarter</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>VER Intake Process:</strong> Every stakeholder request is reviewed by VER before any engagement proceeds. VER determines the path &mdash; approval, more info needed, or decline &mdash; and that decision auto-updates the vendor platform intake queue. Stakeholders act on VER's guidance.
+      </div>
+
+      <div class="filter-strip">
+        <button type="button" class="filter-btn active" onclick="filterIntake('all',this)">All</button>
+        <button type="button" class="filter-btn" onclick="filterIntake('Under Review',this)">Under Review</button>
+        <button type="button" class="filter-btn" onclick="filterIntake('Approved',this)">Approved</button>
+        <button type="button" class="filter-btn" onclick="filterIntake('On Hold',this)">On Hold</button>
+        <button type="button" class="filter-btn" onclick="filterIntake('Declined',this)">Declined</button>
+        <span class="filter-count" id="filter-count"></span>
+      </div>
+
+      <div class="intake-list" id="intake-list"></div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/help-modal.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════
+   BRANDFETCH
+   ══════════════════════════════════════════════════════ */
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+
+var VENDOR_DOMAIN_MAP = {
+  'NTT Data':'nttdata.com','Cognizant':'cognizant.com','Workday':'workday.com',
+  'AWS':'aws.amazon.com','Microsoft':'microsoft.com','Accenture':'accenture.com',
+  'IBM':'ibm.com','Deloitte':'deloitte.com','BCG':'bcg.com','PwC':'pwc.com',
+  'McKinsey':'mckinsey.com','McKinsey & Company':'mckinsey.com',
+  'Insight Global':'insightglobal.com','TEKsystems':'teksystems.com',
+  'Google Cloud':'cloud.google.com','Snowflake':'snowflake.com',
+  'ServiceNow':'servicenow.com','Atlassian':'atlassian.com','Okta':'okta.com',
+  'Dell Technologies':'dell.com','Cisco':'cisco.com','Splunk':'splunk.com',
+  'Tech Mahindra':'techmahindra.com','Gartner':'gartner.com','HP Inc.':'hp.com',
+  'Informatica':'informatica.com','Capgemini':'capgemini.com','Infosys':'infosys.com',
+  'Wipro':'wipro.com','HCL':'hcl.com','Adecco':'adecco.com','BCForward':'bcforward.com',
+  'Spectraforce':'spectraforce.com','Swoon':'swoonstaffing.com',
+  'Verizon':'verizonbusiness.com','Rackspace':'rackspace.com',
+  'Tableau':'tableau.com','SAP':'sap.com','Oracle':'oracle.com',
+  'Salesforce':'salesforce.com','Adobe':'adobe.com','Zoom':'zoom.us',
+  'Slack':'slack.com','GitHub':'github.com','HashiCorp':'hashicorp.com',
+};
+
+var LOGO_PALETTE = ['#F43F5E','#C026D3','#A855F7','#FBBF24','#34D399','#60A5FA'];
+
+function vendorLogo(name, size) {
+  size = size || 40;
+  var domain = VENDOR_DOMAIN_MAP[name] || '';
+  var ini = (name || '?').split(' ').map(function(w){ return w[0]||''; }).join('').slice(0,2).toUpperCase();
+  var lc = LOGO_PALETTE[Math.abs(name.charCodeAt(0)+(name.charCodeAt(1)||0)) % LOGO_PALETTE.length];
+  var bs = 'width:'+size+'px;height:'+size+'px;border-radius:10px;flex-shrink:0;';
+  var fb = '<div class="ir-logo-fb" style="background:'+lc+';'+bs+'display:none;align-items:center;'+
+    'justify-content:center;font-size:'+Math.round(size*0.32)+'px;font-weight:800;color:#fff;'+
+    'font-family:Arial;">'+ini+'</div>';
+  if (!domain) {
+    return '<div class="ir-logo-fb" style="background:'+lc+';'+bs+
+      'display:flex;align-items:center;justify-content:center;'+
+      'font-size:'+Math.round(size*0.32)+'px;font-weight:800;color:#fff;font-family:Arial;">'+ini+'</div>';
+  }
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'" alt="'+name+'"'+
+    ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"'+
+    ' onload="this.nextElementSibling.style.display=\'none\';"'+
+    ' class="ir-logo" style="'+bs+'object-fit:contain;background:#fff;padding:3px;">'+fb;
+}
+
+/* ══════════════════════════════════════════════════════
+   INTAKE DATA — shares localStorage key with vendor_intake.html
+   ══════════════════════════════════════════════════════ */
+var INTAKE_KEY = 'verVP_intake_requests';
+
+var SAMPLE_INTAKES = [
+  { id:'I001', title:'Rubber Duck — New Vendor Review', type:'New Vendor Assessment',
+    submitter:'Matthew Gelbman', team:'DET Engineering', vendor:'Rubber Duck',
+    status:'Under Review', submitted:'2026-07-01', target:'2026-07-08',
+    budget:'Unknown / TBD', desc:'Security questionnaire sent. Evaluating for potential AI tooling engagement. Awaiting VER path decision.', assigned:'VER Team' },
+  { id:'I002', title:'Staff Aug — Platform Engineering (3 headcount)', type:'Staff Augmentation Request',
+    submitter:'Sarah Chen', team:'Platform Engineering', vendor:'TBD',
+    status:'Under Review', submitted:'2026-07-02', target:'2026-07-20',
+    budget:'$500K – $1M', desc:'3 senior platform engineers needed for Q2 initiative. Prefer Tier 1 or Tier 2 partner. VER to recommend from preferred supplier list.', assigned:'VER Team' },
+  { id:'I003', title:'Gartner Renewal — FY28', type:'Renewal Support',
+    submitter:'VER Team', team:'VER', vendor:'Gartner',
+    status:'Approved', submitted:'2026-06-15', target:'2026-09-01',
+    budget:'$100K – $500K', desc:'Standard annual renewal. Terms review complete. Approved for renewal at current scope.',
+    assigned:'Erin', ver_path:'Approved — New SOW', ver_notes:'Terms reviewed. Scope unchanged. Stakeholder notified.', ver_decision_date:'2026-06-18' },
+  { id:'I004', title:'Capgemini — Compliance Gap Assessment', type:'New Vendor Assessment',
+    submitter:'Risk & Compliance', team:'Legal & Compliance', vendor:'Capgemini',
+    status:'On Hold', submitted:'2026-06-28', target:'2026-07-15',
+    budget:'$100K – $500K', desc:'Stakeholder requesting Capgemini engagement for compliance gap assessment. VER flagged active compliance dimension risk — escalated to Director.',
+    assigned:'Casey', ver_path:'Escalated to Director', ver_notes:'Capgemini has active compliance risk flag. Director review required before approval.', ver_decision_date:'2026-06-30' },
+  { id:'I005', title:'Informatica Rate Validation — Q3', type:'Rate Validation',
+    submitter:'Debs', team:'VER', vendor:'Informatica',
+    status:'Under Review', submitted:'2026-07-05', target:'2026-07-12',
+    budget:'Unknown / TBD', desc:'Q3 rate card refresh. Existing rates need validation against current benchmark data before renewal negotiation begins.', assigned:'VER Team' },
+  { id:'I006', title:'Adobe Creative Cloud — Seat Expansion', type:'Renewal Support',
+    submitter:'Digital Marketing', team:'DET Marketing Ops', vendor:'Adobe',
+    status:'Approved', submitted:'2026-06-20', target:'2026-07-01',
+    budget:'Under $100K', desc:'Adding 12 seats to existing Adobe CC enterprise agreement. Within current MSA terms.',
+    assigned:'Aditya', ver_path:'Approved — New SOW', ver_notes:'Within existing MSA. Procurement can proceed directly. Stakeholder notified.', ver_decision_date:'2026-06-22' },
+];
+
+function loadIntakes() {
+  try {
+    var saved = localStorage.getItem(INTAKE_KEY);
+    return saved ? JSON.parse(saved) : SAMPLE_INTAKES;
+  } catch(e) { return SAMPLE_INTAKES; }
+}
+
+function saveIntakes(intakes) {
+  try { localStorage.setItem(INTAKE_KEY, JSON.stringify(intakes)); } catch(e){}
+}
+
+/* ══════════════════════════════════════════════════════
+   FILTER + RENDER
+   ══════════════════════════════════════════════════════ */
+var CURRENT_FILTER = 'all';
+
+function filterIntake(status, btn) {
+  CURRENT_FILTER = status;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderIntakes();
+}
+
+function statusBadgeClass(status) {
+  var map = {
+    'Under Review':'ib-review','Approved':'ib-approved',
+    'On Hold':'ib-hold','Declined':'ib-declined','Needs More Info':'ib-info'
+  };
+  return map[status] || 'ib-review';
+}
+
+function renderIntakes() {
+  var all = loadIntakes();
+  var filtered = CURRENT_FILTER === 'all' ? all
+    : all.filter(function(i){ return i.status === CURRENT_FILTER; });
+
+  document.getElementById('filter-count').textContent = filtered.length + ' request' + (filtered.length !== 1 ? 's' : '');
+
+  updateKPIs(all);
+
+  if (!filtered.length) {
+    document.getElementById('intake-list').innerHTML =
+      '<div class="empty-state"><div class="empty-ico">&#128229;</div>'+
+      '<div class="empty-txt">No requests matching this filter.</div></div>';
+    return;
+  }
+
+  document.getElementById('intake-list').innerHTML = filtered.map(function(req) {
+    var bdgCls = statusBadgeClass(req.status);
+    var logoHtml = vendorLogo(req.vendor !== 'TBD' ? req.vendor : '', 40);
+    var hasDecision = !!req.ver_path;
+    var decisionHtml = hasDecision
+      ? '<span class="ir-decision-badge">&#9889; '+req.ver_path+'</span>'+
+        (req.ver_notes ? '<span class="ir-decision-note">&middot; '+req.ver_notes.slice(0,60)+(req.ver_notes.length>60?'&hellip;':'')+'</span>' : '')
+      : '';
+
+    var ageDays = req.submitted ? Math.floor((Date.now() - new Date(req.submitted)) / 86400000) : 0;
+    var ageFlag = (ageDays > 5 && req.status === 'Under Review')
+      ? '<span class="ir-badge ib-review">&#9888; '+ageDays+'d old</span>' : '';
+
+    return '<div class="ir-card'+(hasDecision?' has-decision':'')+'" id="card-'+req.id+'">'
+      + '<div class="ir-card-top">'
+      + '<div class="ir-logo-wrap">'+logoHtml+'</div>'
+      + '<div class="ir-info">'
+      + '<div class="ir-title">'+req.title+'</div>'
+      + '<div class="ir-meta">'+req.type+' &middot; Submitted by '+req.submitter+' ('+req.team+') &middot; '+req.submitted+'</div>'
+      + '<div class="ir-badges">'
+      + '<span class="ir-badge '+bdgCls+'">'+req.status+'</span>'
+      + '<span class="ir-badge ib-type">'+req.type+'</span>'
+      + ageFlag
+      + '</div>'
+      + '</div>'
+      + '</div>'
+      + '<div class="ir-body">'
+      + '<div class="ir-kv"><strong>Vendor</strong>'+req.vendor+'</div>'
+      + '<div class="ir-kv"><strong>Budget</strong>'+(req.budget||'TBD')+'</div>'
+      + '<div class="ir-kv"><strong>Target</strong>'+(req.target||'—')+'</div>'
+      + '</div>'
+      + '<div class="ir-desc">'+req.desc+'</div>'
+      + '<div class="ir-actions">'
+      + '<button type="button" class="ir-btn ir-btn-path" onclick="openPath(\''+req.id+'\')">&#9889; '+(hasDecision ? 'Update Path' : 'Determine Path')+'</button>'
+      + (hasDecision ? decisionHtml : '<span style="font-size:10px;color:var(--ink-muted)">No VER decision yet &mdash; path pending</span>')
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function updateKPIs(all) {
+  var pending = all.filter(function(i){ return i.status === 'Under Review'; }).length;
+  var now = Date.now();
+  var aged = all.filter(function(i){
+    return i.status === 'Under Review' && i.submitted &&
+      (now - new Date(i.submitted)) / 86400000 > 5;
+  }).length;
+  var decided = all.filter(function(i){ return !!i.ver_path; }).length;
+
+  document.getElementById('kpi-pending').textContent = pending;
+  document.getElementById('kpi-aging').textContent = aged;
+  document.getElementById('kpi-decided').textContent = decided;
+  document.getElementById('kpi-total').textContent = all.length;
+
+  var ageBadge = document.getElementById('kpi-aging-badge');
+  if (ageBadge) ageBadge.textContent = aged > 0 ? 'needs follow-up' : 'on track';
+}
+
+/* ══════════════════════════════════════════════════════
+   PATH DECISION
+   ══════════════════════════════════════════════════════ */
+var _pathTarget = null;
+var _selectedPath = null;
+var _selectedStatus = null;
+
+function openPath(id) {
+  _pathTarget = id;
+  _selectedPath = null;
+  _selectedStatus = null;
+  var intakes = loadIntakes();
+  var req = intakes.find(function(i){ return i.id === id; });
+  if (!req) return;
+
+  document.getElementById('path-modal-sub').textContent = req.title;
+  document.getElementById('path-notes').value = req.ver_notes || '';
+  document.getElementById('path-assignee').value = req.assigned || 'VER Team';
+
+  var today = new Date().toISOString().slice(0,10);
+  document.getElementById('path-target').value = req.target || today;
+
+  // Reset chip selection
+  document.querySelectorAll('.path-chip').forEach(function(c){ c.classList.remove('selected'); });
+
+  // Pre-select if already has a path
+  if (req.ver_path) {
+    document.querySelectorAll('.path-chip').forEach(function(c){
+      if (c.getAttribute('data-path') === req.ver_path) {
+        c.classList.add('selected');
+        _selectedPath = req.ver_path;
+        _selectedStatus = c.getAttribute('data-status');
+      }
+    });
+  }
+
+  openModal('path-modal');
+}
+
+function selectPath(chip) {
+  document.querySelectorAll('.path-chip').forEach(function(c){ c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  _selectedPath = chip.getAttribute('data-path');
+  _selectedStatus = chip.getAttribute('data-status');
+}
+
+function savePath() {
+  if (!_selectedPath) {
+    alert('Please select a path decision before saving.');
+    return;
+  }
+  var intakes = loadIntakes();
+  var idx = intakes.findIndex(function(i){ return i.id === _pathTarget; });
+  if (idx === -1) return;
+
+  intakes[idx].status = _selectedStatus;
+  intakes[idx].ver_path = _selectedPath;
+  intakes[idx].ver_notes = document.getElementById('path-notes').value.trim();
+  intakes[idx].assigned = document.getElementById('path-assignee').value;
+  intakes[idx].target = document.getElementById('path-target').value || intakes[idx].target;
+  intakes[idx].ver_decision_date = new Date().toISOString().slice(0,10);
+
+  saveIntakes(intakes);
+  closeModal('path-modal');
+  renderIntakes();
+  showToast();
+}
+
+/* ══════════════════════════════════════════════════════
+   NEW INTAKE SUBMISSION
+   ══════════════════════════════════════════════════════ */
+function submitIntake() {
+  var required = [
+    ['ni-title','Request Title'],['ni-submitter','Submitted By'],
+    ['ni-team','Business Unit / Team'],['ni-desc','Description']
+  ];
+  required.forEach(function(r){ document.getElementById(r[0]).classList.remove('invalid'); });
+  var errEl = document.getElementById('ni-error');
+  errEl.style.display = 'none';
+
+  var missing = required.filter(function(r){ return !document.getElementById(r[0]).value.trim(); });
+  if (missing.length) {
+    missing.forEach(function(r){ document.getElementById(r[0]).classList.add('invalid'); });
+    errEl.textContent = 'Please complete: ' + missing.map(function(r){ return r[1]; }).join(', ');
+    errEl.style.display = 'block';
+    return;
+  }
+
+  var intakes = loadIntakes();
+  var newId = 'I' + String(intakes.length + 1).padStart(3,'0');
+  intakes.unshift({
+    id: newId,
+    title:     document.getElementById('ni-title').value.trim(),
+    type:      document.getElementById('ni-type').value,
+    submitter: document.getElementById('ni-submitter').value.trim(),
+    team:      document.getElementById('ni-team').value.trim(),
+    vendor:    document.getElementById('ni-vendor').value.trim() || 'TBD',
+    status:    'Under Review',
+    submitted: new Date().toISOString().slice(0,10),
+    target:    document.getElementById('ni-date').value || 'TBD',
+    budget:    document.getElementById('ni-budget').value,
+    desc:      document.getElementById('ni-desc').value.trim(),
+    assigned:  'VER Team',
+  });
+  saveIntakes(intakes);
+  closeModal('intake-modal');
+  ['ni-title','ni-type','ni-submitter','ni-team','ni-vendor','ni-date','ni-desc','ni-budget']
+    .forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el.tagName === 'SELECT') el.selectedIndex = 0;
+      else el.value = '';
+      el.classList.remove('invalid');
+    });
+  renderIntakes();
+  showToast('Request '+newId+' submitted — status: Under Review');
+}
+
+/* ══════════════════════════════════════════════════════
+   UTILS
+   ══════════════════════════════════════════════════════ */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (msg) t.querySelector('span').textContent = msg;
+  else t.querySelector('span').textContent = '✓ Decision recorded — vendor platform updated.';
+  t.style.display = 'flex';
+  setTimeout(function(){ t.style.display = 'none'; }, 5000);
+}
+
+document.querySelectorAll('.modal-bg').forEach(function(bg) {
+  bg.addEventListener('click', function(e){
+    if (e.target === bg) bg.classList.remove('open');
+  });
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') document.querySelectorAll('.modal-bg.open').forEach(function(m){
+    m.classList.remove('open');
+  });
+});
+
+function openHelp() {
+  HelpModal.open({
+    title: 'Intake Review',
+    what: 'VER\'s <strong>Intake Review</strong> is the decision layer between stakeholder requests and vendor engagement. Every new request lands here &mdash; VER reviews, determines the path, and that decision auto-injects into the vendor platform intake queue so stakeholders see the updated status in real time.',
+    steps: [
+      '<strong>Review each request</strong> — read the context, check the vendor, budget, and timeline before determining a path.',
+      '<strong>Determine Path</strong> — click the &#9889; button to assign a VER decision: approve, needs info, escalate, or decline.',
+      '<strong>Decision auto-injects</strong> — the path decision writes directly to the shared intake system. Vendor platform shows the updated status immediately.',
+      '<strong>Aged requests</strong> (flagged in amber) have been sitting over 5 days without a decision &mdash; prioritize these.',
+      '<strong>Add new requests</strong> on behalf of stakeholders using the "+ New Request" button.'
+    ],
+    tips: [
+      { icon: '&#x26A1;', title: 'Always set a path', body: 'Even "Needs More Info" is a decision. Never leave a request without a VER path — stakeholders are waiting on your guidance.' },
+      { icon: '&#x1F4E5;', title: 'Vendor logos load from Brandfetch', body: 'Logos load automatically for known vendors. Unknown or new vendors show initials instead.' },
+      { icon: '&#x1F512;', title: 'Shared with vendor platform', body: 'This page and the vendor_intake.html page share the same data store. Decisions you record here immediately reflect there.' },
+      { icon: '&#x1F4CB;', title: 'Director escalations', body: 'Use "Escalate to Director" for any request involving a high-risk vendor, unusual scope, or budget over $1M — Casey reviews these directly.' }
+    ],
+    footNote: 'VER Team Portal &middot; FY27 &middot; Internal Only'
+  });
+}
+
+document.addEventListener('DOMContentLoaded', renderIntakes);
+
+(function(){try{var u=JSON.parse(localStorage.getItem('ver-team-user')||'null');if(u){var e=document.getElementById('sb-user-emoji'),n=document.getElementById('sb-user-name'),r=document.getElementById('sb-user-role');if(e)e.textContent=u.emoji||'👤';if(n)n.textContent=u.name||'Team VER';if(r)r.textContent=u.role||'VER Team';}}catch(ex){}})();
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+</script>
+</body>
+</html>

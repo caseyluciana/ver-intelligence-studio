@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Monthly Digest · VER Intelligence Hub</title>
+<style>
+:root {
+  --navy:#0F1E3C; --navy2:#1E3A5F; --navy3:#EFF6FF;
+  --teal:#0D9488; --teal2:#0F766E; --teal3:#F0FDF9;
+  --green:#059669; --green2:#065F46; --green3:#D1FAE5;
+  --amber:#D97706; --amber2:#78350F; --amber3:#FEF3C7;
+  --red:#DC2626; --red2:#7F1D1D; --red3:#FEE2E2;
+  --purple:#7C3AED; --purple3:#F5F3FF;
+  --blue:#2563EB; --blue3:#EFF6FF;
+  --ink:#111827; --ink2:#1F2937; --ink3:#374151; --ink4:#6B7280;
+  --gray:#F9FAFB; --gray2:#F3F4F6; --gray3:#E5E7EB;
+  --border:#E5E7EB; --border2:#D1D5DB; --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+.vp-wrap{display:flex;min-height:100vh;}
+.vp-side{width:220px;background:var(--navy);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;}
+.vp-main{flex:1;padding:24px 28px;overflow-x:hidden;}
+.vp-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vp-logo-title{font-size:10.5pt;font-weight:800;color:#fff;line-height:1.2;}
+.vp-logo-sub{font-size:8pt;color:rgba(255,255,255,0.65);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+.vp-nav{padding:12px 0;}
+.vp-nav-section{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.60);padding:10px 18px 4px;}
+.vp-nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;font-size:8.5pt;font-weight:600;color:rgba(255,255,255,0.85);text-decoration:none;transition:all 0.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.vp-nav-item:hover,.vp-nav-item.active{background:rgba(255,255,255,0.10);color:#fff;}
+.vp-nav-item.active{border-left:3px solid var(--teal);}
+.vp-nav-icon{font-size:12pt;flex-shrink:0;}
+.vp-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0;}
+.vp-side-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);font-size:8pt;color:rgba(255,255,255,0.55);margin-top:auto;}
+.vp-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.vp-page-title{font-size:15pt;font-weight:900;color:var(--navy);}
+.vp-page-sub{font-size:9pt;color:var(--ink3);margin-top:2px;}
+
+/* ── Filter bar ── */
+.filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+.fsel{font-size:8pt;padding:5px 10px;border:1px solid var(--border2);border-radius:6px;background:#fff;color:var(--ink2);cursor:pointer;}
+.f-count{font-size:8pt;color:var(--ink4);margin-left:auto;}
+
+/* ── Digest list ── */
+.digest-list{display:flex;flex-direction:column;gap:14px;}
+.digest-card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:box-shadow 0.15s;display:flex;}
+.digest-card:hover{box-shadow:0 4px 18px rgba(0,0,0,0.08);}
+.digest-accent{width:6px;flex-shrink:0;}
+.digest-body{padding:16px 20px;flex:1;}
+.digest-row1{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:6px;}
+.digest-title{font-size:11pt;font-weight:900;color:var(--navy);line-height:1.3;}
+.digest-tags{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0;}
+.digest-tag{font-size:8pt;padding:2px 8px;border-radius:8px;font-weight:700;white-space:nowrap;}
+.digest-meta{font-size:8.5pt;color:var(--ink4);margin-bottom:8px;}
+.digest-topics{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.digest-topic-pill{font-size:8.5pt;padding:3px 10px;border-radius:99px;border:1px solid var(--border2);color:var(--ink3);font-weight:600;}
+.digest-desc{font-size:8.5pt;color:var(--ink3);line-height:1.6;margin-bottom:12px;}
+.digest-cta{display:inline-flex;align-items:center;gap:5px;font-size:8pt;font-weight:700;color:var(--teal);text-decoration:none;}
+.digest-cta:hover{text-decoration:underline;}
+.digest-latest-badge{font-size:8pt;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--teal3);color:var(--teal2);border:1px solid rgba(13,148,136,0.2);}
+</style>
+</head>
+<body>
+<div class="vp-wrap">
+
+  <!-- Sidebar -->
+  <div class="vp-side">
+    <div class="vp-logo">
+      <div class="vp-logo-title">VER Intelligence<br>Hub</div>
+      <div class="vp-logo-sub">DET · FY27</div>
+    </div>
+    <nav class="vp-nav">
+      <div class="vp-nav-section">Resources</div>
+      <a href="page_cqbr.html" class="vp-nav-item"><span class="vp-nav-icon">&#128196;</span>CQBR Library</a>
+      <a href="page_digest.html" class="vp-nav-item active"><span class="vp-nav-icon">&#128240;</span>Monthly Digest</a>
+      <a href="page_vision_series.html" class="vp-nav-item"><span class="vp-nav-icon">&#127909;</span>Vision Series</a>
+      <a href="page_roadmap.html" class="vp-nav-item"><span class="vp-nav-icon">&#128506;</span>Roadmap</a>
+      <a href="page_team.html" class="vp-nav-item"><span class="vp-nav-icon">&#128105;</span>Team & Charter</a>
+      <a href="page_guide.html" class="vp-nav-item"><span class="vp-nav-icon">&#128216;</span>VER Guide</a>
+      <div class="vp-nav-divider"></div>
+      <a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+    <div class="vp-side-footer">VER Intelligence Hub<br>Salesforce DET · FY27</div>
+  </div>
+
+  <!-- Main -->
+  <div class="vp-main">
+    <div class="vp-topbar">
+      <div>
+        <div class="vp-page-title">&#128240; Monthly Digest</div>
+        <div class="vp-page-sub">VER's monthly intelligence briefing — spend signals, market moves, and what's next</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <select class="fsel" id="f-fy" onchange="render()">
+        <option value="">All Fiscal Years</option>
+        <option>FY27</option><option>FY26</option>
+      </select>
+      <select class="fsel" id="f-topic" onchange="render()">
+        <option value="">All Topics</option>
+        <option>Spend Intelligence</option>
+        <option>Vendor Risk</option>
+        <option>Rate Benchmarks</option>
+        <option>Renewals</option>
+        <option>FinOps</option>
+        <option>Market Moves</option>
+        <option>Workforce</option>
+      </select>
+      <span class="f-count" id="f-count"></span>
+    </div>
+
+    <!-- Digest list -->
+    <div class="digest-list" id="digest-list"></div>
+  </div>
+</div>
+
+<script>
+var DIGESTS = [
+  {
+    title: 'VER Monthly Intelligence Digest — May 2026',
+    fy: 'FY26', month: 'May 2026', date: 'June 2, 2026',
+    color: '#0D9488',
+    topics: ['Spend Intelligence','Vendor Risk','Rate Benchmarks','Renewals'],
+    desc: 'This month: Q4 FY26 spend close, top 10 vendors by concentration risk, upcoming renewals requiring immediate action, and rate benchmark updates across AMER Contingent Workforce.',
+    latest: true,
+    href: 'VER_Monthly_Digest_May2026.html'
+  }
+];
+
+function render() {
+  var fy    = document.getElementById('f-fy').value;
+  var topic = document.getElementById('f-topic').value;
+
+  var filtered = DIGESTS.filter(function(d){
+    if (fy    && d.fy !== fy) return false;
+    if (topic && !d.topics.includes(topic)) return false;
+    return true;
+  });
+
+  document.getElementById('f-count').textContent = filtered.length + ' issue' + (filtered.length !== 1 ? 's' : '');
+
+  var list = document.getElementById('digest-list');
+  if (!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--ink4);">'
+      + '<div style="font-size:36pt;margin-bottom:12px;">&#128240;</div>'
+      + '<div style="font-size:11pt;font-weight:800;color:var(--ink3);margin-bottom:6px;">No issues match your filters</div></div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(function(d){
+    return '<div class="digest-card">'
+      + '<div class="digest-accent" style="background:'+d.color+'"></div>'
+      + '<div class="digest-body">'
+      + '<div class="digest-row1">'
+      + '<div class="digest-title">'+d.title+'</div>'
+      + '<div class="digest-tags">'
+      + (d.latest ? '<span class="digest-latest-badge">Latest</span>' : '')
+      + '</div></div>'
+      + '<div class="digest-meta">Published '+d.date+' &middot; '+d.fy+'</div>'
+      + '<div class="digest-topics">'+d.topics.map(function(t){
+          return '<span class="digest-topic-pill">'+t+'</span>';
+        }).join('')+'</div>'
+      + '<div class="digest-desc">'+d.desc+'</div>'
+      + '<a href="'+d.href+'" class="digest-cta">Read Full Issue &#8594;</a>'
+      + '</div></div>';
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>

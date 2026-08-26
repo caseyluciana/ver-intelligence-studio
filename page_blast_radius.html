@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blast Radius Map</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --body-bg:    #020B18;
+      --bg:         #020B18;
+      --surface:    rgba(255,255,255,0.03);
+      --surface-2:  rgba(255,255,255,0.05);
+      --surface-3:  rgba(255,255,255,0.07);
+      --border:     rgba(255,255,255,0.07);
+      --card-bg:    rgba(255,255,255,0.03);
+      --card-border:rgba(255,255,255,0.07);
+      --teal:       #0D9488;
+      --teal2:      #0F766E;
+      --red:        #DC2626;
+      --amber:      #D97706;
+      --green:      #059669;
+      --blue:       #3b82f6;
+      --purple:     #8b5cf6;
+      --orange:     #f97316;
+      --text:       #fff;
+      --text-primary:#fff;
+      --text-muted: rgba(255,255,255,0.55);
+      --text-faint: rgba(255,255,255,0.35);
+      --text-dim:   rgba(255,255,255,0.25);
+      --divider:    rgba(13,148,136,0.2);
+      --top-bar-bg: rgba(2,11,24,0.88);
+      --top-bar-border:rgba(13,148,136,0.15);
+      --mono:       'SF Mono','Fira Code','Cascadia Code','Consolas',monospace;
+      --node-stroke: rgba(255,255,255,0.12);
+      --edge-color:  rgba(148,163,184,0.25);
+      --canvas-bg:   #0d1829;
+    }
+    [data-theme="light"] {
+      --body-bg:    #F0F4FA;
+      --bg:         #F0F4FA;
+      --surface:    #fff;
+      --surface-2:  #F9FAFB;
+      --surface-3:  #E5E7EB;
+      --border:     #E5E7EB;
+      --card-bg:    #fff;
+      --card-border:#E5E7EB;
+      --text:       #111827;
+      --text-primary:#111827;
+      --text-muted: #374151;
+      --text-faint: #6B7280;
+      --text-dim:   #9CA3AF;
+      --top-bar-bg: rgba(15,30,60,0.97);
+      --top-bar-border:rgba(13,148,136,0.2);
+      --node-stroke: rgba(0,0,0,0.12);
+      --edge-color:  rgba(100,116,139,0.35);
+      --canvas-bg:   #eef2f8;
+    }
+    [data-theme="light"] .detail-panel { box-shadow: 0 4px 32px rgba(0,0,0,0.12); }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 50px;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ── Top bar ── */
+    .top-bar{position:fixed;top:0;left:0;right:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 40px;height:50px;
+      background:var(--top-bar-bg);
+      border-bottom:1px solid var(--top-bar-border);
+      -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+      transition:background 0.3s;}
+    .tb-left{display:flex;align-items:center;gap:16px;}
+    .tb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;
+      display:flex;align-items:center;gap:5px;transition:color 0.2s;}
+    .tb-back:hover{color:#0D9488;}
+    .tb-sep{width:1px;height:14px;background:rgba(255,255,255,0.12);}
+    .tb-brand{font-size:8.5pt;font-weight:800;letter-spacing:0.06em;color:rgba(255,255,255,0.65);}
+    .tb-right{display:flex;align-items:center;gap:10px;}
+    .tb-live{display:flex;align-items:center;gap:6px;font-size:8pt;font-weight:700;color:#0D9488;}
+    .live-dot{width:6px;height:6px;border-radius:50%;background:#0D9488;animation:pulse 1.8s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(13,148,136,0.4);}
+      50%{opacity:0.6;box-shadow:0 0 0 5px rgba(13,148,136,0);}}
+    .tb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+      border-radius:6px;font-size:8pt;font-weight:700;cursor:pointer;
+      font-family:inherit;transition:all 0.18s;letter-spacing:0.04em;border:none;}
+    .tb-theme{background:transparent;border:1px solid rgba(255,255,255,0.12);
+      color:rgba(255,255,255,0.45);padding:5px 12px;border-radius:6px;
+      font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.18s;}
+    .tb-theme:hover{border-color:#0D9488;color:#0D9488;}
+
+    /* ── Bar mid (scenario selector — kept in top bar area via separate row below nav) ── */
+    .bar-mid {
+      display: flex; align-items: center; gap: 8px; flex: 1;
+      margin: 0 20px;
+    }
+    .bar-mid label {
+      font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap;
+    }
+    .bar-select {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 12px;
+      padding: 5px 10px; outline: none; font-family: inherit; cursor: pointer;
+      min-width: 200px;
+    }
+    .bar-select:focus { border-color: rgba(13,148,136,0.4); }
+    .bar-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    /* Sub-bar for scenario + actions (sits below top-bar, above layout) */
+    .sub-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 24px;
+      background: rgba(2,11,24,0.7);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      position: sticky; top: 50px; z-index: 150;
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    }
+    .sub-bar-title {
+      font-size: 11px; font-weight: 800; color: var(--teal);
+      letter-spacing: 0.08em; text-transform: uppercase; flex-shrink: 0;
+    }
+
+    /* ── Scanline + particles ── */
+    .scanline{position:fixed;left:0;right:0;height:140px;pointer-events:none;z-index:1;
+      background:linear-gradient(180deg,transparent,rgba(13,148,136,0.04),transparent);
+      top:0;will-change:transform;animation:scan 7s linear infinite;}
+    @keyframes scan{from{transform:translateY(-140px)}to{transform:translateY(100vh)}}
+    #particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.6;}
+    [data-theme="light"] .scanline{opacity:0.3;}
+    [data-theme="light"] #particles{opacity:0.15;}
+
+    /* ── Animations ── */
+    @keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── Buttons ───────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 13px; border-radius: 6px; font-size: 12px;
+      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+      font-family: inherit; transition: all 0.15s;
+      background: transparent; color: var(--text-muted);
+    }
+    .btn:hover { background: var(--surface-2); color: var(--text); }
+    .btn-teal { background: rgba(45,212,191,0.14); color: var(--teal); border-color: rgba(45,212,191,0.3); }
+    .btn-teal:hover { background: rgba(45,212,191,0.24); }
+    .btn-red  { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.28); }
+    .btn-red:hover { background: rgba(239,68,68,0.22); }
+
+    .theme-toggle {
+      background: transparent; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px; color: rgba(255,255,255,0.45);
+      font-size: 13px; padding: 5px 9px; cursor: pointer;
+      font-family: inherit; transition: all 0.15s; line-height: 1;
+    }
+    .theme-toggle:hover { border-color: #0D9488; color: #0D9488; }
+
+    /* ── Layout ────────────────────────────────── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Left sidebar ──────────────────────────── */
+    .sidebar {
+      width: 280px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-title {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--text-faint); margin-bottom: 12px;
+    }
+    .sidebar-scroll { overflow-y: auto; flex: 1; }
+
+    /* Add vendor form */
+    .add-form { display: flex; flex-direction: column; gap: 8px; }
+    .add-form input, .add-form select {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 12px;
+      padding: 7px 10px; outline: none; font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .add-form input:focus, .add-form select:focus { border-color: rgba(13,148,136,0.4); }
+    .add-form-row { display: flex; gap: 6px; }
+    .add-form-row input { flex: 1; }
+
+    /* Vendor list */
+    .vendor-list { padding: 8px 0; }
+    .vendor-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; cursor: pointer;
+      transition: background 0.1s; border-radius: 0;
+      position: relative;
+    }
+    .vendor-item:hover { background: var(--surface-2); }
+    .vendor-item.selected { background: var(--surface-2); }
+    .vendor-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .vendor-name {
+      font-size: 13px; font-weight: 600; color: var(--text); flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .vendor-tier {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+      padding: 2px 7px; border-radius: 20px; text-transform: uppercase;
+    }
+    .tier-critical { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+    .tier-high     { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+    .tier-moderate { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+    .vendor-del {
+      background: none; border: none; color: var(--text-faint);
+      cursor: pointer; font-size: 13px; padding: 2px 4px;
+      opacity: 0; transition: opacity 0.15s; line-height: 1;
+    }
+    .vendor-item:hover .vendor-del { opacity: 1; }
+
+    /* Legend */
+    .legend { display: flex; flex-direction: column; gap: 6px; }
+    .legend-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-line {
+      width: 24px; height: 2px; flex-shrink: 0; border-radius: 2px;
+    }
+
+    /* ── Canvas area ───────────────────────────── */
+    .canvas-wrap {
+      flex: 1; position: relative; overflow: hidden;
+      background: var(--canvas-bg);
+    }
+    #blast-svg {
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    /* ── Detail panel ──────────────────────────── */
+    .detail-panel {
+      position: absolute; right: 20px; top: 20px;
+      width: 300px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.4);
+      z-index: 100;
+    }
+    .detail-close {
+      position: absolute; top: 12px; right: 12px;
+      background: none; border: none; color: var(--text-faint);
+      cursor: pointer; font-size: 16px; line-height: 1; padding: 4px;
+    }
+    .detail-close:hover { color: var(--text); }
+    .detail-vendor-name {
+      font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 4px;
+      padding-right: 24px;
+    }
+    .detail-tier-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .detail-section-title {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; margin-top: 14px;
+    }
+    .detail-deps { display: flex; flex-direction: column; gap: 5px; }
+    .detail-dep {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .dep-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dep-label { flex: 1; }
+    .dep-type {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+      padding: 1px 6px; border-radius: 10px; text-transform: uppercase;
+    }
+    .dep-internal { background: rgba(59,130,246,0.12); color: #93c5fd; }
+    .dep-external { background: rgba(139,92,246,0.12); color: #c4b5fd; }
+    .dep-downstream { background: rgba(249,115,22,0.12); color: #fb923c; }
+    .dep-upstream   { background: rgba(13,148,136,0.12); color: var(--teal); }
+
+    .detail-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .detail-metric {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px; text-align: center;
+    }
+    .dm-label { font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 4px; }
+    .dm-value { font-size: 18px; font-weight: 800; font-family: var(--mono); color: var(--text); }
+    .dm-value.red { color: #f87171; }
+    .dm-value.amber { color: var(--amber); }
+    .dm-value.green { color: #34d399; }
+
+    .detail-notes {
+      font-size: 12px; color: var(--text-muted); line-height: 1.6;
+      background: var(--surface-2); border-radius: 8px; padding: 10px;
+    }
+
+    /* ── Add dependency form ───────────────────── */
+    .dep-add-form { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .dep-add-form select, .dep-add-form input {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 12px;
+      padding: 6px 9px; outline: none; font-family: inherit;
+    }
+    .dep-add-form select:focus, .dep-add-form input:focus { border-color: rgba(13,148,136,0.4); }
+    .dep-add-row { display: flex; gap: 6px; }
+    .dep-add-row select, .dep-add-row input { flex: 1; }
+
+    /* ── Zoom controls ─────────────────────────── */
+    .zoom-controls {
+      position: absolute; bottom: 20px; left: 20px;
+      display: flex; flex-direction: column; gap: 6px; z-index: 50;
+    }
+    .zoom-btn {
+      width: 32px; height: 32px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text-muted);
+      cursor: pointer; font-size: 16px; font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .zoom-btn:hover { background: var(--surface-2); color: var(--text); }
+
+    /* ── Canvas empty state ────────────────────── */
+    .canvas-empty {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; color: var(--text-faint); pointer-events: none;
+      text-align: center; padding: 40px;
+    }
+    .canvas-empty-icon { font-size: 48px; opacity: 0.25; }
+    .canvas-empty-title { font-size: 15px; font-weight: 600; color: var(--text-muted); }
+    .canvas-empty-sub { font-size: 13px; line-height: 1.6; max-width: 320px; }
+
+    /* ── Impact summary bar ────────────────────── */
+    .impact-bar {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 20px;
+      display: flex; align-items: center; gap: 20px;
+      z-index: 50; white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .impact-bar.hidden { display: none; }
+    .impact-stat { text-align: center; }
+    .impact-stat-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); }
+    .impact-stat-val { font-size: 18px; font-weight: 800; font-family: var(--mono); }
+    .impact-stat-val.red { color: #f87171; }
+    .impact-stat-val.amber { color: var(--amber); }
+    .impact-sep { width: 1px; height: 32px; background: var(--border); }
+    .impact-vendor-name { font-size: 13px; font-weight: 700; color: #0D9488; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+    .impact-vendor-label { font-size: 10px; color: var(--text-faint); margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+  <canvas id="particles"></canvas>
+
+  <nav class="top-bar">
+    <div class="tb-left">
+      <a href="index.html" class="tb-back">← Hub</a>
+      <div class="tb-sep"></div>
+      <span class="tb-brand">VER INTELLIGENCE HUB</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-live"><div class="live-dot"></div>LIVE</div>
+      <button class="tb-btn tb-theme" onclick="toggleTheme()">◐ Theme</button>
+    </div>
+  </nav>
+
+  <!-- Sub-bar: page title + scenario selector + actions -->
+  <div class="sub-bar">
+    <span class="sub-bar-title">Blast Radius Map</span>
+    <div class="bar-mid">
+      <label for="scenario-sel">Scenario:</label>
+      <select id="scenario-sel" class="bar-select" onchange="onScenarioChange()">
+        <option value="eol">Vendor EOL / End of Support</option>
+        <option value="acquisition">Acquisition / Ownership Change</option>
+        <option value="bankruptcy">Vendor Bankruptcy / Shutdown</option>
+        <option value="breach">Security Breach / Data Incident</option>
+        <option value="contract">Contract Non-Renewal</option>
+      </select>
+    </div>
+    <div class="bar-actions">
+      <button type="button" class="btn" onclick="loadDemo()">Load Coupa Spend Data</button>
+      <button type="button" class="btn" onclick="clearAll()">Clear All</button>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Add Vendor</div>
+        <div class="add-form">
+          <input type="text" id="v-name" placeholder="Vendor name" autocomplete="off" list="coupa-vendors-list" />
+          <datalist id="coupa-vendors-list"></datalist>
+          <div class="add-form-row">
+            <select id="v-tier">
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="moderate" selected>Moderate</option>
+            </select>
+            <input type="number" id="v-spend" placeholder="Annual $" min="0" step="10000" />
+          </div>
+          <input type="text" id="v-notes" placeholder="Notes (optional)" />
+          <button type="button" class="btn btn-teal" onclick="addVendor()">+ Add Vendor</button>
+        </div>
+      </div>
+
+      <div class="sidebar-scroll">
+        <div class="sidebar-section">
+          <div class="sidebar-title">Vendors <span id="vendor-count" style="font-weight:400;">(0)</span></div>
+          <div class="vendor-list" id="vendor-list">
+            <div style="font-size:12px;color:var(--text-faint);padding:4px 0;">No vendors yet — add one above or load Coupa vendor data.</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-title">Legend</div>
+          <div class="legend">
+            <div class="legend-row"><div class="legend-dot" style="background:#ef4444;"></div>Critical vendor</div>
+            <div class="legend-row"><div class="legend-dot" style="background:#f59e0b;"></div>High vendor</div>
+            <div class="legend-row"><div class="legend-dot" style="background:#3b82f6;"></div>Moderate vendor</div>
+            <div class="legend-row"><div class="legend-dot" style="background:#10b981;"></div>Internal system</div>
+            <div class="legend-row"><div class="legend-line" style="background:#93c5fd;"></div>Upstream dependency</div>
+            <div class="legend-row"><div class="legend-line" style="background:#fb923c;"></div>Downstream impact</div>
+            <div class="legend-row"><div class="legend-line" style="background:rgba(148,163,184,0.4);border-top:2px dashed rgba(148,163,184,0.4);height:0;"></div>Indirect / shared</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap" id="canvas-wrap">
+      <svg id="blast-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+
+      <div class="canvas-empty" id="canvas-empty">
+        <div class="canvas-empty-icon">&#128165;</div>
+        <div class="canvas-empty-title">No vendors mapped yet</div>
+        <div class="canvas-empty-sub">Add vendors in the sidebar, then click any vendor node to add its dependencies and see what breaks if it disappears.</div>
+      </div>
+
+      <!-- Detail panel -->
+      <div class="detail-panel hidden" id="detail-panel">
+        <button type="button" class="detail-close" onclick="closeDetail()">&#10005;</button>
+        <div class="detail-vendor-name" id="dp-name">Vendor</div>
+        <div class="detail-tier-row">
+          <span class="vendor-tier" id="dp-tier">Critical</span>
+          <span style="font-size:11px;color:var(--text-faint);" id="dp-spend"></span>
+        </div>
+
+        <div class="detail-section-title">Impact Metrics</div>
+        <div class="detail-metrics">
+          <div class="detail-metric">
+            <div class="dm-label">Systems Affected</div>
+            <div class="dm-value red" id="dp-systems">0</div>
+          </div>
+          <div class="detail-metric">
+            <div class="dm-label">Recovery Est.</div>
+            <div class="dm-value amber" id="dp-recovery">--</div>
+          </div>
+          <div class="detail-metric">
+            <div class="dm-label">Blast Radius</div>
+            <div class="dm-value red" id="dp-blast">0%</div>
+          </div>
+          <div class="detail-metric">
+            <div class="dm-label">Alternatives</div>
+            <div class="dm-value green" id="dp-alts">--</div>
+          </div>
+        </div>
+
+        <div class="detail-section-title">Dependencies</div>
+        <div class="detail-deps" id="dp-deps">
+          <div style="font-size:12px;color:var(--text-faint);">No dependencies mapped yet.</div>
+        </div>
+
+        <div class="detail-section-title">Add Dependency</div>
+        <div class="dep-add-form">
+          <input type="text" id="dep-name-inp" placeholder="System or vendor name" />
+          <div class="dep-add-row">
+            <select id="dep-type-sel">
+              <option value="downstream">Downstream impact</option>
+              <option value="upstream">Upstream dependency</option>
+              <option value="internal">Internal system</option>
+              <option value="external">External integration</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-teal" onclick="addDependency()">+ Add</button>
+        </div>
+
+        <div id="dp-notes-wrap">
+          <div class="detail-section-title">Notes</div>
+          <div class="detail-notes" id="dp-notes"></div>
+        </div>
+      </div>
+
+      <!-- Zoom controls -->
+      <div class="zoom-controls">
+        <button type="button" class="zoom-btn" onclick="zoom(1.2)" title="Zoom in">+</button>
+        <button type="button" class="zoom-btn" onclick="zoom(0.8)" title="Zoom out">-</button>
+        <button type="button" class="zoom-btn" onclick="resetView()" title="Reset view" style="font-size:12px;">&#8635;</button>
+      </div>
+
+      <!-- Impact summary bar -->
+      <div class="impact-bar hidden" id="impact-bar">
+        <div class="impact-stat">
+          <div class="impact-vendor-label">Selected Vendor</div>
+          <div class="impact-vendor-name" id="ib-name">--</div>
+        </div>
+        <div class="impact-sep"></div>
+        <div class="impact-stat">
+          <div class="impact-stat-label">Systems at Risk</div>
+          <div class="impact-stat-val red" id="ib-systems">0</div>
+        </div>
+        <div class="impact-sep"></div>
+        <div class="impact-stat">
+          <div class="impact-stat-label">Annual Spend</div>
+          <div class="impact-stat-val amber" id="ib-spend">$0</div>
+        </div>
+        <div class="impact-sep"></div>
+        <div class="impact-stat">
+          <div class="impact-stat-label">Scenario</div>
+          <div class="impact-stat-val" style="font-size:12px;color:var(--text-muted);" id="ib-scenario">EOL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/coupa_spend.js"></script>
+  <script>
+(function(){
+  var c=document.getElementById('particles');
+  if(!c)return;
+  var ctx=c.getContext('2d');
+  var pts=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  for(var i=0;i<60;i++) pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    vx:(Math.random()-0.5)*0.15,vy:(Math.random()-0.5)*0.15,
+    r:Math.random()*1.2+0.4,a:Math.random()*0.4+0.1});
+  function frame(){
+    ctx.clearRect(0,0,c.width,c.height);
+    pts.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(13,148,136,'+p.a+')';ctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+  </script>
+  <script>
+    var VENDORS = [];
+    var SELECTED_ID = null;
+    var VIEW_SCALE = 1;
+    var VIEW_X = 0;
+    var VIEW_Y = 0;
+    var DRAG_STATE = null;
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+
+    var TIER_COLORS = {
+      critical: '#ef4444',
+      high:     '#f59e0b',
+      moderate: '#3b82f6',
+    };
+    var DEP_COLORS = {
+      downstream: '#fb923c',
+      upstream:   '#0D9488',
+      internal:   '#10b981',
+      external:   '#8b5cf6',
+    };
+    var SCENARIOS = {
+      eol:         'EOL / End of Support',
+      acquisition: 'Acquisition',
+      bankruptcy:  'Vendor Shutdown',
+      breach:      'Security Breach',
+      contract:    'Contract Non-Renewal',
+    };
+    var RECOVERY = {
+      critical: '6–18 mo',
+      high:     '3–9 mo',
+      moderate: '1–3 mo',
+    };
+
+    // ── Coupa integration ────────────────────────
+    function populateCoupaDatalist() {
+      var dl = document.getElementById('coupa-vendors-list');
+      if (!dl || !window.VER_COUPA) return;
+      window.VER_COUPA.vendors.forEach(function(v) {
+        var opt = document.createElement('option');
+        opt.value = v.n;
+        dl.appendChild(opt);
+      });
+    }
+
+    function coupaMatchVendor(name) {
+      if (!window.VER_COUPA) return null;
+      var nl = name.toLowerCase();
+      return window.VER_COUPA.vendors.find(function(v) {
+        return v.n.toLowerCase() === nl || v.n.toLowerCase().indexOf(nl) === 0;
+      }) || null;
+    }
+
+    // ── Persistence ──────────────────────────────
+    function save() {
+      try { localStorage.setItem('brm_vendors', JSON.stringify(VENDORS)); } catch(e) {}
+    }
+    function load() {
+      try {
+        var raw = localStorage.getItem('brm_vendors');
+        if (raw) VENDORS = JSON.parse(raw);
+      } catch(e) { VENDORS = []; }
+    }
+
+    // ── ID gen ───────────────────────────────────
+    function genId() {
+      return 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+    }
+
+    // ── Formatting ───────────────────────────────
+    function fmtSpend(n) {
+      if (!n || n <= 0) return '';
+      if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M/yr';
+      if (n >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K/yr';
+      return '$' + n + '/yr';
+    }
+
+    // ── CRUD ──────────────────────────────────────
+    function addVendor() {
+      var name = (document.getElementById('v-name').value || '').trim();
+      if (!name) { alert('Enter a vendor name.'); return; }
+      var existing = VENDORS.find(function(v) { return v.name.toLowerCase() === name.toLowerCase(); });
+      if (existing) { alert('A vendor with that name already exists.'); return; }
+
+      var coupaV = coupaMatchVendor(name);
+      var spendM = coupaV ? coupaV.fy27 : 0;
+      var tierSel = document.getElementById('v-tier');
+      var tier = tierSel ? tierSel.value : 'moderate';
+      if (coupaV && tierSel && !tierSel.value) {
+        tier = coupaV.fy27 >= 10 ? 'critical' : coupaV.fy27 >= 3 ? 'high' : 'moderate';
+      }
+
+      var vendor = {
+        id:    genId(),
+        name:  name,
+        tier:  tier,
+        spend: Math.max(0, parseFloat(document.getElementById('v-spend').value) || 0),
+        spendM: spendM,
+        notes: (document.getElementById('v-notes').value || '').trim(),
+        deps:  [],
+        x: 200 + Math.random() * 400,
+        y: 150 + Math.random() * 300,
+      };
+      VENDORS.push(vendor);
+      save();
+      ['v-name', 'v-spend', 'v-notes'].forEach(function(id) {
+        document.getElementById(id).value = '';
+      });
+      renderAll();
+    }
+
+    function deleteVendor(id) {
+      VENDORS = VENDORS.filter(function(v) { return v.id !== id; });
+      if (SELECTED_ID === id) { SELECTED_ID = null; closeDetail(); }
+      save();
+      renderAll();
+    }
+
+    function addDependency() {
+      if (!SELECTED_ID) return;
+      var vendor = VENDORS.find(function(v) { return v.id === SELECTED_ID; });
+      if (!vendor) return;
+      var depName = (document.getElementById('dep-name-inp').value || '').trim();
+      if (!depName) { alert('Enter a dependency name.'); return; }
+      var depType = document.getElementById('dep-type-sel').value;
+      vendor.deps.push({ name: depName, type: depType });
+      document.getElementById('dep-name-inp').value = '';
+      save();
+      renderAll();
+      openDetail(SELECTED_ID);
+    }
+
+    // ── Layout: radial spread ────────────────────
+    function layoutVendors() {
+      if (VENDORS.length === 0) return;
+      var svg = document.getElementById('blast-svg');
+      var W = svg.clientWidth  || 800;
+      var H = svg.clientHeight || 600;
+      var cx = W / 2, cy = H / 2;
+      var r  = Math.min(W, H) * 0.32;
+      VENDORS.forEach(function(v, i) {
+        if (!v.x || !v.y) {
+          var angle = (i / VENDORS.length) * 2 * Math.PI - Math.PI / 2;
+          v.x = cx + r * Math.cos(angle);
+          v.y = cy + r * Math.sin(angle);
+        }
+      });
+    }
+
+    // ── SVG rendering ────────────────────────────
+    function svgEl(tag, attrs) {
+      var el = document.createElementNS(SVG_NS, tag);
+      if (attrs) {
+        Object.keys(attrs).forEach(function(k) {
+          el.setAttribute(k, attrs[k]);
+        });
+      }
+      return el;
+    }
+
+    function renderAll() {
+      renderSidebar();
+      renderSVG();
+    }
+
+    function renderSidebar() {
+      var list  = document.getElementById('vendor-list');
+      var count = document.getElementById('vendor-count');
+      if (!list) return;
+      if (count) count.textContent = '(' + VENDORS.length + ')';
+
+      while (list.firstChild) list.removeChild(list.firstChild);
+
+      if (VENDORS.length === 0) {
+        var msg = document.createElement('div');
+        msg.style.cssText = 'font-size:12px;color:var(--text-faint);padding:4px 0;';
+        msg.textContent = 'No vendors yet.';
+        list.appendChild(msg);
+        return;
+      }
+
+      VENDORS.forEach(function(v) {
+        var row = document.createElement('div');
+        row.className = 'vendor-item' + (v.id === SELECTED_ID ? ' selected' : '');
+        row.onclick = function() { selectVendor(v.id); };
+
+        var dot = document.createElement('div');
+        dot.className = 'vendor-dot';
+        dot.style.background = TIER_COLORS[v.tier] || '#64748b';
+
+        var nameEl = document.createElement('div');
+        nameEl.className = 'vendor-name';
+        nameEl.textContent = v.name;
+
+        var tier = document.createElement('span');
+        tier.className = 'vendor-tier tier-' + v.tier;
+        tier.textContent = v.tier.charAt(0).toUpperCase() + v.tier.slice(1);
+
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'vendor-del';
+        del.textContent = '×';
+        del.title = 'Remove vendor';
+        del.onclick = function(e) { e.stopPropagation(); deleteVendor(v.id); };
+
+        row.appendChild(dot);
+        row.appendChild(nameEl);
+        row.appendChild(tier);
+        row.appendChild(del);
+        list.appendChild(row);
+      });
+    }
+
+    function renderSVG() {
+      var svg    = document.getElementById('blast-svg');
+      var empty  = document.getElementById('canvas-empty');
+      var impBar = document.getElementById('impact-bar');
+      if (!svg) return;
+
+      // Clear
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      if (VENDORS.length === 0) {
+        if (empty) empty.classList.remove('hidden');
+        if (impBar) impBar.classList.add('hidden');
+        return;
+      }
+      if (empty) empty.classList.add('hidden');
+
+      layoutVendors();
+
+      var W = svg.clientWidth  || 800;
+      var H = svg.clientHeight || 600;
+
+      // Group for pan/zoom
+      var g = svgEl('g', { id: 'map-g', transform: 'translate(' + VIEW_X + ',' + VIEW_Y + ') scale(' + VIEW_SCALE + ')' });
+      svg.appendChild(g);
+
+      // Draw edges: vendor-to-vendor (if deps reference another vendor name)
+      VENDORS.forEach(function(v) {
+        v.deps.forEach(function(dep) {
+          var target = VENDORS.find(function(vv) { return vv.name.toLowerCase() === dep.name.toLowerCase(); });
+          if (target) {
+            var line = svgEl('line', {
+              x1: v.x, y1: v.y, x2: target.x, y2: target.y,
+              stroke: DEP_COLORS[dep.type] || 'rgba(148,163,184,0.3)',
+              'stroke-width': dep.type === 'downstream' ? 2 : 1.5,
+              'stroke-opacity': 0.6,
+              'stroke-dasharray': (dep.type === 'upstream' || dep.type === 'external') ? '5,4' : 'none',
+            });
+            g.appendChild(line);
+          }
+        });
+      });
+
+      // Dep nodes (non-vendor systems) around their parent
+      var depNodeMap = {};
+      VENDORS.forEach(function(v) {
+        var nonVendorDeps = v.deps.filter(function(d) {
+          return !VENDORS.find(function(vv) { return vv.name.toLowerCase() === d.name.toLowerCase(); });
+        });
+        nonVendorDeps.forEach(function(dep, i) {
+          var key = v.id + '_' + dep.name;
+          if (depNodeMap[key]) return;
+          var angle = (i / Math.max(nonVendorDeps.length, 1)) * 2 * Math.PI + Math.PI / 4;
+          var dx = v.x + 110 * Math.cos(angle);
+          var dy = v.y + 110 * Math.sin(angle);
+          depNodeMap[key] = { x: dx, y: dy, dep: dep, parent: v };
+
+          // Edge
+          var line = svgEl('line', {
+            x1: v.x, y1: v.y, x2: dx, y2: dy,
+            stroke: DEP_COLORS[dep.type] || 'rgba(148,163,184,0.3)',
+            'stroke-width': 1.5, 'stroke-opacity': 0.55,
+            'stroke-dasharray': '4,3',
+          });
+          g.appendChild(line);
+
+          // Node
+          var circle = svgEl('circle', {
+            cx: dx, cy: dy, r: 20,
+            fill: DEP_COLORS[dep.type] ? (DEP_COLORS[dep.type] + '22') : 'rgba(100,116,139,0.1)',
+            stroke: DEP_COLORS[dep.type] || 'rgba(148,163,184,0.4)',
+            'stroke-width': 1.5,
+          });
+          g.appendChild(circle);
+
+          // Label
+          var depLabel = svgEl('text', {
+            x: dx, y: dy + 34,
+            'text-anchor': 'middle',
+            'font-size': '9',
+            'font-family': '-apple-system,BlinkMacSystemFont,Inter,sans-serif',
+            fill: 'var(--text-faint)',
+          });
+          depLabel.textContent = dep.name.length > 14 ? dep.name.slice(0, 13) + '…' : dep.name;
+          g.appendChild(depLabel);
+        });
+      });
+
+      // Vendor nodes (on top)
+      VENDORS.forEach(function(v) {
+        var isSelected = v.id === SELECTED_ID;
+        var color = TIER_COLORS[v.tier] || '#64748b';
+        var r = v.tier === 'critical' ? 36 : v.tier === 'high' ? 30 : 26;
+
+        // Glow for selected
+        if (isSelected) {
+          var glow = svgEl('circle', {
+            cx: v.x, cy: v.y, r: r + 14,
+            fill: color + '18',
+            stroke: color + '55',
+            'stroke-width': 1,
+          });
+          g.appendChild(glow);
+        }
+
+        // Pulse ring for critical
+        if (v.tier === 'critical') {
+          var pulse = svgEl('circle', {
+            cx: v.x, cy: v.y, r: r + 8,
+            fill: 'none',
+            stroke: color + '40',
+            'stroke-width': 1.5,
+          });
+          g.appendChild(pulse);
+        }
+
+        // Main node
+        var circle = svgEl('circle', {
+          cx: v.x, cy: v.y, r: r,
+          fill: color + (isSelected ? 'dd' : '33'),
+          stroke: color,
+          'stroke-width': isSelected ? 2.5 : 1.5,
+          style: 'cursor:pointer;',
+        });
+        circle.addEventListener('click', function() { selectVendor(v.id); });
+        g.appendChild(circle);
+
+        // Vendor name label
+        var label = svgEl('text', {
+          x: v.x, y: v.y + 4,
+          'text-anchor': 'middle',
+          'font-size': v.name.length > 12 ? '10' : '11',
+          'font-weight': '700',
+          'font-family': '-apple-system,BlinkMacSystemFont,Inter,sans-serif',
+          fill: isSelected ? '#fff' : 'var(--text)',
+          style: 'cursor:pointer; pointer-events:none;',
+        });
+        label.textContent = v.name.length > 14 ? v.name.slice(0, 13) + '…' : v.name;
+        g.appendChild(label);
+
+        // Spend sub-label
+        if (v.spend > 0) {
+          var subLabel = svgEl('text', {
+            x: v.x, y: v.y + r + 16,
+            'text-anchor': 'middle',
+            'font-size': '10',
+            'font-family': '-apple-system,BlinkMacSystemFont,Inter,sans-serif',
+            fill: 'var(--text-faint)',
+          });
+          subLabel.textContent = fmtSpend(v.spend);
+          g.appendChild(subLabel);
+        }
+
+        // Coupa FY27 spend label
+        if (v.spendM > 0) {
+          var spendLbl = svgEl('text', {
+            x: v.x, y: v.y + r + 28,
+            'text-anchor': 'middle',
+            'font-size': '9',
+            'font-family': '-apple-system,BlinkMacSystemFont,Inter,sans-serif',
+            fill: 'var(--text-faint)',
+          });
+          spendLbl.textContent = '$' + v.spendM.toFixed(1) + 'M FY27';
+          g.appendChild(spendLbl);
+        }
+
+        // Dep count badge
+        if (v.deps.length > 0) {
+          var badgeBg = svgEl('circle', {
+            cx: v.x + r - 4, cy: v.y - r + 4, r: 9,
+            fill: '#ef4444', stroke: 'var(--canvas-bg)', 'stroke-width': 1.5,
+          });
+          g.appendChild(badgeBg);
+          var badgeText = svgEl('text', {
+            x: v.x + r - 4, y: v.y - r + 4 + 4,
+            'text-anchor': 'middle', 'font-size': '9', 'font-weight': '700',
+            'font-family': 'var(--mono)',
+            fill: '#fff',
+          });
+          badgeText.textContent = v.deps.length;
+          g.appendChild(badgeText);
+        }
+      });
+
+      // Drag support
+      svg.onmousedown = function(e) {
+        if (e.target === svg || e.target.tagName === 'g') {
+          DRAG_STATE = { sx: e.clientX - VIEW_X, sy: e.clientY - VIEW_Y, isPan: true };
+        }
+      };
+      svg.onmousemove = function(e) {
+        if (!DRAG_STATE) return;
+        VIEW_X = e.clientX - DRAG_STATE.sx;
+        VIEW_Y = e.clientY - DRAG_STATE.sy;
+        var gEl = document.getElementById('map-g');
+        if (gEl) gEl.setAttribute('transform', 'translate(' + VIEW_X + ',' + VIEW_Y + ') scale(' + VIEW_SCALE + ')');
+      };
+      svg.onmouseup = function() { DRAG_STATE = null; };
+      svg.onmouseleave = function() { DRAG_STATE = null; };
+
+      // Update impact bar
+      updateImpactBar();
+    }
+
+    function updateImpactBar() {
+      var bar = document.getElementById('impact-bar');
+      if (!bar) return;
+      if (!SELECTED_ID) { bar.classList.add('hidden'); return; }
+      var v = VENDORS.find(function(vv) { return vv.id === SELECTED_ID; });
+      if (!v) { bar.classList.add('hidden'); return; }
+      bar.classList.remove('hidden');
+
+      var scenarioSel = document.getElementById('scenario-sel');
+      var scenario = scenarioSel ? SCENARIOS[scenarioSel.value] || '' : '';
+      setText('ib-name',     v.name);
+      setText('ib-systems',  v.deps.length);
+      setText('ib-spend',    v.spend > 0 ? fmtSpend(v.spend) : '--');
+      setText('ib-scenario', scenario);
+    }
+
+    // ── Selection / detail panel ──────────────────
+    function selectVendor(id) {
+      SELECTED_ID = id;
+      renderAll();
+      openDetail(id);
+    }
+
+    function openDetail(id) {
+      var v = VENDORS.find(function(vv) { return vv.id === id; });
+      if (!v) return;
+      var panel = document.getElementById('detail-panel');
+      if (!panel) return;
+      panel.classList.remove('hidden');
+
+      setText('dp-name',  v.name);
+      var coupaInfo = coupaMatchVendor(v.name);
+      var spendEl = document.getElementById('dp-spend');
+      if (spendEl) {
+        if (coupaInfo) {
+          spendEl.textContent = '$' + coupaInfo.fy27.toFixed(2) + 'M FY27 (Coupa)';
+        } else {
+          spendEl.textContent = v.spend > 0 ? fmtSpend(v.spend) : '';
+        }
+      }
+
+      var tierEl = document.getElementById('dp-tier');
+      if (tierEl) {
+        tierEl.className = 'vendor-tier tier-' + v.tier;
+        tierEl.textContent = v.tier.charAt(0).toUpperCase() + v.tier.slice(1);
+      }
+
+      var totalVendors = VENDORS.length;
+      var blastPct = totalVendors > 1
+        ? Math.round((v.deps.length / Math.max(v.deps.length + totalVendors - 1, 1)) * 100)
+        : (v.deps.length > 0 ? 100 : 0);
+
+      setText('dp-systems',  v.deps.length);
+      setText('dp-recovery', RECOVERY[v.tier] || '--');
+      setText('dp-blast',    blastPct + '%');
+      setText('dp-alts',     v.tier === 'critical' ? 'Low' : v.tier === 'high' ? 'Medium' : 'High');
+
+      // Notes
+      var notesEl = document.getElementById('dp-notes');
+      var notesWrap = document.getElementById('dp-notes-wrap');
+      if (notesEl) notesEl.textContent = v.notes || 'No notes.';
+      if (notesWrap) notesWrap.style.display = v.notes ? 'block' : 'none';
+
+      // Deps list
+      var depsEl = document.getElementById('dp-deps');
+      if (depsEl) {
+        while (depsEl.firstChild) depsEl.removeChild(depsEl.firstChild);
+        if (v.deps.length === 0) {
+          var noDepMsg = document.createElement('div');
+          noDepMsg.style.cssText = 'font-size:12px;color:var(--text-faint);';
+          noDepMsg.textContent = 'No dependencies mapped yet.';
+          depsEl.appendChild(noDepMsg);
+        } else {
+          v.deps.forEach(function(dep, i) {
+            var row = document.createElement('div');
+            row.className = 'detail-dep';
+
+            var dot = document.createElement('div');
+            dot.className = 'dep-dot';
+            dot.style.background = DEP_COLORS[dep.type] || '#64748b';
+
+            var labelEl = document.createElement('div');
+            labelEl.className = 'dep-label';
+            labelEl.textContent = dep.name;
+
+            var typeEl = document.createElement('span');
+            typeEl.className = 'dep-type dep-' + dep.type;
+            typeEl.textContent = dep.type;
+
+            var delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.style.cssText = 'background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:12px;padding:1px 4px;';
+            delBtn.textContent = '×';
+            delBtn.title = 'Remove';
+            (function(idx) {
+              delBtn.onclick = function() { removeDep(SELECTED_ID, idx); };
+            }(i));
+
+            row.appendChild(dot);
+            row.appendChild(labelEl);
+            row.appendChild(typeEl);
+            row.appendChild(delBtn);
+            depsEl.appendChild(row);
+          });
+        }
+      }
+
+      updateImpactBar();
+    }
+
+    function removeDep(vendorId, depIdx) {
+      var v = VENDORS.find(function(vv) { return vv.id === vendorId; });
+      if (!v) return;
+      v.deps.splice(depIdx, 1);
+      save();
+      renderAll();
+      openDetail(vendorId);
+    }
+
+    function closeDetail() {
+      SELECTED_ID = null;
+      var panel = document.getElementById('detail-panel');
+      if (panel) panel.classList.add('hidden');
+      var bar = document.getElementById('impact-bar');
+      if (bar) bar.classList.add('hidden');
+      renderAll();
+    }
+
+    // ── Scenario change ───────────────────────────
+    function onScenarioChange() {
+      updateImpactBar();
+    }
+
+    // ── Zoom ──────────────────────────────────────
+    function zoom(factor) {
+      VIEW_SCALE = Math.max(0.3, Math.min(3, VIEW_SCALE * factor));
+      var g = document.getElementById('map-g');
+      if (g) g.setAttribute('transform', 'translate(' + VIEW_X + ',' + VIEW_Y + ') scale(' + VIEW_SCALE + ')');
+    }
+
+    function resetView() {
+      VIEW_SCALE = 1; VIEW_X = 0; VIEW_Y = 0;
+      VENDORS.forEach(function(v) { v.x = null; v.y = null; });
+      renderSVG();
+    }
+
+    // ── Theme ─────────────────────────────────────
+    function toggleTheme() {
+      var html = document.documentElement;
+      var isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      var btn = document.getElementById('theme-btn');
+      if (btn) btn.textContent = isDark ? '☽' : '☀';
+      renderSVG();
+    }
+
+    // ── Demo data ─────────────────────────────────
+    function loadDemo() {
+      VENDORS = [
+        { id:'d1', name:'Salesforce', tier:'critical', spend:2400000, spendM:2.76, notes:'Core CRM & Service Cloud. ELA renewal FY27.', deps:[
+          { name:'Service Cloud', type:'internal' },
+          { name:'Marketing Automation', type:'downstream' },
+          { name:'Partner Portal', type:'downstream' },
+          { name:'Data Warehouse', type:'downstream' },
+          { name:'SSO / Identity', type:'upstream' },
+        ], x:null, y:null },
+        { id:'d2', name:'SAP ECC 6.0', tier:'critical', spend:1800000, spendM:0.02, notes:'Legacy ERP. EOL extended support ends 2027.', deps:[
+          { name:'Finance Reporting', type:'downstream' },
+          { name:'Supply Chain', type:'downstream' },
+          { name:'HR Systems', type:'internal' },
+          { name:'API Gateway', type:'upstream' },
+        ], x:null, y:null },
+        { id:'d3', name:'Workday', tier:'high', spend:650000, spendM:23.71, notes:'HCM platform. Annual renewal.', deps:[
+          { name:'Payroll Integration', type:'downstream' },
+          { name:'ADP', type:'external' },
+        ], x:null, y:null },
+        { id:'d4', name:'AWS', tier:'critical', spend:3200000, spendM:17.17, notes:'Primary cloud infrastructure. Multi-region.', deps:[
+          { name:'Production Apps', type:'internal' },
+          { name:'Data Lake', type:'internal' },
+          { name:'DR / Failover', type:'internal' },
+          { name:'CI/CD Pipeline', type:'internal' },
+        ], x:null, y:null },
+        { id:'d5', name:'ServiceNow', tier:'high', spend:480000, spendM:0, notes:'ITSM platform. Renewal Q2.', deps:[
+          { name:'IT Helpdesk', type:'internal' },
+          { name:'Change Management', type:'internal' },
+        ], x:null, y:null },
+        { id:'d6', name:'Okta', tier:'high', spend:220000, spendM:1.25, notes:'Identity & SSO. All apps depend on this.', deps:[
+          { name:'All SaaS Applications', type:'downstream' },
+          { name:'VPN', type:'downstream' },
+        ], x:null, y:null },
+      ];
+      SELECTED_ID = null;
+      save();
+      VIEW_SCALE = 1; VIEW_X = 0; VIEW_Y = 0;
+      renderAll();
+    }
+
+    // ── Clear ──────────────────────────────────────
+    function clearAll() {
+      VENDORS = []; SELECTED_ID = null;
+      save(); renderAll();
+    }
+
+    // ── Helpers ───────────────────────────────────
+    function setText(id, val) {
+      var node = document.getElementById(id);
+      if (node) node.textContent = val;
+    }
+
+    // ── Init ──────────────────────────────────────
+    load();
+    renderAll();
+    populateCoupaDatalist();
+
+    // Re-render on resize
+    window.addEventListener('resize', function() {
+      VENDORS.forEach(function(v) { v.x = null; v.y = null; });
+      renderSVG();
+    });
+  </script>
+
+</body>
+</html>

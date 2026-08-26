@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Market Intelligence · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --orange:#EA580C;--orange3:#FFF7ED;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 48px;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border);}
+.back{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;
+  border-radius:6px;background:var(--gray2);border:1px solid var(--border2);
+  color:var(--ink3);font-size:8pt;font-weight:600;text-decoration:none;
+  cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.back:hover{background:var(--navy);color:#fff;}
+.pg-title{font-size:15pt;font-weight:900;color:var(--navy);}
+.pg-sub{font-size:8.5pt;color:var(--ink4);margin-top:2px;}
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.card-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.card-sub{font-size:8pt;color:var(--ink4);margin-bottom:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.stat{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;border-top:3px solid var(--navy);}
+.stat.teal{border-top-color:var(--teal);}
+.stat.green{border-top-color:var(--green);}
+.stat.amber{border-top-color:var(--amber);}
+.stat.red{border-top-color:var(--red);}
+.stat.purple{border-top-color:var(--purple);}
+.stat.blue{border-top-color:var(--blue);}
+.stat-val{font-size:20pt;font-weight:900;color:var(--navy);line-height:1;margin-bottom:3px;}
+.stat.teal .stat-val{color:var(--teal);}
+.stat.green .stat-val{color:var(--green);}
+.stat.amber .stat-val{color:var(--amber);}
+.stat.red .stat-val{color:var(--red);}
+.stat.purple .stat-val{color:var(--purple);}
+.stat.blue .stat-val{color:var(--blue);}
+.stat-lbl{font-size:7.5pt;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.06em;}
+.stat-note{font-size:7pt;color:var(--ink4);margin-top:4px;}
+.prog{background:var(--gray2);border-radius:4px;height:10px;overflow:hidden;}
+.prog-bar{height:10px;border-radius:4px;transition:width 0.8s;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.bg{background:var(--green3);color:var(--green2);}
+.ba{background:var(--amber3);color:var(--amber2);}
+.br{background:var(--red3);color:var(--red2);}
+.bn{background:var(--navy3);color:var(--navy2);}
+.bt{background:var(--teal3);color:var(--teal2);}
+.bp{background:var(--purple3);color:var(--purple);}
+.bz{background:var(--gray2);color:var(--ink4);}
+.bo{background:var(--orange3);color:var(--orange);}
+.bb{background:var(--blue3);color:var(--blue);}
+.vt{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.vt th{background:var(--navy);color:#fff;padding:8px 12px;text-align:left;
+  font-size:7.5pt;font-weight:700;letter-spacing:0.03em;}
+.vt td{padding:9px 12px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.vt tr:hover td{background:var(--gray);}
+.vt tr:last-child td{border-bottom:none;}
+.callout{border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;
+  border-left:4px solid;font-size:8.5pt;line-height:1.6;}
+.c-info{background:var(--navy3);border-color:var(--navy2);color:var(--navy2);}
+.c-teal{background:var(--teal3);border-color:var(--teal);color:var(--green2);}
+.c-amber{background:var(--amber3);border-color:var(--amber);color:var(--amber2);}
+.shdr{font-size:10pt;font-weight:800;color:var(--navy);margin:20px 0 10px;
+  display:flex;align-items:center;gap:8px;padding-bottom:8px;
+  border-bottom:2px solid var(--gray3);}
+.tab-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{font-size:8pt;padding:6px 14px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--border2);background:#fff;font-family:inherit;
+  transition:all 0.15s;font-weight:600;color:var(--ink4);}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+.footer{margin-top:24px;padding-top:12px;border-top:1px solid var(--border);
+  font-size:7.5pt;color:var(--ink4);text-align:center;font-style:italic;}
+@media print{.back,.tab-bar{display:none!important;}.wrap{padding:12px!important;}}
+
+/* ── VER Dark Mode ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+  --purple3:rgba(124,58,237,0.15);--orange3:rgba(234,88,12,0.15);
+  --blue3:rgba(37,99,235,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .card,[data-theme="dark"] .stat{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .card-title,[data-theme="dark"] .stat-val{color:var(--ink);}
+[data-theme="dark"] .vp-table th{background:#162942;}
+[data-theme="dark"] .vp-table td,[data-theme="dark"] .vp-table tr:hover td{background:var(--gray2);}
+[data-theme="dark"] .vp-table tr:hover td{background:var(--gray3);}
+[data-theme="dark"] .callout.info,[data-theme="dark"] .c-info{background:#0F1E3C;border-left-color:var(--navy2);color:var(--ink3);}
+[data-theme="dark"] .callout.teal,[data-theme="dark"] .c-teal{background:rgba(13,148,136,0.12);}
+[data-theme="dark"] .callout.amber,[data-theme="dark"] .c-amber{background:rgba(217,119,6,0.12);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{
+  background:var(--gray2)!important;color:var(--ink2)!important;border-color:var(--border2)!important;}
+[data-theme="dark"] .back-btn,[data-theme="dark"] .back{
+  background:var(--gray2);border-color:var(--border2);color:var(--ink3);}
+[data-theme="dark"] .hub-nav,[data-theme="dark"] .page-wrap>.top-bar{border-bottom-color:var(--border);}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid var(--border2);background:var(--gray2);
+  color:var(--ink4);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── Hub Top Bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.45);line-height:1.4;}
+.htb-meta-sub{font-size:7pt;}
+.print-btn-bar{padding:6px 14px;border-radius:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.6);font-size:8pt;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.print-btn-bar:hover{background:rgba(255,255,255,0.15);color:#fff;}
+
+/* ── Hero Stage ── */
+.stage{background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 60%,#061020 100%);
+  position:relative;overflow:hidden;padding:52px 0 40px;}
+.stage::before{content:'';position:absolute;top:-80px;right:-80px;width:540px;height:540px;
+  background:radial-gradient(circle,rgba(13,148,136,0.07) 0%,transparent 70%);pointer-events:none;}
+.stage-inner{max-width:1100px;margin:0 auto;padding:0 48px;}
+.stage-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+.stage-title{font-size:28pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:6px;}
+.stage-accent{color:var(--teal);}
+.stage-pos{font-size:9pt;color:rgba(255,255,255,0.55);margin-bottom:28px;}
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:24px;}
+.kpi-tile{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:16px 18px;border-top:2px solid var(--teal);}
+.kpi-tile.amber{border-top-color:var(--amber);}
+.kpi-tile.green{border-top-color:var(--green);}
+.kpi-tile.red{border-top-color:var(--red);}
+.kpi-tile.teal2{border-top-color:#5EEAD4;}
+.kpi-tile-lbl{font-size:7.5pt;font-weight:700;color:rgba(255,255,255,0.45);
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
+.kpi-tile-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;margin-bottom:4px;}
+.kpi-tile.amber .kpi-tile-val{color:#FCD34D;}
+.kpi-tile.green .kpi-tile-val{color:#6EE7B7;}
+.kpi-tile.red .kpi-tile-val{color:#FCA5A5;}
+.kpi-tile.teal2 .kpi-tile-val{color:#5EEAD4;}
+.kpi-tile-note{font-size:7.5pt;color:rgba(255,255,255,0.35);}
+.callout-link{color:var(--teal);font-weight:700;text-decoration:none;}
+.callout-link:hover{text-decoration:underline;}
+
+/* ── Main wrapper ── */
+.mkt-main{max-width:1100px;margin:0 auto;padding:28px 48px;}
+
+/* ── Rate table ── */
+.mkt-tbl-wrap{overflow-x:auto;padding:0;}
+.mkt-role{font-weight:700;}
+.mkt-cat{font-size:7.5pt;color:var(--ink4);}
+.mkt-market{color:var(--green);font-weight:600;}
+.mkt-our{font-weight:600;color:var(--navy);}
+.mkt-th-center{text-align:center;}
+.mkt-sources{font-size:7.5pt;color:var(--ink4);font-style:italic;margin-top:6px;}
+
+/* ── Trend cards ── */
+.trend-card{margin-bottom:10px;}
+.trend-inner{display:flex;align-items:flex-start;gap:12px;}
+.trend-arrow{font-size:20pt;font-weight:900;flex-shrink:0;width:36px;text-align:center;}
+.trend-arrow-up{color:#DC2626;}
+.trend-arrow-down{color:#059669;}
+.trend-arrow-stable{color:#D97706;}
+.trend-body{flex:1;}
+.trend-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.trend-name{font-size:9pt;font-weight:800;color:var(--navy);}
+.trend-pct-up{font-size:9pt;font-weight:800;color:#DC2626;}
+.trend-pct-down{font-size:9pt;font-weight:800;color:#059669;}
+.trend-pct-stable{font-size:9pt;font-weight:800;color:#D97706;}
+.trend-desc{font-size:8.5pt;color:var(--ink3);line-height:1.6;}
+
+/* ── Peer benchmark table ── */
+.peer-row-even{background:var(--gray);}
+.peer-row-odd{background:#fff;}
+.peer-avg{color:var(--teal);font-weight:600;text-align:center;}
+.peer-val{color:var(--navy);font-weight:700;text-align:center;}
+.peer-status-cell{text-align:center;}
+
+/* Scroll fade */
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+/* ── Rate detail modal ── */
+.mkt-modal-backdrop{position:fixed;inset:0;z-index:200;
+  background:rgba(6,13,26,0.80);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  opacity:0;pointer-events:none;transition:opacity 0.25s ease;}
+.mkt-modal-backdrop.open{opacity:1;pointer-events:all;}
+.mkt-modal{background:#fff;border-radius:14px;
+  border:1px solid var(--border);
+  box-shadow:0 32px 80px rgba(0,0,0,0.35),0 8px 24px rgba(0,0,0,0.18);
+  width:100%;max-width:560px;
+  overflow:hidden;display:flex;flex-direction:column;
+  transform:translateY(28px) scale(0.97);
+  transition:transform 0.25s ease;}
+.mkt-modal-backdrop.open .mkt-modal{transform:translateY(0) scale(1);}
+.mkt-modal-signal{height:4px;flex-shrink:0;}
+.mkt-modal-hdr{display:flex;align-items:flex-start;gap:14px;
+  padding:18px 20px 14px;border-bottom:1px solid var(--border);}
+.mkt-modal-title{flex:1;}
+.mkt-modal-role{font-size:11pt;font-weight:800;color:var(--navy);margin-bottom:3px;}
+.mkt-modal-cat{font-size:8.5pt;color:var(--ink4);}
+.mkt-modal-close{width:34px;height:34px;border-radius:50%;border:none;
+  background:var(--gray2);color:var(--ink4);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all 0.15s;flex-shrink:0;}
+.mkt-modal-close:hover{background:var(--red3);color:var(--red);}
+.mkt-modal-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
+.mkt-modal-kpi{padding:12px 16px;background:#fff;}
+.mkt-modal-kpi-val{font-size:13pt;font-weight:900;color:var(--navy);line-height:1.2;}
+.mkt-modal-kpi-val-green{color:var(--green);}
+.mkt-modal-kpi-val-amber{color:var(--amber);}
+.mkt-modal-kpi-lbl{font-size:7.5pt;color:var(--ink4);margin-top:3px;
+  text-transform:uppercase;letter-spacing:0.06em;}
+.mkt-modal-body{padding:18px 20px;}
+.mkt-modal-lbl{font-size:8pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.mkt-modal-notes-text{font-size:9pt;color:var(--ink2);line-height:1.7;margin-bottom:12px;}
+.mkt-modal-source{font-size:8pt;color:var(--ink4);font-style:italic;}
+.mkt-tbl-row-clickable{cursor:pointer;}
+.mkt-tbl-row-clickable:hover td{background:var(--teal3);}
+
+/* Advisory close */
+.advisory-close{background:linear-gradient(135deg,var(--navy) 0%,#1a2f50 100%);
+  color:rgba(255,255,255,0.6);padding:32px 48px;margin-top:40px;}
+.advisory-close-inner{max-width:1100px;margin:0 auto;}
+.advisory-title{font-size:9pt;font-weight:800;color:rgba(255,255,255,0.9);margin-bottom:8px;}
+.advisory-text{font-size:8pt;line-height:1.7;}
+.advisory-meta{margin-top:12px;font-size:7.5pt;color:rgba(255,255,255,0.35);}
+
+@media print{
+  .hub-top-bar,.print-btn-bar,.stage{display:none!important;}
+  .mkt-main{padding:12px;}
+}
+</style>
+</head>
+<body>
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">Market Intelligence</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="dm-toggle" onclick="openMarketHelp()" aria-label="How to read Market Intelligence">&#63; How to Read</button>
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button>
+    <button type="button" class="print-btn-bar" onclick="window.print()">Print</button>
+    <div class="htb-meta">DET Portfolio Intelligence &mdash; Powered by VER<br><span class="htb-meta-sub">Updated: May 2026 &middot; Salesforce DET &middot; Confidential</span></div>
+  </div>
+</nav>
+
+<section class="stage">
+  <div class="stage-inner">
+    <div class="stage-eyebrow">VER Intelligence Hub · Rate &amp; Market Analysis · FY27</div>
+    <div class="stage-title">Market <span class="stage-accent">Intelligence</span></div>
+    <div class="stage-pos">Rate benchmarks · Market trends · Peer comparisons · VER advisory intelligence</div>
+    <div class="kpi-strip">
+      <div class="kpi-tile green">
+        <div class="kpi-tile-lbl">Roles Benchmarked</div>
+        <div class="kpi-tile-val">7</div>
+        <div class="kpi-tile-note">AMER · EMEA · APAC · Global</div>
+      </div>
+      <div class="kpi-tile amber">
+        <div class="kpi-tile-lbl">Overpayment Flags</div>
+        <div class="kpi-tile-val">1</div>
+        <div class="kpi-tile-note">Poland resources above market</div>
+      </div>
+      <div class="kpi-tile teal2">
+        <div class="kpi-tile-lbl">Market Trends</div>
+        <div class="kpi-tile-val">5</div>
+        <div class="kpi-tile-note">AI premium · India inflation · SaaS</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile-lbl">Peer Benchmarks</div>
+        <div class="kpi-tile-val">6</div>
+        <div class="kpi-tile-note">vs. $1B+ tech companies</div>
+      </div>
+      <div class="kpi-tile green">
+        <div class="kpi-tile-lbl">Savings Opportunity</div>
+        <div class="kpi-tile-val">$2.1M</div>
+        <div class="kpi-tile-note">Poland rate correction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="mkt-main">
+
+  <div class="callout c-info fade-in">
+    <strong>Market Intelligence — Powered by VER.</strong>
+    VER monitors external market conditions, rate benchmarks, and peer data to ensure
+    DET engagements are priced competitively and structured appropriately.
+    All rate data sourced from Insight Global negotiated rate cards, Gartner research,
+    and third-party benchmarking. Advisory guidance only — sourcing decisions rest with Procurement.
+  </div>
+
+  <div class="callout c-teal fade-in">
+    <strong>&#128178; Deep Rate Intelligence Available:</strong>
+    The full <a href="page_rate_benchmarks.html" class="callout-link">Rate Benchmarks module</a>
+    covers 35 roles across 9 categories and 4 regions with leverage scores, YoY deltas,
+    and 8 negotiation playbooks. This page provides market context; use Rate Benchmarks for
+    sourcing and negotiation strategy.
+  </div>
+
+  <!-- RATE BENCHMARKING -->
+  <div class="shdr fade-in">💰 Rate Benchmarking — Market vs DET Portfolio</div>
+  <div class="card mkt-tbl-wrap fade-in">
+    <table class="vt">
+      <thead><tr>
+        <th>Role / Engagement Type</th><th>Region</th><th>Market Range</th>
+        <th>DET Rate / Value</th><th>Status</th><th>VER Notes</th>
+      </tr></thead>
+      <tbody id="rate-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="callout c-amber fade-in">
+    <strong>🚨 Rate Overpayment Alert — Poland Resources:</strong>
+    VER rate benchmarking identified a supplier charging US-equivalent rates ($112+/hr)
+    for Poland-based resources where the IG Poland market rate is $60–$130/hr.
+    Lead Software Developer (Poland): market rate $87–$102/hr per IG rate card.
+    VER has flagged for engagement review and potential rate renegotiation.
+  </div>
+
+  <!-- MARKET TRENDS -->
+  <div class="shdr">📈 Market Trends — What VER Is Watching</div>
+  <div id="trends-list"></div>
+
+  <!-- PEER BENCHMARKS -->
+  <div class="shdr fade-in">🏢 Peer Benchmarks — DET vs Industry</div>
+  <div class="card mkt-tbl-wrap fade-in">
+    <table class="vt">
+      <thead><tr>
+        <th>Benchmark Metric</th>
+        <th class="mkt-th-center">Peer Average</th>
+        <th class="mkt-th-center">DET Portfolio</th>
+        <th class="mkt-th-center">Status</th>
+      </tr></thead>
+      <tbody id="peer-tbody"></tbody>
+    </table>
+  </div>
+  <div class="mkt-sources">
+    Sources: Gartner IT Key Metrics Data 2025 · Insight Global 2026 Rate Cards (as of May 2026) · Global analyst surveys. Market intelligence compiled by VER from publicly available and negotiated data sources.
+    Peer benchmarks based on technology companies with comparable IT footprint ($1B+ revenue).
+  </div>
+
+</div>
+
+<footer class="advisory-close">
+  <div class="advisory-close-inner">
+    <div class="advisory-title">VER Intelligence Hub · Advisory Notice</div>
+    <div class="advisory-text">Market Intelligence data is sourced from Insight Global negotiated rate cards, Gartner research, and internal VER analysis.
+    All figures are advisory benchmarks only — sourcing and pricing decisions rest with the respective Pillar Lead and Procurement.</div>
+    <div class="advisory-meta">VER Intelligence Hub · Vendor Engagement &amp; Reliability · Salesforce DET · DET Portfolio Intelligence — Powered by VER · Confidential</div>
+  </div>
+</footer>
+<!-- Rate detail modal -->
+<div class="mkt-modal-backdrop" id="mkt-modal-backdrop" onclick="if(event.target===this)closeMktModal()">
+  <div class="mkt-modal" id="mkt-modal">
+    <div class="mkt-modal-signal" id="mkt-modal-signal"></div>
+    <div class="mkt-modal-hdr">
+      <div class="mkt-modal-title">
+        <div class="mkt-modal-role" id="mkt-modal-role"></div>
+        <div class="mkt-modal-cat" id="mkt-modal-cat"></div>
+      </div>
+      <button type="button" class="mkt-modal-close" onclick="closeMktModal()">&#10005;</button>
+    </div>
+    <div class="mkt-modal-kpis" id="mkt-modal-kpis"></div>
+    <div class="mkt-modal-body">
+      <div class="mkt-modal-lbl">VER Notes</div>
+      <div class="mkt-modal-notes-text" id="mkt-modal-notes"></div>
+      <div class="mkt-modal-lbl">Data Source</div>
+      <div class="mkt-modal-source" id="mkt-modal-source"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MARKET_DATA = {
+  rate_insights: [
+    { category:'Contingent Workforce', role:'Software Engineer (Senior)', region:'AMER',
+      market_low:'$130', market_high:'$165', our_rate:'$113-$150', status:'Aligned',
+      source:'Insight Global AMER Rate Card 2026', notes:'IG negotiated rates within market. Senior SWE onshore.' },
+    { category:'Contingent Workforce', role:'Lead Software Developer', region:'EMEA (Poland)',
+      market_low:'$87', market_high:'$102', our_rate:'$112-$200', status:'Overpaying',
+      source:'IG Poland Rate Card + Poland Benchmark Analysis',
+      notes:'⚠️ A supplier is charging above-market rates — flagged for review. Market rate $60-$130. VER flagged for review.' },
+    { category:'Contingent Workforce', role:'Software Developer', region:'APAC (India)',
+      market_low:'$18', market_high:'$49', our_rate:'$35-$55', status:'Aligned',
+      source:'IG India Rate Card 2026', notes:'NTT/Cognizant offshore rates within IG India market benchmark.' },
+    { category:'Professional Services', role:'Big 4 Consulting (Manager)', region:'AMER',
+      market_low:'$2,800', market_high:'$4,200', our_rate:'Deloitte $9.1M total', status:'Aligned',
+      source:'Big 4 market benchmarks + Deloitte SOW confirmed', notes:'Deloitte rates within Tier 1 consulting market norms.' },
+    { category:'Software / SaaS', role:'Enterprise HCM Platform (Workday)', region:'Global',
+      market_low:'$20M', market_high:'$28M', our_rate:'$23.7M', status:'Aligned',
+      source:'Gartner Magic Quadrant + peer benchmarks', notes:'Workday at market midpoint. Renewal Nov 2026 — negotiate toward lower bound.' },
+    { category:'Cloud & Managed Services', role:'AWS Cloud Committed Spend (EDP)', region:'Global',
+      market_low:'10% discount', market_high:'25% discount', our_rate:'EDP in place', status:'Aligned',
+      source:'AWS EDP market benchmarks', notes:'EDP committed spend provides volume discount. Within market norm for DET scale.' },
+    { category:'Professional Services', role:'AMS/AD Offshore (Onshore equivalent)', region:'AMER',
+      market_low:'$100', market_high:'$140', our_rate:'NTT $113-$150', status:'Aligned',
+      source:'IG AMER Rate Card + NTT SOW analysis', notes:'Post-restructure NTT AD rates align to market. AMS rates actively being reviewed.' },
+  ],
+
+  market_trends: [
+    { trend:'AI/GenAI Talent Premium', direction:'up', pct:'+18-25%', impact:'High',
+      desc:'Demand for AI/ML engineers driving 18-25% rate premium over general SWE rates. Relevant for Agentic Transformation pillar staffing.' },
+    { trend:'Offshore Rate Inflation (India)', direction:'up', pct:'+8-12%', impact:'Medium',
+      desc:'India resource rates increasing 8-12% YoY due to demand and currency shifts. Current IG card reflects 2026 rates — monitor for 2027 renewal.' },
+    { trend:'Poland Market Maturation', direction:'up', pct:'+5-8%', impact:'Medium',
+      desc:'Poland becoming premium nearshore market. Rates approaching Western Europe levels for senior talent. this supplier overpayment issue understates this trend.' },
+    { trend:'SaaS Enterprise Pricing Normalization', direction:'down', pct:'-3-8%', impact:'Medium',
+      desc:'Post-2021-2023 SaaS bubble deflating. Enterprise software vendors offering more flexibility on multi-year renewals. Opportunity at Workday renewal.' },
+    { trend:'Consulting Rate Pressure', direction:'stable', pct:'±2%', impact:'Low',
+      desc:'Big 4 and boutique consulting rates stable. BCG escalation may indicate scope/value misalignment more than market rate issue.' },
+  ],
+
+  peer_benchmarks: [
+    { metric:'Technology Company CWF as % of IT spend', peer_avg:'28-32%', ver_portfolio:'29.5%', status:'Aligned' },
+    { metric:'Software licensing as % of IT spend', peer_avg:'48-55%', ver_portfolio:'52.5%', status:'Aligned' },
+    { metric:'Hardware as % of IT spend', peer_avg:'8-14%', ver_portfolio:'11.5%', status:'Aligned' },
+    { metric:'Offshore/Nearshore ratio (CWF)', peer_avg:'40-60%', ver_portfolio:'Majority offshore', status:'Monitor' },
+    { metric:'Single-vendor concentration (top vendor % of total)', peer_avg:'<15%', ver_portfolio:'8% (Workday)', status:'Aligned' },
+    { metric:'Active renewals in 12-month window (% of portfolio)', peer_avg:'20-30%', ver_portfolio:'~25%', status:'Aligned' },
+  ],
+};
+
+function getTrendArrowCls(dir) {
+  return dir === 'up' ? 'trend-arrow-up' : dir === 'down' ? 'trend-arrow-down' : 'trend-arrow-stable';
+}
+function getTrendPctCls(dir) {
+  return dir === 'up' ? 'trend-pct-up' : dir === 'down' ? 'trend-pct-down' : 'trend-pct-stable';
+}
+
+function init() {
+  // Rate insights table
+  document.getElementById('rate-tbody').innerHTML = MARKET_DATA.rate_insights.map(function(r,i) {
+    var sc = r.status === 'Aligned' ? 'bg' : r.status === 'Overpaying' ? 'ba' : 'br';
+    return '<tr class="mkt-tbl-row-clickable" onclick="openMktModal('+i+')">' +
+      '<td><span class="mkt-role">' + r.role + '</span><div class="mkt-cat">' + r.category + '</div></td>' +
+      '<td>' + r.region + '</td>' +
+      '<td class="mkt-market">' + r.market_low + ' – ' + r.market_high + '</td>' +
+      '<td class="mkt-our">' + r.our_rate + '</td>' +
+      '<td><span class="badge ' + sc + '">' + r.status + '</span></td>' +
+      '<td class="trend-desc">' + r.notes + '</td>' +
+    '</tr>';
+  }).join('');
+
+  // Market trends
+  document.getElementById('trends-list').innerHTML = MARKET_DATA.market_trends.map(function(t) {
+    var arrow  = t.direction === 'up' ? '↑' : t.direction === 'down' ? '↓' : '→';
+    var arCls  = getTrendArrowCls(t.direction);
+    var pctCls = getTrendPctCls(t.direction);
+    var impCls = t.impact === 'High' ? 'br' : t.impact === 'Medium' ? 'ba' : 'bg';
+    return '<div class="card trend-card fade-in">' +
+      '<div class="trend-inner">' +
+        '<div class="trend-arrow ' + arCls + '">' + arrow + '</div>' +
+        '<div class="trend-body">' +
+          '<div class="trend-hdr">' +
+            '<div class="trend-name">' + t.trend + '</div>' +
+            '<span class="badge ' + impCls + '">' + t.impact + ' Impact</span>' +
+            '<span class="' + pctCls + '">' + t.pct + '</span>' +
+          '</div>' +
+          '<div class="trend-desc">' + t.desc + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Peer benchmarks table
+  document.getElementById('peer-tbody').innerHTML = MARKET_DATA.peer_benchmarks.map(function(b,i) {
+    var sc = b.status === 'Aligned' ? 'bg' : 'ba';
+    var rowCls = i % 2 === 0 ? 'peer-row-even' : 'peer-row-odd';
+    return '<tr class="' + rowCls + '">' +
+      '<td>' + b.metric + '</td>' +
+      '<td class="peer-avg">' + b.peer_avg + '</td>' +
+      '<td class="peer-val">' + b.ver_portfolio + '</td>' +
+      '<td class="peer-status-cell"><span class="badge ' + sc + '">' + b.status + '</span></td>' +
+    '</tr>';
+  }).join('');
+
+  // Scroll fade
+  var fadeEls = document.querySelectorAll('.fade-in');
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, {threshold:0.1});
+  fadeEls.forEach(function(el){ obs.observe(el); });
+}
+
+function openMktModal(i){
+  var r = MARKET_DATA.rate_insights[i];
+  if(!r) return;
+  var sc = r.status === 'Aligned' ? 'var(--green)' : r.status === 'Overpaying' ? 'var(--amber)' : 'var(--red)';
+  var vcls = r.status === 'Aligned' ? 'mkt-modal-kpi-val mkt-modal-kpi-val-green'
+           : r.status === 'Overpaying' ? 'mkt-modal-kpi-val mkt-modal-kpi-val-amber'
+           : 'mkt-modal-kpi-val';
+  var badgeCls = r.status === 'Aligned' ? 'bg' : r.status === 'Overpaying' ? 'ba' : 'br';
+  document.getElementById('mkt-modal-signal').style.background = sc;
+  document.getElementById('mkt-modal-role').textContent = r.role;
+  document.getElementById('mkt-modal-cat').textContent  = r.category+' · '+r.region;
+  document.getElementById('mkt-modal-kpis').innerHTML =
+    '<div class="mkt-modal-kpi"><div class="mkt-modal-kpi-val mkt-modal-kpi-val-green">'+r.market_low+' – '+r.market_high+'</div><div class="mkt-modal-kpi-lbl">Market Range</div></div>'
+    +'<div class="mkt-modal-kpi"><div class="'+vcls+'">'+r.our_rate+'</div><div class="mkt-modal-kpi-lbl">DET Rate</div></div>'
+    +'<div class="mkt-modal-kpi"><div class="mkt-modal-kpi-val"><span class="badge '+badgeCls+'">'+r.status+'</span></div><div class="mkt-modal-kpi-lbl">Status</div></div>';
+  document.getElementById('mkt-modal-notes').textContent  = r.notes;
+  document.getElementById('mkt-modal-source').textContent = r.source;
+  document.getElementById('mkt-modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMktModal(){
+  document.getElementById('mkt-modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeMktModal(); });
+
+document.addEventListener('DOMContentLoaded', init);
+
+function _dmToggle(){
+  var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+}
+(function(){
+  var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+})();
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openMarketHelp(){
+  HelpModal.open({
+    title: 'Market Intelligence',
+    what: 'Market Intelligence surfaces <strong>external signals about your active vendors</strong> — M&A activity, financial health, product direction changes, competitive moves, and analyst ratings. It gives you early warning before a vendor event becomes a contract problem.',
+    steps: [
+      '<strong>Check the signal feed</strong> at the top — new market events for DET vendors are surfaced here in near-real-time, flagged by relevance to active contracts.',
+      '<strong>Review vendor health scores</strong> — each tracked vendor has a composite market health score based on financial stability, analyst sentiment, and news volume.',
+      '<strong>Check the M&A watch list</strong> — vendors with elevated M&A signals (acquisition rumors, PE activity, strategic reviews) are flagged separately. These require proactive contract review.',
+      '<strong>Drill into a vendor</strong> to see the full signal history, analyst commentary, and recommended procurement action (monitor, review, escalate).',
+      '<strong>Set alerts</strong> for specific vendors so you are notified when a significant market event occurs for a vendor with an active DET contract.'
+    ],
+    tips: [
+      { icon: '&#x26A0;', title: 'M&A = contract review trigger', body: 'Any vendor with an M&A signal should trigger a review of your change-of-control clauses. Do not wait for the deal to close.' },
+      { icon: '&#x1F4C9;', title: 'Financial distress has lead time', body: 'Vendor financial distress shows signals 6-12 months before it becomes a contract risk. Act early — alternatives take time to qualify.' },
+      { icon: '&#x1F4F0;', title: 'Product direction matters', body: 'A vendor deprioritizing your use case in their product roadmap is as important as financial risk — it affects renewal leverage and alternatives.' },
+      { icon: '&#x1F517;', title: 'Links to Vendor 360', body: 'Click any vendor in the market feed to open their full 360 dossier in the Vendor Registry with complete contract and governance context.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

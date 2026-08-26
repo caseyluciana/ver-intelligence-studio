@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CQBR Generator · VER Intelligence Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98),rgba(10,22,40,0.98));
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,#0A1628,#0F1E3C,#0D2E38);padding:30px 0 26px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.12),transparent 70%);pointer-events:none;}
+.hero-inner{max-width:1100px;margin:0 auto;padding:0 48px;}
+.hero-eyebrow{font-size:6.5pt;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;}
+.hero-title{font-size:21pt;font-weight:900;color:#fff;line-height:1.15;margin-bottom:6px;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.6);line-height:1.6;max-width:560px;}
+
+/* ── Main layout ── */
+.main{max-width:1100px;margin:0 auto;padding:28px 48px 60px;}
+
+/* ── Step cards ── */
+.step-card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden;}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--gray);}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-size:9pt;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-num.done{background:var(--green);}
+.step-title{font-size:10.5pt;font-weight:800;color:var(--navy);}
+.step-sub{font-size:8pt;color:var(--ink4);margin-top:1px;}
+.step-body{padding:22px 24px;}
+
+/* ── Drop zone ── */
+.drop-zone{border:2px dashed var(--border2);border-radius:10px;padding:40px 24px;text-align:center;
+  cursor:pointer;transition:all 0.2s;background:var(--gray);}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--teal);background:var(--teal3);}
+.drop-icon{font-size:28pt;margin-bottom:10px;}
+.drop-title{font-size:10.5pt;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.drop-sub{font-size:8.5pt;color:var(--ink4);}
+.drop-browse{color:var(--teal);font-weight:700;cursor:pointer;}
+.drop-browse:hover{text-decoration:underline;}
+#file-input{display:none;}
+
+/* ── Parse status ── */
+.parse-status{display:none;margin-top:16px;padding:14px 16px;border-radius:8px;font-size:8.5pt;font-weight:600;}
+.parse-status.ok{background:var(--green3);color:var(--green2);border:1px solid #A7F3D0;}
+.parse-status.err{background:var(--red3);color:var(--red2);border:1px solid #FECACA;}
+
+/* ── Preview sections ── */
+.preview-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.ptab{font-size:8pt;padding:5px 14px;border-radius:20px;border:1.5px solid var(--border2);
+  background:#fff;cursor:pointer;font-weight:600;color:var(--ink4);font-family:inherit;transition:all 0.15s;}
+.ptab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ptab:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+.preview-panel{display:none;}
+.preview-panel.active{display:block;}
+
+/* ── Preview table ── */
+.prev-table{width:100%;border-collapse:collapse;font-size:8pt;}
+.prev-table th{text-align:left;padding:7px 10px;background:var(--gray2);border-bottom:2px solid var(--border);
+  font-weight:800;color:var(--ink3);font-size:7.5pt;text-transform:uppercase;letter-spacing:0.05em;}
+.prev-table td{padding:8px 10px;border-bottom:1px solid var(--gray2);vertical-align:top;color:var(--ink2);}
+.prev-table tr:last-child td{border-bottom:none;}
+.prev-table tr:hover td{background:var(--gray);}
+
+/* ── Field grid (header preview) ── */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-item{background:var(--gray);border-radius:8px;padding:10px 12px;}
+.field-lbl{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink4);margin-bottom:3px;}
+.field-val{font-size:9pt;font-weight:700;color:var(--ink);}
+.field-val.empty{color:var(--border2);font-style:italic;font-weight:400;}
+
+/* ── Generate button ── */
+.gen-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.gen-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;
+  background:var(--teal);color:#fff;font-size:10pt;font-weight:800;border:none;
+  border-radius:8px;cursor:pointer;font-family:inherit;transition:background 0.15s;}
+.gen-btn:hover{background:var(--teal2);}
+.gen-btn:disabled{background:var(--gray3);color:var(--ink4);cursor:not-allowed;}
+.snippet-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;
+  background:#fff;color:var(--navy);font-size:10pt;font-weight:800;
+  border:2px solid var(--navy);border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.snippet-btn:hover{background:var(--navy3);}
+.snippet-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.inject-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;
+  background:var(--green);color:#fff;font-size:10pt;font-weight:800;border:none;
+  border-radius:8px;cursor:pointer;font-family:inherit;transition:background 0.15s;}
+.inject-btn:hover{background:var(--green2);}
+.inject-btn:disabled{background:var(--gray3);color:var(--ink4);cursor:not-allowed;}
+.gen-note{font-size:8pt;color:var(--ink4);}
+.inject-result{display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:8.5pt;font-weight:600;}
+.inject-result.ok{background:var(--green3);color:var(--green2);border:1px solid #A7F3D0;}
+.inject-result.err{background:var(--red3);color:var(--red2);border:1px solid #FECACA;}
+.inject-result.warn{background:var(--amber3);color:var(--amber2);border:1px solid #FDE68A;}
+
+/* ── Snippet box ── */
+.snippet-box{display:none;margin-top:16px;background:var(--navy);border-radius:10px;padding:16px 18px;}
+.snippet-label{font-size:7.5pt;font-weight:800;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.snippet-code{font-family:'Courier New',monospace;font-size:8pt;color:#5EEAD4;white-space:pre-wrap;word-break:break-all;line-height:1.6;}
+.copy-btn{margin-top:10px;padding:6px 16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  color:#fff;border-radius:6px;cursor:pointer;font-size:8pt;font-weight:700;font-family:inherit;transition:all 0.15s;}
+.copy-btn:hover{background:rgba(13,148,136,0.3);border-color:var(--teal);}
+
+/* ── Validation warnings ── */
+.val-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.val-item{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-radius:6px;font-size:8.5pt;}
+.val-item.warn{background:var(--amber3);color:var(--amber2);}
+.val-item.ok{background:var(--green3);color:var(--green2);}
+.val-dot{flex-shrink:0;font-size:10pt;}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;
+  border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.55);font-size:7.5pt;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:all 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.40);color:#C084FC;}
+body.mid-mode .hub-top-bar{background:#1E1440;}
+body.mid-mode{background:#0E0B22 !important;}
+body.light-mode .hub-top-bar{background:rgba(255,240,244,0.97);border-bottom-color:#F5C6D3;}
+body.light-mode .hub-top-bar *{color:#5A2038 !important;}
+body.light-mode .htb-back{color:#E11D48 !important;}
+body.light-mode .theme-toggle-btn{border-color:#F5C6D3;background:#FFF0F4;color:#5A2038 !important;}
+body.light-mode .theme-toggle-btn:hover{background:rgba(244,63,94,0.10);color:#E11D48 !important;}
+body.light-mode{background:#FFF0F4 !important;color:#1A0818 !important;}
+body.light-mode .gen-form,body.light-mode .gen-card,body.light-mode .gen-section{background:#FFF8FA !important;border-color:#F5C6D3 !important;color:#1A0818 !important;}
+body.light-mode label,body.light-mode .field-label{color:#3D1028 !important;}
+body.light-mode input,body.light-mode select,body.light-mode textarea{background:#FFF8FA !important;border-color:#F5C6D3 !important;color:#1A0818 !important;}
+body.light-mode .val-item{color:#3D1028 !important;}
+</style>
+</head>
+<body>
+
+<div class="hub-top-bar">
+  <div class="htb-left">
+    <a href="page_cqbr.html" class="htb-back">&#8592; CQBR Library</a>
+    <div class="htb-divider"></div>
+    <div class="htb-brand">CQBR Generator</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+    <button type="button" style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;" onclick="openCqbrGenHelp()" aria-label="How to use CQBR Generator">&#63; How to Use</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">VER Intelligence · Internal Tool</div>
+    <div class="hero-title">Cinematic CQBR Generator</div>
+    <div class="hero-sub">Upload a completed vendor input form to generate a cinematic QBR experience and CQBR Library entry — ready in seconds.</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STEP 1: Upload -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num" id="sn1">1</div>
+      <div>
+        <div class="step-title">Upload Vendor Input Form</div>
+        <div class="step-sub">VER_CQBR_Vendor_Input_Form.xlsx — completed by the vendor and reviewed by VER</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="handleDrop(event)">
+        <div class="drop-icon">&#128196;</div>
+        <div class="drop-title">Drop the .xlsx file here</div>
+        <div class="drop-sub">or <span class="drop-browse">browse to select</span> &nbsp;·&nbsp; Accepts .xlsx only &nbsp;·&nbsp; Parsed entirely in-browser</div>
+      </div>
+      <input type="file" id="file-input" accept=".xlsx" onchange="handleFile(this.files[0])">
+      <div class="parse-status" id="parse-status"></div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Review -->
+  <div class="step-card" id="step2-card" style="opacity:0.4;pointer-events:none;">
+    <div class="step-header">
+      <div class="step-num" id="sn2">2</div>
+      <div>
+        <div class="step-title">Review Parsed Data</div>
+        <div class="step-sub">Verify all sections parsed correctly before generating</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="preview-tabs" id="preview-tabs"></div>
+      <div id="preview-panels"></div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Validate -->
+  <div class="step-card" id="step3-card" style="opacity:0.4;pointer-events:none;">
+    <div class="step-header">
+      <div class="step-num" id="sn3">3</div>
+      <div>
+        <div class="step-title">Validation Check</div>
+        <div class="step-sub">Required fields and minimum data thresholds</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <ul class="val-list" id="val-list"></ul>
+    </div>
+  </div>
+
+  <!-- STEP 4: Generate -->
+  <div class="step-card" id="step4-card" style="opacity:0.4;pointer-events:none;">
+    <div class="step-header">
+      <div class="step-num" id="sn4">4</div>
+      <div>
+        <div class="step-title">Generate</div>
+        <div class="step-sub">Download the cinematic HTML and get the CQBR Library snippet</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="gen-row">
+        <button class="gen-btn" id="gen-btn" onclick="generateCQBR()" disabled>&#9654; Generate Cinematic CQBR</button>
+        <button class="inject-btn" id="inject-btn" onclick="injectToLibrary()" disabled>&#10133; Add to CQBR Library</button>
+        <button class="snippet-btn" id="snippet-btn" onclick="showSnippet()" disabled>&#128203; Manual Snippet</button>
+        <span class="gen-note" id="gen-note">Upload and review a file to enable generation</span>
+      </div>
+      <div class="inject-result" id="inject-result"></div>
+      <div class="snippet-box" id="snippet-box">
+        <div class="snippet-label">Manual fallback — paste into QBRS array in page_cqbr.html</div>
+        <div class="snippet-code" id="snippet-code"></div>
+        <button class="copy-btn" onclick="copySnippet()">&#128203; Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────
+var DATA = null; // parsed workbook data
+
+// ── File handling ─────────────────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  var f = e.dataTransfer.files[0];
+  if (f) handleFile(f);
+}
+
+function handleFile(file) {
+  if (!file || !file.name.endsWith('.xlsx')) {
+    showStatus('err', 'Please upload a .xlsx file.');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var wb = XLSX.read(e.target.result, { type: 'array' });
+      DATA = parseWorkbook(wb);
+      onParsed();
+    } catch(ex) {
+      showStatus('err', 'Parse error: ' + ex.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── Parse workbook ─────────────────────────────────────────────────────────
+function parseWorkbook(wb) {
+  function sheet(name) {
+    var ws = wb.Sheets[name];
+    if (!ws) return [];
+    return XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+  }
+
+  // Helper: find rows where first non-empty cell matches a pattern
+  function dataRows(rows, startAfterPattern) {
+    var idx = 0;
+    if (startAfterPattern) {
+      for (var i = 0; i < rows.length; i++) {
+        var joined = rows[i].join('|').toLowerCase();
+        if (joined.indexOf(startAfterPattern.toLowerCase()) >= 0) { idx = i + 1; break; }
+      }
+    }
+    return rows.slice(idx).filter(function(r){ return r.some(function(c){ return String(c).trim(); }); });
+  }
+
+  // ── 1. Engagement Header ──
+  var hdr = {};
+  var hRows = sheet('1. Engagement Header');
+  var hFieldMap = {
+    'vendor legal name': 'vendor',
+    'fiscal year': 'fy',
+    'quarter': 'quarter',
+    'qbr date': 'qbr_date',
+    'submission date': 'submission_date',
+    'primary det pillar': 'pillar',
+    'secondary pillars': 'secondary_pillars',
+    'service lines covered': 'service_lines',
+    'engagement start date': 'start_date',
+    'total headcount': 'headcount',
+    'vendor account lead name': 'lead_name',
+    'vendor account lead email': 'lead_email',
+    'det primary contact': 'det_contact',
+    'engagement summary': 'summary',
+    'prior quarter score': 'prior_score'
+  };
+  hRows.forEach(function(r) {
+    var key = String(r[0] || '').replace(/[^a-z\s]/gi,'').trim().toLowerCase();
+    var val = String(r[1] || '').trim();
+    Object.keys(hFieldMap).forEach(function(k) {
+      if (key.indexOf(k) >= 0 && val) hdr[hFieldMap[k]] = val;
+    });
+  });
+
+  // ── 2. By The Numbers ──
+  var btnRows = sheet('2. By The Numbers');
+  var metrics = [];
+  var inData = false;
+  btnRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim();
+    if (!inData && c0.toLowerCase().indexOf('metric name') >= 0) { inData = true; return; }
+    if (!inData) return;
+    if (!c0 || c0.startsWith('?') || c0.startsWith('*')) return;
+    metrics.push({ name: c0, value: String(r[1]||'').trim(), context: String(r[2]||'').trim(),
+      trend: String(r[3]||'').trim(), color: String(r[4]||'').trim() });
+  });
+
+  // ── 3. SLA Performance ──
+  var slaRows = sheet('3. SLA Performance');
+  var slas = [];
+  var inSla = false;
+  var slaOverall = '';
+  slaRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim();
+    if (!inSla && c0.toLowerCase().indexOf('sla name') >= 0) { inSla = true; return; }
+    if (!inSla) return;
+    if (c0.toLowerCase().indexOf('overall sla') >= 0) { slaOverall = String(r[1]||r[0]||'').trim(); return; }
+    if (!c0 || c0.startsWith('?')) return;
+    slas.push({ name: c0, target: String(r[1]||'').trim(), actual: String(r[2]||'').trim(),
+      status: String(r[3]||'').trim(), notes: String(r[4]||'').trim() });
+  });
+
+  // ── 4. Attrition ──
+  var atRows = sheet('4. Attrition');
+  var attrition = [];
+  var inAt = false;
+  var atNarrative = '';
+  atRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim();
+    if (!inAt && c0.toLowerCase().indexOf('service line') >= 0) { inAt = true; return; }
+    if (!inAt) return;
+    if (c0.toLowerCase().indexOf('attrition context') >= 0) { atNarrative = String(r[1]||r[0]||'').trim(); return; }
+    if (!c0 || c0.startsWith('?')) return;
+    attrition.push({ line: c0, pct: String(r[1]||'').trim(), roles: String(r[2]||'').trim(),
+      backfill: String(r[3]||'').trim(), plan: String(r[4]||'').trim() });
+  });
+
+  // ── 5. Milestones ──
+  var msRows = sheet('5. Milestones Delivered');
+  var milestones = [];
+  var inMs = false;
+  msRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim();
+    if (!inMs && c0.toLowerCase().indexOf('milestone name') >= 0) { inMs = true; return; }
+    if (!inMs || !c0 || c0.startsWith('?')) return;
+    milestones.push({ name: c0, status: String(r[1]||'').trim(), desc: String(r[2]||'').trim(),
+      line: String(r[3]||'').trim() });
+  });
+
+  // ── 6. Innovation ──
+  var innRows = sheet('6. Innovation');
+  var innovations = [];
+  var inInn = false;
+  innRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim();
+    if (!inInn && c0.toLowerCase().indexOf('innovation name') >= 0) { inInn = true; return; }
+    if (!inInn || !c0 || c0.startsWith('?')) return;
+    innovations.push({ name: c0, desc: String(r[1]||'').trim(),
+      status: String(r[2]||'').trim(), metric: String(r[3]||'').trim() });
+  });
+
+  // ── 7. Improvement Areas ──
+  var impRows = sheet('7. Improvement Areas');
+  var improvements = [];
+  var inImp = false;
+  impRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim();
+    if (!inImp && c0.toLowerCase().indexOf('issue name') >= 0) { inImp = true; return; }
+    if (!inImp || !c0 || c0.startsWith('?') || c0.startsWith('VER')) return;
+    improvements.push({ issue: c0, severity: String(r[1]||'').trim(), desc: String(r[2]||'').trim(),
+      plan: String(r[3]||'').trim(), owner: String(r[4]||'').trim(), due: String(r[5]||'').trim() });
+  });
+
+  // ── 8. Team Recognition ──
+  var recRows = sheet('8. Team Recognition');
+  var recognition = [];
+  var inRec = false;
+  recRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim();
+    if (!inRec && c0.toLowerCase().indexOf('full name') >= 0) { inRec = true; return; }
+    if (!inRec || !c0 || c0.startsWith('?')) return;
+    recognition.push({ name: c0, role: String(r[1]||'').trim(), impact: String(r[2]||'').trim() });
+  });
+
+  // ── 9. Forward Commitments ──
+  var fwdRows = sheet('9. Forward Commitments');
+  var commitments = [];
+  var inFwd = false;
+  fwdRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim();
+    if (!inFwd && c0.toLowerCase().indexOf('commitment') >= 0 && c0.toLowerCase().indexOf('owner') < 0) { inFwd = true; return; }
+    if (!inFwd && c0.toLowerCase().indexOf('owner') >= 0 && String(r[1]||'').toLowerCase().indexOf('detail') >= 0) { inFwd = true; return; }
+    if (!inFwd || !c0 || c0.startsWith('?')) return;
+    commitments.push({ item: c0, owner: String(r[1]||'').trim(), detail: String(r[2]||'').trim(),
+      due: String(r[3]||'').trim(), consequence: String(r[4]||'').trim() });
+  });
+
+  // ── 10. Additional Context ──
+  var addRows = sheet('10. Additional Context');
+  var additional = {};
+  var addFields = ['business context','changes to engagement','anything ver should know','questions or feedback'];
+  var lastKey = '';
+  addRows.forEach(function(r) {
+    var c0 = String(r[0]||'').trim().toLowerCase();
+    var found = addFields.find(function(f){ return c0.indexOf(f) >= 0; });
+    if (found) { lastKey = found; additional[lastKey] = String(r[1]||'').trim(); }
+    else if (lastKey && String(r[0]||'').trim()) { additional[lastKey] += ' ' + String(r[0]||'').trim(); }
+  });
+
+  return { hdr, metrics, slas, slaOverall, attrition, atNarrative,
+    milestones, innovations, improvements, recognition, commitments, additional };
+}
+
+// ── On parsed: unlock steps ───────────────────────────────────────────────
+function onParsed() {
+  var d = DATA;
+  var vendor = d.hdr.vendor || '(unknown vendor)';
+  var quarter = (d.hdr.fy || '') + ' ' + (d.hdr.quarter || '');
+  showStatus('ok', '&#10003; Parsed: ' + vendor + ' · ' + quarter.trim() +
+    ' · ' + d.metrics.length + ' metrics · ' + d.milestones.length + ' milestones · ' +
+    d.improvements.length + ' improvement areas · ' + d.commitments.length + ' commitments');
+
+  document.getElementById('sn1').classList.add('done');
+  unlock('step2-card'); buildPreview();
+  unlock('step3-card'); buildValidation();
+  unlock('step4-card');
+  document.getElementById('sn2').classList.add('done');
+  document.getElementById('sn3').classList.add('done');
+}
+
+function unlock(id) {
+  var el = document.getElementById(id);
+  el.style.opacity = '1';
+  el.style.pointerEvents = 'auto';
+}
+
+function showStatus(type, msg) {
+  var el = document.getElementById('parse-status');
+  el.className = 'parse-status ' + type;
+  el.innerHTML = msg;
+  el.style.display = 'block';
+}
+
+// ── Preview ───────────────────────────────────────────────────────────────
+var PREVIEW_TABS = [
+  { id:'hdr',  label:'Header' },
+  { id:'nums', label:'By The Numbers' },
+  { id:'sla',  label:'SLA' },
+  { id:'att',  label:'Attrition' },
+  { id:'ms',   label:'Milestones' },
+  { id:'inn',  label:'Innovation' },
+  { id:'imp',  label:'Improvements' },
+  { id:'rec',  label:'Recognition' },
+  { id:'fwd',  label:'Commitments' },
+];
+
+function buildPreview() {
+  var d = DATA;
+  var tabsEl = document.getElementById('preview-tabs');
+  var panelsEl = document.getElementById('preview-panels');
+  tabsEl.innerHTML = '';
+  panelsEl.innerHTML = '';
+
+  PREVIEW_TABS.forEach(function(t, i) {
+    var btn = document.createElement('button');
+    btn.className = 'ptab' + (i === 0 ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = function() {
+      document.querySelectorAll('.ptab').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.preview-panel').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('panel-' + t.id).classList.add('active');
+    };
+    tabsEl.appendChild(btn);
+
+    var panel = document.createElement('div');
+    panel.className = 'preview-panel' + (i === 0 ? ' active' : '');
+    panel.id = 'panel-' + t.id;
+    panel.innerHTML = buildPanelHtml(t.id, d);
+    panelsEl.appendChild(panel);
+  });
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function ev(v){ return v ? '<span class="field-val">' + esc(v) + '</span>' : '<span class="field-val empty">not provided</span>'; }
+
+function buildPanelHtml(id, d) {
+  if (id === 'hdr') {
+    var fields = [
+      ['Vendor Legal Name', d.hdr.vendor], ['Fiscal Year', d.hdr.fy],
+      ['Quarter', d.hdr.quarter], ['QBR Date', d.hdr.qbr_date],
+      ['Primary DET Pillar', d.hdr.pillar], ['Service Lines', d.hdr.service_lines],
+      ['Total Headcount', d.hdr.headcount], ['Account Lead', d.hdr.lead_name],
+      ['DET Contact', d.hdr.det_contact], ['Prior Quarter Score', d.hdr.prior_score]
+    ];
+    return '<div class="field-grid">' + fields.map(function(f){
+      return '<div class="field-item"><div class="field-lbl">' + esc(f[0]) + '</div>' + ev(f[1]) + '</div>';
+    }).join('') + '</div>' +
+    '<div class="field-item" style="margin-top:12px;"><div class="field-lbl">Engagement Summary</div>' + ev(d.hdr.summary) + '</div>';
+  }
+  if (id === 'nums') return tableHtml(['Metric','Value','Context','Trend','Color'],
+    d.metrics.map(function(m){ return [m.name, m.value, m.context, m.trend, m.color]; }));
+  if (id === 'sla') return tableHtml(['SLA Name','Target','Actual','Status','Notes'],
+    d.slas.map(function(s){ return [s.name, s.target, s.actual, s.status, s.notes]; }));
+  if (id === 'att') return tableHtml(['Service Line','Attrition %','Roles Affected','Backfill','Plan'],
+    d.attrition.map(function(a){ return [a.line, a.pct, a.roles, a.backfill, a.plan]; }));
+  if (id === 'ms') return tableHtml(['Milestone','Status','Description','Service Line'],
+    d.milestones.map(function(m){ return [m.name, m.status, m.desc, m.line]; }));
+  if (id === 'inn') return tableHtml(['Innovation','Description','Status','Evidence'],
+    d.innovations.map(function(i){ return [i.name, i.desc, i.status, i.metric]; }));
+  if (id === 'imp') return tableHtml(['Issue','Severity','Description','Plan','Owner','Due'],
+    d.improvements.map(function(i){ return [i.issue, i.severity, i.desc, i.plan, i.owner, i.due]; }));
+  if (id === 'rec') return tableHtml(['Name','Role','DET Impact'],
+    d.recognition.map(function(r){ return [r.name, r.role, r.impact]; }));
+  if (id === 'fwd') return tableHtml(['Commitment','Owner','Detail','Due','If Missed'],
+    d.commitments.map(function(c){ return [c.item, c.owner, c.detail, c.due, c.consequence]; }));
+  return '';
+}
+
+function tableHtml(headers, rows) {
+  if (!rows.length) return '<div style="padding:20px;text-align:center;color:var(--ink4);">No data found for this section.</div>';
+  return '<div style="overflow-x:auto;"><table class="prev-table"><thead><tr>' +
+    headers.map(function(h){ return '<th>' + esc(h) + '</th>'; }).join('') +
+    '</tr></thead><tbody>' +
+    rows.map(function(r){ return '<tr>' + r.map(function(c){ return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>'; }).join('') +
+    '</tbody></table></div>';
+}
+
+// ── Validation ────────────────────────────────────────────────────────────
+function buildValidation() {
+  var d = DATA;
+  var checks = [
+    { label:'Vendor name present', ok: !!d.hdr.vendor },
+    { label:'Fiscal year + quarter present', ok: !!(d.hdr.fy && d.hdr.quarter) },
+    { label:'At least 4 headline metrics', ok: d.metrics.length >= 4 },
+    { label:'At least 3 SLA entries', ok: d.slas.length >= 3 },
+    { label:'At least 3 milestones delivered', ok: d.milestones.length >= 3 },
+    { label:'Improvement areas completed (required)', ok: d.improvements.length >= 1,
+      warn: 'VER will fill this from DET stakeholder feedback if blank' },
+    { label:'At least 1 forward commitment', ok: d.commitments.length >= 1 },
+    { label:'Service lines identified', ok: !!d.hdr.service_lines },
+  ];
+  var allOk = checks.every(function(c){ return c.ok; });
+  var ul = document.getElementById('val-list');
+  ul.innerHTML = checks.map(function(c){
+    return '<li class="val-item ' + (c.ok ? 'ok' : 'warn') + '">' +
+      '<span class="val-dot">' + (c.ok ? '&#10003;' : '&#9888;') + '</span>' +
+      '<span>' + esc(c.label) + ((!c.ok && c.warn) ? ' — ' + esc(c.warn) : '') + '</span></li>';
+  }).join('');
+
+  document.getElementById('gen-btn').disabled = false;
+  document.getElementById('snippet-btn').disabled = false;
+  document.getElementById('inject-btn').disabled = false;
+  document.getElementById('gen-note').textContent = allOk
+    ? 'All checks passed — ready to generate'
+    : 'Some checks failed — review above. You can still generate.';
+  document.getElementById('sn4').classList.add('done');
+}
+
+// ── Color helper ──────────────────────────────────────────────────────────
+var COLOR_MAP = {
+  'teal':   { num:'#0D9488', cls:'c-teal'   },
+  'blue':   { num:'#CADCFC', cls:'c-blue'   },
+  'amber':  { num:'#F59E0B', cls:'c-amber'  },
+  'green':  { num:'#34D399', cls:'c-green'  },
+  'purple': { num:'#A78BFA', cls:'c-purple' },
+  'red':    { num:'#F87171', cls:'c-red'    },
+};
+var FALLBACK_COLORS = ['c-teal','c-blue','c-amber','c-green','c-purple','c-red'];
+function metricColor(colorStr, idx) {
+  var key = (colorStr||'').toLowerCase();
+  for (var k in COLOR_MAP) { if (key.indexOf(k) >= 0) return COLOR_MAP[k]; }
+  return COLOR_MAP[Object.keys(COLOR_MAP)[idx % 6]];
+}
+function trendClass(trend) {
+  var t = (trend||'').toLowerCase();
+  if (t.indexOf('positive') >= 0 || t.indexOf('up') >= 0 || t.indexOf('good') >= 0) return 'delta-up';
+  if (t.indexOf('watch') >= 0 || t.indexOf('amber') >= 0) return 'delta-watch';
+  if (t.indexOf('down') >= 0 || t.indexOf('risk') >= 0 || t.indexOf('red') >= 0) return 'delta-down';
+  return 'delta-up';
+}
+function trendIcon(trend) {
+  var t = (trend||'').toLowerCase();
+  if (t.indexOf('watch') >= 0) return '&#9873;';
+  if (t.indexOf('down') >= 0 || t.indexOf('risk') >= 0) return '&#9660;';
+  return '&#9650;';
+}
+function severityColor(sev) {
+  var s = (sev||'').toLowerCase();
+  if (s.indexOf('high') >= 0 || s.indexOf('critical') >= 0) return 'risk';
+  if (s.indexOf('medium') >= 0 || s.indexOf('med') >= 0) return 'watch';
+  return 'good';
+}
+function ownerClass(owner) {
+  var o = (owner||'').toLowerCase();
+  if (o.indexOf('joint') >= 0) return 'owner-both';
+  if (o.indexOf('ver') >= 0) return 'owner-ver';
+  return 'owner-cog';
+}
+function slaStatusColor(status) {
+  var s = (status||'').toLowerCase();
+  if (s.indexOf('green') >= 0 || s.indexOf('met') >= 0) return 'good';
+  if (s.indexOf('amber') >= 0 || s.indexOf('risk') >= 0 || s.indexOf('border') >= 0) return 'watch';
+  return 'risk';
+}
+
+// ── GENERATE CINEMATIC HTML ───────────────────────────────────────────────
+function generateCQBR() {
+  var d = DATA;
+  if (!d) return;
+  var vendor = d.hdr.vendor || 'Vendor';
+  var quarter = (d.hdr.fy || 'FY27') + ' ' + (d.hdr.quarter || 'Q1');
+  var qbrDate = d.hdr.qbr_date || '';
+  var serviceLines = d.hdr.service_lines || '';
+  var headcount = d.hdr.headcount || '—';
+  var summary = d.hdr.summary || '';
+
+  // Group milestones by service line for delivery timeline
+  var msGroups = {};
+  d.milestones.forEach(function(m) {
+    var key = m.line || 'General';
+    if (!msGroups[key]) msGroups[key] = [];
+    msGroups[key].push(m);
+  });
+  var msKeys = Object.keys(msGroups).slice(0, 3);
+  while (msKeys.length < 3) msKeys.push('');
+  var colColors = ['teal-h','blue-h','amber-h'];
+
+  // Derive VER frame narrative from summary + improvements
+  var frameNarrative = summary ||
+    (vendor + ' delivered against core commitments this quarter. VER\'s assessment covers service delivery, attrition posture, and forward commitments.');
+  var improvCount = d.improvements.length;
+  var msCount = d.milestones.length;
+
+  // Relationship health from SLAs
+  var rhCards = d.slas.slice(0, 5).map(function(s) {
+    var cls = slaStatusColor(s.status);
+    return { label: s.name, score: s.actual || '—', status: cls, detail: s.notes || s.status };
+  });
+  while (rhCards.length < 3) rhCards.push({ label:'Overall Engagement', score:'—', status:'good', detail:'Engagement in good standing per DET feedback.' });
+
+  var html = buildCinematicHtml(d, vendor, quarter, qbrDate, serviceLines, headcount,
+    frameNarrative, msGroups, msKeys, colColors, rhCards);
+
+  var fname = vendor.replace(/[^a-zA-Z0-9]/g,'_') + '_CQBR_' + quarter.replace(/\s/g,'') + '_Cinematic.html';
+  var blob = new Blob([html], { type: 'text/html' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── LIBRARY SNIPPET ───────────────────────────────────────────────────────
+function showSnippet() {
+  var d = DATA;
+  if (!d) return;
+  var vendor = d.hdr.vendor || 'Vendor';
+  var quarter = (d.hdr.fy || 'FY27') + ' ' + (d.hdr.quarter || 'Q1');
+  var date = d.hdr.qbr_date || '';
+  var cat = d.hdr.pillar || 'Professional Services';
+  var fname = vendor.replace(/[^a-zA-Z0-9]/g,'_') + '_CQBR_' + quarter.replace(/\s/g,'') + '_Cinematic.html';
+  var themes = d.metrics.slice(0,1).map(function(m){ return metricColor(m.color,0).num; });
+  var color = themes[0] || '#0D9488';
+  var highlights = '';
+  if (d.metrics.length) highlights += '<strong>Key metrics:</strong> ' + d.metrics.slice(0,3).map(function(m){ return m.name + ' ' + m.value; }).join(', ') + '. ';
+  if (d.improvements.length) highlights += '<strong>Improvement areas:</strong> ' + d.improvements.length + ' item' + (d.improvements.length>1?'s':'') + ' tracked. ';
+  if (d.commitments.length) highlights += '<strong>Forward commitments:</strong> ' + d.commitments.length + ' item' + (d.commitments.length>1?'s':'') + ' for next quarter.';
+
+  var snippet = '{\n  vendor: \'' + vendor.replace(/'/g,"\\'") + '\',\n' +
+    '  quarter: \'' + quarter + '\',\n' +
+    '  date: \'' + date + '\',\n' +
+    '  category: \'' + cat.replace(/'/g,"\\'") + '\',\n' +
+    '  status: \'Complete\',\n' +
+    '  color: \'' + color + '\',\n' +
+    '  highlights: \'' + highlights.replace(/'/g,"\\'") + '\',\n' +
+    '  href: \'' + fname + '\'\n}';
+
+  document.getElementById('snippet-code').textContent = snippet;
+  document.getElementById('snippet-box').style.display = 'block';
+}
+
+function copySnippet() {
+  var code = document.getElementById('snippet-code').textContent;
+  navigator.clipboard.writeText(code).then(function() {
+    var btn = document.querySelector('.copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(function(){ btn.textContent = '⧉ Copy to Clipboard'; }, 2000);
+  });
+}
+
+// ── AUTO-INJECT INTO page_cqbr.html VIA FILE SYSTEM ACCESS API ───────────
+async function injectToLibrary() {
+  var resultEl = document.getElementById('inject-result');
+
+  // Check browser support
+  if (!window.showOpenFilePicker) {
+    resultEl.className = 'inject-result warn';
+    resultEl.innerHTML = '&#9888; Your browser doesn\'t support the File System Access API. Use <strong>Manual Snippet</strong> instead (Chrome/Edge required).';
+    resultEl.style.display = 'block';
+    showSnippet();
+    return;
+  }
+
+  // Build the snippet string first
+  showSnippet();
+  var snippet = document.getElementById('snippet-code').textContent.trim();
+  if (!snippet) { return; }
+
+  try {
+    // Open file picker — suggest page_cqbr.html
+    var [fileHandle] = await window.showOpenFilePicker({
+      types: [{ description: 'HTML files', accept: { 'text/html': ['.html'] } }],
+      suggestedName: 'page_cqbr.html',
+      multiple: false
+    });
+
+    var file = await fileHandle.getFile();
+    var text = await file.text();
+
+    // Find the QBRS array and inject at the top
+    // Matches: var QBRS = [  OR  var QBRS=[
+    var match = text.match(/var\s+QBRS\s*=\s*\[/);
+    if (!match) {
+      resultEl.className = 'inject-result err';
+      resultEl.innerHTML = '&#10005; Could not find <code>var QBRS = [</code> in the selected file. Make sure you selected <strong>page_cqbr.html</strong>.';
+      resultEl.style.display = 'block';
+      return;
+    }
+
+    // Check for duplicate — same vendor + quarter already in the array
+    var d = DATA;
+    var vendor = d.hdr.vendor || '';
+    var quarter = (d.hdr.fy || '') + ' ' + (d.hdr.quarter || '');
+    var dupCheck = new RegExp('vendor:\\s*[\'"]' + vendor.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '[\'"]', 'i');
+    if (dupCheck.test(text)) {
+      resultEl.className = 'inject-result warn';
+      resultEl.innerHTML = '&#9888; A CQBR entry for <strong>' + esc(vendor) + '</strong> already exists in this file. '
+        + 'Check the library to avoid duplicates, or use <strong>Manual Snippet</strong> to add a new quarter entry.';
+      resultEl.style.display = 'block';
+      return;
+    }
+
+    // Inject snippet right after the opening bracket
+    var insertPos = match.index + match[0].length;
+    var newText = text.slice(0, insertPos) + '\n  ' + snippet + ',' + text.slice(insertPos);
+
+    // Write back
+    var writable = await fileHandle.createWritable();
+    await writable.write(newText);
+    await writable.close();
+
+    resultEl.className = 'inject-result ok';
+    resultEl.innerHTML = '&#10003; <strong>' + esc(vendor) + ' ' + esc(quarter.trim()) + '</strong> added to CQBR Library. '
+      + 'Reload <a href="page_cqbr.html" style="color:var(--green2);font-weight:700;">page_cqbr.html</a> to see it.';
+    resultEl.style.display = 'block';
+
+  } catch (err) {
+    if (err.name === 'AbortError') return; // user cancelled picker — no message needed
+    resultEl.className = 'inject-result err';
+    resultEl.innerHTML = '&#10005; Write failed: ' + esc(err.message) + '. Try <strong>Manual Snippet</strong> as a fallback.';
+    resultEl.style.display = 'block';
+  }
+}
+
+// ── BUILD CINEMATIC HTML ──────────────────────────────────────────────────
+function buildCinematicHtml(d, vendor, quarter, qbrDate, serviceLines, headcount,
+    frameNarrative, msGroups, msKeys, colColors, rhCards) {
+
+  var metrics = d.metrics.slice(0, 6);
+  while (metrics.length < 6) metrics.push({ name:'—', value:'—', context:'', trend:'', color:'' });
+
+  // Metrics grid (S3)
+  var metricsHtml = metrics.map(function(m, i) {
+    var c = metricColor(m.color, i);
+    var tc = trendClass(m.trend); var ti = trendIcon(m.trend);
+    return '<div class="btn-cell ' + c.cls + '" id="bc' + (i+1) + '">' +
+      '<div class="btn-num" id="bn' + (i+1) + '">' + esc(m.value) + '</div>' +
+      '<div class="btn-label">' + esc(m.name) + '</div>' +
+      '<div class="btn-ctx">' + esc(m.context) + '</div>' +
+      '<div class="btn-delta ' + tc + '">' + ti + ' ' + esc(m.trend) + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Milestones timeline (S4)
+  var timelineCols = msKeys.map(function(key, ci) {
+    if (!key) return '<div class="dt-col"><div class="dt-col-header ' + colColors[ci] + '">—</div></div>';
+    var items = (msGroups[key]||[]).map(function(m, mi) {
+      var isMilestone = (m.status||'').toLowerCase().indexOf('first') >= 0 || (m.desc||'').toLowerCase().indexOf('first-time') >= 0;
+      var cls = isMilestone ? 'milestone' : 'delivered';
+      var icon = isMilestone ? '&#9733;' : '&#10003;';
+      return '<div class="dt-item ' + cls + '" id="dt' + (ci*10+mi+1) + '">' +
+        '<div class="dt-status">' + icon + '</div>' +
+        '<div class="dt-content"><div class="dt-name">' + esc(m.name) + '</div>' +
+        '<div class="dt-detail">' + esc(m.desc.substring(0,120)) + '</div></div></div>';
+    }).join('');
+    return '<div class="dt-col"><div class="dt-col-header ' + colColors[ci] + '">' + esc(key) + '</div>' + items + '</div>';
+  }).join('');
+
+  // Improvement areas (S6)
+  var impHtml = d.improvements.slice(0,3).map(function(imp) {
+    var sc = severityColor(imp.severity);
+    return '<div class="m-card ' + sc + '">' +
+      '<div class="m-lbl">' + esc(imp.issue) + ' · ' + esc(imp.severity) + '</div>' +
+      '<div class="m-val" style="font-size:13pt;">' + esc(imp.owner || 'Vendor') + ' · ' + esc(imp.due) + '</div>' +
+      '<div class="m-note">' + esc(imp.plan.substring(0,140)) + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Forward commitments (S7)
+  var fwdHtml = d.commitments.slice(0,4).map(function(c) {
+    var oc = ownerClass(c.owner);
+    return '<div class="fwd-item">' + esc(c.item) + '</div>' +
+      '<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:14px;">' +
+      'Due: ' + esc(c.due) + ' &nbsp;·&nbsp; ' +
+      '<span class="fwd-owner ' + oc + '">' + esc(c.owner) + '</span>' +
+    '</div>';
+  }).join('');
+
+  // Relationship health (S5)
+  var rhHtml = rhCards.map(function(rh, ri) {
+    var cls = rh.status === 'good' ? 'rh-good' : 'rh-watch';
+    return '<div class="rh-card ' + cls + '" id="rh' + (ri+1) + '">' +
+      '<div class="rh-score">' + esc(rh.score) + '</div>' +
+      '<div class="rh-label">' + esc(rh.label) + '</div>' +
+      '<div class="rh-detail">' + esc(rh.detail.substring(0,100)) + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Recognition (in S7 or appended)
+  var recHtml = d.recognition.slice(0,4).map(function(r) {
+    return '<div class="r-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;margin-bottom:10px;">' +
+      '<div class="r-name">' + esc(r.name) + '</div>' +
+      '<div class="r-role">' + esc(r.role) + '</div>' +
+      '<div class="r-detail" style="font-size:12px;color:rgba(255,255,255,0.65);">' + esc(r.impact.substring(0,200)) + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Scene count for progress dots
+  var sceneCount = 9;
+  var dots = Array.from({length: sceneCount}, function(_,i){
+    return '<div class="dot' + (i===0?' active':'') + '" onclick="goTo(' + i + ')"></div>';
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${esc(vendor)} CQBR ${esc(quarter)} &mdash; VER Intelligence Hub</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;}
+#stage{position:fixed;inset:0;background:#000;}
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity 0.9s ease;}
+.scene.active{opacity:1;pointer-events:all;}
+.bar-top,.bar-bottom{position:fixed;left:0;right:0;height:52px;background:#000;z-index:100;transition:height 0.7s ease;}
+.bar-top{top:0;}.bar-bottom{bottom:0;}
+#timer-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#0D9488,#14B8A6,#0D9488);background-size:200% 100%;animation:shimmer 2s linear infinite;z-index:150;transition:width 0.1s linear;width:0%;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+#progress{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:200;}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.35);cursor:pointer;transition:all 0.4s;}
+.dot.active{background:#0D9488;width:20px;border-radius:3px;}
+#controls{position:fixed;bottom:60px;right:20px;display:flex;gap:8px;z-index:200;opacity:0;transition:opacity 0.3s;align-items:center;}
+#controls.visible{opacity:1;}
+.ctrl-btn{background:rgba(15,30,60,0.85);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:10px;font-weight:600;letter-spacing:0.05em;font-family:inherit;transition:all 0.2s;backdrop-filter:blur(10px);}
+.ctrl-btn:hover{background:rgba(13,148,136,0.3);border-color:#0D9488;}
+select.ctrl-btn{padding:6px 8px;}
+#particles{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.5;}
+.scanline{position:fixed;left:0;right:0;height:120px;background:linear-gradient(180deg,transparent,rgba(13,148,136,0.03),transparent);pointer-events:none;z-index:2;animation:scan 6s linear infinite;}
+@keyframes scan{from{top:-120px}to{top:100vh}}
+.watermark{position:fixed;bottom:58px;left:20px;font-size:9px;letter-spacing:0.3em;color:rgba(255,255,255,0.4);z-index:200;text-transform:uppercase;}
+@keyframes fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes punchin{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+@keyframes slideL{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideR{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes expandW{from{width:0}to{width:60px}}
+.eyebrow{font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:#0D9488;margin-bottom:16px;opacity:0;animation:fadeup 0.7s 0.3s forwards;}
+.punch{font-size:clamp(48px,8vw,100px);font-weight:900;letter-spacing:-0.02em;line-height:1;opacity:0;animation:punchin 0.6s 0.7s cubic-bezier(0.22,1,0.36,1) forwards;}
+.subhead{font-size:clamp(16px,2vw,24px);font-weight:300;color:rgba(255,255,255,0.55);opacity:0;animation:fadeup 0.8s 1s forwards;}
+/* S0 */
+#s0{background:#000;}
+.co-ver{font-size:10px;letter-spacing:0.5em;color:rgba(255,255,255,0.45);text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fadeup 0.8s 0.3s forwards;}
+.co-line{font-size:clamp(16px,2vw,22px);font-weight:300;text-align:center;color:rgba(255,255,255,0.65);line-height:1.9;max-width:700px;opacity:0;animation:fadeup 1s 1s forwards;}
+.co-line strong{color:#fff;font-weight:600;}
+/* S1 Title */
+#s1{background:radial-gradient(ellipse at 25% 60%,#0D2A40 0%,#050D1A 65%);}
+.t-kicker{font-size:10px;letter-spacing:0.5em;color:#0D9488;text-transform:uppercase;margin-bottom:20px;opacity:0;animation:fadeup 0.7s 0.3s forwards;}
+.t-vendor{font-size:clamp(56px,10vw,120px);font-weight:900;letter-spacing:-0.03em;line-height:1;opacity:0;animation:punchin 0.6s 0.7s cubic-bezier(0.22,1,0.36,1) forwards;}
+.t-sub{font-size:clamp(14px,1.8vw,22px);font-weight:300;color:rgba(255,255,255,0.55);margin-top:10px;opacity:0;animation:fadeup 0.8s 1.1s forwards;}
+.t-line{width:0;height:2px;background:#0D9488;margin:22px 0;animation:expandW 0.8s 1.4s cubic-bezier(0.22,1,0.36,1) forwards;}
+.t-meta{display:flex;gap:30px;opacity:0;animation:fadeup 0.8s 1.6s forwards;}
+.tm-item{text-align:center;}.tm-val{font-size:24px;font-weight:700;color:#0D9488;}
+.tm-lbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-top:3px;}
+.tm-div{width:1px;background:rgba(255,255,255,0.15);align-self:stretch;}
+/* S2 Frame */
+#s2{background:#050D1A;}
+.frame-wrap{max-width:820px;text-align:center;}
+.frame-badge{display:inline-block;border:1px solid rgba(13,148,136,0.4);border-radius:20px;padding:5px 16px;font-size:10px;letter-spacing:0.3em;color:#0D9488;text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fadeup 0.7s 0.3s forwards;}
+.frame-head{font-size:clamp(24px,3.5vw,48px);font-weight:700;line-height:1.15;margin-bottom:20px;opacity:0;animation:fadeup 0.9s 0.7s forwards;}
+.frame-head em{color:#0D9488;font-style:normal;}
+.frame-body{font-size:clamp(13px,1.4vw,16px);color:rgba(255,255,255,0.60);line-height:1.85;font-weight:300;opacity:0;animation:fadeup 0.9s 1.2s forwards;}
+/* S3 Numbers */
+#s3{background:#000;}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;width:100%;height:100%;background:#000;}
+.btn-cell{display:flex;flex-direction:column;justify-content:center;align-items:center;background:#050810;border:1px solid rgba(255,255,255,0.03);padding:36px 28px;position:relative;overflow:hidden;}
+.btn-cell::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.8s;}
+.btn-cell.c-teal::after{background:radial-gradient(ellipse,rgba(13,148,136,0.12),transparent 70%);}
+.btn-cell.c-blue::after{background:radial-gradient(ellipse,rgba(30,58,95,0.4),transparent 70%);}
+.btn-cell.c-amber::after{background:radial-gradient(ellipse,rgba(217,119,6,0.12),transparent 70%);}
+.btn-cell.c-red::after{background:radial-gradient(ellipse,rgba(220,38,38,0.12),transparent 70%);}
+.btn-cell.c-green::after{background:radial-gradient(ellipse,rgba(5,150,105,0.12),transparent 70%);}
+.btn-cell.c-purple::after{background:radial-gradient(ellipse,rgba(124,58,237,0.12),transparent 70%);}
+.btn-cell.lit::after{opacity:1;}
+.btn-num{font-size:clamp(40px,6vw,80px);font-weight:900;letter-spacing:-0.02em;line-height:1;opacity:0;transform:scale(0.6);transition:all 0.7s cubic-bezier(0.22,1,0.36,1);z-index:1;}
+.btn-cell.lit .btn-num{opacity:1;transform:scale(1);}
+.c-teal .btn-num{color:#0D9488;}.c-blue .btn-num{color:#CADCFC;}.c-amber .btn-num{color:#F59E0B;}
+.c-red .btn-num{color:#F87171;}.c-green .btn-num{color:#34D399;}.c-purple .btn-num{color:#A78BFA;}
+.btn-label{font-size:clamp(10px,1vw,13px);letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-top:8px;text-align:center;opacity:0;transition:opacity 0.5s 0.3s;z-index:1;}
+.btn-cell.lit .btn-label{opacity:1;}
+.btn-ctx{font-size:clamp(10px,1vw,12px);color:rgba(255,255,255,0.45);margin-top:4px;font-weight:300;opacity:0;transition:opacity 0.5s 0.5s;z-index:1;}
+.btn-cell.lit .btn-ctx{opacity:1;}
+.btn-delta{font-size:clamp(10px,1vw,12px);font-weight:700;margin-top:6px;opacity:0;transition:opacity 0.5s 0.6s;z-index:1;}
+.btn-cell.lit .btn-delta{opacity:1;}
+.delta-up{color:#34D399;}.delta-watch{color:#FBBF24;}.delta-down{color:#F87171;}
+/* S4 Timeline */
+#s4{background:linear-gradient(160deg,#04080F,#050D1A);}
+.dt-wrap{max-width:min(92%,1100px);width:92%;}
+.dt-eye{font-size:10px;letter-spacing:0.5em;color:#0D9488;text-transform:uppercase;margin-bottom:12px;opacity:0;animation:fadeup 0.7s 0.3s forwards;}
+.dt-head{font-size:clamp(18px,2.5vw,34px);font-weight:900;margin-bottom:6px;opacity:0;animation:fadeup 0.8s 0.7s forwards;}
+.dt-sub{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:18px;font-weight:300;opacity:0;animation:fadeup 0.8s 1s forwards;}
+.dt-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:18px;}
+.dt-col{display:flex;flex-direction:column;gap:8px;}
+.dt-col-header{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;font-weight:800;padding:6px 12px;border-radius:5px;margin-bottom:4px;text-align:center;}
+.teal-h{background:rgba(13,148,136,0.15);color:#2DD4BF;border:1px solid rgba(13,148,136,0.3);}
+.blue-h{background:rgba(2,39,117,0.2);color:#98CEFC;border:1px solid rgba(2,80,217,0.3);}
+.amber-h{background:rgba(217,119,6,0.15);color:#FBBF24;border:1px solid rgba(217,119,6,0.3);}
+.dt-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:8px;opacity:0;transform:translateY(10px);transition:all 0.6s cubic-bezier(0.22,1,0.36,1);}
+.dt-item.revealed{opacity:1;transform:translateY(0);}
+.dt-item.delivered{background:rgba(13,148,136,0.08);border:1px solid rgba(13,148,136,0.2);}
+.dt-item.milestone{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);}
+.dt-item.watch{background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.22);}
+.dt-status{font-size:13px;flex-shrink:0;margin-top:1px;line-height:1;}
+.delivered .dt-status{color:#34D399;}.milestone .dt-status{color:#FBBF24;}.watch .dt-status{color:#F59E0B;}
+.dt-name{font-size:clamp(11px,1.2vw,13px);font-weight:700;color:#fff;margin-bottom:2px;line-height:1.3;}
+.dt-detail{font-size:clamp(10px,1vw,11px);color:rgba(255,255,255,0.55);line-height:1.4;}
+/* S5 Relationship Health */
+#s5{background:linear-gradient(140deg,#050D1A,#04080F);}
+.rh-wrap{max-width:min(92%,1100px);width:92%;}
+.rh-eye{font-size:10px;letter-spacing:0.5em;color:#0D9488;text-transform:uppercase;margin-bottom:12px;opacity:0;animation:fadeup 0.7s 0.3s forwards;}
+.rh-head{font-size:clamp(20px,2.8vw,38px);font-weight:900;margin-bottom:4px;opacity:0;animation:fadeup 0.8s 0.7s forwards;}
+.rh-sub{font-size:clamp(11px,1.2vw,14px);color:rgba(255,255,255,0.55);margin-bottom:20px;font-weight:300;opacity:0;animation:fadeup 0.8s 1s forwards;}
+.rh-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px;}
+.rh-card{border-radius:10px;padding:16px 14px;opacity:0;transform:translateY(18px);transition:all 0.8s cubic-bezier(0.22,1,0.36,1);}
+.rh-card.lit{opacity:1;transform:translateY(0);}
+.rh-card.rh-good{background:rgba(13,148,136,0.10);border:1px solid rgba(13,148,136,0.28);}
+.rh-card.rh-watch{background:rgba(217,119,6,0.10);border:1px solid rgba(217,119,6,0.28);}
+.rh-card.rh-risk{background:rgba(220,38,38,0.10);border:1px solid rgba(220,38,38,0.28);}
+.rh-score{font-size:clamp(24px,3.5vw,42px);font-weight:900;line-height:1;}
+.rh-good .rh-score{color:#34D399;}.rh-watch .rh-score{color:#FBBF24;}.rh-risk .rh-score{color:#F87171;}
+.rh-label{font-size:clamp(9px,1vw,11px);font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.08em;margin:6px 0 5px;line-height:1.3;}
+.rh-detail{font-size:clamp(9px,0.9vw,11px);color:rgba(255,255,255,0.55);line-height:1.5;}
+/* S6 Improvements */
+#s6{background:linear-gradient(135deg,#050D1A,#0A1628);}
+.dd-layout{display:grid;grid-template-columns:1fr 1fr;gap:50px;max-width:1100px;width:min(90%,1100px);align-items:start;}
+.dd-left{opacity:0;animation:slideL 0.9s 0.4s cubic-bezier(0.22,1,0.36,1) forwards;}
+.dd-right{opacity:0;animation:slideR 0.9s 0.7s cubic-bezier(0.22,1,0.36,1) forwards;}
+.dd-eyebrow{font-size:10px;letter-spacing:0.4em;color:#0D9488;text-transform:uppercase;margin-bottom:12px;}
+.dd-title{font-size:clamp(24px,3vw,40px);font-weight:800;line-height:1.1;margin-bottom:14px;}
+.dd-body{font-size:clamp(12px,1.3vw,15px);color:rgba(255,255,255,0.60);line-height:1.8;font-weight:300;}
+.metric-stack{display:flex;flex-direction:column;gap:12px;}
+.m-card{border-left:3px solid;border-radius:0 10px 10px 0;padding:14px 16px;}
+.m-card.good{border-color:#0D9488;background:rgba(13,148,136,0.10);}
+.m-card.watch{border-color:#F59E0B;background:rgba(217,119,6,0.10);}
+.m-card.risk{border-color:#F87171;background:rgba(220,38,38,0.10);}
+.m-lbl{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:4px;}
+.m-val{font-size:clamp(14px,1.8vw,22px);font-weight:800;}
+.m-card.good .m-val{color:#34D399;}.m-card.watch .m-val{color:#FBBF24;}.m-card.risk .m-val{color:#F87171;}
+.m-note{font-size:clamp(11px,1.1vw,13px);color:rgba(255,255,255,0.55);margin-top:3px;}
+/* S7 Forward */
+#s7{background:#050D1A;}
+.fwd-wrap{max-width:min(88%,900px);width:88%;text-align:center;}
+.fwd-eye{font-size:10px;letter-spacing:0.5em;color:#0D9488;text-transform:uppercase;margin-bottom:12px;opacity:0;animation:fadeup 0.7s 0.3s forwards;}
+.fwd-head{font-size:clamp(22px,3vw,42px);font-weight:900;margin-bottom:8px;opacity:0;animation:fadeup 0.8s 0.7s forwards;}
+.fwd-sub{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:28px;font-weight:300;opacity:0;animation:fadeup 0.8s 1s forwards;}
+.fwd-list{text-align:left;opacity:0;animation:fadeup 0.9s 1.3s forwards;}
+.fwd-item{font-size:clamp(13px,1.5vw,17px);font-weight:700;margin-bottom:6px;color:#fff;}
+.fwd-owner{font-weight:700;font-size:12px;letter-spacing:0.06em;}
+.owner-cog{color:#2DD4BF;}.owner-ver{color:#FBBF24;}.owner-both{color:#C4B5FD;}
+/* S8 Recognition */
+#s8{background:linear-gradient(135deg,#04080F,#0A0F1E);}
+.rec-wrap{max-width:min(92%,1000px);width:92%;}
+.rec-eye{font-size:10px;letter-spacing:0.5em;color:#0D9488;text-transform:uppercase;margin-bottom:12px;opacity:0;animation:fadeup 0.7s 0.3s forwards;}
+.rec-head{font-size:clamp(20px,2.8vw,36px);font-weight:900;margin-bottom:20px;opacity:0;animation:fadeup 0.8s 0.7s forwards;}
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;opacity:0;animation:fadeup 0.9s 1.1s forwards;}
+.r-name{font-size:clamp(13px,1.4vw,16px);font-weight:700;margin-bottom:2px;color:#fff;}
+.r-role{font-size:clamp(10px,1vw,12px);color:#FBBF24;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+/* S8 Close */
+#s9{background:#000;}
+.cls-ver{font-size:10px;letter-spacing:0.5em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fadeup 0.8s 0.3s forwards;}
+.cls-line{font-size:clamp(20px,3vw,44px);font-weight:700;text-align:center;line-height:1.3;max-width:760px;opacity:0;animation:fadeup 1s 0.8s forwards;}
+.cls-teal{width:0;height:2px;background:#0D9488;margin:28px auto;animation:expandW 0.8s 2.2s cubic-bezier(0.22,1,0.36,1) forwards;}
+.cls-next{font-size:clamp(11px,1.2vw,14px);color:rgba(255,255,255,0.50);text-align:center;margin-top:22px;opacity:0;animation:fadeup 0.8s 2.5s forwards;}
+.cls-meta{font-size:10px;color:rgba(255,255,255,0.35);margin-top:28px;letter-spacing:0.08em;opacity:0;animation:fadeup 0.8s 3s forwards;}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="scanline"></div>
+<div class="bar-top"></div>
+<div class="bar-bottom"></div>
+<div id="timer-bar"></div>
+<div id="progress">${dots}</div>
+<div id="controls">
+  <select id="speed-sel" class="ctrl-btn">
+    <option value="0.5">0.5× slow</option>
+    <option value="0.75">0.75×</option>
+    <option value="1" selected>1× normal</option>
+    <option value="1.5">1.5× fast</option>
+    <option value="2">2× faster</option>
+  </select>
+  <button class="ctrl-btn" id="btn-prev">&#8592; Prev</button>
+  <button class="ctrl-btn" id="btn-pause">&#9646;&#9646; Pause</button>
+  <button class="ctrl-btn" id="btn-next">Next &#8594;</button>
+</div>
+<div class="watermark">Vendor Engagement &amp; Reliability &middot; DET DA&amp;O</div>
+<div id="stage">
+
+<!-- S0: Cold open -->
+<div class="scene" id="s0">
+  <div class="co-ver">Vendor Engagement &amp; Reliability &middot; DET Delivery Assurance &amp; Operations</div>
+  <div class="co-line">
+    This is not ${esc(vendor)}'s story to tell.<br>
+    <strong>This is VER's assessment of it.</strong>
+  </div>
+</div>
+
+<!-- S1: Title -->
+<div class="scene" id="s1">
+  <div style="text-align:center;">
+    <div class="t-kicker">${esc(quarter)} &middot; Cinematic QBR &middot; VER Intelligence Assessment</div>
+    <div class="t-vendor">${esc(vendor)}</div>
+    <div class="t-sub">${esc(serviceLines)}</div>
+    <div class="t-line"></div>
+    <div class="t-meta">
+      <div class="tm-item"><div class="tm-val">${esc(headcount)}</div><div class="tm-lbl">Total Resources</div></div>
+      <div class="tm-div"></div>
+      <div class="tm-item"><div class="tm-val">${esc(d.milestones.length.toString())}</div><div class="tm-lbl">Milestones Delivered</div></div>
+      <div class="tm-div"></div>
+      <div class="tm-item"><div class="tm-val">${esc(d.improvements.length.toString())}</div><div class="tm-lbl">Improvement Items</div></div>
+      <div class="tm-div"></div>
+      <div class="tm-item"><div class="tm-val">${esc(qbrDate)}</div><div class="tm-lbl">QBR Date</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S2: VER Frame -->
+<div class="scene" id="s2">
+  <div class="frame-wrap">
+    <div class="frame-badge">VER Advisory Frame</div>
+    <div class="frame-head">${esc(vendor)} delivered against commitments this quarter.<br><em>VER's job is to tell you what that means</em><br>— and what it doesn't.</div>
+    <div class="frame-body">${esc(frameNarrative)}</div>
+  </div>
+</div>
+
+<!-- S3: By The Numbers -->
+<div class="scene" id="s3">
+  <div class="btn-grid">${metricsHtml}</div>
+</div>
+
+<!-- S4: Delivery Timeline -->
+<div class="scene" id="s4">
+  <div class="dt-wrap">
+    <div class="dt-eye">Quarter at a Glance</div>
+    <div class="dt-head">What shipped. When. Against what was expected.</div>
+    <div class="dt-sub">${esc(quarter)} &middot; ${esc(vendor)} &middot; VER Delivery Assessment</div>
+    <div class="dt-grid">${timelineCols}</div>
+  </div>
+</div>
+
+<!-- S5: Relationship Health -->
+<div class="scene" id="s5">
+  <div class="rh-wrap">
+    <div class="rh-eye">SLA &amp; Relationship Health</div>
+    <div class="rh-head">Performance against contract terms.</div>
+    <div class="rh-sub">VER cross-referenced against DET stakeholder feedback and contract actuals.</div>
+    <div class="rh-grid">${rhHtml}</div>
+  </div>
+</div>
+
+<!-- S6: Improvement Areas -->
+<div class="scene" id="s6">
+  <div class="dd-layout">
+    <div class="dd-left">
+      <div class="dd-eyebrow">VER Improvement Assessment</div>
+      <div class="dd-title">Every engagement<br>has room to grow.</div>
+      <div class="dd-body">
+        ${esc(d.improvements.length)} improvement area${d.improvements.length !== 1 ? 's' : ''} identified this quarter.
+        ${d.improvements.some(function(i){ return (i.severity||'').toLowerCase().indexOf('high') >= 0; })
+          ? 'At least one is rated High severity and requires action before the next QBR cycle.'
+          : 'None are rated Critical — the engagement remains in good standing.'}
+        VER tracks all open items and will report on resolution status in the next CQBR.
+      </div>
+    </div>
+    <div class="dd-right">
+      <div class="metric-stack">${impHtml}</div>
+    </div>
+  </div>
+</div>
+
+<!-- S7: Forward Commitments -->
+<div class="scene" id="s7">
+  <div class="fwd-wrap">
+    <div class="fwd-eye">Forward Commitments</div>
+    <div class="fwd-head">What ${esc(vendor)} owns next quarter.</div>
+    <div class="fwd-sub">These commitments are published and tracked by VER. They appear in the next CQBR with resolution status.</div>
+    <div class="fwd-list">${fwdHtml}</div>
+  </div>
+</div>
+
+<!-- S8: Recognition -->
+<div class="scene" id="s8">
+  <div class="rec-wrap">
+    <div class="rec-eye">Team Recognition &middot; DET-Validated</div>
+    <div class="rec-head">The people behind the delivery.</div>
+    <div class="rec-grid">${recHtml}</div>
+  </div>
+</div>
+
+<!-- S9: Close -->
+<div class="scene" id="s9">
+  <div class="cls-ver">VER Intelligence &middot; ${esc(quarter)}</div>
+  <div class="cls-line">
+    The data was reviewed.<br>The commitments are on record.<br>VER will be watching.
+  </div>
+  <div class="cls-teal"></div>
+  <div class="cls-next">Next review: ${esc(d.hdr.fy || 'FY27')} ${nextQuarter(d.hdr.quarter||'Q1')} &middot; ${esc(vendor)} CQBR</div>
+  <div class="cls-meta">Vendor Engagement &amp; Reliability &middot; Salesforce DET &middot; Confidential</div>
+</div>
+
+</div><!-- /stage -->
+
+<script>
+var SCENES = ${sceneCount};
+var cur = 0, paused = false, speed = 1;
+var DURATIONS = [6,8,10,12,10,10,10,8,8];
+var timer, elapsed = 0, interval;
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function goTo(n) {
+  clearTimeout(timer); clearInterval(interval);
+  document.querySelectorAll('.scene').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.dot').forEach(function(d,i){ d.classList.toggle('active', i===n); });
+  cur = Math.max(0, Math.min(SCENES-1, n));
+  document.getElementById('s' + cur).classList.add('active');
+  onSceneEnter(cur);
+  startTimer(DURATIONS[cur] || 8);
+}
+
+function onSceneEnter(n) {
+  if (n === 3) { setTimeout(function(){ animateNumbers(); }, 400); }
+  if (n === 4) { setTimeout(function(){ revealTimeline(); }, 600); }
+  if (n === 5) { setTimeout(function(){ revealRH(); }, 500); }
+}
+
+function animateNumbers() {
+  document.querySelectorAll('.btn-cell').forEach(function(c){ c.classList.add('lit'); });
+}
+function revealTimeline() {
+  document.querySelectorAll('.dt-item').forEach(function(el, i){
+    setTimeout(function(){ el.classList.add('revealed'); }, i * 150);
+  });
+}
+function revealRH() {
+  document.querySelectorAll('.rh-card').forEach(function(el, i){
+    setTimeout(function(){ el.classList.add('lit'); }, i * 200);
+  });
+}
+
+function startTimer(secs) {
+  elapsed = 0;
+  clearInterval(interval);
+  var bar = document.getElementById('timer-bar');
+  bar.style.width = '0%';
+  interval = setInterval(function() {
+    if (paused) return;
+    elapsed += 0.1;
+    bar.style.width = Math.min(100, (elapsed / (secs / speed)) * 100) + '%';
+    if (elapsed >= secs / speed) {
+      clearInterval(interval);
+      if (cur < SCENES - 1) goTo(cur + 1);
+    }
+  }, 100);
+}
+
+document.getElementById('btn-next').onclick  = function(){ goTo(cur + 1); };
+document.getElementById('btn-prev').onclick  = function(){ goTo(cur - 1); };
+document.getElementById('btn-pause').onclick = function(){
+  paused = !paused;
+  this.textContent = paused ? '&#9654; Play' : '&#9646;&#9646; Pause';
+};
+document.getElementById('speed-sel').onchange = function(){ speed = +this.value; };
+
+// Particles
+(function(){
+  var c = document.getElementById('particles');
+  var ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  window.onresize = function(){ c.width = window.innerWidth; c.height = window.innerHeight; };
+  var pts = Array.from({length:60}, function(){
+    return { x: Math.random()*c.width, y: Math.random()*c.height,
+      vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3, r:Math.random()*1.5+0.5 };
+  });
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    pts.forEach(function(p){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<0||p.x>c.width) p.vx*=-1;
+      if(p.y<0||p.y>c.height) p.vy*=-1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(13,148,136,0.4)'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Controls visibility
+document.addEventListener('mousemove', function(){
+  var c = document.getElementById('controls');
+  c.classList.add('visible');
+  clearTimeout(window._ctHide);
+  window._ctHide = setTimeout(function(){ c.classList.remove('visible'); }, 2500);
+});
+
+goTo(0);
+<\/script>
+</body>
+</html>`;
+}
+
+// ── Next quarter helper ───────────────────────────────────────────────────
+function nextQuarter(q) {
+  var map = { 'Q1':'Q2','Q2':'Q3','Q3':'Q4','Q4':'Q1' };
+  return map[q.toUpperCase()] || 'next quarter';
+}
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openCqbrGenHelp(){
+  HelpModal.open({
+    title: 'CQBR Generator',
+    what: 'The CQBR Generator creates <strong>structured Collaborative Quarterly Business Review presentations</strong> from your vendor performance data. Paste in your data, select your template options, and get a polished, VER-standard CQBR ready to present — in minutes.',
+    steps: [
+      '<strong>Enter the vendor name and quarter</strong> at the top — this sets the header metadata for the entire review.',
+      '<strong>Paste your data</strong> into the input area — the generator accepts spreadsheet-style data (copy from Excel or Google Sheets). Column headers are auto-detected.',
+      '<strong>Select your sections</strong> — toggle which CQBR sections to include: Performance Scorecard, Action Review, Financial Summary, Risk Register, and Next Quarter Commitments.',
+      '<strong>Choose the output format</strong> — Standard (full deck), Executive Summary (2-page), or Action-Only (for escalation packages).',
+      '<strong>Generate and review</strong> — the output renders in a preview panel. Make inline edits before exporting to PDF or PowerPoint format.'
+    ],
+    tips: [
+      { icon: '&#x1F4CB;', title: 'Data quality = output quality', body: 'The generator is only as good as the data you paste in. Clean your source data before generating — blank cells and merged headers cause formatting issues.' },
+      { icon: '&#x1F3AF;', title: 'Executive Summary for SteerCo', body: 'Use the Executive Summary format for SteerCo and CPO-level reviews. The full Standard deck is for the vendor-facing CQBR session itself.' },
+      { icon: '&#x26A0;', title: 'Review before sending', body: 'Always review the generated output before sharing. Auto-populated commentary is based on data patterns — validate the narrative reflects reality.' },
+      { icon: '&#x1F4C5;', title: 'Schedule CQBRs quarterly', body: 'Tier 1 vendors require quarterly CQBRs per DET policy. The generator makes this fast — no excuse for missing the cadence.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+</script>
+</body>
+</html>

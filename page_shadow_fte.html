@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Shadow FTE Index · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --blue:#2563EB;--blue2:#1D4ED8;--blue3:#EFF6FF;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;-webkit-font-smoothing:antialiased;}
+
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;background:rgba(10,18,38,0.96);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.07);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8pt;color:rgba(255,255,255,0.45);text-decoration:none;font-weight:600;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.1);}
+.htb-brand{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.55);}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-tag{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.25);padding:3px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:4px;}
+.top-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:6px;
+  border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);
+  color:rgba(255,255,255,0.5);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.top-btn:hover{background:rgba(217,119,6,0.15);border-color:rgba(217,119,6,0.4);color:#FCD34D;}
+
+/* HERO */
+.hero{background:linear-gradient(150deg,#06091A 0%,#160B02 40%,#060D1A 100%);
+  padding:44px 0 36px;position:relative;overflow:hidden;}
+.hero-glow-1{position:absolute;top:-60px;right:-80px;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(217,119,6,0.14),transparent 65%);pointer-events:none;
+  animation:glowPulse 6s ease-in-out infinite;}
+.hero-glow-2{position:absolute;bottom:-60px;left:5%;width:400px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(220,38,38,0.07),transparent 65%);pointer-events:none;}
+@keyframes glowPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.55;transform:scale(1.05);}}
+.hero-wrap{max-width:1280px;margin:0 auto;padding:0 52px;position:relative;}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.hero-eyebrow-text{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.35);}
+.hero-eyebrow-dot{width:4px;height:4px;border-radius:50%;background:rgba(217,119,6,0.9);}
+.hero-title{font-size:28pt;font-weight:900;color:#fff;line-height:1.05;margin-bottom:10px;letter-spacing:-0.02em;}
+.hero-title span{color:#FCD34D;}
+.hero-sub{font-size:9.5pt;color:rgba(255,255,255,0.5);line-height:1.7;max-width:600px;margin-bottom:20px;}
+.hero-data-source{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;
+  font-size:7pt;color:rgba(255,255,255,0.3);font-weight:600;letter-spacing:0.05em;margin-bottom:20px;}
+.hero-data-source-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;
+  box-shadow:0 0 6px #22C55E;animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.hero-kpis{display:flex;gap:14px;flex-wrap:wrap;}
+.hkpi{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:15px 18px;min-width:132px;position:relative;overflow:hidden;transition:all 0.2s;}
+.hkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0.7;}
+.hkpi.red::before{background:linear-gradient(90deg,#DC2626,transparent);}
+.hkpi.amber::before{background:linear-gradient(90deg,#D97706,transparent);}
+.hkpi.purple::before{background:linear-gradient(90deg,#7C3AED,transparent);}
+.hkpi.teal::before{background:linear-gradient(90deg,#0D9488,transparent);}
+.hkpi:hover{background:rgba(255,255,255,0.08);}
+.hkpi-val{font-size:20pt;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.02em;}
+.hkpi.red .hkpi-val{color:#FCA5A5;}
+.hkpi.amber .hkpi-val{color:#FCD34D;}
+.hkpi.purple .hkpi-val{color:#C4B5FD;}
+.hkpi.teal .hkpi-val{color:#5EEAD4;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-top:5px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.3);margin-top:3px;line-height:1.4;}
+
+/* EXEC BRIEF */
+.exec-brief{background:linear-gradient(135deg,#0F1E3C 0%,#1E1005 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);padding:28px 0;}
+.exec-brief-wrap{max-width:1280px;margin:0 auto;padding:0 52px;}
+.eb-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.3);margin-bottom:16px;}
+.eb-insights{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.eb-insight{padding:16px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);}
+.eb-insight.critical{border-left:3px solid #DC2626;background:rgba(220,38,38,0.06);}
+.eb-insight.warning{border-left:3px solid #D97706;background:rgba(217,119,6,0.06);}
+.eb-insight.info{border-left:3px solid #7C3AED;background:rgba(124,58,237,0.06);}
+.ebi-number{font-size:22pt;font-weight:900;color:rgba(255,255,255,0.1);float:right;line-height:1;margin-left:8px;}
+.ebi-headline{font-size:9.5pt;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;}
+.ebi-body{font-size:8pt;color:rgba(255,255,255,0.45);line-height:1.6;}
+
+/* PAGE */
+.page-wrap{max-width:1280px;margin:0 auto;padding:32px 52px 72px;}
+.sec-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--ink4);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.explain-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--white);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:28px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+.es-col{padding:18px 20px;border-right:1px solid var(--border);}
+.es-col:last-child{border-right:none;}
+.es-icon{font-size:18pt;margin-bottom:8px;}
+.es-title{font-size:8.5pt;font-weight:800;color:var(--ink);margin-bottom:5px;}
+.es-body{font-size:7.5pt;color:var(--ink4);line-height:1.6;}
+
+.sort-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.sort-label{font-size:7.5pt;color:var(--ink4);font-weight:700;}
+.sort-btn{padding:5px 13px;border-radius:6px;border:1px solid var(--border2);background:var(--white);
+  font-size:7.5pt;font-weight:700;color:var(--ink4);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.sort-btn:hover{border-color:var(--amber);color:var(--amber);}
+.sort-btn.active{background:var(--amber);border-color:var(--amber);color:#fff;}
+
+.fte-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:32px;}
+.fte-card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:box-shadow 0.2s,transform 0.2s;}
+.fte-card:hover{box-shadow:0 5px 20px rgba(0,0,0,0.08);transform:translateY(-1px);}
+.fte-card.risk-high{border-left:4px solid var(--red);}
+.fte-card.risk-med{border-left:4px solid var(--amber);}
+.fte-card.risk-low{border-left:4px solid var(--green);}
+
+.fte-card-hdr{padding:13px 16px;border-bottom:1px solid var(--border);}
+.fte-vendor{font-size:9.5pt;font-weight:900;color:var(--ink);}
+.fte-cat{font-size:7.5pt;color:var(--ink4);margin-top:2px;}
+.fte-body{padding:13px 16px;}
+.fte-row{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px solid var(--gray2);}
+.fte-row:last-child{border-bottom:none;}
+.fte-lbl{font-size:8pt;color:var(--ink4);}
+.fte-val{font-size:8.5pt;font-weight:700;color:var(--ink);}
+.fte-val.red{color:var(--red);}
+.fte-val.amber{color:var(--amber);}
+.fte-val.green{color:var(--green);}
+
+.friction-bar{margin:10px 0 8px;}
+.fb-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.fb-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);}
+.fb-pct{font-size:9pt;font-weight:900;}
+.fb-track{height:7px;background:var(--gray2);border-radius:99px;overflow:hidden;}
+.fb-fill{height:100%;border-radius:99px;transition:width 0.8s ease;}
+.fb-fill.high{background:linear-gradient(90deg,#DC2626,#EF4444);}
+.fb-fill.med{background:linear-gradient(90deg,#D97706,#F59E0B);}
+.fb-fill.low{background:linear-gradient(90deg,#059669,#10B981);}
+
+.friction-insight{margin-top:10px;padding:9px 11px;border-radius:8px;font-size:7.5pt;line-height:1.5;}
+.fi-high{background:var(--red3);color:var(--red2);border:1px solid rgba(220,38,38,0.12);}
+.fi-med{background:var(--amber3);color:var(--amber2);border:1px solid rgba(217,119,6,0.12);}
+.fi-low{background:var(--green3);color:var(--green2);border:1px solid rgba(5,150,105,0.12);}
+
+.tbl-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);margin-bottom:28px;}
+.rtbl{width:100%;border-collapse:collapse;}
+.rtbl th{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;
+  color:var(--ink4);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);
+  background:var(--gray);white-space:nowrap;}
+.rtbl td{font-size:8.5pt;color:var(--ink2);padding:9px 14px;border-bottom:1px solid var(--border);}
+.rtbl tr:last-child td{border-bottom:none;}
+.rtbl tr:hover td{background:var(--gray2);}
+.risk-pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:7pt;font-weight:700;}
+.rp-high{background:var(--red3);color:var(--red2);}
+.rp-med{background:var(--amber3);color:var(--amber2);}
+.rp-low{background:var(--green3);color:var(--green2);}
+.coupa-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#22C55E;
+  margin-right:4px;vertical-align:middle;}
+
+.data-note{margin-top:28px;padding:14px 18px;background:var(--white);border:1px solid var(--border);
+  border-radius:10px;display:flex;align-items:flex-start;gap:12px;}
+.dn-icon{font-size:11pt;flex-shrink:0;opacity:0.6;}
+.dn-text{font-size:7.5pt;color:var(--ink4);line-height:1.6;}
+.dn-text strong{color:var(--ink3);}
+
+.fade-up{opacity:0;transform:translateY(18px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:900px){
+  .hero-wrap,.exec-brief-wrap,.page-wrap{padding:0 20px;}
+  .page-wrap{padding-top:24px;}
+  .fte-grid{grid-template-columns:1fr;}
+  .eb-insights{grid-template-columns:1fr;}
+  .explain-strip{grid-template-columns:1fr;}
+  .es-col{border-right:none;border-bottom:1px solid var(--border);}
+  .hero-title{font-size:20pt;}
+}
+@media print{
+  .hub-top-bar,.top-btn,.sort-bar{display:none!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .fade-up{opacity:1!important;transform:none!important;}
+  .hero{background:#0F1E3C!important;}
+  .exec-brief{background:#f8f9fa!important;}
+  .fte-card{break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">VER Intelligence Hub</span>
+  </div>
+  <div class="htb-right">
+    <div class="htb-tag">DET Confidential</div>
+    <button type="button" class="top-btn" onclick="window.print()">Print / PDF</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-wrap">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      <span class="hero-eyebrow-text">Executive Intelligence &middot; FY27</span>
+    </div>
+    <h1 class="hero-title">Shadow <span>FTE Index</span></h1>
+    <p class="hero-sub">Every vendor relationship requires internal bandwidth to manage &#8212; meetings, reviews, escalations, oversight. This index makes that hidden cost visible. The true cost of a vendor engagement is the invoice plus the internal FTE hours it consumes.</p>
+    <div class="hero-data-source">
+      <div class="hero-data-source-dot"></div>
+      Vendor spend: Coupa DEV · FY27 actuals (point-in-time snapshot) &nbsp;|&nbsp; Management hours: VER analyst estimates
+    </div>
+    <div class="hero-kpis" id="hero-kpis"></div>
+  </div>
+</section>
+
+<section class="exec-brief">
+  <div class="exec-brief-wrap">
+    <div class="eb-label">What leadership needs to know right now</div>
+    <div class="eb-insights" id="exec-insights"></div>
+  </div>
+</section>
+
+<div class="page-wrap">
+
+  <div class="explain-strip fade-up">
+    <div class="es-col">
+      <div class="es-icon">👻</div>
+      <div class="es-title">What is Shadow Cost?</div>
+      <div class="es-body">The annual value of internal employee time spent managing a vendor. Calculated as: (management hours/week &times; 52 / 2080) &times; blended annual rate for that employee level. This cost is real but never appears on an invoice.</div>
+    </div>
+    <div class="es-col">
+      <div class="es-icon">🔥</div>
+      <div class="es-title">The Friction Index</div>
+      <div class="es-body">Shadow cost as a percentage of the vendor invoice. A Friction Index above 20% means managing the vendor costs more than 20 cents for every dollar spent. Above 30% is a governance and ROI problem, not a vendor management problem.</div>
+    </div>
+    <div class="es-col">
+      <div class="es-icon">⚡</div>
+      <div class="es-title">Why This Matters</div>
+      <div class="es-body">Finance sees the vendor invoice. No system captures the director-level hours in weekly status calls, escalation bridges, and contract reviews. Surfacing this makes the true cost of complexity visible to the people who approve vendor spend.</div>
+    </div>
+  </div>
+
+  <p class="sec-label">Vendor Friction Cards</p>
+  <div class="sort-bar">
+    <span class="sort-label">Sort by:</span>
+    <button type="button" class="sort-btn active" onclick="sortCards('friction',this)">Friction Index</button>
+    <button type="button" class="sort-btn" onclick="sortCards('truecost',this)">True Cost</button>
+    <button type="button" class="sort-btn" onclick="sortCards('spend',this)">Vendor Spend</button>
+  </div>
+  <div class="fte-grid" id="fte-grid"></div>
+
+  <p class="sec-label">Summary Table &mdash; All Vendors</p>
+  <div class="tbl-wrap fade-up">
+    <table class="rtbl">
+      <thead>
+        <tr>
+          <th>Vendor</th>
+          <th>Category</th>
+          <th>FY27 Spend</th>
+          <th>Mgmt Hrs/Wk</th>
+          <th>Shadow Cost</th>
+          <th>True Cost</th>
+          <th>Friction Index</th>
+          <th>Risk</th>
+        </tr>
+      </thead>
+      <tbody id="summary-tbl"></tbody>
+    </table>
+  </div>
+
+  <div class="data-note fade-up">
+    <div class="dn-icon">&#8505;</div>
+    <div class="dn-text">
+      <strong>Vendor spend</strong> sourced from Coupa DEV (salesforce-compass-dev.coupahost.com) FY27 actuals (point-in-time snapshot, not a live connection) &#8212; marked with a green dot throughout.
+      <strong>Management hours and employee levels</strong> are VER analyst estimates based on vendor tier, contract complexity, and team self-reporting. These are directional inputs, not audited data.
+      Blended annual rates by level: IC $120K &middot; Sr $160K &middot; Mgr $185K &middot; Dir $220K &middot; VP $270K.
+    </div>
+  </div>
+
+</div>
+
+<script src="assets/coupa_spend.js"></script>
+<script>
+var COUPA = (window.VER_COUPA && window.VER_COUPA.vendors) ? window.VER_COUPA.vendors : [];
+function cs(name){var v=COUPA.find(function(x){return x.n===name;});return v?v.fy27:null;}
+
+var LEVEL_RATE={ic:120000,sr:160000,mgr:185000,dir:220000,vp:270000};
+
+var VENDORS=[
+  {name:'Workday',      cat:'HCM/ERP Software',       hrsWk:6,  level:'dir', owner:'Finance & HR'},
+  {name:'NTT Data',     cat:'Network CWF',             hrsWk:12, level:'dir', owner:'Technology Services'},
+  {name:'AWS',          cat:'Cloud Infrastructure',    hrsWk:5,  level:'mgr', owner:'Engineering'},
+  {name:'IBM',          cat:'Technology Services CWF', hrsWk:10, level:'dir', owner:'Strategic Portfolio'},
+  {name:'Google',       cat:'Software / Cloud',        hrsWk:4,  level:'mgr', owner:'Engineering'},
+  {name:'WWT',          cat:'Hardware / IT Logistics', hrsWk:6,  level:'mgr', owner:'Technology Services'},
+  {name:'Cognizant',    cat:'Managed Services CWF',    hrsWk:10, level:'dir', owner:'Strategic Portfolio'},
+  {name:'Deloitte',     cat:'Management Consulting',   hrsWk:8,  level:'vp',  owner:'Finance'},
+  {name:'BCG',          cat:'Strategy Consulting',     hrsWk:6,  level:'vp',  owner:'Admin'},
+  {name:'StaffUp',      cat:'Contingent Workforce',    hrsWk:5,  level:'mgr', owner:'Technology Services'},
+  {name:'Accenture',    cat:'Technology Consulting',   hrsWk:8,  level:'dir', owner:'Strategic Portfolio'},
+  {name:'Ironclad',     cat:'CLM Software',            hrsWk:3,  level:'mgr', owner:'Legal'},
+  {name:'Conga',        cat:'Contract & Revenue SW',   hrsWk:2,  level:'sr',  owner:'Legal'},
+  {name:'TechM',        cat:'Offshore Dev CWF',        hrsWk:8,  level:'mgr', owner:'Asset Management'},
+  {name:'Sycomp',       cat:'Hardware / IT Solutions', hrsWk:4,  level:'mgr', owner:'Technology Services'},
+  {name:'Certinia',     cat:'ERP / PSA Software',      hrsWk:4,  level:'mgr', owner:'Finance'},
+  {name:'Figma',        cat:'Design Software',         hrsWk:1,  level:'ic',  owner:'Product'},
+  {name:'Lucid',        cat:'Diagramming Software',    hrsWk:1,  level:'ic',  owner:'Product'},
+  {name:'Insight Direct',cat:'Hardware / Asset Mgmt',  hrsWk:5,  level:'mgr', owner:'Technology Services'},
+  {name:'Nucleusteq',   cat:'Data Engineering CWF',    hrsWk:6,  level:'mgr', owner:'Strategic Portfolio'},
+  {name:'Docusign',     cat:'eSignature Software',     hrsWk:1,  level:'ic',  owner:'Legal'},
+  {name:'Smartsheet',   cat:'Work Management',         hrsWk:1,  level:'ic',  owner:'PMO'},
+  {name:'Okta',         cat:'IAM Software',            hrsWk:2,  level:'sr',  owner:'Security'},
+  {name:'DBT Labs',     cat:'Data Engineering',        hrsWk:2,  level:'sr',  owner:'Data'},
+  {name:'Asana',        cat:'Work Management',         hrsWk:1,  level:'ic',  owner:'PMO'},
+  {name:'Realtimeboard',cat:'Visual Collaboration',    hrsWk:1,  level:'ic',  owner:'Product'},
+  {name:'Capgemini',    cat:'Technology Consulting',   hrsWk:6,  level:'dir', owner:'Strategic Portfolio'},
+  {name:'Oktana',       cat:'Salesforce Consulting',   hrsWk:4,  level:'mgr', owner:'Strategic Portfolio'},
+  {name:'Coupa',        cat:'Procurement Software',    hrsWk:3,  level:'mgr', owner:'Procurement'},
+  {name:'D&B',          cat:'Data & Analytics',        hrsWk:1,  level:'sr',  owner:'Sales Ops'},
+  {name:'Xactly',       cat:'Incentive Compensation',  hrsWk:2,  level:'sr',  owner:'Finance'},
+  {name:'Concur',       cat:'T&E Software',            hrsWk:1,  level:'ic',  owner:'Finance'},
+  {name:'Fractal Analytics',cat:'Data Analytics CWF',  hrsWk:4,  level:'mgr', owner:'Strategic Portfolio'},
+  {name:'Infosys',      cat:'IT Consulting CWF',       hrsWk:4,  level:'mgr', owner:'Strategic Portfolio'},
+  {name:'Demandbase',   cat:'ABM / Marketing',         hrsWk:1,  level:'ic',  owner:'Marketing'}
+];
+
+VENDORS.forEach(function(v){
+  var spend=cs(v.name);
+  v.coupaSpend = spend !== null ? spend : null;
+  var annualRate = LEVEL_RATE[v.level] || 160000;
+  v.shadowCost = (v.hrsWk * 52 / 2080) * annualRate;
+  var baseSpend = v.coupaSpend !== null ? v.coupaSpend : 1.0;
+  v.frictionIndex = (v.shadowCost / (baseSpend * 1000000)) * 100;
+  v.trueCost = (v.coupaSpend !== null ? v.coupaSpend * 1000000 : 1000000) + v.shadowCost;
+  v.risk = v.frictionIndex > 20 ? 'high' : v.frictionIndex > 10 ? 'med' : 'low';
+});
+
+var currentSort = 'friction';
+
+function fmtM(n){if(!n&&n!==0) return 'N/A';if(n>=1000000) return '$'+(n/1000000).toFixed(2)+'M';if(n>=1000) return '$'+(n/1000).toFixed(0)+'K';return '$'+Math.round(n);}
+function fmtK(n){return '$'+Math.round(n/1000)+'K';}
+function el(tag,cls,text){var e=document.createElement(tag);if(cls) e.className=cls;if(text!=null) e.textContent=text;return e;}
+function clearEl(node){while(node.firstChild) node.removeChild(node.firstChild);}
+function animateCount(el,target,prefix,suffix,decimals,duration){
+  var start=0,step=target/((duration||900)/16);
+  function tick(){start=Math.min(start+step,target);el.textContent=prefix+(decimals?start.toFixed(1):Math.round(start))+suffix;if(start<target) requestAnimationFrame(tick);else el.textContent=prefix+(decimals?target.toFixed(1):Math.round(target))+suffix;}
+  requestAnimationFrame(tick);
+}
+
+function buildHero(){
+  var totalShadow=0,highCount=0,totalTrue=0,totalSpend=0;
+  VENDORS.forEach(function(v){
+    totalShadow+=v.shadowCost;
+    totalTrue+=v.trueCost;
+    if(v.coupaSpend) totalSpend+=v.coupaSpend;
+    if(v.risk==='high') highCount++;
+  });
+  var kpis=[
+    {val:totalShadow/1000000,prefix:'$',suffix:'M',dec:true, lbl:'Total Hidden Overhead',note:'shadow FTE cost across all vendors',cls:'amber'},
+    {val:highCount,          prefix:'',  suffix:'', dec:false,lbl:'High-Friction Vendors', note:'Friction Index > 20%',             cls:'red'},
+    {val:totalTrue/1000000,  prefix:'$',suffix:'M',dec:true, lbl:'True Portfolio Cost',   note:'invoice + management overhead',     cls:'purple'},
+    {val:VENDORS.length,     prefix:'',  suffix:'', dec:false,lbl:'Vendors Analyzed',      note:'FY27 active relationships',         cls:'teal'}
+  ];
+  var wrap=document.getElementById('hero-kpis');
+  kpis.forEach(function(k){
+    var d=el('div','hkpi '+k.cls);
+    var v=el('div','hkpi-val','–');
+    d.appendChild(v);d.appendChild(el('div','hkpi-lbl',k.lbl));d.appendChild(el('div','hkpi-note',k.note));
+    wrap.appendChild(d);
+    setTimeout(function(){animateCount(v,k.val,k.prefix,k.suffix,k.dec,1000);},300);
+  });
+}
+
+function buildExecBrief(){
+  var highFriction=VENDORS.filter(function(v){return v.risk==='high';}).sort(function(a,b){return b.frictionIndex-a.frictionIndex;});
+  var top=highFriction.slice(0,3);
+  var totalShadow=0;VENDORS.forEach(function(v){totalShadow+=v.shadowCost;});
+  var wrap=document.getElementById('exec-insights');
+  var insights=[
+    {cls:'critical',num:'1',
+     headline:'$'+Math.round(totalShadow/1000000)+'M in internal management cost is invisible to every finance and procurement system in use today.',
+     body:'This number represents employee time spent in vendor status calls, escalations, contract reviews, and oversight activities. It never appears on a PO, never hits a cost center, and is never part of a vendor business case. It is real cost — just untracked.'},
+    {cls:'warning',num:'2',
+     headline:highFriction.length+' vendors have a Friction Index above 20% — meaning internal management overhead exceeds 20 cents per vendor dollar spent.',
+     body:top.length?'Highest friction: '+top.map(function(v){return v.name+' ('+v.frictionIndex.toFixed(0)+'%)';}).join(', ')+'. These relationships require structural changes to governance, not just tighter SOWs.':'Review vendor governance models for high-friction relationships.'},
+    (function(){
+      var catMap={};
+      VENDORS.forEach(function(v){
+        if(!catMap[v.cat]) catMap[v.cat]={shadowCost:0,names:[]};
+        catMap[v.cat].shadowCost+=v.shadowCost||0;
+        catMap[v.cat].names.push(v.name);
+      });
+      var cats=Object.keys(catMap).map(function(c){return {cat:c,shadowCost:catMap[c].shadowCost,names:catMap[c].names};});
+      cats.sort(function(a,b){return b.shadowCost-a.shadowCost;});
+      var topCat=cats[0]||{cat:'Consulting',names:[]};
+      var topVendors=VENDORS.filter(function(v){return v.cat===topCat.cat;}).sort(function(a,b){return (b.shadowCost||0)-(a.shadowCost||0);}).slice(0,3).map(function(v){return v.name;});
+      return {cls:'info',num:'3',
+        headline:topCat.cat+' vendors carry the highest shadow overhead burden — not because they\'re large, but because they require the most human coordination.',
+        body:'Top shadow-cost vendors in this category: '+topVendors.join(', ')+'. These relationships consume the most VP and Director time. Structuring engagements with fewer touchpoints and clear deliverable-based milestones is the primary lever.'};
+    })()
+  ];
+  insights.forEach(function(ins){
+    var d=el('div','eb-insight '+ins.cls);
+    d.appendChild(el('div','ebi-number',ins.num));
+    d.appendChild(el('div','ebi-headline',ins.headline));
+    d.appendChild(el('div','ebi-body',ins.body));
+    wrap.appendChild(d);
+  });
+}
+
+function buildCards(){
+  var grid=document.getElementById('fte-grid');
+  clearEl(grid);
+  var sorted=VENDORS.slice().sort(function(a,b){
+    if(currentSort==='friction') return b.frictionIndex-a.frictionIndex;
+    if(currentSort==='truecost') return b.trueCost-a.trueCost;
+    return (b.coupaSpend||0)-(a.coupaSpend||0);
+  });
+
+  sorted.forEach(function(v){
+    var card=el('div','fte-card fade-up risk-'+v.risk);
+    var hdr=el('div','fte-card-hdr');
+    var nameRow=el('div','fte-vendor');
+    if(v.coupaSpend!==null){
+      var cdot=el('span','coupa-dot');
+      nameRow.appendChild(cdot);
+    }
+    nameRow.appendChild(document.createTextNode(v.name));
+    hdr.appendChild(nameRow);
+    hdr.appendChild(el('div','fte-cat',v.cat+' · '+v.owner));
+    card.appendChild(hdr);
+
+    var body=el('div','fte-body');
+    var rows=[
+      {lbl:'FY27 Vendor Spend',val:v.coupaSpend!==null?fmtM(v.coupaSpend*1000000):'Analyst est.',cls:v.coupaSpend&&v.coupaSpend>5?'':''},
+      {lbl:'Mgmt Hours / Week', val:v.hrsWk+'h ('+v.level.toUpperCase()+')',cls:''},
+      {lbl:'Annual Shadow Cost', val:fmtK(v.shadowCost),cls:v.risk==='high'?'red':v.risk==='med'?'amber':'green'},
+      {lbl:'True Annual Cost',  val:fmtM(v.trueCost),cls:''}
+    ];
+    rows.forEach(function(r){
+      var row=el('div','fte-row');
+      row.appendChild(el('div','fte-lbl',r.lbl));
+      row.appendChild(el('div','fte-val'+(r.cls?' '+r.cls:''),r.val));
+      body.appendChild(row);
+    });
+
+    var fb=el('div','friction-bar');
+    var fbTop=el('div','fb-top');
+    fbTop.appendChild(el('div','fb-label','Friction Index'));
+    var fbPct=el('div','fb-pct',v.frictionIndex.toFixed(1)+'%');
+    fbPct.style.color=v.risk==='high'?'var(--red)':v.risk==='med'?'var(--amber)':'var(--green)';
+    fbTop.appendChild(fbPct);
+    fb.appendChild(fbTop);
+    var track=el('div','fb-track');
+    var fill=el('div','fb-fill '+v.risk);
+    fill.style.width='0%';
+    var pct=Math.min(100,v.frictionIndex);
+    setTimeout(function(){fill.style.width=pct+'%';},300);
+    track.appendChild(fill);fb.appendChild(track);
+    body.appendChild(fb);
+
+    var insightText='';
+    if(v.risk==='high') insightText='Management burden exceeds 20% of invoice value. Governance restructure recommended — milestone-based delivery, fewer standing meetings, clear escalation path.';
+    else if(v.risk==='med') insightText='Moderate friction. Monitor quarterly. Consider streamlining touchpoints or moving to a vendor account manager model.';
+    else insightText='Well-managed. Overhead is proportionate to spend. No action required.';
+    var ins=el('div','friction-insight fi-'+v.risk,insightText);
+    body.appendChild(ins);
+
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+
+  setTimeout(function(){
+    document.querySelectorAll('.fade-up').forEach(function(e){e.classList.add('visible');});
+  },80);
+}
+
+function buildTable(){
+  var tbody=document.getElementById('summary-tbl');
+  var sorted=VENDORS.slice().sort(function(a,b){return b.frictionIndex-a.frictionIndex;});
+  sorted.forEach(function(v){
+    var tr=document.createElement('tr');
+    var td0=el('td');
+    if(v.coupaSpend!==null) td0.appendChild(el('span','coupa-dot'));
+    td0.appendChild(document.createTextNode(v.name));td0.style.fontWeight='700';
+    var td1=el('td',null,v.cat);
+    var td2=el('td',null,v.coupaSpend!==null?fmtM(v.coupaSpend*1000000):'Analyst est.');
+    td2.style.fontWeight='700';
+    var td3=el('td',null,v.hrsWk+'h ('+v.level+')');
+    var td4=el('td',null,fmtK(v.shadowCost));
+    var td5=el('td',null,fmtM(v.trueCost));td5.style.fontWeight='700';
+    var td6=el('td',null,v.frictionIndex.toFixed(1)+'%');
+    td6.style.color=v.risk==='high'?'var(--red)':v.risk==='med'?'var(--amber)':'var(--green)';
+    td6.style.fontWeight='800';
+    var td7=el('td');
+    var rmap={high:'rp-high High',med:'rp-med Medium',low:'rp-low Low'};
+    var parts=rmap[v.risk].split(' ');
+    td7.appendChild(el('span','risk-pill '+parts[0],parts[1]));
+    [td0,td1,td2,td3,td4,td5,td6,td7].forEach(function(td){tr.appendChild(td);});
+    tbody.appendChild(tr);
+  });
+}
+
+function sortCards(mode,btn){
+  currentSort=mode;
+  document.querySelectorAll('.sort-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  buildCards();
+}
+
+function initScrollReveal(){
+  if(!('IntersectionObserver' in window)) return;
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting) e.target.classList.add('visible');});
+  },{threshold:0.08});
+  document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
+}
+
+buildHero();
+buildExecBrief();
+buildCards();
+buildTable();
+initScrollReveal();
+</script>
+</body>
+</html>

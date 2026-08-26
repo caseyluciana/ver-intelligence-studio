@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Exit Optionality · VER Team Portal</title>
+<script src="assets/vendors.js" defer></script>
+<script src="assets/coupa_spend.js" defer></script>
+<style>
+:root {
+  --bloom:#F43F5E; --bloom-dim:#E11D48; --bloom-bright:#FB7185;
+  --bloom-glow:rgba(244,63,94,0.16); --bloom-border:rgba(244,63,94,0.30);
+  --bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3; --magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14); --mag-border:rgba(192,38,211,0.28);
+  --violet:#A855F7; --violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12); --vio-border:rgba(168,85,247,0.28);
+  --bg:#070411; --bg-side:#130D26; --bg-surface:rgba(255,255,255,0.034);
+  --bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96); --ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52); --ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06); --border-soft:rgba(255,255,255,0.10);
+  --green:#34D399; --amber:#FBBF24;
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);
+  font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.22) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.18) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 48%,rgba(168,85,247,0.07) 0%,transparent 60%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(244,63,94,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,63,94,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+
+/* ── SIDEBAR ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sb-gem{width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  box-shadow:0 0 24px rgba(244,63,94,0.42),0 0 8px rgba(192,38,211,0.28);}
+.sb-logo-title{font-size:13.5px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.55);margin-top:2px;}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;font-size:8px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);
+  animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.sb-nav{flex:1;padding:10px 0;}
+.sb-section{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.42);padding:12px 20px 5px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:8px 0;}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;
+  font-size:9px;color:rgba(255,255,255,0.50);line-height:1.7;}
+.sb-user{margin:0 12px 10px;padding:10px 14px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:20px;line-height:1;}
+.sb-user-name{font-size:11.5px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:9px;color:rgba(255,255,255,0.55);}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.80);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-actions{display:flex;align-items:center;gap:8px;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;white-space:nowrap;}
+.tb-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.tb-btn.primary{background:linear-gradient(90deg,var(--bloom-dim),var(--magenta));
+  border-color:transparent;color:#fff;box-shadow:0 0 16px rgba(244,63,94,0.24);}
+.tb-btn.primary:hover{opacity:0.88;}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── PAGE HEADER ── */
+.page-head{margin-bottom:22px;}
+.page-eyebrow{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.18em;
+  color:var(--bloom-bright);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.page-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--bloom);
+  animation:pulse 2.5s ease-in-out infinite;}
+.page-title{font-size:26px;font-weight:900;letter-spacing:-0.02em;
+  background:linear-gradient(92deg,var(--bloom) 0%,var(--magenta) 55%,var(--violet) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:inline-block;margin-bottom:5px;}
+.page-sub{font-size:12px;color:var(--ink-muted);line-height:1.55;}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.kpi-tile{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;
+  padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0;}
+.t-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.t-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.t-amber::before  {background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.t-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.kpi-ico-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico{font-size:18px;}
+.kpi-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.kb-bloom  {background:rgba(244,63,94,0.14);color:var(--bloom-bright);}
+.kb-green  {background:rgba(52,211,153,0.14);color:#34D399;}
+.kb-amber  {background:rgba(192,38,211,0.12);color:var(--magenta-bright);}
+.kb-violet {background:rgba(168,85,247,0.12);color:var(--violet-bright);}
+.kpi-val{font-size:32px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.t-bloom   .kpi-val{color:var(--bloom-bright);}
+.t-magenta .kpi-val{color:var(--magenta-bright);}
+.t-amber   .kpi-val{color:var(--magenta-bright);}
+.t-violet  .kpi-val{color:var(--violet-bright);}
+.kpi-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:var(--ink-muted);}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode::before{background:radial-gradient(ellipse at 80% 0%,rgba(192,38,211,0.12) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.10) 0%,transparent 50%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title{color:#1A0818;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover,body.light-mode .tb-btn.primary{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .page-title{-webkit-text-fill-color:initial;color:#1A0818;background:none;}
+body.light-mode .kpi-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .kpi-val{color:#E11D48!important;}
+body.light-mode .kpi-label{color:#7A4055;}
+body.light-mode .form-input{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .form-input::placeholder{color:#B06080;}
+body.light-mode .form-label{color:#7A4055;}
+
+/* ── ASSESSMENT LAYOUT ── */
+.assessment-grid{display:grid;grid-template-columns:420px 1fr;gap:18px;margin-bottom:24px;}
+@media(max-width:1100px){.assessment-grid{grid-template-columns:1fr;}}
+
+/* ── CARD ── */
+.eo-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:14px;padding:22px;overflow:hidden;}
+.eo-card-title{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:16px;letter-spacing:-0.01em;}
+
+/* ── VENDOR SELECT CARD ── */
+.vselect-wrap{background:linear-gradient(135deg,#1C1030 0%,#150D28 100%);
+  border-radius:14px;padding:18px 20px;border:1px solid rgba(244,63,94,0.14);margin-bottom:12px;}
+.vselect-title{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:rgba(255,255,255,0.52);margin-bottom:8px;}
+.vselect-select{width:100%;padding:10px 12px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);
+  border-radius:9px;color:var(--ink);font-family:var(--font);font-size:13px;font-weight:600;
+  cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;}
+.vselect-select option{background:#150D28;color:#fff;}
+
+/* ── FORM FIELDS ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.form-full{grid-column:1/-1;}
+.form-label{display:block;font-size:9.5px;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.10em;color:var(--ink-muted);margin-bottom:5px;}
+.form-input{width:100%;padding:9px 12px;border-radius:8px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  color:var(--ink);font-family:var(--font);font-size:13px;outline:none;
+  transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--bloom-border);}
+.form-input::placeholder{color:var(--ink-muted);}
+select.form-input option{background:#150D28;color:#fff;}
+textarea.form-input{min-height:64px;resize:vertical;}
+
+/* ── ACTION BUTTONS ── */
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.eo-btn{border:0;border-radius:8px;padding:9px 16px;font:inherit;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-calc{background:linear-gradient(90deg,var(--bloom-dim),var(--magenta));color:#fff;
+  box-shadow:0 0 14px rgba(244,63,94,0.22);}
+.btn-calc:hover{opacity:0.88;}
+.btn-save{background:rgba(168,85,247,0.18);color:var(--violet-bright);
+  border:1px solid rgba(168,85,247,0.30);}
+.btn-save:hover{background:rgba(168,85,247,0.28);}
+.btn-export{background:var(--bg-surface);color:var(--ink-dim);border:1px solid var(--border-soft);}
+.btn-export:hover{background:rgba(255,255,255,0.07);color:var(--ink);}
+.btn-print{background:var(--bg-surface);color:var(--ink-dim);border:1px solid var(--border-soft);}
+.btn-print:hover{background:rgba(255,255,255,0.07);color:var(--ink);}
+.btn-reset{background:rgba(244,63,94,0.08);color:var(--bloom-bright);
+  border:1px solid rgba(244,63,94,0.20);}
+.btn-reset:hover{background:rgba(244,63,94,0.16);}
+
+/* ── RESULTS PANEL ── */
+.results-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:320px;color:var(--ink-muted);text-align:center;gap:10px;}
+.placeholder-icon{font-size:36px;opacity:0.3;}
+.placeholder-text{font-size:13px;font-weight:500;color:var(--ink-muted);}
+
+.results-hero{display:grid;grid-template-columns:170px 1fr;gap:22px;align-items:center;margin-bottom:20px;}
+.dial-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.dial{width:160px;height:160px;border-radius:50%;display:grid;place-items:center;
+  position:relative;transition:background 0.5s;}
+.dial-inner{width:120px;height:120px;background:rgba(7,4,17,0.88);border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
+.dial-score{font-size:36px;font-weight:900;line-height:1;color:var(--ink);}
+.dial-lbl{font-size:9px;color:var(--ink-muted);font-weight:600;margin-top:2px;}
+.status-badge{display:inline-block;border-radius:99px;padding:5px 13px;font-size:11px;font-weight:800;letter-spacing:0.03em;}
+.status-constrained{background:rgba(220,38,38,0.18);color:#FCA5A5;border:1px solid rgba(220,38,38,0.30);}
+.status-manageable{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.30);}
+.status-strong{background:rgba(52,211,153,0.18);color:#34D399;border:1px solid rgba(52,211,153,0.28);}
+.results-meta-vendor{font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;
+  letter-spacing:0.06em;margin-bottom:4px;}
+.results-meta-headline{font-size:16px;font-weight:700;color:var(--ink);margin:6px 0 5px;line-height:1.3;}
+.results-meta-narrative{font-size:12px;color:var(--ink-muted);line-height:1.6;}
+
+.metric-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.mtile{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.mtile-val{font-size:17px;font-weight:800;color:var(--ink);line-height:1;margin-bottom:4px;}
+.mtile-lbl{font-size:9px;color:var(--ink-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;}
+
+.bars-section{display:grid;gap:9px;}
+.bar-row{display:grid;grid-template-columns:170px 1fr 40px;gap:9px;align-items:center;font-size:11.5px;color:var(--ink-dim);}
+.bar-track{height:8px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:99px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);}
+.bar-num{font-size:11px;font-weight:700;color:var(--ink-muted);text-align:right;}
+
+/* ── SAVED TABLE ── */
+.sec-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--ink-muted);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px;}
+th{font-size:9px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;
+  color:var(--ink-muted);padding:10px 12px;border-bottom:2px solid var(--border-soft);text-align:left;}
+td{padding:11px 12px;border-bottom:1px solid var(--border);color:var(--ink-dim);vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,0.025);}
+tr.edit-row td{background:rgba(244,63,94,0.04);}
+.score-badge{display:inline-block;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:800;}
+.sb-high{background:rgba(220,38,38,0.18);color:#FCA5A5;}
+.sb-med{background:rgba(217,119,6,0.18);color:#FCD34D;}
+.sb-low{background:rgba(52,211,153,0.18);color:#34D399;}
+.table-empty{text-align:center;color:var(--ink-muted);padding:32px;font-size:12px;}
+.tbl-del-btn{display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px;
+  background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.18);
+  color:var(--bloom-bright);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);
+  transition:background 0.15s;}
+.tbl-del-btn:hover{background:rgba(244,63,94,0.18);}
+.tbl-edit-btn{display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px;
+  background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.18);
+  color:var(--violet-bright);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);
+  margin-right:6px;transition:background 0.15s;}
+.tbl-edit-btn:hover{background:rgba(168,85,247,0.18);}
+
+/* ── TOAST ── */
+.success-toast{display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  z-index:9999;border-radius:12px;padding:13px 22px;font-size:11px;font-weight:700;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);align-items:center;gap:10px;
+  background:linear-gradient(135deg,rgba(52,211,153,0.18),rgba(52,211,153,0.10));
+  border:1px solid rgba(52,211,153,0.32);color:#34D399;
+  backdrop-filter:blur(12px);}
+.toast-dismiss{background:rgba(255,255,255,0.10);border:none;color:rgba(255,255,255,0.60);
+  border-radius:6px;padding:2px 8px;cursor:pointer;font-size:13px;margin-left:6px;}
+
+/* ── CALLOUT ── */
+.callout{padding:12px 17px;border-radius:10px;margin-bottom:20px;
+  background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.16);
+  border-left:3px solid var(--bloom);font-size:12px;color:var(--ink-dim);line-height:1.65;}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-head{animation:rise 0.45s var(--ease) 0.05s both;}
+.kpi-strip{animation:rise 0.45s var(--ease) 0.12s both;}
+.callout{animation:rise 0.45s var(--ease) 0.18s both;}
+.assessment-grid{animation:rise 0.45s var(--ease) 0.22s both;}
+
+@media(max-width:1100px){.kpi-strip{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.sidebar{display:none;}.content{padding:16px 16px 40px;}
+  .kpi-strip{grid-template-columns:1fr 1fr;}}
+@media print{.sidebar,.topbar,.btn-row{display:none!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}}
+</style>
+</head>
+<body data-portal="true">
+
+<!-- TOAST -->
+<div class="success-toast" id="toast">
+  <span id="toast-msg">Assessment saved.</span>
+  <button type="button" class="toast-dismiss" onclick="document.getElementById('toast').style.display='none'">&#215;</button>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128142;</div>
+        <div>
+          <div class="sb-logo-title">VER Intelligence Hub</div>
+          <div class="sb-logo-sub">Team Portal &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-user">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Casey</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html" class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"       class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"           class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"        class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"     class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"   class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"   class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html" class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html" class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html" class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"          class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item active"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html"  class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="portal_home.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Exit Optionality</span>
+      </div>
+      <div class="tb-actions">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button type="button" class="tb-btn" onclick="exportJSON()">&#8659; Export JSON</button>
+        <button type="button" class="tb-btn primary" onclick="saveAssessment()">&#10003; Save Assessment</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-head">
+        <div class="page-eyebrow"><span class="page-eyebrow-dot"></span>VER INTELLIGENCE HUB &nbsp;&middot;&nbsp; ASSESSMENTS</div>
+        <div class="page-title">Exit Optionality</div>
+        <div class="page-sub">Create and manage exit risk assessments for the vendor portfolio. Score contractual, operational, financial, and knowledge constraints. Saved data syncs to the hub read-only view in real time via localStorage.</div>
+      </div>
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip">
+        <div class="kpi-tile t-bloom">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128202;</span><span class="kpi-badge kb-bloom">Portfolio</span></div>
+          <div class="kpi-val" id="kpi-total">0</div>
+          <div class="kpi-label">Total Assessments</div>
+        </div>
+        <div class="kpi-tile t-magenta">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128680;</span><span class="kpi-badge kb-amber">Score &ge;70</span></div>
+          <div class="kpi-val" id="kpi-constrained">0</div>
+          <div class="kpi-label">Constrained</div>
+        </div>
+        <div class="kpi-tile t-amber">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#9888;</span><span class="kpi-badge kb-amber">45&ndash;69</span></div>
+          <div class="kpi-val" id="kpi-manageable">0</div>
+          <div class="kpi-label">Manageable</div>
+        </div>
+        <div class="kpi-tile t-violet">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#9989;</span><span class="kpi-badge kb-violet">Score &lt;45</span></div>
+          <div class="kpi-val" id="kpi-strong">0</div>
+          <div class="kpi-label">Strong Optionality</div>
+        </div>
+      </div>
+
+      <!-- CALLOUT -->
+      <div class="callout">
+        <strong style="color:var(--bloom-bright);">VER Use:</strong> This is the write tool. Assessments saved here auto-appear on the hub Exit Optionality page for stakeholder read-only review. Click a row in the table below to load it into the form for editing.
+      </div>
+
+      <!-- ASSESSMENT GRID -->
+      <div class="assessment-grid">
+
+        <!-- LEFT: Vendor selector + inputs -->
+        <div>
+          <div class="vselect-wrap">
+            <div class="vselect-title">Select vendor to auto-populate fields</div>
+            <select class="vselect-select" id="vendorSelector">
+              <option value="">&#8212; Choose a vendor to pre-fill &#8212;</option>
+            </select>
+          </div>
+
+          <div class="eo-card">
+            <div class="eo-card-title">Relationship Assumptions</div>
+            <div class="form-grid">
+              <div class="form-full">
+                <label class="form-label" for="i-vendor">Vendor / Relationship Name</label>
+                <input class="form-input" id="i-vendor" type="text" placeholder="e.g. NTT Data — AMS">
+              </div>
+              <div>
+                <label class="form-label" for="i-spend">Annual Spend ($M)</label>
+                <input class="form-input" id="i-spend" type="number" min="0" step="0.1" placeholder="e.g. 14.3">
+              </div>
+              <div>
+                <label class="form-label" for="i-notice">Notice Period (days)</label>
+                <input class="form-input" id="i-notice" type="number" min="0" placeholder="e.g. 90">
+              </div>
+              <div>
+                <label class="form-label" for="i-transition">Operational Transition (days)</label>
+                <input class="form-input" id="i-transition" type="number" min="0" placeholder="e.g. 180">
+              </div>
+              <div>
+                <label class="form-label" for="i-cost">Transition Cost ($M)</label>
+                <input class="form-input" id="i-cost" type="number" min="0" step="0.1" placeholder="e.g. 1.2">
+              </div>
+              <div>
+                <label class="form-label" for="i-knowledge">Knowledge Concentration</label>
+                <select class="form-input" id="i-knowledge">
+                  <option value="20">Low</option>
+                  <option value="50" selected>Moderate</option>
+                  <option value="85">High</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="i-portability">Data Portability</label>
+                <select class="form-input" id="i-portability">
+                  <option value="20">Easy</option>
+                  <option value="50" selected>Some constraints</option>
+                  <option value="85">Difficult</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="i-market">Replacement Market</label>
+                <select class="form-input" id="i-market">
+                  <option value="20">Many alternatives</option>
+                  <option value="50" selected>Limited alternatives</option>
+                  <option value="85">Few / no alternatives</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="i-absorb">Internal Absorption</label>
+                <select class="form-input" id="i-absorb">
+                  <option value="20">Ready now</option>
+                  <option value="50" selected>Partial capacity</option>
+                  <option value="85">No practical capacity</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="i-critical">Business Criticality</label>
+                <select class="form-input" id="i-critical">
+                  <option value="20">Low</option>
+                  <option value="50">Moderate</option>
+                  <option value="85" selected>Mission critical</option>
+                </select>
+              </div>
+              <div class="form-full">
+                <label class="form-label" for="i-notes">Decision Notes</label>
+                <textarea class="form-input" id="i-notes" rows="3" placeholder="Key constraints, assumptions, or evidence for this assessment..."></textarea>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="eo-btn btn-calc" id="btn-calc">&#9654; Calculate</button>
+              <button type="button" class="eo-btn btn-save" id="btn-save">&#10003; Save Assessment</button>
+              <button type="button" class="eo-btn btn-export" id="btn-export">&#8659; Export JSON</button>
+              <button type="button" class="eo-btn btn-print" onclick="window.print()">&#128438; Print</button>
+              <button type="button" class="eo-btn btn-reset" id="btn-reset">&#8635; Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Results panel -->
+        <div class="eo-card" id="results-card">
+          <div class="eo-card-title">Exit Readiness Profile</div>
+
+          <div class="results-placeholder" id="results-placeholder">
+            <div class="placeholder-icon">&#8857;</div>
+            <div class="placeholder-text">Select a vendor and enter assumptions, then click Calculate</div>
+          </div>
+
+          <div id="results-content" style="display:none">
+            <div class="results-hero">
+              <div class="dial-wrap">
+                <div class="dial" id="dial">
+                  <div class="dial-inner">
+                    <div class="dial-score" id="dial-score">--</div>
+                    <div class="dial-lbl">Exit constraint</div>
+                  </div>
+                </div>
+                <span class="status-badge" id="status-badge">--</span>
+              </div>
+              <div>
+                <div class="results-meta-vendor" id="meta-vendor-name"></div>
+                <div class="results-meta-headline" id="meta-headline">&#8212;</div>
+                <div class="results-meta-narrative" id="meta-narrative">&#8212;</div>
+              </div>
+            </div>
+
+            <div class="metric-tiles">
+              <div class="mtile">
+                <div class="mtile-val" id="m-earliest">&#8212;</div>
+                <div class="mtile-lbl">Earliest Practical Exit</div>
+              </div>
+              <div class="mtile">
+                <div class="mtile-val" id="m-cost">&#8212;</div>
+                <div class="mtile-lbl">Transition Cost</div>
+              </div>
+              <div class="mtile">
+                <div class="mtile-val" id="m-runway">&#8212;</div>
+                <div class="mtile-lbl">Decision Runway</div>
+              </div>
+              <div class="mtile">
+                <div class="mtile-val" id="m-ratio">&#8212;</div>
+                <div class="mtile-lbl">Transition Cost Ratio</div>
+              </div>
+            </div>
+
+            <div class="bars-section" id="bars-section"></div>
+          </div>
+        </div>
+
+      </div><!-- /assessment-grid -->
+
+      <!-- SAVED ASSESSMENTS -->
+      <div class="sec-label">Saved Assessments</div>
+      <div class="eo-card">
+        <div class="eo-card-title" id="saved-card-title">Assessment History</div>
+        <div class="table-wrap" id="saved-wrap"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+/* ============================================================
+   STORAGE
+   ============================================================ */
+var STORAGE_KEY = 'ver_exit_optionality_v2';
+
+function loadAssessments() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function saveAssessmentsToStorage(arr) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+
+var assessments = [];
+var currentCalc = null;
+var editingIndex = null;
+
+/* ============================================================
+   HELPERS — no innerHTML with variable data
+   ============================================================ */
+function mkEl(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function clearEl(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+function numVal(id) { return Number(document.getElementById(id).value) || 0; }
+function strVal(id) { return document.getElementById(id).value; }
+
+function setSelectValue(id, value) {
+  var sel = document.getElementById(id);
+  if (!sel) return;
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === String(value)) { sel.selectedIndex = i; return; }
+  }
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg || 'Assessment saved.';
+  t.style.display = 'flex';
+  setTimeout(function(){ t.style.display = 'none'; }, 5000);
+}
+
+/* ============================================================
+   VENDOR SELECTOR
+   ============================================================ */
+function populateVendorSelector() {
+  var sel = document.getElementById('vendorSelector');
+  if (!window.VER_VENDORS || !Array.isArray(window.VER_VENDORS)) return;
+  var vendors = window.VER_VENDORS.filter(function(v) {
+    if (!v.tier || v.tier > 2) return false;
+    var sp = (v.annual_spend || '').replace(/[^0-9.]/g, '');
+    return sp && parseFloat(sp) > 0;
+  });
+  vendors.sort(function(a, b) {
+    var sa = parseFloat((a.annual_spend || '').replace(/[^0-9.]/g, '')) || 0;
+    var sb = parseFloat((b.annual_spend || '').replace(/[^0-9.]/g, '')) || 0;
+    return sb - sa;
+  });
+  vendors.forEach(function(v) {
+    var opt = document.createElement('option');
+    opt.value = v.id;
+    opt.textContent = v.name + ' — ' + v.annual_spend + ' · ' + v.category;
+    sel.appendChild(opt);
+  });
+}
+
+function parseSpend(str) {
+  if (!str) return 0;
+  return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
+}
+
+function coupaSpend(name) {
+  if (!window.VER_COUPA || !Array.isArray(window.VER_COUPA.vendors)) return null;
+  var nl = name.toLowerCase();
+  var match = window.VER_COUPA.vendors.find(function(c) { return c.n.toLowerCase() === nl; });
+  return match ? match.fy27 : null;
+}
+
+function parseNotice(notes) {
+  if (!notes) return 90;
+  var m = notes.match(/(\d+)-day notice/i);
+  if (m) return parseInt(m[1], 10);
+  return 90;
+}
+
+function mapKnowledge(cr) {
+  if (cr > 60) return '85';
+  if (cr >= 30) return '50';
+  return '20';
+}
+
+function mapMarket(capabilities, tier) {
+  var caps = Array.isArray(capabilities) ? capabilities.length : 0;
+  if (caps > 4 && tier === 1) return '85';
+  if (caps >= 3) return '50';
+  return '20';
+}
+
+function mapCriticality(rs) {
+  if (rs > 40) return '85';
+  if (rs >= 25) return '50';
+  return '20';
+}
+
+function onVendorSelect() {
+  var sel = document.getElementById('vendorSelector');
+  var selectedId = sel.value;
+  if (!selectedId || !window.VER_VENDORS) return;
+  var vendor = window.VER_VENDORS.find(function(v) { return v.id === selectedId; });
+  if (!vendor) return;
+
+  document.getElementById('i-vendor').value = vendor.name;
+
+  var spend = coupaSpend(vendor.name);
+  if (spend === null) spend = parseSpend(vendor.annual_spend);
+  document.getElementById('i-spend').value = spend.toFixed(2);
+  document.getElementById('i-notice').value = parseNotice(vendor.notes);
+
+  setSelectValue('i-knowledge', mapKnowledge(vendor.concentration_risk || 0));
+  setSelectValue('i-market', mapMarket(vendor.capabilities, vendor.tier));
+  setSelectValue('i-critical', mapCriticality(vendor.risk_score || 0));
+}
+
+/* ============================================================
+   CALCULATE  — formula identical to hub
+   factor_avg * 0.7 + timeline * 0.2 + costPressure * 0.1
+   ============================================================ */
+function calculate() {
+  var knowledgeVal  = numVal('i-knowledge');
+  var portabilityVal = numVal('i-portability');
+  var marketVal     = numVal('i-market');
+  var absorbVal     = numVal('i-absorb');
+  var criticalVal   = numVal('i-critical');
+  var noticeDays    = numVal('i-notice');
+  var transitionDays = numVal('i-transition');
+  var annualSpend   = numVal('i-spend');
+  var transitionCost = numVal('i-cost');
+  var vendorName    = strVal('i-vendor').trim();
+  var notes         = strVal('i-notes');
+
+  if (!vendorName) {
+    document.getElementById('i-vendor').focus();
+    showToast('Enter a vendor name before calculating.');
+    return null;
+  }
+
+  var factors = {
+    'Knowledge concentration': knowledgeVal,
+    'Data portability': portabilityVal,
+    'Replacement market': marketVal,
+    'Internal absorption': absorbVal,
+    'Business criticality': criticalVal
+  };
+
+  var timeline = Math.min(100, Math.max(noticeDays, transitionDays) / 365 * 100);
+  var costPressure = Math.min(100, annualSpend ? (transitionCost / annualSpend) * 180 : 0);
+
+  var factorSum = 0;
+  var fkeys = Object.keys(factors);
+  for (var i = 0; i < fkeys.length; i++) { factorSum += factors[fkeys[i]]; }
+  var score = Math.round((factorSum / 5) * 0.7 + timeline * 0.2 + costPressure * 0.1);
+
+  var days = Math.max(noticeDays, transitionDays);
+  var exitDate = new Date();
+  exitDate.setDate(exitDate.getDate() + days);
+  var runwayMonths = Math.ceil(days / 30 + 3);
+  var ratio = annualSpend ? (transitionCost / annualSpend * 100) : 0;
+
+  currentCalc = {
+    vendor: vendorName,
+    spend: annualSpend,
+    notice: noticeDays,
+    transition: transitionDays,
+    transitionCost: transitionCost,
+    factors: factors,
+    score: score,
+    notes: notes,
+    assessed: new Date().toISOString()
+  };
+
+  renderResults(currentCalc, exitDate, runwayMonths, ratio);
+  return currentCalc;
+}
+
+/* ============================================================
+   RENDER RESULTS
+   ============================================================ */
+function getFactorColor(v) {
+  if (v >= 70) return '#DC2626';
+  if (v >= 45) return '#D97706';
+  return '#059669';
+}
+
+function renderResults(data, exitDate, runwayMonths, ratio) {
+  document.getElementById('results-placeholder').style.display = 'none';
+  document.getElementById('results-content').style.display = '';
+
+  var score = data.score;
+  var dialColor = score >= 70 ? '#DC2626' : score >= 45 ? '#D97706' : '#059669';
+  document.getElementById('dial').style.background =
+    'conic-gradient(' + dialColor + ' 0 ' + score + '%, rgba(255,255,255,0.08) ' + score + '% 100%)';
+  document.getElementById('dial-score').textContent = score;
+
+  var badge = document.getElementById('status-badge');
+  var statusText;
+  if (score >= 70) {
+    badge.className = 'status-badge status-constrained';
+    statusText = 'Constrained';
+  } else if (score >= 45) {
+    badge.className = 'status-badge status-manageable';
+    statusText = 'Manageable';
+  } else {
+    badge.className = 'status-badge status-strong';
+    statusText = 'Strong Optionality';
+  }
+  badge.textContent = statusText;
+
+  document.getElementById('meta-vendor-name').textContent = data.vendor;
+
+  var sortedFactors = Object.keys(data.factors).sort(function(a,b){ return data.factors[b] - data.factors[a]; });
+  var top2 = sortedFactors.slice(0,2);
+  var factorPhrase = top2.length === 2
+    ? top2[0] + ' (' + data.factors[top2[0]] + ') and ' + top2[1] + ' (' + data.factors[top2[1]] + ') are the primary constraints.'
+    : top2.length === 1 ? top2[0] + ' (' + data.factors[top2[0]] + ') is the primary constraint.' : '';
+  var narrativeMap = {
+    'Constrained': 'Begin executive exit planning now. ' + factorPhrase,
+    'Manageable': 'Build transition capacity before a commercial decision. ' + factorPhrase,
+    'Strong Optionality': 'Relationship is practically replaceable with controlled planning. ' + factorPhrase
+  };
+  document.getElementById('meta-headline').textContent = data.vendor + ': ' + statusText;
+  document.getElementById('meta-narrative').textContent = narrativeMap[statusText] || '';
+
+  document.getElementById('m-earliest').textContent =
+    exitDate.toLocaleDateString('en-US', {month: 'short', year: 'numeric'});
+  document.getElementById('m-cost').textContent = '$' + data.transitionCost.toFixed(1) + 'M';
+  document.getElementById('m-runway').textContent = runwayMonths + ' mos';
+  document.getElementById('m-ratio').textContent = ratio.toFixed(0) + '%';
+
+  var barsSection = document.getElementById('bars-section');
+  clearEl(barsSection);
+  var fkeys = Object.keys(data.factors);
+  for (var i = 0; i < fkeys.length; i++) {
+    var key = fkeys[i];
+    var fv = data.factors[key];
+    var row = mkEl('div', 'bar-row');
+    var nameSpan = mkEl('span', null, key);
+    var track = mkEl('div', 'bar-track');
+    var fill = mkEl('div', 'bar-fill');
+    fill.style.width = fv + '%';
+    fill.style.background = getFactorColor(fv);
+    track.appendChild(fill);
+    var numSpan = mkEl('span', 'bar-num', String(fv));
+    row.appendChild(nameSpan);
+    row.appendChild(track);
+    row.appendChild(numSpan);
+    barsSection.appendChild(row);
+  }
+}
+
+/* ============================================================
+   SAVE ASSESSMENT
+   ============================================================ */
+function saveAssessment() {
+  var data = calculate();
+  if (!data) return;
+
+  if (editingIndex !== null && editingIndex >= 0 && editingIndex < assessments.length) {
+    data.assessed = new Date().toISOString();
+    assessments[editingIndex] = data;
+    editingIndex = null;
+    showToast('Assessment updated — hub synced automatically.');
+  } else {
+    assessments.unshift(data);
+    assessments = assessments.slice(0, 30);
+    showToast('Assessment saved — hub synced automatically.');
+  }
+
+  saveAssessmentsToStorage(assessments);
+  renderSaved();
+  updateKPIs();
+}
+
+/* ============================================================
+   LOAD ROW INTO FORM
+   ============================================================ */
+function loadIntoForm(idx) {
+  var a = assessments[idx];
+  if (!a) return;
+  editingIndex = idx;
+
+  document.getElementById('i-vendor').value     = a.vendor || '';
+  document.getElementById('i-spend').value      = a.spend != null ? a.spend : '';
+  document.getElementById('i-notice').value     = a.notice != null ? a.notice : '';
+  document.getElementById('i-transition').value = a.transition != null ? a.transition : '';
+  document.getElementById('i-cost').value       = a.transitionCost != null ? a.transitionCost : '';
+  document.getElementById('i-notes').value      = a.notes || '';
+
+  if (a.factors) {
+    setSelectValue('i-knowledge',   a.factors['Knowledge concentration']);
+    setSelectValue('i-portability', a.factors['Data portability']);
+    setSelectValue('i-market',      a.factors['Replacement market']);
+    setSelectValue('i-absorb',      a.factors['Internal absorption']);
+    setSelectValue('i-critical',    a.factors['Business criticality']);
+  }
+
+  var days = Math.max(a.notice || 0, a.transition || 0);
+  var exitDate = new Date(a.assessed);
+  exitDate.setDate(exitDate.getDate() + days);
+  var runway = Math.ceil(days / 30 + 3);
+  var ratio = a.spend ? (a.transitionCost / a.spend * 100) : 0;
+  renderResults(a, exitDate, runway, ratio);
+
+  document.querySelector('.assessment-grid').scrollIntoView({behavior: 'smooth', block: 'start'});
+  showToast('Loaded for editing: ' + a.vendor);
+}
+
+/* ============================================================
+   DELETE ROW
+   ============================================================ */
+function deleteRow(idx) {
+  var name = assessments[idx] ? assessments[idx].vendor : '';
+  if (!confirm('Delete assessment for "' + name + '"? This cannot be undone.')) return;
+  if (editingIndex === idx) editingIndex = null;
+  assessments.splice(idx, 1);
+  saveAssessmentsToStorage(assessments);
+  renderSaved();
+  updateKPIs();
+  showToast('Assessment deleted.');
+}
+
+/* ============================================================
+   RENDER SAVED TABLE — createElement only, no innerHTML with data
+   ============================================================ */
+function renderSaved() {
+  var wrap = document.getElementById('saved-wrap');
+  clearEl(wrap);
+
+  var titleEl = document.getElementById('saved-card-title');
+  titleEl.textContent = 'Assessment History';
+  var countSpan = mkEl('span');
+  countSpan.style.cssText = 'font-weight:500;color:var(--ink-muted);margin-left:6px;';
+  countSpan.textContent = '— ' + assessments.length + ' record' + (assessments.length !== 1 ? 's' : '');
+  titleEl.appendChild(countSpan);
+
+  if (!assessments.length) {
+    var empty = mkEl('div', 'table-empty');
+    var b = mkEl('b', null, 'No assessments saved yet');
+    var p = mkEl('p', null, 'Calculate and save an assessment above to populate this table.');
+    empty.appendChild(b);
+    empty.appendChild(p);
+    wrap.appendChild(empty);
+    return;
+  }
+
+  var tableWrap = mkEl('div', 'table-wrap');
+  var table = mkEl('table');
+  var thead = mkEl('thead');
+  var hrow = mkEl('tr');
+  var cols = ['Vendor', 'Annual Spend', 'Score', 'Earliest Exit', 'Runway', 'Assessed', 'Actions'];
+  for (var c = 0; c < cols.length; c++) { hrow.appendChild(mkEl('th', null, cols[c])); }
+  thead.appendChild(hrow);
+  table.appendChild(thead);
+
+  var tbody = mkEl('tbody');
+  for (var i = 0; i < assessments.length; i++) {
+    (function(idx) {
+      var a = assessments[idx];
+      var tr = mkEl('tr');
+      if (editingIndex === idx) tr.className = 'edit-row';
+
+      // Vendor — bold name, notes as sub-text
+      var tdV = mkEl('td');
+      var vb = mkEl('b', null, a.vendor || '—');
+      tdV.appendChild(vb);
+      if (a.notes) {
+        var vNote = mkEl('div');
+        vNote.style.cssText = 'font-size:10px;color:var(--ink-muted);margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+        vNote.textContent = a.notes;
+        tdV.appendChild(vNote);
+      }
+      tr.appendChild(tdV);
+
+      // Spend
+      tr.appendChild(mkEl('td', null, '$' + (a.spend || 0).toFixed(1) + 'M'));
+
+      // Score badge
+      var tdSc = mkEl('td');
+      var sc = a.score || 0;
+      var sbCls = sc >= 70 ? 'score-badge sb-high' : sc >= 45 ? 'score-badge sb-med' : 'score-badge sb-low';
+      tdSc.appendChild(mkEl('span', sbCls, String(sc)));
+      tr.appendChild(tdSc);
+
+      // Earliest exit
+      var days = Math.max(a.notice || 0, a.transition || 0);
+      var eDate = new Date(a.assessed);
+      eDate.setDate(eDate.getDate() + days);
+      tr.appendChild(mkEl('td', null, eDate.toLocaleDateString('en-US', {month: 'short', year: 'numeric'})));
+
+      // Runway
+      var runway = Math.ceil(days / 30 + 3);
+      tr.appendChild(mkEl('td', null, runway + ' mos'));
+
+      // Assessed date
+      tr.appendChild(mkEl('td', null, new Date(a.assessed).toLocaleDateString()));
+
+      // Actions
+      var tdAct = mkEl('td');
+      var editBtn = mkEl('button', 'tbl-edit-btn', 'Edit');
+      editBtn.type = 'button';
+      editBtn.setAttribute('aria-label', 'Edit assessment for ' + (a.vendor || ''));
+      editBtn.addEventListener('click', function() { loadIntoForm(idx); });
+      var delBtn = mkEl('button', 'tbl-del-btn', 'Delete');
+      delBtn.type = 'button';
+      delBtn.setAttribute('aria-label', 'Delete assessment for ' + (a.vendor || ''));
+      delBtn.addEventListener('click', function() { deleteRow(idx); });
+      tdAct.appendChild(editBtn);
+      tdAct.appendChild(delBtn);
+      tr.appendChild(tdAct);
+
+      tbody.appendChild(tr);
+    })(i);
+  }
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  wrap.appendChild(tableWrap);
+}
+
+/* ============================================================
+   KPI STRIP
+   ============================================================ */
+function updateKPIs() {
+  var total = assessments.length;
+  var constrained = 0, manageable = 0, strong = 0;
+  for (var i = 0; i < assessments.length; i++) {
+    var sc = assessments[i].score || 0;
+    if (sc >= 70) constrained++;
+    else if (sc >= 45) manageable++;
+    else strong++;
+  }
+  document.getElementById('kpi-total').textContent       = total;
+  document.getElementById('kpi-constrained').textContent = constrained;
+  document.getElementById('kpi-manageable').textContent  = manageable;
+  document.getElementById('kpi-strong').textContent      = strong;
+}
+
+/* ============================================================
+   EXPORT JSON
+   ============================================================ */
+function exportJSON() {
+  var data = assessments.length ? assessments : (currentCalc ? [currentCalc] : []);
+  if (!data.length) { showToast('No assessments to export. Calculate or save one first.'); return; }
+  var payload = JSON.stringify({
+    methodologyVersion: '2.0',
+    exportDate: new Date().toISOString(),
+    assessments: data
+  }, null, 2);
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([payload], {type: 'application/json'}));
+  a.download = 'exit-optionality-assessments.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ============================================================
+   RESET FORM
+   ============================================================ */
+function resetForm() {
+  if (!confirm('Reset the form? Unsaved inputs will be lost.')) return;
+  editingIndex = null;
+  document.getElementById('i-vendor').value     = '';
+  document.getElementById('i-spend').value      = '';
+  document.getElementById('i-notice').value     = '';
+  document.getElementById('i-transition').value = '';
+  document.getElementById('i-cost').value       = '';
+  document.getElementById('i-notes').value      = '';
+  setSelectValue('i-knowledge',   '50');
+  setSelectValue('i-portability', '50');
+  setSelectValue('i-market',      '50');
+  setSelectValue('i-absorb',      '50');
+  setSelectValue('i-critical',    '85');
+  document.getElementById('vendorSelector').value = '';
+  document.getElementById('results-placeholder').style.display = '';
+  document.getElementById('results-content').style.display     = 'none';
+  currentCalc = null;
+}
+
+/* ============================================================
+   SEED DEFAULT DATA — 10 records, same as hub pilot
+   ============================================================ */
+function seedDefaultData() {
+  if (localStorage.getItem(STORAGE_KEY)) return;
+  var seed = [
+    {vendor:'Tech Mahindra',spend:6.5,notice:90,transition:180,transitionCost:1.8,
+     factors:{'Knowledge concentration':50,'Data portability':50,'Replacement market':50,'Internal absorption':50,'Business criticality':85},
+     score:66,notes:'Service Desk and On-Site Services. 3 SLA metrics below target. Active VER monitoring.',
+     assessed:'2026-06-15T10:00:00.000Z'},
+    {vendor:'BCG',spend:6.0,notice:60,transition:90,transitionCost:0.8,
+     factors:{'Knowledge concentration':30,'Data portability':20,'Replacement market':50,'Internal absorption':50,'Business criticality':85},
+     score:55,notes:'Strategic consulting. Delivery risk elevated. Renewal risk flagged.',
+     assessed:'2026-06-18T10:00:00.000Z'},
+    {vendor:'IBM',spend:14.3,notice:120,transition:240,transitionCost:4.2,
+     factors:{'Knowledge concentration':50,'Data portability':50,'Replacement market':50,'Internal absorption':50,'Business criticality':85},
+     score:73,notes:'Enterprise application and data services. Renewal Aug 2026 — active review.',
+     assessed:'2026-06-20T10:00:00.000Z'},
+    {vendor:'NTT Data',spend:22.8,notice:180,transition:365,transitionCost:6.8,
+     factors:{'Knowledge concentration':85,'Data portability':50,'Replacement market':50,'Internal absorption':85,'Business criticality':85},
+     score:85,notes:'MSP for DET AMS. ~140 resources across 24 POs. 180-day notice. Strategic partner.',
+     assessed:'2026-06-22T10:00:00.000Z'},
+    {vendor:'Atos',spend:3.5,notice:90,transition:180,transitionCost:0.9,
+     factors:{'Knowledge concentration':50,'Data portability':50,'Replacement market':50,'Internal absorption':50,'Business criticality':50},
+     score:57,notes:'IT services and digital transformation. EMEA primary. Monitor financial health.',
+     assessed:'2026-06-25T10:00:00.000Z'},
+    {vendor:'Cognizant',spend:9.5,notice:90,transition:180,transitionCost:2.5,
+     factors:{'Knowledge concentration':50,'Data portability':50,'Replacement market':50,'Internal absorption':50,'Business criticality':85},
+     score:65,notes:'BPO and Workday AMS. ES Yr3 final year. FINS Yr2. Renewal decision Q1 FY28.',
+     assessed:'2026-07-01T10:00:00.000Z'},
+    {vendor:'DXC Technology',spend:2.8,notice:90,transition:180,transitionCost:0.7,
+     factors:{'Knowledge concentration':50,'Data portability':50,'Replacement market':50,'Internal absorption':50,'Business criticality':50},
+     score:57,notes:'IT services and solutions. Monitor delivery quality.',
+     assessed:'2026-07-05T10:00:00.000Z'},
+    {vendor:'Workday',spend:23.7,notice:180,transition:365,transitionCost:9.5,
+     factors:{'Knowledge concentration':85,'Data portability':85,'Replacement market':85,'Internal absorption':85,'Business criticality':85},
+     score:94,notes:'Core HCM and Financials. Mission-critical. Renewal Nov 2026. Extreme exit constraint.',
+     assessed:'2026-07-08T10:00:00.000Z'},
+    {vendor:'Rackspace',spend:1.8,notice:60,transition:90,transitionCost:0.3,
+     factors:{'Knowledge concentration':30,'Data portability':20,'Replacement market':20,'Internal absorption':50,'Business criticality':50},
+     score:40,notes:'Multi-cloud managed services. Many cloud alternatives available.',
+     assessed:'2026-07-10T10:00:00.000Z'},
+    {vendor:'Verizon Business',spend:2.4,notice:90,transition:120,transitionCost:0.5,
+     factors:{'Knowledge concentration':50,'Data portability':50,'Replacement market':50,'Internal absorption':50,'Business criticality':50},
+     score:55,notes:'Network, security, and managed communication services. Renewal monitoring.',
+     assessed:'2026-07-12T10:00:00.000Z'}
+  ];
+  saveAssessmentsToStorage(seed);
+}
+
+/* ============================================================
+   WIRE EVENTS
+   ============================================================ */
+document.getElementById('btn-calc').addEventListener('click', function() { calculate(); });
+document.getElementById('btn-save').addEventListener('click', function() { saveAssessment(); });
+document.getElementById('btn-export').addEventListener('click', function() { exportJSON(); });
+document.getElementById('btn-reset').addEventListener('click', function() { resetForm(); });
+document.getElementById('vendorSelector').addEventListener('change', function() { onVendorSelect(); });
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  seedDefaultData();
+  assessments = loadAssessments();
+
+  function tryPopulate() {
+    if (window.VER_VENDORS && Array.isArray(window.VER_VENDORS)) {
+      populateVendorSelector();
+    } else {
+      setTimeout(tryPopulate, 80);
+    }
+  }
+  tryPopulate();
+
+  renderSaved();
+  updateKPIs();
+});
+
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+function _toggleTheme() {
+  var b = document.body;
+  var cur = b.classList.contains('light-mode') ? 'light' : b.classList.contains('mid-mode') ? 'mid' : 'dark';
+  var next = cur === 'dark' ? 'mid' : cur === 'mid' ? 'light' : 'dark';
+  b.classList.remove('light-mode', 'mid-mode');
+  if (next === 'light') b.classList.add('light-mode');
+  if (next === 'mid')   b.classList.add('mid-mode');
+  var btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = next === 'light' ? '☾ Mid' : next === 'mid' ? '☀ Light' : '☀ Mid';
+  try { localStorage.setItem('ver-portal-theme', next); } catch(e) {}
+}
+(function() {
+  try {
+    var t = localStorage.getItem('ver-portal-theme');
+    var btn = document.getElementById('theme-toggle-btn');
+    if (t === 'light') { document.body.classList.add('light-mode'); if (btn) btn.textContent = '☾ Dark'; }
+    else if (t === 'mid') { document.body.classList.add('mid-mode'); if (btn) btn.textContent = '☀ Light'; }
+  } catch(e) {}
+})();
+
+/* ============================================================
+   USER BLOCK — textContent only, no innerHTML
+   ============================================================ */
+(function() {
+  try {
+    var u = JSON.parse(localStorage.getItem('ver-team-user') || 'null');
+    if (u) {
+      var eEl = document.getElementById('sb-user-emoji');
+      var nEl = document.getElementById('sb-user-name');
+      var rEl = document.getElementById('sb-user-role');
+      if (eEl) eEl.textContent = u.emoji || '👤';
+      if (nEl) nEl.textContent = u.name  || 'Casey';
+      if (rEl) rEl.textContent = u.role  || 'VER Team';
+    }
+  } catch(ex) {}
+})();
+</script>
+</body>
+</html>

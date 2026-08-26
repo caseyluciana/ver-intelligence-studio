@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Scenario Planner &mdash; VER Intelligence Hub</title>
+<script src="assets/vendors.js" defer></script>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── VENDOR PORTAL LAYOUT ── */
+.vp-wrap{display:flex;min-height:100vh;}
+.vp-side{width:220px;background:var(--navy);flex-shrink:0;position:sticky;
+  top:0;height:100vh;overflow-y:auto;z-index:100;display:flex;flex-direction:column;}
+.vp-main{flex:1;padding:16px 20px;overflow-x:hidden;}
+
+/* ── SIDEBAR ── */
+.vp-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vp-logo-title{font-size:10.5pt;font-weight:800;color:#fff;line-height:1.2;}
+.vp-logo-sub{font-size:8pt;color:rgba(255,255,255,0.65);margin-top:2px;
+  letter-spacing:0.05em;text-transform:uppercase;}
+.vp-nav{padding:12px 0;flex:1;}
+.vp-nav-section{font-size:8pt;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.08em;color:rgba(255,255,255,0.60);padding:10px 18px 4px;}
+.vp-nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;
+  font-size:8.5pt;font-weight:600;color:rgba(255,255,255,0.85);
+  text-decoration:none;transition:all 0.15s;cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;}
+.vp-nav-item:hover,.vp-nav-item.active{background:rgba(255,255,255,0.10);color:#fff;}
+.vp-nav-item.active{border-left:3px solid var(--teal);}
+.vp-nav-icon{font-size:12pt;flex-shrink:0;}
+.vp-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0;}
+.vp-side-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);
+  font-size:8pt;color:rgba(255,255,255,0.55);margin-top:auto;}
+
+/* ── TOP BAR ── */
+.vp-dm-row{display:flex;justify-content:flex-end;margin-bottom:6px;}
+.vp-topbar{display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.vp-back{font-size:8pt;color:var(--teal);text-decoration:none;font-weight:600;
+  display:inline-flex;align-items:center;gap:4px;margin-bottom:3px;transition:color 0.15s;}
+.vp-back:hover{color:var(--teal2);}
+.vp-page-title{font-size:13pt;font-weight:900;color:var(--navy);}
+.vp-page-sub{font-size:8pt;color:var(--ink4);margin-top:1px;}
+.vp-topbar-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;padding-top:4px;}
+
+/* ── BUTTONS ── */
+.btn{font-size:8pt;padding:7px 16px;border-radius:7px;cursor:pointer;
+  border:none;font-weight:600;font-family:inherit;transition:all 0.15s;}
+.btn-ghost{background:transparent;color:var(--ink3);border:1px solid var(--border2);}
+.btn-ghost:hover{background:var(--gray2);}
+.btn-sm{font-size:7.5pt;padding:5px 12px;}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid var(--border2);background:var(--gray2);
+  color:var(--ink4);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── SESSION KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.kpi{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:12px 16px;border-top:3px solid var(--navy);}
+.kpi.teal{border-top-color:var(--teal);}
+.kpi.green{border-top-color:var(--green);}
+.kpi.amber{border-top-color:var(--amber);}
+.kpi.purple{border-top-color:var(--purple);}
+.kpi-val{font-size:18pt;font-weight:900;color:var(--navy);line-height:1;margin-bottom:2px;}
+.kpi.teal .kpi-val{color:var(--teal);}
+.kpi.green .kpi-val{color:var(--green);}
+.kpi.amber .kpi-val{color:var(--amber);}
+.kpi.purple .kpi-val{color:var(--purple);}
+.kpi-lbl{font-size:6.5pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;}
+.kpi-note{font-size:6.5pt;color:var(--ink4);}
+
+/* ── PLANNER LAYOUT ── */
+.planner-layout{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start;}
+
+/* ── CONFIG PANEL ── */
+.config-panel{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.cp-hdr{background:var(--navy);padding:12px 16px;display:flex;align-items:center;gap:8px;}
+.cp-hdr-icon{font-size:12pt;}
+.cp-hdr-title{font-size:9pt;font-weight:800;color:#fff;}
+.cp-body{padding:16px;}
+.cp-section{margin-bottom:16px;}
+.cp-section:last-child{margin-bottom:0;}
+.cp-sec-lbl{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--teal);margin-bottom:8px;}
+.cp-field{margin-bottom:10px;}
+.cp-field:last-child{margin-bottom:0;}
+.cp-label{font-size:8pt;font-weight:700;color:var(--ink3);margin-bottom:4px;
+  display:flex;align-items:center;justify-content:space-between;}
+.cp-label-val{font-weight:900;color:var(--teal);font-size:9pt;}
+.cp-select{width:100%;font-size:8pt;padding:7px 10px;border:1.5px solid var(--border2);
+  border-radius:7px;background:var(--white);color:var(--ink2);font-family:inherit;
+  cursor:pointer;transition:border-color 0.15s;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.cp-select:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.cp-range{width:100%;accent-color:var(--teal);cursor:pointer;height:4px;margin-top:4px;}
+.cp-divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* ── TOGGLE SWITCH ── */
+.cp-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;}
+.cp-toggle-lbl{font-size:8pt;font-weight:600;color:var(--ink3);}
+.toggle-sw{position:relative;display:inline-block;width:34px;height:19px;flex-shrink:0;}
+.toggle-sw input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;border-radius:20px;background:var(--gray3);cursor:pointer;transition:background 0.2s;}
+.toggle-track::after{content:'';position:absolute;left:3px;top:3px;width:13px;height:13px;
+  border-radius:50%;background:#fff;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.toggle-sw input:checked + .toggle-track{background:var(--teal);}
+.toggle-sw input:checked + .toggle-track::after{transform:translateX(15px);}
+
+/* ── RUN BUTTON ── */
+.run-btn{width:100%;padding:11px;background:linear-gradient(135deg,var(--teal) 0%,var(--teal2) 100%);
+  border:none;border-radius:8px;color:#fff;font-size:9.5pt;font-weight:800;
+  cursor:pointer;font-family:inherit;transition:all 0.18s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 12px rgba(13,148,136,0.25);}
+.run-btn:hover{box-shadow:0 6px 18px rgba(13,148,136,0.4);transform:translateY(-1px);}
+.run-btn:active{transform:translateY(0);}
+
+/* ── RESULTS PANEL ── */
+.results-panel{min-width:0;}
+
+/* Scenario summary bar */
+.scenario-summary{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.ss-label{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--teal);flex-shrink:0;}
+.ss-desc{font-size:8.5pt;color:var(--ink3);flex:1;line-height:1.5;}
+.ss-tag{font-size:7pt;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;}
+.ss-placeholder{font-size:9pt;color:var(--ink4);font-style:italic;}
+
+/* ── SAVINGS CALLOUT ── */
+.savings-callout{border-radius:10px;padding:16px 20px;margin-bottom:12px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.sc-green{background:var(--green3);border:1px solid #A7F3D0;}
+.sc-amber{background:var(--amber3);border:1px solid #FDE68A;}
+.sc-red{background:var(--red3);border:1px solid #FECACA;}
+.sc-num{font-size:26pt;font-weight:900;line-height:1;flex-shrink:0;}
+.sc-green .sc-num{color:var(--green2);}
+.sc-amber .sc-num{color:var(--amber2);}
+.sc-red .sc-num{color:var(--red2);}
+.sc-title{font-size:10pt;font-weight:800;margin-bottom:3px;}
+.sc-green .sc-title{color:var(--green2);}
+.sc-amber .sc-title{color:var(--amber2);}
+.sc-red .sc-title{color:var(--red2);}
+.sc-note{font-size:8pt;line-height:1.6;}
+.sc-green .sc-note{color:var(--green2);}
+.sc-amber .sc-note{color:var(--amber2);}
+.sc-red .sc-note{color:var(--red2);}
+
+/* ── COMPARISON TABLE ── */
+.comp-wrap{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);margin-bottom:12px;}
+.comp-table{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.comp-table thead tr{background:var(--navy);}
+.comp-table th{padding:10px 14px;text-align:left;font-size:7.5pt;font-weight:700;
+  letter-spacing:0.05em;color:rgba(255,255,255,0.7);white-space:nowrap;}
+.comp-table th.current-col{background:rgba(220,38,38,0.15);color:#FCA5A5;}
+.comp-table th.scenario-col{background:rgba(13,148,136,0.2);color:#5EEAD4;}
+.comp-table td{padding:10px 14px;border-bottom:1px solid var(--gray3);vertical-align:middle;}
+.comp-table tbody tr:hover td{background:var(--gray2);}
+.comp-table tbody tr:last-child td{border-bottom:none;}
+.comp-col-metric{width:160px;}
+.comp-col-delta{text-align:right;min-width:90px;}
+.ct-metric{font-size:8pt;font-weight:700;color:var(--ink3);}
+.ct-current{font-size:9pt;font-weight:700;color:var(--ink);}
+.ct-scenario{font-size:9pt;font-weight:900;color:var(--teal);}
+.ct-delta{font-size:8pt;font-weight:800;text-align:right;}
+.delta-save{color:var(--green);}
+.delta-cost{color:var(--red);}
+.delta-flat{color:var(--ink4);}
+
+/* ── RISK COMPARISON ── */
+.risk-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.risk-card{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.rc-hdr{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;
+  margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.rc-current .rc-hdr{color:var(--red);}
+.rc-scenario .rc-hdr{color:var(--teal);}
+.rc-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray3);}
+.rc-row:last-child{border-bottom:none;}
+.rc-lbl{font-size:7.5pt;color:var(--ink4);width:110px;flex-shrink:0;}
+.rc-bar-wrap{flex:1;height:5px;background:var(--gray3);border-radius:3px;overflow:hidden;}
+.rc-bar{height:5px;border-radius:3px;}
+.rcb-red{background:var(--red);}
+.rcb-amber{background:var(--amber);}
+.rcb-green{background:var(--green);}
+.rcb-teal{background:var(--teal);}
+.rc-num{font-size:7.5pt;font-weight:800;width:28px;text-align:right;flex-shrink:0;}
+.rcn-red{color:var(--red);}.rcn-amber{color:var(--amber);}.rcn-green{color:var(--green);}
+
+/* ── SCENARIO HISTORY ── */
+.history-wrap{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.history-hdr{background:var(--navy);padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;}
+.hh-title{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.8);}
+.hh-clear{font-size:7.5pt;color:rgba(255,255,255,0.35);background:none;border:none;
+  cursor:pointer;font-family:inherit;transition:color 0.15s;padding:0;}
+.hh-clear:hover{color:var(--red);}
+.history-list{max-height:240px;overflow-y:auto;}
+.history-item{display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border-bottom:1px solid var(--gray3);cursor:pointer;transition:background 0.12s;}
+.history-item:last-child{border-bottom:none;}
+.history-item:hover{background:var(--gray2);}
+.hi-num{font-size:8pt;font-weight:900;color:var(--teal);width:22px;flex-shrink:0;}
+.hi-info{flex:1;min-width:0;}
+.hi-name{font-size:8.5pt;font-weight:700;color:var(--ink);margin-bottom:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hi-meta{font-size:7.5pt;color:var(--ink4);}
+.hi-savings{font-size:9pt;font-weight:900;flex-shrink:0;}
+.his-pos{color:var(--green);}
+.his-neg{color:var(--red);}
+.his-flat{color:var(--ink4);}
+.history-empty{padding:20px;text-align:center;font-size:8.5pt;color:var(--ink4);font-style:italic;}
+
+/* Saved scenarios section label */
+.section-hdr{display:flex;align-items:center;gap:8px;font-size:9pt;font-weight:800;
+  color:var(--navy);margin:16px 0 8px;padding-bottom:10px;border-bottom:2px solid var(--gray3);}
+.section-hdr-count{margin-left:auto;font-size:8pt;font-weight:700;color:var(--ink4);
+  padding:2px 10px;border-radius:10px;background:var(--gray3);}
+
+/* ── EMPTY STATE ── */
+.results-placeholder{text-align:center;padding:48px 24px;color:var(--ink4);
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.rp-icon{font-size:32pt;margin-bottom:12px;}
+.rp-title{font-size:11pt;font-weight:800;color:var(--ink3);margin-bottom:6px;}
+.rp-note{font-size:8.5pt;line-height:1.6;}
+
+/* ── BADGE HELPERS ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  padding:3px 8px;border-radius:10px;white-space:nowrap;}
+.b-teal{background:var(--teal3);color:var(--teal2);border:1px solid rgba(13,148,136,0.25);}
+.b-red{background:var(--red3);color:var(--red2);}
+.b-green{background:var(--green3);color:var(--green2);}
+.b-amber{background:var(--amber3);color:var(--amber2);}
+.b-purple{background:var(--purple3);color:var(--purple2);}
+.b-gray{background:var(--gray3);color:var(--ink4);}
+
+/* ── DARK MODE ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .vp-side{background:#060e1c;}
+[data-theme="dark"] .vp-main{background:var(--gray);}
+[data-theme="dark"] .vp-page-title{color:var(--ink);}
+[data-theme="dark"] .vp-back{color:#5EEAD4;}
+[data-theme="dark"] .vp-topbar{border-color:var(--border);}
+[data-theme="dark"] .kpi{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .kpi-val{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .kpi.teal .kpi-val{color:#5EEAD4;}
+[data-theme="dark"] .kpi.green .kpi-val{color:#6EE7B7;}
+[data-theme="dark"] .kpi.amber .kpi-val{color:#FDE68A;}
+[data-theme="dark"] .kpi.purple .kpi-val{color:#C4B5FD;}
+[data-theme="dark"] .config-panel,.results-placeholder,.scenario-summary,
+[data-theme="dark"] .comp-wrap,.risk-card,.history-wrap{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .cp-label{color:rgba(255,255,255,0.6);}
+[data-theme="dark"] .cp-toggle-lbl{color:rgba(255,255,255,0.6);}
+[data-theme="dark"] .cp-select{background-color:#162642;border-color:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);}
+[data-theme="dark"] .cp-divider{background:rgba(255,255,255,0.07);}
+[data-theme="dark"] .toggle-track{background:rgba(255,255,255,0.15);}
+[data-theme="dark"] .ss-desc{color:rgba(255,255,255,0.55);}
+[data-theme="dark"] .ss-placeholder{color:rgba(255,255,255,0.3);}
+[data-theme="dark"] .comp-table td{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .comp-table tbody tr:hover td{background:rgba(255,255,255,0.03);}
+[data-theme="dark"] .ct-metric{color:rgba(255,255,255,0.7);}
+[data-theme="dark"] .ct-current{color:rgba(255,255,255,0.85);}
+[data-theme="dark"] .delta-flat{color:rgba(255,255,255,0.3);}
+[data-theme="dark"] .rc-lbl{color:rgba(255,255,255,0.4);}
+[data-theme="dark"] .rc-row{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .rc-bar-wrap{background:rgba(255,255,255,0.08);}
+[data-theme="dark"] .history-item{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .history-item:hover{background:rgba(255,255,255,0.04);}
+[data-theme="dark"] .hi-name{color:rgba(255,255,255,0.85);}
+[data-theme="dark"] .hi-meta{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .history-empty{color:rgba(255,255,255,0.3);}
+[data-theme="dark"] .section-hdr{color:rgba(255,255,255,0.85);border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .section-hdr-count{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);}
+[data-theme="dark"] .rp-title{color:rgba(255,255,255,0.45);}
+[data-theme="dark"] .rp-note{color:rgba(255,255,255,0.3);}
+[data-theme="dark"] .btn-ghost{color:var(--ink3);border-color:var(--border2);}
+[data-theme="dark"] .btn-ghost:hover{background:var(--gray2);}
+[data-theme="dark"] .b-teal{background:rgba(13,148,136,0.18);color:#5EEAD4;border-color:rgba(13,148,136,0.3);}
+[data-theme="dark"] .b-red{background:rgba(220,38,38,0.18);color:#FCA5A5;}
+[data-theme="dark"] .b-green{background:rgba(5,150,105,0.18);color:#6EE7B7;}
+[data-theme="dark"] .b-amber{background:rgba(217,119,6,0.18);color:#FDE68A;}
+[data-theme="dark"] .b-purple{background:rgba(124,58,237,0.18);color:#C4B5FD;}
+[data-theme="dark"] .b-gray{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.45);}
+[data-theme="dark"] .sc-green{background:rgba(5,150,105,0.15);border-color:rgba(5,150,105,0.3);}
+[data-theme="dark"] .sc-green .sc-num,[data-theme="dark"] .sc-green .sc-title,[data-theme="dark"] .sc-green .sc-note{color:#6EE7B7;}
+[data-theme="dark"] .sc-amber{background:rgba(217,119,6,0.15);border-color:rgba(217,119,6,0.3);}
+[data-theme="dark"] .sc-amber .sc-num,[data-theme="dark"] .sc-amber .sc-title,[data-theme="dark"] .sc-amber .sc-note{color:#FDE68A;}
+[data-theme="dark"] .sc-red{background:rgba(220,38,38,0.15);border-color:rgba(220,38,38,0.3);}
+[data-theme="dark"] .sc-red .sc-num,[data-theme="dark"] .sc-red .sc-title,[data-theme="dark"] .sc-red .sc-note{color:#FCA5A5;}
+.is-hidden{display:none!important;}
+
+/* ── PRINT ── */
+@media print{
+  .vp-side,.vp-dm-row,.config-panel,.vp-back,.btn{display:none!important;}
+  .vp-wrap,.vp-main{display:block!important;}
+  .vp-main{padding:16px!important;}
+  .planner-layout{display:block!important;}
+  .results-panel{width:100%!important;}
+  .kpi-strip{grid-template-columns:repeat(3,1fr)!important;}
+  .is-hidden{display:none!important;}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .vp-side{display:none;}
+  .vp-main{padding:14px 16px;}
+  .kpi-strip{grid-template-columns:repeat(2,1fr);}
+  .planner-layout{grid-template-columns:1fr;}
+  .risk-compare{grid-template-columns:1fr;}
+}
+
+/* ── AI Augmentation Panel ── */
+.ai-panel{
+  background:#fff;
+  border-radius:12px;
+  border:1px solid #E5E7EB;
+  border-left:3px solid #7C3AED;
+  padding:16px;margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.ai-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.ai-panel-title-row{display:flex;align-items:center;gap:8px;}
+.ai-panel-icon{font-size:16px;}
+.ai-panel-title{font-size:10px;font-weight:800;color:#7C3AED;
+  text-transform:uppercase;letter-spacing:0.10em;}
+.ai-panel-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:rgba(124,58,237,0.10);color:#6D28D9;
+  border:1px solid rgba(124,58,237,0.35);}
+.ai-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:10px;color:#6B7280;font-weight:600;}
+.ai-toggle-track{width:28px;height:16px;border-radius:8px;
+  background:#F3F4F6;border:1px solid #D1D5DB;
+  position:relative;transition:background 200ms ease;cursor:pointer;}
+.ai-toggle-track.on{background:rgba(124,58,237,0.55);border-color:rgba(124,58,237,0.70);}
+.ai-toggle-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;
+  border-radius:50%;background:#fff;transition:transform 200ms ease,opacity 200ms ease;opacity:0.5;}
+.ai-toggle-track.on .ai-toggle-thumb{transform:translateX(12px);opacity:1;}
+.ai-toggle-label{font-size:10px;}
+.ai-body{display:none;}
+.ai-body.ai-on{display:block;}
+.ai-desc{font-size:11px;color:#6B7280;line-height:1.6;
+  margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.ai-scn-slider-row{margin-bottom:12px;}
+.ai-scn-lbl-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.ai-scn-lbl{font-size:11px;color:#374151;font-weight:600;}
+.ai-scn-val{font-size:11px;font-weight:900;color:#7C3AED;}
+.ai-range{width:100%;height:5px;border-radius:99px;
+  -webkit-appearance:none;appearance:none;
+  background:#E5E7EB;cursor:pointer;outline:none;}
+.ai-range::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:#7C3AED;cursor:pointer;box-shadow:0 0 0 3px rgba(124,58,237,0.25);}
+.ai-scn-result{background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.22);
+  border-radius:8px;padding:12px 14px;margin-top:12px;}
+.ai-scn-result-row{display:flex;align-items:center;justify-content:space-between;
+  padding:4px 0;border-bottom:1px solid #F3F4F6;}
+.ai-scn-result-row:last-child{border-bottom:none;}
+.ai-scn-result-lbl{font-size:11px;color:#6B7280;}
+.ai-scn-result-val{font-size:11px;font-weight:900;}
+.ai-scn-result-val.green{color:#86EFAC;}
+.ai-scn-result-val.purple{color:#7C3AED;}
+.ai-scn-result-val.teal{color:#2DD4BF;}
+.ai-scn-note{font-size:10px;color:#9CA3AF;
+  font-style:italic;line-height:1.5;margin-top:8px;}
+</style>
+</head>
+<body data-page="scenario-planner">
+
+<div class="vp-wrap">
+
+<!-- ── Sidebar ── -->
+<div class="vp-side">
+  <div class="vp-logo">
+    <div class="vp-logo-title">VER Intelligence<br>Hub</div>
+    <div class="vp-logo-sub">DET &middot; FY27</div>
+  </div>
+  <nav class="vp-nav">
+    <div class="vp-nav-section">Platform</div>
+    <a href="vendor_home.html" class="vp-nav-item"><span class="vp-nav-icon">&#127968;</span>Portfolio Overview</a>
+    <a href="vendor_registry.html" class="vp-nav-item"><span class="vp-nav-icon">&#128203;</span>Vendor Registry</a>
+    <a href="vendor_risk.html" class="vp-nav-item"><span class="vp-nav-icon">&#9888;&#65039;</span>Risk Dashboard</a>
+    <a href="page_survey_review.html" class="vp-nav-item"><span class="vp-nav-icon">&#128203;</span>Survey Review</a>
+    <div class="vp-nav-section">Tools</div>
+    <a href="vendor_selector.html" class="vp-nav-item"><span class="vp-nav-icon">&#127919;</span>Vendor Selector</a>
+    <a href="page_scenario.html" class="vp-nav-item active"><span class="vp-nav-icon">&#128200;</span>Scenario Planner</a>
+    <a href="spend_benchmarking.html" class="vp-nav-item"><span class="vp-nav-icon">&#128178;</span>Spend Benchmarking</a>
+    
+    <a href="vendor_intake.html" class="vp-nav-item"><span class="vp-nav-icon">&#128229;</span>Intake Requests</a>
+    <a href="vendor_sow.html" class="vp-nav-item"><span class="vp-nav-icon">&#128196;</span>SOW Generator</a>
+    <a href="vendor_co.html" class="vp-nav-item"><span class="vp-nav-icon">&#128260;</span>Change Order</a>
+    <div class="vp-nav-divider"></div>
+    <a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a>
+  </nav>
+  <div class="vp-side-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27</div>
+</div>
+
+<!-- ── Main ── -->
+<div class="vp-main">
+
+  <div class="vp-dm-row">
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button>
+  </div>
+
+  <!-- Top bar -->
+  <div class="vp-topbar">
+    <div>
+      <a href="vendor_home.html" class="vp-back">&#8592; Portfolio Overview</a>
+      <div class="vp-page-title">Scenario Planner</div>
+      <div class="vp-page-sub" id="page-sub">Model commercial scenarios, benchmark swaps, and project savings before committing to a strategy.</div>
+    </div>
+    <div class="vp-topbar-actions">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="openScenarioHelp()" aria-label="How to use Scenario Planning">&#63; How to Use</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="csv-btn" onclick="_exportCSV()" disabled>&#8681; Export CSV</button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="window.print()">&#128438; Print PDF</button>
+    </div>
+  </div>
+
+  <!-- Session KPI strip -->
+  <div class="kpi-strip">
+    <div class="kpi teal">
+      <div class="kpi-lbl">Scenarios Modeled</div>
+      <div class="kpi-val" id="kpi-modeled">0</div>
+      <div class="kpi-note">This session</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-lbl">Best Case Savings</div>
+      <div class="kpi-val" id="kpi-best">—</div>
+      <div class="kpi-note">Highest projected</div>
+    </div>
+    <div class="kpi purple">
+      <div class="kpi-lbl">Portfolio At Stake</div>
+      <div class="kpi-val">$33.7M</div>
+      <div class="kpi-note">Active renewal exposure</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-lbl">Avg Rate Reduction</div>
+      <div class="kpi-val" id="kpi-avg-reduction">—</div>
+      <div class="kpi-note">Across saved scenarios</div>
+    </div>
+  </div>
+
+  <!-- Planner layout -->
+  <div class="planner-layout">
+
+    <!-- Config panel -->
+    <div>
+      <div class="config-panel">
+        <div class="cp-hdr">
+          <span class="cp-hdr-icon">&#127919;</span>
+          <span class="cp-hdr-title">Configure Scenario</span>
+        </div>
+        <div class="cp-body">
+
+          <div class="cp-section">
+            <div class="cp-sec-lbl">Scenario Type</div>
+            <div class="cp-field">
+              <label class="cp-label" for="s-type">Analysis Mode</label>
+              <select class="cp-select" id="s-type" title="Select scenario type" onchange="_onTypeChange()">
+                <option value="renegotiate">Rate Renegotiation</option>
+                <option value="swap">Vendor Swap</option>
+                <option value="consolidate">Vendor Consolidation</option>
+                <option value="insource">Partial Insource</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cp-divider"></div>
+
+          <div class="cp-section">
+            <div class="cp-sec-lbl">Vendor Selection</div>
+            <div class="cp-field">
+              <label class="cp-label" for="s-vendor-a">Primary Vendor</label>
+              <select class="cp-select" id="s-vendor-a" title="Select primary vendor" onchange="_onVendorChange()"></select>
+            </div>
+            <div class="cp-field" id="vendor-b-field">
+              <label class="cp-label" for="s-vendor-b">Replacement Vendor</label>
+              <select class="cp-select" id="s-vendor-b" title="Select replacement vendor" onchange="_onVendorChange()">
+                <option value="">— Select replacement —</option>
+              </select>
+            </div>
+            <div class="cp-field is-hidden" id="vendor-c-field">
+              <label class="cp-label" for="s-vendor-c">Secondary Vendor (consolidate into)</label>
+              <select class="cp-select" id="s-vendor-c" title="Select secondary vendor" onchange="_onVendorChange()">
+                <option value="">— Select vendor —</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cp-divider"></div>
+
+          <div class="cp-section">
+            <div class="cp-sec-lbl">Commercial Levers</div>
+            <div class="cp-field">
+              <label class="cp-label" for="s-rate-reduction">
+                Rate Reduction Target
+                <span class="cp-label-val" id="lbl-rate">10%</span>
+              </label>
+              <input type="range" class="cp-range" id="s-rate-reduction"
+                min="0" max="30" step="1" value="10"
+                title="Rate reduction target percentage"
+                oninput="document.getElementById('lbl-rate').textContent=this.value+'%'">
+            </div>
+            <div class="cp-field">
+              <label class="cp-label" for="s-scope-reduction">
+                Scope Reduction
+                <span class="cp-label-val" id="lbl-scope">0%</span>
+              </label>
+              <input type="range" class="cp-range" id="s-scope-reduction"
+                min="0" max="50" step="5" value="0"
+                title="Scope reduction percentage"
+                oninput="document.getElementById('lbl-scope').textContent=this.value+'%'">
+            </div>
+            <div class="cp-field">
+              <label class="cp-label" for="s-transition-cost">
+                Transition Cost
+                <span class="cp-label-val" id="lbl-transition">$0</span>
+              </label>
+              <input type="range" class="cp-range" id="s-transition-cost"
+                min="0" max="2000000" step="50000" value="0"
+                title="Transition cost assumption in dollars"
+                oninput="document.getElementById('lbl-transition').textContent='$'+_fmt(+this.value)">
+            </div>
+          </div>
+
+          <div class="cp-divider"></div>
+
+          <div class="cp-section">
+            <div class="cp-sec-lbl">Assumptions</div>
+            <div class="cp-toggle-row">
+              <span class="cp-toggle-lbl">Risk-adjusted discount</span>
+              <label class="toggle-sw">
+                <input type="checkbox" id="t-risk-adj" title="Include risk-adjusted discount" checked>
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="cp-toggle-row">
+              <span class="cp-toggle-lbl">Apply benchmark floor (22%)</span>
+              <label class="toggle-sw">
+                <input type="checkbox" id="t-bench-floor" title="Apply benchmark floor (cap rate reduction at 22%)" checked>
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="cp-toggle-row">
+              <span class="cp-toggle-lbl">Multi-year projection (3yr)</span>
+              <label class="toggle-sw">
+                <input type="checkbox" id="t-multiyear" title="Project savings over 3 years instead of 1">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="cp-divider"></div>
+
+          <button type="button" class="run-btn" onclick="_runScenario()">
+            &#9654; Run Scenario
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Results panel -->
+    <div class="results-panel">
+
+      <div id="results-placeholder" class="results-placeholder">
+        <div class="rp-icon">&#127919;</div>
+        <div class="rp-title">No Scenario Modeled Yet</div>
+        <div class="rp-note" id="rp-note">Configure a vendor and commercial levers on the left, then click <strong>Run Scenario</strong> to see projected outcomes.</div>
+      </div>
+
+      <div id="results-body" class="is-hidden">
+        <div class="scenario-summary" id="scenario-summary"></div>
+        <div id="savings-callout"></div>
+        <div class="comp-wrap">
+          <table class="comp-table" id="comp-table">
+            <thead>
+              <tr>
+                <th class="comp-col-metric">Metric</th>
+                <th class="current-col">Current State</th>
+                <th class="scenario-col">Scenario Outcome</th>
+                <th class="comp-col-delta">Delta</th>
+              </tr>
+            </thead>
+            <tbody id="comp-tbody"></tbody>
+          </table>
+        </div>
+        <div class="risk-compare">
+          <div class="risk-card rc-current">
+            <div class="rc-hdr">&#128308; Current Risk Profile</div>
+            <div id="rc-current-bars"></div>
+          </div>
+          <div class="risk-card rc-scenario">
+            <div class="rc-hdr">&#128994; Scenario Risk Profile</div>
+            <div id="rc-scenario-bars"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Augmentation Panel -->
+      <div class="ai-panel" id="ai-panel-scenario">
+        <div class="ai-panel-head">
+          <div class="ai-panel-title-row">
+            <span class="ai-panel-icon">&#10024;</span>
+            <span class="ai-panel-title">AI Offset Lever</span>
+            <span class="ai-panel-badge">Beta</span>
+          </div>
+          <div class="ai-toggle" onclick="toggleAiScenario()" aria-label="Toggle AI Offset Lever">
+            <span id="ai-scn-label" class="ai-toggle-label">Off</span>
+            <div class="ai-toggle-track" id="ai-scn-track">
+              <div class="ai-toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ai-body" id="ai-scn-body">
+          <div class="ai-desc">Add AI/agentic adoption as a scenario lever. Models the net savings from task automation and productivity uplift, offset by AI platform investment costs.</div>
+          <div class="ai-scn-slider-row">
+            <div class="ai-scn-lbl-row">
+              <span class="ai-scn-lbl">AI Adoption Rate</span>
+              <span class="ai-scn-val" id="ai-scn-adoption-val">40%</span>
+            </div>
+            <input type="range" class="ai-range" id="ai-scn-adoption" min="0" max="100" step="10" value="40" oninput="updateAiScenarioPanel()">
+          </div>
+          <div class="ai-scn-slider-row">
+            <div class="ai-scn-lbl-row">
+              <span class="ai-scn-lbl">Task Automation Coverage</span>
+              <span class="ai-scn-val" id="ai-scn-auto-val">25%</span>
+            </div>
+            <input type="range" class="ai-range" id="ai-scn-auto" min="0" max="60" step="5" value="25" oninput="updateAiScenarioPanel()">
+          </div>
+          <div class="ai-scn-slider-row">
+            <div class="ai-scn-lbl-row">
+              <span class="ai-scn-lbl">Productivity Multiplier</span>
+              <span class="ai-scn-val" id="ai-scn-prod-val">20%</span>
+            </div>
+            <input type="range" class="ai-range" id="ai-scn-prod" min="0" max="50" step="5" value="20" oninput="updateAiScenarioPanel()">
+          </div>
+          <div class="ai-scn-result">
+            <div class="ai-scn-result-row">
+              <span class="ai-scn-result-lbl">Gross Savings (est.)</span>
+              <span class="ai-scn-result-val green" id="ai-scn-gross">—</span>
+            </div>
+            <div class="ai-scn-result-row">
+              <span class="ai-scn-result-lbl">AI Investment Required</span>
+              <span class="ai-scn-result-val purple" id="ai-scn-invest">—</span>
+            </div>
+            <div class="ai-scn-result-row">
+              <span class="ai-scn-result-lbl">Net Impact</span>
+              <span class="ai-scn-result-val teal" id="ai-scn-net">—</span>
+            </div>
+          </div>
+          <div class="ai-scn-note" id="ai-scn-note">Adjust sliders to model AI impact alongside your other scenario levers.</div>
+        </div>
+      </div>
+
+      <div class="section-hdr">
+        &#128203; Saved Scenarios
+        <span class="section-hdr-count" id="history-count">0 saved</span>
+      </div>
+      <div class="history-wrap">
+        <div class="history-hdr">
+          <span class="hh-title">Session Scenario Log</span>
+          <button type="button" class="hh-clear" onclick="_clearHistory()">Clear all</button>
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="history-empty">No scenarios saved yet. Run a scenario to add it here.</div>
+        </div>
+      </div>
+
+    </div><!-- end results-panel -->
+
+  </div><!-- end planner-layout -->
+
+</div><!-- end .vp-main -->
+</div><!-- end .vp-wrap -->
+
+<script>
+// ── Dark mode ──────────────────────────────────────────────────────
+(function(){
+  var saved = localStorage.getItem('ver-theme');
+  if(saved === 'dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    var btn = document.getElementById('dm-btn');
+    if(btn) btn.textContent = '☀ Light Mode';
+  }
+})();
+function _dmToggle(){
+  var cur = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ver-theme', next);
+  document.getElementById('dm-btn').textContent = next === 'dark' ? '☀ Light Mode' : '☽ Dark Mode';
+}
+
+// ── State ──────────────────────────────────────────────────────────
+var _scenarios = [];
+var _scenarioCount = 0;
+
+// ── Formatters ─────────────────────────────────────────────────────
+function _fmt(n){
+  if(n >= 1000000) return (n/1000000).toFixed(1).replace(/\.0$/,'') + 'M';
+  if(n >= 1000) return (n/1000).toFixed(0) + 'K';
+  return n.toLocaleString();
+}
+function _parseDollar(s){
+  if(!s || s === 'N/A' || s === '$0') return 0;
+  var m = String(s).replace(/[^0-9.BMK]/gi,'');
+  var num = parseFloat(m) || 0;
+  if(s.toUpperCase().includes('B')) num *= 1000000000;
+  else if(s.toUpperCase().includes('M')) num *= 1000000;
+  else if(s.toUpperCase().includes('K')) num *= 1000;
+  return num;
+}
+function _fmtDate(dateStr){
+  if(!dateStr) return 'N/A';
+  return new Date(dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+// ── Populate vendor selects ────────────────────────────────────────
+window.addEventListener('load', function(){
+  var allVendors = (window.VER_VENDORS || []).sort(function(a,b){
+    return a.name.localeCompare(b.name);
+  });
+
+  var selA = document.getElementById('s-vendor-a');
+  var selB = document.getElementById('s-vendor-b');
+  var selC = document.getElementById('s-vendor-c');
+
+  // Placeholder for Primary Vendor
+  var oPlaceholder = document.createElement('option');
+  oPlaceholder.value = '';
+  oPlaceholder.textContent = '— Select a vendor —';
+  selA.appendChild(oPlaceholder);
+
+  allVendors.forEach(function(v){
+    var spend = v.annual_spend && v.annual_spend !== '$0' ? ' · ' + v.annual_spend : '';
+    var tier = v.tier ? ' · T' + v.tier : '';
+
+    var oA = document.createElement('option');
+    oA.value = v.id;
+    oA.textContent = v.name + spend + tier;
+    selA.appendChild(oA);
+
+    var oB = document.createElement('option');
+    oB.value = v.id;
+    oB.textContent = v.name + ' · ' + v.category;
+    selB.appendChild(oB);
+
+    var oC = document.createElement('option');
+    oC.value = v.id;
+    oC.textContent = v.name + ' · ' + v.category;
+    selC.appendChild(oC);
+  });
+
+  // Pre-select vendor from ?id= query param (deep-link from dossier)
+  var preId = new URLSearchParams(window.location.search).get('id');
+  if(preId){
+    for(var i = 0; i < selA.options.length; i++){
+      if(selA.options[i].value === preId){
+        selA.selectedIndex = i;
+        var vPre = allVendors.find(function(v){ return v.id === preId; });
+        if(vPre){
+          document.getElementById('page-sub').textContent =
+            vPre.name + ' pre-loaded from dossier. Adjust levers and run a scenario.';
+        }
+        break;
+      }
+    }
+  }
+
+  _onTypeChange();
+});
+
+function _onTypeChange(){
+  var type = document.getElementById('s-type').value;
+  document.getElementById('vendor-b-field').classList.toggle('is-hidden', type !== 'swap');
+  document.getElementById('vendor-c-field').classList.toggle('is-hidden', type !== 'consolidate');
+}
+
+function _onVendorChange(){}
+
+// ── Run scenario ───────────────────────────────────────────────────
+function _runScenario(){
+  var vendors = window.VER_VENDORS || [];
+  var type = document.getElementById('s-type').value;
+  var vendorAId = document.getElementById('s-vendor-a').value;
+  var vendorBId = document.getElementById('s-vendor-b').value;
+  var vendorCId = document.getElementById('s-vendor-c').value;
+  var rateReduction = parseInt(document.getElementById('s-rate-reduction').value) / 100;
+  var scopeReduction = parseInt(document.getElementById('s-scope-reduction').value) / 100;
+  var transitionCost = parseInt(document.getElementById('s-transition-cost').value) || 0;
+  var riskAdj = document.getElementById('t-risk-adj').checked;
+  var benchFloor = document.getElementById('t-bench-floor').checked;
+  var multiYear = document.getElementById('t-multiyear').checked;
+
+  var vA = vendors.find(function(v){ return v.id === vendorAId; });
+  if(!vA) return;
+
+  var vB = vendorBId ? vendors.find(function(v){ return v.id === vendorBId; }) : null;
+  var vC = vendorCId ? vendors.find(function(v){ return v.id === vendorCId; }) : null;
+
+  var currentSpend = _parseDollar(vA.annual_spend);
+  if(currentSpend === 0) currentSpend = 2000000;
+
+  var effectiveReduction = rateReduction;
+  if(riskAdj){
+    var riskPenalty = vA.risk_score > 50 ? 0.05 : vA.risk_score > 30 ? 0.02 : 0;
+    effectiveReduction = Math.max(0, effectiveReduction - riskPenalty);
+  }
+  if(benchFloor) effectiveReduction = Math.min(effectiveReduction, 0.22);
+
+  var spendAfterScope = currentSpend * (1 - scopeReduction);
+  var scenarioSpend = spendAfterScope * (1 - effectiveReduction);
+
+  if(type === 'swap' && vB){
+    var vBSpend = _parseDollar(vB.annual_spend);
+    if(vBSpend > 0 && vBSpend < currentSpend) scenarioSpend = Math.min(scenarioSpend, vBSpend * 1.15);
+  }
+  if(type === 'insource'){
+    scenarioSpend = currentSpend * (1 - scopeReduction) * 0.6;
+    transitionCost = transitionCost || Math.round(currentSpend * 0.08);
+  }
+
+  var grossSavings = currentSpend - scenarioSpend;
+  var netSavings = grossSavings - transitionCost;
+  var projectedSavings = netSavings * (multiYear ? 3 : 1);
+
+  var scenarioRisk = vA.risk_score, scenarioDelivery = vA.delivery_risk;
+  var scenarioConcentration = vA.concentration_risk, scenarioCompliance = vA.compliance_risk;
+  var scenarioSLA = vA.sla_score;
+
+  if(type === 'swap' && vB){
+    scenarioRisk = Math.round((vA.risk_score + vB.risk_score) / 2);
+    scenarioDelivery = vB.delivery_risk;
+    scenarioConcentration = Math.round(vA.concentration_risk * 0.7);
+    scenarioSLA = vB.sla_score;
+  } else if(type === 'consolidate'){
+    scenarioConcentration = Math.min(100, Math.round(vA.concentration_risk * 1.2));
+    scenarioRisk = Math.round(vA.risk_score * 0.85);
+  } else if(type === 'insource'){
+    scenarioConcentration = Math.max(0, vA.concentration_risk - 20);
+    scenarioRisk = Math.round(vA.risk_score * 0.7);
+    scenarioDelivery = Math.round(vA.delivery_risk * 0.8);
+  } else {
+    if(effectiveReduction > 0.10) scenarioDelivery = Math.min(100, vA.delivery_risk + 8);
+    scenarioRisk = Math.round(vA.risk_score * (1 - effectiveReduction * 0.3));
+  }
+
+  _scenarioCount++;
+  var scenario = {
+    id:_scenarioCount, type:type, vendorA:vA, vendorB:vB, vendorC:vC,
+    rateReduction:Math.round(effectiveReduction*100), scopeReduction:Math.round(scopeReduction*100),
+    transitionCost:transitionCost, multiYear:multiYear, currentSpend:currentSpend,
+    scenarioSpend:scenarioSpend, grossSavings:grossSavings, netSavings:netSavings,
+    projectedSavings:projectedSavings, scenarioRisk:scenarioRisk, scenarioDelivery:scenarioDelivery,
+    scenarioConcentration:scenarioConcentration, scenarioCompliance:scenarioCompliance, scenarioSLA:scenarioSLA
+  };
+
+  _scenarios.unshift(scenario);
+  _renderResults(scenario);
+  _renderHistory();
+  _updateKPIs();
+  document.getElementById('results-placeholder').classList.add('is-hidden');
+  document.getElementById('results-body').classList.remove('is-hidden');
+}
+
+// ── Render results ─────────────────────────────────────────────────
+function _renderResults(s){
+  var typeLabels = {renegotiate:'Rate Renegotiation',swap:'Vendor Swap',consolidate:'Consolidation',insource:'Partial Insource'};
+
+  document.getElementById('scenario-summary').innerHTML =
+    '<span class="ss-label">'+typeLabels[s.type]+'</span>'+
+    '<span class="ss-desc">'+s.vendorA.name+
+      (s.vendorB?' → '+s.vendorB.name:'')+(s.vendorC?' (into '+s.vendorC.name+')':'')+
+      ' &middot; '+s.rateReduction+'% rate reduction &middot; '+
+      (s.scopeReduction>0?s.scopeReduction+'% scope &middot; ':'')+
+      (s.multiYear?'3-year':'1-year')+' projection'+
+    '</span>'+
+    '<span class="badge b-gray">Scenario #'+s.id+'</span>';
+
+  var costLabel = {
+    renegotiate: 'Negotiation Cost',
+    swap:        'Transition Cost',
+    consolidate: 'Consolidation Cost',
+    insource:    'Insourcing Cost'
+  }[s.type] || 'Cost';
+
+  var savClass, savTitle, savNote;
+  if(s.netSavings > 0){
+    savClass = 'sc-green';
+    var savTitleBase = {
+      renegotiate: 'Projected Savings from Renegotiation',
+      swap:        'Projected Net Savings from Vendor Swap',
+      consolidate: 'Projected Savings from Consolidation',
+      insource:    'Projected Savings from Insourcing'
+    }[s.type] || 'Projected Net Savings';
+    savTitle = s.multiYear ? '3-Year ' + savTitleBase : savTitleBase;
+    savNote = 'Gross savings of $' + _fmt(s.grossSavings) +
+      (s.transitionCost > 0 ? ' less $' + _fmt(s.transitionCost) + ' ' + costLabel.toLowerCase() + '.' : '.') +
+      (s.rateReduction > 0 ? ' Effective rate reduction: ' + s.rateReduction + '%.' : '') +
+      (s.scopeReduction > 0 ? ' Scope reduced by ' + s.scopeReduction + '%.' : '');
+  } else if(s.netSavings < 0){
+    savClass = 'sc-red';
+    savTitle = {
+      renegotiate: 'Negotiation Cost Exceeds Savings',
+      swap:        'Transition Cost Exceeds Savings',
+      consolidate: 'Consolidation Cost Exceeds Savings',
+      insource:    'Insourcing Cost Exceeds Savings'
+    }[s.type] || 'Cost Exceeds Savings';
+    savNote = costLabel + ' ($' + _fmt(s.transitionCost) + ') exceeds gross savings ($' + _fmt(s.grossSavings) + '). Consider a phased approach or revised scope.';
+  } else {
+    savClass = 'sc-amber';
+    savTitle = 'Break-Even Scenario';
+    savNote = 'Savings and costs are balanced. Assess risk and strategic value before proceeding.';
+  }
+  document.getElementById('savings-callout').innerHTML =
+    '<div class="savings-callout '+savClass+'">'+
+      '<div class="sc-num">$'+_fmt(Math.abs(s.projectedSavings))+'</div>'+
+      '<div class="sc-info">'+
+        '<div class="sc-title">'+savTitle+'</div>'+
+        '<div class="sc-note">'+savNote+'</div>'+
+      '</div>'+
+    '</div>';
+
+  var rows = [
+    {metric:'Annual Spend',current:'$'+_fmt(s.currentSpend),scenario:'$'+_fmt(s.scenarioSpend),delta:s.grossSavings,fmt:'dollar'},
+    {metric:'Risk Score',current:s.vendorA.risk_score,scenario:s.scenarioRisk,delta:s.vendorA.risk_score-s.scenarioRisk,fmt:'risk',lowerBetter:true},
+    {metric:'SLA Score',current:s.vendorA.sla_score,scenario:s.scenarioSLA,delta:s.scenarioSLA-s.vendorA.sla_score,fmt:'score'},
+    {metric:'Concentration Risk',current:s.vendorA.concentration_risk,scenario:s.scenarioConcentration,delta:s.vendorA.concentration_risk-s.scenarioConcentration,fmt:'risk',lowerBetter:true},
+    {metric:'Delivery Risk',current:s.vendorA.delivery_risk,scenario:s.scenarioDelivery,delta:s.vendorA.delivery_risk-s.scenarioDelivery,fmt:'risk',lowerBetter:true},
+    {metric:'Compliance Risk',current:s.vendorA.compliance_risk,scenario:s.scenarioCompliance,delta:s.vendorA.compliance_risk-s.scenarioCompliance,fmt:'risk',lowerBetter:true},
+    {metric:costLabel,current:'$0',scenario:'$'+_fmt(s.transitionCost),delta:-s.transitionCost,fmt:'dollar'},
+    {metric:'Net Savings ('+(s.multiYear?'3yr':'1yr')+')',current:'—',scenario:'$'+_fmt(s.projectedSavings),delta:s.projectedSavings,fmt:'dollar',highlight:true}
+  ];
+  document.getElementById('comp-tbody').innerHTML = rows.map(function(r){
+    var deltaTxt, deltaCls;
+    if(!r.delta){ deltaTxt='—'; deltaCls='delta-flat'; }
+    else if(r.fmt==='dollar'){ deltaTxt=(r.delta>0?'+':'')+'$'+_fmt(r.delta); deltaCls=r.delta>0?'delta-save':'delta-cost'; }
+    else if(r.lowerBetter){ deltaTxt=(r.delta>0?'↓':'↑')+Math.abs(r.delta); deltaCls=r.delta>0?'delta-save':'delta-cost'; }
+    else { deltaTxt=(r.delta>0?'+':'')+r.delta; deltaCls=r.delta>=0?'delta-save':'delta-cost'; }
+    return '<tr style="'+(r.highlight?'background:rgba(13,148,136,0.06);font-weight:900;':'')+'">'+
+      '<td class="ct-metric comp-col-metric">'+r.metric+'</td>'+
+      '<td class="ct-current">'+r.current+'</td>'+
+      '<td class="ct-scenario">'+r.scenario+'</td>'+
+      '<td class="ct-delta comp-col-delta '+deltaCls+'">'+deltaTxt+'</td>'+
+    '</tr>';
+  }).join('');
+
+  var riskMetrics = [
+    {lbl:'Risk Score',cur:s.vendorA.risk_score,scen:s.scenarioRisk,lowerBetter:true},
+    {lbl:'Concentration',cur:s.vendorA.concentration_risk,scen:s.scenarioConcentration,lowerBetter:true},
+    {lbl:'Delivery',cur:s.vendorA.delivery_risk,scen:s.scenarioDelivery,lowerBetter:true},
+    {lbl:'Compliance',cur:s.vendorA.compliance_risk,scen:s.scenarioCompliance,lowerBetter:true},
+    {lbl:'SLA Score',cur:s.vendorA.sla_score,scen:s.scenarioSLA,lowerBetter:false}
+  ];
+  function rBar(val, lb){
+    var bad=lb?val>=60:val<80, warn=lb?val>=30:val<95;
+    return {cls:bad?'rcb-red':warn?'rcb-amber':lb?'rcb-green':'rcb-teal',
+            nCls:bad?'rcn-red':warn?'rcn-amber':'rcn-green'};
+  }
+  document.getElementById('rc-current-bars').innerHTML = riskMetrics.map(function(m){
+    var b=rBar(m.cur,m.lowerBetter);
+    return '<div class="rc-row"><span class="rc-lbl">'+m.lbl+'</span>'+
+      '<div class="rc-bar-wrap"><div class="rc-bar '+b.cls+'" style="width:'+m.cur+'%"></div></div>'+
+      '<span class="rc-num '+b.nCls+'">'+m.cur+'</span></div>';
+  }).join('');
+  document.getElementById('rc-scenario-bars').innerHTML = riskMetrics.map(function(m){
+    var b=rBar(m.scen,m.lowerBetter);
+    return '<div class="rc-row"><span class="rc-lbl">'+m.lbl+'</span>'+
+      '<div class="rc-bar-wrap"><div class="rc-bar '+b.cls+'" style="width:'+m.scen+'%"></div></div>'+
+      '<span class="rc-num '+b.nCls+'">'+m.scen+'</span></div>';
+  }).join('');
+}
+
+// ── Render history ─────────────────────────────────────────────────
+function _renderHistory(){
+  var list = document.getElementById('history-list');
+  if(_scenarios.length === 0){
+    list.innerHTML = '<div class="history-empty">No scenarios saved yet. Run a scenario to add it here.</div>';
+    document.getElementById('history-count').textContent = '0 saved';
+    return;
+  }
+  document.getElementById('history-count').textContent = _scenarios.length + ' saved';
+  var typeLabels = {renegotiate:'Renegotiate',swap:'Swap',consolidate:'Consolidate',insource:'Insource'};
+  list.innerHTML = _scenarios.map(function(s, i){
+    var savCls = s.netSavings>0?'his-pos':s.netSavings<0?'his-neg':'his-flat';
+    return '<div class="history-item" onclick="_restoreScenario('+i+')">'+
+      '<span class="hi-num">#'+s.id+'</span>'+
+      '<div class="hi-info">'+
+        '<div class="hi-name">'+s.vendorA.name+(s.vendorB?' → '+s.vendorB.name:'')+'</div>'+
+        '<div class="hi-meta">'+typeLabels[s.type]+' &middot; '+s.rateReduction+'% rate &middot; '+(s.multiYear?'3yr':'1yr')+'</div>'+
+      '</div>'+
+      '<span class="hi-savings '+savCls+'">'+(s.netSavings>=0?'+':'')+'$'+_fmt(s.projectedSavings)+'</span>'+
+    '</div>';
+  }).join('');
+}
+
+function _restoreScenario(idx){
+  var s = _scenarios[idx]; if(!s) return;
+  _renderResults(s);
+  document.getElementById('results-placeholder').classList.add('is-hidden');
+  document.getElementById('results-body').classList.remove('is-hidden');
+}
+
+function _clearHistory(){
+  _scenarios=[]; _scenarioCount=0;
+  _renderHistory(); _updateKPIs();
+  document.getElementById('results-body').classList.add('is-hidden');
+  document.getElementById('results-placeholder').classList.remove('is-hidden');
+}
+
+// ── KPI updates ────────────────────────────────────────────────────
+function _updateKPIs(){
+  document.getElementById('kpi-modeled').textContent = _scenarioCount;
+  var csvBtn = document.getElementById('csv-btn');
+  if(csvBtn) csvBtn.disabled = _scenarios.length === 0;
+  if(_scenarios.length === 0){
+    document.getElementById('kpi-best').textContent = '—';
+    document.getElementById('kpi-avg-reduction').textContent = '—';
+    return;
+  }
+  var best = _scenarios.reduce(function(acc,s){ return s.projectedSavings>acc?s.projectedSavings:acc; }, 0);
+  document.getElementById('kpi-best').textContent = '$'+_fmt(best);
+  var avg = Math.round(_scenarios.reduce(function(acc,s){ return acc+s.rateReduction; },0)/_scenarios.length);
+  document.getElementById('kpi-avg-reduction').textContent = avg+'%';
+}
+
+// ── CSV export ─────────────────────────────────────────────────────
+function _exportCSV(){
+  if(!_scenarios.length) return;
+  var typeLabels = {renegotiate:'Rate Renegotiation',swap:'Vendor Swap',consolidate:'Consolidation',insource:'Partial Insource'};
+  var header = ['Scenario #','Type','Primary Vendor','Secondary Vendor','Current Spend','Projected Spend','Gross Savings','Transition Cost','Net Savings','Projected (1yr/3yr)','Rate Reduction %','Scope Reduction %','Risk Score (Before)','Risk Score (After)','SLA (Before)','SLA (After)','Multi-Year'];
+  var rows = [header.join(',')];
+  _scenarios.forEach(function(s){
+    var row = [
+      s.id,
+      typeLabels[s.type]||s.type,
+      '"'+(s.vendorA?s.vendorA.name:'')+'"',
+      '"'+(s.vendorB?s.vendorB.name:'')+'"',
+      s.currentSpend,
+      Math.round(s.scenarioSpend),
+      Math.round(s.grossSavings),
+      s.transitionCost,
+      Math.round(s.netSavings),
+      Math.round(s.projectedSavings),
+      s.rateReduction,
+      s.scopeReduction,
+      s.vendorA?s.vendorA.risk_score:'',
+      s.scenarioRisk,
+      s.vendorA?s.vendorA.sla_score:'',
+      s.scenarioSLA,
+      s.multiYear?'3-Year':'1-Year'
+    ];
+    rows.push(row.join(','));
+  });
+  var summary = [
+    '',
+    'SUMMARY',
+    '"Total Scenarios Modeled",'+_scenarioCount,
+    '"Best Net Savings","$'+_fmt(_scenarios.reduce(function(acc,s){return s.projectedSavings>acc?s.projectedSavings:acc;},0))+'"',
+    '"Avg Rate Reduction",'+Math.round(_scenarios.reduce(function(acc,s){return acc+s.rateReduction;},0)/_scenarios.length)+'%',
+    '"Generated","'+new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'"'
+  ];
+  var content = rows.join('\n') + '\n' + summary.join('\n');
+  var b = new Blob([content],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'VER_Scenario_Analysis_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openScenarioHelp(){
+  HelpModal.open({
+    title: 'Scenario Planning',
+    what: 'The Scenario Planning tool lets you <strong>model the financial and operational impact of different vendor strategy decisions</strong> before committing. Compare consolidation vs. diversification, in-source vs. outsource, or build-vs-buy across your DET vendor portfolio.',
+    steps: [
+      '<strong>Select your base scenario</strong> — start from the current-state vendor portfolio or define a custom baseline with adjusted assumptions.',
+      '<strong>Define your variables</strong> — toggle sliders for headcount change, contract consolidation %, rate renegotiation targets, AI automation offset, and demand growth. Each variable shows a live cost impact estimate.',
+      '<strong>Build comparison scenarios</strong> — create up to 3 named scenarios side by side. Each scenario maintains its own variable set so you can model independent hypotheses.',
+      '<strong>Review the waterfall</strong> — the cost waterfall chart shows the cumulative impact of each lever from baseline to modeled outcome. Identify which levers drive the most savings.',
+      '<strong>Export the scenario comparison</strong> — the output is formatted for executive review and can be included in QBR or SteerCo materials.'
+    ],
+    tips: [
+      { icon: '&#x1F4CA;', title: 'Start with the biggest levers', body: 'Rate renegotiation and contract consolidation typically drive 70%+ of addressable savings. Model these first before smaller levers.' },
+      { icon: '&#x23F1;', title: 'Time-to-value matters', body: 'Each lever has an implementation timeline estimate. A 20% savings scenario achievable in 6 months is worth more than 30% achievable in 18.' },
+      { icon: '&#x1F4A1;', title: 'Use realistic ranges not point estimates', body: 'Scenarios are most useful when you model a range (optimistic/base/conservative) rather than a single number. The range tells you the risk profile.' },
+      { icon: '&#x1F517;', title: 'Scenarios feed the QBR Generator', body: 'Finalized scenarios can be exported directly into the CQBR Generator\'s data input to populate the financial outlook section.' }
+    ],
+    ai: '<strong>AI Augmentation slider:</strong> The Scenario tool includes an AI/Agentic Offset variable that models potential cost savings from AI-assisted task automation, reduced CW headcount through augmentation, and productivity multipliers for FTE retained. Adjust the adoption rate slider (0–100%) to see the range of AI-driven savings alongside traditional levers.',
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+<script>
+function toggleAiScenario(){
+  var on = document.getElementById('ai-scn-track').classList.toggle('on');
+  document.getElementById('ai-scn-label').textContent = on ? 'On' : 'Off';
+  document.getElementById('ai-scn-body').classList.toggle('ai-on', on);
+  if(on) updateAiScenarioPanel();
+}
+function updateAiScenarioPanel(){
+  var adoption = parseInt(document.getElementById('ai-scn-adoption').value)||0;
+  var autoRate = parseInt(document.getElementById('ai-scn-auto').value)||0;
+  var prod     = parseInt(document.getElementById('ai-scn-prod').value)||0;
+  document.getElementById('ai-scn-adoption-val').textContent = adoption+'%';
+  document.getElementById('ai-scn-auto-val').textContent     = autoRate+'%';
+  document.getElementById('ai-scn-prod-val').textContent     = prod+'%';
+  ['ai-scn-adoption','ai-scn-auto','ai-scn-prod'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el) return;
+    var pct=(parseInt(el.value)/parseInt(el.max))*100;
+    el.style.background='linear-gradient(to right,#7C3AED 0%,#7C3AED '+pct+'%,rgba(255,255,255,0.10) '+pct+'%,rgba(255,255,255,0.10) 100%)';
+  });
+  var base = 10000000; // $10M placeholder base spend
+  var gross   = base * (autoRate/100) * (adoption/100) + base * 0.12 * (prod/100) * (adoption/100);
+  var invest  = gross * 0.38;
+  var net     = gross - invest;
+  function fmtM(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+Math.round(v);}
+  document.getElementById('ai-scn-gross').textContent  = '−'+fmtM(gross);
+  document.getElementById('ai-scn-invest').textContent = '+'+fmtM(invest);
+  document.getElementById('ai-scn-net').textContent    = net>=0?'−'+fmtM(net):'+'+fmtM(Math.abs(net));
+  document.getElementById('ai-scn-note').textContent   = adoption+'% adoption, '+autoRate+'% automation, '+prod+'% productivity lift. Base spend placeholder $10M — wire to your scenario base for calibrated output.';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vendor Risk &middot; VER Team Portal</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-border:rgba(244,63,94,0.30);--bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --violet:#A855F7;--violet-bright:#C084FC;
+  --green:#34D399;--green2:#10B981;--green3:rgba(52,211,153,0.12);
+  --amber:#FBBF24;--amber2:#F59E0B;--amber3:rgba(251,191,36,0.12);
+  --red:#F87171;--red2:#EF4444;--red3:rgba(248,113,113,0.12);
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.034);--bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  /* compat aliases */
+  --teal:var(--bloom);--teal2:var(--bloom-dim);
+  --teal3:rgba(244,63,94,0.08);
+  --green3c:rgba(52,211,153,0.12);
+  --navy:#1C1030;--navy2:#2A1848;--navy3:rgba(168,85,247,0.12);
+  --gray:var(--bg);--gray2:rgba(255,255,255,0.07);--gray3:rgba(255,255,255,0.10);
+  --border2:rgba(255,255,255,0.14);
+  --ink2:rgba(255,255,255,0.88);--ink3:rgba(255,255,255,0.68);--ink4:rgba(255,255,255,0.48);
+  --white:rgba(255,255,255,0.05);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 80% 0%,rgba(244,63,94,0.14) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(192,38,211,0.18) 0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(244,63,94,0.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,63,94,0.012) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(244,63,94,0.018) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sb-gem{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(244,63,94,0.38);}
+.sb-logo-title{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.42);}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);animation:pulse 2.5s ease-in-out infinite;}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-section{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);padding:12px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+.sb-footer{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;font-size:8.5px;color:rgba(255,255,255,0.42);line-height:1.7;}
+.sb-user{margin:0 12px 10px;padding:10px 14px;border-radius:10px;background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:20px;line-height:1;}
+.sb-user-name{font-size:11.5px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:9px;color:rgba(255,255,255,0.55);}
+body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-actions{display:flex;gap:8px;align-items:center;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);color:var(--bloom-bright);}
+
+/* ── Hero ── */
+.hero{padding:24px 28px 20px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,rgba(244,63,94,0.09) 0%,rgba(192,38,211,0.07) 40%,rgba(168,85,247,0.06) 100%);
+  animation:rise 0.45s var(--ease) both;}
+.hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--bloom-bright);margin-bottom:5px;opacity:0.85;}
+.hero-title{font-size:26px;font-weight:900;letter-spacing:-0.025em;line-height:1.1;
+  background:linear-gradient(92deg,#fff 0%,var(--bloom-bright) 60%,var(--magenta-bright) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;}
+.hero-sub{font-size:11.5px;color:var(--ink-muted);line-height:1.6;max-width:700px;}
+.hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;}
+.hero-stats{display:flex;gap:20px;flex-shrink:0;}
+.hero-stat-val{font-size:22px;font-weight:900;
+  background:linear-gradient(135deg,var(--bloom-bright),var(--magenta-bright));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;}
+.hero-stat-label{font-size:9px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.10em;margin-top:3px;}
+
+/* ── Risk toolbar ── */
+.risk-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding:12px 20px;background:var(--bg-surface);border-bottom:1px solid var(--border);
+  position:sticky;top:52px;z-index:40;backdrop-filter:blur(12px);}
+.risk-toolbar select,.risk-toolbar input{
+  padding:7px 12px;border:1px solid var(--border-soft);border-radius:8px;
+  font-size:11px;font-family:var(--font);color:var(--ink-dim);
+  background:rgba(255,255,255,0.05);outline:none;transition:border-color 0.15s;}
+.risk-toolbar select option{background:#1C1030;color:var(--ink);}
+.risk-toolbar select:focus,.risk-toolbar input:focus{border-color:var(--bloom);}
+.risk-toolbar input{min-width:200px;}
+.risk-toolbar input::placeholder{color:var(--ink-muted);}
+.view-toggle{display:flex;border:1px solid var(--border-soft);border-radius:8px;overflow:hidden;}
+.vt-btn{padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;
+  border:none;font-family:var(--font);transition:all 0.15s;
+  background:rgba(255,255,255,0.04);color:var(--ink-muted);}
+.vt-btn.active{background:linear-gradient(135deg,rgba(244,63,94,0.25),rgba(192,38,211,0.20));color:var(--bloom-bright);}
+.assess-btn{padding:7px 16px;
+  background:linear-gradient(135deg,var(--bloom-dim),var(--magenta));
+  color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;
+  font-family:var(--font);transition:all 0.15s;margin-left:auto;}
+.assess-btn:hover{background:linear-gradient(135deg,var(--bloom),var(--magenta-bright));}
+
+/* ── Legend ── */
+.legend-bar{background:var(--bg-surface);border-bottom:1px solid var(--border);padding:0 20px;}
+.legend-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;
+  font-size:11px;font-weight:700;color:var(--ink-muted);user-select:none;}
+.legend-toggle:hover{color:var(--ink);}
+.legend-body{display:none;padding:12px 0 16px;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.legend-body.open{display:grid;}
+.legend-section-title{font-size:9px;font-weight:800;color:var(--bloom-bright);
+  text-transform:uppercase;letter-spacing:0.10em;margin-bottom:8px;}
+.legend-items{display:flex;flex-direction:column;gap:5px;}
+.legend-item{display:flex;gap:8px;align-items:flex-start;font-size:10.5px;color:var(--ink-muted);}
+.legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0;margin-top:2px;}
+.legend-text strong{color:var(--ink-dim);}
+.ls-green{background:var(--green);}
+.ls-amber{background:var(--amber);}
+.ls-red{background:var(--red);}
+.ls-bloom{background:var(--bloom);}
+.ls-violet{background:var(--violet);}
+.ls-magenta{background:var(--magenta);}
+.ls-teal-outline{background:rgba(244,63,94,0.10);border:1px solid var(--bloom-border);}
+.ls-gray-outline{background:rgba(255,255,255,0.06);border:1px solid var(--border-soft);}
+.ls-amber-outline{background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.30);}
+
+/* ── Summary strip ── */
+.risk-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
+  padding:12px 20px;border-bottom:1px solid var(--border);}
+.rs-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:10px;
+  padding:12px 14px;text-align:center;}
+.rs-val{font-size:22px;font-weight:800;color:var(--ink);line-height:1;}
+.rs-label{font-size:8px;color:var(--ink-muted);margin-top:4px;
+  text-transform:uppercase;letter-spacing:0.08em;}
+
+/* Watch chip */
+.wl-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px 4px 8px;
+  border-radius:20px;border:1.5px solid rgba(248,113,113,0.35);
+  background:rgba(248,113,113,0.10);color:var(--red);
+  font-size:9px;font-weight:700;cursor:pointer;transition:all 0.15s;white-space:nowrap;user-select:none;}
+.wl-chip:hover,.wl-chip.active{background:rgba(248,113,113,0.25);border-color:var(--red);color:#fff;}
+.wl-chip-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;}
+
+/* ── Heat map ── */
+.risk-content{display:flex;flex:1;overflow:hidden;}
+.risk-left{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.18) transparent;}
+.risk-left::-webkit-scrollbar{width:4px;}
+.risk-left::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+.heatmap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:18px 20px;}
+.hm-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:12px;
+  padding:14px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.hm-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.30);}
+.hm-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;}
+.hm-card.risk-green::before{background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.hm-card.risk-amber::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.hm-card.risk-red::before{background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.hm-logo{width:36px;height:36px;border-radius:6px;object-fit:contain;
+  background:#fff;padding:2px;border:1px solid var(--border);}
+.hm-logo-fb{width:36px;height:36px;border-radius:6px;display:flex;
+  align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.hm-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.hm-name{font-size:11px;font-weight:700;color:var(--ink);flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hm-score{font-size:20px;font-weight:900;line-height:1;}
+.risk-green .hm-score{color:var(--violet-bright);}
+.risk-amber .hm-score{color:var(--magenta-bright);}
+.risk-red   .hm-score{color:var(--bloom-bright);}
+.hm-score-label{font-size:8px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:1px;}
+.hm-bars{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+.hm-bar-row{display:flex;align-items:center;gap:6px;}
+.hm-bar-label{font-size:8.5px;color:var(--ink-muted);width:64px;flex-shrink:0;}
+.hm-bar-track{flex:1;height:4px;background:rgba(255,255,255,0.28);border-radius:2px;overflow:hidden;}
+.hm-bar-fill{height:100%;border-radius:2px;transition:width 0.3s;}
+.hm-pillar{font-size:8px;color:var(--ink-muted);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ── Table view ── */
+.table-view-panel{display:none;padding:16px 20px;overflow-x:auto;}
+.vp-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+.vp-table th{background:linear-gradient(135deg,rgba(244,63,94,0.30),rgba(192,38,211,0.25));
+  color:var(--ink);padding:8px 12px;text-align:left;font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:0.06em;}
+.vp-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--ink-dim);}
+.vp-table tr:hover td{background:var(--bg-hover);cursor:pointer;}
+.risk-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:8px;font-weight:700;text-transform:uppercase;}
+.rb-green{background:rgba(168,85,247,0.12);color:var(--violet-bright);}
+.rb-amber{background:rgba(192,38,211,0.12);color:var(--magenta-bright);}
+.rb-red{background:rgba(244,63,94,0.12);color:var(--bloom-bright);}
+
+/* ── Detail panel ── */
+.risk-detail{display:none;background:rgba(7,4,17,0.95);border-left:1px solid var(--border);
+  width:420px;flex-shrink:0;overflow-y:auto;
+  height:calc(100vh - 104px);position:sticky;top:0;align-self:flex-start;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.18) transparent;}
+.risk-detail.open{display:block;}
+.rd-header{padding:20px;background:linear-gradient(135deg,rgba(244,63,94,0.20),rgba(192,38,211,0.16));
+  border-bottom:1px solid var(--border);}
+.rd-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.10);
+  border:1px solid var(--border-soft);color:var(--ink-muted);border-radius:6px;
+  padding:4px 10px;cursor:pointer;font-size:13px;font-family:var(--font);}
+.rd-close:hover{background:rgba(244,63,94,0.20);color:var(--bloom-bright);}
+.rd-vendor-name{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.rd-meta{font-size:10px;color:var(--ink-muted);}
+.rd-score-hero{display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid var(--border);}
+.rd-score-circle{width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;flex-shrink:0;}
+.rd-score-num{font-size:22px;font-weight:900;line-height:1;}
+.rd-score-label{font-size:8px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);}
+.rd-overall-label{font-size:13px;font-weight:700;color:var(--ink);}
+.rd-overall-sub{font-size:10px;color:var(--ink-muted);margin-top:2px;}
+.radar-wrap{padding:20px;border-bottom:1px solid var(--border);text-align:center;}
+.radar-title{font-size:9px;font-weight:800;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.10em;margin-bottom:12px;}
+.dim-scores{padding:16px 20px;border-bottom:1px solid var(--border);}
+.dim-score-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.dim-score-icon{font-size:14px;width:28px;text-align:center;}
+.dim-score-label{font-size:11px;font-weight:600;color:var(--ink-dim);flex:1;}
+.dim-score-bar-wrap{flex:2;}
+.dim-score-track{height:7px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;
+  position:relative;}
+.dim-score-track::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,0.07) 0px,rgba(255,255,255,0.07) 1px,transparent 1px,transparent 20%);}
+.dim-score-fill{height:100%;border-radius:4px;transition:width 0.5s;position:relative;z-index:1;}
+.dim-score-val{font-size:11px;font-weight:700;width:36px;text-align:right;}
+.rd-notes{padding:16px 20px;border-bottom:1px solid var(--border);}
+.rd-notes-label{font-size:8px;font-weight:800;color:var(--bloom-bright);
+  text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+.rd-notes-text{font-size:11.5px;color:var(--ink-muted);line-height:1.65;}
+.rd-actions{padding:14px 20px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+/* Side panel legend */
+.rd-legend{padding:14px 20px;}
+.rd-legend-title{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink-muted);margin-bottom:10px;}
+.rd-legend-bands,.rd-legend-dims{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.rd-legend-row{display:flex;align-items:flex-start;gap:7px;font-size:10px;color:var(--ink-dim);}
+.rd-legend-row strong{color:var(--ink);}
+.rdl-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0;margin-top:2px;}
+.rdl-violet{background:rgba(168,85,247,0.50);}
+.rdl-magenta{background:rgba(192,38,211,0.50);}
+.rdl-bloom{background:rgba(244,63,94,0.50);}
+.rdl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.rdl-d-bloom{background:#F43F5E;}.rdl-d-violet{background:#A855F7;}
+.rdl-d-magenta{background:#C026D3;}.rdl-d-amber{background:#F59E0B;}.rdl-d-red{background:#FB7185;}
+.rd-action-btn{padding:7px 14px;border-radius:8px;font-size:10px;font-weight:700;
+  cursor:pointer;font-family:var(--font);border:1px solid;transition:all 0.15s;}
+.rd-action-btn.primary{background:linear-gradient(135deg,var(--bloom-dim),var(--magenta));
+  color:#fff;border-color:transparent;}
+.rd-action-btn.primary:hover{background:linear-gradient(135deg,var(--bloom),var(--magenta-bright));}
+.rd-action-btn.secondary{background:rgba(255,255,255,0.05);color:var(--bloom-bright);border-color:var(--bloom-border);}
+.rd-action-btn.secondary:hover{background:rgba(244,63,94,0.12);}
+
+/* ── Assessment panel ── */
+.assess-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:200;
+  overflow-y:auto;backdrop-filter:blur(6px);}
+.assess-panel.open{display:block;}
+.assess-inner{background:#0F0A1E;border:1px solid rgba(244,63,94,0.22);max-width:860px;
+  margin:40px auto;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.assess-top{background:linear-gradient(135deg,rgba(244,63,94,0.25),rgba(192,38,211,0.20));
+  padding:20px 24px;color:var(--ink);display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border);}
+.assess-title{flex:1;}
+.assess-title h2{font-size:15px;font-weight:800;margin-bottom:2px;}
+.assess-title p{font-size:10px;color:var(--ink-muted);}
+.assess-close{background:rgba(255,255,255,0.10);border:1px solid var(--border-soft);
+  color:var(--ink-muted);border-radius:8px;padding:6px 12px;cursor:pointer;font-family:var(--font);font-size:13px;}
+.assess-close:hover{background:rgba(244,63,94,0.20);color:var(--bloom-bright);}
+.assess-vendor-select{padding:14px 24px;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.025);display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.avs-label{font-size:11px;font-weight:700;color:var(--ink-dim);}
+.avs-select{padding:7px 12px;border:1px solid var(--border-soft);border-radius:8px;
+  font-family:var(--font);font-size:11px;color:var(--ink-dim);
+  background:rgba(255,255,255,0.05);min-width:200px;}
+.avs-select option{background:#1C1030;color:var(--ink);}
+.avs-select:focus{outline:none;border-color:var(--bloom);}
+.assess-vendor-input{min-width:260px;}
+.assess-body{display:grid;grid-template-columns:1fr 280px;gap:0;}
+.assess-questions{padding:20px 24px;overflow-y:auto;max-height:65vh;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.18) transparent;}
+.assess-live{padding:20px;background:rgba(255,255,255,0.025);border-left:1px solid var(--border);
+  position:sticky;top:0;display:flex;flex-direction:column;align-items:center;}
+.alv-title{font-size:9px;font-weight:800;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.10em;margin-bottom:12px;text-align:center;}
+.alv-score{font-size:32px;font-weight:900;color:var(--ink);text-align:center;line-height:1;}
+.alv-score-label{font-size:8px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;text-align:center;}
+.alv-progress{font-size:10px;color:var(--ink-muted);margin-top:12px;text-align:center;}
+.alv-dims{width:100%;display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.alv-dim-row{display:flex;align-items:center;gap:6px;}
+.alv-dim-icon{font-size:12px;width:20px;}
+.alv-dim-label{font-size:9.5px;color:var(--ink-muted);flex:1;}
+.alv-dim-val{font-size:10px;font-weight:700;width:30px;text-align:right;}
+.dim-group{margin-bottom:20px;}
+.dim-header{display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:rgba(255,255,255,0.04);border-radius:10px;border-left:3px solid;margin-bottom:12px;}
+.dim-header.dim-header-teal{border-color:var(--bloom);}
+.dim-header.dim-header-navy{border-color:var(--violet);}
+.dim-header.dim-header-purple{border-color:var(--magenta);}
+.dim-header.dim-header-amber{border-color:var(--amber);}
+.dim-header.dim-header-red{border-color:var(--red);}
+.dim-icon{font-size:15px;}
+.dim-label{font-size:12px;font-weight:700;color:var(--ink-dim);flex:1;}
+.dim-weight{font-size:9.5px;font-weight:600;color:var(--ink-muted);}
+.q-block{margin-bottom:14px;padding:12px 14px;border:1px solid var(--border-soft);
+  border-radius:10px;background:var(--bg-surface);transition:border-color 0.2s;}
+.q-block.answered{border-color:rgba(244,63,94,0.40);background:rgba(244,63,94,0.05);}
+.q-text{font-size:11.5px;font-weight:600;color:var(--ink-dim);margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;}
+.q-num{background:linear-gradient(135deg,var(--bloom-dim),var(--magenta));color:#fff;border-radius:5px;
+  padding:2px 7px;font-size:9px;font-weight:700;flex-shrink:0;}
+.q-options{display:flex;flex-direction:column;gap:5px;}
+.q-opt{display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 8px;border-radius:7px;transition:background 0.15s;}
+.q-opt:hover{background:rgba(255,255,255,0.05);}
+.q-opt input{display:none;}
+.q-opt-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border-soft);flex-shrink:0;transition:all 0.15s;}
+.q-opt input:checked + .q-opt-dot{border-color:var(--bloom);background:var(--bloom);}
+.q-opt-text{font-size:11px;color:var(--ink-muted);line-height:1.4;}
+.q-opt input:checked ~ .q-opt-text{color:var(--bloom-bright);font-weight:600;}
+.assess-footer{padding:14px 24px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(255,255,255,0.025);}
+.af-progress{font-size:11px;color:var(--ink-muted);}
+.af-progress strong{color:var(--green);}
+.af-btns{display:flex;gap:8px;}
+.af-btn{padding:8px 18px;border-radius:8px;font-size:11px;font-weight:700;
+  cursor:pointer;font-family:var(--font);border:1px solid;transition:all 0.15s;}
+.af-btn.save{background:linear-gradient(135deg,var(--bloom-dim),var(--magenta));
+  color:#fff;border-color:transparent;}
+.af-btn.save:disabled{opacity:0.35;cursor:not-allowed;}
+.af-btn.cancel{background:rgba(255,255,255,0.05);color:var(--ink-muted);border-color:var(--border-soft);}
+.af-btn.cancel:hover{background:rgba(255,255,255,0.10);color:var(--ink);}
+
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .risk-detail{width:100%;max-height:60vh;}
+  .assess-body{grid-template-columns:1fr;}
+  .assess-live{display:none;}
+}
+@media print{
+  .sidebar,.topbar,.risk-toolbar,.legend-bar,.rd-actions,.assess-panel{display:none!important;}
+  .shell,.main{display:block!important;}
+}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode::before{background:radial-gradient(ellipse at 80% 0%,rgba(192,38,211,0.12) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.10) 0%,transparent 50%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title{color:#1A0818;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .hero{background:linear-gradient(135deg,#FDE8EE 0%,#FCDDE7 38%,#FEE8F0 68%,#FFF0F4 100%);border-bottom-color:#F5C6D3;}
+body.light-mode .hero-eyebrow{color:var(--bloom);}
+body.light-mode .hero-sub{color:#7A4055;}
+body.light-mode .hero-title{background:linear-gradient(92deg,#1A0818 0%,#E11D48 60%,#C026D3 100%);-webkit-background-clip:text;background-clip:text;}
+body.light-mode .risk-toolbar{background:#FFF8FA;border-bottom-color:#F5C6D3;}
+body.light-mode .risk-toolbar input,body.light-mode .risk-toolbar select{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .risk-toolbar select option{background:#FFF8FA;color:#1A0818;}
+body.light-mode .legend-bar{background:#FFF8FA;border-bottom-color:#F5C6D3;}
+body.light-mode .legend-toggle{color:#7A4055;}
+body.light-mode .legend-toggle:hover{color:#1A0818;}
+body.light-mode .legend-item{color:#7A4055;}
+body.light-mode .legend-text strong{color:#3D1028;}
+body.light-mode .risk-summary{border-bottom-color:#F5C6D3;}
+body.light-mode .rs-card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .rs-val{color:#1A0818;}
+body.light-mode .rs-label{color:#7A4055;}
+body.light-mode .hm-card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .hm-card:hover{background:#FFF0F4;}
+body.light-mode .hm-name{color:#1A0818;}
+body.light-mode .hm-bar-label,body.light-mode .hm-pillar,body.light-mode .hm-score-label{color:#7A4055;}
+body.light-mode .hm-bar-track{background:rgba(26,8,24,0.14);}
+body.light-mode .vp-table td{color:#3D1028;border-bottom-color:#F5C6D3;}
+body.light-mode .vp-table tr:hover td{background:rgba(244,63,94,0.05);}
+body.light-mode .vendor-row{border-bottom-color:#F5C6D3;}
+body.light-mode .vendor-row:hover{background:rgba(244,63,94,0.04);}
+body.light-mode .v-name{color:#1A0818;}
+body.light-mode .v-cat,body.light-mode .v-tier,body.light-mode .legend-label{color:#7A4055;}
+body.light-mode .risk-detail{background:#FFF8FA;border-left-color:#F5C6D3;}
+body.light-mode .rd-header{background:linear-gradient(135deg,rgba(244,63,94,0.10),rgba(192,38,211,0.08));border-bottom-color:#F5C6D3;}
+body.light-mode .assess-panel{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .assess-title,body.light-mode .rd-vendor-name{color:#1A0818;}
+body.light-mode .dim-label,body.light-mode .assess-sub{color:#7A4055;}
+body.light-mode .view-toggle{border-color:#F5C6D3;}
+body.light-mode .vt-btn{background:#FFF8FA;color:#7A4055;}
+body.light-mode .vt-btn.active{background:linear-gradient(135deg,rgba(244,63,94,0.12),rgba(192,38,211,0.10));color:#E11D48;}
+body.light-mode .dim-score-track{background:rgba(26,8,24,0.10);}
+body.light-mode .dim-score-track::before{background:repeating-linear-gradient(90deg,rgba(26,8,24,0.08) 0px,rgba(26,8,24,0.08) 1px,transparent 1px,transparent 20%);}
+body.light-mode .dim-score-val{color:#1A0818;}
+body.light-mode .dim-score-label{color:#3D1028;}
+body.light-mode .dim-score-icon{color:#3D1028;}
+body.light-mode .rd-notes-label{color:#C0143C;}
+body.light-mode .rd-notes-text{color:#3D1028;}
+body.light-mode .rd-score-label{color:#7A4055;}
+body.light-mode .rd-overall-label{color:#1A0818;}
+body.light-mode .rd-overall-sub{color:#7A4055;}
+body.light-mode .radar-title{color:#7A4055;}
+body.light-mode .rd-legend-title{color:#7A4055;}
+body.light-mode .rd-legend-row{color:#3D1028;}
+body.light-mode .rd-legend-row strong{color:#1A0818;}
+body.light-mode .rdl-violet{background:rgba(109,40,217,0.45);}
+body.light-mode .rdl-magenta{background:rgba(154,13,175,0.45);}
+body.light-mode .rdl-bloom{background:rgba(192,20,60,0.45);}
+body.light-mode .rd-close{color:#5A2038;}
+body.light-mode .rd-close:hover{color:#1A0818;}
+body.light-mode .rd-vendor-tier,body.light-mode .rd-spend,body.light-mode .dim-weight{color:#7A4055;}
+body.light-mode .dim-header{background:rgba(244,63,94,0.05);border-color:#F5C6D3;}
+body.light-mode .hm-score{color:#1A0818;}
+body.light-mode .risk-green .hm-score{color:#7C3AED;}
+body.light-mode .risk-amber .hm-score{color:#9333EA;}
+body.light-mode .risk-red   .hm-score{color:#E11D48;}
+body.light-mode .rb-green{background:rgba(124,58,237,0.10);color:#7C3AED;}
+body.light-mode .rb-amber{background:rgba(147,51,234,0.10);color:#9333EA;}
+body.light-mode .rb-red{background:rgba(225,29,72,0.12);color:#E11D48;}
+body.light-mode .scan{opacity:0.12;}
+</style>
+</head>
+<body data-portal="true">
+
+<div class="scan" aria-hidden="true"></div>
+
+<div class="shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="window.location.href='team_portal.html'">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-user">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+      <div class="sb-section">Director</div>
+      <a href="assignments.html"    class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"        class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"            class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"         class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html"  class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"      class="sb-item active"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"    class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"    class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html"  class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html"     class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html"  class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"             class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Vendor Risk</span>
+      </div>
+      <div class="tb-actions">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button type="button" class="tb-btn" onclick="window.print()">&#128438; Print</button>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="hero-eyebrow">VER Intelligence &middot; Risk Assessment &middot; FY27</div>
+          <div class="hero-title">Vendor Risk Monitor</div>
+          <div class="hero-sub">Real-time risk scoring across all managed vendors &middot; Heat map, table, and dimension views &middot; Use to identify concentration risk, delivery concerns, and compliance flags before they escalate.</div>
+        </div>
+        <div class="hero-stats">
+          <div style="text-align:right;">
+            <div class="hero-stat-val" id="hero-total">—</div>
+            <div class="hero-stat-label">Vendors Tracked</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="hero-stat-val" style="background:linear-gradient(135deg,var(--bloom-bright),var(--magenta-bright));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;" id="hero-highrisk">—</div>
+            <div class="hero-stat-label">High Risk</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="risk-toolbar">
+      <input type="text" id="search-input" placeholder="&#128269; Search vendors..." oninput="filterVendors()">
+      <select id="risk-filter" onchange="filterVendors()">
+        <option value="all">All Risk Levels</option>
+        <option value="red">&#128308; High Risk</option>
+        <option value="amber">&#128993; Monitor</option>
+        <option value="green">&#128994; Healthy</option>
+      </select>
+      <select id="type-filter" onchange="filterVendors()">
+        <option value="all">All Types</option>
+        <option value="assessed">&#10003; VER Assessed</option>
+        <option value="derived">&#9678; Derived</option>
+      </select>
+      <select id="region-filter" onchange="filterVendors()">
+        <option value="all">All Regions</option>
+        <option value="AMER">AMER</option>
+        <option value="EMEA">EMEA</option>
+        <option value="APAC">APAC</option>
+        <option value="LATAM">LATAM</option>
+        <option value="JAPAC">JAPAC</option>
+        <option value="Global">Global</option>
+      </select>
+      <div class="view-toggle">
+        <button class="vt-btn active" id="vt-heatmap" onclick="setView('heatmap')">Heat Map</button>
+        <button class="vt-btn" id="vt-table" onclick="setView('table')">Table</button>
+      </div>
+      <button class="assess-btn" onclick="openAssessment()">+ New Assessment</button>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend-bar">
+      <div class="legend-toggle" onclick="toggleLegend()">
+        <span id="legend-arrow">&#9658;</span>
+        <span>Scoring Methodology &amp; Legend</span>
+      </div>
+      <div class="legend-body" id="legend-body">
+        <div>
+          <div class="legend-section-title">Risk Bands</div>
+          <div class="legend-items">
+            <div class="legend-item"><div class="legend-swatch ls-green"></div><div class="legend-text"><strong>Healthy (0–35):</strong> Low risk — standard VER monitoring cadence.</div></div>
+            <div class="legend-item"><div class="legend-swatch ls-amber"></div><div class="legend-text"><strong>Monitor (36–55):</strong> Elevated risk — VER advisory engagement recommended within 30 days.</div></div>
+            <div class="legend-item"><div class="legend-swatch ls-red"></div><div class="legend-text"><strong>High Risk (56+):</strong> Action required — VER escalation recommended. Pillar Lead should be engaged.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="legend-section-title">Five Dimensions</div>
+          <div class="legend-items">
+            <div class="legend-item"><div class="legend-swatch ls-bloom"></div><div class="legend-text"><strong>&#128666; Delivery:</strong> SLA performance, milestone delivery, attrition, escalations, evidence quality.</div></div>
+            <div class="legend-item"><div class="legend-swatch ls-violet"></div><div class="legend-text"><strong>&#128176; Financial:</strong> Spend concentration, rate vs benchmark, budget variance, invoice compliance.</div></div>
+            <div class="legend-item"><div class="legend-swatch ls-magenta"></div><div class="legend-text"><strong>&#129309; Relationship:</strong> Responsiveness, key person dependency, transparency, requirements comprehension.</div></div>
+            <div class="legend-item"><div class="legend-swatch ls-amber"></div><div class="legend-text"><strong>&#128202; Market:</strong> Vendor financial health, competitive alternatives, rate trend vs market.</div></div>
+            <div class="legend-item"><div class="legend-swatch ls-red"></div><div class="legend-text"><strong>&#128203; Compliance:</strong> SOW currency, security documentation, portal registration, CO governance.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="legend-section-title">Score Types</div>
+          <div class="legend-items">
+            <div class="legend-item"><div class="legend-swatch ls-teal-outline"></div><div class="legend-text"><strong>&#10003; VER Assessed:</strong> Score from a formal 20-question VER assessment. Most reliable signal.</div></div>
+            <div class="legend-item"><div class="legend-swatch ls-gray-outline"></div><div class="legend-text"><strong>&#9678; Derived:</strong> Computed from vendor data fields. Indicative only. Perform a formal assessment for a definitive score.</div></div>
+            <div class="legend-item"><div class="legend-swatch ls-amber-outline"></div><div class="legend-text"><strong>Renewal proximity:</strong> Vendors expiring within 180 days receive a compliance risk adjustment.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary strip -->
+    <div class="risk-summary" id="summary-strip"></div>
+
+    <!-- Main content -->
+    <div class="risk-content">
+      <div class="risk-left">
+        <div id="heatmap-view" class="heatmap-grid"></div>
+        <div id="table-view" class="table-view-panel">
+          <table class="vp-table">
+            <thead><tr>
+              <th>Vendor</th><th>Pillar</th><th>Category</th>
+              <th>Delivery</th><th>Financial</th><th>Relationship</th><th>Market</th><th>Compliance</th>
+              <th>Overall</th><th>Level</th>
+            </tr></thead>
+            <tbody id="risk-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Detail panel -->
+      <div class="risk-detail" id="risk-detail">
+        <div class="rd-header">
+          <button class="rd-close" onclick="closeDetail()">&#10005;</button>
+          <div class="rd-vendor-name" id="rd-name">—</div>
+          <div class="rd-meta" id="rd-meta">—</div>
+        </div>
+        <div class="rd-score-hero">
+          <div class="rd-score-circle" id="rd-score-circle">
+            <div class="rd-score-num" id="rd-score-num">—</div>
+            <div class="rd-score-label">Risk Score</div>
+          </div>
+          <div>
+            <div class="rd-overall-label" id="rd-overall-label">—</div>
+            <div class="rd-overall-sub" id="rd-overall-sub">—</div>
+          </div>
+        </div>
+        <div class="radar-wrap">
+          <div class="radar-title">Risk Profile — Five Dimensions</div>
+          <canvas id="radarChart" width="360" height="260"></canvas>
+        </div>
+        <div class="dim-scores" id="dim-scores"></div>
+        <div class="rd-notes">
+          <div class="rd-notes-label">VER Advisory Notes</div>
+          <div class="rd-notes-text" id="rd-notes">—</div>
+        </div>
+        <div class="rd-actions">
+          <button type="button" class="rd-action-btn primary" onclick="openAssessmentForVendor()">&#9998; Perform Assessment</button>
+          <button type="button" class="rd-action-btn secondary" onclick="exportBrief()">&#128203; Copy Risk Brief</button>
+          <button type="button" class="rd-action-btn secondary" onclick="printRiskProfile()">&#128438; Print Profile</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assessment Panel -->
+<div class="assess-panel" id="assess-panel">
+  <div class="assess-inner">
+    <div class="assess-top">
+      <div class="assess-title">
+        <h2>Perform Risk Assessment</h2>
+        <p>Answer 20 questions to generate a VER risk score &middot; Chart updates live</p>
+      </div>
+      <button class="assess-close" onclick="closeAssessment()">&#10005;</button>
+    </div>
+    <div class="assess-vendor-select">
+      <span class="avs-label">Assessing:</span>
+      <input type="text" class="avs-select assess-vendor-input" id="assess-vendor-input"
+        placeholder="Search all vendors..." oninput="onAssessVendorInput(this.value)" autocomplete="off">
+      <datalist id="vendor-datalist"></datalist>
+      <input type="hidden" id="assess-vendor-id">
+      <select class="avs-select" id="assess-pillar-select">
+        <option value="All Pillars">All Pillars</option>
+        <option value="Salesforce on Salesforce Technology">Salesforce on Salesforce Technology</option>
+        <option value="Engineering Development &amp; Delivery">Engineering Development &amp; Delivery</option>
+        <option value="IT">IT</option>
+        <option value="Delivery Assurance &amp; Operations">Delivery Assurance &amp; Operations</option>
+        <option value="Digital Marketing Technology">Digital Marketing Technology</option>
+        <option value="Data Solutions">Data Solutions</option>
+        <option value="Agentic Transformation">Agentic Transformation</option>
+        <option value="Office of the CDO">Office of the CDO</option>
+        <option value="Emerging Technology">Emerging Technology</option>
+      </select>
+    </div>
+    <div class="assess-body">
+      <div class="assess-questions" id="assess-questions">
+        <!-- Delivery -->
+        <div class="dim-group" data-dim="delivery">
+          <div class="dim-header dim-header-teal"><span class="dim-icon">&#128666;</span><span class="dim-label">Delivery &amp; Reliability</span><span class="dim-weight">12&times; weight</span></div>
+          <div class="q-block" data-q="1" data-dim="delivery" data-weight="3"><div class="q-text"><span class="q-num">Q1</span>SLA performance trend (last 3 quarters)</div><div class="q-options"><label class="q-opt"><input type="radio" name="q1" value="100" onchange="onAnswer(1,'delivery',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Met all targets consistently</span></label><label class="q-opt"><input type="radio" name="q1" value="80" onchange="onAnswer(1,'delivery',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Met most — 1-2 minor misses</span></label><label class="q-opt"><input type="radio" name="q1" value="60" onchange="onAnswer(1,'delivery',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Borderline — recurring borderline</span></label><label class="q-opt"><input type="radio" name="q1" value="40" onchange="onAnswer(1,'delivery',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Missed 1+ critical SLA</span></label><label class="q-opt"><input type="radio" name="q1" value="20" onchange="onAnswer(1,'delivery',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Repeated critical misses</span></label></div></div>
+          <div class="q-block" data-q="2" data-dim="delivery" data-weight="3"><div class="q-text"><span class="q-num">Q2</span>Milestone delivery rate this quarter</div><div class="q-options"><label class="q-opt"><input type="radio" name="q2" value="100" onchange="onAnswer(2,'delivery',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">100% on time</span></label><label class="q-opt"><input type="radio" name="q2" value="80" onchange="onAnswer(2,'delivery',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Minor delays — no impact</span></label><label class="q-opt"><input type="radio" name="q2" value="60" onchange="onAnswer(2,'delivery',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Some delays with impact</span></label><label class="q-opt"><input type="radio" name="q2" value="40" onchange="onAnswer(2,'delivery',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Material delays or scope gaps</span></label><label class="q-opt"><input type="radio" name="q2" value="20" onchange="onAnswer(2,'delivery',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Significant delivery failure</span></label></div></div>
+          <div class="q-block" data-q="3" data-dim="delivery" data-weight="2"><div class="q-text"><span class="q-num">Q3</span>Attrition rate and continuity plan</div><div class="q-options"><label class="q-opt"><input type="radio" name="q3" value="100" onchange="onAnswer(3,'delivery',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">&lt;5% — plan on file</span></label><label class="q-opt"><input type="radio" name="q3" value="80" onchange="onAnswer(3,'delivery',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">5-8% — plan in progress</span></label><label class="q-opt"><input type="radio" name="q3" value="60" onchange="onAnswer(3,'delivery',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">8-12% — plan not submitted</span></label><label class="q-opt"><input type="radio" name="q3" value="40" onchange="onAnswer(3,'delivery',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">12-15% — no plan</span></label><label class="q-opt"><input type="radio" name="q3" value="20" onchange="onAnswer(3,'delivery',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">15%+ — active continuity risk</span></label></div></div>
+          <div class="q-block" data-q="4" data-dim="delivery" data-weight="2"><div class="q-text"><span class="q-num">Q4</span>Escalation frequency this quarter</div><div class="q-options"><label class="q-opt"><input type="radio" name="q4" value="100" onchange="onAnswer(4,'delivery',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Zero escalations</span></label><label class="q-opt"><input type="radio" name="q4" value="80" onchange="onAnswer(4,'delivery',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">1 minor escalation</span></label><label class="q-opt"><input type="radio" name="q4" value="60" onchange="onAnswer(4,'delivery',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">2 escalations — resolved</span></label><label class="q-opt"><input type="radio" name="q4" value="40" onchange="onAnswer(4,'delivery',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">3+ escalations</span></label><label class="q-opt"><input type="radio" name="q4" value="20" onchange="onAnswer(4,'delivery',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Active unresolved escalation</span></label></div></div>
+          <div class="q-block" data-q="5" data-dim="delivery" data-weight="2"><div class="q-text"><span class="q-num">Q5</span>Evidence quality — self-reported vs supported</div><div class="q-options"><label class="q-opt"><input type="radio" name="q5" value="100" onchange="onAnswer(5,'delivery',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">All claims supported by data</span></label><label class="q-opt"><input type="radio" name="q5" value="80" onchange="onAnswer(5,'delivery',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Most claims supported</span></label><label class="q-opt"><input type="radio" name="q5" value="60" onchange="onAnswer(5,'delivery',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Mixed — some self-reported</span></label><label class="q-opt"><input type="radio" name="q5" value="40" onchange="onAnswer(5,'delivery',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Primarily self-reported</span></label><label class="q-opt"><input type="radio" name="q5" value="20" onchange="onAnswer(5,'delivery',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">No supporting data provided</span></label></div></div>
+        </div>
+        <!-- Financial -->
+        <div class="dim-group" data-dim="financial">
+          <div class="dim-header dim-header-navy"><span class="dim-icon">&#128176;</span><span class="dim-label">Financial &amp; Spend</span><span class="dim-weight">10&times; weight</span></div>
+          <div class="q-block" data-q="6" data-dim="financial" data-weight="3"><div class="q-text"><span class="q-num">Q6</span>Spend concentration vs pillar total</div><div class="q-options"><label class="q-opt"><input type="radio" name="q6" value="100" onchange="onAnswer(6,'financial',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">&lt;20% of pillar spend</span></label><label class="q-opt"><input type="radio" name="q6" value="80" onchange="onAnswer(6,'financial',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">20-35% of pillar spend</span></label><label class="q-opt"><input type="radio" name="q6" value="60" onchange="onAnswer(6,'financial',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">35-50% of pillar spend</span></label><label class="q-opt"><input type="radio" name="q6" value="40" onchange="onAnswer(6,'financial',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">50-70% of pillar spend</span></label><label class="q-opt"><input type="radio" name="q6" value="20" onchange="onAnswer(6,'financial',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">&gt;70% of pillar spend</span></label></div></div>
+          <div class="q-block" data-q="7" data-dim="financial" data-weight="3"><div class="q-text"><span class="q-num">Q7</span>Rate competitiveness vs VER benchmark</div><div class="q-options"><label class="q-opt"><input type="radio" name="q7" value="100" onchange="onAnswer(7,'financial',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">At or below benchmark</span></label><label class="q-opt"><input type="radio" name="q7" value="80" onchange="onAnswer(7,'financial',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">1-5% above benchmark</span></label><label class="q-opt"><input type="radio" name="q7" value="60" onchange="onAnswer(7,'financial',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">5-10% above benchmark</span></label><label class="q-opt"><input type="radio" name="q7" value="40" onchange="onAnswer(7,'financial',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">10-20% above benchmark</span></label><label class="q-opt"><input type="radio" name="q7" value="20" onchange="onAnswer(7,'financial',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">&gt;20% above — review required</span></label></div></div>
+          <div class="q-block" data-q="8" data-dim="financial" data-weight="2"><div class="q-text"><span class="q-num">Q8</span>Budget vs actuals variance this quarter</div><div class="q-options"><label class="q-opt"><input type="radio" name="q8" value="100" onchange="onAnswer(8,'financial',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Within 3%</span></label><label class="q-opt"><input type="radio" name="q8" value="80" onchange="onAnswer(8,'financial',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">3-7% variance</span></label><label class="q-opt"><input type="radio" name="q8" value="60" onchange="onAnswer(8,'financial',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">7-12% variance</span></label><label class="q-opt"><input type="radio" name="q8" value="40" onchange="onAnswer(8,'financial',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">12-20% variance</span></label><label class="q-opt"><input type="radio" name="q8" value="20" onchange="onAnswer(8,'financial',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">&gt;20% — unexplained variance</span></label></div></div>
+          <div class="q-block" data-q="9" data-dim="financial" data-weight="2"><div class="q-text"><span class="q-num">Q9</span>Invoice compliance and payment terms</div><div class="q-options"><label class="q-opt"><input type="radio" name="q9" value="100" onchange="onAnswer(9,'financial',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">100% compliant</span></label><label class="q-opt"><input type="radio" name="q9" value="80" onchange="onAnswer(9,'financial',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">1-2 minor issues</span></label><label class="q-opt"><input type="radio" name="q9" value="60" onchange="onAnswer(9,'financial',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Recurring minor issues</span></label><label class="q-opt"><input type="radio" name="q9" value="40" onchange="onAnswer(9,'financial',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Material non-compliance</span></label><label class="q-opt"><input type="radio" name="q9" value="20" onchange="onAnswer(9,'financial',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Significant disputes</span></label></div></div>
+        </div>
+        <!-- Relationship -->
+        <div class="dim-group" data-dim="relationship">
+          <div class="dim-header dim-header-purple"><span class="dim-icon">&#129309;</span><span class="dim-label">Relationship &amp; Responsiveness</span><span class="dim-weight">10&times; weight</span></div>
+          <div class="q-block" data-q="10" data-dim="relationship" data-weight="3"><div class="q-text"><span class="q-num">Q10</span>Responsiveness and communication quality</div><div class="q-options"><label class="q-opt"><input type="radio" name="q10" value="100" onchange="onAnswer(10,'relationship',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Proactive — anticipates needs</span></label><label class="q-opt"><input type="radio" name="q10" value="80" onchange="onAnswer(10,'relationship',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Responsive — prompt replies</span></label><label class="q-opt"><input type="radio" name="q10" value="60" onchange="onAnswer(10,'relationship',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Adequate — some delays</span></label><label class="q-opt"><input type="radio" name="q10" value="40" onchange="onAnswer(10,'relationship',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Reactive only</span></label><label class="q-opt"><input type="radio" name="q10" value="20" onchange="onAnswer(10,'relationship',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Poor — chronic delays</span></label></div></div>
+          <div class="q-block" data-q="11" data-dim="relationship" data-weight="3"><div class="q-text"><span class="q-num">Q11</span>Key person dependency exposure</div><div class="q-options"><label class="q-opt"><input type="radio" name="q11" value="100" onchange="onAnswer(11,'relationship',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Strong bench — no single points</span></label><label class="q-opt"><input type="radio" name="q11" value="80" onchange="onAnswer(11,'relationship',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Minor dependency — plan exists</span></label><label class="q-opt"><input type="radio" name="q11" value="60" onchange="onAnswer(11,'relationship',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Moderate dependency</span></label><label class="q-opt"><input type="radio" name="q11" value="40" onchange="onAnswer(11,'relationship',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">High dependency — 1-2 critical people</span></label><label class="q-opt"><input type="radio" name="q11" value="20" onchange="onAnswer(11,'relationship',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Critical dependency — no coverage</span></label></div></div>
+          <div class="q-block" data-q="12" data-dim="relationship" data-weight="2"><div class="q-text"><span class="q-num">Q12</span>Transparency vs accountability patterns</div><div class="q-options"><label class="q-opt"><input type="radio" name="q12" value="100" onchange="onAnswer(12,'relationship',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Fully transparent — owns issues</span></label><label class="q-opt"><input type="radio" name="q12" value="80" onchange="onAnswer(12,'relationship',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Generally transparent</span></label><label class="q-opt"><input type="radio" name="q12" value="60" onchange="onAnswer(12,'relationship',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Selective disclosure</span></label><label class="q-opt"><input type="radio" name="q12" value="40" onchange="onAnswer(12,'relationship',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Minimizes issues</span></label><label class="q-opt"><input type="radio" name="q12" value="20" onchange="onAnswer(12,'relationship',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Deflects accountability</span></label></div></div>
+          <div class="q-block" data-q="13" data-dim="relationship" data-weight="2"><div class="q-text"><span class="q-num">Q13</span>Requirements comprehension and execution</div><div class="q-options"><label class="q-opt"><input type="radio" name="q13" value="100" onchange="onAnswer(13,'relationship',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">First-time right — minimal back-and-forth</span></label><label class="q-opt"><input type="radio" name="q13" value="80" onchange="onAnswer(13,'relationship',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Minor clarifications needed</span></label><label class="q-opt"><input type="radio" name="q13" value="60" onchange="onAnswer(13,'relationship',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Regular back-and-forth</span></label><label class="q-opt"><input type="radio" name="q13" value="40" onchange="onAnswer(13,'relationship',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Frequent misunderstandings</span></label><label class="q-opt"><input type="radio" name="q13" value="20" onchange="onAnswer(13,'relationship',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Persistent requirement gaps</span></label></div></div>
+        </div>
+        <!-- Market -->
+        <div class="dim-group" data-dim="market">
+          <div class="dim-header dim-header-amber"><span class="dim-icon">&#128202;</span><span class="dim-label">Market &amp; Strategic</span><span class="dim-weight">8&times; weight</span></div>
+          <div class="q-block" data-q="14" data-dim="market" data-weight="3"><div class="q-text"><span class="q-num">Q14</span>Vendor financial health and stability</div><div class="q-options"><label class="q-opt"><input type="radio" name="q14" value="100" onchange="onAnswer(14,'market',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Publicly traded — strong financials</span></label><label class="q-opt"><input type="radio" name="q14" value="80" onchange="onAnswer(14,'market',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Private — stable known financials</span></label><label class="q-opt"><input type="radio" name="q14" value="60" onchange="onAnswer(14,'market',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Private — limited visibility</span></label><label class="q-opt"><input type="radio" name="q14" value="40" onchange="onAnswer(14,'market',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Some market concerns</span></label><label class="q-opt"><input type="radio" name="q14" value="20" onchange="onAnswer(14,'market',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Active M&amp;A or financial concern</span></label></div></div>
+          <div class="q-block" data-q="15" data-dim="market" data-weight="3"><div class="q-text"><span class="q-num">Q15</span>Competitive alternatives available</div><div class="q-options"><label class="q-opt"><input type="radio" name="q15" value="100" onchange="onAnswer(15,'market',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">3+ qualified alternatives</span></label><label class="q-opt"><input type="radio" name="q15" value="80" onchange="onAnswer(15,'market',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">2 alternatives</span></label><label class="q-opt"><input type="radio" name="q15" value="60" onchange="onAnswer(15,'market',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">1 credible alternative</span></label><label class="q-opt"><input type="radio" name="q15" value="40" onchange="onAnswer(15,'market',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Limited alternatives</span></label><label class="q-opt"><input type="radio" name="q15" value="20" onchange="onAnswer(15,'market',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">No viable alternative</span></label></div></div>
+          <div class="q-block" data-q="16" data-dim="market" data-weight="2"><div class="q-text"><span class="q-num">Q16</span>Rate trend vs market benchmark (12 months)</div><div class="q-options"><label class="q-opt"><input type="radio" name="q16" value="100" onchange="onAnswer(16,'market',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Rates declining or flat</span></label><label class="q-opt"><input type="radio" name="q16" value="80" onchange="onAnswer(16,'market',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">1-3% increase — market normal</span></label><label class="q-opt"><input type="radio" name="q16" value="60" onchange="onAnswer(16,'market',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">3-6% increase — above market</span></label><label class="q-opt"><input type="radio" name="q16" value="40" onchange="onAnswer(16,'market',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">6-10% increase</span></label><label class="q-opt"><input type="radio" name="q16" value="20" onchange="onAnswer(16,'market',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">10%+ increase — unsustainable</span></label></div></div>
+        </div>
+        <!-- Compliance -->
+        <div class="dim-group" data-dim="compliance">
+          <div class="dim-header dim-header-red"><span class="dim-icon">&#128203;</span><span class="dim-label">Governance &amp; Compliance</span><span class="dim-weight">10&times; weight</span></div>
+          <div class="q-block" data-q="17" data-dim="compliance" data-weight="3"><div class="q-text"><span class="q-num">Q17</span>SOW and contract currency</div><div class="q-options"><label class="q-opt"><input type="radio" name="q17" value="100" onchange="onAnswer(17,'compliance',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">All SOWs current — 6+ months remaining</span></label><label class="q-opt"><input type="radio" name="q17" value="80" onchange="onAnswer(17,'compliance',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">1 SOW expiring within 6 months</span></label><label class="q-opt"><input type="radio" name="q17" value="60" onchange="onAnswer(17,'compliance',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Multiple expiring within 6 months</span></label><label class="q-opt"><input type="radio" name="q17" value="40" onchange="onAnswer(17,'compliance',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">1+ already expired</span></label><label class="q-opt"><input type="radio" name="q17" value="20" onchange="onAnswer(17,'compliance',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Multiple expired — governance gap</span></label></div></div>
+          <div class="q-block" data-q="18" data-dim="compliance" data-weight="3"><div class="q-text"><span class="q-num">Q18</span>Security and compliance documentation</div><div class="q-options"><label class="q-opt"><input type="radio" name="q18" value="100" onchange="onAnswer(18,'compliance',3,100)"><span class="q-opt-dot"></span><span class="q-opt-text">All certs current — filed with VER</span></label><label class="q-opt"><input type="radio" name="q18" value="80" onchange="onAnswer(18,'compliance',3,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Minor gaps — in progress</span></label><label class="q-opt"><input type="radio" name="q18" value="60" onchange="onAnswer(18,'compliance',3,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Some outdated documentation</span></label><label class="q-opt"><input type="radio" name="q18" value="40" onchange="onAnswer(18,'compliance',3,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Material compliance gaps</span></label><label class="q-opt"><input type="radio" name="q18" value="20" onchange="onAnswer(18,'compliance',3,20)"><span class="q-opt-dot"></span><span class="q-opt-text">No documentation on file</span></label></div></div>
+          <div class="q-block" data-q="19" data-dim="compliance" data-weight="2"><div class="q-text"><span class="q-num">Q19</span>Supplier portal registration status</div><div class="q-options"><label class="q-opt"><input type="radio" name="q19" value="100" onchange="onAnswer(19,'compliance',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">Fully registered — current</span></label><label class="q-opt"><input type="radio" name="q19" value="80" onchange="onAnswer(19,'compliance',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Registered — minor updates needed</span></label><label class="q-opt"><input type="radio" name="q19" value="60" onchange="onAnswer(19,'compliance',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Partially registered</span></label><label class="q-opt"><input type="radio" name="q19" value="40" onchange="onAnswer(19,'compliance',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Not registered — engagement active</span></label><label class="q-opt"><input type="radio" name="q19" value="20" onchange="onAnswer(19,'compliance',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">Not registered — no engagement record</span></label></div></div>
+          <div class="q-block" data-q="20" data-dim="compliance" data-weight="2"><div class="q-text"><span class="q-num">Q20</span>Change order governance adherence</div><div class="q-options"><label class="q-opt"><input type="radio" name="q20" value="100" onchange="onAnswer(20,'compliance',2,100)"><span class="q-opt-dot"></span><span class="q-opt-text">All COs through VER process</span></label><label class="q-opt"><input type="radio" name="q20" value="80" onchange="onAnswer(20,'compliance',2,80)"><span class="q-opt-dot"></span><span class="q-opt-text">Minor exceptions — corrected</span></label><label class="q-opt"><input type="radio" name="q20" value="60" onchange="onAnswer(20,'compliance',2,60)"><span class="q-opt-dot"></span><span class="q-opt-text">Some informal changes</span></label><label class="q-opt"><input type="radio" name="q20" value="40" onchange="onAnswer(20,'compliance',2,40)"><span class="q-opt-dot"></span><span class="q-opt-text">Regular informal scope changes</span></label><label class="q-opt"><input type="radio" name="q20" value="20" onchange="onAnswer(20,'compliance',2,20)"><span class="q-opt-dot"></span><span class="q-opt-text">No CO governance — all informal</span></label></div></div>
+        </div>
+      </div>
+      <div class="assess-live">
+        <div class="alv-title">Live Risk Profile</div>
+        <canvas id="liveRadar" width="240" height="200"></canvas>
+        <div class="alv-score" id="alv-score">—</div>
+        <div class="alv-score-label">Composite Score</div>
+        <div class="alv-progress" id="alv-progress">0 / 20 answered</div>
+        <div class="alv-dims" id="alv-dims"></div>
+      </div>
+    </div>
+    <div class="assess-footer">
+      <div class="af-progress" id="af-progress">Complete all 20 questions to save the assessment.</div>
+      <div class="af-btns">
+        <button class="af-btn cancel" onclick="closeAssessment()">Cancel</button>
+        <button class="af-btn save" id="save-btn" disabled onclick="saveAssessment()">Save Assessment</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendors.js"></script>
+<script>
+var BF='1idLxwmT7Sv6VAWJq9j';
+var RISK_DATA=[{"id":"R001","vendor_id":"V001","name":"NTT Data","domain":"nttdata.com","category":"Professional Services","tier":"1","pillar":"","region":"AMER|APAC|EMEA","concentration":85,"financial":15,"delivery":20,"compliance":10,"overall":40,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":10,"market":10},{"id":"R002","vendor_id":"V002","name":"Cognizant","domain":"cognizant.com","category":"Professional Services","tier":"1","pillar":"","region":"AMER|APAC|EMEA","concentration":60,"financial":20,"delivery":15,"compliance":12,"overall":31,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":10,"market":15},{"id":"R003","vendor_id":"V003","name":"Tech Mahindra","domain":"techmahindra.com","category":"Professional Services","tier":"2","pillar":"","region":"Global","concentration":50,"financial":30,"delivery":55,"compliance":40,"overall":46,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":45,"market":25},{"id":"R004","vendor_id":"V004","name":"Workday","domain":"workday.com","category":"Software / SaaS","tier":"1","pillar":"","region":"Global","concentration":90,"financial":10,"delivery":10,"compliance":8,"overall":38,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":10,"market":10},{"id":"R005","vendor_id":"V005","name":"AWS","domain":"aws.amazon.com","category":"Cloud & Managed Services","tier":"1","pillar":"","region":"Global","concentration":80,"financial":8,"delivery":10,"compliance":12,"overall":34,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":10,"market":10},{"id":"R006","vendor_id":"V006","name":"IBM","domain":"ibm.com","category":"Professional Services","tier":"2","pillar":"","region":"AMER|EMEA","concentration":55,"financial":35,"delivery":40,"compliance":30,"overall":43,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":30,"market":30},{"id":"R007","vendor_id":"V007","name":"Google","domain":"cloud.google.com","category":"Cloud & Managed Services","tier":"2","pillar":"","region":"Global","concentration":65,"financial":10,"delivery":12,"compliance":10,"overall":30,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":10,"market":10},{"id":"R008","vendor_id":"V008","name":"Deloitte","domain":"deloitte.com","category":"Professional Services","tier":"2","pillar":"","region":"AMER|EMEA","concentration":40,"financial":25,"delivery":30,"compliance":20,"overall":31,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":20,"market":20},{"id":"R009","vendor_id":"V009","name":"BCG","domain":"bcg.com","category":"Professional Services","tier":"2","pillar":"","region":"AMER","concentration":30,"financial":40,"delivery":70,"compliance":50,"overall":47,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":60,"market":35},{"id":"R010","vendor_id":"V010","name":"Gartner","domain":"gartner.com","category":"Software / SaaS","tier":"3","pillar":"","region":"AMER","concentration":15,"financial":20,"delivery":18,"compliance":15,"overall":17,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":10,"market":15},{"id":"R011","vendor_id":"V011","name":"Conviva","domain":"conviva.com","category":"Software / SaaS","tier":"3","pillar":"","region":"AMER","concentration":20,"financial":22,"delivery":25,"compliance":18,"overall":22,"notes":"Initial FY27 baseline","date":"2026-04-01","relationship":15,"market":17},{"id":"R016","vendor_id":"V016","name":"Computacenter","domain":"computacenter.com","category":"Hardware","tier":"2","pillar":"IT","concentration":45,"financial":40,"delivery":45,"compliance":35,"relationship":38,"market":42,"overall":48,"notes":"Hardware procurement — rate review pending"},{"id":"R018","vendor_id":"V018","name":"Capgemini","domain":"capgemini.com","category":"Professional Services","tier":"2","pillar":"Data Solutions","concentration":40,"financial":35,"delivery":40,"compliance":30,"relationship":35,"market":38,"overall":42,"notes":"Data engineering partner"},{"id":"R019","vendor_id":"V019","name":"Informatica","domain":"informatica.com","category":"Software","tier":"2","pillar":"Data Solutions","concentration":50,"financial":55,"delivery":35,"compliance":30,"relationship":32,"market":62,"overall":53,"notes":"M&A exposure — monitor"}];
+
+var currentView='heatmap';
+var selectedVendor=null;
+var filteredData=[...RISK_DATA];
+var assessAnswers={};
+
+function riskLevel(s){return s<=35?'green':s<=55?'amber':'red';}
+function riskLabel(s){return s<=35?'Healthy':s<=55?'Monitor':'High Risk';}
+function barColor(s){return s<=35?'var(--green)':s<=55?'var(--amber)':'var(--bloom-bright)';}
+function vlogoErr(img){img.style.display='none';var fb=img.nextElementSibling;if(fb)fb.style.display='flex';}
+function logoHtml(domain,name,size){
+  size=size||36;
+  var ini=(name||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+  var pal=['#F43F5E','#C026D3','#A855F7','#FBBF24','#34D399'];
+  var lc=pal[(name||'').length%pal.length];
+  var fb='<div class="hm-logo-fb" style="background:'+lc+';width:'+size+'px;height:'+size+'px;display:none;">'+ini+'</div>';
+  if(!domain) return '<div class="hm-logo-fb" style="background:'+lc+';width:'+size+'px;height:'+size+'px;">'+ini+'</div>';
+  return '<img class="hm-logo" src="https://cdn.brandfetch.io/'+domain+'?c='+BF+'" alt="'+name+'" style="width:'+size+'px;height:'+size+'px;" onerror="vlogoErr(this)">'+fb;
+}
+
+function toggleLegend(){
+  var b=document.getElementById('legend-body');
+  var a=document.getElementById('legend-arrow');
+  b.classList.toggle('open');
+  a.textContent=b.classList.contains('open')?'▼':'▶';
+}
+
+function filterVendors(){
+  var search=document.getElementById('search-input').value.toLowerCase();
+  var riskFil=document.getElementById('risk-filter').value;
+  var typeFil=document.getElementById('type-filter').value;
+  var regionFil=document.getElementById('region-filter').value;
+  var src=window.ALL_VENDORS||RISK_DATA;
+  filteredData=src.filter(function(v){
+    if(search&&!v.name.toLowerCase().includes(search)&&!(v.category||'').toLowerCase().includes(search))return false;
+    if(riskFil!=='all'&&riskLevel(v.overall)!==riskFil)return false;
+    if(typeFil!=='all'&&(v.scoreType||'derived')!==typeFil)return false;
+    if(regionFil!=='all'&&!(v.region||'').includes(regionFil))return false;
+    return true;
+  });
+  renderAll();
+}
+
+function renderSummary(){
+  var total=filteredData.length;
+  var green=filteredData.filter(function(v){return riskLevel(v.overall)==='green';}).length;
+  var amber=filteredData.filter(function(v){return riskLevel(v.overall)==='amber';}).length;
+  var red=filteredData.filter(function(v){return riskLevel(v.overall)==='red';}).length;
+  var vrA=filteredData.filter(function(v){return v.scoreType==='assessed';}).length;
+  var isWLA=document.getElementById('risk-filter')&&document.getElementById('risk-filter').value==='red';
+  var chipHtml=red>0
+    ?'<div class="rs-card" style="display:flex;align-items:center;justify-content:center;"><span class="wl-chip'+(isWLA?' active':'')+'" onclick="toggleWatchFilter()" title="Filter to High Risk only"><span class="wl-chip-dot"></span>&#9888;&nbsp;'+red+' High Risk</span></div>'
+    :'<div class="rs-card"><div class="rs-val" style="color:var(--green)">&#10003;</div><div class="rs-label">No High Risk</div></div>';
+  document.getElementById('summary-strip').innerHTML=
+    '<div class="rs-card"><div class="rs-val">'+total+'</div><div class="rs-label">In Portfolio</div></div>'+
+    '<div class="rs-card"><div class="rs-val" style="color:var(--bloom-bright)">'+vrA+'</div><div class="rs-label">VER Assessed</div></div>'+
+    chipHtml+
+    '<div class="rs-card"><div class="rs-val" style="color:var(--amber)">'+amber+'</div><div class="rs-label">Monitor</div></div>'+
+    '<div class="rs-card"><div class="rs-val" style="color:var(--green)">'+green+'</div><div class="rs-label">Healthy</div></div>';
+}
+
+function toggleWatchFilter(){var sel=document.getElementById('risk-filter');if(!sel)return;sel.value=sel.value==='red'?'all':'red';filterVendors();}
+
+function renderHeatmap(){
+  var dims=[{key:'delivery',label:'Delivery',icon:'&#128666;'},{key:'financial',label:'Financial',icon:'&#128176;'},{key:'relationship',label:'Relation',icon:'&#129309;'},{key:'compliance',label:'Compliance',icon:'&#128203;'}];
+  var html=filteredData.map(function(v){
+    var lvl=riskLevel(v.overall);
+    var bars=dims.map(function(d){var val=v[d.key]||0;return'<div class="hm-bar-row"><div class="hm-bar-label">'+d.icon+' '+d.label+'</div><div class="hm-bar-track"><div class="hm-bar-fill" style="width:'+val+'%;background:'+barColor(val)+'"></div></div></div>';}).join('');
+    var sb=v.scoreType==='assessed'?'<span style="font-size:8px;background:rgba(244,63,94,0.12);color:var(--bloom-bright);padding:1px 6px;border-radius:4px;font-weight:700">&#10003; VER</span>':'<span style="font-size:8px;background:rgba(255,255,255,0.07);color:var(--ink-muted);padding:1px 6px;border-radius:4px;">Derived</span>';
+    return'<div class="hm-card risk-'+lvl+'" data-vid="'+v.id+'">'+
+      '<div class="hm-header">'+logoHtml(v.domain,v.name,32)+'<span class="hm-name">'+v.name+'</span></div>'+
+      '<div style="display:flex;align-items:baseline;gap:5px;"><div class="hm-score">'+v.overall+'</div>'+sb+'</div>'+
+      '<div class="hm-score-label">'+riskLabel(v.overall)+'</div>'+
+      '<div class="hm-bars">'+bars+'</div>'+
+      '<div class="hm-pillar">'+((v.pillar||'').split(' ').slice(0,4).join(' ')||'Not assigned')+'</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('heatmap-view').innerHTML=html||'<div style="padding:40px;color:var(--ink-muted);text-align:center;font-size:12px;">No vendors match the current filters.</div>';
+}
+
+function renderTable(){
+  var html=filteredData.map(function(v){
+    var lvl=riskLevel(v.overall);
+    return'<tr style="cursor:pointer" data-vid="'+v.id+'">'+
+      '<td><strong>'+v.name+'</strong></td>'+
+      '<td style="font-size:10px;color:var(--ink-muted)">'+((v.pillar||'').split(' ').slice(0,3).join(' ')||'—')+'</td>'+
+      '<td style="font-size:10px;">'+( v.category||'—')+'</td>'+
+      '<td><span style="color:'+barColor(v.delivery||0)+'">'+( v.delivery||0)+'</span></td>'+
+      '<td><span style="color:'+barColor(v.financial||0)+'">'+( v.financial||0)+'</span></td>'+
+      '<td><span style="color:'+barColor(v.relationship||0)+'">'+( v.relationship||0)+'</span></td>'+
+      '<td><span style="color:'+barColor(v.market||0)+'">'+( v.market||0)+'</span></td>'+
+      '<td><span style="color:'+barColor(v.compliance||0)+'">'+( v.compliance||0)+'</span></td>'+
+      '<td><strong style="color:'+barColor(v.overall)+'">'+v.overall+'</strong></td>'+
+      '<td><span class="risk-badge rb-'+lvl+'">'+riskLabel(v.overall)+'</span></td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('risk-table-body').innerHTML=html;
+}
+
+function setView(view){
+  currentView=view;
+  document.getElementById('heatmap-view').style.display=view==='heatmap'?'':'none';
+  document.getElementById('table-view').style.display=view==='table'?'':'none';
+  document.getElementById('vt-heatmap').classList.toggle('active',view==='heatmap');
+  document.getElementById('vt-table').classList.toggle('active',view==='table');
+}
+
+function drawRadar(canvasId,scores,labels){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  var isLight=document.body.classList.contains('light-mode');
+  var gridColor=isLight?'rgba(26,8,24,0.15)':'rgba(255,255,255,0.15)';
+  var spokeColor=isLight?'rgba(26,8,24,0.10)':'rgba(255,255,255,0.10)';
+  var labelColor=isLight?'rgba(26,8,24,0.70)':'rgba(255,255,255,0.55)';
+  var W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=Math.min(W,H)/2-28,n=scores.length;
+  ctx.clearRect(0,0,W,H);
+  [0.25,0.5,0.75,1].forEach(function(f){
+    ctx.beginPath();
+    for(var i=0;i<n;i++){var a=(i/n)*Math.PI*2-Math.PI/2;i===0?ctx.moveTo(cx+R*f*Math.cos(a),cy+R*f*Math.sin(a)):ctx.lineTo(cx+R*f*Math.cos(a),cy+R*f*Math.sin(a));}
+    ctx.closePath();ctx.strokeStyle=gridColor;ctx.lineWidth=1;ctx.stroke();
+  });
+  for(var i=0;i<n;i++){var a=(i/n)*Math.PI*2-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(a),cy+R*Math.sin(a));ctx.strokeStyle=spokeColor;ctx.lineWidth=1;ctx.stroke();}
+  ctx.beginPath();
+  scores.forEach(function(s,i){var a=(i/n)*Math.PI*2-Math.PI/2;var r=(s/100)*R;i===0?ctx.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));});
+  ctx.closePath();ctx.fillStyle='rgba(244,63,94,0.14)';ctx.fill();ctx.strokeStyle='#F43F5E';ctx.lineWidth=2;ctx.stroke();
+  scores.forEach(function(s,i){var a=(i/n)*Math.PI*2-Math.PI/2;var r=(s/100)*R;ctx.beginPath();ctx.arc(cx+r*Math.cos(a),cy+r*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle=s>55?'#F87171':s>35?'#FBBF24':'#34D399';ctx.fill();});
+  ctx.fillStyle=labelColor;ctx.font='bold 9px Arial';ctx.textAlign='center';
+  labels.forEach(function(l,i){var a=(i/n)*Math.PI*2-Math.PI/2;var r=R+18;ctx.fillText(l,cx+r*Math.cos(a),cy+r*Math.sin(a)+4);});
+}
+
+function selectVendor(id){
+  var src=window.ALL_VENDORS||RISK_DATA;
+  var v=src.find(function(r){return r.id===id;});
+  if(!v)return;
+  selectedVendor=v;
+  var lvl=riskLevel(v.overall);
+  document.getElementById('rd-name').textContent=v.name;
+  document.getElementById('rd-meta').textContent=(v.category||'')+(v.pillar?' · '+v.pillar.split(' ').slice(0,3).join(' '):'');
+  var circle=document.getElementById('rd-score-circle');
+  var bg={green:'rgba(52,211,153,0.12)',amber:'rgba(251,191,36,0.12)',red:'rgba(244,63,94,0.12)'};
+  var tc={green:'var(--green)',amber:'var(--amber)',red:'var(--bloom-bright)'};
+  circle.style.background=bg[lvl];circle.style.border='1px solid '+tc[lvl];
+  document.getElementById('rd-score-num').style.color=tc[lvl];
+  document.getElementById('rd-score-num').textContent=v.overall;
+  document.getElementById('rd-overall-label').textContent=riskLabel(v.overall);
+  document.getElementById('rd-overall-sub').textContent=v.scoreType==='assessed'?'VER Assessment · '+(v.date||'Unknown'):'Derived from vendors.csv · Pending VER assessment';
+  var dims=[{key:'delivery',label:'Delivery'},{key:'financial',label:'Financial'},{key:'relationship',label:'Relations'},{key:'market',label:'Market'},{key:'compliance',label:'Compliance'}];
+  setTimeout(function(){drawRadar('radarChart',dims.map(function(d){return v[d.key]||0;}),dims.map(function(d){return d.label;}));},50);
+  var dimDefs=[{key:'delivery',label:'Delivery & Reliability',icon:'&#128666;'},{key:'financial',label:'Financial & Spend',icon:'&#128176;'},{key:'relationship',label:'Relationship & Responsiveness',icon:'&#129309;'},{key:'market',label:'Market & Strategic',icon:'&#128202;'},{key:'compliance',label:'Governance & Compliance',icon:'&#128203;'}];
+  document.getElementById('dim-scores').innerHTML=dimDefs.map(function(d){var val=v[d.key]||0;var col=barColor(val);return'<div class="dim-score-row"><div class="dim-score-icon">'+d.icon+'</div><div class="dim-score-label">'+d.label+'</div><div class="dim-score-bar-wrap"><div class="dim-score-track"><div class="dim-score-fill" style="width:'+val+'%;background:'+col+'"></div></div></div><div class="dim-score-val" style="color:'+col+'">'+val+'</div></div>';}).join('');
+  var notesEl=document.getElementById('rd-notes');
+  if(v.notes&&v.notes.trim()){notesEl.textContent=v.notes;notesEl.style.fontStyle='normal';}
+  else{notesEl.textContent='No VER advisory notes on file. Perform a formal assessment to generate advisory notes.';notesEl.style.fontStyle='italic';}
+  document.getElementById('risk-detail').classList.add('open');
+}
+function closeDetail(){document.getElementById('risk-detail').classList.remove('open');selectedVendor=null;}
+
+function populateVendorDatalist(){
+  var dl=document.getElementById('vendor-datalist');if(!dl)return;
+  var src=window.ALL_VENDORS||RISK_DATA;
+  dl.innerHTML=src.map(function(v){return'<option value="'+v.name+'" data-id="'+v.id+'">';}).join('');
+}
+
+function onAssessVendorInput(val){
+  var src=window.ALL_VENDORS||RISK_DATA;
+  var match=src.find(function(v){return v.name.toLowerCase()===val.toLowerCase();});
+  var hid=document.getElementById('assess-vendor-id');
+  if(match){hid.value=match.id;onAssessVendorChange();}else{hid.value='';}
+}
+
+function openAssessment(vendorId){
+  assessAnswers={};
+  document.querySelectorAll('.q-block').forEach(function(el){el.classList.remove('answered');});
+  document.querySelectorAll('input[type=radio]').forEach(function(el){el.checked=false;});
+  updateLiveScore();
+  var inp=document.getElementById('assess-vendor-input');
+  var hid=document.getElementById('assess-vendor-id');
+  if(vendorId){var src=window.ALL_VENDORS||RISK_DATA;var v=src.find(function(v){return v.id===vendorId;});if(inp)inp.value=v?v.name:'';if(hid)hid.value=vendorId||'';}
+  else{if(inp)inp.value='';if(hid)hid.value='';}
+  document.getElementById('assess-panel').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function openAssessmentForVendor(){if(selectedVendor)openAssessment(selectedVendor.id);}
+function closeAssessment(){document.getElementById('assess-panel').classList.remove('open');document.body.style.overflow='';}
+function onAssessVendorChange(){assessAnswers={};document.querySelectorAll('.q-block').forEach(function(el){el.classList.remove('answered');});document.querySelectorAll('input[type=radio]').forEach(function(el){el.checked=false;});updateLiveScore();}
+
+var QUESTIONS=[["delivery",3],[" delivery",3],["delivery",2],["delivery",2],["delivery",2],["financial",3],["financial",3],["financial",2],["financial",2],["relationship",3],["relationship",3],["relationship",2],["relationship",2],["market",3],["market",3],["market",2],["compliance",3],["compliance",3],["compliance",2],["compliance",2]];
+
+function onAnswer(qNum,dim,weight,score){
+  assessAnswers[qNum]={dim:dim,weight:weight,score:score};
+  var block=document.querySelector('[data-q="'+qNum+'"]');
+  if(block)block.classList.add('answered');
+  updateLiveScore();
+}
+
+function updateLiveScore(){
+  var answered=Object.keys(assessAnswers).length;
+  var total=20;
+  var dimSums={delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  var dimWeights={delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  Object.values(assessAnswers).forEach(function(a){dimSums[a.dim]+=a.score*a.weight;dimWeights[a.dim]+=100*a.weight;});
+  var totalW={delivery:12,financial:10,relationship:10,market:8,compliance:10};
+  var dimScores={};
+  Object.keys(dimSums).forEach(function(dim){var mp=totalW[dim]*100;var e=dimSums[dim];dimScores[dim]=mp>0?Math.round((1-e/mp)*100):answered>0?50:0;});
+  var fd=Object.keys(dimScores).filter(function(d){return dimWeights[d]>0;});
+  var overall=fd.length?Math.round(fd.reduce(function(s,d){return s+dimScores[d];},0)/fd.length):0;
+  var scoreEl=document.getElementById('alv-score');
+  if(answered>0){scoreEl.textContent=overall;var cols={green:'var(--green)',amber:'var(--amber)',red:'var(--bloom-bright)'};scoreEl.style.color=cols[riskLevel(overall)];}
+  else{scoreEl.textContent='—';scoreEl.style.color='var(--ink)';}
+  document.getElementById('alv-progress').textContent=answered+' / '+total+' answered';
+  var dims=['delivery','financial','relationship','market','compliance'];
+  drawRadar('liveRadar',dims.map(function(d){return answered>0&&dimWeights[d]>0?dimScores[d]:0;}),['Delivery','Financial','Relations','Market','Compliance']);
+  var dimIcons={delivery:'&#128666;',financial:'&#128176;',relationship:'&#129309;',market:'&#128202;',compliance:'&#128203;'};
+  document.getElementById('alv-dims').innerHTML=dims.map(function(d){var val=dimWeights[d]>0?dimScores[d]:null;var col=val!==null?barColor(val):'var(--ink-muted)';return'<div class="alv-dim-row"><div class="alv-dim-icon">'+dimIcons[d]+'</div><div class="alv-dim-label">'+d.charAt(0).toUpperCase()+d.slice(1)+'</div><div class="alv-dim-val" style="color:'+col+'">'+(val!==null?val:'—')+'</div></div>';}).join('');
+  var saveBtn=document.getElementById('save-btn');
+  var progEl=document.getElementById('af-progress');
+  if(answered===total){saveBtn.disabled=false;progEl.innerHTML='<strong>&#10003; Assessment complete — ready to save</strong>';}
+  else{saveBtn.disabled=true;progEl.innerHTML=answered+' of '+total+' questions answered. Complete all to save.';}
+}
+
+function saveAssessment(){
+  var vendorId=document.getElementById('assess-vendor-id').value;
+  if(!vendorId){alert('Please select a vendor from the list first.');return;}
+  var dimSums={delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  var dimWeights={delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  Object.values(assessAnswers).forEach(function(a){dimSums[a.dim]+=a.score*a.weight;dimWeights[a.dim]+=100*a.weight;});
+  var totalW={delivery:12,financial:10,relationship:10,market:8,compliance:10};
+  var dimScores={};
+  Object.keys(dimSums).forEach(function(dim){var mp=totalW[dim]*100;dimScores[dim]=mp>0?Math.round((1-dimSums[dim]/mp)*100):50;});
+  var overall=Math.round(Object.values(dimScores).reduce(function(s,v){return s+v;},0)/5);
+  var src=window.ALL_VENDORS||RISK_DATA;
+  var vendor=src.find(function(v){return v.id===vendorId||v.vendor_id===vendorId;});
+  if(!vendor){vendor=RISK_DATA.find(function(v){return v.id===vendorId||v.vendor_id===vendorId;});if(!vendor){alert('Vendor not found.');return;}}
+  vendor.delivery=dimScores.delivery;vendor.financial=dimScores.financial;vendor.relationship=dimScores.relationship;vendor.market=dimScores.market;vendor.compliance=dimScores.compliance;vendor.overall=overall;vendor.date=new Date().toISOString().split('T')[0];vendor.scoreType='assessed';
+  closeAssessment();renderAll();
+  if(confirm('Assessment saved for '+vendor.name+'\n\nOverall Score: '+overall+' ('+riskLabel(overall)+')\n\nCopy to clipboard?')){
+    var row=[vendor.id,vendor.name,vendor.date,dimScores.delivery,dimScores.financial,dimScores.compliance,overall,'VER assessment '+vendor.date].join(',');
+    navigator.clipboard&&navigator.clipboard.writeText(row);
+  }
+  selectVendor(vendor.id);
+}
+
+function exportBrief(){
+  if(!selectedVendor)return;
+  var v=selectedVendor;
+  var brief=['VER RISK BRIEF','══════════════════════════════════','Vendor: '+v.name,'Category: '+(v.category||'—'),'Pillar: '+(v.pillar||'—'),'Assessment Date: '+(v.date||'Not yet assessed'),'','OVERALL RISK SCORE: '+v.overall+' — '+riskLabel(v.overall),'','DIMENSION BREAKDOWN','──────────────────────────────────','Delivery & Reliability:       '+v.delivery,'Financial & Spend:            '+v.financial,'Relationship & Responsiveness:'+v.relationship,'Market & Strategic:           '+v.market,'Governance & Compliance:      '+v.compliance,'','VER ADVISORY NOTES','──────────────────────────────────',v.notes||'No notes recorded.','','══════════════════════════════════','Prepared by VER Intelligence · Salesforce DET · Confidential'].join('\n');
+  navigator.clipboard&&navigator.clipboard.writeText(brief).then(function(){alert('Risk Brief copied to clipboard.');});
+}
+
+function printRiskProfile(){if(!selectedVendor)return;window.print();}
+
+function renderAll(){
+  renderSummary();renderHeatmap();renderTable();
+  var ht=document.getElementById('hero-total');
+  var hh=document.getElementById('hero-highrisk');
+  if(ht)ht.textContent=filteredData.length;
+  if(hh)hh.textContent=filteredData.filter(function(v){return v.overall>=67;}).length;
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.addEventListener('click',function(e){var t=e.target.closest('[data-vid]');if(t)selectVendor(t.getAttribute('data-vid'));});
+  if(window.VER_VENDORS&&window.VER_VENDORS.length>50){
+    var amap={};RISK_DATA.forEach(function(r){amap[r.name.toLowerCase()]=r;});
+    var all=window.VER_VENDORS.map(function(v){
+      var a=amap[v.name.toLowerCase()];
+      return{id:a?a.id:'VR-'+v.id,vendor_id:v.id,name:v.name,domain:v.domain||'',category:v.category||'',tier:String(v.tier||3),pillar:v.pillar||'',region:v.region||'',concentration:a?a.concentration:v.concentration_risk||30,delivery:a?a.delivery:v.delivery_risk||20,financial:a?a.financial:v.financial_risk||20,compliance:a?a.compliance:v.compliance_risk||15,relationship:a?a.relationship:20,market:a?a.market:20,overall:a?a.overall:v.risk_score||Math.round((v.concentration_risk||30)*0.3+(v.delivery_risk||20)*0.3+(v.financial_risk||20)*0.2+(v.compliance_risk||15)*0.2),notes:(a?a.notes:v.notes)||'',date:a?a.date:'',scoreType:a?'assessed':'derived'};
+    });
+    window.ALL_VENDORS=all;filteredData=all.slice();
+  }else{filteredData=RISK_DATA.slice();}
+  renderAll();populateVendorDatalist();
+});
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+(function(){try{var u=JSON.parse(localStorage.getItem('ver-team-user')||'null');if(u){var e=document.getElementById('sb-user-emoji'),n=document.getElementById('sb-user-name'),r=document.getElementById('sb-user-role');if(e)e.textContent=u.emoji||'👤';if(n)n.textContent=u.name||'Team VER';if(r)r.textContent=u.role||'VER Team';}}catch(ex){}})();
+</script>
+</body>
+</html>

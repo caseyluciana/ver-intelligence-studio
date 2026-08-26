@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ghost Capacity View · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --blue:#2563EB;--blue2:#1D4ED8;--blue3:#EFF6FF;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+[data-theme="dark"]{
+  --gray:#080F1E;--gray2:#111F35;--gray3:#1A2D47;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --white:#0F1E3C;--ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --red3:rgba(220,38,38,0.15);--red2:#FCA5A5;
+  --amber3:rgba(217,119,6,0.15);--amber2:#FCD34D;
+  --green3:rgba(5,150,105,0.15);--green2:#6EE7B7;
+  --blue3:rgba(37,99,235,0.15);--blue2:#93C5FD;
+  --purple3:rgba(124,58,237,0.15);--purple2:#C4B5FD;
+  --teal3:rgba(13,148,136,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .card,[data-theme="dark"] .pc-card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .exec-brief{background:linear-gradient(135deg,#0F1E3C,#1A0F2E);}
+[data-theme="dark"] .card-title{color:var(--ink);}
+[data-theme="dark"] .pc-label{color:var(--ink4);}
+[data-theme="dark"] .pc-value{color:var(--ink);}
+[data-theme="dark"] .status-badge{background:rgba(255,255,255,0.08)!important;color:var(--ink2)!important;}
+[data-theme="dark"] .score-badge{background:rgba(255,255,255,0.08)!important;color:var(--ink2)!important;}
+[data-theme="dark"] th{color:var(--ink4);border-bottom-color:var(--border);}
+[data-theme="dark"] td{color:var(--ink2);border-bottom-color:var(--border);}
+[data-theme="dark"] tr:hover td{background:var(--gray2);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;-webkit-font-smoothing:antialiased;}
+
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;background:rgba(10,18,38,0.96);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.07);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8pt;color:rgba(255,255,255,0.45);text-decoration:none;font-weight:600;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.1);}
+.htb-brand{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.55);}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-tag{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.25);padding:3px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:4px;}
+.top-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:6px;
+  border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);
+  color:rgba(255,255,255,0.5);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.top-btn:hover{background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.4);color:#C4B5FD;}
+.top-btn-manage{border-color:rgba(124,58,237,0.4);color:#C4B5FD;}
+
+/* HERO */
+.hero{background:linear-gradient(150deg,#06091A 0%,#0C0618 40%,#060D1A 100%);
+  padding:22px 0 18px;position:relative;overflow:hidden;}
+.hero-glow-1{position:absolute;top:-60px;right:-80px;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.13),transparent 65%);pointer-events:none;
+  animation:glowPulse 7s ease-in-out infinite;}
+.hero-glow-2{position:absolute;bottom:-60px;left:5%;width:380px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(5,150,105,0.07),transparent 65%);pointer-events:none;}
+@keyframes glowPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.06);}}
+.hero-wrap{max-width:1280px;margin:0 auto;padding:0 52px;position:relative;}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.hero-eyebrow-text{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.35);}
+.hero-eyebrow-dot{width:4px;height:4px;border-radius:50%;background:rgba(124,58,237,0.9);}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.05;margin-bottom:6px;letter-spacing:-0.02em;}
+.hero-title span{color:#C4B5FD;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.5);line-height:1.6;max-width:600px;margin-bottom:14px;}
+.hero-data-source{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;
+  font-size:7pt;color:rgba(255,255,255,0.3);font-weight:600;letter-spacing:0.05em;margin-bottom:20px;}
+.hero-data-source-dot{width:6px;height:6px;border-radius:50%;background:#F59E0B;
+  box-shadow:0 0 6px #F59E0B;animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.hero-kpis{display:flex;gap:14px;flex-wrap:wrap;}
+.hkpi{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:15px 18px;min-width:132px;position:relative;overflow:hidden;transition:all 0.2s;}
+.hkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0.7;}
+.hkpi.red::before{background:linear-gradient(90deg,#DC2626,transparent);}
+.hkpi.amber::before{background:linear-gradient(90deg,#D97706,transparent);}
+.hkpi.purple::before{background:linear-gradient(90deg,#7C3AED,transparent);}
+.hkpi.green::before{background:linear-gradient(90deg,#059669,transparent);}
+.hkpi:hover{background:rgba(255,255,255,0.08);}
+.hkpi-val{font-size:20pt;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.02em;}
+.hkpi.red .hkpi-val{color:#FCA5A5;}
+.hkpi.amber .hkpi-val{color:#FCD34D;}
+.hkpi.purple .hkpi-val{color:#C4B5FD;}
+.hkpi.green .hkpi-val{color:#6EE7B7;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-top:5px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.3);margin-top:3px;line-height:1.4;}
+
+/* EXEC BRIEF */
+.exec-brief{background:linear-gradient(135deg,#0F1E3C 0%,#180F2E 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);padding:28px 0;}
+.exec-brief-wrap{max-width:1280px;margin:0 auto;padding:0 52px;}
+.eb-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.3);margin-bottom:16px;}
+.eb-insights{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.eb-insight{padding:16px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);}
+.eb-insight.critical{border-left:3px solid #DC2626;background:rgba(220,38,38,0.06);}
+.eb-insight.warning{border-left:3px solid #D97706;background:rgba(217,119,6,0.06);}
+.eb-insight.info{border-left:3px solid #7C3AED;background:rgba(124,58,237,0.06);}
+.ebi-number{font-size:22pt;font-weight:900;color:rgba(255,255,255,0.1);float:right;line-height:1;margin-left:8px;}
+.ebi-headline{font-size:9.5pt;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;}
+.ebi-body{font-size:8pt;color:rgba(255,255,255,0.45);line-height:1.6;}
+
+/* PAGE */
+.page-wrap{max-width:1280px;margin:0 auto;padding:32px 52px 72px;}
+.sec-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--ink4);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.filter-label{font-size:7.5pt;color:var(--ink4);font-weight:700;}
+.filter-btn{padding:5px 13px;border-radius:6px;border:1px solid var(--border2);background:var(--white);
+  font-size:7.5pt;font-weight:700;color:var(--ink4);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.filter-btn:hover{border-color:var(--purple);color:var(--purple);}
+.filter-btn.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+
+/* PILLAR CARDS */
+.pillar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(560px,1fr));gap:20px;margin-bottom:32px;}
+.pillar-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,0.05);transition:box-shadow 0.2s,transform 0.2s;cursor:pointer;}
+.pillar-card:hover{box-shadow:0 8px 28px rgba(0,0,0,0.12);transform:translateY(-3px);}
+.pillar-card:focus-visible{outline:2px solid var(--purple);outline-offset:2px;}
+.pillar-card.ghost-critical{border-top:3px solid var(--red);}
+.pillar-card.ghost-medium{border-top:3px solid var(--amber);}
+.pillar-card.ghost-low{border-top:3px solid var(--green);}
+
+.pc-header{padding:16px 18px 13px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.pc-title-area{}
+.pc-pillar{font-size:11pt;font-weight:900;color:var(--ink);}
+.pc-sub{font-size:7.5pt;color:var(--ink4);margin-top:3px;}
+.ghost-badge{padding:4px 11px;border-radius:6px;font-size:7pt;font-weight:800;white-space:nowrap;flex-shrink:0;}
+.gb-critical{background:var(--red3);color:var(--red2);}
+.gb-medium{background:var(--amber3);color:var(--amber2);}
+.gb-low{background:var(--green3);color:var(--green2);}
+
+.pc-metrics{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+.pc-metric{padding:12px 14px;border-right:1px solid var(--border);text-align:center;}
+.pc-metric:last-child{border-right:none;}
+.pcm-val{font-size:13pt;font-weight:900;color:var(--ink);line-height:1;}
+.pcm-lbl{font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink4);margin-top:3px;}
+.pcm-val.red{color:var(--red);}
+.pcm-val.amber{color:var(--amber);}
+.pcm-val.green{color:var(--green);}
+
+.pc-body{padding:16px 18px;}
+
+/* DUAL BAR VISUAL */
+.gap-visual{margin-bottom:14px;}
+.gv-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.gv-label{font-size:7.5pt;font-weight:700;color:var(--ink3);width:110px;flex-shrink:0;}
+.gv-track{flex:1;height:10px;background:var(--gray2);border-radius:99px;overflow:hidden;position:relative;}
+.gv-fill{height:100%;border-radius:99px;transition:width 0.9s cubic-bezier(.4,0,.2,1);}
+.gv-fill.spend{background:linear-gradient(90deg,#7C3AED,#A78BFA);}
+.gv-fill.output{background:linear-gradient(90deg,#0D9488,#34D399);}
+.gv-fill.expected{background:linear-gradient(90deg,#6B7280,#9CA3AF);}
+.gv-pct{font-size:7.5pt;font-weight:700;color:var(--ink4);width:36px;text-align:right;flex-shrink:0;}
+
+.gap-callout{padding:11px 14px;border-radius:9px;display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.gc-critical{background:var(--red3);border:1px solid rgba(220,38,38,0.12);}
+.gc-medium{background:var(--amber3);border:1px solid rgba(217,119,6,0.12);}
+.gc-low{background:var(--green3);border:1px solid rgba(5,150,105,0.12);}
+.gc-icon{font-size:13pt;flex-shrink:0;}
+.gc-body{}
+.gc-title{font-size:8pt;font-weight:800;color:var(--ink);margin-bottom:3px;}
+.gc-text{font-size:7.5pt;line-height:1.5;color:var(--ink3);}
+
+.vendors-chips{margin-top:10px;}
+.vc-label{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink4);margin-bottom:6px;}
+.vc-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.vc-chip{padding:3px 9px;border-radius:5px;font-size:7.5pt;font-weight:700;
+  background:var(--gray2);color:var(--ink3);border:1px solid var(--border);}
+.vc-chip.top{background:var(--purple3);color:var(--purple2);border-color:rgba(124,58,237,0.2);}
+.vc-chip.coupa{border-color:rgba(34,197,94,0.3);}
+
+/* FINDINGS / RECOS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
+.panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px 22px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.panel-title{font-size:10pt;font-weight:800;color:var(--ink);margin-bottom:14px;
+  padding-bottom:10px;border-bottom:1px solid var(--border);}
+.finding-item{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--gray2);}
+.finding-item:last-child{border-bottom:none;}
+.fi-rank{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:8pt;font-weight:800;flex-shrink:0;margin-top:1px;}
+.fi-rank.red{background:var(--red3);color:var(--red2);}
+.fi-rank.amber{background:var(--amber3);color:var(--amber2);}
+.fi-rank.green{background:var(--green3);color:var(--green2);}
+.fi-title{font-size:8.5pt;font-weight:700;color:var(--ink);}
+.fi-detail{font-size:7.5pt;color:var(--ink4);line-height:1.5;margin-top:2px;}
+.reco-item{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--gray2);}
+.reco-item:last-child{border-bottom:none;}
+.reco-num{width:24px;height:24px;border-radius:50%;background:var(--navy);color:rgba(255,255,255,0.9);
+  display:flex;align-items:center;justify-content:center;font-size:8pt;font-weight:800;flex-shrink:0;margin-top:1px;}
+.reco-title{font-size:8.5pt;font-weight:700;color:var(--ink);}
+.reco-text{font-size:7.5pt;color:var(--ink4);line-height:1.5;margin-top:2px;}
+
+/* TABLE */
+.tbl-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.rtbl{width:100%;border-collapse:collapse;}
+.rtbl th{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;
+  color:var(--ink4);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);
+  background:var(--gray);white-space:nowrap;}
+.rtbl td{font-size:8.5pt;color:var(--ink2);padding:9px 14px;border-bottom:1px solid var(--border);}
+.rtbl tr:last-child td{border-bottom:none;}
+.rtbl tr:hover td{background:var(--gray2);}
+.gap-pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:7pt;font-weight:700;}
+.gp-critical{background:var(--red3);color:var(--red2);}
+.gp-medium{background:var(--amber3);color:var(--amber2);}
+.gp-low{background:var(--green3);color:var(--green2);}
+
+.data-note{margin-top:28px;padding:14px 18px;background:var(--white);border:1px solid var(--border);
+  border-radius:10px;display:flex;align-items:flex-start;gap:12px;}
+.dn-icon{font-size:11pt;flex-shrink:0;opacity:0.6;}
+.dn-text{font-size:7.5pt;color:var(--ink4);line-height:1.6;}
+.dn-text strong{color:var(--ink3);}
+
+.fade-up{opacity:0;transform:translateY(18px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+/* PILLAR DETAIL MODAL */
+.pdm-overlay{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  opacity:0;transition:opacity 0.2s ease;pointer-events:none;}
+.pdm-overlay.open{opacity:1;pointer-events:auto;}
+.pdm-box{background:var(--white);border:1px solid var(--border);border-radius:16px;
+  width:100%;max-width:640px;max-height:88vh;overflow-y:auto;
+  box-shadow:0 24px 64px rgba(0,0,0,0.22);
+  transform:translateY(20px) scale(0.97);transition:transform 0.25s cubic-bezier(.4,0,.2,1);
+  position:relative;}
+.pdm-overlay.open .pdm-box{transform:translateY(0) scale(1);}
+[data-theme="dark"] .pdm-box{background:#111F35;border-color:rgba(255,255,255,0.1);}
+[data-theme="dark"] .pdm-overlay{background:rgba(0,0,0,0.72);}
+
+.pdm-top{padding:20px 22px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.pdm-title-area{}
+.pdm-eyebrow{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink4);margin-bottom:5px;}
+.pdm-name{font-size:14pt;font-weight:900;color:var(--ink);line-height:1.2;}
+.pdm-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-size:14pt;color:var(--ink4);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:inherit;transition:all 0.15s;line-height:1;}
+.pdm-close:hover{background:var(--gray2);color:var(--ink);}
+[data-theme="dark"] .pdm-close:hover{background:rgba(255,255,255,0.08);}
+
+.pdm-metrics{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+.pdm-metric{padding:14px 12px;text-align:center;border-right:1px solid var(--border);}
+.pdm-metric:last-child{border-right:none;}
+.pdmm-val{font-size:13pt;font-weight:900;color:var(--ink);line-height:1;}
+.pdmm-lbl{font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink4);margin-top:3px;}
+.pdmm-val.red{color:var(--red);}
+.pdmm-val.amber{color:var(--amber);}
+.pdmm-val.green{color:var(--green);}
+
+.pdm-section{padding:16px 22px;border-bottom:1px solid var(--border);}
+.pdm-section:last-child{border-bottom:none;}
+.pdm-sec-label{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--ink4);margin-bottom:10px;}
+
+.pdm-utilization{display:flex;flex-direction:column;gap:8px;}
+.pdm-util-row{display:flex;align-items:center;gap:10px;}
+.pdm-util-lbl{font-size:7.5pt;font-weight:700;color:var(--ink3);width:120px;flex-shrink:0;}
+.pdm-util-track{flex:1;height:10px;background:var(--gray2);border-radius:99px;overflow:hidden;}
+.pdm-util-fill{height:100%;border-radius:99px;transition:width 0.8s cubic-bezier(.4,0,.2,1);}
+.pdm-util-fill.spend{background:linear-gradient(90deg,#7C3AED,#A78BFA);}
+.pdm-util-fill.output{background:linear-gradient(90deg,#0D9488,#34D399);}
+.pdm-util-fill.expected{background:linear-gradient(90deg,#6B7280,#9CA3AF);}
+.pdm-util-pct{font-size:7.5pt;font-weight:700;color:var(--ink4);width:32px;text-align:right;flex-shrink:0;}
+
+.pdm-risk-list{display:flex;flex-direction:column;gap:7px;}
+.pdm-risk-item{display:flex;align-items:center;gap:10px;padding:8px 11px;
+  border-radius:8px;background:var(--gray2);border:1px solid var(--border);}
+[data-theme="dark"] .pdm-risk-item{background:rgba(255,255,255,0.04);}
+.pdm-risk-rank{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:7.5pt;font-weight:800;flex-shrink:0;background:var(--red3);color:var(--red2);}
+.pdm-risk-vendor{font-size:8.5pt;font-weight:700;color:var(--ink);flex:1;}
+.pdm-risk-note{font-size:7pt;color:var(--ink4);}
+
+.pdm-actions-list{display:flex;flex-direction:column;gap:7px;}
+.pdm-action-item{display:flex;gap:10px;padding:9px 11px;
+  border-radius:8px;border:1px solid var(--border2);background:var(--gray);}
+[data-theme="dark"] .pdm-action-item{background:rgba(255,255,255,0.03);}
+.pdm-action-num{width:22px;height:22px;border-radius:50%;background:var(--navy);
+  color:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;
+  font-size:7.5pt;font-weight:800;flex-shrink:0;margin-top:1px;}
+[data-theme="dark"] .pdm-action-num{background:#1E3A5F;}
+.pdm-action-text{font-size:8pt;color:var(--ink3);line-height:1.5;}
+
+.pdm-callout{padding:11px 14px;border-radius:9px;margin-bottom:0;}
+.pdm-callout.critical{background:var(--red3);border:1px solid rgba(220,38,38,0.15);}
+.pdm-callout.medium{background:var(--amber3);border:1px solid rgba(217,119,6,0.15);}
+.pdm-callout.low{background:var(--green3);border:1px solid rgba(5,150,105,0.15);}
+.pdm-callout-text{font-size:7.5pt;line-height:1.55;color:var(--ink3);}
+
+/* ── MANAGE DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.drawer-overlay.open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100vw);z-index:801;
+  background:var(--white);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform 0.28s cubic-bezier(.4,0,.2,1);}
+[data-theme="dark"] .drawer{background:#0D1B30;border-color:rgba(255,255,255,0.1);}
+.drawer-overlay.open .drawer{transform:translateX(0);}
+.drawer-head{padding:18px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.drawer-title{font-size:11pt;font-weight:900;color:var(--ink);}
+.drawer-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-size:14pt;color:var(--ink4);
+  display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all 0.15s;}
+.drawer-close:hover{background:var(--gray2);color:var(--ink);}
+.drawer-body{flex:1;overflow-y:auto;padding:16px 20px;}
+.drawer-foot{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.d-btn{padding:7px 16px;border-radius:8px;font-size:8pt;font-weight:700;
+  cursor:pointer;font-family:inherit;border:1px solid var(--border);
+  background:var(--gray2);color:var(--ink3);transition:all 0.15s;}
+.d-btn:hover{border-color:var(--purple);color:var(--purple);}
+.d-btn.primary{background:var(--purple);border-color:var(--purple);color:#fff;}
+.d-btn.primary:hover{background:var(--purple2);border-color:var(--purple2);}
+.d-btn.danger{background:var(--red3);border-color:rgba(220,38,38,0.2);color:var(--red);}
+.d-btn.danger:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.d-btn.success{background:var(--green3);border-color:rgba(5,150,105,0.2);color:var(--green2);}
+.d-btn.success:hover{background:var(--green);color:#fff;border-color:var(--green);}
+.drawer-sect-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink4);margin:14px 0 8px;}
+.pillar-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;
+  border:1px solid var(--border);background:var(--gray);margin-bottom:6px;}
+[data-theme="dark"] .pillar-row{background:rgba(255,255,255,0.03);}
+.pillar-row-name{flex:1;font-size:8.5pt;font-weight:700;color:var(--ink);}
+.pillar-row-gap{font-size:7.5pt;font-weight:700;padding:2px 7px;border-radius:5px;}
+.pillar-row-edit{padding:4px 10px;border-radius:6px;font-size:7.5pt;font-weight:700;
+  border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--ink4);
+  font-family:inherit;transition:all 0.15s;}
+.pillar-row-edit:hover{border-color:var(--purple);color:var(--purple);}
+.pillar-row-del{padding:4px 8px;border-radius:6px;font-size:7.5pt;font-weight:700;
+  border:1px solid transparent;background:transparent;cursor:pointer;color:var(--ink4);
+  font-family:inherit;transition:all 0.15s;}
+.pillar-row-del:hover{color:var(--red);border-color:rgba(220,38,38,0.3);}
+.pf-form{background:var(--gray);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-top:8px;}
+[data-theme="dark"] .pf-form{background:rgba(255,255,255,0.03);}
+.pf-form-title{font-size:9pt;font-weight:800;color:var(--ink);margin-bottom:12px;}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pf-field{display:flex;flex-direction:column;gap:4px;}
+.pf-field.full{grid-column:1/-1;}
+.pf-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);}
+.pf-input{padding:7px 10px;border-radius:7px;border:1px solid var(--border);
+  background:var(--white);color:var(--ink);font-family:inherit;font-size:8.5pt;transition:border-color 0.15s;}
+[data-theme="dark"] .pf-input{background:#111F35;color:var(--ink);}
+.pf-input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,0.12);}
+.pf-textarea{resize:vertical;min-height:64px;}
+.pf-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end;}
+.method-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;margin-top:28px;}
+.method-head{padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+  list-style:none;}
+.method-head:hover{background:var(--gray2);}
+[data-theme="dark"] .method-head:hover{background:rgba(255,255,255,0.04);}
+.method-title{font-size:9pt;font-weight:800;color:var(--ink);}
+.method-body{padding:18px 20px;}
+.method-formula{background:var(--gray2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;font-family:monospace;font-size:8.5pt;color:var(--ink2);margin:6px 0 12px;line-height:1.8;}
+[data-theme="dark"] .method-formula{background:rgba(255,255,255,0.05);}
+.method-row{margin-bottom:16px;}
+.method-row-label{font-size:8.5pt;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.method-row-body{font-size:7.5pt;color:var(--ink4);line-height:1.6;}
+.method-row:last-child{margin-bottom:0;}
+
+@media(max-width:900px){
+  .hero-wrap,.exec-brief-wrap,.page-wrap{padding:0 20px;}
+  .page-wrap{padding-top:24px;}
+  .pillar-grid{grid-template-columns:1fr;}
+  .two-col{grid-template-columns:1fr;}
+  .pc-metrics{grid-template-columns:repeat(2,1fr);}
+  .eb-insights{grid-template-columns:1fr;}
+  .hero-title{font-size:17pt;}
+}
+@media print{
+  .hub-top-bar,.top-btn,.filter-bar{display:none!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .fade-up{opacity:1!important;transform:none!important;}
+  .hero{background:#0F1E3C!important;}
+  .exec-brief{background:#f8f9fa!important;}
+  .pillar-card,.panel{break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">VER Intelligence Hub</span>
+  </div>
+  <div class="htb-right">
+    <div class="htb-tag">DET Confidential</div>
+    <button type="button" class="top-btn" id="dm-btn" onclick="toggleDark()">☾ Dark</button>
+    <button type="button" class="top-btn" onclick="openGhostHelp()">? How to Use</button>
+    <button type="button" class="top-btn top-btn-manage" onclick="openDrawer()">⚙ Manage Pillars</button>
+    <button type="button" class="top-btn" onclick="window.print()">Print / PDF</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-wrap">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      <span class="hero-eyebrow-text">Executive Intelligence &middot; FY27</span>
+    </div>
+    <h1 class="hero-title">Ghost <span>Capacity View</span></h1>
+    <p class="hero-sub">CWF &amp; vendor spend mapped against delivery throughput by pillar. Surfaces where dollars went in but output didn&#8217;t move &#8212; the gap between what was invoiced and what was actually delivered.</p>
+    <div class="hero-data-source">
+      <div class="hero-data-source-dot"></div>
+      Vendor spend: Coupa-aligned estimates &nbsp;|&nbsp; Output scores &amp; throughput: VER analyst estimates &nbsp;|&nbsp; Gap classification: calculated
+    </div>
+    <div class="hero-kpis" id="hero-kpis"></div>
+  </div>
+</section>
+
+<section class="exec-brief">
+  <div class="exec-brief-wrap">
+    <div class="eb-label">What leadership needs to know right now</div>
+    <div class="eb-insights" id="exec-insights"></div>
+  </div>
+</section>
+
+<!-- ── LEGEND STRIP ─────────────────────────────────────── -->
+<style>
+.legend-strip{max-width:1280px;margin:0 auto 0;padding:0 52px;}
+.legend-bar{display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:10px 16px;margin-bottom:16px;}
+[data-theme="dark"] .legend-bar{background:rgba(255,255,255,0.04);border-color:var(--border);}
+.legend-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink4);flex-shrink:0;margin-right:4px;}
+.legend-items{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--ink3);}
+[data-theme="dark"] .legend-item{color:var(--ink4);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-dot-red{background:#EF4444;}
+.legend-dot-amber{background:#F59E0B;}
+.legend-dot-green{background:#10B981;}
+.legend-dot-purple{background:#7C3AED;}
+.legend-dot-teal{background:#0D9488;}
+.legend-dot-gray{background:#6B7280;}
+.legend-formula{font-size:10px;color:var(--ink4);}
+.legend-divider{width:1px;height:14px;background:var(--border);flex-shrink:0;}
+@media(max-width:900px){.legend-strip{padding:0 20px;}}
+</style>
+<div class="legend-strip">
+  <div class="legend-bar">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><div class="legend-dot legend-dot-red"></div>Critical Gap (&gt;30% ghost)</div>
+      <div class="legend-item"><div class="legend-dot legend-dot-amber"></div>Medium Gap (15–30%)</div>
+      <div class="legend-item"><div class="legend-dot legend-dot-green"></div>Aligned (&lt;15%)</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item"><div class="legend-dot legend-dot-purple"></div>Ghost Capacity</div>
+      <div class="legend-item"><div class="legend-dot legend-dot-teal"></div>Output Score</div>
+      <div class="legend-item"><div class="legend-dot legend-dot-gray"></div>Expected Output</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item legend-formula">Ghost % = (Expected − Actual) ÷ Expected &nbsp;&middot;&nbsp; &gt;30% Critical · 15–30% Medium · &lt;15% Aligned</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+  <p class="sec-label">Spend vs. Output by Pillar</p>
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <button type="button" class="filter-btn active" onclick="filterPillars('all',this)">All Pillars</button>
+    <button type="button" class="filter-btn" onclick="filterPillars('critical',this)">Critical Gap</button>
+    <button type="button" class="filter-btn" onclick="filterPillars('medium',this)">Medium Gap</button>
+    <button type="button" class="filter-btn" onclick="filterPillars('low',this)">Aligned</button>
+  </div>
+  <div class="pillar-grid" id="pillar-grid"></div>
+
+  <p class="sec-label">Key Findings &amp; Executive Recommendations</p>
+  <div class="two-col">
+    <div class="panel" id="findings-panel"></div>
+    <div class="panel" id="recos-panel"></div>
+  </div>
+
+  <p class="sec-label">Pillar Summary Table</p>
+  <div class="tbl-wrap fade-up">
+    <table class="rtbl">
+      <thead>
+        <tr>
+          <th>Pillar</th>
+          <th>CWF Spend</th>
+          <th>Vendor Spend</th>
+          <th>Total Investment</th>
+          <th>Output Score</th>
+          <th>Throughput Delta</th>
+          <th>Gap Rating</th>
+        </tr>
+      </thead>
+      <tbody id="summary-tbl"></tbody>
+    </table>
+  </div>
+
+  <details class="method-panel fade-up">
+    <summary class="method-head">
+      <span class="method-title">&#128220; Methodology — How Every Number Is Calculated</span>
+      <span>&#9660;</span>
+    </summary>
+    <div class="method-body">
+      <div class="method-row">
+        <div class="method-row-label">Ghost Capacity %</div>
+        <div class="method-formula">Ghost % = (Expected Output Score − Actual Output Score) ÷ Expected Output Score × 100</div>
+        <div class="method-row-body">Measures the relative performance gap against what was expected — not a raw inverse of the output score. A pillar with actual=71 and expected=75 has a 5.3% ghost rate, not 29%. This is the only defensible framing for leadership: it accounts for realistic expectations, not a theoretical 100% benchmark.</div>
+      </div>
+      <div class="method-row">
+        <div class="method-row-label">Gap Classification</div>
+        <div class="method-formula">Critical: Ghost % &gt; 30% &nbsp;|&nbsp; Medium: 15–30% &nbsp;|&nbsp; Aligned: &lt; 15%</div>
+        <div class="method-row-body">Thresholds are calculated automatically from the Ghost % formula — never manually assigned. This eliminates classification inconsistencies caused by hardcoded status values in the data.</div>
+      </div>
+      <div class="method-row">
+        <div class="method-row-label">Capital at Risk</div>
+        <div class="method-formula">Capital at Risk = Sum of (CWF Spend + Vendor Spend) for all Critical Gap pillars</div>
+        <div class="method-row-body">The total investment in pillars where spend materially exceeds attributable output. This is <em>spend under review</em>, not confirmed waste — it surfaces where leadership conversations should be happening. Not every dollar is unproductive; the number sets the scope of inquiry.</div>
+      </div>
+      <div class="method-row">
+        <div class="method-row-label">CWF Mix</div>
+        <div class="method-formula">CWF Mix = CWF Spend ÷ (CWF Spend + Vendor Spend) × 100</div>
+        <div class="method-row-body">Shows sourcing composition — what share of the pillar's investment is contingent workforce versus direct vendor spend. High CWF mix in a critical gap pillar may indicate staff-aug model risk. This is a composition measure, not a spend efficiency measure.</div>
+      </div>
+      <div class="method-row">
+        <div class="method-row-label">Output Score</div>
+        <div class="method-row-body">A 0–100 analyst-estimated composite of delivery quality, milestone completion rate, and SLA adherence for the pillar. There is no single authoritative system of record — scores are VER analyst assessments based on program status reporting and stakeholder feedback. Confidence is directional; treat scores as relative comparisons, not absolute measurements.</div>
+      </div>
+      <div class="method-row">
+        <div class="method-row-label">Throughput Delta</div>
+        <div class="method-row-body">The percentage point change between actual output score and expected output score. A negative delta means the pillar is delivering below its performance contract. Displayed separately from Ghost % to preserve the raw gap signal alongside the normalized rate.</div>
+      </div>
+      <div class="method-row">
+        <div class="method-row-label">Data Transparency</div>
+        <div class="method-row-body">Spend figures are VER analyst estimates aligned to Coupa pillar/category groupings. Output scores are directional estimates — not sourced from a program management system. This view is designed to surface conversations and prioritize review, not replace a formal program health dashboard. All pillar data is editable in the Manage Pillars drawer.</div>
+      </div>
+    </div>
+  </details>
+
+  <div class="data-note fade-up">
+    <div class="dn-icon">&#8505;</div>
+    <div class="dn-text">
+      <strong>Data provenance:</strong> Vendor spend figures are Coupa-aligned estimates — sourced from VER analyst review of Coupa category groupings, not a direct API pull.
+      <strong>Output scores and throughput deltas are VER analyst estimates</strong> based on program status reporting, delivery milestone tracking, and stakeholder feedback — no single authoritative system tracks these across all pillars.
+      <strong>Gap classifications are calculated</strong> from the Ghost % formula, not manually assigned. All pillar data is editable via the Manage Pillars drawer. This view is designed to surface conversations, not replace a formal program health dashboard.
+    </div>
+  </div>
+</div>
+
+<!-- Manage Pillars Drawer -->
+<div class="drawer-overlay" id="drawer-overlay">
+  <div class="drawer" role="dialog" aria-modal="true" aria-label="Manage Pillars">
+    <div class="drawer-head">
+      <div class="drawer-title">Manage Pillars</div>
+      <button type="button" class="drawer-close" id="drawer-close" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-foot">
+      <button type="button" class="d-btn primary" onclick="showAddForm()">+ Add Pillar</button>
+      <button type="button" class="d-btn success" onclick="exportCSV()">&#8595; Export CSV</button>
+      <button type="button" class="d-btn danger" onclick="resetToDefaults()">Reset to Defaults</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pillar Detail Modal -->
+<div class="pdm-overlay" id="pdm-overlay" role="dialog" aria-modal="true" aria-labelledby="pdm-modal-name">
+  <div class="pdm-box" id="pdm-box">
+    <div class="pdm-top">
+      <div class="pdm-title-area">
+        <div class="pdm-eyebrow" id="pdm-eyebrow">Pillar Detail</div>
+        <div class="pdm-name" id="pdm-modal-name"></div>
+      </div>
+      <button type="button" class="pdm-close" id="pdm-close" aria-label="Close detail modal">&#x2715;</button>
+    </div>
+    <div class="pdm-metrics" id="pdm-metrics"></div>
+    <div class="pdm-section" id="pdm-util-section">
+      <div class="pdm-sec-label">Utilization Breakdown</div>
+      <div class="pdm-utilization" id="pdm-utilization"></div>
+    </div>
+    <div class="pdm-section" id="pdm-risk-section">
+      <div class="pdm-sec-label">Top Vendors at Risk</div>
+      <div class="pdm-risk-list" id="pdm-risk-list"></div>
+    </div>
+    <div class="pdm-section" id="pdm-summary-section">
+      <div class="pdm-sec-label">Gap Summary</div>
+      <div class="pdm-callout" id="pdm-callout">
+        <div class="pdm-callout-text" id="pdm-callout-text"></div>
+      </div>
+    </div>
+    <div class="pdm-section" id="pdm-actions-section">
+      <div class="pdm-sec-label">Recommended Actions</div>
+      <div class="pdm-actions-list" id="pdm-actions-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){var t=localStorage.getItem('ver-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+function toggleDark(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('ver-theme',next);
+  var btn=document.getElementById('dm-btn');
+  if(btn)btn.innerHTML=next==='dark'?'&#9790; Light':'&#9789; Dark';
+}
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openGhostHelp(){
+  HelpModal.open({
+    title: 'Ghost Capacity View',
+    what: 'Ghost Capacity identifies engagements where spend is flowing but delivery throughput is not moving proportionally — the gap between what was invoiced and what was actually produced. Use it to surface underperforming vendors, flag billing-without-delivery risk, and build the evidence base for renewal decisions or scope reductions.',
+    steps: [
+      '<strong>Review pillar cards</strong> — each card shows a vendor or engagement with spend-in vs. output-score, and a calculated Ghost Capacity rating.',
+      '<strong>Read the Ghost Capacity percentage</strong> — this is the share of spend that cannot be attributed to measurable delivery. Above 30% is flagged High Risk.',
+      '<strong>Check the Exec Brief</strong> for the top findings: which pillar has the highest ghost spend, the total unattributed budget, and recommended actions.',
+      '<strong>Drill into individual vendors</strong> to see the spend/output breakdown and the factors contributing to the ghost capacity rating.',
+      '<strong>Use findings in renewal planning</strong> — vendors with high ghost capacity are candidates for scope reduction, SLA renegotiation, or non-renewal.'
+    ],
+    glossary: [
+      {term:'Ghost Capacity', color:'#7C3AED', def:'The relative gap between expected and actual delivery output. Calculated as: (Expected Output Score − Actual Output Score) ÷ Expected Output Score × 100. A 5% ghost rate on a pillar expected at 75 means actual is 71 — materially different from reporting 29% ghost using a raw 100-point baseline.'},
+      {term:'Ghost Risk: High', color:'#EF4444', def:'More than 30% of spend is unattributed to delivery. Immediate review recommended before next renewal or SOW extension.'},
+      {term:'Ghost Risk: Medium', color:'#F59E0B', def:'15–30% of spend is unattributed. Monitor closely; gather output evidence before next governance checkpoint.'},
+      {term:'Ghost Risk: Low', color:'#10B981', def:'Less than 15% of spend is unattributed. Delivery is tracking reasonably well against invoiced cost.'},
+      {term:'Throughput Score', color:null, def:'A 0–100 measure of delivery output velocity for the engagement — combines milestone completion rate, SLA adherence, and analyst-estimated output quality.'},
+      {term:'Delivery Efficiency', color:null, def:'The ratio of throughput score to normalized spend. A high-spend, low-throughput vendor has poor delivery efficiency.'},
+      {term:'CWF (Contingent Workforce)', color:null, def:'Contractors, consultants, and staff aug resources engaged through Coupa. Distinct from direct vendor MSP/software spend.'},
+      {term:'Pillar', color:null, def:'VER\'s organizational grouping for vendor relationships: Engineering, Data & Analytics, Security, Infrastructure, Business Applications, or Corporate Services.'},
+      {term:'Output Score', color:null, def:'Analyst-estimated composite of delivery quality, milestone hit rate, and SLA compliance. Not sourced from a single system — based on VER analyst assessments.'},
+      {term:'Data Provenance', color:null, def:'Spend data is Coupa-aligned (VER analyst estimates mapped to Coupa category groupings — not a live API pull). Output scores are VER analyst estimates. Gap classifications are calculated automatically from the Ghost % formula — never manually assigned.'}
+    ],
+    footNote: 'FY27 · Salesforce DET · Confidential'
+  });
+}
+</script>
+<script src="assets/coupa_spend.js"></script>
+<script>
+var COUPA = (window.VER_COUPA && window.VER_COUPA.vendors) ? window.VER_COUPA.vendors : [];
+var COUPA_PILLAR = window.VER_COUPA ? window.VER_COUPA.by_pillar : {};
+
+var PILLARS = [
+  {id:'data-analytics',name:'Data & Analytics',
+   cwfSpend:3.2,vendorSpend:2.8,outputScore:31,expectedScore:75,
+   vendors:['Nucleusteq','DBT Labs','Monte Carlo','Scuba Analytics'],topSpenders:['Nucleusteq','DBT Labs'],
+   gapSummary:'Spend ramped 40% YoY while delivery throughput declined. Pipeline velocity dropped from 8 to 3 initiatives per quarter. Only 3 of 11 planned dashboards live after a $6M investment.',
+   actions:[
+     'Gate all new intake until the current 8-item backlog reaches 80% completion.',
+     'Milestone-gate Nucleusteq payments to verified dashboard deliveries.',
+     'Commission a pipeline velocity audit — determine root cause of the 8-to-3 initiative decline.'
+   ],
+   vendorNotes:{'Nucleusteq':'Top spender · 3 of 5 milestones missed','DBT Labs':'Spend up 30% · delivery velocity flat','Monte Carlo':'Data observability coverage below contracted SLA'}
+  },
+  {id:'digital-transformation',name:'Digital Transformation',
+   cwfSpend:8.1,vendorSpend:4.4,outputScore:38,expectedScore:80,
+   vendors:['NTT Data','IBM','Cognizant','TechM','Accenture','Capgemini'],topSpenders:['NTT Data','IBM'],
+   gapSummary:'Offshore augmentation model producing coordination overhead, not output. 5 of 8 active projects in yellow/red. Code velocity declined 22% despite headcount growth.',
+   actions:[
+     'Commission a 6-week delivery audit of NTT Data, IBM, and Cognizant before next SOW cycle.',
+     'Convert at least 2 critical delivery roles from offshore CWF to FTE.',
+     'Re-scope or exit the Capgemini engagement; no new work until audit findings are addressed.'
+   ],
+   vendorNotes:{'NTT Data':'Largest offshore pool · throughput down 22%','IBM':'2 of 3 active projects in red status','Cognizant':'Coordination overhead exceeding delivery output'}
+  },
+  {id:'cloud-infra',name:'Cloud & Infrastructure',
+   cwfSpend:1.9,vendorSpend:5.6,outputScore:55,expectedScore:78,
+   vendors:['AWS','WWT','Insight Direct','Sycomp'],topSpenders:['AWS','WWT'],
+   gapSummary:'Vendor delivery adequate; internal process bottlenecks absorbing capacity. $1.2M in hardware not yet deployed. Not a vendor performance gap — an internal sequencing gap.',
+   actions:[
+     'Unblock $1.2M in undeployed hardware through an internal sequencing review.',
+     'Establish a cross-functional deployment readiness checkpoint with internal owners.',
+     'Vendor delivery is adequate — escalate internal bottlenecks to leadership for resolution.'
+   ],
+   vendorNotes:{'AWS':'Spend on-plan · $1.2M hardware blocked internally','WWT':'Deployment queue stalled — internal dependency','Insight Direct':'Hardware procurement complete · awaiting provisioning'}
+  },
+  {id:'finance-ops',name:'Finance Operations',
+   cwfSpend:2.6,vendorSpend:1.1,outputScore:58,expectedScore:80,
+   vendors:['Deloitte','Workday','Coupa','Xactly','Concur'],topSpenders:['Deloitte','Workday'],
+   gapSummary:'Three RPA bots scoped in FY26 still not in production. Consulting spend increased while finance cycle time has not improved. Gap is execution, not strategy.',
+   actions:[
+     'Amend Deloitte contract: deliverables must be production-ready, not advisory.',
+     'Tie final 20% of Deloitte payment to confirmed go-live of at least 2 RPA bots.',
+     'Set a hard deadline: all 3 FY26-scoped bots in production by end of Q2 or trigger scope reduction.'
+   ],
+   vendorNotes:{'Deloitte':'Advisory deliverables only · 0 bots in production','Workday':'Analytics module delayed · core HRIS stable','Coupa':'Platform operational · reporting gaps unresolved'}
+  },
+  {id:'customer-success',name:'Customer & Revenue',
+   cwfSpend:1.2,vendorSpend:0.9,outputScore:71,expectedScore:75,
+   vendors:['Demandbase','Xactly','D&B','Highspot'],topSpenders:['Demandbase','Xactly'],
+   gapSummary:'Largely aligned. Revenue tech stack spend matches usage levels. Minor gap from delayed analytics module rollout. CSAT and pipeline metrics stable.',
+   actions:[
+     'Accelerate the delayed analytics module rollout — assign a dedicated delivery owner.',
+     'Continue current spend profile; revenue tech stack is well-aligned.',
+     'Monitor CSAT and pipeline metrics at monthly cadence to sustain alignment.'
+   ],
+   vendorNotes:{'Demandbase':'Pipeline data quality below benchmark','Xactly':'Compensation analytics module rollout delayed','D&B':'Data enrichment coverage at 88% of contract target'}
+  },
+  {id:'security-risk',name:'Security & Risk',
+   cwfSpend:1.7,vendorSpend:2.1,outputScore:49,expectedScore:72,
+   vendors:['Okta','Delinea','Wallarm'],topSpenders:['Okta','Delinea'],
+   gapSummary:'Security posture assessments completed but remediation backlog grew 40%. Vendor delivered findings; internal teams have not closed issues. Spend is accumulating without proportional risk reduction.',
+   actions:[
+     'Shift 30% of assessment spend toward remediation execution.',
+     'Establish finding SLAs with financial penalties for items over 60 days at critical or high severity.',
+     'Require Delinea and Okta to provide quarterly remediation closure reports.'
+   ],
+   vendorNotes:{'Okta':'Identity gaps in 3 subsidiary tenants','Delinea':'PAM deployment 60% complete · backlog growing','Wallarm':'API coverage below contracted scope'}
+  },
+  {id:'hr-workforce',name:'HR & Workforce',
+   cwfSpend:0.7,vendorSpend:1.4,outputScore:68,expectedScore:72,
+   vendors:['Workday','Beamery','Concentrix'],topSpenders:['Workday'],
+   gapSummary:'HRIS platform stabilized post-migration. Benefits administration on track. Minor gap from delayed Workday analytics module. Performance near benchmark.',
+   actions:[
+     'Expedite the delayed Workday analytics module — assign a single accountable owner.',
+     'Maintain current spend trajectory; platform is post-migration stable.',
+     'Set a benchmark scorecard and review at next QBR to protect alignment status.'
+   ],
+   vendorNotes:{'Workday':'Analytics module delayed · core HRIS stable post-migration','Beamery':'Talent pipeline utilization at 55% of licensed capacity','Concentrix':'BPO delivery on-track · minor SLA misses in Q3'}
+  },
+  {id:'supply-chain',name:'Supply Chain',
+   cwfSpend:4.5,vendorSpend:1.8,outputScore:28,expectedScore:70,
+   vendors:['Accenture','Kinaxis','JLL'],topSpenders:['Accenture','Kinaxis'],
+   gapSummary:'Most acute ghost capacity situation in portfolio. 14 months into an 18-month build with only 25% of integrations complete. At current velocity, go-live is 24+ months away.',
+   actions:[
+     'Require Accenture to deliver a binding re-baseline forecast within 30 days.',
+     'Evaluate partial recovery options and initiate a termination review if milestones are not credible.',
+     'Escalate to executive leadership immediately — this is not a quarterly update situation.'
+   ],
+   vendorNotes:{'Accenture':'Prime SI · 14 months in, 25% integrations complete','Kinaxis':'Platform licensed · integration blockers stalling value realization','JLL':'Facilities scope partially delivered · change orders pending'}
+  }
+];
+
+var currentFilter = 'all';
+
+var DEFAULTS = JSON.parse(JSON.stringify(PILLARS)); // deep copy before any mutation
+var LS_KEY = 'ver-ghost-pillars';
+
+function loadPillars(){
+  try{
+    var saved = localStorage.getItem(LS_KEY);
+    if(saved){ PILLARS = JSON.parse(saved); }
+  }catch(e){}
+}
+function savePillars(){
+  localStorage.setItem(LS_KEY, JSON.stringify(PILLARS));
+}
+function resetToDefaults(){
+  if(!confirm('Reset all pillars to the built-in defaults? Your edits will be lost.')) return;
+  PILLARS = JSON.parse(JSON.stringify(DEFAULTS));
+  savePillars();
+  rebuildAll();
+  renderDrawerList();
+}
+
+function ghostPct(p){
+  if(!p.expectedScore || p.expectedScore<=0) return 0;
+  return Math.max(0, Math.round(((p.expectedScore - p.outputScore) / p.expectedScore) * 100));
+}
+function throughputDelta(p){ return p.outputScore - p.expectedScore; }
+function gapLevel(p){ var g=ghostPct(p); return g>30?'critical':g>15?'medium':'low'; }
+
+// Load saved pillars then derive gap levels
+loadPillars();
+PILLARS.forEach(function(p){ p.gapLevel = gapLevel(p); });
+
+function fmtM(n){return '$'+n.toFixed(1)+'M';}
+function el(tag,cls,text){var e=document.createElement(tag);if(cls) e.className=cls;if(text!=null) e.textContent=text;return e;}
+function clearEl(node){while(node.firstChild) node.removeChild(node.firstChild);}
+function animateCount(el,target,prefix,suffix,decimals,duration){
+  var start=0,step=target/((duration||900)/16);
+  function tick(){start=Math.min(start+step,target);el.textContent=prefix+(decimals?start.toFixed(1):Math.round(start))+suffix;if(start<target) requestAnimationFrame(tick);else el.textContent=prefix+(decimals?target.toFixed(1):Math.round(target))+suffix;}
+  requestAnimationFrame(tick);
+}
+
+function buildHero(){
+  var totalCwf=0,totalVendor=0,critCount=0,ghostDollars=0;
+  PILLARS.forEach(function(p){
+    totalCwf+=p.cwfSpend;totalVendor+=p.vendorSpend;
+    if(p.gapLevel==='critical'){critCount++;ghostDollars+=p.cwfSpend+p.vendorSpend;}
+  });
+  var aligned=PILLARS.filter(function(p){return p.gapLevel==='low';}).length;
+  var kpis=[
+    {val:totalCwf+totalVendor,prefix:'$',suffix:'M',dec:true, lbl:'Total Investment Tracked',note:'CWF + vendor spend',cls:'purple'},
+    {val:critCount,           prefix:'', suffix:'', dec:false,lbl:'Critical Gap Pillars',    note:'spend far exceeds output',cls:'red'},
+    {val:ghostDollars,        prefix:'$',suffix:'M',dec:true, lbl:'Capital at Risk',          note:'$ in critical gap pillars',cls:'amber'},
+    {val:aligned,             prefix:'', suffix:'', dec:false,lbl:'Aligned Pillars',         note:'spend matches throughput',cls:'green'}
+  ];
+  var wrap=document.getElementById('hero-kpis');
+  kpis.forEach(function(k){
+    var d=el('div','hkpi '+k.cls);
+    var v=el('div','hkpi-val','–');
+    d.appendChild(v);d.appendChild(el('div','hkpi-lbl',k.lbl));d.appendChild(el('div','hkpi-note',k.note));
+    wrap.appendChild(d);
+    setTimeout(function(){animateCount(v,k.val,k.prefix,k.suffix,k.dec,1000);},300);
+  });
+}
+
+function buildExecBrief(){
+  var wrap=document.getElementById('exec-insights');
+  // Sort by ghost % descending, take top 2 critical/medium for insights
+  var ranked = PILLARS.slice().sort(function(a,b){ return ghostPct(b)-ghostPct(a); });
+  var criticals = ranked.filter(function(p){ return gapLevel(p)==='critical'; });
+  var mediums   = ranked.filter(function(p){ return gapLevel(p)==='medium'; });
+  var aligned   = PILLARS.filter(function(p){ return gapLevel(p)==='low'; });
+  var critCount = criticals.length;
+  var medCount  = mediums.length;
+  var insights  = [];
+
+  // Insight 1: worst critical pillar by ghost %
+  if(criticals.length>0){
+    var worst = criticals[0];
+    var gp = ghostPct(worst);
+    var total = (worst.cwfSpend+worst.vendorSpend).toFixed(1);
+    insights.push({cls:'critical',num:'1',
+      headline: worst.name+' is the highest ghost in the portfolio — '+fmtM(worst.cwfSpend+worst.vendorSpend)+' invested, '+worst.outputScore+'/100 output score, '+gp+'% capacity gap.',
+      body: worst.gapSummary || 'Immediate executive review is required.'
+    });
+  }
+
+  // Insight 2: second worst critical, or first medium if only one critical
+  var second = criticals.length>1 ? criticals[1] : (mediums.length>0 ? mediums[0] : null);
+  if(second){
+    var gp2=ghostPct(second);
+    insights.push({cls: gapLevel(second)==='critical'?'critical':'warning', num:'2',
+      headline: second.name+': '+fmtM(second.cwfSpend+second.vendorSpend)+' invested, '+second.outputScore+'/100 output, '+gp2+'% ghost capacity.',
+      body: second.gapSummary || 'Owner review required before next spend cycle.'
+    });
+  }
+
+  // Insight 3: portfolio summary
+  var portfolioBody = critCount+' critical and '+medCount+' medium gap pillar'+(critCount+medCount!==1?'s are':' is')+' not visible in standard finance reporting. ';
+  if(aligned.length>0){
+    portfolioBody += aligned.map(function(p){return p.name;}).join(' and ')+' '+(aligned.length===1?'defines':'define')+' what spend-output alignment looks like in this portfolio.';
+  } else {
+    portfolioBody += 'No pillar is currently fully aligned — portfolio-wide review is warranted.';
+  }
+  insights.push({cls:'warning', num: String(insights.length+1),
+    headline: critCount+' of '+PILLARS.length+' pillars show meaningful spend-output misalignment. None of these gaps are visible in cost center reporting.',
+    body: portfolioBody
+  });
+
+  insights.forEach(function(ins){
+    var d=el('div','eb-insight '+ins.cls);
+    d.appendChild(el('div','ebi-number',ins.num));
+    d.appendChild(el('div','ebi-headline',ins.headline));
+    d.appendChild(el('div','ebi-body',ins.body));
+    wrap.appendChild(d);
+  });
+}
+
+function buildPillarCards(){
+  var grid=document.getElementById('pillar-grid');
+  clearEl(grid);
+  PILLARS.forEach(function(p){
+    if(currentFilter!=='all' && p.gapLevel!==currentFilter) return;
+    var card=el('div','pillar-card fade-up ghost-'+p.gapLevel);
+
+    var hdr=el('div','pc-header');
+    var ta=el('div','pc-title-area');
+    ta.appendChild(el('div','pc-pillar',p.name));
+    ta.appendChild(el('div','pc-sub',p.vendors.length+' vendor relationships · Analyst estimates'));
+    var badgeText={critical:'Critical Gap',medium:'Medium Gap',low:'Aligned'};
+    hdr.appendChild(ta);
+    hdr.appendChild(el('div','ghost-badge gb-'+p.gapLevel,badgeText[p.gapLevel]));
+
+    var metrics=el('div','pc-metrics');
+    var mdata=[
+      {val:fmtM(p.cwfSpend),       lbl:'CWF Spend',      cls:''},
+      {val:fmtM(p.vendorSpend),     lbl:'Vendor Spend',   cls:''},
+      {val:p.outputScore+'/100',    lbl:'Output Score',   cls:p.outputScore<40?'red':p.outputScore<60?'amber':'green'},
+      {val:(throughputDelta(p)>=0?'+':'')+throughputDelta(p)+' pts',lbl:'Throughput Delta',cls:throughputDelta(p)<-30?'red':throughputDelta(p)<-15?'amber':'green'}
+    ];
+    mdata.forEach(function(m){
+      var mc=el('div','pc-metric');
+      mc.appendChild(el('div','pcm-val'+(m.cls?' '+m.cls:''),m.val));
+      mc.appendChild(el('div','pcm-lbl',m.lbl));
+      metrics.appendChild(mc);
+    });
+
+    var body=el('div','pc-body');
+
+    var gv=el('div','gap-visual');
+    var spendPct=Math.min(100,Math.round(((p.cwfSpend)/(p.cwfSpend+p.vendorSpend))*100));
+    var outPct=Math.round((p.outputScore/100)*100);
+    var expPct=Math.round((p.expectedScore/100)*100);
+    [{label:'CWF Mix',pct:spendPct,cls:'spend'},
+     {label:'Output Score',pct:outPct,cls:'output'},
+     {label:'Expected Output',pct:expPct,cls:'expected'}
+    ].forEach(function(r){
+      var row=el('div','gv-row');
+      row.appendChild(el('div','gv-label',r.label));
+      var track=el('div','gv-track');
+      var fill=el('div','gv-fill '+r.cls);
+      fill.style.width='0%';
+      setTimeout(function(){fill.style.width=r.pct+'%';},350);
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(el('div','gv-pct',r.pct+'%'));
+      gv.appendChild(row);
+    });
+    body.appendChild(gv);
+
+    var gc=el('div','gap-callout gc-'+p.gapLevel);
+    gc.appendChild(el('div','gc-icon',p.gapLevel==='critical'?'🚨':p.gapLevel==='medium'?'⚠️':'✅'));
+    var gcb=el('div','gc-body');
+    gcb.appendChild(el('div','gc-title',p.gapLevel==='critical'?'Critical Gap — Executive Action Required':p.gapLevel==='medium'?'Gap Detected — Owner Review Needed':'Spend & Output Aligned'));
+    gcb.appendChild(el('div','gc-text',p.gapSummary));
+    gc.appendChild(gcb);
+    body.appendChild(gc);
+
+    var vc=el('div','vendors-chips');
+    vc.appendChild(el('div','vc-label','Vendors in Pillar'));
+    var chips=el('div','vc-chips');
+    p.vendors.forEach(function(v){
+      var cls='vc-chip'+(p.topSpenders.indexOf(v)>=0?' top':'');
+      chips.appendChild(el('div',cls,v));
+    });
+    vc.appendChild(chips);
+    body.appendChild(vc);
+
+    card.setAttribute('tabindex','0');
+    card.setAttribute('aria-label','Open '+p.name+' detail');
+    (function(pid){
+      card.addEventListener('click', function(){ openPillarModal(pid); });
+      card.addEventListener('keydown', function(e){
+        if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPillarModal(pid); }
+      });
+    }(p.id));
+
+    card.appendChild(hdr);card.appendChild(metrics);card.appendChild(body);
+    grid.appendChild(card);
+  });
+
+  setTimeout(function(){
+    document.querySelectorAll('.fade-up').forEach(function(e){e.classList.add('visible');});
+  },80);
+}
+
+function buildFindings(){
+  var panel=document.getElementById('findings-panel');
+  panel.appendChild(el('div','panel-title','Key Findings'));
+  // Rank all pillars by ghost % descending
+  var ranked = PILLARS.slice().sort(function(a,b){ return ghostPct(b)-ghostPct(a); });
+  ranked.forEach(function(p,i){
+    var gl = gapLevel(p);
+    var gp = ghostPct(p);
+    var td = throughputDelta(p);
+    var clsMap={critical:'red',medium:'amber',low:'green'};
+    var item=el('div','finding-item');
+    item.appendChild(el('div','fi-rank '+clsMap[gl],String(i+1)));
+    var cnt=el('div');
+    cnt.appendChild(el('div','fi-title',p.name+': '+gp+'% ghost capacity · '+fmtM(p.cwfSpend+p.vendorSpend)+' invested'));
+    cnt.appendChild(el('div','fi-detail',
+      'Output '+p.outputScore+'/100 vs. expected '+p.expectedScore+'/100 ('+td+' pts). '
+      +(p.gapSummary||'')
+    ));
+    item.appendChild(cnt);panel.appendChild(item);
+  });
+}
+
+function buildRecos(){
+  var panel=document.getElementById('recos-panel');
+  panel.appendChild(el('div','panel-title','Executive Recommendations'));
+  // Only surface recommendations for non-aligned pillars, ranked by ghost %
+  var actionable = PILLARS.slice()
+    .filter(function(p){ return gapLevel(p)!=='low'; })
+    .sort(function(a,b){ return ghostPct(b)-ghostPct(a); });
+  if(actionable.length===0){
+    panel.appendChild(el('div','fi-detail','All pillars are currently aligned. No immediate action required.'));
+    return;
+  }
+  actionable.forEach(function(p,i){
+    var actions = (p.actions && p.actions.length) ? p.actions : ['Review vendor contracts and delivery milestones against expected output.'];
+    var item=el('div','reco-item');
+    item.appendChild(el('div','reco-num',String(i+1)));
+    var bd=el('div');
+    bd.appendChild(el('div','reco-title',p.name+' — '+gapLevel(p).charAt(0).toUpperCase()+gapLevel(p).slice(1)+' Gap ('+ghostPct(p)+'%)'));
+    bd.appendChild(el('div','reco-text',actions[0]+(actions.length>1?' '+actions[1]:'')));
+    item.appendChild(bd);panel.appendChild(item);
+  });
+}
+
+function buildTable(){
+  var tbody=document.getElementById('summary-tbl');
+  var sorted=PILLARS.slice().sort(function(a,b){return throughputDelta(a)-throughputDelta(b);});
+  sorted.forEach(function(p){
+    var tr=document.createElement('tr');
+    var gl=gapLevel(p);
+    var gCls=gl==='critical'?'gp-critical':gl==='medium'?'gp-medium':'gp-low';
+    var gLabel=gl==='critical'?'Critical':gl==='medium'?'Medium':'Aligned';
+    var td_val=throughputDelta(p);
+    [p.name,fmtM(p.cwfSpend),fmtM(p.vendorSpend),fmtM(p.cwfSpend+p.vendorSpend),
+     p.outputScore+' / 100',(td_val>=0?'+':'')+td_val+' pts'
+    ].forEach(function(c,i){
+      var td=el('td',null,c);
+      if(i===0) td.style.fontWeight='700';
+      if(i===4){td.style.color=p.outputScore<40?'var(--red)':p.outputScore<60?'var(--amber)':'var(--green)';td.style.fontWeight='700';}
+      if(i===5){td.style.color=td_val<-30?'var(--red)':td_val<-15?'var(--amber)':'var(--green)';td.style.fontWeight='700';}
+      tr.appendChild(td);
+    });
+    var tdGap=el('td');tdGap.appendChild(el('span','gap-pill '+gCls,gLabel));
+    tr.appendChild(tdGap);
+    tbody.appendChild(tr);
+  });
+}
+
+function filterPillars(level,btn){
+  currentFilter=level;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  buildPillarCards();
+}
+
+/* ── PILLAR DETAIL MODAL ── */
+
+function openPillarModal(pillarId){
+  var p = PILLARS.find(function(x){ return x.id === pillarId; });
+  if(!p) return;
+
+  /* header */
+  document.getElementById('pdm-eyebrow').textContent = 'Pillar Detail · Ghost Capacity View';
+  document.getElementById('pdm-modal-name').textContent = p.name;
+
+  /* top border color by gap level */
+  var box = document.getElementById('pdm-box');
+  box.style.borderTopWidth = '3px';
+  box.style.borderTopStyle = 'solid';
+  var gl = gapLevel(p);
+  box.style.borderTopColor = gl==='critical'?'var(--red)':gl==='medium'?'var(--amber)':'var(--green)';
+
+  /* metrics row */
+  var mWrap = document.getElementById('pdm-metrics');
+  clearEl(mWrap);
+  var ghostPctVal = ghostPct(p);
+  var mdata = [
+    {val: fmtM(p.cwfSpend),    lbl: 'CWF Spend',    cls: ''},
+    {val: fmtM(p.vendorSpend), lbl: 'Vendor Spend',  cls: ''},
+    {val: p.outputScore+'/100',lbl: 'Output Score',  cls: p.outputScore<40?'red':p.outputScore<60?'amber':'green'},
+    {val: ghostPctVal+'%',     lbl: 'Ghost Capacity',cls: ghostPctVal>30?'red':ghostPctVal>15?'amber':'green'}
+  ];
+  mdata.forEach(function(m){
+    var mc = el('div','pdm-metric');
+    mc.appendChild(el('div','pdmm-val'+(m.cls?' '+m.cls:''),m.val));
+    mc.appendChild(el('div','pdmm-lbl',m.lbl));
+    mWrap.appendChild(mc);
+  });
+
+  /* utilization bars */
+  var utilWrap = document.getElementById('pdm-utilization');
+  clearEl(utilWrap);
+  var spendPct = Math.min(100, Math.round((p.cwfSpend/(p.cwfSpend+p.vendorSpend))*100));
+  [{label:'CWF Mix', pct:spendPct,       cls:'spend'},
+   {label:'Output Score',       pct:p.outputScore,  cls:'output'},
+   {label:'Expected Output',    pct:p.expectedScore, cls:'expected'}
+  ].forEach(function(r){
+    var row   = el('div','pdm-util-row');
+    var track = el('div','pdm-util-track');
+    var fill  = el('div','pdm-util-fill '+r.cls);
+    fill.style.width = '0%';
+    setTimeout(function(){ fill.style.width = r.pct+'%'; }, 120);
+    track.appendChild(fill);
+    row.appendChild(el('div','pdm-util-lbl',r.label));
+    row.appendChild(track);
+    row.appendChild(el('div','pdm-util-pct',r.pct+'%'));
+    utilWrap.appendChild(row);
+  });
+
+  /* top vendors at risk (topSpenders first, then rest, cap at 3) */
+  var riskWrap  = document.getElementById('pdm-risk-list');
+  clearEl(riskWrap);
+  var riskNotes = p.vendorNotes || {};
+  var riskVendors = p.topSpenders.slice();
+  p.vendors.forEach(function(v){ if(riskVendors.indexOf(v)<0) riskVendors.push(v); });
+  riskVendors.slice(0,3).forEach(function(vName,idx){
+    var item   = el('div','pdm-risk-item');
+    item.appendChild(el('div','pdm-risk-rank',String(idx+1)));
+    item.appendChild(el('div','pdm-risk-vendor',vName));
+    item.appendChild(el('div','pdm-risk-note',riskNotes[vName]||'Top spender in pillar'));
+    riskWrap.appendChild(item);
+  });
+
+  /* gap summary callout */
+  var callout = document.getElementById('pdm-callout');
+  callout.className = 'pdm-callout '+gapLevel(p);
+  document.getElementById('pdm-callout-text').textContent = p.gapSummary;
+
+  /* recommended actions */
+  var actWrap = document.getElementById('pdm-actions-list');
+  clearEl(actWrap);
+  var actions = (p.actions && p.actions.length) ? p.actions : ['Review vendor contracts and delivery milestones against expected output.'];
+  actions.forEach(function(txt,idx){
+    var item = el('div','pdm-action-item');
+    item.appendChild(el('div','pdm-action-num',String(idx+1)));
+    item.appendChild(el('div','pdm-action-text',txt));
+    actWrap.appendChild(item);
+  });
+
+  /* open overlay */
+  var overlay = document.getElementById('pdm-overlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('pdm-close').focus();
+}
+
+function closePillarModal(){
+  document.getElementById('pdm-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* wire close controls — run once after DOM is ready */
+(function(){
+  document.getElementById('pdm-close').addEventListener('click', closePillarModal);
+  document.getElementById('pdm-overlay').addEventListener('click', function(e){
+    if(e.target === this) closePillarModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if((e.key==='Escape'||e.key==='Esc') &&
+       document.getElementById('pdm-overlay').classList.contains('open')){
+      closePillarModal();
+    }
+  });
+}());
+/* ── END PILLAR DETAIL MODAL ── */
+
+function initScrollReveal(){
+  if(!('IntersectionObserver' in window)) return;
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting) e.target.classList.add('visible');});
+  },{threshold:0.08});
+  document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
+}
+
+/* ── DRAWER ── */
+function openDrawer(){
+  renderDrawerList();
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+document.getElementById('drawer-overlay').addEventListener('click', function(e){
+  if(e.target===this) closeDrawer();
+});
+
+function renderDrawerList(){
+  var body = document.getElementById('drawer-body');
+  body.innerHTML = '';
+  var lbl = document.createElement('div');
+  lbl.className = 'drawer-sect-label';
+  lbl.textContent = PILLARS.length + ' pillars · click Edit to modify';
+  body.appendChild(lbl);
+  PILLARS.forEach(function(p, idx){
+    var row = document.createElement('div');
+    row.className = 'pillar-row';
+    var name = document.createElement('div');
+    name.className = 'pillar-row-name';
+    name.textContent = p.name;
+    var gp = ghostPct(p);
+    var gl = gapLevel(p);
+    var badge = document.createElement('div');
+    badge.className = 'pillar-row-gap gap-pill gp-'+gl;
+    badge.textContent = gp+'% ghost';
+    var editBtn = document.createElement('button');
+    editBtn.className = 'pillar-row-edit';
+    editBtn.textContent = 'Edit';
+    (function(i){ editBtn.addEventListener('click', function(){ showEditForm(i); }); }(idx));
+    var delBtn = document.createElement('button');
+    delBtn.className = 'pillar-row-del';
+    delBtn.textContent = '✕';
+    delBtn.setAttribute('aria-label', 'Delete '+p.name);
+    (function(i){ delBtn.addEventListener('click', function(){ deletePillar(i); }); }(idx));
+    row.appendChild(name);
+    row.appendChild(badge);
+    row.appendChild(editBtn);
+    row.appendChild(delBtn);
+    body.appendChild(row);
+  });
+}
+
+function deletePillar(idx){
+  if(!confirm('Delete "'+PILLARS[idx].name+'"?')) return;
+  PILLARS.splice(idx,1);
+  savePillars();
+  rebuildAll();
+  renderDrawerList();
+}
+
+var editingIdx = -1;
+
+function showAddForm(){
+  editingIdx = -1;
+  renderPillarForm(null);
+}
+function showEditForm(idx){
+  editingIdx = idx;
+  renderPillarForm(PILLARS[idx]);
+}
+
+function renderPillarForm(p){
+  var body = document.getElementById('drawer-body');
+  body.innerHTML = '';
+  var form = document.createElement('div');
+  form.className = 'pf-form';
+  form.innerHTML = '<div class="pf-form-title">'+(p?'Edit Pillar':'Add New Pillar')+'</div>'
+    +'<div class="pf-grid">'
+    +'<div class="pf-field full"><label class="pf-label">Pillar Name</label>'
+      +'<input class="pf-input" id="pf-name" type="text" value="'+(p?esc(p.name):'')+'"></div>'
+    +'<div class="pf-field"><label class="pf-label">CWF Spend ($M)</label>'
+      +'<input class="pf-input" id="pf-cwf" type="number" min="0" step="0.1" value="'+(p?p.cwfSpend:'')+'"></div>'
+    +'<div class="pf-field"><label class="pf-label">Vendor Spend ($M)</label>'
+      +'<input class="pf-input" id="pf-vendor" type="number" min="0" step="0.1" value="'+(p?p.vendorSpend:'')+'"></div>'
+    +'<div class="pf-field"><label class="pf-label">Actual Output Score (0–100)</label>'
+      +'<input class="pf-input" id="pf-output" type="number" min="0" max="100" step="1" value="'+(p?p.outputScore:'')+'"></div>'
+    +'<div class="pf-field"><label class="pf-label">Expected Output Score (0–100)</label>'
+      +'<input class="pf-input" id="pf-expected" type="number" min="0" max="100" step="1" value="'+(p?p.expectedScore:'')+'"></div>'
+    +'<div class="pf-field full"><label class="pf-label">Vendors (comma-separated)</label>'
+      +'<input class="pf-input" id="pf-vendors" type="text" value="'+(p?esc(p.vendors.join(', ')):'')+'"></div>'
+    +'<div class="pf-field full"><label class="pf-label">Top Spenders (comma-separated)</label>'
+      +'<input class="pf-input" id="pf-topspenders" type="text" value="'+(p?esc(p.topSpenders.join(', ')):'')+'"></div>'
+    +'<div class="pf-field full"><label class="pf-label">Gap Summary / Narrative</label>'
+      +'<textarea class="pf-input pf-textarea" id="pf-summary">'+(p?esc(p.gapSummary):'')+'</textarea></div>'
+    +'</div>'
+    +'<div class="pf-actions">'
+      +'<button type="button" class="d-btn" id="pf-cancel">Cancel</button>'
+      +'<button type="button" class="d-btn primary" id="pf-save">Save Pillar</button>'
+    +'</div>';
+  body.appendChild(form);
+  document.getElementById('pf-cancel').addEventListener('click', renderDrawerList);
+  document.getElementById('pf-save').addEventListener('click', savePillarForm);
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function savePillarForm(){
+  var name    = document.getElementById('pf-name').value.trim();
+  var cwf     = parseFloat(document.getElementById('pf-cwf').value) || 0;
+  var vendor  = parseFloat(document.getElementById('pf-vendor').value) || 0;
+  var output  = parseInt(document.getElementById('pf-output').value,10) || 0;
+  var expected= parseInt(document.getElementById('pf-expected').value,10) || 100;
+  var vendors = document.getElementById('pf-vendors').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var topSpenders = document.getElementById('pf-topspenders').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var summary = document.getElementById('pf-summary').value.trim();
+  if(!name){ alert('Pillar name is required.'); return; }
+  var record = {
+    id: name.toLowerCase().replace(/[^a-z0-9]+/g,'-'),
+    name: name, cwfSpend: cwf, vendorSpend: vendor,
+    outputScore: output, expectedScore: expected,
+    throughputDelta: output - expected,
+    vendors: vendors, topSpenders: topSpenders,
+    gapSummary: summary, gapLevel: 'low'
+  };
+  record.gapLevel = gapLevel(record);
+  if(editingIdx >= 0){ PILLARS[editingIdx] = record; }
+  else { PILLARS.push(record); }
+  savePillars();
+  rebuildAll();
+  renderDrawerList();
+}
+
+/* ── EXPORT CSV ── */
+function csvCell(v){
+  var s = String(v==null?'':v);
+  if(s.indexOf(',')>=0 || s.indexOf('"')>=0 || s.indexOf('\n')>=0){
+    return '"'+s.replace(/"/g,'""')+'"';
+  }
+  return s;
+}
+function exportCSV(){
+  var headers = ['Pillar','CWF Spend ($M)','Vendor Spend ($M)','Total Spend ($M)',
+    'Actual Output (0-100)','Expected Output (0-100)','Ghost %','Throughput Delta (pts)',
+    'Gap Level','Narrative'];
+  var rows = [headers.map(csvCell).join(',')];
+  PILLARS.forEach(function(p){
+    rows.push([
+      p.name, p.cwfSpend, p.vendorSpend,
+      (p.cwfSpend+p.vendorSpend).toFixed(1),
+      p.outputScore, p.expectedScore,
+      ghostPct(p)+'%',
+      throughputDelta(p),
+      gapLevel(p),
+      p.gapSummary||''
+    ].map(csvCell).join(','));
+  });
+  var csv = rows.join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'ghost-capacity-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+/* ── REBUILD ALL VIEWS ── */
+function rebuildAll(){
+  PILLARS.forEach(function(p){ p.gapLevel = gapLevel(p); });
+  document.getElementById('hero-kpis').innerHTML = '';
+  document.getElementById('exec-insights').innerHTML = '';
+  document.getElementById('summary-tbl').innerHTML = '';
+  document.getElementById('findings-panel').innerHTML = '';
+  document.getElementById('recos-panel').innerHTML = '';
+  buildHero();
+  buildExecBrief();
+  buildPillarCards();
+  buildFindings();
+  buildRecos();
+  buildTable();
+  document.querySelectorAll('.fade-up').forEach(function(e){ e.classList.add('visible'); });
+}
+
+buildHero();
+buildExecBrief();
+buildPillarCards();
+buildFindings();
+buildRecos();
+buildTable();
+initScrollReveal();
+</script>
+</body>
+</html>

@@ -1,0 +1,1159 @@
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;
+  font-family:'Segoe UI',system-ui,sans-serif;color:#fff;}
+#stage{position:fixed;inset:0;}
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;opacity:0;pointer-events:none;
+  transition:opacity 1s ease;}
+.scene.active{opacity:1;pointer-events:all;}
+
+/* DA&O Palette — navy:#032D60 blue:#0250D9 royal:#002775
+   purple:#24087D deep:#2C0392 violet:#730394
+   lavender:#D5BEF6 sky:#98CEFC white:#FFFFFF */
+
+.bar-top,.bar-bottom{position:fixed;left:0;right:0;height:52px;
+  background:#000;z-index:100;transition:height 0.8s ease;}
+.bar-top{top:0;}.bar-bottom{bottom:0;}
+.bc .bar-top,.bc .bar-bottom{height:52px;}
+.bo .bar-top,.bo .bar-bottom{height:0;}
+
+#tbar{position:fixed;top:0;left:0;height:3px;
+  background:linear-gradient(90deg,#0250D9,#730394,#24087D,#0250D9);
+  background-size:300% 100%;animation:shimmer 4s linear infinite;
+  z-index:150;transition:width 0.1s linear;width:0%;}
+@keyframes shimmer{0%{background-position:300% 0}100%{background-position:-300% 0}}
+
+#progress{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  display:flex;gap:8px;z-index:200;}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(2,39,117,0.12);
+  cursor:pointer;transition:all 0.4s;}
+.dot.active{background:#0250D9;width:22px;border-radius:3px;}
+
+#controls{position:fixed;bottom:60px;right:20px;display:flex;
+  gap:8px;z-index:200;opacity:0;transition:opacity 0.3s;align-items:center;}
+#controls.visible{opacity:1;}
+.ctrl-btn{background:rgba(2,39,117,0.85);border:1px solid rgba(2,80,217,0.2);
+  color:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;
+  font-size:10px;font-weight:600;letter-spacing:0.05em;font-family:inherit;
+  transition:all 0.2s;backdrop-filter:blur(10px);}
+.ctrl-btn:hover{background:rgba(2,80,217,0.5);border-color:#0250D9;}
+select.ctrl-btn{padding:6px 8px;}
+
+#particles{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.65;}
+.scanline{position:fixed;left:0;right:0;height:100px;
+  background:linear-gradient(180deg,transparent,rgba(2,80,217,0.05),transparent);
+  pointer-events:none;z-index:2;animation:scan 8s linear infinite;}
+@keyframes scan{from{top:-100px}to{top:100vh}}
+
+.wm{position:fixed;bottom:58px;left:20px;font-size:9px;
+  letter-spacing:0.3em;color:rgba(255,255,255,0.65);z-index:200;
+  text-transform:uppercase;}
+.series-badge{position:fixed;top:60px;right:24px;
+  background:rgba(2,80,217,0.12);border:1px solid rgba(2,80,217,0.25);
+  border-radius:20px;padding:5px 14px;font-size:9px;letter-spacing:0.2em;
+  color:#98CEFC;z-index:200;text-transform:uppercase;
+  opacity:0;transition:opacity 0.5s;}
+.series-badge.show{opacity:1;}
+
+/* ── Keyframes ── */
+@keyframes fadeup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes punchin{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+@keyframes slideL{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideR{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes expandW{from{width:0;opacity:0}to{width:72px;opacity:1}}
+@keyframes glow{0%,100%{box-shadow:0 0 30px rgba(2,80,217,0.15)}
+  50%{box-shadow:0 0 60px rgba(115,3,148,0.35),0 0 30px rgba(2,80,217,0.2)}}
+@keyframes floatin{from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}}
+
+/* ── Gradient text helper ── */
+.gtext{background:linear-gradient(135deg,#FFFFFF 0%,#98CEFC 45%,#D5BEF6 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;}
+.gtext-blue{background:linear-gradient(135deg,#0250D9,#98CEFC);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;}
+.gtext-purple{background:linear-gradient(135deg,#730394,#D5BEF6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;}
+
+/* ══ SCENE 0: Cold open ══ */
+#s0{background:radial-gradient(ellipse at 50% 50%,#060620 0%,#000 75%);}
+.s0-series{font-size:10px;letter-spacing:0.6em;color:rgba(152,206,252,0.35);
+  text-transform:uppercase;margin-bottom:30px;opacity:0;
+  animation:fadeup 1s 0.5s forwards;}
+.s0-line{max-width:760px;width:90%;text-align:center;font-size:clamp(17px,2.2vw,26px);font-weight:300;
+  color:rgba(255,255,255,0.65);text-align:center;line-height:2;
+  opacity:0;animation:fadeup 1.2s 1.2s forwards;}
+.s0-line strong{font-weight:700;}
+.s0-line em{font-style:normal;color:#98CEFC;}
+
+/* ══ SCENE 1: Title ══ */
+#s1{background:linear-gradient(140deg,#000 0%,#020A1E 35%,#06042A 70%,#040012 100%);}
+.s1-ep{font-size:10px;letter-spacing:0.5em;color:#0250D9;
+  text-transform:uppercase;margin-bottom:12px;opacity:0;
+  animation:fadeup 0.7s 0.3s forwards;}
+.s1-series{font-size:clamp( 12px,1.3vw,15px);color:rgba(152,206,252,0.45);
+  letter-spacing:0.25em;text-transform:uppercase;margin-bottom:22px;
+  opacity:0;animation:fadeup 0.7s 0.6s forwards;}
+.s1-title{font-size:clamp(58px,10vw,120px);font-weight:900;
+  letter-spacing:-0.025em;line-height:1;opacity:0;
+  animation:punchin 0.7s 1s cubic-bezier(0.22,1,0.36,1) forwards;}
+.s1-sub{font-size:clamp(16px,2vw,28px);font-weight:300;
+  color:rgba(255,255,255,0.65);margin-top:12px;opacity:0;
+  animation:fadeup 0.9s 1.4s forwards;}
+.s1-line{width:0;height:2px;
+  background:linear-gradient(90deg,#0250D9,#730394);
+  margin:22px auto;animation:expandW 1s 1.7s forwards;}
+.s1-meta{display:flex;gap:26px;justify-content:center;opacity:0;
+  animation:fadeup 0.9s 2s forwards;}
+.sm-i{text-align:center;}
+.sm-v{font-size:22px;font-weight:700;}
+.sm-l{font-size:9px;letter-spacing:0.12em;color:rgba(255,255,255,0.65);
+  text-transform:uppercase;margin-top:3px;}
+.sm-d{width:1px;background:rgba(2,39,117,0.12);align-self:stretch;}
+
+/* ══ SCENE 2: The Name ══ */
+#s2{background:linear-gradient(160deg,#032D60 0%,#04081E 100%);}
+.name-wrap{max-width:900px;width:90%;text-align:center;}
+.name-eye{font-size:10px;letter-spacing:0.5em;color:#98CEFC;
+  text-transform:uppercase;margin-bottom:22px;opacity:0;
+  animation:fadeup 0.7s 0.3s forwards;}
+.name-head{font-size:clamp(24px,3.4vw,46px);font-weight:700;
+  line-height:1.25;margin-bottom:20px;opacity:0;
+  animation:fadeup 0.9s 0.7s forwards;}
+.name-expanded{display:flex;gap:0;justify-content:center;margin-bottom:28px;
+  opacity:0;animation:fadeup 0.8s 1.3s forwards;}
+.name-letter{text-align:center;padding:16px 24px;position:relative;}
+.name-initial{font-size:clamp(42px,7vw,80px);font-weight:900;line-height:1;}
+.name-word{font-size:clamp( 12px,1.1vw,13px);color:rgba(255,255,255,0.65);
+  text-transform:uppercase;letter-spacing:0.1em;margin-top:6px;}
+.name-div{width:1px;background:rgba(2,39,117,0.12);align-self:stretch;margin:16px 0;}
+.name-body{font-size:clamp(13px,1.5vw,18px);color:rgba(255,255,255,0.65);
+  line-height:1.85;font-weight:300;max-width:700px;margin:0 auto;
+  opacity:0;animation:fadeup 0.9s 1.8s forwards;}
+
+/* ══ SCENE 3: What VER Does ══ */
+#s3{background:#000;}
+.what-wrap{max-width:860px;width:90%;text-align:center;}
+.what-eye{font-size:10px;letter-spacing:0.5em;color:#0250D9;
+  text-transform:uppercase;margin-bottom:20px;opacity:0;
+  animation:fadeup 0.7s 0.3s forwards;}
+.what-head{font-size:clamp(26px,4vw,56px);font-weight:700;line-height:1.15;
+  margin-bottom:22px;opacity:0;animation:fadeup 0.9s 0.7s forwards;}
+.what-body{font-size:clamp(14px,1.6vw,19px);color:rgba(255,255,255,0.65);
+  line-height:1.9;font-weight:300;opacity:0;animation:fadeup 0.9s 1.2s forwards;}
+.what-highlight{background:rgba(2,80,217,0.12);
+  border-left:3px solid #0250D9;border-radius:0 10px 10px 0;
+  padding:16px 22px;margin-top:24px;text-align:left;
+  font-size:clamp(14px,1.5vw,18px);color:rgba(255,255,255,0.8);
+  line-height:1.7;opacity:0;animation:fadeup 0.9s 2s forwards;}
+.what-highlight em{font-style:normal;color:#98CEFC;font-weight:600;}
+
+/* ══ SCENE 4: Three Mandates ══ */
+#s4{background:radial-gradient(ellipse at 20% 50%,#04081E 0%,#000 70%);}
+.mandate-wrap{max-width:1100px;width:92%;text-align:center;}
+.man-eye{font-size:10px;letter-spacing:0.5em;color:#0250D9;
+  text-transform:uppercase;margin-bottom:16px;opacity:0;
+  animation:fadeup 0.7s 0.3s forwards;}
+.man-head{font-size:clamp(26px,4vw,52px);font-weight:900;
+  margin-bottom:30px;opacity:0;animation:fadeup 0.8s 0.7s forwards;}
+.mandate-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+  text-align:left;}
+.m-card{border-radius:14px;padding:28px 24px;opacity:0;
+  transform:translateY(24px);
+  transition:all 0.9s cubic-bezier(0.22,1,0.36,1);}
+.m-card.lit{opacity:1;transform:translateY(0);}
+.m-card.ei{background:rgba(2,80,217,0.12);border:1px solid rgba(2,80,217,0.25);}
+.m-card.sa{background:rgba(36,8,125,0.18);border:1px solid rgba(36,8,125,0.30);}
+.m-card.ra{background:rgba(115,3,148,0.12);border:1px solid rgba(115,3,148,0.25);}
+.m-num{font-size:clamp(52px,8vw,88px);font-weight:900;
+  letter-spacing:-0.03em;line-height:1;margin-bottom:10px;}
+.ei .m-num{background:linear-gradient(135deg,#0250D9,#98CEFC);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sa .m-num{background:linear-gradient(135deg,#24087D,#D5BEF6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.ra .m-num{background:linear-gradient(135deg,#730394,#D5BEF6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.m-title{font-size:clamp(16px,1.8vw,22px);font-weight:800;margin-bottom:10px;}
+.m-body{font-size:clamp( 12px,1.1vw,14px);color:rgba(255,255,255,0.65);
+  line-height:1.7;}
+
+/* ══ SCENE 5: When VER Engages ══ */
+#s5{background:linear-gradient(135deg,#020820 0%,#032D60 100%);}
+.when-wrap{max-width:1080px;width:92%;}
+.when-eye{font-size:10px;letter-spacing:0.5em;color:#98CEFC;
+  text-transform:uppercase;margin-bottom:14px;opacity:0;
+  animation:fadeup 0.7s 0.3s forwards;}
+.when-head{font-size:clamp(26px,3.8vw,50px);font-weight:900;
+  margin-bottom:8px;opacity:0;animation:fadeup 0.8s 0.7s forwards;}
+.when-sub{font-size:clamp(13px,1.4vw,17px);color:rgba(255,255,255,0.65);
+  margin-bottom:28px;font-weight:300;opacity:0;
+  animation:fadeup 0.8s 1s forwards;}
+.when-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.w-card{border-radius:10px;padding:20px 18px;opacity:0;
+  transform:translateY(16px);
+  transition:all 0.8s cubic-bezier(0.22,1,0.36,1);}
+.w-card.lit{opacity:1;transform:translateY(0);}
+.w-card.early{background:rgba(2,80,217,0.12);border:1px solid rgba(2,80,217,0.25);border-top:3px solid #0250D9;}
+.w-card.mid{background:rgba(36,8,125,0.15);border:1px solid rgba(36,8,125,0.28);border-top:3px solid #24087D;}
+.w-card.late{background:rgba(115,3,148,0.10);border:1px solid rgba(115,3,148,0.22);border-top:3px solid #730394;}
+.w-timing{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;
+  margin-bottom:10px;font-weight:700;}
+.early .w-timing{color:#98CEFC;} .mid .w-timing{color:#D5BEF6;}
+.late .w-timing{color:#E9ADFF;}
+.w-title{font-size:clamp(14px,1.6vw,20px);font-weight:800;margin-bottom:8px;}
+.w-body{font-size:clamp( 12px,1.1vw,13px);color:rgba(255,255,255,0.65);
+  line-height:1.65;}
+.w-examples{margin-top:10px;display:flex;flex-direction:column;gap:5px;}
+.w-ex{font-size:clamp( 12px,1vw,12px);color:rgba(255,255,255,0.65);
+  display:flex;gap:7px;line-height:1.4;}
+.w-ex::before{content:'›';color:#0250D9;font-weight:700;flex-shrink:0;}
+.mid .w-ex::before{color:#24087D;} .late .w-ex::before{color:#730394;}
+
+/* ══ SCENE 6: The CQBR ══ */
+#s6{background:#000;}
+.cqbr-wrap{max-width:980px;width:90%;text-align:center;text-align:center;}
+.cqbr-eye{font-size:10px;letter-spacing:0.5em;color:#730394;
+  text-transform:uppercase;margin-bottom:18px;opacity:0;
+  animation:fadeup 0.7s 0.3s forwards;}
+.cqbr-head{font-size:clamp(28px,4.5vw,62px);font-weight:900;line-height:1.08;
+  margin-bottom:22px;opacity:0;animation:fadeup 0.9s 0.7s forwards;}
+.cqbr-body{font-size:clamp(14px,1.6vw,19px);color:rgba(255,255,255,0.65);
+  line-height:1.85;font-weight:300;max-width:740px;margin:0 auto 28px;
+  opacity:0;animation:fadeup 0.9s 1.2s forwards;}
+.cqbr-features{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  opacity:0;animation:fadeup 0.8s 1.8s forwards;}
+.cqbr-feat{border-radius:10px;padding:14px 20px;text-align:left;
+  min-width:200px;flex:1;max-width:280px;}
+.cf-1{background:rgba(2,80,217,0.12);border:1px solid rgba(2,80,217,0.25);}
+.cf-2{background:rgba(36,8,125,0.15);border:1px solid rgba(36,8,125,0.28);}
+.cf-3{background:rgba(115,3,148,0.12);border:1px solid rgba(115,3,148,0.25);}
+.cf-icon{font-size:22px;margin-bottom:8px;}
+.cf-title{font-size:clamp(13px,1.4vw,16px);font-weight:700;margin-bottom:5px;}
+.cf-body{font-size:clamp( 12px,1.1vw,13px);color:rgba(255,255,255,0.65);
+  line-height:1.55;}
+
+/* ══ SCENE 7: The Partnership ══ */
+#s7{background:linear-gradient(160deg,#032D60 0%,#06042A 100%);}
+.part-wrap{max-width:1080px;width:92%;}
+.part-eye{font-size:10px;letter-spacing:0.5em;color:#D5BEF6;
+  text-transform:uppercase;margin-bottom:14px;opacity:0;
+  animation:fadeup 0.7s 0.3s forwards;}
+.part-head{font-size:clamp(26px,3.8vw,50px);font-weight:900;
+  margin-bottom:8px;opacity:0;animation:fadeup 0.8s 0.7s forwards;}
+.part-sub{font-size:clamp(12px,1.3vw,16px);color:rgba(255,255,255,0.65);
+  margin-bottom:26px;font-weight:300;opacity:0;
+  animation:fadeup 0.8s 1s forwards;}
+.part-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.p-card{border-radius:12px;padding:22px 24px;opacity:0;
+  transform:translateY(18px);
+  transition:all 0.9s cubic-bezier(0.22,1,0.36,1);}
+.p-card.lit{opacity:1;transform:translateY(0);}
+.p-card.ver{background:rgba(2,80,217,0.10);border:1px solid rgba(2,80,217,0.22);}
+.p-card.pillar{background:rgba(115,3,148,0.10);border:1px solid rgba(115,3,148,0.22);}
+.p-dir{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;
+  margin-bottom:10px;font-weight:700;}
+.ver .p-dir{color:#98CEFC;} .pillar .p-dir{color:#D5BEF6;}
+.p-title{font-size:clamp(15px,1.7vw,21px);font-weight:800;margin-bottom:10px;}
+.p-list{display:flex;flex-direction:column;gap:8px;}
+.p-item{font-size:clamp( 12px,1.1vw,14px);color:rgba(255,255,255,0.65);
+  display:flex;gap:9px;align-items:flex-start;line-height:1.5;}
+.ver .p-item::before{content:'›';color:#0250D9;font-weight:700;flex-shrink:0;}
+.pillar .p-item::before{content:'›';color:#730394;font-weight:700;flex-shrink:0;}
+
+/* ══ SCENE 8: The Future ══ */
+#s8{background:radial-gradient(ellipse at 50% 100%,#0A0A2E 0%,#000 65%);}
+.fut-wrap{max-width:960px;width:90%;text-align:center;text-align:center;}
+.fut-eye{font-size:10px;letter-spacing:0.5em;color:#98CEFC;
+  text-transform:uppercase;margin-bottom:18px;opacity:0;
+  animation:fadeup 0.7s 0.3s forwards;}
+.fut-head{font-size:clamp(28px,4.5vw,62px);font-weight:900;line-height:1.05;
+  margin-bottom:24px;opacity:0;animation:fadeup 0.9s 0.7s forwards;}
+.fut-body{font-size:clamp(13px,1.5vw,18px);color:rgba(255,255,255,0.65);
+  line-height:1.85;max-width:720px;margin:0 auto 28px;font-weight:300;
+  opacity:0;animation:fadeup 0.9s 1.2s forwards;}
+.fut-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+  opacity:0;animation:fadeup 0.8s 1.8s forwards;}
+.f-pill{border-radius:20px;padding:7px 18px;font-size:11px;font-weight:600;
+  letter-spacing:0.05em;border:1px solid;}
+.fp-b{background:rgba(2,80,217,0.15);border-color:rgba(2,80,217,0.30);color:#98CEFC;}
+.fp-p{background:rgba(36,8,125,0.20);border-color:rgba(36,8,125,0.35);color:#D5BEF6;}
+.fp-v{background:rgba(115,3,148,0.15);border-color:rgba(115,3,148,0.30);color:#E9ADFF;}
+
+/* ══ SCENE 9: Close ══ */
+#s9{background:radial-gradient(ellipse at 50% 50%,#030D2A 0%,#000 70%);}
+.cls-wrap{max-width:840px;width:90%;text-align:center;text-align:center;}
+.cls-ser{font-size:10px;letter-spacing:0.5em;color:rgba(152,206,252,0.2);
+  text-transform:uppercase;margin-bottom:30px;opacity:0;
+  animation:fadeup 0.8s 0.4s forwards;}
+.cls-ep{font-size:clamp( 12px,1.2vw,14px);letter-spacing:0.3em;
+  text-transform:uppercase;margin-bottom:20px;opacity:0;
+  animation:fadeup 0.7s 0.9s forwards;
+  background:linear-gradient(135deg,#0250D9,#730394);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;}
+.cls-line{font-size:clamp(22px,3.5vw,48px);font-weight:300;
+  line-height:1.45;opacity:0;animation:fadeup 1s 1.3s forwards;}
+.cls-line strong{font-weight:800;color:#fff;}
+.cls-line em{font-style:normal;
+  background:linear-gradient(135deg,#98CEFC,#D5BEF6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;}
+.cls-gline{width:0;height:2px;
+  background:linear-gradient(90deg,#0250D9,#730394);
+  margin:30px auto;animation:expandW 1s 2.2s forwards;}
+.cls-next{font-size:clamp(12px,1.3vw,16px);color:rgba(255,255,255,0.65);
+  margin-top:18px;opacity:0;animation:fadeup 0.8s 2.6s forwards;}
+.cls-next strong{color:#D5BEF6;}
+.cls-meta{font-size:10px;color:rgba(255,255,255,0.65);margin-top:20px;
+  letter-spacing:0.08em;opacity:0;animation:fadeup 0.8s 3s forwards;}
+
+
+
+/* ── Centered popup callouts ── */
+.popup{position:fixed;border-radius:12px;padding:18px 24px;
+  backdrop-filter:blur(24px);border:1px solid rgba(2,80,217,0.2);
+  z-index:300;transform:scale(0.75) translateY(16px);opacity:0;
+  transition:all 0.55s cubic-bezier(0.22,1,0.36,1);pointer-events:none;
+  text-align:center;min-width:180px;
+  top:50%;left:50%;transform:translate(-50%,-50%) scale(0.75);}
+.popup.show{transform:translate(-50%,-50%) scale(1);opacity:1;}
+.popup.teal-pop{background:rgba(13,148,136,0.2);
+  border-color:rgba(13,148,136,0.4);}
+.popup.amber-pop{background:rgba(217,119,6,0.2);
+  border-color:rgba(217,119,6,0.4);}
+.popup.red-pop{background:rgba(220,38,38,0.18);
+  border-color:rgba(220,38,38,0.35);}
+.pop-val{font-size:clamp(32px,5vw,52px);font-weight:900;line-height:1;}
+.teal-pop .pop-val{color:#2DD4BF;}
+.amber-pop .pop-val{color:#FBBF24;}
+.red-pop .pop-val{color:#F87171;}
+.pop-label{font-size:11px;letter-spacing:0.2em;color:rgba(255,255,255,0.55);
+  text-transform:uppercase;margin-top:6px;}
+
+/* ── Font visibility overrides ── */
+/* All body/supporting text minimum opacity 0.72 */
+.btn-ctx,.btn-label,.stat-context,.stat-label,
+.dd-body,.story-body,.narr-body,.frame-body,
+.m-body,.w-body,.p-item,.cf-body,.adv-body,
+.impr-detail,.impr-plan,.r-detail,.fwd-detail,
+.what-body,.name-body,.man-body,.fut-body,
+.cqbr-body,.part-item,.cls-next,.cls-meta,
+.sm-l,.tm-lbl,.meta-label,.pop-label,
+.rec-sub,.fwd-sub,.ask-sub,.bring-sub{
+  color:rgba(255,255,255,0.72) !important;}
+
+/* Context/hint text minimum 0.55 */
+.dw-text,.win-text,.adv-body,.r-detail,
+.m-card .m-body,.w-card .w-body{
+  color:rgba(255,255,255,0.68) !important;}
+
+/* Sub-labels minimum 0.5 */
+.btn-delta,.stat-note,.m-note,.fwd-due,.impr-plan{
+  color:rgba(255,255,255,0.6) !important;}
+
+/* Text shadow on dark scenes for lift */
+.narr-headline,.frame-head,.man-head,.what-head,
+.when-head,.cqbr-head,.fut-head,.cls-line,
+.t-vendor,.s1-title,.punch{
+  text-shadow: 0 2px 20px rgba(0,0,0,0.6);}
+
+/* ── Music toggle ── */
+#music-btn{position:fixed;bottom:60px;left:20px;z-index:200;
+  background:rgba(15,30,60,0.88);border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.7);border-radius:20px;padding:7px 16px;
+  cursor:pointer;font-size:11px;font-weight:600;letter-spacing:0.08em;
+  font-family:inherit;transition:all 0.35s;backdrop-filter:blur(12px);
+  opacity:0;pointer-events:none;user-select:none;}
+#music-btn.ready{opacity:1;pointer-events:all;}
+#music-btn.playing{background:rgba(13,148,136,0.28);
+  border-color:rgba(13,148,136,0.55);color:#2DD4BF;}
+#music-btn:hover{transform:scale(1.06);
+  background:rgba(13,148,136,0.2);border-color:rgba(13,148,136,0.4);}
+/* Vision card text readability */
+.m-body,.w-body,.b-body,.p-item,.cf-body,.fut-body,.cls-next,.cls-meta{
+  color:rgba(255,255,255,0.72)!important;}
+.m-title,.w-title,.b-title,.cf-title{color:#fff;font-weight:700;}
+.w-ex{color:rgba(255,255,255,0.60)!important;}
+.w-timing{font-weight:700;letter-spacing:0.15em;}
+.early .w-timing{color:#98CEFC;}
+.mid .w-timing{color:#D5BEF6;}
+.late .w-timing{color:#E9ADFF;}
+
+.manifesto-wrap{max-width:860px;width:90%;}
+
+/* ── Scene layout safety ── */
+.scene{padding:54px 16px;overflow:visible;}
+.scene > div{max-width:100%;box-sizing:border-box;}
+
+/* ── Responsive grid collapse ── */
+@media(max-width:900px){
+  .mandate-grid,.when-grid{grid-template-columns:1fr;}
+  .part-grid{grid-template-columns:1fr;}
+  .mandate-wrap,.when-wrap,.part-wrap{width:95%;}
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="scanline"></div>
+<div class="bar-top"></div>
+<div class="bar-bottom"></div>
+<div id="tbar"></div>
+<div id="progress"></div>
+<div id="controls">
+  <select id="speed-sel" class="ctrl-btn">
+    <option value="0.5">0.5× slow</option>
+    <option value="0.75">0.75×</option>
+    <option value="1" selected>1× normal</option>
+    <option value="1.5">1.5× fast</option>
+    <option value="2">2× faster</option>
+  </select>
+  <button class="ctrl-btn" id="btn-prev">← Prev</button>
+  <button class="ctrl-btn" id="btn-pause">⏸ Pause</button>
+  <button class="ctrl-btn" id="btn-next">Next →</button>
+</div>
+<div class="series-badge" id="badge">VER Vision Series · Episode 1</div>
+<div class="wm">Vendor Engagement & Reliability · DET Delivery Assurance & Operations</div>
+<button id="music-btn" onclick="toggleMusic()">♪ Music</button>
+
+
+
+
+<div id="stage">
+
+<!-- S0: Cold open -->
+<div class="scene" id="s0">
+  <div class="s0-series">VER Vision Series · Episode 1 of 6</div>
+  <div class="s0-line">
+    Every time DET brings in a third party to do the work —<br>
+    someone should already be <em>watching that spend.</em><br>
+    <strong>That someone is VER.</strong>
+  </div>
+</div>
+
+<!-- S1: Title -->
+<div class="scene" id="s1">
+  <div style="text-align:center;z-index:1;">
+    <div class="s1-ep">Episode 1</div>
+    <div class="s1-series">VER Vision Series</div>
+    <div class="s1-title gtext">Who Is VER?</div>
+    <div class="s1-sub">Vendor Engagement & Reliability · Salesforce DET</div>
+    <div class="s1-line"></div>
+    <div class="s1-meta">
+      <div class="sm-i">
+        <div class="sm-v gtext-blue">9</div>
+        <div class="sm-l">DET Pillars</div>
+      </div>
+      <div class="sm-d"></div>
+      <div class="sm-i">
+        <div class="sm-v gtext-blue">Active</div>
+        <div class="sm-l">Engagements Monitored</div>
+      </div>
+      <div class="sm-d"></div>
+      <div class="sm-i">
+        <div class="sm-v gtext-blue">$10M+</div>
+        <div class="sm-l">Advisory Savings FY27</div>
+      </div>
+      <div class="sm-d"></div>
+      <div class="sm-i">
+        <div class="sm-v gtext-blue">On Demand</div>
+        <div class="sm-l">Intelligence · No Meeting Required</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S2: The Name -->
+<div class="scene" id="s2">
+  <div class="name-wrap">
+    <div class="name-eye">The Name</div>
+    <div class="name-head">
+      Every letter is intentional.<br>
+      <span style="font-size:0.65em;font-weight:300;color:rgba(255,255,255,0.65);">The name reflects a standard, not just a function.</span>
+    </div>
+    <div class="name-expanded">
+      <div class="name-letter">
+        <div class="name-initial gtext-blue">V</div>
+        <div class="name-word">Vendor</div>
+      </div>
+      <div class="name-div"></div>
+      <div class="name-letter">
+        <div class="name-initial gtext-purple">E</div>
+        <div class="name-word">Engagement</div>
+      </div>
+      <div class="name-div"></div>
+      <div class="name-letter">
+        <div class="name-initial" style="background:linear-gradient(135deg,#730394,#D5BEF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">R</div>
+        <div class="name-word">Reliability</div>
+      </div>
+    </div>
+    <div class="name-body">
+      Not vendor management. Not procurement. Not a vendor database.
+      VER focuses on the <strong>engagements</strong> — the third-party work being done
+      inside DET, the spend attached to it, and the <strong>reliability</strong>
+      of the vendors delivering it. The emphasis on Reliability isn't semantic.
+      It's the standard VER holds every engagement to.
+    </div>
+  </div>
+</div>
+
+<!-- S3: What VER Does -->
+<div class="scene" id="s3">
+  <div class="what-wrap">
+    <div class="what-eye">The Definition</div>
+    <div class="what-head">
+      VER exists because<br>
+      <span class="gtext">third-party spend is one of DET's largest<br>
+      and most consequential cost levers.</span>
+    </div>
+    <div class="what-body">
+      DET engages third parties across every pillar — for project work, application maintenance,
+      staff augmentation, consulting, and technology services. That spend is significant,
+      it's active, and it requires a function that monitors engagements, advises on decisions,
+      and holds vendors accountable to the standard DET deserves.
+      VER is that function.
+    </div>
+    <div class="what-highlight">
+      VER doesn't govern the portfolio. VER <em>advises and monitors</em> the engagements
+      and spend within it — so that every dollar DET spends with a third party
+      is visible, defensible, and working as hard as it should.
+    </div>
+  </div>
+</div>
+
+<!-- S4: Three Mandates -->
+<div class="scene" id="s4">
+  <div class="mandate-wrap">
+    <div class="man-eye">How VER Works</div>
+    <div class="man-head">Three mandates. One function.</div>
+    <div class="mandate-grid">
+      <div class="m-card ei" id="mc1">
+        <div class="m-num">01</div>
+        <div class="m-title">Engagement Intelligence</div>
+        <div class="m-body">VER monitors active engagements and third-party spend across all 9 DET pillars ��� performance trends, spend patterns, reliability signals, and emerging risks. We surface what matters before it becomes a problem.</div>
+      </div>
+      <div class="m-card sa" id="mc2">
+        <div class="m-num">02</div>
+        <div class="m-title">Strategic Advisory</div>
+        <div class="m-body">When a Pillar Lead is considering bringing in a third party — for any reason, at any stage — VER should be in that conversation. We bring the intelligence, the market context, and the advisory perspective. The decision stays with the Pillar Lead.</div>
+      </div>
+      <div class="m-card ra" id="mc3">
+        <div class="m-num">03</div>
+        <div class="m-title">Reliability Assurance</div>
+        <div class="m-body">VER holds vendors accountable to the standard DET deserves — through Cinematic QBRs, performance monitoring, and spend analysis. When a vendor isn't delivering, VER says so. When they are, VER validates it.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S5: When VER Engages -->
+<div class="scene" id="s5">
+  <div class="when-wrap">
+    <div class="when-eye">When VER Engages</div>
+    <div class="when-head">Not just at renewal. At the beginning.</div>
+    <div class="when-sub">
+      VER's advisory value is highest before a commitment is made —
+      not after. Here's when VER needs to be in the conversation.
+    </div>
+    <div class="when-grid">
+      <div class="w-card early" id="wc1">
+        <div class="w-timing">Early Stage — Before Commitment</div>
+        <div class="w-title">Any time a third party is being considered</div>
+        <div class="w-body">This is where VER adds the most value. Before a SOW is written, before a vendor is selected, before scope is defined — VER should be advising.</div>
+        <div class="w-examples">
+          <div class="w-ex">New SOW or project engagement</div>
+          <div class="w-ex">Staff augmentation or resource requests</div>
+          <div class="w-ex">Consulting or advisory engagements</div>
+          <div class="w-ex">Any planned third-party spend</div>
+        </div>
+      </div>
+      <div class="w-card mid" id="wc2">
+        <div class="w-timing">Active Engagement — During Delivery</div>
+        <div class="w-title">While the work is being done</div>
+        <div class="w-body">VER monitors active engagements continuously — not just at review time. Performance signals, spend patterns, and reliability indicators are tracked in real time.</div>
+        <div class="w-examples">
+          <div class="w-ex">SLA performance and delivery tracking</div>
+          <div class="w-ex">Attrition and continuity monitoring</div>
+          <div class="w-ex">Spend vs. MFT variance analysis</div>
+          <div class="w-ex">Change orders and scope shifts</div>
+        </div>
+      </div>
+      <div class="w-card late" id="wc3">
+        <div class="w-timing">Renewal & Transition — At Decision Points</div>
+        <div class="w-title">When decisions need intelligence</div>
+        <div class="w-body">At renewal, VER provides the full advisory picture — performance history, rate benchmarks, market alternatives, and a recommendation. This is when everything VER has been monitoring converges.</div>
+        <div class="w-examples">
+          <div class="w-ex">Renewal strategy and rate benchmarking</div>
+          <div class="w-ex">Vendor transition or replacement</div>
+          <div class="w-ex">Scope expansion or renegotiation</div>
+          <div class="w-ex">Cinematic QBR delivery and review</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S6: The CQBR -->
+<div class="scene" id="s6">
+  <div class="cqbr-wrap">
+    <div class="cqbr-eye">A New Kind of Intelligence Delivery</div>
+    <div class="cqbr-head">
+      No meeting required.<br>
+      <span class="gtext">No calendar. On demand. Always.</span>
+    </div>
+    <div class="cqbr-body">
+      The Cinematic QBR is VER's answer to death by slide deck.
+      A self-running, narrative-driven intelligence experience —
+      the honest story of an engagement, told with data and without
+      the vendor's marketing spin. Stakeholders watch when it's
+      relevant to them. Rewatch when they need context.
+      The intelligence is always available.
+    </div>
+    <div class="cqbr-features">
+      <div class="cqbr-feat cf-1">
+        <div class="cf-icon">🎬</div>
+        <div class="cf-title">Cinematic, not corporate</div>
+        <div class="cf-body">Produced like it deserves to be — narrative-driven, visually compelling, nothing like a traditional QBR.</div>
+      </div>
+      <div class="cqbr-feat cf-2">
+        <div class="cf-icon">🎯</div>
+        <div class="cf-title">VER's voice, not the vendor's</div>
+        <div class="cf-body">The good, the not-so-good, and what VER is watching. Honest advisory intelligence, not vendor PR.</div>
+      </div>
+      <div class="cqbr-feat cf-3">
+        <div class="cf-icon">▶️</div>
+        <div class="cf-title">Watch anytime, anywhere</div>
+        <div class="cf-body">No scheduling. No showing up. Stakeholders access intelligence on their terms — when it matters to them.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S7: The Partnership -->
+<div class="scene" id="s7">
+  <div class="part-wrap">
+    <div class="part-eye">The Working Relationship</div>
+    <div class="part-head">VER advises. Pillar Leads decide. Together, we make better spend decisions.</div>
+    <div class="part-sub">This is a two-way intelligence relationship. Here's what both sides look like at their best.</div>
+    <div class="part-grid">
+      <div class="p-card ver" id="pc1">
+        <div class="p-dir">What VER commits to Pillar Leads</div>
+        <div class="p-title">Intelligence that earns your trust</div>
+        <div class="p-list">
+          <div class="p-item">Engagement monitoring across all active third-party work</div>
+          <div class="p-item">Honest advisory — not vendor advocacy</div>
+          <div class="p-item">Early engagement support before the SOW is written</div>
+          <div class="p-item">Rate benchmarking before any major spend commitment</div>
+          <div class="p-item">Cinematic QBRs that tell the real story</div>
+          <div class="p-item">Spend analysis that surfaces what isn't obvious</div>
+        </div>
+      </div>
+      <div class="p-card pillar" id="pc2">
+        <div class="p-dir">What makes the partnership work</div>
+        <div class="p-title">What VER needs from Pillar Leads</div>
+        <div class="p-list">
+          <div class="p-item">Bring VER in early — before the third-party conversation ends</div>
+          <div class="p-item">Share performance signals when you see them, not after escalation</div>
+          <div class="p-item">Route new SOWs and third-party engagements through VER intake</div>
+          <div class="p-item">Forward visibility on planned spend and scope changes</div>
+          <div class="p-item">Trust that VER advises — you always make the final call</div>
+          <div class="p-item">Share context VER can't see from the outside</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S8: The Future -->
+<div class="scene" id="s8">
+  <div class="fut-wrap">
+    <div class="fut-eye">Where VER Is Headed</div>
+    <div class="fut-head gtext">The intelligence layer<br>is just getting started.</div>
+    <div class="fut-body">
+      VER has built the foundation — engagement monitoring, advisory capability,
+      Cinematic QBRs, a supplier portal, and $10M+ in realized advisory savings.
+      What's being built on top of that foundation will make third-party spend
+      one of the most intelligently managed functions in DET.
+    </div>
+    <div class="fut-pills">
+      <div class="f-pill fp-b">Spend Benchmarking Dashboard — H2 FY27</div>
+      <div class="f-pill fp-p">AI-Assisted Spend Analysis — Q1 FY28</div>
+      <div class="f-pill fp-v">Cinematic QBRs — Live Now</div>
+      <div class="f-pill fp-b">DET Supplier Portal — Live Now</div>
+      <div class="f-pill fp-p">Rate Card Intelligence — In Development</div>
+      <div class="f-pill fp-v">VER Vision Series — You're Watching It</div>
+    </div>
+  </div>
+</div>
+
+<!-- S9: Close -->
+<div class="scene" id="s9">
+  <div class="cls-wrap">
+    <div class="cls-ser">VER Vision Series · Episode 1 of 6</div>
+    <div class="cls-ep">Vendor Engagement & Reliability</div>
+    <div class="cls-line">
+      If a third party is doing work inside DET,<br>
+      <strong>VER should already be</strong><br>
+      <em>in that conversation.</em>
+    </div>
+    <div class="cls-gline"></div>
+    <div class="cls-next">
+      Next: <strong>Episode 2 — The Third-Party Spend Story.</strong><br>
+      Where the spend goes. What it buys. What it should cost.
+    </div>
+    <div class="cls-meta">
+      VER Vision Series · Episode 1 of 6 · Vendor Engagement & Reliability · DET DA&O · FY27
+    </div>
+  </div>
+</div>
+
+</div><!-- /stage -->
+
+<script>
+// ── Blue/purple particle system ────────────────────────────────
+(function(){
+  const cv=document.getElementById('particles'),ctx=cv.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  const cols=['rgba(2,80,217,','rgba(115,3,148,','rgba(36,8,125,',
+              'rgba(152,206,252,','rgba(213,190,246,'];
+  for(let i=0;i<75;i++) pts.push({
+    x:Math.random(),y:Math.random(),
+    vx:(Math.random()-0.5)*0.00012,
+    vy:-Math.random()*0.00022-0.00004,
+    r:Math.random()*1.8+0.3,
+    o:Math.random()*0.28+0.04,
+    c:cols[Math.floor(Math.random()*cols.length)]
+  });
+  (function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.y<0){p.y=1;p.x=Math.random();}
+      if(p.x<0)p.x=1;if(p.x>1)p.x=0;
+      ctx.beginPath();ctx.arc(p.x*W,p.y*H,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.c+p.o+')';ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  })();
+})();
+
+// ── Scene engine ───────────────────────────────────────────────
+const SCENES=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+const DUR=[5000,10000,11000,11000,13000,14000,12000,13000,11000,12000];
+let cur=0,paused=false,spd=1,elapsed=0,sceneStart=0,tmr=null;
+
+// Progress dots
+const prog=document.getElementById('progress');
+SCENES.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='dot';d.onclick=()=>goTo(i);prog.appendChild(d);
+});
+
+function dots(){
+  document.querySelectorAll('.dot')
+    .forEach((d,i)=>d.classList.toggle('active',i===cur));
+}
+
+function barTick(){
+  if(!paused) elapsed=performance.now()-sceneStart;
+  const pct=Math.min((elapsed/(DUR[cur]/spd))*100,100);
+  document.getElementById('tbar').style.width=pct+'%';
+  requestAnimationFrame(barTick);
+}
+requestAnimationFrame(barTick);
+
+function clearAnimated(){
+  document.querySelectorAll('.m-card,.w-card,.p-card').forEach(c=>c.classList.remove('lit'));
+}
+
+function enter(i){
+  clearAnimated();
+  // Series badge
+  document.getElementById('badge').classList.toggle('show', i>0);
+
+  if(i===4){
+    ['mc1','mc2','mc3'].forEach((id,j)=>{
+      setTimeout(()=>document.getElementById(id).classList.add('lit'),600+j*500);
+    });
+  }
+  if(i===5){
+    ['wc1','wc2','wc3'].forEach((id,j)=>{
+      setTimeout(()=>document.getElementById(id).classList.add('lit'),500+j*450);
+    });
+  }
+  if(i===7){
+    setTimeout(()=>document.getElementById('pc1').classList.add('lit'),600);
+    setTimeout(()=>document.getElementById('pc2').classList.add('lit'),1100);
+  }
+  // Letterbox
+  document.body.className=([0,1,2,3,6,9].includes(i)?'bc':'bo');
+}
+
+function show(i){
+  SCENES.forEach((id,j)=>
+    document.getElementById(id).classList.toggle('active',j===i));
+  cur=i; elapsed=0; sceneStart=performance.now();
+  document.getElementById('tbar').style.width='0%';
+  dots(); enter(i);
+}
+
+function goTo(i){
+  if(i<0||i>=SCENES.length) return;
+  clearTimeout(tmr); show(i);
+  if(!paused) schedule();
+}
+
+function schedule(){
+  clearTimeout(tmr);
+  tmr=setTimeout(()=>{
+    if(!paused&&cur<SCENES.length-1) goTo(cur+1);
+  },(DUR[cur]/spd)-elapsed);
+}
+
+// Controls
+document.getElementById('btn-prev').onclick=()=>goTo(cur-1);
+document.getElementById('btn-next').onclick=()=>goTo(cur+1);
+document.getElementById('btn-pause').onclick=function(){
+  paused=!paused;
+  this.textContent=paused?'▶ Play':'⏸ Pause';
+  if(!paused){sceneStart=performance.now()-elapsed;schedule();}
+  else clearTimeout(tmr);
+};
+document.getElementById('speed-sel').onchange=function(){
+  spd=parseFloat(this.value);
+  if(!paused){clearTimeout(tmr);sceneStart=performance.now()-elapsed;schedule();}
+};
+
+let hideT;
+document.addEventListener('mousemove',()=>{
+  document.getElementById('controls').classList.add('visible');
+  clearTimeout(hideT);
+  hideT=setTimeout(()=>
+    document.getElementById('controls').classList.remove('visible'),3000);
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ') goTo(cur+1);
+  if(e.key==='ArrowLeft') goTo(cur-1);
+  if(e.key==='p'||e.key==='P') document.getElementById('btn-pause').click();
+});
+
+show(0); schedule();
+
+
+
+
+
+
+
+
+
+// ── VER Vision Series Lo-Fi Audio Engine ──────────────────────
+// Slower, more contemplative, ambient lo-fi
+// 72 BPM — introspective, cinematic, strategic
+// ──────────────────────────────────────────────────────────────
+(function(){
+  var ctx, masterGain, playing = false;
+  var BPM = 72, BAR = (60/BPM)*4;
+  var schedTimerId = null;
+  var nextBarTime  = 0;
+  var barNum       = 0;
+
+  function init() {
+    if(ctx) return;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0, ctx.currentTime);
+    masterGain.connect(ctx.destination);
+  }
+
+  function mkFilter(type, freq, Q) {
+    var f = ctx.createBiquadFilter();
+    f.type = type; f.frequency.value = freq;
+    if(Q) f.Q.value = Q;
+    return f;
+  }
+
+  // ── Long lush reverb ─────────────────────────────────────────
+  function mkReverb(decay, wet) {
+    wet = wet || 0.25;
+    var conv = ctx.createConvolver();
+    var len  = Math.floor(ctx.sampleRate * decay);
+    var buf  = ctx.createBuffer(2, len, ctx.sampleRate);
+    for(var ch=0;ch<2;ch++){
+      var d = buf.getChannelData(ch);
+      for(var i=0;i<len;i++)
+        d[i] = (Math.random()*2-1)*Math.pow(1-i/len, 1.6);
+    }
+    conv.buffer = buf;
+    var wg = ctx.createGain(); wg.gain.value = wet;
+    conv.connect(wg);
+    return {input: conv, output: wg};
+  }
+
+  // ── Soft atmospheric pad ──────────────────────────────────────
+  // Abmaj7 → Fm9 → Dbmaj7 → Ebsus4 cycle
+  var padChords = [
+    [207.7, 261.6, 311.1, 392.0, 466.2],  // Abmaj7
+    [174.6, 220.0, 261.6, 329.6, 392.0],  // Fm9
+    [138.6, 174.6, 207.7, 261.6, 311.1],  // Dbmaj7
+    [155.6, 207.7, 233.1, 311.1, 369.9],  // Ebsus4
+  ];
+
+  function playPad(chordIdx, time, dur) {
+    var chord = padChords[chordIdx % padChords.length];
+    var rev   = mkReverb(3.2, 0.3);
+    rev.output.connect(masterGain);
+    chord.forEach(function(freq, ci) {
+      // Slightly detuned oscillators for width
+      [-0.5, 0, 0.5].forEach(function(detune) {
+        var o = ctx.createOscillator();
+        o.type = ci < 2 ? 'sine' : 'triangle';
+        o.frequency.value = freq;
+        o.detune.value = detune * 8;
+        var f = mkFilter('lowpass', 1800, 0.6);
+        var g = ctx.createGain();
+        // Slow attack — the defining feature of this engine
+        var attack = 0.6;
+        g.gain.setValueAtTime(0, time);
+        g.gain.linearRampToValueAtTime(0.038, time + attack);
+        g.gain.setValueAtTime(0.034, time + dur * 0.6);
+        g.gain.linearRampToValueAtTime(0, time + dur * 0.96);
+        o.connect(f); f.connect(g); g.connect(rev.input);
+        o.start(time); o.stop(time + dur);
+      });
+    });
+  }
+
+  // ── Soft bass — minimal, melodic ─────────────────────────────
+  // Ab pentatonic: Ab2=103.8, C3=130.8, Db3=138.6, Eb3=155.6, F3=174.6
+  var bassNotes  = [103.8, 103.8, 130.8, 103.8, 138.6, 155.6, 130.8, 103.8];
+  var bassSteps  = [
+    {s:0,    n:0, d:1.5},
+    {s:2,    n:1, d:0.5},
+    {s:3,    n:2, d:1.0},
+    {s:4.5,  n:3, d:0.5},
+    {s:5.5,  n:4, d:0.5},
+    {s:6.5,  n:5, d:0.75},
+    {s:7.5,  n:6, d:0.5},
+  ];
+
+  function playBass(time, stepLen) {
+    bassSteps.forEach(function(b) {
+      var t   = time + b.s * stepLen;
+      var dur = b.d * stepLen;
+      var o   = ctx.createOscillator();
+      o.type  = 'sine';
+      o.frequency.value = bassNotes[b.n % bassNotes.length];
+      // Sub overtone
+      var o2  = ctx.createOscillator();
+      o2.type = 'sine';
+      o2.frequency.value = bassNotes[b.n % bassNotes.length] * 2.01;
+      var f   = mkFilter('lowpass', 380, 1.2);
+      var g   = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.22, t + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.88);
+      var g2  = ctx.createGain(); g2.gain.value = 0.08;
+      o.connect(f); o2.connect(g2); g2.connect(f); f.connect(g);
+      g.connect(masterGain);
+      o.start(t); o2.start(t); o.stop(t+dur); o2.stop(t+dur);
+    });
+  }
+
+  // ── Soft brushed drums — very sparse and gentle ───────────────
+  function playBrush(type, time, vel) {
+    vel = vel || 0.4;
+
+    if(type === 'kick') {
+      var o = ctx.createOscillator();
+      o.frequency.setValueAtTime(100, time);
+      o.frequency.exponentialRampToValueAtTime(42, time + 0.18);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(vel * 0.45, time);
+      g.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+      var f = mkFilter('lowpass', 180, 0.7);
+      o.connect(f); f.connect(g); g.connect(masterGain);
+      o.start(time); o.stop(time + 0.25);
+
+    } else if(type === 'brush') {
+      // Soft snare brush — noise through bandpass
+      var len  = Math.floor(ctx.sampleRate * 0.12);
+      var buf  = ctx.createBuffer(1, len, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for(var i=0;i<len;i++) data[i] = Math.random()*2-1;
+      var src  = ctx.createBufferSource(); src.buffer = buf;
+      var bf   = ctx.createBiquadFilter();
+      bf.type  = 'bandpass'; bf.frequency.value = 1200; bf.Q.value = 0.5;
+      var bg   = ctx.createGain();
+      bg.gain.setValueAtTime(vel * 0.18, time);
+      bg.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+      src.connect(bf); bf.connect(bg); bg.connect(masterGain);
+      src.start(time); src.stop(time + 0.13);
+
+    } else if(type === 'shaker') {
+      var slen = Math.floor(ctx.sampleRate * 0.04);
+      var sbuf = ctx.createBuffer(1, slen, ctx.sampleRate);
+      var sd   = sbuf.getChannelData(0);
+      for(var j=0;j<slen;j++) sd[j] = Math.random()*2-1;
+      var ssrc = ctx.createBufferSource(); ssrc.buffer = sbuf;
+      var shf  = mkFilter('highpass', 6000);
+      var shg  = ctx.createGain();
+      shg.gain.setValueAtTime(vel * 0.12, time);
+      shg.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
+      ssrc.connect(shf); shf.connect(shg); shg.connect(masterGain);
+      ssrc.start(time); ssrc.stop(time + 0.04);
+    }
+  }
+
+  // ── Vinyl warmth ─────────────────────────────────────────────
+  function playVinyl(time, dur) {
+    var len = Math.floor(ctx.sampleRate * dur);
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var d   = buf.getChannelData(0);
+    for(var i=0;i<d.length;i++)
+      d[i] = Math.random() < 0.002 ? (Math.random()-0.5)*0.3 : 0;
+    var src = ctx.createBufferSource(); src.buffer = buf;
+    var f   = mkFilter('bandpass', 2500, 0.5);
+    var g   = ctx.createGain(); g.gain.value = 0.03;
+    src.connect(f); f.connect(g); g.connect(masterGain);
+    src.start(time); src.stop(time + dur);
+  }
+
+  // ── Rhodes melody — sparse, contemplative ────────────────────
+  var melodyNotes = [207.7, 261.6, 233.1, 207.7, 174.6, 196.0, 220.0];
+  var melodyRhythm = [
+    {bar:0, beat:0,   dur:1.2, n:0},
+    {bar:0, beat:2.5, dur:0.6, n:1},
+    {bar:0, beat:5,   dur:0.8, n:2},
+    {bar:1, beat:1,   dur:1.0, n:3},
+    {bar:1, beat:4,   dur:0.7, n:4},
+    {bar:1, beat:6,   dur:1.0, n:5},
+  ];
+
+  function playMelody(barStart, barIdx) {
+    var beatLen = BAR / 8;
+    var rev     = mkReverb(2.4, 0.22);
+    rev.output.connect(masterGain);
+
+    melodyRhythm.forEach(function(m) {
+      if(m.bar !== barIdx % 2) return;
+      var t   = barStart + m.beat * beatLen;
+      var dur = m.dur * beatLen * 1.1;
+      var o   = ctx.createOscillator();
+      o.type  = 'sine';
+      o.frequency.value = melodyNotes[m.n % melodyNotes.length];
+      var mod = ctx.createOscillator();
+      var mg  = ctx.createGain();
+      mod.frequency.value = melodyNotes[m.n % melodyNotes.length] * 2.003;
+      mg.gain.value = melodyNotes[m.n % melodyNotes.length] * 0.25;
+      mod.connect(mg); mg.connect(o.frequency);
+      var f = mkFilter('lowpass', 2800, 0.7);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.055, t + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(f); f.connect(g); g.connect(rev.input);
+      mod.start(t); o.start(t); mod.stop(t+dur); o.stop(t+dur);
+    });
+  }
+
+  // ── Schedule one bar ──────────────────────────────────────────
+  function scheduleBar(barStart, bn) {
+    var stepLen = BAR / 8;
+    var chord   = Math.floor(bn / 2) % padChords.length;
+
+    // Very sparse, brushy drums
+    // Kick: just beat 1 and beat 5 (soft)
+    playBrush('kick',   barStart,              0.55);
+    playBrush('kick',   barStart + 4*stepLen,  0.45);
+    // Brush snare: beat 3 and beat 7 only
+    playBrush('brush',  barStart + 2*stepLen,  0.5);
+    playBrush('brush',  barStart + 6*stepLen,  0.45);
+    // Shakers: every 2 steps, gentle
+    [0,2,4,6].forEach(function(s) {
+      playBrush('shaker', barStart + s*stepLen, 0.35);
+      // Offbeat at slightly lower vel
+      playBrush('shaker', barStart + (s+1)*stepLen, 0.18);
+    });
+
+    // Pad — slow attack, full bar + small overlap
+    playPad(chord, barStart, BAR * 1.05);
+
+    // Bass — melodic, not heavy
+    playBass(barStart, stepLen);
+
+    // Melody — every other bar feels more spacious
+    playMelody(barStart, bn);
+
+    // Vinyl warmth throughout
+    playVinyl(barStart, BAR);
+  }
+
+  // ── Lookahead scheduler ───────────────────────────────────────
+  var ahead = 0.25;
+
+  function tick() {
+    while(nextBarTime < ctx.currentTime + ahead) {
+      scheduleBar(nextBarTime, barNum);
+      nextBarTime += BAR;
+      barNum++;
+    }
+    schedTimerId = setTimeout(tick, 60);
+  }
+
+  // ── Public API ────────────────────────────────────────────────
+  window.VERLofi = {
+    start: function() {
+      if(playing) return;
+      init();
+      if(ctx.state === 'suspended') ctx.resume();
+      nextBarTime = ctx.currentTime + 0.1;
+      barNum = 0;
+      masterGain.gain.cancelScheduledValues(ctx.currentTime);
+      masterGain.gain.setValueAtTime(0, ctx.currentTime);
+      // Longer fade-in for Vision Series — 4 seconds
+      masterGain.gain.linearRampToValueAtTime(0.68, ctx.currentTime + 4);
+      tick();
+      playing = true;
+    },
+    stop: function() {
+      if(!playing) return;
+      clearTimeout(schedTimerId);
+      masterGain.gain.cancelScheduledValues(ctx.currentTime);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, ctx.currentTime);
+      masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2.5);
+      playing = false;
+    },
+    toggle: function() {
+      if(playing) this.stop(); else this.start();
+      return playing;
+    },
+    isPlaying: function() { return playing; }
+  };
+})();
+
+
+// ── Music toggle ──────────────────────────────────────────────
+function toggleMusic() {
+  var btn = document.getElementById('music-btn');
+  if(!btn) return;
+  var nowPlaying = VERLofi.toggle();
+  btn.textContent = nowPlaying ? '♫ On' : '♪ Off';
+  btn.classList.toggle('playing', nowPlaying);
+}
+document.addEventListener('click',   makeMusicReady, {once:true});
+document.addEventListener('keydown', makeMusicReady, {once:true});
+function makeMusicReady() {
+  var btn = document.getElementById('music-btn');
+  if(btn) btn.classList.add('ready');
+}
+
+</script>
+</body>
+</html>

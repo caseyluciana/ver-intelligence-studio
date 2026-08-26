@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VER Monthly Intelligence Digest &mdash; May 2026</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --orange:#EA580C;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--border:#E5E7EB;--white:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:#fff;color:var(--ink);}
+
+/* ── Badge system ── */
+.badge{display:inline-block;font-size:7pt;padding:2px 8px;
+  border-radius:10px;font-weight:700;}
+.b-green{background:var(--green3);color:var(--green2);}
+.b-amber{background:var(--amber3);color:var(--amber2);}
+.b-red{background:var(--red3);color:var(--red2);}
+.b-navy{background:var(--navy3);color:var(--navy);}
+.b-teal{background:var(--teal3);color:var(--teal2);}
+.b-gray{background:var(--gray2);color:var(--ink4);}
+.b-purple{background:var(--purple3);color:var(--purple);}
+
+/* ── Print ── */
+@media print{
+  .no-print{display:none!important;}
+  .cover{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .savings-panel,.risk-grid,.renewal-row,.ask-card,
+  .update-card,.advisory-close{
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{background:#fff;}
+  .page-break{page-break-before:always;}
+}
+
+/* ── Outer wrap ── */
+.digest{max-width:860px;margin:0 auto;
+  box-shadow:0 0 60px rgba(0,0,0,0.12);}
+
+/* ── Nav bar ── */
+.digest-nav{background:var(--navy);padding:10px 36px;
+  display:flex;align-items:center;justify-content:space-between;}
+.nav-brand{font-size:7.5pt;font-weight:700;color:rgba(255,255,255,0.45);
+  text-transform:uppercase;letter-spacing:0.12em;}
+.nav-actions{display:flex;gap:8px;}
+.nav-btn{padding:5px 14px;border-radius:5px;font-size:8pt;font-weight:600;
+  cursor:pointer;border:none;font-family:inherit;text-decoration:none;
+  display:inline-block;transition:all 0.15s;}
+.nav-btn.sec{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);}
+.nav-btn.sec:hover{background:rgba(255,255,255,0.14);}
+.nav-btn.pri{background:var(--teal);color:#fff;}
+.nav-btn.pri:hover{background:var(--teal2);}
+
+/* ── Cover ── */
+.cover{
+  background:linear-gradient(150deg,#0D2137 0%,#0F1E3C 40%,#091220 100%);
+  padding:52px 48px 44px;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 85% 15%,rgba(13,148,136,0.25) 0%,transparent 50%),
+    radial-gradient(ellipse at 10% 90%,rgba(124,58,237,0.16) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,rgba(14,165,233,0.04) 0%,transparent 70%);
+  pointer-events:none;}
+.cover::after{content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(13,148,136,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(13,148,136,0.025) 1px,transparent 1px);
+  background-size:52px 52px;pointer-events:none;}
+.cover-inner{position:relative;z-index:1;}
+.cover-accent{width:44px;height:3px;background:var(--teal);
+  border-radius:2px;margin-bottom:16px;}
+.cover-flag{font-size:7.5pt;font-weight:700;color:var(--teal);
+  text-transform:uppercase;letter-spacing:0.20em;margin-bottom:12px;}
+.cover-month{font-size:56pt;font-weight:900;color:#fff;line-height:0.95;
+  letter-spacing:-0.04em;margin-bottom:6px;}
+.cover-month .accent{color:var(--teal);}
+.cover-year{font-size:18pt;font-weight:300;color:rgba(255,255,255,0.35);
+  letter-spacing:0.08em;margin-bottom:28px;}
+.cover-savings{margin-bottom:28px;}
+.cover-savings-label{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.35);
+  text-transform:uppercase;letter-spacing:0.14em;margin-bottom:4px;}
+.cover-savings-val{font-size:36pt;font-weight:900;color:var(--teal);
+  line-height:1;letter-spacing:-0.02em;}
+.cover-savings-sub{font-size:9pt;color:rgba(255,255,255,0.45);margin-top:4px;}
+.cover-divider{width:100%;height:1px;background:rgba(255,255,255,0.08);
+  margin:20px 0;}
+.cover-position{font-size:10pt;color:rgba(255,255,255,0.60);
+  line-height:1.75;max-width:600px;}
+.cover-position strong{color:rgba(255,255,255,0.90);font-weight:700;}
+.cover-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  margin-top:24px;}
+.ckpi{padding:12px 16px;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);border-radius:8px;}
+.ckpi-lbl{font-size:7pt;font-weight:700;color:rgba(255,255,255,0.35);
+  text-transform:uppercase;letter-spacing:0.10em;margin-bottom:4px;}
+.ckpi-val{font-size:17pt;font-weight:900;line-height:1;color:#fff;}
+.ckpi-note{font-size:7pt;color:rgba(255,255,255,0.25);margin-top:3px;}
+.ckpi.g .ckpi-val{color:#34D399;}
+.ckpi.w .ckpi-val{color:#FCD34D;}
+.ckpi.r .ckpi-val{color:#FCA5A5;}
+
+/* ── Movement label ── */
+.movement{padding:0 48px;margin-top:40px;}
+.movement-label{font-size:7pt;font-weight:800;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.18em;padding:8px 0;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;}
+.movement-num{font-size:24pt;font-weight:900;color:var(--gray2);
+  line-height:1;margin-right:2px;}
+
+/* ── Body sections ── */
+.body{padding:0 48px 48px;}
+.section{margin-top:32px;}
+.sec-hdr{margin-bottom:16px;}
+.sec-eyebrow{font-size:7pt;font-weight:700;color:var(--teal);
+  text-transform:uppercase;letter-spacing:0.16em;margin-bottom:6px;}
+.sec-title{font-size:16pt;font-weight:900;color:var(--navy);
+  line-height:1.2;letter-spacing:-0.01em;margin-bottom:6px;}
+.sec-editorial{font-size:9.5pt;color:var(--ink3);line-height:1.75;
+  max-width:640px;}
+.sec-editorial strong{color:var(--ink2);}
+
+/* ── Pillar health strip ── */
+.pillar-strip{display:grid;grid-template-columns:repeat(9,1fr);
+  gap:5px;margin:16px 0;}
+.p-pill{border-radius:7px;padding:8px 4px;text-align:center;
+  text-decoration:none;display:block;}
+.p-name{font-size:6.5pt;font-weight:700;color:#fff;margin-bottom:3px;
+  text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.p-status{font-size:6pt;font-weight:700;padding:1px 4px;border-radius:5px;
+  display:inline-block;}
+.ps-g{background:rgba(5,150,105,0.30);color:#6EE7B7;}
+.ps-a{background:rgba(217,119,6,0.30);color:#FCD34D;}
+.ps-r{background:rgba(220,38,38,0.30);color:#FCA5A5;}
+
+/* ── Savings ── */
+.savings-panel{background:var(--navy);border-radius:12px;
+  padding:24px 28px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.sav-main-label{font-size:7.5pt;font-weight:700;color:var(--teal);
+  text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+.sav-main-val{font-size:36pt;font-weight:900;color:#fff;line-height:1;
+  margin-bottom:6px;}
+.sav-main-val .accent{color:var(--teal);}
+.sav-main-note{font-size:8.5pt;color:rgba(255,255,255,0.45);line-height:1.6;}
+.sav-items{display:flex;flex-direction:column;gap:8px;justify-content:center;}
+.sav-item{border-radius:8px;padding:12px 16px;border-left:3px solid;}
+.sav-item.t{background:rgba(13,148,136,0.15);border-color:var(--teal);}
+.sav-item.g{background:rgba(5,150,105,0.15);border-color:var(--green);}
+.sav-item.p{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.12);}
+.sav-item-val{font-size:16pt;font-weight:900;line-height:1;margin-bottom:3px;}
+.sav-item.t .sav-item-val{color:var(--teal);}
+.sav-item.g .sav-item-val{color:#34D399;}
+.sav-item.p .sav-item-val{color:rgba(255,255,255,0.30);}
+.sav-item-lbl{font-size:8pt;color:rgba(255,255,255,0.50);}
+
+/* ── Renewal cards ── */
+.renewal-card{background:#fff;border-radius:10px;
+  border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
+.renewal-signal{height:3px;}
+.renewal-body{display:grid;grid-template-columns:80px 1fr auto;
+  gap:0;align-items:stretch;}
+.renewal-countdown{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:16px 12px;
+  border-right:1px solid var(--border);}
+.renewal-days-num{font-size:22pt;font-weight:900;line-height:1;}
+.renewal-days-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.08em;margin-top:2px;}
+.renewal-info{padding:14px 16px;}
+.renewal-vendor{font-size:10pt;font-weight:800;color:var(--navy);margin-bottom:3px;}
+.renewal-contract{font-size:8.5pt;color:var(--ink4);margin-bottom:8px;}
+.renewal-editorial{font-size:8.5pt;color:var(--ink3);line-height:1.6;}
+.renewal-editorial strong{color:var(--ink2);}
+.renewal-right{padding:14px 16px;display:flex;flex-direction:column;
+  align-items:flex-end;justify-content:space-between;
+  border-left:1px solid var(--border);min-width:110px;}
+.renewal-val{font-size:14pt;font-weight:900;color:var(--navy);text-align:right;}
+.renewal-val-lbl{font-size:7.5pt;color:var(--ink4);text-align:right;}
+
+/* ── Risk pulse ── */
+.risk-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
+  margin-bottom:14px;}
+.risk-card{background:#fff;border-radius:10px;padding:16px;
+  border:1px solid var(--border);text-align:center;}
+.risk-num{font-size:28pt;font-weight:900;line-height:1;margin-bottom:4px;}
+.risk-lbl{font-size:7.5pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+.risk-detail{font-size:8pt;color:var(--ink4);line-height:1.65;text-align:left;}
+.risk-detail strong{color:var(--ink2);}
+.alert-bar{background:#fff;border-radius:8px;padding:12px 16px;
+  border:1px solid var(--border);border-left:4px solid var(--red);
+  font-size:8.5pt;color:var(--ink3);line-height:1.6;}
+.alert-bar strong{color:var(--red2);}
+
+/* ── Pillar asks ── */
+.ask-card{background:#fff;border-radius:10px;
+  border:1px solid var(--border);margin-bottom:8px;
+  display:grid;grid-template-columns:110px 1fr;
+  overflow:hidden;}
+.ask-pillar-col{display:flex;align-items:center;justify-content:center;
+  padding:16px 12px;text-align:center;}
+.ask-pillar-name{font-size:8pt;font-weight:800;color:#fff;
+  text-align:center;line-height:1.3;}
+.ask-body{padding:14px 16px;border-left:1px solid var(--border);}
+.ask-title{font-size:9pt;font-weight:800;color:var(--navy);margin-bottom:5px;}
+.ask-text{font-size:8.5pt;color:var(--ink3);line-height:1.65;}
+
+/* ── Hub updates ── */
+.update-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.update-card{background:#fff;border-radius:10px;padding:16px;
+  border:1px solid var(--border);border-top:3px solid;}
+.update-icon{font-size:18pt;margin-bottom:8px;}
+.update-title{font-size:9pt;font-weight:800;color:var(--navy);margin-bottom:5px;}
+.update-desc{font-size:8.5pt;color:var(--ink4);line-height:1.6;}
+
+/* ── Advisory close ── */
+.advisory-close{background:linear-gradient(135deg,var(--navy) 0%,#1a2f50 100%);
+  border-radius:12px;padding:24px 28px;margin-top:32px;}
+.ac-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);
+  text-transform:uppercase;letter-spacing:0.14em;margin-bottom:10px;}
+.ac-title{font-size:14pt;font-weight:900;color:#fff;
+  margin-bottom:10px;line-height:1.3;}
+.ac-text{font-size:9pt;color:rgba(255,255,255,0.60);line-height:1.80;}
+.ac-footer{font-size:7.5pt;color:rgba(255,255,255,0.25);
+  margin-top:16px;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,0.08);}
+
+/* ── Footer ── */
+.digest-footer{background:var(--navy);padding:14px 48px;
+  display:flex;align-items:center;justify-content:space-between;}
+.df-brand{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.40);
+  text-transform:uppercase;letter-spacing:0.10em;}
+.df-meta{font-size:7.5pt;color:rgba(255,255,255,0.25);}
+</style>
+</head>
+<body>
+<div class="digest">
+
+  <!-- Nav -->
+  <div class="digest-nav no-print">
+    <div class="nav-brand">VER Intelligence Hub &mdash; Monthly Digest</div>
+    <div class="nav-actions">
+      <a href="index.html" class="nav-btn sec">&#8592; Hub</a>
+      <button onclick="window.print()" class="nav-btn pri">&#128438; Download PDF</button>
+    </div>
+  </div>
+
+  <!-- ══ COVER ══════════════════════════════════════════════ -->
+  <div class="cover">
+    <div class="cover-inner">
+      <div class="cover-accent"></div>
+      <div class="cover-flag">VER Intelligence Hub &middot; Monthly Digest &middot; Salesforce DET &middot; Confidential</div>
+      <div class="cover-month">May <span class="accent">2026</span></div>
+      <div class="cover-year">FY 27 &nbsp;&middot;&nbsp; Q1</div>
+
+      <div class="cover-savings">
+        <div class="cover-savings-label">FY27 Realized Savings</div>
+        <div class="cover-savings-val">$10.236M</div>
+        <div class="cover-savings-sub">NTT Data AD restructure &middot; Cognizant termination &middot; VER advisory</div>
+      </div>
+
+      <div class="cover-divider"></div>
+
+      <div class="cover-position">
+        <strong>Two contracts requiring decisions this month.</strong>
+        NTT Data AD expires August 12 on 30-day notice &mdash; the decision window
+        is already open. Workday ELP renews November 30 with a 90-day notice
+        requirement &mdash; VER rate benchmarking is active.
+        The portfolio is stable. <strong>VER advisory is engaged.</strong>
+      </div>
+
+      <div class="cover-kpis">
+        <div class="ckpi g">
+          <div class="ckpi-lbl">Savings Realized</div>
+          <div class="ckpi-val">$10.2M</div>
+          <div class="ckpi-note">FY27 confirmed</div>
+        </div>
+        <div class="ckpi w">
+          <div class="ckpi-lbl">Critical Renewals</div>
+          <div class="ckpi-val">2</div>
+          <div class="ckpi-note">$33.7M at risk</div>
+        </div>
+        <div class="ckpi">
+          <div class="ckpi-lbl">Pillars Monitored</div>
+          <div class="ckpi-val">9</div>
+          <div class="ckpi-note">All DET pillars</div>
+        </div>
+        <div class="ckpi">
+          <div class="ckpi-lbl">Active SOWs</div>
+          <div class="ckpi-val">2,397</div>
+          <div class="ckpi-note">Coupa POs tracked</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MOVEMENT I: WHERE WE STAND ════════════════════════ -->
+  <div class="movement">
+    <div class="movement-label">
+      <span class="movement-num">I</span>
+      Where We Stand
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Portfolio Health -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-eyebrow">Portfolio Health</div>
+        <div class="sec-title">9 pillars. One portfolio.<br>All under VER advisory.</div>
+        <div class="sec-editorial">
+          The DET vendor portfolio spans nine pillars and 1,368 active vendor relationships.
+          Four pillars carry amber signals this month &mdash; active watch items, not escalations.
+          Five are healthy. No pillar is in red status.
+        </div>
+      </div>
+      <div class="pillar-strip">
+        <a href="page_pillar_detail.html?pillar=sf-on-sf" class="p-pill" style="background:linear-gradient(160deg,#0D9488,#0D9488cc);">
+          <div class="p-name">SF on SF</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$22.2M</div>
+          <span class="p-status ps-a">Watch</span></a>
+        <a href="page_pillar_detail.html?pillar=eng-dev" class="p-pill" style="background:linear-gradient(160deg,#D97706,#D97706cc);">
+          <div class="p-name">Engineering</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$15.9M</div>
+          <span class="p-status ps-a">Watch</span></a>
+        <a href="page_pillar_detail.html?pillar=it" class="p-pill" style="background:linear-gradient(160deg,#3B82F6,#3B82F6cc);">
+          <div class="p-name">IT</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$116.8M</div>
+          <span class="p-status ps-a">Watch</span></a>
+        <a href="page_pillar_detail.html?pillar=da-ops" class="p-pill" style="background:linear-gradient(160deg,#059669,#059669cc);">
+          <div class="p-name">DA&amp;O</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$0 Coupa</div>
+          <span class="p-status ps-a">Watch</span></a>
+        <a href="page_pillar_detail.html?pillar=data" class="p-pill" style="background:linear-gradient(160deg,#0EA5E9,#0EA5E9cc);">
+          <div class="p-name">Data</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$11.9M</div>
+          <span class="p-status ps-g">Healthy</span></a>
+        <a href="page_pillar_detail.html?pillar=dig-mkt" class="p-pill" style="background:linear-gradient(160deg,#7C3AED,#7C3AEDcc);">
+          <div class="p-name">Dig Mktg</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$4.7M</div>
+          <span class="p-status ps-g">Healthy</span></a>
+        <a href="page_pillar_detail.html?pillar=agentic" class="p-pill" style="background:linear-gradient(160deg,#EC4899,#EC4899cc);">
+          <div class="p-name">Agentic</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$0</div>
+          <span class="p-status ps-g">Healthy</span></a>
+        <a href="page_pillar_detail.html?pillar=cdo" class="p-pill" style="background:linear-gradient(160deg,#64748B,#64748Bcc);">
+          <div class="p-name">CDO</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$6.3M</div>
+          <span class="p-status ps-a">Watch</span></a>
+        <a href="page_pillar_detail.html?pillar=emerging" class="p-pill" style="background:linear-gradient(160deg,#EA580C,#EA580Ccc);">
+          <div class="p-name">Emerging</div><div class="p-name" style="font-size:6.5pt;opacity:0.7;">$0</div>
+          <span class="p-status ps-g">Healthy</span></a>
+      </div>
+    </div>
+
+    <!-- Savings -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-eyebrow">Savings &amp; Value</div>
+        <div class="sec-title">$10.236M confirmed.<br>More in the pipeline.</div>
+        <div class="sec-editorial">
+          VER delivered $10.236M in realized savings in FY27 through two advisory-led actions.
+          The NTT Data AD restructure alone represents the largest single advisory win
+          in DET's third-party spend history. A further $3&ndash;5M is actively
+          being pursued through rate benchmarking engagements in H2 FY27.
+        </div>
+      </div>
+      <div class="savings-panel">
+        <div>
+          <div class="sav-main-label">FY27 Realized Savings</div>
+          <div class="sav-main-val">$10.<span class="accent">236M</span></div>
+          <div class="sav-main-note">
+            Two advisory-led savings actions confirmed in FY27.
+            Both engagements restructured or terminated through
+            VER advisory. Savings attributed to budget-owning pillar.
+          </div>
+        </div>
+        <div class="sav-items">
+          <div class="sav-item t">
+            <div class="sav-item-val">$9.0M</div>
+            <div class="sav-item-lbl">NTT Data AD restructure &middot; DA&amp;O &middot; Apr 2026</div>
+          </div>
+          <div class="sav-item g">
+            <div class="sav-item-val">$1.236M</div>
+            <div class="sav-item-lbl">Cognizant engagement termination &middot; SF on SF &middot; FY27</div>
+          </div>
+          <div class="sav-item p">
+            <div class="sav-item-val">$3&ndash;5M</div>
+            <div class="sav-item-lbl">Pipeline &middot; Rate benchmarking in progress &middot; H2 FY27</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /body movement I -->
+
+  <!-- ══ MOVEMENT II: WHAT NEEDS ATTENTION ══════════════════ -->
+  <div class="movement page-break">
+    <div class="movement-label">
+      <span class="movement-num">II</span>
+      What Needs Attention
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Renewals -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-eyebrow">Renewal Watch</div>
+        <div class="sec-title">Two contracts.<br>$33.7M. Decisions required now.</div>
+        <div class="sec-editorial">
+          Both of DET's critical renewals require active engagement this month.
+          One is urgent &mdash; <strong>the NTT Data AD decision window is open today.</strong>
+          The other is approaching &mdash; Workday ELP's 90-day notice means
+          the September 1 decision point is 14 weeks away.
+          VER is positioned to support both. The decisions belong to Pillar Leads.
+        </div>
+      </div>
+
+      <div class="renewal-card">
+        <div class="renewal-signal" style="background:var(--red);"></div>
+        <div class="renewal-body">
+          <div class="renewal-countdown" style="border-right-color:var(--red3);">
+            <div class="renewal-days-num" style="color:var(--red);">99</div>
+            <div class="renewal-days-lbl" style="color:var(--red2);">days</div>
+          </div>
+          <div class="renewal-info">
+            <div class="renewal-vendor">NTT Data &mdash; Application Development</div>
+            <div class="renewal-contract">
+              DA&amp;O budget owner &middot; 30-day notice &middot; Expires Aug 12, 2026
+            </div>
+            <div class="renewal-editorial">
+              <strong>This is the most time-sensitive item in the portfolio right now.</strong>
+              The 30-day notice means the decision window closes July 13.
+              If this engagement continues, restructured terms should be agreed before then.
+              If it doesn&rsquo;t, transition planning needs to start immediately.
+              VER&rsquo;s position is clear: this cannot wait for next quarter.
+            </div>
+          </div>
+          <div class="renewal-right">
+            <div>
+              <div class="renewal-val">$10.0M</div>
+              <div class="renewal-val-lbl">annual</div>
+            </div>
+            <span class="badge b-red">Action Required</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="renewal-card">
+        <div class="renewal-signal" style="background:var(--amber);"></div>
+        <div class="renewal-body">
+          <div class="renewal-countdown" style="border-right-color:var(--amber3);">
+            <div class="renewal-days-num" style="color:var(--amber);">210</div>
+            <div class="renewal-days-lbl" style="color:var(--amber2);">days</div>
+          </div>
+          <div class="renewal-info">
+            <div class="renewal-vendor">Workday &mdash; Enterprise License Program</div>
+            <div class="renewal-contract">
+              SF on SF budget owner &middot; 90-day notice &middot; Expires Nov 30, 2026
+            </div>
+            <div class="renewal-editorial">
+              The decision window opens September 1 &mdash; 14 weeks from now.
+              VER rate benchmarking is in progress. <strong>The Pillar Lead needs to
+              confirm renewal intent and budget authority before Q2 close</strong>
+              so VER has enough lead time to benchmark and advise before the
+              notice window opens.
+            </div>
+          </div>
+          <div class="renewal-right">
+            <div>
+              <div class="renewal-val">$23.7M</div>
+              <div class="renewal-val-lbl">annual</div>
+            </div>
+            <span class="badge b-amber">Engage Now</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Risk Pulse -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-eyebrow">Vendor Risk Pulse</div>
+        <div class="sec-title">3 vendors in red.<br>One action required today.</div>
+        <div class="sec-editorial">
+          The Sonata Software SOW lapsed May 15 without renewal.
+          <strong>This requires an immediate decision from the responsible Pillar Lead.</strong>
+          The other two high-risk vendors &mdash; Tech Mahindra and Informatica &mdash;
+          are being actively monitored. No new escalations this month.
+        </div>
+      </div>
+      <div class="risk-grid">
+        <div class="risk-card" style="border-top:3px solid var(--red);">
+          <div class="risk-num" style="color:var(--red);">3</div>
+          <div class="risk-lbl" style="color:var(--red2);">High Risk</div>
+          <div class="risk-detail">
+            <strong>Tech Mahindra</strong> &mdash; 3 SLA metrics below target<br>
+            <strong>Informatica</strong> &mdash; M&amp;A exposure, pricing risk<br>
+            <strong>Sonata Software</strong> &mdash; SOW lapsed May 15
+          </div>
+        </div>
+        <div class="risk-card" style="border-top:3px solid var(--amber);">
+          <div class="risk-num" style="color:var(--amber);">8</div>
+          <div class="risk-lbl" style="color:var(--amber2);">Under Watch</div>
+          <div class="risk-detail">
+            Cognizant, NTT Data AD, Workday (renewal risk)<br>
+            +5 vendors under standard VER elevated monitoring<br>
+            No escalation required at this time
+          </div>
+        </div>
+        <div class="risk-card" style="border-top:3px solid var(--green);">
+          <div class="risk-num" style="color:var(--green);">1,357</div>
+          <div class="risk-lbl" style="color:var(--green2);">Healthy</div>
+          <div class="risk-detail">
+            Standard VER monitoring cadence in place<br>
+            No escalations required<br>
+            Quarterly review cycle on track
+          </div>
+        </div>
+      </div>
+      <div class="alert-bar">
+        <strong>&#9888; Open Action &mdash; Sonata Software:</strong>
+        SF Support SOW lapsed May 15, 2026. Immediate Renew or Wind-Down
+        decision required from Pillar Lead and Procurement.
+        VER recommends a response by May 22.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ MOVEMENT III: WHAT WE NEED FROM YOU ════════════════ -->
+  <div class="movement">
+    <div class="movement-label">
+      <span class="movement-num">III</span>
+      What VER Needs from You
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Pillar Asks -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-eyebrow">VER Asks &mdash; May 2026</div>
+        <div class="sec-title">Five pillars.<br>Five specific asks. One deadline.</div>
+        <div class="sec-editorial">
+          These are not administrative requests. They are the inputs that allow VER
+          to deliver real advisory value for DET. Each ask below has a clear owner
+          and a clear reason. <strong>VER requests responses by May 31, 2026.</strong>
+        </div>
+      </div>
+
+      <div class="ask-card">
+        <div class="ask-pillar-col" style="background:#0D9488;">
+          <div class="ask-pillar-name">SF on SF</div>
+        </div>
+        <div class="ask-body">
+          <div class="ask-title">Confirm Workday ELP renewal intent and budget authority</div>
+          <div class="ask-text">
+            VER needs written confirmation before Aug 1 to begin formal rate benchmarking
+            and advisory positioning before the Sep 1 decision window opens.
+            Without this, VER cannot provide effective pre-renewal advisory.
+          </div>
+        </div>
+      </div>
+
+      <div class="ask-card">
+        <div class="ask-pillar-col" style="background:#D97706;">
+          <div class="ask-pillar-name">Engineering</div>
+        </div>
+        <div class="ask-body">
+          <div class="ask-title">Confirm NTT Data AD renewal decision &mdash; this month</div>
+          <div class="ask-text">
+            30-day notice means action is required by July 13.
+            VER needs a go / no-go from Engineering Pillar Lead and DA&amp;O
+            (budget owner) <strong>before the end of May</strong> to allow transition
+            planning or restructuring if needed.
+          </div>
+        </div>
+      </div>
+
+      <div class="ask-card">
+        <div class="ask-pillar-col" style="background:#3B82F6;">
+          <div class="ask-pillar-name">IT</div>
+        </div>
+        <div class="ask-body">
+          <div class="ask-title">Provide Tech Mahindra SLA remediation plan to VER</div>
+          <div class="ask-text">
+            Three SLA metrics are below target. VER requires the formal vendor
+            response plan before the next review cycle to assess whether
+            escalation or contract action is warranted.
+          </div>
+        </div>
+      </div>
+
+      <div class="ask-card">
+        <div class="ask-pillar-col" style="background:#059669;">
+          <div class="ask-pillar-name">DA&amp;O</div>
+        </div>
+        <div class="ask-body">
+          <div class="ask-title">Share GSA re-assignment timeline and NTT communications</div>
+          <div class="ask-text">
+            VER is monitoring transition risk on the NTT AMS master agreement.
+            Any communications from NTT regarding the GSA re-assignment
+            must be shared with VER immediately to inform advisory positioning.
+          </div>
+        </div>
+      </div>
+
+      <div class="ask-card">
+        <div class="ask-pillar-col" style="background:#0EA5E9;">
+          <div class="ask-pillar-name">Data</div>
+        </div>
+        <div class="ask-body">
+          <div class="ask-title">Engage Procurement on Q1 data platform renewals &mdash; now</div>
+          <div class="ask-text">
+            VER needs 60 days minimum for advisory on the Q1 FY27 renewal cluster.
+            That window has already started. Also share any Informatica
+            communications regarding pricing or contract changes immediately.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Hub Updates -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-eyebrow">What&rsquo;s New</div>
+        <div class="sec-title">Four new capabilities<br>live in the Hub.</div>
+        <div class="sec-editorial">
+          VER Intelligence continues to expand. Four significant capabilities
+          went live this month — each one designed to give Pillar Leads
+          more actionable intelligence with less effort.
+        </div>
+      </div>
+      <div class="update-grid">
+        <div class="update-card" style="border-top-color:var(--teal);">
+          <div class="update-icon">&#127963;</div>
+          <div class="update-title">Spend &amp; Savings Intelligence (SSI)</div>
+          <div class="update-desc">
+            All 9 pillar detail pages rebuilt around three questions:
+            What&rsquo;s happening? What to watch? What VER needs from you?
+            Interactive spend charts, renewal horizons, and open action registers.
+          </div>
+        </div>
+        <div class="update-card" style="border-top-color:var(--purple);">
+          <div class="update-icon">&#128202;</div>
+          <div class="update-title">Spend Benchmarking Dashboard</div>
+          <div class="update-desc">
+            Rate intelligence across AMER, APAC, LATAM, and EMEA.
+            AWS published rates anchored. VER can now walk into any vendor
+            conversation with market data to back the position.
+          </div>
+        </div>
+        <div class="update-card" style="border-top-color:var(--amber);">
+          <div class="update-icon">&#128268;</div>
+          <div class="update-title">VER Risk Intelligence Platform</div>
+          <div class="update-desc">
+            1,368 vendors with 5-dimension risk scoring.
+            20 vendors formally assessed. Derived scoring for all others.
+            Live assessment engine available to VER team.
+          </div>
+        </div>
+        <div class="update-card" style="border-top-color:var(--navy);">
+          <div class="update-icon">&#128202;</div>
+          <div class="update-title">Executive Snapshot Rebuilt</div>
+          <div class="update-desc">
+            New cinematic design with pillar health strip, savings story,
+            engagement intelligence cards, and VER advisory position.
+            Rebuilt from scratch in the Hub&rsquo;s executive visual language.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advisory close -->
+    <div class="advisory-close">
+      <div class="ac-eyebrow">VER &mdash; Closing</div>
+      <div class="ac-title">The portfolio is stable.<br>VER advisory is active.</div>
+      <div class="ac-text">
+        Every number in this digest reflects real work: real savings negotiated,
+        real renewals tracked, real risks assessed. VER&rsquo;s value to DET is
+        most visible when Pillar Leads engage early &mdash; before decisions are
+        forced, before notice windows close, before risk becomes escalation.
+        The asks in this digest are the inputs that make that possible.
+        Thank you for your engagement with VER Intelligence.
+      </div>
+      <div class="ac-footer">
+        Next digest: June 1, 2026 &nbsp;&middot;&nbsp;
+        Published monthly, first working day &nbsp;&middot;&nbsp;
+        VER Intelligence Hub &nbsp;&middot;&nbsp; Salesforce DET &nbsp;&middot;&nbsp; Confidential
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="digest-footer">
+    <div class="df-brand">VER Intelligence Hub</div>
+    <div class="df-meta">Monthly Digest &middot; May 2026 &middot; Salesforce DET &middot; Confidential</div>
+  </div>
+
+</div>
+</body>
+</html>

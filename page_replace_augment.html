@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Replace / Augment / Automate · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --blue:#2563EB;--blue2:#1D4ED8;--blue3:#EFF6FF;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --orange:#EA580C;--orange2:#7C2D12;--orange3:#FFF7ED;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+[data-theme="dark"]{
+  --gray:#080F1E;--gray2:#111F35;--gray3:#1A2D47;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --white:#0F1E3C;--ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --red3:rgba(220,38,38,0.15);--red2:#FCA5A5;
+  --amber3:rgba(217,119,6,0.15);--amber2:#FCD34D;
+  --green3:rgba(5,150,105,0.15);--green2:#6EE7B7;
+  --blue3:rgba(37,99,235,0.15);--blue2:#93C5FD;
+  --purple3:rgba(124,58,237,0.15);--purple2:#C4B5FD;
+  --teal3:rgba(13,148,136,0.15);
+  --orange3:rgba(234,88,12,0.15);--orange2:#FDBA74;
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .rec-badge{background:rgba(255,255,255,0.08)!important;color:var(--ink2)!important;}
+[data-theme="dark"] .status-badge{background:rgba(255,255,255,0.08)!important;color:var(--ink2)!important;}
+[data-theme="dark"] th{color:var(--ink4);border-bottom-color:var(--border);}
+[data-theme="dark"] td{color:var(--ink2);border-bottom-color:var(--border);}
+[data-theme="dark"] tr:hover td{background:var(--gray2);}
+[data-theme="dark"] .matrix-row{border-bottom-color:var(--border);}
+[data-theme="dark"] .raa-card,[data-theme="dark"] .matrix-card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .exec-brief{background:linear-gradient(135deg,#0F1E3C,#1A0F2E);}
+[data-theme="dark"] .card-title,[data-theme="dark"] .raa-title{color:var(--ink);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── TOP BAR ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.35);line-height:1.4;}
+.top-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;
+  border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.55);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.top-btn:hover{background:rgba(234,88,12,0.2);border-color:var(--orange);color:var(--orange);}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#0A1628 0%,#1A0D06 50%,#0A1228 100%);
+  padding:22px 0 18px;position:relative;overflow:hidden;}
+.hero-glow-1{position:absolute;top:-60px;right:-60px;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(234,88,12,0.18),transparent 70%);pointer-events:none;
+  animation:glowPulse 5s ease-in-out infinite;}
+.hero-glow-2{position:absolute;bottom:-80px;left:10%;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.1),transparent 70%);pointer-events:none;
+  animation:glowPulse 7s ease-in-out infinite reverse;}
+@keyframes glowPulse{
+  0%,100%{opacity:0.6;transform:scale(1);}
+  50%{opacity:1;transform:scale(1.08);}
+}
+.hero-wrap{max-width:1280px;margin:0 auto;padding:0 48px;position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.hero-eyebrow-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px rgba(234,88,12,0.6);
+  animation:blink 2.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
+.hero-eyebrow-text{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.4);}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.05;margin-bottom:6px;}
+.hero-title span{color:#FDBA74;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.55);line-height:1.6;max-width:680px;margin-bottom:14px;}
+.hero-data-source{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;
+  background:rgba(234,88,12,0.12);border:1px solid rgba(234,88,12,0.22);
+  border-radius:99px;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.65);margin-bottom:20px;}
+.hds-dot{width:6px;height:6px;border-radius:50%;background:#F59E0B;flex-shrink:0;}
+.hero-kpis{display:flex;gap:12px;flex-wrap:wrap;}
+.hkpi{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:12px;
+  padding:14px 18px;min-width:130px;position:relative;overflow:hidden;}
+.hkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.hkpi.orange::before{background:linear-gradient(90deg,var(--orange),transparent);}
+.hkpi.blue::before{background:linear-gradient(90deg,var(--blue),transparent);}
+.hkpi.amber::before{background:linear-gradient(90deg,var(--amber),transparent);}
+.hkpi.green::before{background:linear-gradient(90deg,var(--green),transparent);}
+.hkpi.teal::before{background:linear-gradient(90deg,var(--teal),transparent);}
+.hkpi-val{font-size:18pt;font-weight:900;color:#fff;line-height:1;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.45);margin-top:4px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.35);margin-top:2px;}
+.hkpi.orange .hkpi-val{color:#FDBA74;}
+.hkpi.blue .hkpi-val{color:#93C5FD;}
+.hkpi.amber .hkpi-val{color:#FCD34D;}
+.hkpi.green .hkpi-val{color:#6EE7B7;}
+.hkpi.teal .hkpi-val{color:#5EEAD4;}
+
+/* ── EXEC BRIEF ── */
+.exec-brief{background:linear-gradient(135deg,#0F1E3C 0%,#1A2540 100%);padding:28px 0;}
+.eb-wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+.eb-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.3);margin-bottom:14px;}
+.eb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.eb-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);
+  border-radius:12px;padding:18px 20px;}
+.eb-icon{font-size:18pt;margin-bottom:10px;}
+.eb-kpi{font-size:22pt;font-weight:900;line-height:1;margin-bottom:4px;}
+.eb-kpi.orange{color:#FDBA74;}
+.eb-kpi.blue{color:#93C5FD;}
+.eb-kpi.green{color:#6EE7B7;}
+.eb-kpi.amber{color:#FCD34D;}
+.eb-label-sm{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.4);margin-bottom:8px;}
+.eb-insight{font-size:8.5pt;color:rgba(255,255,255,0.7);line-height:1.6;}
+.eb-insight strong{color:#fff;font-weight:700;}
+
+/* ── PAGE WRAP ── */
+.page-wrap{max-width:1280px;margin:0 auto;padding:28px 48px 60px;}
+
+.sec-label{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.sec-label-text{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--ink4);white-space:nowrap;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── FRAMEWORK STRIP ── */
+.framework-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--white);
+  border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:28px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.fw-col{padding:20px 22px;border-right:1px solid var(--border);}
+.fw-col:last-child{border-right:none;}
+.fw-accent{height:4px;border-radius:2px;margin-bottom:14px;}
+.fw-col.replace .fw-accent{background:linear-gradient(90deg,var(--blue),rgba(37,99,235,0.3));}
+.fw-col.augment .fw-accent{background:linear-gradient(90deg,var(--amber),rgba(217,119,6,0.3));}
+.fw-col.automate .fw-accent{background:linear-gradient(90deg,var(--green),rgba(5,150,105,0.3));}
+.fw-title{font-size:10.5pt;font-weight:900;color:var(--ink);margin-bottom:5px;}
+.fw-sub{font-size:7.5pt;color:var(--ink4);line-height:1.65;margin-bottom:12px;}
+.fw-signals{display:flex;flex-direction:column;gap:5px;}
+.fw-signal{font-size:7.5pt;color:var(--ink3);display:flex;align-items:flex-start;gap:6px;line-height:1.4;}
+.fw-signal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.replace-dot{background:var(--blue);}
+.augment-dot{background:var(--amber);}
+.automate-dot{background:var(--green);}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.filter-btn{padding:5px 13px;border-radius:99px;border:1px solid var(--border2);background:var(--white);
+  font-size:7.5pt;font-weight:700;color:var(--ink4);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.filter-btn:hover{background:var(--navy);border-color:var(--navy);color:#fff;}
+.filter-btn.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+.filter-btn.active-replace{background:var(--blue);border-color:var(--blue);color:#fff;}
+.filter-btn.active-augment{background:var(--amber);border-color:var(--amber);color:#fff;}
+.filter-btn.active-automate{background:var(--green);border-color:var(--green);color:#fff;}
+.filter-label{font-size:7.5pt;color:var(--ink4);font-weight:700;margin-right:4px;}
+
+/* ── SCENARIO CARDS ── */
+.scenario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:18px;margin-bottom:32px;}
+.scenario-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  transition:box-shadow 0.2s,transform 0.2s;}
+.scenario-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.1);transform:translateY(-2px);}
+.scenario-card.rec-replace{border-left:4px solid var(--blue);}
+.scenario-card.rec-augment{border-left:4px solid var(--amber);}
+.scenario-card.rec-automate{border-left:4px solid var(--green);}
+
+.sc-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;gap:13px;align-items:flex-start;}
+.sc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:16pt;flex-shrink:0;}
+.sc-icon.replace{background:var(--blue3);}
+.sc-icon.augment{background:var(--amber3);}
+.sc-icon.automate{background:var(--green3);}
+.sc-title-block{flex:1;}
+.sc-name{font-size:10pt;font-weight:900;color:var(--ink);}
+.sc-cat{font-size:7.5pt;color:var(--ink4);margin-top:2px;}
+.sc-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.sc-rec{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:7pt;font-weight:800;}
+.sc-rec.rec-replace{background:var(--blue3);color:var(--blue2);}
+.sc-rec.rec-augment{background:var(--amber3);color:var(--amber2);}
+.sc-rec.rec-automate{background:var(--green3);color:var(--green2);}
+.sc-conf{font-size:7pt;color:var(--ink4);}
+
+.sc-metrics{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border);}
+.sc-metric{padding:11px 14px;border-right:1px solid var(--border);text-align:center;}
+.sc-metric:last-child{border-right:none;}
+.scm-val{font-size:11.5pt;font-weight:900;color:var(--ink);line-height:1;}
+.scm-lbl{font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink4);margin-top:3px;}
+.scm-val.blue{color:var(--blue);}
+.scm-val.amber{color:var(--amber);}
+.scm-val.green{color:var(--green);}
+.scm-val.red{color:var(--red);}
+.scm-val.orange{color:var(--orange);}
+
+.sc-body{padding:14px 18px;}
+.sc-rationale{font-size:8pt;color:var(--ink3);line-height:1.65;margin-bottom:13px;
+  padding:10px 12px;background:var(--gray);border-radius:8px;border-left:3px solid var(--border2);}
+
+.sc-scenarios{display:flex;flex-direction:column;gap:8px;}
+.sc-scenario-row{border-radius:9px;padding:10px 12px;border:1px solid transparent;transition:all 0.15s;}
+.ssr-replace{background:var(--blue3);border-color:rgba(37,99,235,0.12);}
+.ssr-augment{background:var(--amber3);border-color:rgba(217,119,6,0.12);}
+.ssr-automate{background:var(--green3);border-color:rgba(5,150,105,0.12);}
+.ssr-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.ssr-label{font-size:7.5pt;font-weight:800;color:var(--ink);}
+.ssr-savings{font-size:8.5pt;font-weight:900;}
+.ssr-savings.replace{color:var(--blue2);}
+.ssr-savings.augment{color:var(--amber2);}
+.ssr-savings.automate{color:var(--green2);}
+.ssr-desc{font-size:7.5pt;color:var(--ink3);line-height:1.55;}
+.ssr-rec-tag{font-size:6.5pt;font-weight:800;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle;}
+.rrt-replace{background:var(--blue);color:#fff;}
+.rrt-augment{background:var(--amber);color:#fff;}
+.rrt-automate{background:var(--green);color:#fff;}
+
+/* ── SAVINGS SUMMARY ── */
+.savings-summary{margin-bottom:32px;background:var(--white);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.ss-hdr{padding:16px 22px;border-bottom:1px solid var(--border);font-size:9.5pt;font-weight:800;color:var(--ink);}
+.ss-body{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border);}
+.ss-col{padding:20px 22px;border-right:1px solid var(--border);text-align:center;}
+.ss-col:last-child{border-right:none;}
+.ss-accent-bar{height:3px;border-radius:2px;margin-bottom:12px;
+  background:var(--gray3);overflow:hidden;position:relative;}
+.ss-accent-fill{height:100%;border-radius:2px;width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+.ss-col.replace .ss-accent-fill{background:linear-gradient(90deg,var(--blue),var(--blue2));}
+.ss-col.augment .ss-accent-fill{background:linear-gradient(90deg,var(--amber),var(--amber2));}
+.ss-col.automate .ss-accent-fill{background:linear-gradient(90deg,var(--green),var(--green2));}
+.ss-val{font-size:20pt;font-weight:900;line-height:1;}
+.ss-col.replace .ss-val{color:var(--blue2);}
+.ss-col.augment .ss-val{color:var(--amber2);}
+.ss-col.automate .ss-val{color:var(--green2);}
+.ss-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);margin-top:5px;}
+.ss-count{font-size:7.5pt;color:var(--ink4);margin-top:3px;}
+.ss-footer{padding:14px 22px;background:var(--gray);font-size:8pt;color:var(--ink4);
+  display:flex;justify-content:space-between;align-items:center;}
+.ss-total{font-size:11pt;font-weight:900;color:var(--ink);}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px;}
+.rtbl{width:100%;border-collapse:collapse;}
+.rtbl th{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--ink4);padding:9px 14px;text-align:left;border-bottom:2px solid var(--border);background:var(--gray);}
+.rtbl td{font-size:8.5pt;color:var(--ink2);padding:10px 14px;border-bottom:1px solid var(--border);}
+.rtbl tr:last-child td{border-bottom:none;}
+.rtbl tr:hover td{background:var(--gray2);}
+.rec-pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:7pt;font-weight:700;}
+.spend-tag{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  color:var(--amber2);background:var(--amber3);padding:1px 6px;border-radius:4px;vertical-align:middle;margin-left:4px;}
+
+/* ── DATA NOTE ── */
+.data-note{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;margin-bottom:32px;display:flex;gap:12px;align-items:flex-start;}
+.dn-icon{font-size:14pt;flex-shrink:0;margin-top:1px;}
+.dn-text{font-size:7.5pt;color:var(--ink4);line-height:1.65;}
+.dn-text strong{color:var(--ink3);}
+
+/* ── SCROLL REVEAL ── */
+.fade-up{opacity:0;transform:translateY(18px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:900px){
+  .scenario-grid{grid-template-columns:1fr;}
+  .framework-strip{grid-template-columns:1fr;}
+  .fw-col{border-right:none;border-bottom:1px solid var(--border);}
+  .ss-body{grid-template-columns:1fr;}
+  .ss-col{border-right:none;border-bottom:1px solid var(--border);}
+  .eb-grid{grid-template-columns:1fr;}
+  .hero-wrap,.page-wrap,.eb-wrap{padding:0 20px;}
+  .page-wrap{padding-top:20px;}
+  .hero-title{font-size:17pt;}
+}
+</style>
+</head>
+<body>
+
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">VER Intelligence Hub</span>
+  </div>
+  <div class="htb-right">
+    <div class="htb-meta">Replace / Augment / Automate<br>Executive Intelligence</div>
+    <button type="button" class="top-btn" id="dm-btn" onclick="toggleDark()">☾ Dark</button>
+    <button type="button" class="top-btn" onclick="openRAAHelp()">? How to Use</button>
+    <button type="button" class="top-btn" onclick="window.print()">Print / PDF</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-wrap">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      <span class="hero-eyebrow-text">Executive Intelligence · Strategic Decision Support</span>
+    </div>
+    <h1 class="hero-title">Replace / Augment / <span>Automate</span></h1>
+    <p class="hero-sub">For each active CWF engagement, this matrix models three options: replace with FTE, continue to augment with contractors, or automate the function with AI or tooling. Surfaces the optimal path and estimated annual savings for each engagement.</p>
+    <div class="hero-data-source">
+      <div class="hds-dot"></div>
+      <span>Engagement spend: VER analyst allocation from Coupa FY27 portfolio · Savings: modeled estimates</span>
+    </div>
+    <div class="hero-kpis" id="hero-kpis"></div>
+  </div>
+</section>
+
+<section class="exec-brief">
+  <div class="eb-wrap">
+    <div class="eb-label">Executive Brief — Three things leadership needs to act on</div>
+    <div class="eb-grid">
+
+      <div class="eb-card">
+        <div class="eb-icon">🔄</div>
+        <div class="eb-kpi orange" id="eb-replace-sav">$2.6M</div>
+        <div class="eb-label-sm">Stranded in FTE-convertible work</div>
+        <div class="eb-insight"><strong>Three engagements should already be employees.</strong> Digital Dev, PMO, and Supply Chain Data all meet every FTE conversion signal — tenure over 18 months, core capability, quantified re-ramp costs. Executing all three removes agency margin permanently, not temporarily.</div>
+      </div>
+
+      <div class="eb-card">
+        <div class="eb-icon">🤖</div>
+        <div class="eb-kpi green" id="eb-auto-sav">$2.96M</div>
+        <div class="eb-label-sm">AI automation savings — payback under 12 months</div>
+        <div class="eb-insight"><strong>Three engagements are ready to automate now.</strong> Data Entry (IDP), IT Help Desk, and QA Testing are high-volume, rule-based, and already have tooling options with sub-12-month ROI. These are tooling decisions, not headcount decisions. The delay is costing $247K/month.</div>
+      </div>
+
+      <div class="eb-card">
+        <div class="eb-icon">📊</div>
+        <div class="eb-kpi amber" id="eb-total-spend">$14.6M</div>
+        <div class="eb-label-sm">Total CWF spend modeled — only 2 of 8 stay as-is</div>
+        <div class="eb-insight"><strong>Six of eight engagements have a better path than the current model.</strong> Only Finance and Content are legitimately "continue augmenting" — and even those benefit from AI-assisted tooling. Every other engagement is either ready to convert or ready to automate.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── LEGEND STRIP ─────────────────────────────────────── -->
+<style>
+.legend-strip{max-width:1280px;margin:0 auto 0;padding:0 48px;}
+.legend-bar{display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:10px 16px;margin-bottom:16px;}
+[data-theme="dark"] .legend-bar{background:rgba(255,255,255,0.04);border-color:var(--border);}
+.legend-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink4);flex-shrink:0;margin-right:4px;}
+.legend-items{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--ink3);}
+[data-theme="dark"] .legend-item{color:var(--ink4);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-divider{width:1px;height:14px;background:var(--border);flex-shrink:0;}
+@media(max-width:900px){.legend-strip{padding:0 20px;}}
+</style>
+<div class="legend-strip">
+  <div class="legend-bar">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div>Replace with FTE</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>Continue Augmenting</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#059669"></div>Automate (AI/Tool)</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div>70/30 Policy Risk</div>
+      <div class="legend-item" style="font-size:10px;color:var(--ink4);">High conf = green · Medium = amber · Savings shown per engagement</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <div class="sec-label fade-up"><span class="sec-label-text">Decision Framework</span></div>
+  <div class="framework-strip fade-up" id="framework-strip"></div>
+
+  <div class="sec-label fade-up"><span class="sec-label-text">Decision Matrix by Engagement</span></div>
+  <div class="filter-bar fade-up">
+    <span class="filter-label">Show:</span>
+    <button type="button" class="filter-btn active" id="fb-all" onclick="filterCards('all')">All</button>
+    <button type="button" class="filter-btn" id="fb-replace" onclick="filterCards('replace')">Replace with FTE</button>
+    <button type="button" class="filter-btn" id="fb-augment" onclick="filterCards('augment')">Continue Augmenting</button>
+    <button type="button" class="filter-btn" id="fb-automate" onclick="filterCards('automate')">Automate</button>
+  </div>
+  <div class="scenario-grid" id="scenario-grid"></div>
+
+  <div class="sec-label fade-up"><span class="sec-label-text">Portfolio Savings Summary</span></div>
+  <div class="savings-summary fade-up" id="savings-summary"></div>
+
+  <div class="sec-label fade-up"><span class="sec-label-text">All Engagements — Decision Table</span></div>
+  <div class="tbl-wrap fade-up">
+    <table class="rtbl">
+      <thead>
+        <tr>
+          <th>Engagement</th>
+          <th>Category</th>
+          <th>Current CWF Spend</th>
+          <th>Replace Savings</th>
+          <th>Automate Savings</th>
+          <th>Recommendation</th>
+          <th>Confidence</th>
+        </tr>
+      </thead>
+      <tbody id="summary-tbl"></tbody>
+    </table>
+  </div>
+
+  <div class="data-note fade-up">
+    <div class="dn-icon">ℹ️</div>
+    <div class="dn-text">
+      <strong>Data sourcing:</strong> Current CWF spend figures represent VER analyst allocations derived from Coupa FY27 actuals ($295.5M total portfolio at salesforce-compass-dev.coupahost.com). Engagement-level breakdowns are analyst estimates — Coupa tracks vendor spend, not functional engagement categories. Savings projections are modeled estimates based on agency margin rates (18–22% for staffing, 40–60% for consulting), published AI tooling benchmarks, and comparable implementations. Figures should be validated with Finance before presenting externally.
+    </div>
+  </div>
+
+</div>
+
+<script src="assets/coupa_spend.js"></script>
+<script>
+var COUPA = (window.VER_COUPA && window.VER_COUPA.vendors) ? window.VER_COUPA.vendors : [];
+
+var SCENARIOS = [
+  {
+    id:'digital-dev',name:'Digital Dev Augmentation',category:'Software Development',icon:'💻',
+    recommendation:'replace',confidence:'High',currentSpend:3800000,
+    replaceNet:900000,augmentNet:0,automateNet:1400000,
+    rationale:'Core software delivery capability — 14 CWF engineers across 3 product teams. Contractor cost premium is 38% above FTE equivalent. Tenure avg 27 months indicates stable long-term need. FTE conversion reduces per-head cost and improves institutional knowledge.',
+    scenarios:[
+      {type:'replace',label:'Replace with FTE',savings:'$900K/yr',desc:'Convert 8 of 14 positions to FTE. Retain 6 as specialist contractors for peak demand. Savings from eliminating agency margin (18–22%) on converted roles.'},
+      {type:'augment',label:'Continue Augmenting',savings:'$0',desc:'Status quo. Acceptable if delivery velocity is strong and roles remain project-scoped. Current delivery metrics are not supporting this option.'},
+      {type:'automate',label:'Automate (AI Assist)',savings:'$1.4M/yr',desc:'AI coding assistant deployment (Copilot, Cursor) reduces required contractor headcount by 30–40%. Requires internal adoption program. Longer transition timeline.'}
+    ]
+  },
+  {
+    id:'data-entry',name:'Data Entry & Processing',category:'Operations / BPO',icon:'📋',
+    recommendation:'automate',confidence:'Very High',currentSpend:1200000,
+    replaceNet:200000,augmentNet:0,automateNet:960000,
+    rationale:'High-volume, rule-based data entry across 3 finance and ops workflows. Eight CWF BPO resources. Structured data, defined rules, zero creativity required — textbook automation candidate. AI document processing (OCR + extraction) can replace 85% of volume.',
+    scenarios:[
+      {type:'replace',label:'Replace with FTE',savings:'$200K/yr',desc:'FTE conversion saves agency margin but does not address the underlying economics. Two FTEs could manage automated workflows post-implementation.'},
+      {type:'augment',label:'Continue Augmenting',savings:'$0',desc:'Cost exposure grows as volume scales. BPO contracts renew at 6–8% annual rate increases. This is the highest-cost path over a 3-year horizon.'},
+      {type:'automate',label:'Automate (IDP + AI)',savings:'$960K/yr',desc:'Intelligent document processing platform (e.g., Hyperscience, AWS Textract) handles 85%+ of volume. Two FTE oversight roles. Implementation 4–6 months, payback in under 12 months.'}
+    ]
+  },
+  {
+    id:'program-mgmt',name:'Program Management Office',category:'PMO / Delivery',icon:'📌',
+    recommendation:'replace',confidence:'High',currentSpend:2100000,
+    replaceNet:720000,augmentNet:0,automateNet:300000,
+    rationale:'Seven contracted PMs across major initiatives. PMO function is strategic and org-embedded — requires deep institutional knowledge, stakeholder trust, and continuity. CWF PMO consistently loses context at contract end, creating re-ramp costs averaging $80K/transition. This is a retention and continuity risk, not a scalability problem.',
+    scenarios:[
+      {type:'replace',label:'Replace with FTE',savings:'$720K/yr',desc:'Convert 5 of 7 PM roles to FTE. Saves agency margin + eliminates transition/re-ramp cost. Projected 34% reduction in annual PMO spend while improving delivery continuity.'},
+      {type:'augment',label:'Continue Augmenting',savings:'$0',desc:'Acceptable for project-specific surge capacity only. Not appropriate for program-level leadership roles with cross-functional accountability.'},
+      {type:'automate',label:'Automate (PM Tooling)',savings:'$300K/yr',desc:'Enhanced PM tooling (automated status, risk flagging, milestone tracking) reduces admin burden by ~30%, potentially eliminating 2 contractor roles. Not a full replacement strategy.'}
+    ]
+  },
+  {
+    id:'it-support',name:'IT Help Desk & Support',category:'IT Operations',icon:'🖥️',
+    recommendation:'automate',confidence:'High',currentSpend:880000,
+    replaceNet:120000,augmentNet:0,automateNet:620000,
+    rationale:'Tier 1 and Tier 2 support — 6 CWF resources. 72% of tickets are resolvable via self-service or AI chat. Current resolution time averages 4.2 hours for Tier 1 issues that an AI agent resolves in under 2 minutes. Contractor spend is growing 12% YoY as headcount scales but ticket automation has not kept pace.',
+    scenarios:[
+      {type:'replace',label:'Replace with FTE',savings:'$120K/yr',desc:'Agency margin savings only. Does not change ticket economics. Two FTEs would be needed to manage AI tooling and escalations.'},
+      {type:'augment',label:'Continue Augmenting',savings:'$0',desc:'12% YoY cost escalation as ticket volume grows. Least favorable path over 3-year horizon.'},
+      {type:'automate',label:'Automate (AI Service Desk)',savings:'$620K/yr',desc:'AI service desk (ServiceNow AI, Moveworks) auto-resolves 65–75% of tickets. Requires 2 FTE supervisors. ROI in 8–10 months. Tier 2 backlog also reduced by 40%.'}
+    ]
+  },
+  {
+    id:'finance-analysis',name:'Financial Analysis & Reporting',category:'Finance',icon:'📊',
+    recommendation:'augment',confidence:'Medium',currentSpend:1500000,
+    replaceNet:480000,augmentNet:0,automateNet:600000,
+    rationale:'Specialized finance analysts embedded in FP&A and procurement. Skills are high-value but demand is uneven — Q1/Q4 peak with moderate mid-year workload. Headcount fluctuation makes pure FTE conversion inefficient. Hybrid model (FTE core + CWF surge) is optimal for now, with targeted automation for routine reporting.',
+    scenarios:[
+      {type:'replace',label:'Replace with FTE',savings:'$480K/yr',desc:'Convert 3 of 5 core analysis roles to FTE. Savings on base 3 roles, retain 2 surge-capacity contractors. Reduces cost during peak periods without over-hiring.'},
+      {type:'augment',label:'Continue Augmenting (Current)',savings:'$0',desc:'Reasonable for now given uneven demand. Revisit if peak/off-peak ratio changes. Maintain at current scope with performance benchmarks.'},
+      {type:'automate',label:'Automate (AI Analytics)',savings:'$600K/yr',desc:'AI reporting layer (Power BI Copilot, Sigma AI) automates recurring reports and variance analysis. Reduces analyst hours by 35–40%. Implement in parallel with current model.'}
+    ]
+  },
+  {
+    id:'qa-testing',name:'QA & Test Engineering',category:'Software QA',icon:'🔬',
+    recommendation:'automate',confidence:'Very High',currentSpend:1650000,
+    replaceNet:350000,augmentNet:0,automateNet:1100000,
+    rationale:'Manual QA across 4 product lines — 9 CWF testers. Test coverage is 41% automated today. Industry benchmark for comparable products is 75–80%. Each manual test cycle costs 3x what automated execution costs. Converting to automated test suites is the clearest ROI play in the portfolio.',
+    scenarios:[
+      {type:'replace',label:'Replace with FTE',savings:'$350K/yr',desc:'Saves agency margin on converted roles. Appropriate for 2–3 SDET roles needed to build and maintain automated test infrastructure. Not a complete solution alone.'},
+      {type:'augment',label:'Continue Augmenting',savings:'$0',desc:'Manual test costs are fixed per cycle. As codebase grows, manual coverage degrades and CWF headcount requirements increase proportionally.'},
+      {type:'automate',label:'Automate (Test Suite)',savings:'$1.1M/yr',desc:'Playwright/Cypress + AI test generation reaches 80% automation coverage in 6–8 months. Reduces CWF testers from 9 to 3. SDET-in-house model sustains automation going forward.'}
+    ]
+  },
+  {
+    id:'content-ops',name:'Content & Communications Ops',category:'Marketing / Comms',icon:'✍️',
+    recommendation:'augment',confidence:'Medium',currentSpend:620000,
+    replaceNet:90000,augmentNet:0,automateNet:280000,
+    rationale:'Content production — 4 CWF writers and designers for internal comms, product content, and marketing assets. Creative work requires brand judgment and contextual nuance. AI-assisted drafting can accelerate volume production but brand-sensitive content needs human review. Hybrid AI + CWF model reduces cost without sacrificing quality.',
+    scenarios:[
+      {type:'replace',label:'Replace with FTE',savings:'$90K/yr',desc:'Agency margin savings on 1–2 roles. Not compelling at this spend level unless creative work is becoming strategic (brand ownership, thought leadership).'},
+      {type:'augment',label:'Continue Augmenting (AI-Assisted)',savings:'$0',desc:'Add AI writing tools (Claude API, Jasper) to CWF workflow. Doubles output per contractor without headcount increase — effective cost reduction of 40–50% per deliverable.'},
+      {type:'automate',label:'Automate (AI-First Content)',savings:'$280K/yr',desc:'AI-generated first drafts + human review model. Reduces 2 of 4 CWF roles. Requires brand guidelines and prompt library to maintain quality. Viable for routine content categories.'}
+    ]
+  },
+  {
+    id:'scm-ops',name:'Supply Chain Data & Ops',category:'Supply Chain',icon:'🔗',
+    recommendation:'replace',confidence:'Medium',currentSpend:2800000,
+    replaceNet:980000,augmentNet:0,automateNet:700000,
+    rationale:'Supply chain analysts and data ops CWF embedded in the Accenture-led platform build. High institutional knowledge requirement — these roles are doing systems integration work that requires deep organizational context. Contractor churn is increasing re-ramp costs and delivery risk. FTE conversion reduces dependency on consulting-adjacent rates.',
+    scenarios:[
+      {type:'replace',label:'Replace with FTE',savings:'$980K/yr',desc:'Convert 6 core integration and data ops roles to FTE. Removes consulting rate premium (45–60% above FTE equiv). Reduces program risk from contractor churn.'},
+      {type:'augment',label:'Continue Augmenting',savings:'$0',desc:'Acceptable as a bridge during active build phase. Must not persist post go-live — lock in FTE conversion plan at contract renewal.'},
+      {type:'automate',label:'Automate (Integration Layer)',savings:'$700K/yr',desc:'No-code integration platform (MuleSoft, Boomi) automates data pipeline maintenance. Reduces ongoing ops CWF need post-launch. Implementation timeline: 12–18 months.'}
+    ]
+  }
+];
+
+var currentFilter = 'all';
+
+function fmtM(n){
+  if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
+  if(n>=1000) return '$'+(n/1000).toFixed(0)+'K';
+  return '$'+n;
+}
+
+function el(tag,cls,text){
+  var d=document.createElement(tag);
+  if(cls) d.className=cls;
+  if(text!==undefined) d.textContent=text;
+  return d;
+}
+
+function clearEl(node){
+  while(node.firstChild) node.removeChild(node.firstChild);
+}
+
+function animateCount(elem, target, prefix, suffix, decimals, duration){
+  prefix = prefix||''; suffix = suffix||''; decimals = decimals||0; duration = duration||1200;
+  var start = null;
+  function step(ts){
+    if(!start) start = ts;
+    var prog = Math.min((ts - start) / duration, 1);
+    var ease = 1 - Math.pow(1 - prog, 3);
+    var val = target * ease;
+    elem.textContent = prefix + val.toFixed(decimals) + suffix;
+    if(prog < 1) requestAnimationFrame(step);
+    else elem.textContent = prefix + target.toFixed(decimals) + suffix;
+  }
+  requestAnimationFrame(step);
+}
+
+function buildHero(){
+  var totalSpend=0, replaceCount=0, augmentCount=0, automateCount=0;
+  var totalReplSav=0, totalAutoSav=0;
+  SCENARIOS.forEach(function(s){
+    totalSpend += s.currentSpend;
+    if(s.recommendation==='replace'){replaceCount++;totalReplSav+=s.replaceNet;}
+    else if(s.recommendation==='augment') augmentCount++;
+    else if(s.recommendation==='automate'){automateCount++;totalAutoSav+=s.automateNet;}
+  });
+
+  var kpis = document.getElementById('hero-kpis');
+  var defs = [
+    {val:(totalSpend/1000000), prefix:'$', suffix:'M', dec:1, lbl:'Total CWF Spend Analyzed', note:'across '+SCENARIOS.length+' engagements', cls:'orange'},
+    {val:replaceCount, prefix:'', suffix:'', dec:0, lbl:'Replace with FTE', note:'FTE conversion recommended', cls:'blue'},
+    {val:augmentCount, prefix:'', suffix:'', dec:0, lbl:'Continue Augmenting', note:'maintain current model', cls:'amber'},
+    {val:automateCount, prefix:'', suffix:'', dec:0, lbl:'Automate', note:'AI or tooling replacement', cls:'teal'},
+    {val:(totalReplSav+totalAutoSav)/1000000, prefix:'$', suffix:'M', dec:1, lbl:'Potential Savings Pool', note:'replace + automate paths', cls:'green'}
+  ];
+
+  defs.forEach(function(k){
+    var card = el('div','hkpi '+k.cls);
+    var valEl = el('div','hkpi-val',k.prefix+'0'+k.suffix);
+    card.appendChild(valEl);
+    card.appendChild(el('div','hkpi-lbl',k.lbl));
+    card.appendChild(el('div','hkpi-note',k.note));
+    kpis.appendChild(card);
+    setTimeout(function(){ animateCount(valEl, k.val, k.prefix, k.suffix, k.dec, 1400); }, 300);
+  });
+}
+
+function buildFramework(){
+  var wrap = document.getElementById('framework-strip');
+  var cols = [
+    {cls:'replace',title:'Replace with FTE',sub:'When the work is strategic, continuous, and requires institutional knowledge — convert contractors to employees.',
+      dotcls:'replace-dot',signals:['Tenure > 18 months in same role','Core product or delivery capability','High re-ramp cost at contract end','Rate premium > 25% above FTE equivalent','Role exists in similar form every year']},
+    {cls:'augment',title:'Continue Augmenting',sub:'When demand is uneven, specialty is narrow, or scale is unpredictable — maintain contractor flexibility.',
+      dotcls:'augment-dot',signals:['Peak/trough demand pattern','Highly specialized skill (rare in FTE market)','Short project horizon (< 12 months)','Output metrics are meeting benchmarks','Transition cost exceeds 2-year savings']},
+    {cls:'automate',title:'Automate with AI / Tooling',sub:'When the work is high-volume, rule-based, or pattern-driven — replace with software before hiring.',
+      dotcls:'automate-dot',signals:['Repetitive, structured task pattern','High volume with low variability','Output can be validated programmatically','Payback period < 18 months','Existing tools have AI capabilities unused']}
+  ];
+  cols.forEach(function(c){
+    var col = el('div','fw-col '+c.cls);
+    col.appendChild(el('div','fw-accent'));
+    col.appendChild(el('div','fw-title',c.title));
+    col.appendChild(el('div','fw-sub',c.sub));
+    var sigs = el('div','fw-signals');
+    c.signals.forEach(function(s){
+      var row = el('div','fw-signal');
+      row.appendChild(el('div','fw-signal-dot '+c.dotcls));
+      row.appendChild(document.createTextNode(s));
+      sigs.appendChild(row);
+    });
+    col.appendChild(sigs);
+    wrap.appendChild(col);
+  });
+}
+
+function buildCards(){
+  var grid = document.getElementById('scenario-grid');
+  clearEl(grid);
+
+  SCENARIOS.forEach(function(s){
+    if(currentFilter!=='all' && s.recommendation!==currentFilter) return;
+
+    var card = el('div','scenario-card rec-'+s.recommendation+' fade-up');
+
+    var hdr = el('div','sc-header');
+    var icon = el('div','sc-icon '+s.recommendation,s.icon);
+    var tb = el('div','sc-title-block');
+    tb.appendChild(el('div','sc-name',s.name));
+    tb.appendChild(el('div','sc-cat',s.category));
+    hdr.appendChild(icon);
+    hdr.appendChild(tb);
+    var recLabels = {replace:'Replace with FTE',augment:'Continue Augmenting',automate:'Automate'};
+    var hrRight = el('div','sc-header-right');
+    hrRight.appendChild(el('div','sc-rec rec-'+s.recommendation,recLabels[s.recommendation]));
+    hrRight.appendChild(el('div','sc-conf','Confidence: '+s.confidence));
+    hdr.appendChild(hrRight);
+
+    var metrics = el('div','sc-metrics');
+    var bestSavings = s.recommendation==='replace'?s.replaceNet:s.recommendation==='automate'?s.automateNet:0;
+    var savCls = s.recommendation==='replace'?'blue':s.recommendation==='automate'?'green':'amber';
+    var mdata = [
+      {val:fmtM(s.currentSpend),lbl:'Current Spend',cls:''},
+      {val:bestSavings>0?fmtM(bestSavings):'Maintain',lbl:'Best-Path Savings',cls:savCls},
+      {val:s.confidence,lbl:'Confidence',cls:s.confidence==='Very High'?'green':s.confidence==='High'?'blue':'amber'}
+    ];
+    mdata.forEach(function(m){
+      var mc = el('div','sc-metric');
+      mc.appendChild(el('div','scm-val'+(m.cls?' '+m.cls:''),m.val));
+      mc.appendChild(el('div','scm-lbl',m.lbl));
+      metrics.appendChild(mc);
+    });
+
+    var body = el('div','sc-body');
+    body.appendChild(el('div','sc-rationale',s.rationale));
+
+    var scList = el('div','sc-scenarios');
+    s.scenarios.forEach(function(sc){
+      var row = el('div','sc-scenario-row ssr-'+sc.type);
+      var rowHdr = el('div','ssr-header');
+      var labelWrap = el('div');
+      labelWrap.appendChild(el('span','ssr-label',sc.label));
+      if(s.recommendation===sc.type){
+        labelWrap.appendChild(el('span','ssr-rec-tag rrt-'+sc.type,'Recommended'));
+      }
+      rowHdr.appendChild(labelWrap);
+      rowHdr.appendChild(el('div','ssr-savings '+sc.type,sc.savings));
+      row.appendChild(rowHdr);
+      row.appendChild(el('div','ssr-desc',sc.desc));
+      scList.appendChild(row);
+    });
+    body.appendChild(scList);
+
+    card.appendChild(hdr);
+    card.appendChild(metrics);
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+
+  setupScrollReveal();
+}
+
+function buildSavingsSummary(){
+  var wrap = document.getElementById('savings-summary');
+  var replaceItems=[], augItems=[], autoItems=[];
+  var replaceTotal=0, autoTotal=0, grandSpend=0;
+
+  SCENARIOS.forEach(function(s){
+    grandSpend += s.currentSpend;
+    if(s.recommendation==='replace'){replaceItems.push(s);replaceTotal+=s.replaceNet;}
+    else if(s.recommendation==='augment') augItems.push(s);
+    else if(s.recommendation==='automate'){autoItems.push(s);autoTotal+=s.automateNet;}
+  });
+
+  var hdr = el('div','ss-hdr','If All Recommended Paths Are Executed — Estimated Annual Savings');
+  wrap.appendChild(hdr);
+
+  var body = el('div','ss-body');
+  var maxSav = Math.max(replaceTotal, autoTotal, 1);
+  var cols = [
+    {cls:'replace',val:replaceTotal,lbl:'Replace Path Savings',count:replaceItems.length+' engagements',pct:replaceTotal/maxSav*100},
+    {cls:'augment',val:0,lbl:'Maintain Current Spend',count:augItems.length+' engagements (no change)',pct:0},
+    {cls:'automate',val:autoTotal,lbl:'Automate Path Savings',count:autoItems.length+' engagements',pct:autoTotal/maxSav*100}
+  ];
+  cols.forEach(function(c){
+    var col = el('div','ss-col '+c.cls);
+    var accentBar = el('div','ss-accent-bar');
+    var accentFill = el('div','ss-accent-fill');
+    accentBar.appendChild(accentFill);
+    col.appendChild(accentBar);
+    var valEl = el('div','ss-val',c.val>0?'$0':'-');
+    col.appendChild(valEl);
+    col.appendChild(el('div','ss-lbl',c.lbl));
+    col.appendChild(el('div','ss-count',c.count));
+    body.appendChild(col);
+    if(c.val > 0){
+      setTimeout(function(){
+        accentFill.style.width = c.pct + '%';
+        animateCount(valEl, c.val/1000000, '$', 'M', 1, 1300);
+      }, 600);
+    }
+  });
+  wrap.appendChild(body);
+
+  var footer = el('div','ss-footer');
+  footer.appendChild(document.createTextNode('Total combined savings opportunity across recommended paths:'));
+  var totalEl = el('div','ss-total','$0');
+  footer.appendChild(totalEl);
+  wrap.appendChild(footer);
+  setTimeout(function(){
+    animateCount(totalEl, (replaceTotal+autoTotal)/1000000, '$', 'M / year', 1, 1400);
+  }, 700);
+}
+
+function buildTable(){
+  var tbody = document.getElementById('summary-tbl');
+  var sorted = SCENARIOS.slice().sort(function(a,b){
+    var savA = a.recommendation==='replace'?a.replaceNet:a.recommendation==='automate'?a.automateNet:0;
+    var savB = b.recommendation==='replace'?b.replaceNet:b.recommendation==='automate'?b.automateNet:0;
+    return savB - savA;
+  });
+
+  var recBg = {replace:'var(--blue3)',augment:'var(--amber3)',automate:'var(--green3)'};
+  var recColor = {replace:'var(--blue2)',augment:'var(--amber2)',automate:'var(--green2)'};
+  var recLabel = {replace:'Replace',augment:'Augment',automate:'Automate'};
+
+  sorted.forEach(function(s){
+    var tr = document.createElement('tr');
+
+    var tdName = el('td','',s.name);
+    tr.appendChild(tdName);
+    tr.appendChild(el('td','',s.category));
+    tr.appendChild(el('td','',fmtM(s.currentSpend)));
+    tr.appendChild(el('td','',s.replaceNet>0?fmtM(s.replaceNet):'—'));
+    tr.appendChild(el('td','',s.automateNet>0?fmtM(s.automateNet):'—'));
+
+    var tdRec = document.createElement('td');
+    var pill = el('span','rec-pill',recLabel[s.recommendation]);
+    pill.style.background = recBg[s.recommendation];
+    pill.style.color = recColor[s.recommendation];
+    tdRec.appendChild(pill);
+    tr.appendChild(tdRec);
+
+    tr.appendChild(el('td','',s.confidence));
+    tbody.appendChild(tr);
+  });
+}
+
+function filterCards(level){
+  currentFilter = level;
+  document.querySelectorAll('.filter-btn').forEach(function(b){
+    b.classList.remove('active','active-replace','active-augment','active-automate');
+  });
+  var btn = document.getElementById('fb-'+level);
+  if(btn){
+    if(level==='all') btn.classList.add('active');
+    else btn.classList.add('active-'+level);
+  }
+  buildCards();
+}
+
+function setupScrollReveal(){
+  var items = document.querySelectorAll('.fade-up');
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  },{threshold:0.08});
+  items.forEach(function(item){ obs.observe(item); });
+}
+
+buildHero();
+buildFramework();
+buildCards();
+buildSavingsSummary();
+buildTable();
+setupScrollReveal();
+</script>
+<script>
+(function(){var t=localStorage.getItem('ver-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+function toggleDark(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('ver-theme',next);
+  var btn=document.getElementById('dm-btn');
+  if(btn)btn.textContent=next==='dark'?'☾ Light':'☽ Dark';
+}
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openRAAHelp(){
+  HelpModal.open({
+    title: 'Replace / Augment / Automate',
+    what: 'The Replace / Augment / Automate matrix evaluates every active CWF engagement against three strategic options: convert to FTE hire (Replace), maintain the contractor relationship (Augment), or eliminate the need through AI or tooling (Automate). The tool surfaces the optimal path and estimated annual savings for each engagement, supporting data-driven workforce planning decisions.',
+    steps: [
+      '<strong>Review the engagement matrix</strong> — each row is an active CWF engagement with spend, duration, and role type.',
+      '<strong>Read the recommendation badge</strong> — each engagement is scored Replace, Augment, or Automate based on criticality, replaceability, and automation potential.',
+      '<strong>Check the savings estimate</strong> — Replace and Automate paths include an estimated annual savings or cost-avoidance figure based on rate differential or tool cost.',
+      '<strong>Review the Exec Brief</strong> — summarizes the total savings opportunity, highest-impact decisions, and recommended sequencing.',
+      '<strong>Use in workforce planning</strong> — export or print the matrix to support HC planning submissions, contractor rightsizing reviews, or AI investment business cases.'
+    ],
+    glossary: [
+      {term:'Replace (FTE)', color:'#3B82F6', def:'Convert the engagement to a permanent FTE hire. Recommended when the role is ongoing, the function is strategic, and the cost premium of contracting is sustained over 12+ months.'},
+      {term:'Augment (CWF)', color:'#10B981', def:'Maintain the contingent workforce relationship. Recommended for time-bound, specialized, or fluctuating demand that does not warrant permanent headcount.'},
+      {term:'Automate (AI/Tool)', color:'#F59E0B', def:'Replace the function with an AI capability or software tool. Recommended when the work is repetitive, well-defined, and a viable automation exists at lower total cost.'},
+      {term:'70/30 FTE/CW Policy', color:'#EF4444', def:'Salesforce DET leadership mandate: maintain at least 70% FTE to 30% CW ratio across the portfolio. Engagements that push the CW ratio above 30% are flagged for prioritized Replace review.'},
+      {term:'Rate Differential', color:null, def:'The annualized cost difference between the current contractor bill rate and the estimated loaded FTE cost for the equivalent role. Positive differential = FTE is cheaper at scale.'},
+      {term:'Automation Potential Score', color:null, def:'0–100 score estimating how much of the engagement\'s work scope can be covered by existing or near-term AI/tooling. Above 60 is flagged as high automation potential.'},
+      {term:'Engagement Duration', color:null, def:'How long the current CWF engagement has been active. Engagements over 18 months are flagged — extended contractor tenure increases Replace consideration.'},
+      {term:'CWF (Contingent Workforce)', color:null, def:'Contractors, consultants, and staff aug resources engaged through Coupa. Tracked separately from FTE headcount.'},
+      {term:'Savings Opportunity', color:'#10B981', def:'The estimated annual cost savings or avoidance if the recommended action is taken. For Replace: rate differential × annualized hours. For Automate: current spend minus estimated tool cost.'},
+      {term:'Strategic / Non-Strategic', color:null, def:'A classification of whether the function performed is core to DET\'s competitive differentiation (Strategic) or a commodity support function (Non-Strategic). Non-strategic functions have higher Automate weighting.'}
+    ],
+    footNote: 'FY27 · Salesforce DET · Confidential'
+  });
+}
+</script>
+</body>
+</html>

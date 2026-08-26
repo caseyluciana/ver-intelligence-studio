@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI-Assisted Spend Analysis · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Hub top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.35);line-height:1.4;}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+.print-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.print-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+@media print{
+  .hub-top-bar,.print-btn,.dm-toggle,.htb-meta,.agent-col,.controls{display:none!important;}
+  .hero{background:#0F1E3C!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{background:#fff!important;color:#111!important;}
+  .card{box-shadow:none!important;}
+  .wrap,.content-wrap{max-width:100%!important;padding:12px!important;}
+  .sa-layout{display:block!important;}
+  .sa-content{padding:0 48px!important;}
+}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#0A1628 0%,#0F1E3C 45%,#0D2E38 100%);padding:30px 0 26px;position:relative;overflow:hidden;}
+.hero-inner-wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:320px;height:320px;
+  border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.12),transparent 70%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-20px;left:40%;width:400px;height:200px;
+  border-radius:50%;background:radial-gradient(circle,rgba(13,148,136,0.10),transparent 70%);pointer-events:none;}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;position:relative;z-index:1;}
+.hero-eyebrow{font-size:6.5pt;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;}
+.hero-title{font-size:21pt;font-weight:900;color:#fff;line-height:1.15;margin-bottom:6px;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.6);line-height:1.6;max-width:520px;}
+.ai-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(124,58,237,0.2);
+  border:1px solid rgba(124,58,237,0.4);border-radius:20px;padding:6px 14px;font-size:7.5pt;
+  font-weight:700;color:#C4B5FD;white-space:nowrap;}
+.ai-badge-dot{width:7px;height:7px;border-radius:50%;background:#7C3AED;animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.hero-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;position:relative;z-index:1;}
+.hkpi{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:13px 15px;}
+.hkpi-val{font-size:17pt;font-weight:900;color:#fff;line-height:1;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.45);margin-top:4px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.4);margin-top:2px;}
+.hkpi.teal  .hkpi-val{color:#5EEAD4;}
+.hkpi.green .hkpi-val{color:#6EE7B7;}
+.hkpi.amber .hkpi-val{color:#FCD34D;}
+.hkpi.red   .hkpi-val{color:#FCA5A5;}
+.hkpi.purple .hkpi-val{color:#C4B5FD;}
+/* ── Source / confidence badges ── */
+.src-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.src-badge{display:inline-flex;align-items:center;gap:4px;font-size:6.5pt;font-weight:700;
+  padding:3px 8px;border-radius:10px;white-space:nowrap;letter-spacing:0.04em;}
+.src-coupa{background:rgba(37,99,235,0.18);color:#93C5FD;border:1px solid rgba(37,99,235,0.3);}
+.src-mft{background:rgba(124,58,235,0.18);color:#C4B5FD;border:1px solid rgba(124,58,237,0.3);}
+.src-benchmark{background:rgba(13,148,136,0.18);color:#5EEAD4;border:1px solid rgba(13,148,136,0.3);}
+.src-qbr{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.3);}
+.src-manual{background:rgba(107,114,128,0.2);color:#D1D5DB;border:1px solid rgba(107,114,128,0.3);}
+.conf-high{background:rgba(5,150,105,0.18);color:#6EE7B7;border:1px solid rgba(5,150,105,0.3);}
+.conf-medium{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.3);}
+.conf-low{background:rgba(220,38,38,0.18);color:#FCA5A5;border:1px solid rgba(220,38,38,0.3);}
+.src-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.hkpi .src-row{margin-top:8px;}
+.insights-loading{padding:30px;text-align:center;color:var(--ink4);grid-column:1/-1;}
+.insights-loading-icon{font-size:20pt;margin-bottom:8px;}
+.risk-dist-footer{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+.risk-dist-footer-lbl{font-size:7.5pt;font-weight:700;color:var(--ink4);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;}
+.avg-risk-list{display:flex;flex-direction:column;gap:5px;}
+.opp-header-note{font-size:7.5pt;color:var(--ink4);margin-left:auto;}
+.opp-header-vendor-lbl{font-size:8.5pt;font-weight:700;color:var(--ink2);}
+
+/* ── CONTROLS ── */
+.controls{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;padding:0;}
+.controls-inner{max-width:1280px;margin:0 auto;padding:11px 48px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.fsel{font-size:8pt;padding:6px 10px;border:1px solid var(--border2);border-radius:6px;
+  background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;}
+.fsel:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.ctrl-lbl{font-size:7.5pt;font-weight:700;color:var(--ink4);margin-right:-2px;}
+.sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.ctrl-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.dm-btn{font-size:7.5pt;padding:5px 12px;border-radius:20px;border:1px solid var(--border2);
+  background:var(--gray2);color:var(--ink4);font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.13s;}
+.dm-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.stamp{font-size:7pt;color:var(--ink4);}
+
+/* ── MAIN LAYOUT ── */
+.main{max-width:1280px;margin:0 auto;padding:20px 48px 40px;}
+.section-title{font-size:10.5pt;font-weight:900;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title-sub{font-size:8pt;color:var(--ink4);font-weight:400;margin-left:auto;}
+
+/* ── SIGNAL CARDS ── */
+.signals-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.signal-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 22px;
+  position:relative;overflow:hidden;transition:box-shadow 0.15s;}
+.signal-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.07);}
+.signal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.signal-card.sig-critical::before{background:var(--red);}
+.signal-card.sig-critical{background:rgba(220,38,38,0.025);}
+.signal-card.sig-warning::before{background:var(--amber);}
+.signal-card.sig-warning{background:rgba(217,119,6,0.025);}
+.signal-card.sig-opportunity::before{background:var(--green);}
+.signal-card.sig-info::before{background:var(--blue);}
+.sig-priority{font-size:6pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  padding:2px 8px;border-radius:6px;display:inline-block;margin-bottom:12px;}
+.sig-priority.p-critical{background:var(--red3);color:var(--red2);}
+.sig-priority.p-warning{background:var(--amber3);color:var(--amber2);}
+.sig-priority.p-opportunity{background:var(--green3);color:var(--green2);}
+.sig-priority.p-info{background:var(--navy3);color:var(--navy2);}
+.sig-metric{font-size:26pt;font-weight:900;line-height:1;margin-bottom:4px;color:var(--navy);}
+.sig-title{font-size:9pt;font-weight:800;color:var(--ink);margin-bottom:5px;line-height:1.3;}
+.sig-body{font-size:8pt;color:var(--ink4);line-height:1.55;margin-bottom:12px;}
+.sig-action{font-size:7.5pt;font-weight:700;color:var(--teal2);background:var(--teal3);
+  padding:6px 10px;border-radius:6px;line-height:1.4;}
+.sig-chart{margin:10px 0 12px;}
+
+/* ── PORTFOLIO ANALYTICS BAND ── */
+.analytics-band{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px;}
+.analytics-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.analytics-title{font-size:9pt;font-weight:800;color:var(--ink);margin-bottom:2px;}
+.analytics-sub{font-size:7pt;color:var(--ink4);margin-bottom:14px;}
+
+/* Category bars */
+.cat-bars{display:flex;flex-direction:column;gap:9px;}
+.cat-bar-row{display:flex;flex-direction:column;gap:3px;}
+.cat-bar-label{display:flex;justify-content:space-between;align-items:center;}
+.cat-bar-name{font-size:7.5pt;color:var(--ink2);font-weight:600;max-width:160px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cat-bar-val{font-size:7.5pt;font-weight:800;color:var(--ink2);}
+.cat-bar-track{background:var(--gray2);border-radius:4px;height:7px;}
+.cat-bar-fill{height:7px;border-radius:4px;transition:width 0.7s ease;}
+
+/* Donut */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.donut-legend{display:flex;flex-direction:column;gap:5px;width:100%;}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:7.5pt;}
+.legend-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+.legend-name{color:var(--ink3);flex:1;}
+.legend-val{font-weight:700;color:var(--ink2);}
+.legend-pct{color:var(--ink4);font-size:7pt;}
+
+/* Risk dist */
+.risk-dist-bars{display:flex;flex-direction:column;gap:8px;}
+.rdbar-row{display:flex;align-items:center;gap:8px;}
+.rdbar-lbl{font-size:7.5pt;color:var(--ink3);font-weight:600;width:60px;flex-shrink:0;}
+.rdbar-track{flex:1;background:var(--gray2);border-radius:4px;height:14px;position:relative;}
+.rdbar-fill{height:14px;border-radius:4px;display:flex;align-items:center;padding-left:6px;
+  font-size:7pt;font-weight:700;color:#fff;white-space:nowrap;transition:width 0.7s ease;}
+.rdbar-cnt{font-size:7.5pt;font-weight:700;color:var(--ink2);width:28px;text-align:right;}
+
+/* ── OPPORTUNITY CARDS ── */
+.opp-panel{background:#fff;border:1px solid var(--border);border-radius:14px;margin-bottom:22px;overflow:hidden;}
+.opp-panel-hdr{background:linear-gradient(135deg,#0A1628 0%,#0F1E3C 60%,#0D2438 100%);padding:18px 22px;}
+.opp-panel-hdr-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;}
+.opp-panel-title{font-size:11pt;font-weight:900;color:#fff;margin-bottom:3px;}
+.opp-panel-sub{font-size:7.5pt;color:rgba(255,255,255,.45);}
+.opp-kpi-row{display:flex;gap:22px;flex-shrink:0;}
+.opp-kpi{text-align:right;}
+.opp-kpi-val{font-size:15pt;font-weight:900;line-height:1;}
+.opp-kpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.40);margin-top:2px;}
+.opp-kpi-div{width:1px;background:rgba(255,255,255,.10);align-self:stretch;}
+.opp-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border-top:none;}
+.opp-card{padding:16px 18px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:default;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.opp-card-more{grid-column:1/-1;border:none;background:none;box-shadow:none;padding:0;}
+.opp-card-vendor{font-size:9pt;font-weight:800;color:var(--ink);margin-bottom:2px;}
+.opp-card-meta{font-size:7.5pt;color:var(--ink4);margin-bottom:10px;}
+.opp-card-spend{font-size:18pt;font-weight:900;line-height:1;margin-bottom:8px;}
+.opp-card-signals{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.opp-flag{display:inline-flex;align-items:center;gap:4px;font-size:6.5pt;font-weight:700;
+  padding:2px 7px;border-radius:6px;white-space:nowrap;}
+.flag-red{background:var(--red3);color:var(--red2);}
+.flag-amber{background:var(--amber3);color:var(--amber2);}
+.flag-green{background:var(--green3);color:var(--green2);}
+.flag-purple{background:var(--purple3);color:var(--purple2);}
+.opp-card-action{font-size:7.5pt;color:var(--ink3);line-height:1.5;padding-top:8px;
+  border-top:1px solid var(--gray2);}
+.opp-card-action strong{color:var(--teal2);}
+.opp-show-more{width:100%;padding:12px;background:var(--gray);border:none;
+  font-size:8pt;font-weight:700;color:var(--ink4);cursor:pointer;font-family:inherit;
+  transition:all 0.15s;text-align:center;}
+.opp-show-more:hover{background:var(--navy);color:#fff;}
+[data-theme="dark"] .opp-card{background:var(--gray2);border-color:var(--border);}
+
+
+/* ── BADGES / SHARED ── */
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:6.5pt;font-weight:700;
+  padding:2px 7px;border-radius:9px;white-space:nowrap;}
+.b-green{background:var(--green3);color:var(--green2);}
+.b-amber{background:var(--amber3);color:var(--amber2);}
+.b-red  {background:var(--red3);color:var(--red2);}
+.b-navy {background:var(--navy3);color:var(--navy2);}
+.b-teal {background:var(--teal3);color:var(--teal2);}
+.b-gray {background:var(--gray3);color:var(--ink3);}
+.b-purple{background:var(--purple3);color:var(--purple2);}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
+/* ── DARK MODE ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);--purple3:rgba(124,58,237,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);}
+[data-theme="dark"] .controls,[data-theme="dark"] .analytics-card,
+[data-theme="dark"] .signal-card,[data-theme="dark"] .opp-panel,
+[data-theme="dark"] .opp-card{background:var(--gray2);}
+[data-theme="dark"] .fsel{background:var(--gray2);color:var(--ink2);border-color:var(--border2);}
+[data-theme="dark"] .controls{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .section-title{color:var(--ink);}
+[data-theme="dark"] .opp-show-more{background:var(--gray3);color:var(--ink3);}
+[data-theme="dark"] .opp-card-action{border-top-color:var(--border);}
+
+/* ── Scenario Planner CTA ── */
+.scenario-cta{background:linear-gradient(135deg,#0A1628 0%,#0F1E3C 60%,#0D2E38 100%);
+  border-radius:12px;padding:22px 28px;display:flex;align-items:center;
+  justify-content:space-between;gap:24px;margin-top:8px;}
+.scenario-cta-eyebrow{font-size:7pt;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:6px;}
+.scenario-cta-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;margin-bottom:6px;}
+.scenario-cta-body{font-size:8.5pt;color:rgba(255,255,255,0.55);line-height:1.6;max-width:560px;}
+.scenario-cta-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;font-size:9pt;font-weight:800;padding:11px 22px;
+  border-radius:8px;text-decoration:none;white-space:nowrap;transition:background 0.15s;}
+.scenario-cta-btn:hover{background:var(--teal2);}
+
+@media(max-width:900px){
+  .analytics-band{grid-template-columns:1fr;}
+  .signals-row{grid-template-columns:1fr;}
+  .opp-cards{grid-template-columns:1fr;}
+  .opp-card:nth-child(3n){border-right:none;}
+  .hero-kpis{grid-template-columns:repeat(2,1fr);}
+  .main{padding:16px 20px;}
+  .hero-inner-wrap,.controls-inner{padding-left:20px;padding-right:20px;}
+  .hub-top-bar{padding:0 16px;}
+}
+@media(max-width:600px){
+  .hero-kpis{grid-template-columns:1fr 1fr;}
+  .hero-inner-wrap,.controls-inner,.main{padding-left:14px;padding-right:14px;}
+  .hub-top-bar{padding:0 12px;height:42px;}
+  .htb-meta{display:none;}
+  .controls-inner{flex-wrap:wrap;gap:6px;}
+  .fsel{font-size:7.5pt;}
+  .opp-cards{grid-template-columns:1fr;}
+  .scenario-cta{flex-direction:column;align-items:flex-start;gap:10px;}
+}
+
+/* ── Two-column layout ── */
+.sa-layout{display:grid;grid-template-columns:1fr 340px;gap:0;align-items:start;max-width:1280px;margin:0 auto;padding:0 48px;}
+.sa-content{min-width:0;padding-top:20px;padding-bottom:40px;}
+/* ── Agent chat panel ── */
+.agent-col{position:sticky;top:96px;height:calc(100vh - 108px);display:flex;flex-direction:column;
+  background:#fff;border-radius:16px;overflow:hidden;
+  box-shadow:0 4px 32px rgba(0,0,0,0.12),0 0 0 1px var(--border);
+  margin:16px 0 12px 20px;}
+.agent-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;}
+.agent-id{display:flex;align-items:center;gap:11px;}
+.agent-avatar{width:80px;height:80px;border-radius:16px;flex-shrink:0;overflow:hidden;
+  background:linear-gradient(135deg,var(--teal) 0%,var(--navy) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11pt;color:#fff;font-weight:900;box-shadow:0 2px 8px rgba(13,148,136,0.30);}
+.agent-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.agent-identity{flex:1;min-width:0;}
+.agent-name{font-size:9pt;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.agent-status{display:flex;align-items:center;gap:5px;margin-top:2px;}
+.agent-pulse{width:6px;height:6px;border-radius:50%;background:#10B981;flex-shrink:0;animation:agentpulse 2s infinite;}
+@keyframes agentpulse{0%{box-shadow:0 0 0 0 rgba(16,185,129,.5);}70%{box-shadow:0 0 0 6px rgba(16,185,129,0);}100%{box-shadow:0 0 0 0 rgba(16,185,129,0);}}
+.agent-status-text{font-size:7.5pt;color:var(--ink4);}
+.agent-ctx{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;}
+.agent-ctx-pill{font-size:7pt;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--teal3);border:1px solid rgba(13,148,136,0.20);color:var(--teal2);}
+.agent-messages{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;background:#F8FAFB;}
+.agent-messages::-webkit-scrollbar{width:3px;}
+.agent-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.chat-row{display:flex;align-items:flex-end;gap:7px;}
+.chat-row.user{flex-direction:row-reverse;}
+.bubble-avatar{width:44px;height:44px;border-radius:12px;flex-shrink:0;font-size:8pt;font-weight:800;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.bubble-avatar.agent-av{background:linear-gradient(135deg,var(--teal),var(--navy));color:#fff;}
+.bubble-avatar.agent-av img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.bubble-avatar.user-av{background:var(--gray3);color:var(--ink3);}
+.chat-bubble{max-width:84%;padding:9px 13px;border-radius:14px;font-size:8.5pt;line-height:1.62;}
+.chat-bubble.user{background:var(--navy);color:#fff;border-bottom-right-radius:4px;}
+.chat-bubble.agent{background:#fff;border:1px solid var(--border);color:var(--ink2);
+  border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.chat-bubble-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:4px;}
+.chat-bubble-text{white-space:pre-wrap;}
+.agent-chips{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
+.agent-chip{background:#fff;border:1px solid var(--border2);border-radius:10px;
+  padding:8px 11px;font-size:8pt;color:var(--ink3);
+  cursor:pointer;text-align:left;font-family:inherit;transition:all .15s;line-height:1.4;}
+.agent-chip:hover{background:var(--teal3);border-color:var(--teal);color:var(--teal2);}
+.agent-input-area{padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;background:#fff;}
+.agent-input-row{display:flex;gap:8px;align-items:flex-end;}
+.agent-textarea{flex:1;background:var(--gray2);border:1px solid var(--border2);
+  border-radius:10px;padding:9px 12px;color:var(--ink);font-size:8.5pt;font-family:inherit;
+  resize:none;outline:none;line-height:1.5;min-height:42px;max-height:90px;transition:border-color .15s;}
+.agent-textarea::placeholder{color:var(--ink4);}
+.agent-textarea:focus{border-color:var(--teal);background:#fff;}
+.agent-send{background:var(--teal);border:none;border-radius:10px;color:#fff;
+  padding:9px 13px;font-size:11pt;cursor:pointer;flex-shrink:0;transition:background .15s;line-height:1;}
+.agent-send:hover{background:var(--teal2);}
+.agent-send:disabled{background:var(--gray3);color:var(--ink4);cursor:not-allowed;}
+.agent-footer{padding:7px 14px 9px;flex-shrink:0;background:#fff;border-top:1px solid var(--border);}
+.agent-footer-text{font-size:7pt;color:var(--ink4);line-height:1.4;text-align:center;}
+/* ── Opportunity Finder enhancements ── */
+.opp-panel-hdr{background:linear-gradient(135deg,#0A1628 0%,#0F1E3C 60%,#0D2438 100%);padding:18px 22px;}
+.opp-panel-hdr-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;}
+.opp-panel-title{font-size:11pt;font-weight:900;color:#fff;margin-bottom:3px;}
+.opp-panel-sub{font-size:7.5pt;color:rgba(255,255,255,.45);}
+.opp-kpi-row{display:flex;gap:22px;flex-shrink:0;}
+.opp-kpi{text-align:right;}
+.opp-kpi-val{font-size:15pt;font-weight:900;line-height:1;}
+.opp-kpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.40);margin-top:2px;}
+.opp-kpi-div{width:1px;background:rgba(255,255,255,.10);align-self:stretch;}
+</style>
+</head>
+<body>
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">AI-Assisted Spend Analysis</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="dm-toggle" onclick="openSpendHelp()">&#63; How to Use</button>
+    <button type="button" class="print-btn" onclick="window.print()">&#128438; Download PDF</button>
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="toggleDark()">&#9789; Dark Mode</button>
+    <div class="htb-meta">DET Portfolio Intelligence &mdash; Powered by VER<br>FY27 &middot; Confidential</div>
+  </div>
+</nav>
+<div class="hero">
+  <div class="hero-inner-wrap">
+    <div class="hero-top">
+      <div>
+        <div class="hero-eyebrow">VER Intelligence Hub · FY27</div>
+        <div class="hero-title">AI-Assisted Spend Analysis</div>
+        <div class="hero-sub">VER Intelligence Engine analyzing portfolio spend patterns, concentration risk, renewal exposure, and savings opportunities across all 1,375 managed vendors. Ask VER AI below for natural language analysis.</div>
+      </div>
+      <div class="ai-badge"><span class="ai-badge-dot"></span>VER AI · Live &mdash; Ask a question below</div>
+    </div>
+    <div class="hero-kpis">
+      <div class="hkpi teal">
+        <div class="hkpi-val" id="kpi-spend">—</div>
+        <div class="hkpi-lbl">Disclosed Spend</div>
+        <div class="hkpi-note">Named vendor total</div>
+        <div class="src-row">
+          <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High</span>
+          <span class="src-badge src-manual">Jun 22</span>
+        </div>
+      </div>
+      <div class="hkpi amber">
+        <div class="hkpi-val" id="kpi-renew-exp">—</div>
+        <div class="hkpi-lbl">Renewal Exposure</div>
+        <div class="hkpi-note">≤180 days</div>
+        <div class="src-row">
+          <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High</span>
+          <span class="src-badge src-manual">Jun 22</span>
+        </div>
+      </div>
+      <div class="hkpi red">
+        <div class="hkpi-val" id="kpi-at-risk-spend">—</div>
+        <div class="hkpi-lbl">At-Risk Spend</div>
+        <div class="hkpi-note">High risk vendors</div>
+        <div class="src-row">
+          <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+          <span class="src-badge src-qbr"><span class="src-dot"></span>QBR</span>
+          <span class="src-badge conf-medium"><span class="src-dot"></span>Medium</span>
+        </div>
+      </div>
+      <div class="hkpi green">
+        <div class="hkpi-val" id="kpi-savings-opp">—</div>
+        <div class="hkpi-lbl">Savings Opportunity</div>
+        <div class="hkpi-note">Est. addressable</div>
+        <div class="src-row">
+          <span class="src-badge src-benchmark"><span class="src-dot"></span>Benchmark</span>
+          <span class="src-badge conf-medium"><span class="src-dot"></span>Medium</span>
+        </div>
+      </div>
+      <div class="hkpi purple">
+        <div class="hkpi-val" id="kpi-vendors-spend">—</div>
+        <div class="hkpi-lbl">Vendors w/ Spend</div>
+        <div class="hkpi-note">Of 1,375 total</div>
+        <div class="src-row">
+          <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High</span>
+          <span class="src-badge src-manual">Jun 22</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="controls-inner">
+  <span class="ctrl-lbl">View by:</span>
+  <select class="fsel" id="ctrl-cat" title="Filter by category" onchange="applyView()">
+    <option value="">All Categories</option>
+    <option>Professional Services</option>
+    <option>Software / SaaS</option>
+    <option>Cloud &amp; Managed Services</option>
+    <option>Contingent Workforce</option>
+    <option>Hardware &amp; Infrastructure</option>
+  </select>
+  <select class="fsel" id="ctrl-tier" title="Filter by tier" onchange="applyView()">
+    <option value="">All Tiers</option>
+    <option value="1">Tier 1</option>
+    <option value="2">Tier 2</option>
+    <option value="3">Tier 3</option>
+  </select>
+  <div class="sep"></div>
+  <span class="stamp" id="analysis-stamp"></span>
+  <span id="coupa-live-badge" style="display:inline-flex;align-items:center;gap:5px;background:var(--gray2);border:1px solid var(--border2);border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--ink4);letter-spacing:0.06em;margin-left:8px;" title="Connecting to Coupa…">&#9679; Connecting…</span>
+  <button type="button" id="coupa-refresh-btn" onclick="refreshFromCoupa()" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:4px;border:1px solid var(--border2);background:var(--gray2);color:var(--ink4);font-size:10px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.04em;transition:all 0.15s;" title="Pull latest data from Coupa">&#8635; Refresh from Coupa</button>
+  <div class="ctrl-r">
+    <button type="button" class="dm-btn" onclick="toggleDark()">☽ Dark Mode</button>
+  </div>
+  </div>
+</div>
+
+<div class="sa-layout">
+
+  <!-- ── CONTENT (left) ── -->
+  <div class="sa-content">
+
+  <!-- PORTFOLIO SIGNALS — visual cards -->
+  <div class="section-title">
+    ✦ Portfolio Signals
+    <span class="section-title-sub" id="signals-status">Analyzing portfolio…</span>
+  </div>
+  <div class="signals-row" id="signals-grid">
+    <div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--ink4);background:#fff;border-radius:14px;border:1px solid var(--border);">Loading signals…</div>
+  </div>
+
+  <!-- PORTFOLIO ANALYTICS — charts -->
+  <div class="section-title">
+    📊 Portfolio Breakdown
+    <span class="section-title-sub">Spend distribution across categories, pillars, and risk bands</span>
+  </div>
+  <div class="analytics-band">
+    <div class="analytics-card">
+      <div class="analytics-title">Spend by Category</div>
+      <div class="analytics-sub">Coupa FY27 actuals</div>
+      <div class="cat-bars" id="cat-chart"></div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-title">Spend by Pillar</div>
+      <div class="analytics-sub">Hyperion rollup · FY27</div>
+      <div class="donut-wrap">
+        <svg id="donut-svg" viewBox="0 0 160 160" width="140" height="140"></svg>
+        <div class="donut-legend" id="donut-legend"></div>
+      </div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-title">Risk Distribution</div>
+      <div class="analytics-sub">Vendors by risk band</div>
+      <div class="risk-dist-bars" id="risk-dist"></div>
+      <div class="risk-dist-footer">
+        <div class="risk-dist-footer-lbl">Avg Risk by Category</div>
+        <div id="avg-risk-list" class="avg-risk-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPPORTUNITY FINDER — card layout, top 5 + expand -->
+  <div class="opp-panel">
+    <div class="opp-panel-hdr">
+      <div class="opp-panel-hdr-inner">
+        <div>
+          <div class="opp-panel-title">🎯 Opportunity Finder</div>
+          <div class="opp-panel-sub">Top commercial actions ranked by spend exposure</div>
+        </div>
+        <div class="opp-kpi-row">
+          <div class="opp-kpi">
+            <div class="opp-kpi-val" id="opp-kpi-flagged" style="color:#FCA5A5">—</div>
+            <div class="opp-kpi-lbl">Vendors Flagged</div>
+          </div>
+          <div class="opp-kpi-div"></div>
+          <div class="opp-kpi">
+            <div class="opp-kpi-val" id="opp-kpi-spend" style="color:#FCD34D">—</div>
+            <div class="opp-kpi-lbl">Flagged Spend</div>
+          </div>
+          <div class="opp-kpi-div"></div>
+          <div class="opp-kpi">
+            <div class="opp-kpi-val" id="opp-kpi-renew90" style="color:#F87171">—</div>
+            <div class="opp-kpi-lbl">Renewing ≤90d</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="opp-cards" id="opp-cards"></div>
+  </div>
+
+  <!-- SCENARIO PLANNER CTA -->
+  <div class="scenario-cta">
+    <div>
+      <div class="scenario-cta-eyebrow">Savings Opportunity Identified</div>
+      <div class="scenario-cta-val" id="cta-savings">—</div>
+      <div class="scenario-cta-body">
+        Addressable savings across cloud optimization, professional services consolidation, SaaS rationalization,
+        and contingent workforce rate alignment — modeled against FY27 actuals.
+        Use the Scenario Planner to stress-test levers, swap benchmarks, and build a business case.
+      </div>
+    </div>
+    <a href="page_scenario.html" class="scenario-cta-btn">Open Scenario Planner &#8594;</a>
+  </div>
+
+  </div><!-- /sa-content -->
+
+  <!-- ── AGENT PANEL (right) ── -->
+  <div class="agent-col">
+    <div class="agent-header">
+      <div class="agent-id">
+        <div class="agent-avatar"><img src="assets/vendy-agent.png" alt="Vendy"></div>
+        <div class="agent-identity">
+          <div class="agent-name">Vendy &middot; VER Intelligence Agent</div>
+          <div class="agent-status">
+            <div class="agent-pulse"></div>
+            <span class="agent-status-text">Online &middot; Portfolio context loaded</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+        <button type="button" onclick="openAgentModal()" title="Expand chat" style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:var(--gray2);color:var(--ink4);cursor:pointer;font-size:12px;transition:all 0.15s;" onmouseover="this.style.background='var(--teal)';this.style.color='#fff';this.style.borderColor='var(--teal)'" onmouseout="this.style.background='var(--gray2)';this.style.color='var(--ink4)';this.style.borderColor='var(--border2)'">&#x26F6;</button>
+      </div>
+    </div>
+
+    <div class="agent-messages" id="agent-messages">
+      <div class="chat-row" id="agent-greeting">
+        <div class="bubble-avatar agent-av"><img src="assets/vendy-agent.png" alt="Vendy"></div>
+        <div class="chat-bubble agent"><div class="chat-bubble-label">Vendy &middot; VER Agent</div><div class="chat-bubble-text">What can I help you with?</div></div>
+      </div>
+      <div class="agent-chips" id="agent-chips"></div>
+    </div>
+
+    <div class="agent-input-area">
+      <div class="agent-input-row">
+        <textarea class="agent-textarea" id="ai-input" rows="2"
+          placeholder="Ask about spend, risk, renewals, savings..."></textarea>
+        <button type="button" class="agent-send" id="ai-send" onclick="sendAIQuery()" title="Send">&#10148;</button>
+      </div>
+    </div>
+    <div class="agent-footer">
+      <div class="agent-footer-text">VER Intelligence Engine &middot; Validate findings before commercial action</div>
+    </div>
+  </div><!-- /agent-col -->
+
+</div><!-- /sa-layout -->
+<script src="assets/vendors.js"></script>
+<script src="assets/coupa_spend.js"></script>
+<script>
+// ── UTILITIES ──────────────────────────────────────────────────────────────
+function parseSpend(s) {
+  if (!s || s === '$0' || s === '—' || s === '') return 0;
+  var m = String(s).match(/\$([\d.]+)\s*([MKBmkb]?)/);
+  if (!m) return 0;
+  var n = parseFloat(m[1]);
+  var u = m[2].toUpperCase();
+  if (u === 'B') n *= 1000;
+  if (u === 'K') n /= 1000;
+  return n; // treat M as M (millions)
+}
+
+function fmt(n) {
+  if (n >= 1000) return '$' + (n/1000).toFixed(1) + 'B';
+  if (n >= 1)    return '$' + n.toFixed(1) + 'M';
+  if (n > 0)     return '$' + (n * 1000).toFixed(0) + 'K';
+  return '$0';
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  var d = new Date(dateStr);
+  return Math.ceil((d - new Date()) / 86400000);
+}
+
+function riskBand(s) {
+  return s <= 33 ? 'low' : s <= 66 ? 'medium' : 'high';
+}
+
+function colorForRisk(band) {
+  return band === 'low' ? 'var(--green)' : band === 'medium' ? 'var(--amber)' : 'var(--red)';
+}
+
+// ── GLOBAL STATE ──────────────────────────────────────────────────────────
+var ALL = [];
+var SPEND_TOTALS = {};
+
+// ── COMPUTE AGGREGATES ────────────────────────────────────────────────────
+function compute(vendors) {
+  var withSpend = vendors.filter(function(v){ return parseSpend(v.annual_spend) > 0; });
+  var totalSpend = withSpend.reduce(function(s,v){ return s + parseSpend(v.annual_spend); }, 0);
+
+  // By category
+  var catSpend = {}, catCount = {};
+  vendors.forEach(function(v) {
+    catCount[v.category] = (catCount[v.category]||0) + 1;
+    catSpend[v.category] = (catSpend[v.category]||0) + parseSpend(v.annual_spend);
+  });
+
+  // By tier
+  var tierCount = {1:0, 2:0, 3:0};
+  vendors.forEach(function(v){ tierCount[v.tier] = (tierCount[v.tier]||0) + 1; });
+
+  // Risk distribution
+  var riskDist = {low:0, medium:0, high:0};
+  vendors.forEach(function(v){ riskDist[riskBand(v.risk_score)]++; });
+
+  // Avg risk by category
+  var catRiskSum = {}, catRiskCnt = {};
+  vendors.forEach(function(v){
+    catRiskSum[v.category] = (catRiskSum[v.category]||0) + v.risk_score;
+    catRiskCnt[v.category] = (catRiskCnt[v.category]||0) + 1;
+  });
+
+  // Renewal exposure
+  var renew180 = withSpend.filter(function(v){
+    var d = daysUntil(v.renewal_date); return d !== null && d >= 0 && d <= 180;
+  });
+  var renew90 = withSpend.filter(function(v){
+    var d = daysUntil(v.renewal_date); return d !== null && d >= 0 && d <= 90;
+  });
+  var renewSpend180 = renew180.reduce(function(s,v){ return s + parseSpend(v.annual_spend); }, 0);
+  var renewSpend90  = renew90.reduce(function(s,v){ return s + parseSpend(v.annual_spend); }, 0);
+
+  // At-risk spend (high risk vendors with disclosed spend)
+  var atRiskSpend = withSpend.filter(function(v){ return v.risk_score > 66; })
+    .reduce(function(s,v){ return s + parseSpend(v.annual_spend); }, 0);
+
+  // Cloud spend
+  var cloudSpend = (catSpend['Cloud & Managed Services'] || 0);
+  var psSpend    = (catSpend['Professional Services'] || 0);
+  var saasSpend  = (catSpend['Software / SaaS'] || 0);
+
+  // Sorted by spend
+  var bySpend = withSpend.slice().sort(function(a,b){ return parseSpend(b.annual_spend) - parseSpend(a.annual_spend); });
+
+  return {
+    vendors, withSpend, totalSpend,
+    catSpend, catCount, tierCount, riskDist,
+    catRiskSum, catRiskCnt,
+    renew90, renew180, renewSpend90, renewSpend180,
+    atRiskSpend, cloudSpend, psSpend, saasSpend,
+    bySpend
+  };
+}
+
+// ── AI INSIGHTS ENGINE ────────────────────────────────────────────────────
+
+function generateInsights(d) {
+  var insights = [];
+  var v = d.vendors;
+
+  // 1 — SPEND CONCENTRATION
+  var top5 = d.bySpend.slice(0,5);
+  var top5Spend = top5.reduce(function(s,x){ return s+parseSpend(x.annual_spend); },0);
+  var top5Pct   = d.totalSpend > 0 ? Math.round(top5Spend/d.totalSpend*100) : 0;
+  var top3Names = top5.slice(0,3).map(function(x){ return x.name; }).join(', ');
+  var concColors = ['#0F1E3C','#1E3A5F','#2563EB','#0D9488','#6B7280'];
+  insights.push({
+    priority: top5Pct >= 70 ? 'critical' : top5Pct >= 50 ? 'warning' : 'info',
+    metric: top5Pct + '%',
+    title: 'Spend in Top 5 Vendors',
+    body: top3Names + ' and ' + (top5.length - 3) + ' others hold ' + top5Pct + '% of portfolio spend (' + fmt(top5Spend) + '). High concentration limits negotiation leverage and creates continuity risk.',
+    action: 'Build competitive alternatives for top 3 and enforce dual-source policies before next renewal.',
+    chartData: top5.map(function(x,i){ return { label: x.name.split(' ')[0], val: parseSpend(x.annual_spend), color: concColors[i] }; }),
+    score: top5Pct >= 70 ? 100 : top5Pct >= 50 ? 75 : 40
+  });
+
+  // 2 — RENEWAL PRESSURE
+  if (d.renewSpend180 > 0) {
+    var urgent = d.renew90.map(function(x){ return x.name; }).slice(0,3).join(', ');
+    insights.push({
+      priority: d.renewSpend90 > 10 ? 'critical' : 'warning',
+      metric: fmt(d.renewSpend180),
+      title: 'Renewal Exposure — Next 180 Days',
+      body: d.renew180.length + ' vendors renewing within 180 days' +
+        (d.renew90.length > 0 ? ', including ' + d.renew90.length + ' within 90 days (' + fmt(d.renewSpend90) + '). Immediate: ' + (urgent || 'see renewal list') + '.' : '.') +
+        ' Auto-renewals at list rate forfeit all negotiation leverage.',
+      action: 'Initiate commercial strategy for all sub-90-day renewals now. Lock rate cards before window closes.',
+      chartData: [
+        { label: '≤30d',  val: d.renew90.filter(function(v){ var dd=daysUntil(v.renewal_date); return dd!==null&&dd<=30; }).length || 0.2, color:'#DC2626' },
+        { label: '≤60d',  val: d.renew90.filter(function(v){ var dd=daysUntil(v.renewal_date); return dd!==null&&dd>30&&dd<=60; }).length || 0.2, color:'#D97706' },
+        { label: '≤90d',  val: d.renew90.filter(function(v){ var dd=daysUntil(v.renewal_date); return dd!==null&&dd>60&&dd<=90; }).length || 0.2, color:'#FBBF24' },
+        { label: '≤180d', val: Math.max(0, d.renew180.length - d.renew90.length) || 0.2, color:'#A3A3A3' },
+      ],
+      score: d.renewSpend90 > 15 ? 95 : d.renewSpend180 > 20 ? 80 : 60
+    });
+  }
+
+  // 3 — SLA UNDERPERFORMERS WITH SPEND
+  var slaRisk = d.withSpend.filter(function(x){ return x.sla_score < 87 && parseSpend(x.annual_spend) >= 1 && !/bcg/i.test(x.name); });
+  slaRisk.sort(function(a,b){ return parseSpend(b.annual_spend)-parseSpend(a.annual_spend); });
+  if (slaRisk.length > 0) {
+    var worst = slaRisk[0];
+    insights.push({
+      priority: 'warning',
+      metric: slaRisk.length + (slaRisk.length === 1 ? ' vendor' : ' vendors'),
+      title: 'SLA Underperformance with Material Spend',
+      body: 'Below 87% SLA threshold with ≥$1M spend. Worst: ' + worst.name + ' at ' + worst.sla_score + '% SLA (' + worst.annual_spend + '). SLA erosion at this spend level is both a performance and contract risk.',
+      action: 'Issue formal SLA improvement plan for ' + worst.name + '. Tie renewal pricing to measurable recovery milestones within 90 days.',
+      chartData: slaRisk.slice(0,5).map(function(x){
+        var col = x.sla_score < 82 ? '#DC2626' : '#D97706';
+        return { label: x.name.split(' ')[0], val: x.sla_score, color: col };
+      }),
+      score: 90
+    });
+  }
+
+  // 4 — HIGH DELIVERY RISK + HIGH SPEND
+  var delivRisk = d.withSpend.filter(function(x){ return x.delivery_risk > 50 && parseSpend(x.annual_spend) >= 2; });
+  delivRisk.sort(function(a,b){ return parseSpend(b.annual_spend)-parseSpend(a.annual_spend); });
+  if (delivRisk.length > 0) {
+    var drSpend = delivRisk.reduce(function(s,x){ return s+parseSpend(x.annual_spend); },0);
+    insights.push({
+      priority: 'warning',
+      metric: fmt(drSpend),
+      title: 'Delivery Risk Exposure',
+      body: delivRisk.length + ' vendor' + (delivRisk.length > 1 ? 's' : '') + ' with delivery risk >50 carry ' + fmt(drSpend) + ' combined. ' +
+        delivRisk.slice(0,2).map(function(x){ return x.name + ' (DR:' + x.delivery_risk + ')'; }).join(', ') + ' are highest-priority.',
+      action: 'Escalate SLA deficiencies through MSP governance track for MSP-engaged vendors. Add delivery risk KPIs to next CQBR cycle.',
+      chartData: delivRisk.slice(0,5).map(function(x){
+        var col = x.delivery_risk > 70 ? '#DC2626' : '#D97706';
+        return { label: x.name.split(' ')[0], val: x.delivery_risk, color: col };
+      }),
+      score: 75
+    });
+  }
+
+  // 5 — CLOUD OPTIMIZATION
+  if (d.cloudSpend > 10) {
+    var cloudPct = d.totalSpend > 0 ? Math.round(d.cloudSpend/d.totalSpend*100) : 0;
+    var savingsEst = Math.round(d.cloudSpend * 0.10 * 10) / 10;
+    insights.push({
+      priority: 'opportunity',
+      metric: fmt(savingsEst) + ' est.',
+      title: 'Cloud Optimization Window Open',
+      body: 'Cloud & Managed Services = ' + fmt(d.cloudSpend) + ' (' + cloudPct + '% of portfolio). AWS EDP and GCP CUD commitments are the highest-leverage levers. Benchmarks show 8–15% savings achievable through right-sizing and commitment alignment.',
+      action: 'Commission FinOps review on AWS and GCP. Present EDP/CUD optimization case before Q3 renewal window.',
+      chartData: [
+        { label: 'AWS',    val: 17.2, color: '#FF9900' },
+        { label: 'Google', val: 14.0, color: '#4285F4' },
+        { label: 'Azure',  val: 8.5,  color: '#0078D4' },
+        { label: 'Other',  val: 5.2,  color: '#6B7280' },
+      ],
+      score: 70
+    });
+  }
+
+  // 6 — SAAS RATIONALIZATION
+  if (d.saasSpend > 5) {
+    var saasPct = d.totalSpend > 0 ? Math.round(d.saasSpend/d.totalSpend*100) : 0;
+    var saasSav = Math.round(d.saasSpend * 0.12 * 10) / 10;
+    insights.push({
+      priority: 'opportunity',
+      metric: fmt(saasSav) + ' est.',
+      title: 'SaaS License Right-Sizing',
+      body: fmt(d.saasSpend) + ' (' + saasPct + '% of portfolio) across ' + (d.catCount['Software / SaaS'] || 0) + ' SaaS vendors. Seat audits typically surface 10–18% recoverable value through inactive-seat reclaim and tier downgrades.',
+      action: 'Run utilization pull on top 8 SaaS vendors before each renewal. Establish quarterly seat hygiene cadence.',
+      score: 65
+    });
+  }
+
+  // 7 — TIER 1 DEPENDENCY
+  var tier1Spend = d.withSpend.filter(function(x){ return x.tier===1; })
+    .reduce(function(s,x){ return s+parseSpend(x.annual_spend); },0);
+  var tier1Pct = d.totalSpend > 0 ? Math.round(tier1Spend/d.totalSpend*100) : 0;
+  if (tier1Pct > 60) {
+    insights.push({
+      priority: 'info',
+      metric: tier1Pct + '%',
+      title: 'Tier 1 Strategic Concentration',
+      body: 'Strategic vendors hold ' + tier1Pct + '% of portfolio spend (' + fmt(tier1Spend) + '). Each requires an active governance cadence, documented exit strategy, and 180-day notice enforcement.',
+      action: 'Confirm all Tier 1 vendors have active CQBR cadence, exit plan, and contractual notice period on file.',
+      score: 50
+    });
+  }
+
+
+  // Sort by score desc, take top 6
+  insights.sort(function(a,b){ return b.score - a.score; });
+  return insights.slice(0,6);
+}
+
+// ── RENDER SIGNAL CARDS ───────────────────────────────────────────────────
+var SIG_META = {
+  critical:    { cls:'sig-critical',    pcls:'p-critical',    ccls:'c-red'   },
+  warning:     { cls:'sig-warning',     pcls:'p-warning',     ccls:'c-amber' },
+  opportunity: { cls:'sig-opportunity', pcls:'p-opportunity', ccls:'c-green' },
+  info:        { cls:'sig-info',        pcls:'p-info',        ccls:'c-blue'  },
+};
+
+// Build a small inline SVG bar chart from an array of {label, val, color}
+function miniBarSVG(items, maxVal) {
+  var W = 220, H = 52, gap = 3;
+  var bW = Math.floor((W - gap*(items.length-1)) / items.length);
+  return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' +
+    items.map(function(item, i) {
+      var bH = Math.max(4, Math.round((item.val / maxVal) * (H - 14)));
+      var x = i * (bW + gap);
+      var y = H - 14 - bH;
+      return '<rect x="' + x + '" y="' + y + '" width="' + bW + '" height="' + bH + '" rx="2" fill="' + item.color + '" opacity="0.85"/>' +
+        '<text x="' + (x + bW/2) + '" y="' + (H - 2) + '" text-anchor="middle" font-size="7" fill="var(--ink4)" font-family="Segoe UI,Arial">' + item.label + '</text>';
+    }).join('') + '</svg>';
+}
+
+function renderInsights(insights) {
+  var grid = document.getElementById('signals-grid');
+  var statusEl = document.getElementById('signals-status');
+  if (!insights.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--ink4)">No significant signals detected.</div>';
+    if (statusEl) statusEl.textContent = 'No alerts';
+    return;
+  }
+
+  var critCount = insights.filter(function(i){ return i.priority==='critical'; }).length;
+  var warnCount = insights.filter(function(i){ return i.priority==='warning'; }).length;
+  var oppCount  = insights.filter(function(i){ return i.priority==='opportunity'; }).length;
+  if (statusEl) statusEl.textContent = critCount + ' Critical · ' + warnCount + ' Watch · ' + oppCount + ' Opportunities';
+
+  grid.innerHTML = insights.map(function(ins) {
+    var m = SIG_META[ins.priority] || SIG_META.info;
+    var priorityLabel = ins.priority.charAt(0).toUpperCase() + ins.priority.slice(1);
+
+    // Build a mini chart if the insight has chartData
+    var chartHtml = '';
+    if (ins.chartData && ins.chartData.length) {
+      var maxV = Math.max.apply(null, ins.chartData.map(function(d){ return d.val; }));
+      chartHtml = '<div class="sig-chart">' + miniBarSVG(ins.chartData, maxV) + '</div>';
+    }
+
+    return '<div class="signal-card ' + m.cls + '">' +
+      '<span class="sig-priority ' + m.pcls + '">' + priorityLabel + '</span>' +
+      '<div class="sig-metric ' + m.ccls + '">' + ins.metric + '</div>' +
+      '<div class="sig-title">' + ins.title + '</div>' +
+      chartHtml +
+      '<div class="sig-body">' + ins.body + '</div>' +
+      '<div class="sig-action">→ ' + ins.action + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ── RENDER CATEGORY CHART ─────────────────────────────────────────────────
+var CAT_COLORS = {
+  'Professional Services': '#0F1E3C',
+  'Software / SaaS':       '#0D9488',
+  'Cloud & Managed Services': '#2563EB',
+  'Contingent Workforce':  '#D97706',
+  'Hardware & Infrastructure': '#7C3AED'
+};
+
+function renderCatChart(catSpend) {
+  var entries = Object.keys(catSpend)
+    .filter(function(k){ return catSpend[k] > 0; })
+    .sort(function(a,b){ return catSpend[b] - catSpend[a]; });
+  var max = entries.length ? catSpend[entries[0]] : 1;
+  document.getElementById('cat-chart').innerHTML = entries.map(function(cat) {
+    var pct = Math.round(catSpend[cat] / max * 100);
+    var col = CAT_COLORS[cat] || '#6B7280';
+    return '<div class="cat-bar-row">' +
+      '<div class="cat-bar-label">' +
+        '<span class="cat-bar-name" title="' + cat + '">' + cat + '</span>' +
+        '<span class="cat-bar-val">' + fmt(catSpend[cat]) + '</span>' +
+      '</div>' +
+      '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
+    '</div>';
+  }).join('') || '<div style="color:var(--ink4);font-size:8pt">No spend data</div>';
+}
+
+// ── RENDER TIER DONUT ─────────────────────────────────────────────────────
+function renderDonut(tierCount) {
+  var total = Object.values(tierCount).reduce(function(s,v){ return s+v; },0);
+  var tiers = [
+    { label:'Tier 1 — Strategic',   key:1, color:'#0F1E3C' },
+    { label:'Tier 2 — Established', key:2, color:'#0D9488' },
+    { label:'Tier 3 — Specialized', key:3, color:'#D97706' },
+  ];
+  var cx = 80, cy = 80, r = 60, ri = 38;
+  var segments = '';
+  var angle = 0;
+  tiers.forEach(function(t) {
+    var n = tierCount[t.key] || 0;
+    var sweep = (n / total) * 2 * Math.PI;
+    var x1 = cx + r * Math.cos(angle);
+    var y1 = cy + r * Math.sin(angle);
+    var x2 = cx + r * Math.cos(angle + sweep);
+    var y2 = cy + r * Math.sin(angle + sweep);
+    var ix1 = cx + ri * Math.cos(angle);
+    var iy1 = cy + ri * Math.sin(angle);
+    var ix2 = cx + ri * Math.cos(angle + sweep);
+    var iy2 = cy + ri * Math.sin(angle + sweep);
+    var large = sweep > Math.PI ? 1 : 0;
+    var d = 'M ' + x1 + ' ' + y1 +
+      ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + x2 + ' ' + y2 +
+      ' L ' + ix2 + ' ' + iy2 +
+      ' A ' + ri + ' ' + ri + ' 0 ' + large + ' 0 ' + ix1 + ' ' + iy1 + ' Z';
+    segments += '<path d="' + d + '" fill="' + t.color + '" opacity="0.9"/>';
+    angle += sweep;
+  });
+  // Center text
+  segments += '<text x="' + cx + '" y="' + (cy-6) + '" text-anchor="middle" ' +
+    'font-size="18" font-weight="900" fill="var(--ink)" font-family="Segoe UI,Arial">' + total.toLocaleString() + '</text>' +
+    '<text x="' + cx + '" y="' + (cy+12) + '" text-anchor="middle" ' +
+    'font-size="9" fill="var(--ink4)" font-family="Segoe UI,Arial">vendors</text>';
+
+  document.getElementById('donut-svg').innerHTML = segments;
+
+  document.getElementById('donut-legend').innerHTML = tiers.map(function(t) {
+    var n = tierCount[t.key] || 0;
+    var pct = total > 0 ? Math.round(n/total*100) : 0;
+    return '<div class="legend-item">' +
+      '<span class="legend-dot" style="background:' + t.color + '"></span>' +
+      '<span class="legend-name">' + t.label + '</span>' +
+      '<span class="legend-val">' + n.toLocaleString() + '</span>' +
+      '<span class="legend-pct">(' + pct + '%)</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ── RENDER RISK DIST ──────────────────────────────────────────────────────
+function renderRiskDist(riskDist, total) {
+  var bands = [
+    { key:'high',   label:'At Risk',  color:'var(--red)'  },
+    { key:'medium', label:'Watch',    color:'var(--amber)'},
+    { key:'low',    label:'Healthy',  color:'var(--green)'},
+  ];
+  document.getElementById('risk-dist').innerHTML = bands.map(function(b) {
+    var n = riskDist[b.key] || 0;
+    var pct = total > 0 ? Math.round(n/total*100) : 0;
+    return '<div class="rdbar-row">' +
+      '<span class="rdbar-lbl">' + b.label + '</span>' +
+      '<div class="rdbar-track"><div class="rdbar-fill" style="width:' + Math.max(pct,3) + '%;background:' + b.color + '">' +
+        (pct > 10 ? pct + '%' : '') + '</div></div>' +
+      '<span class="rdbar-cnt">' + n.toLocaleString() + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ── RENDER AVG RISK BY CATEGORY ───────────────────────────────────────────
+function renderAvgRisk(catRiskSum, catRiskCnt) {
+  var entries = Object.keys(catRiskSum).map(function(k) {
+    return { cat: k, avg: Math.round(catRiskSum[k] / catRiskCnt[k]) };
+  }).sort(function(a,b){ return b.avg - a.avg; });
+
+  document.getElementById('avg-risk-list').innerHTML = entries.map(function(e) {
+    var col = e.avg <= 33 ? 'var(--green)' : e.avg <= 66 ? 'var(--amber)' : 'var(--red)';
+    var shortCat = e.cat.replace('Cloud & Managed Services','Cloud')
+      .replace('Hardware & Infrastructure','Hardware')
+      .replace('Contingent Workforce','Contingent WF')
+      .replace('Professional Services','Prof. Services');
+    return '<div style="display:flex;align-items:center;gap:6px;font-size:7.5pt;">' +
+      '<span style="flex:1;color:var(--ink3)">' + shortCat + '</span>' +
+      '<div style="width:60px;background:var(--gray2);border-radius:3px;height:5px">' +
+        '<div style="width:' + e.avg + '%;height:5px;border-radius:3px;background:' + col + '"></div>' +
+      '</div>' +
+      '<span style="font-weight:800;color:' + col + ';width:22px;text-align:right">' + e.avg + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ── BRANDFETCH LOGO ───────────────────────────────────────────────────────
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+function vlogoErr(img){ img.style.display='none'; var fb=img.nextElementSibling; if(fb) fb.style.display='flex'; }
+function vlogoOk(img){ var fb=img.nextElementSibling; if(fb) fb.style.display='none'; }
+function vendorLogo(domain, name, size) {
+  size = size || 28;
+  var ini = (name||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+  var pal = ['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB'];
+  var lc  = pal[(name||'').length % pal.length];
+  var sz  = size+'px'; var r = size<=32?'6':'10';
+  var bs  = 'width:'+sz+';height:'+sz+';border-radius:'+r+'px;flex-shrink:0;';
+  var fs  = Math.round(size*0.3)+'pt';
+  var fb  = '<div style="'+bs+'background:'+lc+';display:none;align-items:center;justify-content:center;font-size:'+fs+';font-weight:900;color:#fff;font-family:Arial;">'+ini+'</div>';
+  if(!domain) return '<div style="'+bs+'background:'+lc+';display:flex;align-items:center;justify-content:center;font-size:'+fs+';font-weight:900;color:#fff;font-family:Arial;">'+ini+'</div>';
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'" alt="'+name.replace(/"/g,'')+'" style="'+bs+'object-fit:contain;background:#fff;padding:2px;" onerror="vlogoErr(this)" onload="vlogoOk(this)">'+fb;
+}
+
+// ── VENDOR DOMAIN LOOKUP ──────────────────────────────────────────────────
+var VENDOR_DOMAINS = {
+  'Salesforce':'salesforce.com','ServiceNow':'servicenow.com','Workday':'workday.com',
+  'Microsoft':'microsoft.com','SAP':'sap.com','Oracle':'oracle.com','IBM':'ibm.com',
+  'Accenture':'accenture.com','Cognizant':'cognizant.com','Infosys':'infosys.com',
+  'Wipro':'wipro.com','TCS':'tcs.com','Capgemini':'capgemini.com','HCLTech':'hcltech.com',
+  'Deloitte':'deloitte.com','PwC':'pwc.com','KPMG':'kpmg.com','EY':'ey.com',
+  'Gartner':'gartner.com','Coupa':'coupa.com','Verint':'verint.com','Genesys':'genesys.com',
+  'Snowflake':'snowflake.com','Tableau':'tableau.com','MuleSoft':'mulesoft.com',
+  'Adobe':'adobe.com','DocuSign':'docusign.com','Zoom':'zoom.us','Slack':'slack.com',
+  'OpenAI':'openai.com','Anthropic':'anthropic.com','Cohere':'cohere.com',
+  'DataRobot':'datarobot.com','Glean':'glean.com','Writer':'writer.com',
+  'GitHub':'github.com','Google':'google.com','AWS':'aws.amazon.com','Azure':'azure.microsoft.com',
+  'Palo Alto Networks':'paloaltonetworks.com','CrowdStrike':'crowdstrike.com',
+  'Okta':'okta.com','Splunk':'splunk.com','Zscaler':'zscaler.com',
+  'Broadcom':'broadcom.com','VMware':'vmware.com','Nutanix':'nutanix.com',
+  'NetApp':'netapp.com','Pure Storage':'purestorage.com','Dell':'dell.com','HP':'hp.com',
+  'Cisco':'cisco.com','Juniper':'juniper.net','F5':'f5.com',
+  'NTT Data':'nttdata.com','NTT':'nttdata.com',
+  'BCG':'bcg.com','Boston Consulting':'bcg.com',
+  'WWT (World Wide Technology)':'wwt.com','WWT':'wwt.com','World Wide Technology':'wwt.com',
+  'Computacenter':'computacenter.com','StaffUp':'staffup.com',
+  'Kforce':'kforce.com','Randstad':'randstad.com','Insight Direct':'insight.com',
+  'Insight':'insight.com','Lumen':'lumen.com','CenturyLink':'lumen.com',
+  'Tech Mahindra':'techmahindra.com','TechM':'techmahindra.com'
+};
+function vendorDomain(name) {
+  if (!name) return null;
+  if (VENDOR_DOMAINS[name]) return VENDOR_DOMAINS[name];
+  // exact-key substring match, longest key first to avoid short keys shadowing longer ones
+  var keys = Object.keys(VENDOR_DOMAINS).sort(function(a,b){ return b.length - a.length; });
+  var key = keys.find(function(k){ return name.toLowerCase().indexOf(k.toLowerCase()) >= 0; });
+  return key ? VENDOR_DOMAINS[key] : null;
+}
+
+// ── RENDER OPPORTUNITY CARDS ──────────────────────────────────────────────
+function renderOppTable(vendors) {
+  function getSignals(v) {
+    var sigs = [];
+    if (v.sla_score < 87) sigs.push({ label:'SLA Below Target', cls:'flag-red' });
+    if (v.delivery_risk > 50) sigs.push({ label:'Delivery Risk', cls:'flag-amber' });
+    if (v.concentration_risk > 70) sigs.push({ label:'Concentration', cls:'flag-amber' });
+    var days = daysUntil(v.renewal_date);
+    if (days !== null && days >= 0 && days <= 90) sigs.push({ label:'Renewing ≤90d', cls:'flag-red' });
+    else if (days !== null && days >= 0 && days <= 180) sigs.push({ label:'Renewing ≤180d', cls:'flag-amber' });
+    if (v.financial_risk > 35) sigs.push({ label:'Financial Risk', cls:'flag-amber' });
+    if (v.status === 'Under Review') sigs.push({ label:'Under Review', cls:'flag-purple' });
+    return sigs;
+  }
+
+  function getAction(v) {
+    if (v.sla_score < 82) return '<strong>SLA Plan:</strong> Issue improvement notice; tie renewal to measurable recovery milestones';
+    if (v.delivery_risk > 65) {
+      if (/tech mahindra/i.test(v.name)) return '<strong>Governance Action:</strong> Engaged under MSP — escalate SLA deficiencies through MSP governance track before renewal';
+      return '<strong>SOW Restructure:</strong> Convert T&M scope to milestone-based SOW before renewal';
+    }
+    if (v.concentration_risk > 80) return '<strong>Dual-Source:</strong> Build competitive alternative; enforce dual-source policy';
+    var days = daysUntil(v.renewal_date);
+    if (days !== null && days <= 90) return '<strong>Urgent:</strong> Initiate commercial strategy now — renewal window closing';
+    if (days !== null && days <= 180) return '<strong>Prep Now:</strong> Begin negotiation and benchmark current rate card';
+    if (v.status === 'Under Review') return '<strong>Freeze:</strong> No discretionary spend expansion until review resolves';
+    return '<strong>Monitor:</strong> Quarterly CQBR — no immediate action required';
+  }
+
+  var flagged = vendors
+    .filter(function(v){ return parseSpend(v.annual_spend) > 0 && getSignals(v).length > 0; })
+    .sort(function(a,b){ return parseSpend(b.annual_spend) - parseSpend(a.annual_spend); });
+
+  // KPI tiles
+  var flaggedTotal = flagged.reduce(function(s,v){ return s+parseSpend(v.annual_spend); },0);
+  var renew90count = flagged.filter(function(v){ var d=daysUntil(v.renewal_date); return d!==null&&d>=0&&d<=90; }).length;
+  var kpiFlagged = document.getElementById('opp-kpi-flagged');
+  var kpiSpend   = document.getElementById('opp-kpi-spend');
+  var kpiRenew   = document.getElementById('opp-kpi-renew90');
+  if (kpiFlagged) kpiFlagged.textContent = flagged.length;
+  if (kpiSpend)   kpiSpend.textContent   = fmt(flaggedTotal);
+  if (kpiRenew)   kpiRenew.textContent   = renew90count;
+
+  if (!flagged.length) {
+    document.getElementById('opp-cards').innerHTML =
+      '<div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--ink4);font-size:8.5pt;">No flagged vendors for current filter selection.</div>';
+    return;
+  }
+
+  var riskColors = { low:'var(--green)', medium:'var(--amber)', high:'var(--red)' };
+  var TOP = 9;
+  var visible = flagged.slice(0, TOP);
+  var hidden  = flagged.slice(TOP);
+
+  function buildCard(v, extraCls) {
+    var sigs = getSignals(v);
+    var days = daysUntil(v.renewal_date);
+    var daysLabel = days !== null ? (days < 0 ? 'Expired' : days + 'd') : '—';
+    var rb = riskBand(v.risk_score);
+    var spendColor = rb === 'high' ? 'var(--red)' : rb === 'medium' ? 'var(--amber)' : 'var(--green)';
+    var dom = vendorDomain(v.name);
+    var logoHtml = '<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;overflow:hidden;flex-shrink:0;">'
+      + vendorLogo(dom, v.name, 28) + '</span>';
+    return '<div class="opp-card' + (extraCls ? ' ' + extraCls : '') + '">' +
+      '<div style="display:flex;align-items:center;gap:9px;margin-bottom:4px;">' + logoHtml + '<div class="opp-card-vendor" style="margin-bottom:0;">' + v.name + '</div></div>' +
+      '<div class="opp-card-meta">' + v.category + ' · ' + (v.region || 'Global') +
+        (v.renewal_date ? ' · <span style="color:' + (days !== null && days <= 90 ? 'var(--red)' : 'var(--ink4)') + '">' + daysLabel + ' to renewal</span>' : '') +
+      '</div>' +
+      '<div class="opp-card-spend" style="color:' + spendColor + '">' + (v.annual_spend || '—') + '</div>' +
+      '<div class="opp-card-signals">' + sigs.map(function(s){ return '<span class="opp-flag ' + s.cls + '">' + s.label + '</span>'; }).join('') + '</div>' +
+      '<div class="opp-card-action">' + getAction(v) + '</div>' +
+    '</div>';
+  }
+
+  var container = document.getElementById('opp-cards');
+  container.innerHTML =
+    visible.map(function(v){ return buildCard(v); }).join('') +
+    (hidden.length
+      ? '<div class="opp-card opp-card-more"><button type="button" class="opp-show-more" id="opp-expand-btn" onclick="expandOppCards()">+ Show ' + hidden.length + ' more vendors</button></div>'
+      : '');
+
+  if (hidden.length) {
+    var hiddenGrid = document.createElement('div');
+    hiddenGrid.id = 'opp-hidden-cards';
+    hiddenGrid.style.cssText = 'display:none;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;';
+    hiddenGrid.innerHTML = hidden.map(function(v){ return buildCard(v); }).join('');
+    container.parentElement.insertBefore(hiddenGrid, container.nextSibling);
+  }
+}
+
+window.expandOppCards = function() {
+  var hidden = document.getElementById('opp-hidden-cards');
+  var btn    = document.getElementById('opp-expand-btn');
+  if (!hidden) return;
+  var isOpen = hidden.style.display === 'grid';
+  hidden.style.display = isOpen ? 'none' : 'grid';
+  if (btn) btn.textContent = isOpen ? '+ Show ' + hidden.children.length + ' more vendors' : '− Show less';
+};
+
+// ── COUPA ENRICHMENT ─────────────────────────────────────────────────────
+// Enrich VER_VENDORS with real Coupa FY27 actuals where names match
+function enrichWithCoupa(vendors) {
+  if (!window.VER_COUPA) return vendors;
+  // Build lookup: normalize name → coupa row
+  var lookup = {};
+  window.VER_COUPA.vendors.forEach(function(c) {
+    lookup[c.n.toLowerCase()] = c;
+  });
+  // Aliases for common name mismatches between vendor platform and Coupa
+  var ALIASES = {
+    'tech mahindra':    'techm',
+    'google cloud':     'google',
+    'microsoft azure':  'microsoft',
+    'ntt data':         'ntt data',
+    'aws':              'aws',
+    'google':           'google',
+    'wwd':              'wwt',
+    'world wide technology': 'wwt',
+    'dell technologies': 'dell',
+    'hp inc.':          'hp inc',
+    'insight direct':   'insight direct',
+    'insight global':   'insight global',
+    'commoneo':         'commeneo',
+    'icloud nexus':     'icloudnexus',
+    'xebia':            'xebia',
+    'rackspace':        'rackspace',
+  };
+  return vendors.map(function(v) {
+    var key = v.name.toLowerCase();
+    var c = lookup[key] || lookup[ALIASES[key]] || null;
+    if (c && c.fy27 > 0) {
+      return Object.assign({}, v, {
+        annual_spend: '$' + c.fy27.toFixed(2) + 'M',
+        _fy26: c.fy26,
+        _fy27: c.fy27,
+        _pillar: c.pillar,
+        _coupa_cat: c.cat,
+        _coupa_region: c.region,
+        _has_coupa: true
+      });
+    }
+    return v;
+  });
+}
+
+// ── COUPA CHARTS (real actuals) ───────────────────────────────────────────
+function renderCoupaCatChart() {
+  if (!window.VER_COUPA) return;
+  var cats = window.VER_COUPA.by_category;
+  var entries = Object.keys(cats).sort(function(a,b){ return cats[b]-cats[a]; });
+  var max = cats[entries[0]] || 1;
+  var COUPA_COLORS = {
+    'Software':           '#0D9488',
+    'CWF':                '#0F1E3C',
+    'Hardware':           '#7C3AED',
+    'CWF - Maintenance':  '#D97706',
+    'Cabling':            '#2563EB',
+    'Telecom':            '#059669',
+  };
+  document.getElementById('cat-chart').innerHTML = entries.map(function(cat) {
+    var pct = Math.round(cats[cat] / max * 100);
+    var col = COUPA_COLORS[cat] || '#6B7280';
+    var yoy = null;
+    return '<div class="cat-bar-row">' +
+      '<div class="cat-bar-label">' +
+        '<span class="cat-bar-name" title="' + cat + '">' + cat + '</span>' +
+        '<span class="cat-bar-val">$' + cats[cat].toFixed(1) + 'M</span>' +
+      '</div>' +
+      '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderCoupaPillarChart() {
+  // Replace tier donut with pillar breakdown using real Coupa data
+  if (!window.VER_COUPA) return;
+  var pillars = window.VER_COUPA.by_pillar;
+  var total = Object.values(pillars).reduce(function(s,v){ return s+v; }, 0);
+  var PCOLS = ['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669'];
+  var entries = Object.keys(pillars).sort(function(a,b){ return pillars[b]-pillars[a]; });
+  var cx = 80, cy = 80, r = 60, ri = 36;
+  var segments = ''; var angle = -Math.PI/2;
+  entries.forEach(function(p, i) {
+    var sweep = (pillars[p] / total) * 2 * Math.PI;
+    var x1 = cx + r * Math.cos(angle), y1 = cy + r * Math.sin(angle);
+    var x2 = cx + r * Math.cos(angle+sweep), y2 = cy + r * Math.sin(angle+sweep);
+    var ix1 = cx + ri * Math.cos(angle), iy1 = cy + ri * Math.sin(angle);
+    var ix2 = cx + ri * Math.cos(angle+sweep), iy2 = cy + ri * Math.sin(angle+sweep);
+    var large = sweep > Math.PI ? 1 : 0;
+    segments += '<path d="M '+x1+' '+y1+' A '+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+
+      ' L '+ix2+' '+iy2+' A '+ri+' '+ri+' 0 '+large+' 0 '+ix1+' '+iy1+' Z" fill="'+PCOLS[i%PCOLS.length]+'" opacity="0.9"/>';
+    angle += sweep;
+  });
+  segments += '<text x="'+cx+'" y="'+(cy-6)+'" text-anchor="middle" font-size="13" font-weight="900" fill="var(--ink)" font-family="Segoe UI,Arial">$295M</text>'+
+    '<text x="'+cx+'" y="'+(cy+11)+'" text-anchor="middle" font-size="8" fill="var(--ink4)" font-family="Segoe UI,Arial">FY27 Total</text>';
+  document.getElementById('donut-svg').innerHTML = segments;
+  document.getElementById('donut-legend').innerHTML = entries.map(function(p,i){
+    var pct = Math.round(pillars[p]/total*100);
+    return '<div class="legend-item"><span class="legend-dot" style="background:'+PCOLS[i%PCOLS.length]+'"></span>'+
+      '<span class="legend-name">'+p+'</span><span class="legend-val">$'+pillars[p].toFixed(1)+'M</span>'+
+      '<span class="legend-pct">('+pct+'%)</span></div>';
+  }).join('');
+}
+
+// ── SCENARIO BUILDER ──────────────────────────────────────────────────────
+var SPEND_BY_CAT = {};
+
+// ── HERO KPIs ─────────────────────────────────────────────────────────────
+function renderHeroKPIs(d) {
+  var total    = window.VER_COUPA ? window.VER_COUPA.total_fy27 : d.totalSpend;
+  // Renewal exposure: Workday ($23.7M due Nov 2026), Microsoft ($2.8M Jun 2026), BCG ($6M Jun 2026) + others
+  var renewExp = window.VER_COUPA ? 42.3 : d.renewSpend180;
+  // At-risk: vendors with risk_score > 66 cross-referenced with coupa spend
+  var atRisk   = window.VER_COUPA ? 8.9 : d.atRiskSpend;  // TechM + BCG with high delivery risk
+  // Savings opportunity: cloud 8% + SaaS 12% + PS 8% on real numbers
+  var savingsOpp = (17.17 + 14.0) * 0.08 + 155.19 * 0.10 + (87.29 + 9.52) * 0.06;
+  var withSpend  = window.VER_COUPA ? window.VER_COUPA.vendors.length : d.withSpend.length;
+
+  document.getElementById('kpi-spend').textContent         = '$' + total.toFixed(1) + 'M';
+  document.getElementById('kpi-renew-exp').textContent     = '$' + renewExp.toFixed(1) + 'M';
+  document.getElementById('kpi-at-risk-spend').textContent = '$' + atRisk.toFixed(1) + 'M';
+  document.getElementById('kpi-savings-opp').textContent   = '$' + savingsOpp.toFixed(1) + 'M';
+  document.getElementById('kpi-vendors-spend').textContent = withSpend;
+}
+
+// ── VIEW FILTER ───────────────────────────────────────────────────────────
+function applyView() {
+  var cat  = document.getElementById('ctrl-cat').value;
+  var tier = document.getElementById('ctrl-tier').value;
+  var filtered = ALL.filter(function(v) {
+    if (cat  && v.category !== cat) return false;
+    if (tier && v.tier != tier) return false;
+    return true;
+  });
+  var d = compute(filtered);
+  renderInsights(generateInsights(d));
+  if (!window.VER_COUPA) renderCatChart(d.catSpend);
+  renderDonut(d.tierCount);
+  renderRiskDist(d.riskDist, filtered.length);
+  renderAvgRisk(d.catRiskSum, d.catRiskCnt);
+  renderOppTable(filtered);
+}
+
+// ── DARK MODE ─────────────────────────────────────────────────────────────
+function toggleDark() {
+  var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem('ver-theme', t); } catch(e) {}
+  document.getElementById('dm-btn').textContent = t === 'dark' ? '☀ Light Mode' : '☽ Dark Mode';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+(function() {
+  var t; try { t = localStorage.getItem('ver-theme'); } catch(e) {}
+  if (!t) t = window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('dm-btn').textContent = t === 'dark' ? '☀ Light Mode' : '☽ Dark Mode';
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+  (window._coupaLiveFetch || Promise.resolve(null)).then(function(liveData) {
+    var badge = document.getElementById('coupa-live-badge');
+    if (liveData && liveData.total_fy27 > 0) {
+      window.VER_COUPA = liveData;
+      if (badge) {
+        badge.style.background = '#052e16';
+        badge.style.border = '1px solid #34d399';
+        badge.style.color = '#34d399';
+        badge.textContent = '● LIVE · Coupa';
+      }
+    } else {
+      if (badge) {
+        badge.style.background = '#F3F4F6';
+        badge.style.border = '1px solid #D1D5DB';
+        badge.style.color = '#6B7280';
+        badge.textContent = '○ Static · FY27 Snapshot';
+      }
+    }
+
+    if (!window.VER_VENDORS || !window.VER_VENDORS.length) {
+      var errEl = document.createElement('div');
+      errEl.style.cssText = 'padding:30px;text-align:center;color:var(--ink4);grid-column:1/-1';
+      errEl.textContent = '⚠️ vendors.js not loaded';
+      document.getElementById('insights-grid').appendChild(errEl);
+      return;
+    }
+
+    // Enrich vendor data with real Coupa actuals
+    ALL = enrichWithCoupa(window.VER_VENDORS);
+    var d = compute(ALL);
+
+    // Analysis stamp — show Coupa data source if loaded
+    var isLive = window.VER_COUPA && window.VER_COUPA._live;
+    var src = window.VER_COUPA
+      ? (isLive ? 'Coupa Live · ' : 'Coupa FY27 Actuals · ') + window.VER_COUPA.vendors.length + ' vendors · $' + window.VER_COUPA.total_fy27.toFixed(1) + 'M total spend'
+      : 'Estimated spend · ' + ALL.length.toLocaleString() + ' vendors';
+    document.getElementById('analysis-stamp').textContent =
+      'Analysis ' + new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + src;
+
+    // Save spend by cat for scenario fallback
+    Object.keys(d.catSpend).forEach(function(k){ SPEND_BY_CAT[k] = d.catSpend[k]; });
+
+    renderHeroKPIs(d);
+
+    // Update AI context pills with real data
+    var ctxV = document.getElementById('ctx-vendors');
+    var ctxS = document.getElementById('ctx-spend');
+    var isLiveCtx = window.VER_COUPA && window.VER_COUPA._live;
+    if (ctxV) ctxV.textContent = (window.VER_COUPA ? window.VER_COUPA.vendors.length : ALL.length) + ' Vendors' + (isLiveCtx ? ' · Live' : ' Loaded');
+    if (ctxS) ctxS.textContent = '$' + (window.VER_COUPA ? window.VER_COUPA.total_fy27.toFixed(1) : d.totalSpend.toFixed(1)) + 'M' + (isLiveCtx ? ' · Coupa Live' : ' FY27 Spend');
+
+    renderInsights(generateInsights(d));
+
+    // Charts: use Coupa actuals where available
+    if (window.VER_COUPA) {
+      renderCoupaCatChart();
+      renderCoupaPillarChart();
+    } else {
+      renderCatChart(d.catSpend);
+      renderDonut(d.tierCount);
+    }
+
+    renderRiskDist(d.riskDist, ALL.length);
+    renderAvgRisk(d.catRiskSum, d.catRiskCnt);
+    renderOppTable(ALL);
+
+    // Update CTA savings figure from real actuals
+    var cloudActual = 17.17 + 14.00;
+    var psActual    = 22.84 + 9.47 + 9.10 + 5.97 + 5.06;
+    var coupa       = window.VER_COUPA ? window.VER_COUPA.by_category : null;
+    var saasActual  = coupa ? (coupa['Software / SaaS'] || coupa['Software'] || 0) : 155.19;
+    var cwActual    = coupa ? (coupa['Contingent Workforce'] || coupa['CWF'] || 0) : 96.81;
+    var ctaSavings  = cloudActual * 0.08 + psActual * 0.10 + saasActual * 0.12 + cwActual * 0.05;
+    var ctaEl = document.getElementById('cta-savings');
+    if (ctaEl) ctaEl.textContent = '$' + ctaSavings.toFixed(1) + 'M';
+  });
+});
+</script>
+
+<script>
+(function() {
+  var SUGGESTED = [
+    'Which vendors represent the highest concentration risk in my portfolio?',
+    'What savings opportunities should I prioritize this quarter?',
+    'Summarize my renewal exposure in the next 180 days.',
+    'Which vendors have the worst SLA scores relative to their spend?',
+    'Draft an executive summary of portfolio risk for a leadership briefing.'
+  ];
+
+  var chipsEl = document.getElementById('agent-chips');
+  var chipsVisible = true;
+
+  SUGGESTED.forEach(function(q) {
+    var chip = document.createElement('button');
+    chip.className = 'agent-chip';
+    chip.textContent = q;
+    chip.onclick = function() {
+      if (chipsVisible) {
+        chipsEl.style.display = 'none';
+        var greet = document.getElementById('agent-greeting');
+        if (greet) greet.style.display = 'none';
+        chipsVisible = false;
+      }
+      var modal = document.getElementById('agent-modal');
+      var isModalOpen = modal && modal.style.display === 'flex';
+      if (isModalOpen) {
+        var modalInput = document.getElementById('agent-modal-input');
+        modalInput.value = q;
+        modalInput.focus();
+      } else {
+        document.getElementById('ai-input').value = q;
+        document.getElementById('ai-input').focus();
+      }
+    };
+    chipsEl.appendChild(chip);
+  });
+
+  var VENDY_POSE = {
+    wave: 'assets/vendy-agent.png',
+    thinking: 'assets/vendy-penguin-thinking.png',
+    working: 'assets/vendy-penguin-working.png',
+    celebrating: 'assets/vendy-penguin-celebrating.png',
+    alert: 'assets/vendy-penguin-alert.png'
+  };
+
+  function addBubble(role, text) {
+    var msgs = document.getElementById('agent-messages');
+    if (chipsVisible && role === 'user') {
+      chipsEl.style.display = 'none';
+      var greet = document.getElementById('agent-greeting');
+      if (greet) greet.style.display = 'none';
+      chipsVisible = false;
+    }
+    var row = document.createElement('div');
+    row.className = 'chat-row' + (role === 'user' ? ' user' : '');
+    var av = document.createElement('div');
+    av.className = 'bubble-avatar ' + (role === 'user' ? 'user-av' : 'agent-av');
+    var avImg = null;
+    if (role === 'user') {
+      av.textContent = 'You';
+    } else {
+      avImg = document.createElement('img');
+      avImg.src = VENDY_POSE.wave;
+      avImg.alt = 'Vendy';
+      av.appendChild(avImg);
+    }
+    var bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + role;
+    if (role === 'agent') {
+      var lbl = document.createElement('div');
+      lbl.className = 'chat-bubble-label';
+      lbl.textContent = 'Vendy · VER Agent';
+      bubble.appendChild(lbl);
+      var body = document.createElement('div');
+      body.className = 'chat-bubble-text';
+      body.id = 'agent-resp-body-' + Date.now();
+      bubble.appendChild(body);
+    } else {
+      bubble.textContent = text;
+    }
+    row.appendChild(av);
+    row.appendChild(bubble);
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+    return { bubble: bubble, avatarImg: avImg };
+  }
+
+  function getSessionId() {
+    var key = 'ver_agent_session_id';
+    var id = localStorage.getItem(key);
+    if (!id) {
+      id = 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem(key, id);
+    }
+    return id;
+  }
+
+  function streamFromSSE(response, onEvent) {
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+    return reader.read().then(function process(result) {
+      if (result.done) return;
+      buffer += decoder.decode(result.value, { stream: true });
+      var chunks = buffer.split('\n\n');
+      buffer = chunks.pop();
+      chunks.forEach(function(chunk) {
+        var line = chunk.split('\n').find(function(l){ return l.indexOf('data: ') === 0; });
+        if (!line) return;
+        try { onEvent(JSON.parse(line.slice(6))); } catch (_) {}
+      });
+      return reader.read().then(process);
+    });
+  }
+
+  window.sendAIQuery = async function() {
+    var input = document.getElementById('ai-input');
+    var sendBtn = document.getElementById('ai-send');
+    var q = (input.value||'').trim();
+    if (!q) return;
+
+    input.value = '';
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '&#10148;';
+
+    addBubble('user', q);
+    var agentResult = addBubble('agent', '');
+    var bodyEl = agentResult.bubble.querySelector('[id^="agent-resp-body-"]');
+    var vendyImg = agentResult.avatarImg;
+    function setVendyPose(pose) { if (vendyImg) vendyImg.src = VENDY_POSE[pose]; }
+    setVendyPose('thinking');
+    bodyEl.textContent = 'Analyzing…';
+
+    var firstDelta = true;
+    fetch('/api/agent/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: getSessionId(),
+        message: q,
+        pageContext: 'spend_analysis'
+      })
+    }).then(function(response) {
+      if (!response.ok) throw new Error('Agent endpoint returned ' + response.status);
+      return streamFromSSE(response, function(evt) {
+        if (!evt || !evt.type) return;
+        if (evt.type === 'status') {
+          setVendyPose('thinking');
+          bodyEl.textContent = evt.text || 'Analyzing…';
+        } else if (evt.type === 'delta') {
+          if (firstDelta) { setVendyPose('working'); firstDelta = false; }
+          if ((bodyEl.textContent || '').indexOf('Analyzing') === 0) bodyEl.textContent = '';
+          bodyEl.textContent += (evt.delta || '');
+          var msgs = document.getElementById('agent-messages');
+          if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        } else if (evt.type === 'error') {
+          setVendyPose('alert');
+          bodyEl.style.color = '#dc2626';
+          bodyEl.textContent = 'Agent error: ' + (evt.error || 'Unknown error');
+        } else if (evt.type === 'done') {
+          setVendyPose('wave');
+          sendBtn.disabled = false;
+          sendBtn.innerHTML = '&#10148;';
+        }
+      });
+    }).catch(function(err) {
+      setVendyPose('alert');
+      bodyEl.style.color = '#dc2626';
+      bodyEl.textContent = 'Unable to reach VER agent: ' + err.message;
+    }).finally(function() {
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = '&#10148;';
+    });
+  };
+
+  document.getElementById('ai-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAIQuery(); }
+  });
+})();
+</script>
+<script>
+function _mapCoupaCategory(top, second) {
+  var t=(top||'').toLowerCase(), s=(second||'').toLowerCase();
+  if(t==='hr') return 'Contingent Workforce';
+  if(t==='proserv') return 'Professional Services';
+  if(t==='tech'&&(s==='enterprisehw'||s==='datacenter'||s==='telecom'||s==='leasehold')) return 'Hardware & Infrastructure';
+  if(t==='tech') return 'Cloud & Managed Services';
+  if(t==='software') return 'Software / SaaS';
+  return 'Professional Services';
+}
+function _mapCoupaPillar(top, second) {
+  var t=(top||'').toLowerCase(), s=(second||'').toLowerCase();
+  if(t==='hr') return 'CWF';
+  if(t==='tech'&&s==='datacenter') return 'Infrastructure';
+  if(t==='tech') return 'Technology';
+  if(t==='software') return 'Software';
+  if(t==='proserv') return 'Professional Services';
+  return 'Other';
+}
+function _buildCoupaFromPOs(pos) {
+  var vendorMap={}, catMap={}, pillarMap={}, total=0;
+  pos.forEach(function(po) {
+    if(!po.currency||po.currency.code!=='USD') return;
+    var amt=parseFloat(po.total||0)/1000000;
+    if(amt<=0) return;
+    var name=(po.supplier&&po.supplier['display-name'])||'Unknown';
+    var lines=(po['requisition-header']&&po['requisition-header']['requisition-lines'])||[];
+    var hier=(lines.length&&lines[0].commodity&&lines[0].commodity['custom-fields']&&lines[0].commodity['custom-fields']['concatenated-category'])||'';
+    var parts=hier.split('.');
+    var verCat=_mapCoupaCategory(parts[0],parts[1]);
+    var verPillar=_mapCoupaPillar(parts[0],parts[1]);
+    if(!vendorMap[name]) vendorMap[name]={n:name,fy27:0,fy26:0,cat:verCat,pillar:verPillar,region:'AMER'};
+    vendorMap[name].fy27+=amt;
+    catMap[verCat]=(catMap[verCat]||0)+amt;
+    pillarMap[verPillar]=(pillarMap[verPillar]||0)+amt;
+    total+=amt;
+  });
+  var vendors=Object.keys(vendorMap).map(function(k){return vendorMap[k];})
+    .filter(function(v){return v.fy27>0;})
+    .sort(function(a,b){return b.fy27-a.fy27;});
+  return {total_fy27:total, vendors:vendors, by_category:catMap, by_pillar:pillarMap, _live:true};
+}
+window._coupaLiveFetch = (function() {
+  var all = [];
+  var MAX_PAGES = 10;
+  function fetchPage(offset, page) {
+    return fetch('/api/coupa/purchase_orders?limit=50&offset=' + offset)
+      .then(function(r) { return r.ok ? r.json() : Promise.reject('HTTP ' + r.status); })
+      .then(function(rows) {
+        rows = Array.isArray(rows) ? rows : [];
+        all = all.concat(rows);
+        if (rows.length === 50 && page < MAX_PAGES) return fetchPage(offset + 50, page + 1);
+        return all;
+      });
+  }
+  return fetchPage(0, 1)
+    .then(function(pos) { var b = _buildCoupaFromPOs(pos); return b.total_fy27 > 0 ? b : null; })
+    .catch(function() { return null; });
+})();
+
+window.refreshFromCoupa = function() {
+  var btn = document.getElementById('coupa-refresh-btn');
+  var badge = document.getElementById('coupa-live-badge');
+  btn.disabled = true;
+  btn.textContent = '⟳ Fetching…';
+  badge.style.background = 'var(--gray2)';
+  badge.style.border = '1px solid var(--border2)';
+  badge.style.color = 'var(--ink4)';
+  badge.textContent = '● Connecting…';
+
+  var all = [];
+  var MAX_PAGES = 10;
+  function fetchPage(offset, page) {
+    return fetch('/api/coupa/purchase_orders?limit=50&offset=' + offset)
+      .then(function(r) { return r.ok ? r.json() : Promise.reject('HTTP ' + r.status); })
+      .then(function(rows) {
+        rows = Array.isArray(rows) ? rows : [];
+        all = all.concat(rows);
+        btn.textContent = '⟳ Fetching… (' + all.length + ')';
+        if (rows.length === 50 && page < MAX_PAGES) return fetchPage(offset + 50, page + 1);
+        return all;
+      });
+  }
+
+  fetchPage(0, 1)
+    .then(function(pos) {
+      var b = _buildCoupaFromPOs(pos);
+      if (b && b.total_fy27 > 0) {
+        window.VER_COUPA = b;
+        badge.style.background = '#052e16';
+        badge.style.border = '1px solid #34d399';
+        badge.style.color = '#34d399';
+        badge.textContent = '● LIVE · Coupa';
+        btn.textContent = '✓ Refreshed';
+        // Re-run full page render with live data
+        ALL = enrichWithCoupa(window.VER_VENDORS);
+        var d = compute(ALL);
+        var isLive = true;
+        document.getElementById('analysis-stamp').textContent =
+          'Refreshed ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) + ' · Coupa Live · ' + b.vendors.length + ' vendors · $' + b.total_fy27.toFixed(1) + 'M total spend';
+        var ctxV = document.getElementById('ctx-vendors');
+        var ctxS = document.getElementById('ctx-spend');
+        if (ctxV) ctxV.textContent = b.vendors.length + ' Vendors · Live';
+        if (ctxS) ctxS.textContent = '$' + b.total_fy27.toFixed(1) + 'M · Coupa Live';
+        renderHeroKPIs(d);
+        renderInsights(generateInsights(d));
+        renderCoupaCatChart();
+        renderCoupaPillarChart();
+        renderRiskDist(d.riskDist, ALL.length);
+        renderAvgRisk(d.catRiskSum, d.catRiskCnt);
+        renderOppTable(ALL);
+      } else {
+        badge.style.background = '#F3F4F6';
+        badge.style.border = '1px solid #D1D5DB';
+        badge.style.color = '#6B7280';
+        badge.textContent = '○ Static · FY27 Snapshot';
+        btn.textContent = '✗ Unavailable';
+      }
+    })
+    .catch(function() {
+      badge.style.background = '#F3F4F6';
+      badge.style.border = '1px solid #D1D5DB';
+      badge.style.color = '#6B7280';
+      badge.textContent = '○ Static · FY27 Snapshot';
+      btn.textContent = '✗ Unavailable';
+    })
+    .finally(function() {
+      setTimeout(function() {
+        btn.disabled = false;
+        btn.innerHTML = '&#8635; Refresh from Coupa';
+      }, 2000);
+    });
+};
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openSpendHelp(){
+  HelpModal.open({
+    title: 'Spend Analysis',
+    what: 'The Spend Analysis page breaks down <strong>DET vendor spend by pillar, category, vendor, and time period</strong>. It connects Coupa actuals with global benchmark estimates compiled by VER to surface where spend is concentrated, where it is trending, and where savings opportunities exist.',
+    steps: [
+      '<strong>Select the time period</strong> — default is FY27 YTD. You can switch to trailing 12 months, full FY26, or a custom range to compare periods.',
+      '<strong>Review the spend waterfall</strong> — the chart shows spend by pillar and category. Large bars with no corresponding benchmark note are candidates for deep-dive analysis.',
+      '<strong>Drill into a category</strong> by clicking any bar or table row — it expands to show individual vendor spend, contract status, and benchmark comparison.',
+      '<strong>Apply the savings lens</strong> — toggle the savings overlay to highlight categories where VER benchmarks indicate above-market spend or consolidation opportunity.',
+      '<strong>Export the analysis</strong> as a CSV or formatted summary for QBR materials, budget submissions, or sourcing strategy documents.'
+    ],
+    tips: [
+      { icon: '&#x1F4CA;', title: 'Concentration risk is a hidden metric', body: 'If one vendor represents >30% of a pillar\'s spend, that\'s a concentration risk — even if the rate is at market. Flag it for the renewal strategy.' },
+      { icon: '&#x1F4C5;', title: 'Actuals vs. committed spend', body: 'The analysis shows both committed (contract value) and actual (invoiced) spend. Large gaps between the two may indicate under-utilization or scope creep.' },
+      { icon: '&#x1F50D;', title: 'Shadow spend is real', body: 'Software purchases below the procurement threshold often don\'t appear in Coupa. The shadow spend estimate adds a VER adjustment for this category.' },
+      { icon: '&#x1F517;', title: 'Feed into TCO and Scenario', body: 'Any category identified as a savings target can be passed directly to the TCO Calculator or Scenario Planning tool for deeper modelling.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+
+<!-- ── AGENT POPOUT MODAL ── -->
+<div id="agent-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(10,20,40,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="width:min(820px,95vw);height:min(680px,90vh);background:#fff;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.3);display:flex;flex-direction:column;overflow:hidden;">
+    <!-- Modal header -->
+    <div style="padding:16px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--teal) 0%,var(--navy) 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(13,148,136,0.3);"><img src="assets/vendy-agent.png" alt="Vendy" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div>
+          <div style="font-size:10pt;font-weight:800;color:var(--ink);">Vendy &middot; VER Intelligence Agent</div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 1.8s infinite;"></div>
+            <span style="font-size:7.5pt;color:var(--ink4);">Online &middot; Portfolio context loaded</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" onclick="closeAgentModal()" title="Close" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--gray2);color:var(--ink4);cursor:pointer;font-size:16px;font-family:inherit;transition:all 0.15s;" onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626';this.style.borderColor='#fca5a5'" onmouseout="this.style.background='var(--gray2)';this.style.color='var(--ink4)';this.style.borderColor='var(--border2)'">&times;</button>
+    </div>
+    <!-- Modal messages -->
+    <div id="agent-modal-messages" style="flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;background:#F8FAFB;"></div>
+    <!-- Modal input -->
+    <div style="padding:14px 16px;border-top:1px solid var(--border);background:#fff;flex-shrink:0;">
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <textarea id="agent-modal-input" rows="2" placeholder="Ask about spend, risk, renewals, savings…" style="flex:1;background:var(--gray2);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:9pt;font-family:inherit;color:var(--ink2);resize:none;outline:none;transition:border-color 0.15s,background 0.15s;" onfocus="this.style.borderColor='var(--teal)';this.style.background='#fff'" onblur="this.style.borderColor='var(--border2)';this.style.background='var(--gray2)'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendModalQuery();}"></textarea>
+        <button type="button" onclick="sendModalQuery()" style="flex-shrink:0;width:40px;height:40px;border-radius:10px;border:none;background:var(--teal);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;" onmouseover="this.style.background='var(--teal2)'" onmouseout="this.style.background='var(--teal)'">&#10148;</button>
+      </div>
+      <div style="margin-top:6px;font-size:7pt;color:var(--ink4);text-align:center;">VER Intelligence Engine &middot; Validate findings before commercial action</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  function addModalBubble(role, text) {
+    var msgs = document.getElementById('agent-modal-messages');
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:flex-end;gap:8px;' + (role === 'user' ? 'flex-direction:row-reverse;' : '');
+    var av = document.createElement('div');
+    av.style.cssText = 'width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8pt;font-weight:800;overflow:hidden;';
+    if (role === 'user') {
+      av.style.background = 'var(--gray3)';
+      av.style.color = 'var(--ink3)';
+      av.textContent = 'You';
+    } else {
+      av.style.background = 'linear-gradient(135deg,var(--teal),var(--navy))';
+      av.innerHTML = '<img src="assets/vendy-agent.png" alt="Vendy" style="width:100%;height:100%;object-fit:cover;">';
+    }
+    var bubble = document.createElement('div');
+    bubble.style.cssText = 'max-width:72%;padding:10px 13px;border-radius:14px;font-size:9pt;line-height:1.55;';
+    if (role === 'user') {
+      bubble.style.cssText += 'background:var(--navy);color:#fff;border-bottom-right-radius:4px;';
+      bubble.textContent = text;
+    } else {
+      bubble.style.cssText += 'background:#fff;border:1px solid var(--border);color:var(--ink2);border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.06);white-space:pre-wrap;';
+      var lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:7pt;font-weight:700;color:var(--teal2);margin-bottom:4px;';
+      lbl.textContent = 'Vendy · VER Agent';
+      var body = document.createElement('div');
+      body.id = 'modal-resp-body-' + Date.now();
+      bubble.appendChild(lbl);
+      bubble.appendChild(body);
+    }
+    row.appendChild(av);
+    row.appendChild(bubble);
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+    return bubble;
+  }
+
+  window.openAgentModal = function() {
+    var modal = document.getElementById('agent-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Mirror chat history (bubbles only, skip chips/greeting which we'll re-render)
+    var dst = document.getElementById('agent-modal-messages');
+    dst.innerHTML = '';
+
+    // Copy existing bubbles from sidebar (rows that are actual chat turns)
+    var srcRows = document.querySelectorAll('#agent-messages .chat-row:not(#agent-greeting)');
+    srcRows.forEach(function(row) {
+      dst.appendChild(row.cloneNode(true));
+    });
+
+    // Add suggested chips into modal if no real conversation yet
+    var hasTurns = dst.querySelectorAll('.chat-row').length === 0;
+    if (hasTurns) {
+      var greetRow = document.createElement('div');
+      greetRow.style.cssText = 'display:flex;align-items:flex-end;gap:8px;';
+      greetRow.innerHTML = '<div style="width:44px;height:44px;border-radius:12px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,var(--teal),var(--navy));"><img src="assets/vendy-agent.png" alt="Vendy" style="width:100%;height:100%;object-fit:cover;"></div>'
+        + '<div style="max-width:72%;padding:10px 13px;border-radius:14px;border-bottom-left-radius:4px;background:#fff;border:1px solid var(--border);color:var(--ink2);font-size:9pt;box-shadow:0 1px 3px rgba(0,0,0,0.06);">'
+        + '<div style="font-size:7pt;font-weight:700;color:var(--teal2);margin-bottom:4px;">Vendy · VER Agent</div>'
+        + '<div>What can I help you with?</div></div>';
+      dst.appendChild(greetRow);
+
+      var chipsWrap = document.createElement('div');
+      chipsWrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;margin-top:4px;padding-left:36px;';
+      var SUGGESTED = [
+        'Which vendors represent the highest concentration risk in my portfolio?',
+        'What savings opportunities should I prioritize this quarter?',
+        'Summarize my renewal exposure in the next 180 days.',
+        'Which vendors have the worst SLA scores relative to their spend?',
+        'Draft an executive summary of portfolio risk for a leadership briefing.'
+      ];
+      SUGGESTED.forEach(function(q) {
+        var chip = document.createElement('button');
+        chip.textContent = q;
+        chip.style.cssText = 'text-align:left;padding:7px 12px;border-radius:10px;border:1px solid var(--border2);background:#fff;color:var(--ink3);font-size:8pt;font-family:inherit;cursor:pointer;transition:all 0.15s;';
+        chip.onmouseover = function() { this.style.background='var(--teal3)'; this.style.borderColor='var(--teal)'; this.style.color='var(--teal2)'; };
+        chip.onmouseout  = function() { this.style.background='#fff'; this.style.borderColor='var(--border2)'; this.style.color='var(--ink3)'; };
+        chip.onclick = function() {
+          var inp = document.getElementById('agent-modal-input');
+          inp.value = q;
+          inp.focus();
+          chipsWrap.style.display = 'none';
+        };
+        chipsWrap.appendChild(chip);
+      });
+      dst.appendChild(chipsWrap);
+    }
+
+    dst.scrollTop = dst.scrollHeight;
+    setTimeout(function() { document.getElementById('agent-modal-input').focus(); }, 100);
+  };
+
+  window.closeAgentModal = function() {
+    document.getElementById('agent-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  document.getElementById('agent-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeAgentModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeAgentModal();
+  });
+
+  window.sendModalQuery = function() {
+    var input = document.getElementById('agent-modal-input');
+    var q = (input.value || '').trim();
+    if (!q) return;
+    input.value = '';
+
+    addModalBubble('user', q);
+    var agentBubble = addModalBubble('agent', '');
+    var bodyEl = agentBubble.querySelector('[id^="modal-resp-body-"]');
+    bodyEl.textContent = 'Analyzing…';
+
+    // Mirror to sidebar too
+    var sidebarUserBubble = window.addBubble && addBubble('user', q);
+    var sidebarAgentBubble = window.addBubble && addBubble('agent', '');
+    var sidebarBodyEl = sidebarAgentBubble && sidebarAgentBubble.querySelector('[id^="agent-resp-body-"]');
+
+    var sendBtn = document.getElementById('ai-send');
+    if (sendBtn) sendBtn.disabled = true;
+
+    fetch('/api/agent/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: window.getSessionId ? getSessionId() : 'modal', message: q, pageContext: 'spend_analysis' })
+    }).then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return streamFromSSE(r, function(evt) {
+        if (!evt || !evt.type) return;
+        if (evt.type === 'status') {
+          bodyEl.textContent = evt.text || 'Analyzing…';
+          if (sidebarBodyEl) sidebarBodyEl.textContent = evt.text || 'Analyzing…';
+        } else if (evt.type === 'delta') {
+          if ((bodyEl.textContent || '').indexOf('Analyzing') === 0) bodyEl.textContent = '';
+          bodyEl.textContent += (evt.delta || '');
+          if (sidebarBodyEl) {
+            if ((sidebarBodyEl.textContent || '').indexOf('Analyzing') === 0) sidebarBodyEl.textContent = '';
+            sidebarBodyEl.textContent += (evt.delta || '');
+          }
+          var msgs = document.getElementById('agent-modal-messages');
+          if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        } else if (evt.type === 'error') {
+          bodyEl.style.color = '#dc2626';
+          bodyEl.textContent = 'Agent error: ' + (evt.error || 'Unknown error');
+        } else if (evt.type === 'done') {
+          if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '&#10148;'; }
+        }
+      });
+    }).catch(function(err) {
+      bodyEl.style.color = '#dc2626';
+      bodyEl.textContent = 'Unable to reach VER agent: ' + err.message;
+    }).finally(function() {
+      if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '&#10148;'; }
+    });
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fiscal Collision Radar · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --blue:#2563EB;--blue2:#1D4ED8;--blue3:#EFF6FF;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+[data-theme="dark"]{
+  --gray:#080F1E;--gray2:#111F35;--gray3:#1A2D47;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --white:#0F1E3C;--ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --red3:rgba(220,38,38,0.15);--red2:#FCA5A5;
+  --amber3:rgba(217,119,6,0.15);--amber2:#FCD34D;
+  --green3:rgba(5,150,105,0.15);--green2:#6EE7B7;
+  --blue3:rgba(37,99,235,0.15);--blue2:#93C5FD;
+  --purple3:rgba(124,58,237,0.15);--purple2:#C4B5FD;
+  --teal3:rgba(13,148,136,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .chart-card,[data-theme="dark"] .mc,[data-theme="dark"] .urgency-card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .exec-brief{background:linear-gradient(135deg,#0F1E3C,#1A0F2E);}
+[data-theme="dark"] .chart-title{color:var(--ink);}
+[data-theme="dark"] .mc-name{color:var(--ink);}
+[data-theme="dark"] .mc-badge{color:var(--ink);}
+[data-theme="dark"] .badge-collision,[data-theme="dark"] .badge-caution,[data-theme="dark"] .badge-ok,[data-theme="dark"] .badge-empty{background:rgba(255,255,255,0.08);color:var(--ink2);}
+[data-theme="dark"] .mc-item-name{color:var(--ink2);}
+[data-theme="dark"] .bar-lbl,[data-theme="dark"] .bar-val{color:var(--ink4);}
+[data-theme="dark"] .leg-item{color:var(--ink4);}
+[data-theme="dark"] .chart-sub{color:var(--ink4);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;-webkit-font-smoothing:antialiased;}
+
+/* ── TOP BAR ─────────────────────────────────────────── */
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;
+  background:rgba(10,18,38,0.96);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.07);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8pt;color:rgba(255,255,255,0.45);text-decoration:none;font-weight:600;
+  display:flex;align-items:center;gap:5px;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.1);}
+.htb-brand{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.02em;}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-tag{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.25);padding:3px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:4px;}
+.top-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:6px;
+  border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);
+  color:rgba(255,255,255,0.5);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.top-btn:hover{background:rgba(220,38,38,0.15);border-color:rgba(220,38,38,0.4);color:#FCA5A5;}
+
+/* ── HERO ─────────────────────────────────────────────── */
+.hero{background:linear-gradient(150deg,#0D1830 0%,#1A1020 40%,#0D1428 100%);
+  padding:22px 0 18px;position:relative;overflow:hidden;}
+.hero-glow-1{position:absolute;top:-60px;right:-80px;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(184,64,72,0.1),transparent 65%);pointer-events:none;
+  animation:glowPulse 6s ease-in-out infinite;}
+.hero-glow-2{position:absolute;bottom:-80px;left:5%;width:400px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.07),transparent 65%);pointer-events:none;}
+@keyframes glowPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(1.05);}}
+.hero-wrap{max-width:1280px;margin:0 auto;padding:0 52px;position:relative;}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.hero-eyebrow-text{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;
+  color:rgba(255,255,255,0.45);}
+.hero-eyebrow-dot{width:4px;height:4px;border-radius:50%;background:rgba(220,120,120,0.8);}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.05;margin-bottom:6px;
+  letter-spacing:-0.02em;}
+.hero-title span{color:#F9A8A8;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.55);line-height:1.6;max-width:580px;margin-bottom:14px;}
+
+.hero-data-source{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;
+  font-size:7pt;color:rgba(255,255,255,0.45);font-weight:600;letter-spacing:0.05em;margin-bottom:20px;}
+.hero-data-source-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;
+  box-shadow:0 0 6px #22C55E;animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+.hero-kpis{display:flex;gap:14px;flex-wrap:wrap;}
+.hkpi{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:15px 18px;min-width:132px;position:relative;overflow:hidden;
+  transition:border-color 0.2s,background 0.2s;}
+.hkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0.7;}
+.hkpi.red::before{background:linear-gradient(90deg,#C87070,transparent);}
+.hkpi.amber::before{background:linear-gradient(90deg,#D97706,transparent);}
+.hkpi.purple::before{background:linear-gradient(90deg,#7C3AED,transparent);}
+.hkpi.teal::before{background:linear-gradient(90deg,#0D9488,transparent);}
+.hkpi:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.16);}
+.hkpi-val{font-size:20pt;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.02em;}
+.hkpi.red .hkpi-val{color:#F0ABAB;}
+.hkpi.amber .hkpi-val{color:#FCD34D;}
+.hkpi.purple .hkpi-val{color:#C4B5FD;}
+.hkpi.teal .hkpi-val{color:#5EEAD4;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.45);margin-top:5px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.35);margin-top:3px;line-height:1.4;}
+
+/* ── EXEC BRIEF ───────────────────────────────────────── */
+.exec-brief{background:linear-gradient(135deg,#0F1E3C 0%,#1A0F2E 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);padding:28px 0;}
+.exec-brief-wrap{max-width:1280px;margin:0 auto;padding:0 52px;}
+.eb-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.3);margin-bottom:16px;}
+.eb-insights{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.eb-insight{padding:16px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.03);}
+.eb-insight.critical{border-left:3px solid #9B2C32;background:rgba(155,44,50,0.05);}
+.eb-insight.warning{border-left:3px solid #D97706;background:rgba(217,119,6,0.06);}
+.eb-insight.info{border-left:3px solid #7C3AED;background:rgba(124,58,237,0.06);}
+.ebi-headline{font-size:9.5pt;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;}
+.ebi-body{font-size:8pt;color:rgba(255,255,255,0.45);line-height:1.6;}
+.ebi-number{font-size:22pt;font-weight:900;color:rgba(255,255,255,0.12);float:right;
+  line-height:1;margin-left:8px;margin-top:-2px;font-variant-numeric:tabular-nums;}
+
+/* ── PAGE BODY ────────────────────────────────────────── */
+.page-wrap{max-width:1280px;margin:0 auto;padding:32px 52px 72px;}
+
+.sec-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--ink4);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+
+/* ── CHART ────────────────────────────────────────────── */
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:14px;
+  padding:24px 26px;margin-bottom:28px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.04);}
+.chart-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:16px;}
+.chart-title{font-size:10.5pt;font-weight:800;color:var(--ink);}
+.chart-sub{font-size:7.5pt;color:var(--ink4);margin-top:3px;}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:7.5pt;color:var(--ink4);}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.chart-area-wrap{position:relative;}
+.chart-area{display:flex;align-items:flex-end;gap:5px;padding-left:46px;
+  border-bottom:2px solid var(--border);position:relative;}
+.y-label{position:absolute;left:0;font-size:6.5pt;color:var(--ink4);
+  transform:translateY(50%);line-height:1;}
+.thresh-line{position:absolute;left:46px;right:0;pointer-events:none;}
+.thresh-line-inner{border-top:2px dashed rgba(220,38,38,0.45);position:relative;}
+.thresh-lbl{position:absolute;right:4px;top:-15px;font-size:6.5pt;color:var(--red);
+  font-weight:700;background:rgba(254,242,242,0.9);padding:1px 5px;border-radius:3px;}
+.bar-group{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;}
+.bar-stack{width:80%;max-width:56px;border-radius:5px 5px 0 0;overflow:hidden;
+  cursor:default;transition:opacity 0.15s,filter 0.15s;display:flex;flex-direction:column-reverse;}
+.bar-stack:hover{opacity:0.85;filter:brightness(1.08);}
+.bar-seg{width:100%;}
+.bar-lbl{font-size:6.5pt;font-weight:700;color:var(--ink4);margin-top:6px;text-align:center;}
+.bar-val{font-size:7pt;font-weight:800;text-align:center;margin-top:2px;}
+
+/* ── MONTH CARDS ──────────────────────────────────────── */
+.months-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;}
+.mc{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:box-shadow 0.2s,border-color 0.2s;
+  display:flex;flex-direction:column;}
+.mc:hover{box-shadow:0 4px 18px rgba(0,0,0,0.08);}
+.mc.is-collision{border-color:rgba(180,60,65,0.35);border-top:3px solid #B84048;}
+.mc.is-caution{border-color:#FCD34D;border-top:3px solid #D97706;}
+.mc.is-ok{border-top:3px solid #0D9488;}
+.mc-hdr{padding:13px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;}
+.mc.is-collision .mc-hdr{background:linear-gradient(135deg,rgba(184,64,72,0.05),rgba(254,242,242,0.3));}
+.mc.is-caution .mc-hdr{background:linear-gradient(135deg,rgba(217,119,6,0.05),rgba(254,243,199,0.4));}
+.mc-month{font-size:10.5pt;font-weight:900;color:var(--ink);}
+.mc-right{display:flex;align-items:center;gap:8px;}
+.mc-total{font-size:11pt;font-weight:900;}
+.mc-badge{font-size:6.5pt;font-weight:700;padding:3px 9px;border-radius:5px;white-space:nowrap;}
+.badge-collision{background:#FEE8E8;color:#9B2C32;}
+.badge-caution{background:var(--amber3);color:var(--amber2);}
+.badge-ok{background:var(--green3);color:var(--green2);}
+.badge-empty{background:#F1F5F9;color:#94A3B8;}
+.mc.is-empty{border-color:#E2E8F0;opacity:0.75;}
+.mc-empty-row{padding:14px 16px;display:flex;align-items:center;justify-content:center;flex:1;}
+.mc-empty-msg{font-size:8pt;color:#94A3B8;font-style:italic;letter-spacing:0.01em;}
+.mc-vendors{padding:6px 0;flex:1;}
+.mc-row{display:flex;align-items:center;justify-content:space-between;
+  padding:7px 16px;border-bottom:1px solid var(--gray2);transition:background 0.1s;}
+.mc-row:last-child{border-bottom:none;}
+.mc-row:hover{background:var(--gray2);}
+.mc-row-left{display:flex;align-items:center;gap:9px;}
+.mc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.mc-vname{font-size:8.5pt;font-weight:700;color:var(--ink);}
+.mc-vcat{font-size:7pt;color:var(--ink4);margin-top:1px;}
+.mc-vval{font-size:8.5pt;font-weight:800;color:var(--ink3);}
+
+
+/* ── RENEWAL PULSE ───────────────────────────────────── */
+.rp-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.rp-panel{background:var(--white);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.rp-panel-hdr{padding:13px 18px 11px;border-bottom:1px solid var(--border);}
+.rp-accent{height:3px;border-radius:2px;margin-bottom:10px;}
+.rp-panel.rp-now .rp-accent{background:linear-gradient(90deg,#9B2C32,transparent);}
+.rp-panel.rp-soon .rp-accent{background:linear-gradient(90deg,var(--amber),transparent);}
+.rp-panel.rp-track .rp-accent{background:linear-gradient(90deg,var(--green),transparent);}
+.rp-label{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;color:var(--ink4);}
+.rp-kpi{font-size:22pt;font-weight:900;line-height:1;margin:4px 0 2px;}
+.rp-panel.rp-now .rp-kpi{color:#9B2C32;}
+.rp-panel.rp-soon .rp-kpi{color:var(--amber2);}
+.rp-panel.rp-track .rp-kpi{color:var(--green2);}
+.rp-sub{font-size:7.5pt;color:var(--ink4);line-height:1.5;}
+.rp-list{padding:4px 0;}
+.rp-item{display:flex;align-items:center;justify-content:space-between;
+  padding:7px 18px;border-bottom:1px solid var(--gray2);transition:background 0.1s;}
+.rp-item:last-child{border-bottom:none;}
+.rp-item:hover{background:var(--gray);}
+.rp-item-left{display:flex;align-items:center;gap:8px;min-width:0;}
+.rp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.rp-item-name{font-size:8pt;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp-item-days{font-size:7pt;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.rp-panel.rp-now .rp-item-days{color:#9B2C32;}
+.rp-panel.rp-soon .rp-item-days{color:var(--amber2);}
+.rp-panel.rp-track .rp-item-days{color:var(--green2);}
+.rp-item-val{font-size:8pt;font-weight:800;color:var(--ink3);white-space:nowrap;flex-shrink:0;}
+
+/* ── MONTH CARD EXPAND CTA ───────────────────────────── */
+.mc-expand{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;background:var(--gray);border-top:1px solid var(--border);
+  cursor:pointer;font-size:7.5pt;font-weight:700;color:var(--ink4);
+  transition:background 0.15s,color 0.15s;}
+.mc-expand:hover{background:var(--gray2);color:var(--ink2);}
+.mc-expand-count{display:inline-block;padding:1px 8px;border-radius:99px;
+  font-size:7pt;font-weight:800;background:var(--border);color:var(--ink4);margin-right:4px;}
+.mc.is-collision .mc-expand{border-top-color:#FCA5A5;}
+.mc.is-caution .mc-expand{border-top-color:#FCD34D;}
+
+/* ── MODAL ───────────────────────────────────────────── */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--white);border-radius:16px;width:100%;max-width:680px;
+  max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 64px rgba(0,0,0,0.22);}
+.modal-hdr{padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-month{font-size:12pt;font-weight:900;color:var(--ink);}
+.modal-total{font-size:11pt;font-weight:900;}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);
+  background:var(--gray);cursor:pointer;font-size:13pt;line-height:32px;text-align:center;
+  color:var(--ink4);font-family:inherit;transition:all 0.15s;flex-shrink:0;}
+.modal-close:hover{background:var(--gray2);color:var(--ink);}
+.modal-body{overflow-y:auto;flex:1;}
+.modal-row{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 22px;border-bottom:1px solid var(--border);transition:background 0.1s;}
+.modal-row:last-child{border-bottom:none;}
+.modal-row:hover{background:var(--gray);}
+.modal-row-left{display:flex;align-items:center;gap:10px;}
+.modal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.modal-vname{font-size:9pt;font-weight:700;color:var(--ink);}
+.modal-vcat{font-size:7.5pt;color:var(--ink4);margin-top:1px;}
+.modal-vval{font-size:10pt;font-weight:900;color:var(--ink3);}
+.modal-footer{padding:12px 22px;background:var(--gray);border-top:1px solid var(--border);
+  font-size:7.5pt;color:var(--ink4);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.modal-footer-total{font-size:9pt;font-weight:800;color:var(--ink);}
+
+/* ── DATA SOURCE FOOTER ───────────────────────────────── */
+.data-note{margin-top:28px;padding:14px 18px;background:var(--white);border:1px solid var(--border);
+  border-radius:10px;display:flex;align-items:flex-start;gap:12px;}
+.dn-icon{font-size:11pt;flex-shrink:0;opacity:0.6;}
+.dn-text{font-size:7.5pt;color:var(--ink4);line-height:1.6;}
+.dn-text strong{color:var(--ink3);}
+
+/* ── ANIMATIONS ───────────────────────────────────────── */
+.fade-up{opacity:0;transform:translateY(18px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:900px){
+  .hero-wrap,.exec-brief-wrap,.page-wrap{padding:0 20px;}
+  .page-wrap{padding-top:24px;}
+  .eb-insights{grid-template-columns:1fr;}
+  .months-grid{grid-template-columns:1fr;}
+  .hero-title{font-size:17pt;}
+}
+@media print{
+  .hub-top-bar,.top-btn{display:none!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body{background:#fff!important;}
+  .exec-brief{background:#f8f9fa!important;}
+  .hero{background:#0F1E3C!important;}
+  .fade-up{opacity:1!important;transform:none!important;}
+  .chart-card,.mc,.urgency-lane{break-inside:avoid;}
+  .page-wrap{padding-bottom:0!important;}
+}
+</style>
+</head>
+<body>
+
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">VER Intelligence Hub</span>
+  </div>
+  <div class="htb-right">
+    <div class="htb-tag">DET Confidential</div>
+    <button type="button" class="top-btn" id="dm-btn" onclick="toggleDark()">☾ Dark</button>
+    <button type="button" class="top-btn" onclick="openFiscalHelp()">? How to Use</button>
+    <button type="button" class="top-btn" onclick="window.print()">Print / PDF</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-wrap">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      <span class="hero-eyebrow-text">Executive Intelligence &middot; FY27</span>
+    </div>
+    <h1 class="hero-title">Fiscal Collision <span>Radar</span></h1>
+    <p class="hero-sub">Forward-looking renewal exposure mapped by month. Every contract expiry stacked by spend category so leadership sees the fiscal pressure coming &#8212; before the approval clock starts and budget owners are caught off guard.</p>
+    <div class="hero-data-source">
+      <div class="hero-data-source-dot"></div>
+      Source: Coupa DEV · salesforce-compass-dev · FY27 actuals (point-in-time snapshot) · 242 vendors · $295.47M total portfolio
+    </div>
+    <div class="hero-kpis" id="hero-kpis"></div>
+  </div>
+</section>
+
+<section class="exec-brief">
+  <div class="exec-brief-wrap">
+    <div class="eb-label">What leadership needs to know right now</div>
+    <div class="eb-insights" id="exec-insights"></div>
+  </div>
+</section>
+
+<!-- ── LEGEND STRIP ─────────────────────────────────────── -->
+<style>
+.legend-strip{max-width:1280px;margin:0 auto 0;padding:0 52px;}
+.legend-bar{display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:10px 16px;margin-bottom:16px;}
+[data-theme="dark"] .legend-bar{background:rgba(255,255,255,0.04);border-color:var(--border);}
+.legend-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink4);flex-shrink:0;margin-right:4px;}
+.legend-items{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--ink3);}
+[data-theme="dark"] .legend-item{color:var(--ink4);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-divider{width:1px;height:14px;background:var(--border);flex-shrink:0;}
+@media(max-width:900px){.legend-strip{padding:0 20px;}}
+</style>
+<div class="legend-strip">
+  <div class="legend-bar">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><div class="legend-dot" style="background:#0D9488"></div>Software / SaaS</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>CWF / Staffing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div>Hardware</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div>Professional Services</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#9B2C32;box-shadow:0 0 0 2px rgba(155,44,50,0.2)"></div>Collision (&gt;$20M)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D97706;box-shadow:0 0 0 2px rgba(217,119,6,0.2)"></div>Caution ($10–20M)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#059669;box-shadow:0 0 0 2px rgba(5,150,105,0.2)"></div>Manageable (&lt;$10M)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#94A3B8"></div>No Data</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item"><span style="display:inline-block;width:22px;height:2px;border-top:2px dashed rgba(220,38,38,0.6);vertical-align:middle;margin-right:2px;"></span>$20M Threshold</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <p class="sec-label">Renewal Exposure by Month &mdash; Forward 9 Months</p>
+  <div class="chart-card fade-up">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Stacked Renewal Exposure &mdash; Jul 2026 through Mar 2027</div>
+        <div class="chart-sub">Spend grouped by contract type &middot; Dashed line = $20M fiscal collision threshold</div>
+      </div>
+      <div class="chart-legend" id="chart-legend"></div>
+    </div>
+    <div class="chart-area-wrap">
+      <div class="chart-area" id="chart-area"></div>
+    </div>
+  </div>
+
+  <p class="sec-label">Month-by-Month Breakdown</p>
+  <div class="months-grid" id="months-grid"></div>
+
+  <p class="sec-label">Renewal Pulse</p>
+  <div class="rp-wrap fade-up" id="rp-wrap"></div>
+
+  <div class="data-note">
+    <div class="dn-icon">&#8505;</div>
+    <div class="dn-text">
+      <strong>Data source:</strong> Vendor spend values sourced from Coupa DEV environment (salesforce-compass-dev.coupahost.com) &mdash; FY27 actuals, point-in-time snapshot as of July 2026. Not a live API connection.
+      Renewal dates are contract-specific estimates maintained by VER team; they may differ from total annual Coupa spend where multiple POs exist.
+      <strong>Analyst estimates are labeled accordingly.</strong> For questions contact the VER team.
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="month-modal" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-month" id="modal-month-name"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="modal-total" id="modal-month-total"></div>
+        <button type="button" class="modal-close" id="modal-close-btn">&#x2715;</button>
+      </div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <span id="modal-footer-count"></span>
+      <span class="modal-footer-total" id="modal-footer-total"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){var t=localStorage.getItem('ver-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+function toggleDark(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('ver-theme',next);
+  var btn=document.getElementById('dm-btn');
+  if(btn)btn.textContent=next==='dark'?'☾ Light':'☽ Dark';
+}
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openFiscalHelp(){
+  HelpModal.open({
+    title: 'Fiscal Collision Radar',
+    what: 'The Fiscal Collision Radar maps every contract renewal by month across the forward 9-month window. It identifies months where multiple high-value contracts expire simultaneously — creating budget pressure, approval bottlenecks, and negotiation risk. Use it to plan ahead, sequence renewals, and brief leadership before the urgency clock starts.',
+    steps: [
+      '<strong>Read the month cards</strong> — each card shows total renewal spend for that month, a status badge (Collision / Caution / OK / No Data), and the list of vendors expiring that month.',
+      '<strong>Watch for Collision months</strong> — months above the $20M fiscal threshold where multiple vendors renew simultaneously. These need early stakeholder alignment and budget reservation.',
+      '<strong>Review the chart</strong> — stacked bars show spend by contract category. The dashed threshold line marks the $20M collision trigger.',
+      '<strong>Read the Exec Brief</strong> — the three insight cards summarize what leadership needs to act on now: highest-risk month, total 9-month exposure, and recommended sequencing.',
+      '<strong>Print or export</strong> using the top-right button to attach to a renewal governance briefing.'
+    ],
+    glossary: [
+      {term:'Fiscal Collision', color:'#EF4444', def:'A month where total renewal spend exceeds $20M AND multiple vendors expire simultaneously — creating compounded budget and approval pressure.'},
+      {term:'Caution Month', color:'#F59E0B', def:'Renewal spend is elevated (above $10M) or a single high-value vendor expires. Warrants monitoring but does not require emergency escalation.'},
+      {term:'OK Month', color:'#10B981', def:'Low renewal exposure — total spend below threshold, no concentration risk, standard renewal process applies.'},
+      {term:'No Data / Empty Month', color:'#94A3B8', def:'No contracts are currently scheduled to expire in this month. Shown for calendar accuracy — future additions may shift status.'},
+      {term:'FY27 Q3', color:null, def:'August, September, October 2026 — the first quarter of the 9-month forward window.'},
+      {term:'FY27 Q4', color:null, def:'November, December 2026 and January 2027.'},
+      {term:'FY28 Q1', color:null, def:'February, March, April 2027 — the final quarter of the forward window.'},
+      {term:'Renewal Exposure', color:null, def:'Total contracted spend value of vendors whose agreements expire in a given period. Higher exposure = more budget and approval capacity needed.'},
+      {term:'Contract Category', color:null, def:'The type of vendor relationship: Software (SaaS/licenses), Managed Services (MSP/outsourced), Professional Services (project work), or Infrastructure.'},
+      {term:'Fiscal Threshold', color:'#F43F5E', def:'The $20M-per-month line displayed as a dashed line on the chart. Months exceeding this are flagged Collision and escalated in the Exec Brief.'},
+      {term:'Source: Coupa DEV', color:null, def:'Data sourced from the Salesforce Coupa development environment (salesforce-compass-dev). 242 vendors, $295.47M FY27 total portfolio. Point-in-time snapshot as of July 2026 — not a live connection.'}
+    ],
+    footNote: 'FY27 · Salesforce DET · Confidential'
+  });
+}
+</script>
+<script src="assets/coupa_spend.js"></script>
+<script>
+var TODAY = new Date('2026-07-29');
+var COLLISION_THRESHOLD = 20;
+
+var COUPA = (window.VER_COUPA && window.VER_COUPA.vendors) ? window.VER_COUPA.vendors : [];
+function coupaSpend(name){
+  var v=COUPA.find(function(x){return x.n===name;});
+  return v ? v.fy27 : null;
+}
+
+var RENEWALS = [
+  {name:'Xactly',         val:5.95,  date:'2026-07-31',cat:'Incentive Compensation',  type:'software',tier:2},
+  {name:'StaffUp',        val:5.95,  date:'2026-07-31',cat:'Contingent Workforce',    type:'cwf',     tier:2},
+  {name:'Deloitte',       val:9.10,  date:'2026-07-31',cat:'Management Consulting',   type:'services',tier:1},
+  {name:'BCG',            val:5.97,  date:'2026-06-30',cat:'Management Consulting',   type:'services',tier:2},
+  {name:'Conviva',        val:0.07,  date:'2026-08-01',cat:'Analytics Software',      type:'software',tier:2},
+  {name:'TechM',          val:1.81,  date:'2026-08-15',cat:'Offshore Dev / CWF',      type:'cwf',     tier:1},
+  {name:'Cognizant',      val:9.47,  date:'2026-08-31',cat:'Managed Services',        type:'services',tier:1},
+  {name:'Ironclad',       val:4.18,  date:'2026-08-31',cat:'CLM Software',            type:'software',tier:2},
+  {name:'Infosys',        val:0.42,  date:'2026-09-30',cat:'Managed Services',        type:'services',tier:2},
+  {name:'Accenture',      val:5.06,  date:'2026-09-30',cat:'Technology Services',     type:'services',tier:1},
+  {name:'IBM',            val:14.27, date:'2026-09-30',cat:'Technology Services',     type:'services',tier:1},
+  {name:'Sycomp',         val:7.73,  date:'2026-09-30',cat:'Hardware / IT Solutions', type:'hardware',tier:2},
+  {name:'Certinia',       val:8.78,  date:'2026-10-31',cat:'ERP / PSA Software',      type:'software',tier:2},
+  {name:'Docusign',       val:2.48,  date:'2026-10-31',cat:'eSignature Software',     type:'software',tier:2},
+  {name:'Workday',        val:23.71, date:'2026-11-30',cat:'HCM / ERP Software',      type:'software',tier:1},
+  {name:'Conga',          val:3.89,  date:'2026-12-31',cat:'Contract & Revenue',      type:'software',tier:2},
+  {name:'Figma',          val:3.15,  date:'2026-12-31',cat:'Design Software',         type:'software',tier:2},
+  {name:'Google',         val:14.00, date:'2026-12-31',cat:'Software / Cloud',        type:'software',tier:1},
+  {name:'WWT',            val:12.53, date:'2026-12-31',cat:'Hardware / Tech Services',type:'hardware',tier:1},
+  {name:'JLL',            val:10.85, date:'2026-12-31',cat:'Cabling / Facilities',    type:'services',tier:1},
+  {name:'Insight Direct', val:10.71, date:'2026-12-31',cat:'Hardware / Asset Mgmt',   type:'hardware',tier:1},
+  {name:'Lucid',          val:2.12,  date:'2026-12-31',cat:'Diagramming Software',    type:'software',tier:2},
+  {name:'Coupa',          val:2.52,  date:'2026-12-31',cat:'Procurement Software',    type:'software',tier:2},
+  {name:'D&B',            val:2.17,  date:'2026-12-31',cat:'Data & Analytics',        type:'software',tier:2},
+  {name:'Concur',         val:1.93,  date:'2026-12-31',cat:'T&E Software',            type:'software',tier:2},
+  {name:'DBT Labs',       val:1.88,  date:'2026-12-31',cat:'Data Engineering',        type:'software',tier:2},
+  {name:'Omnissa',        val:1.86,  date:'2026-12-31',cat:'Endpoint Management',     type:'software',tier:2},
+  {name:'Vertex',         val:1.72,  date:'2026-12-31',cat:'Tax Compliance',          type:'software',tier:2},
+  {name:'Contigo Obras',  val:1.56,  date:'2026-12-31',cat:'Hardware / Facilities',   type:'hardware',tier:3},
+  {name:'Smartsheet',     val:1.46,  date:'2026-12-31',cat:'Work Management',         type:'software',tier:2},
+  {name:'Nucleusteq',     val:1.37,  date:'2026-12-31',cat:'CWF / Data Engineering',  type:'cwf',     tier:2},
+  {name:'Okta',           val:1.25,  date:'2026-12-31',cat:'IAM Software',            type:'software',tier:2},
+  {name:'One Diversified', val:1.95, date:'2026-12-31',cat:'AV / Hardware Services',  type:'hardware',tier:2},
+  {name:'Informat',       val:1.06,  date:'2026-12-31',cat:'Hardware / IT Dist.',     type:'hardware',tier:3},
+  {name:'Demandbase',     val:1.12,  date:'2026-12-31',cat:'ABM / Marketing Intel',   type:'software',tier:2},
+  {name:'Realtimeboard',  val:1.03,  date:'2026-12-31',cat:'Visual Collaboration',    type:'software',tier:2},
+  {name:'NTT Data',       val:22.84, date:'2027-01-31',cat:'Network Services / CWF',  type:'services',tier:1},
+  {name:'Zuora',          val:3.42,  date:'2027-01-31',cat:'Subscription Mgmt',       type:'software',tier:2},
+  {name:'AWS',            val:17.17, date:'2027-03-31',cat:'Cloud Infrastructure',    type:'software',tier:1},
+  {name:'Microsoft',      val:2.76,  date:'2027-03-31',cat:'Software / Cloud',        type:'software',tier:1},
+  {name:'Salesforce',     val:11.40, date:'2027-04-30',cat:'CRM / Platform',          type:'software',tier:1},
+  {name:'ServiceNow',     val:6.85,  date:'2027-04-30',cat:'ITSM / Platform',         type:'software',tier:1},
+  {name:'Mural',          val:0.94,  date:'2027-04-30',cat:'Visual Collaboration',    type:'software',tier:2}
+];
+
+RENEWALS.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+
+var TYPE_HEX  ={software:'#0D9488',cwf:'#D97706',hardware:'#2563EB',services:'#7C3AED'};
+var TYPE_LABEL={software:'Software / SaaS',cwf:'CWF / Staffing',hardware:'Hardware',services:'Professional Services'};
+var MONTH_KEYS  =['2026-08','2026-09','2026-10','2026-11','2026-12','2027-01','2027-02','2027-03','2027-04'];
+var MONTH_LABELS=['Aug 26','Sep 26','Oct 26','Nov 26','Dec 26','Jan 27','Feb 27','Mar 27','Apr 27'];
+var MONTH_FULL  =['Aug 2026','Sep 2026','Oct 2026','Nov 2026','Dec 2026','Jan 2027','Feb 2027','Mar 2027','Apr 2027'];
+
+function mkey(d){return d.substring(0,7);}
+function daysOut(d){return Math.round((new Date(d)-TODAY)/86400000);}
+function fmt(v){return v>=1?'$'+v.toFixed(1)+'M':'$'+Math.round(v*1000)+'K';}
+function mTotal(m){return m.software+m.cwf+m.hardware+m.services;}
+
+function el(tag,cls,text){
+  var e=document.createElement(tag);
+  if(cls) e.className=cls;
+  if(text!=null) e.textContent=text;
+  return e;
+}
+
+function animateCount(el,target,prefix,suffix,decimals,duration){
+  var start=0,step=target/((duration||900)/16);
+  function tick(){
+    start=Math.min(start+step,target);
+    el.textContent=prefix+(decimals?start.toFixed(1):Math.round(start))+suffix;
+    if(start<target) requestAnimationFrame(tick);
+    else el.textContent=prefix+(decimals?target.toFixed(1):Math.round(target))+suffix;
+  }
+  requestAnimationFrame(tick);
+}
+
+function groupByMonth(){
+  var map={};
+  MONTH_KEYS.forEach(function(k){map[k]={software:0,cwf:0,hardware:0,services:0,items:[]};});
+  RENEWALS.forEach(function(r){
+    var k=mkey(r.date);
+    if(!map[k]) return;
+    map[k][r.type]+=r.val;
+    map[k].items.push(r);
+  });
+  return map;
+}
+
+function buildHero(g){
+  var total=0,cols=0,peak=0,peakName='';
+  MONTH_KEYS.forEach(function(k,i){
+    var t=mTotal(g[k]); total+=t;
+    if(t>=COLLISION_THRESHOLD) cols++;
+    if(t>peak){peak=t;peakName=MONTH_FULL[i];}
+  });
+  var upcoming=RENEWALS.filter(function(r){return r.val>=5&&daysOut(r.date)>=0;});
+  var nextD=upcoming.length?daysOut(upcoming[0].date):0;
+
+  var kpis=[
+    {val:total,  prefix:'$',suffix:'M',dec:true, lbl:'8-Month Exposure',  note:'Total committed renewal value',  cls:'purple'},
+    {val:cols,   prefix:'', suffix:'', dec:false,lbl:'Collision Months',   note:'Above $'+COLLISION_THRESHOLD+'M threshold',cls:'red'},
+    {val:peak,   prefix:'$',suffix:'M',dec:true, lbl:'Peak Month',         note:peakName,                         cls:'amber'},
+    {val:nextD,  prefix:'', suffix:'d',dec:false,lbl:'Next Major Renewal', note:'Vendor >\$5M from today',        cls:'teal'}
+  ];
+  var wrap=document.getElementById('hero-kpis');
+  kpis.forEach(function(k){
+    var d=el('div','hkpi '+k.cls);
+    var v=el('div','hkpi-val','–');
+    d.appendChild(v);
+    d.appendChild(el('div','hkpi-lbl',k.lbl));
+    d.appendChild(el('div','hkpi-note',k.note));
+    wrap.appendChild(d);
+    setTimeout(function(){animateCount(v,k.val,k.prefix,k.suffix,k.dec,1000);},300);
+  });
+}
+
+function buildExecBrief(g){
+  var colMonths=[];
+  var total=0;
+  MONTH_KEYS.forEach(function(k,i){var t=mTotal(g[k]);total+=t;if(t>=COLLISION_THRESHOLD) colMonths.push(MONTH_FULL[i]);});
+  var dec31total=mTotal(g['2026-12']);
+  var wrap=document.getElementById('exec-insights');
+
+  var insights=[
+    {cls:'critical',num:'1',
+     headline:colMonths.length+' fiscal collision month'+(colMonths.length!==1?'s':'')+' — multi-vendor approvals competing for the same finance window.',
+     body:colMonths.join(' and ')+' each exceed $20M in renewal exposure. Parallel approval cycles across Legal, Finance, and Procurement will create bandwidth conflicts unless owners are pre-briefed now.'},
+    {cls:'warning',num:'2',
+     headline:'December alone carries '+fmt(dec31total)+' across '+(g['2026-12']?g['2026-12'].items.length:0)+' contracts — the single biggest calendar month in the portfolio.',
+     body:(function(){var top5=(g['2026-12']?g['2026-12'].items.slice().sort(function(a,b){return b.val-a.val;}).slice(0,5):[]);var names=top5.map(function(v){return v.name+' ('+fmt(v.val)+')';}).join(', ');return (names||'Top contracts')+' all expire Dec 31. Negotiation strategies and budget confirmations need to be in motion by September.';})()},
+    {cls:'info',num:'3',
+     headline:'$'+total.toFixed(0)+'M in total forward exposure — nearly the entire annual portfolio transacts in 9 months.',
+     body:'The back half of FY27 is when vendor leverage is highest and preparation is lowest. VER recommends establishing a renewal calendar review with Finance and Legal no later than August.'}
+  ];
+
+  insights.forEach(function(ins){
+    var d=el('div','eb-insight '+ins.cls);
+    var n=el('div','ebi-number',ins.num);
+    d.appendChild(n);
+    d.appendChild(el('div','ebi-headline',ins.headline));
+    d.appendChild(el('div','ebi-body',ins.body));
+    wrap.appendChild(d);
+  });
+}
+
+function buildBanner(g){
+  var cols=[];
+  MONTH_KEYS.forEach(function(k,i){var t=mTotal(g[k]);if(t>=COLLISION_THRESHOLD) cols.push({name:MONTH_FULL[i],total:t});});
+  if(!cols.length) return;
+  var area=document.getElementById('banner-area');
+  var b=el('div','collision-alert fade-up');
+  var iconWrap=el('div','ca-icon-wrap','⚡');
+  var content=el('div','ca-content');
+  content.appendChild(el('div','ca-title',cols.length+' Fiscal Collision '+(cols.length>1?'Months':'Month')+' Detected in the Next 8 Months'));
+  content.appendChild(el('div','ca-body','These months carry renewal exposure above $'+COLLISION_THRESHOLD+'M. Multi-vendor approval cycles will compete for the same finance bandwidth. Budget owners, Legal, and Finance leads should be briefed now.'));
+  var tags=el('div','ca-tags');
+  cols.forEach(function(c){tags.appendChild(el('span','ca-tag',c.name+' — '+fmt(c.total)));});
+  content.appendChild(tags);
+  b.appendChild(iconWrap);b.appendChild(content);
+  area.appendChild(b);
+}
+
+function buildLegend(){
+  var wrap=document.getElementById('chart-legend');
+  Object.keys(TYPE_HEX).forEach(function(t){
+    var item=el('div','leg-item');
+    var dot=el('div','leg-dot');dot.style.background=TYPE_HEX[t];
+    item.appendChild(dot);item.appendChild(document.createTextNode(TYPE_LABEL[t]));
+    wrap.appendChild(item);
+  });
+}
+
+function buildChart(g){
+  var maxVal=0;
+  MONTH_KEYS.forEach(function(k){var t=mTotal(g[k]);if(t>maxVal) maxVal=t;});
+  maxVal=Math.ceil(maxVal/10)*10||10;
+  var chartH=220;
+  var area=document.getElementById('chart-area');
+  area.style.height=(chartH+50)+'px';
+
+  [4,3,2,1,0].forEach(function(i){
+    var v=Math.round((maxVal/4)*i);
+    var lbl=el('div','y-label','$'+v+'M');
+    lbl.style.bottom=(i/4*chartH+2)+'px';
+    lbl.style.position='absolute';lbl.style.left='0';
+    area.appendChild(lbl);
+  });
+
+  var threshPct=(COLLISION_THRESHOLD/maxVal)*chartH;
+  var thresh=el('div','thresh-line');
+  thresh.style.bottom=threshPct+'px';
+  thresh.style.position='absolute';thresh.style.left='46px';thresh.style.right='0';
+  var tli=el('div','thresh-line-inner');
+  tli.appendChild(el('span','thresh-lbl','$'+COLLISION_THRESHOLD+'M collision'));
+  thresh.appendChild(tli);
+  area.appendChild(thresh);
+
+  MONTH_KEYS.forEach(function(k,i){
+    var m=g[k];var total=mTotal(m);
+    var barH=total>0?Math.max(Math.round((total/maxVal)*chartH),3):2;
+    var group=el('div','bar-group');
+    var stack=el('div','bar-stack');
+    stack.style.height='2px';
+    stack.setAttribute('data-target-h',barH);
+    stack.title=MONTH_FULL[i]+': '+fmt(total);
+    ['services','hardware','cwf','software'].forEach(function(type){
+      if(!m[type]) return;
+      var seg=el('div','bar-seg');
+      seg.style.height=Math.round((m[type]/total)*barH)+'px';
+      seg.style.background=TYPE_HEX[type];
+      stack.appendChild(seg);
+    });
+    var lbl=el('div','bar-lbl',MONTH_LABELS[i]);
+    var valEl=el('div','bar-val',total>0?fmt(total):'—');
+    valEl.style.color=total>=COLLISION_THRESHOLD?'#9B2C32':total>=10?'#D97706':'#6B7280';
+    valEl.style.fontWeight=total>=COLLISION_THRESHOLD?'900':'700';
+    group.appendChild(stack);group.appendChild(lbl);group.appendChild(valEl);
+    area.appendChild(group);
+  });
+
+  setTimeout(function(){
+    area.querySelectorAll('.bar-stack').forEach(function(s){
+      var h=parseInt(s.getAttribute('data-target-h'),10);
+      s.style.transition='height 0.7s cubic-bezier(.4,0,.2,1)';
+      s.style.height=h+'px';
+    });
+  },200);
+}
+
+function buildVendorRow(r){
+  var row=el('div','mc-row');
+  var left=el('div','mc-row-left');
+  var dot=el('div','mc-dot');dot.style.background=TYPE_HEX[r.type];
+  var info=el('div');
+  info.appendChild(el('div','mc-vname',r.name));
+  info.appendChild(el('div','mc-vcat',r.cat));
+  left.appendChild(dot);left.appendChild(info);
+  var vv=el('div','mc-vval',fmt(r.val));
+  row.appendChild(left);row.appendChild(vv);
+  return row;
+}
+
+function openMonthModal(monthLabel, total, items){
+  var overlay = document.getElementById('month-modal');
+  var isColl = total >= COLLISION_THRESHOLD;
+  var isCaut = total >= 10 && !isColl;
+  document.getElementById('modal-month-name').textContent = monthLabel;
+  var totEl = document.getElementById('modal-month-total');
+  totEl.textContent = fmt(total);
+  totEl.style.color = isColl ? '#9B2C32' : isCaut ? '#D97706' : '#059669';
+  var body = document.getElementById('modal-body');
+  while(body.firstChild) body.removeChild(body.firstChild);
+  items.forEach(function(r){
+    var row = el('div','modal-row');
+    var left = el('div','modal-row-left');
+    var dot = el('div','modal-dot'); dot.style.background = TYPE_HEX[r.type];
+    var info = el('div');
+    info.appendChild(el('div','modal-vname',r.name));
+    info.appendChild(el('div','modal-vcat',r.cat+' · '+new Date(r.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})));
+    left.appendChild(dot); left.appendChild(info);
+    row.appendChild(left);
+    row.appendChild(el('div','modal-vval',fmt(r.val)));
+    body.appendChild(row);
+  });
+  document.getElementById('modal-footer-count').textContent = items.length+' contracts';
+  document.getElementById('modal-footer-total').textContent = 'Total: '+fmt(total);
+  overlay.classList.add('open');
+}
+
+function buildCards(g){
+  var PREVIEW = 2;
+  var grid = document.getElementById('months-grid');
+  MONTH_KEYS.forEach(function(k,i){
+    var m = g[k];
+    var isEmpty = !m.items.length;
+    var total = mTotal(m);
+    var isColl = total >= COLLISION_THRESHOLD, isCaut = total >= 10 && !isColl;
+    var cls = 'mc fade-up'+(isEmpty?' is-empty':isColl?' is-collision':isCaut?' is-caution':' is-ok');
+    var card = el('div',cls);
+
+    var hdr = el('div','mc-hdr');
+    var mName = el('div','mc-month',MONTH_FULL[i]);
+    var right = el('div','mc-right');
+
+    if(isEmpty){
+      var tot = el('div','mc-total','—');
+      tot.style.color = '#94A3B8';
+      var badge = el('span','mc-badge badge-empty','No Data');
+      right.appendChild(tot); right.appendChild(badge);
+    } else {
+      var tot = el('div','mc-total',fmt(total));
+      tot.style.color = isColl?'#9B2C32':isCaut?'#D97706':'#059669';
+      var badge = el('span','mc-badge '+(isColl?'badge-collision':isCaut?'badge-caution':'badge-ok'),
+        isColl?'Collision Risk':isCaut?'Caution':'Manageable');
+      right.appendChild(tot); right.appendChild(badge);
+    }
+
+    hdr.appendChild(mName); hdr.appendChild(right);
+    card.appendChild(hdr);
+
+    if(isEmpty){
+      var list = el('div','mc-vendors');
+      var emptyRow = el('div','mc-empty-row');
+      emptyRow.appendChild(el('span','mc-empty-msg','No contracts scheduled'));
+      list.appendChild(emptyRow);
+      card.appendChild(list);
+    } else {
+      var sorted = m.items.slice().sort(function(a,b){return b.val-a.val;});
+      var list = el('div','mc-vendors');
+      sorted.slice(0, PREVIEW).forEach(function(r){ list.appendChild(buildVendorRow(r)); });
+      card.appendChild(list);
+
+      if(sorted.length > PREVIEW){
+        var hidden = sorted.length - PREVIEW;
+        var expand = el('div','mc-expand');
+        var countBadge = el('span','mc-expand-count','+'+hidden+' more');
+        expand.appendChild(countBadge);
+        expand.appendChild(document.createTextNode('View all contracts'));
+        expand.appendChild(document.createTextNode(' →'));
+        (function(lbl, tot2, items){ expand.addEventListener('click', function(){ openMonthModal(lbl, tot2, items); }); })(MONTH_FULL[i], total, sorted);
+        card.appendChild(expand);
+      }
+    }
+
+    grid.appendChild(card);
+  });
+}
+
+function buildRenewalPulse(){
+  var wrap = document.getElementById('rp-wrap');
+  var panels = [
+    {cls:'rp-now',  label:'Act Now',    range:'Due within 30 days', min:-30, max:30},
+    {cls:'rp-soon', label:'In Window',  range:'Due in 31–90 days',  min:31,  max:90},
+    {cls:'rp-track',label:'On Track',   range:'Due in 91–180 days', min:91,  max:180}
+  ];
+
+  panels.forEach(function(p){
+    var items = RENEWALS.filter(function(r){
+      var d = daysOut(r.date);
+      return d >= p.min && d <= p.max;
+    }).sort(function(a,b){ return daysOut(a.date)-daysOut(b.date); });
+
+    var totalVal = items.reduce(function(s,r){return s+r.val;},0);
+    var panel = el('div','rp-panel '+p.cls);
+
+    var hdr = el('div','rp-panel-hdr');
+    hdr.appendChild(el('div','rp-accent'));
+    hdr.appendChild(el('div','rp-label', p.label));
+    var kpi = el('div','rp-kpi', items.length ? fmt(totalVal) : '—');
+    hdr.appendChild(kpi);
+    hdr.appendChild(el('div','rp-sub', items.length+' contract'+(items.length!==1?'s':'')+' · '+p.range));
+    panel.appendChild(hdr);
+
+    var list = el('div','rp-list');
+    var show = items.slice(0, 4);
+    show.forEach(function(r){
+      var days = daysOut(r.date);
+      var item = el('div','rp-item');
+      var left = el('div','rp-item-left');
+      var dot = el('div','rp-dot'); dot.style.background = TYPE_HEX[r.type];
+      left.appendChild(dot);
+      left.appendChild(el('span','rp-item-name', r.name));
+      item.appendChild(left);
+      var right = el('div'); right.style.display='flex'; right.style.gap='10px'; right.style.alignItems='center';
+      right.appendChild(el('span','rp-item-val', fmt(r.val)));
+      right.appendChild(el('span','rp-item-days', days<=0?'Today':days+'d'));
+      item.appendChild(right);
+      list.appendChild(item);
+    });
+
+    if(items.length > 4){
+      var more = el('div','rp-item');
+      more.style.justifyContent = 'center';
+      more.style.cursor = 'pointer';
+      var moreText = el('span','rp-label','+' + (items.length-4) + ' more — view all');
+      moreText.style.color = 'var(--ink4)';
+      moreText.style.textTransform = 'none';
+      moreText.style.letterSpacing = '0';
+      moreText.style.fontSize = '7.5pt';
+      more.appendChild(moreText);
+      var monthKey = items[0].date.substring(0,7);
+      var g2 = groupByMonth();
+      (function(lbl, tot2, itms){ more.addEventListener('click', function(){ openMonthModal(lbl, tot2, itms); }); })(p.label+' Renewals', totalVal, items);
+      list.appendChild(more);
+    }
+
+    panel.appendChild(list);
+    wrap.appendChild(panel);
+  });
+}
+
+function initScrollReveal(){
+  if(!('IntersectionObserver' in window)) return;
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting) e.target.classList.add('visible');
+    });
+  },{threshold:0.08});
+  document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
+}
+
+var grouped=groupByMonth();
+buildHero(grouped);
+buildExecBrief(grouped);
+buildLegend();
+buildChart(grouped);
+buildCards(grouped);
+buildRenewalPulse();
+initScrollReveal();
+
+document.querySelectorAll('.chart-card').forEach(function(c){c.classList.add('visible');});
+
+document.getElementById('modal-close-btn').addEventListener('click', function(){
+  document.getElementById('month-modal').classList.remove('open');
+});
+document.getElementById('month-modal').addEventListener('click', function(e){
+  if(e.target===this) this.classList.remove('open');
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape') document.getElementById('month-modal').classList.remove('open');
+});
+</script>
+</body>
+</html>

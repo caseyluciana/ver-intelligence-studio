@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Chief of Staff · Personal Work Dashboard</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-glow:rgba(244,63,94,0.16);--bloom-border:rgba(244,63,94,0.30);
+  --bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14);--mag-border:rgba(192,38,211,0.28);
+  --violet:#A855F7;--violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12);--vio-border:rgba(168,85,247,0.28);
+  --rose-gold:#E8A598;--blush:#FECDD3;
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --bg:#070411;--bg-side:#130D26;--bg-surface:rgba(255,255,255,0.034);
+  --bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 80% 0%,  rgba(192,38,211,0.28) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 92%,  rgba(244,63,94,0.22)  0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(168,85,247,0.08) 0%,transparent 60%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(244,63,94,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,63,94,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(244,63,94,0.028) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+.shell-wrap{position:relative;z-index:2;min-height:100vh;padding:0 16px;}
+
+/* ── Main / standalone ── */
+.main{min-width:0;display:flex;flex-direction:column;max-width:960px;margin:0 auto;width:100%;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 36px;height:54px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.88);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:10px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-crumb-meta{color:var(--ink-muted);font-size:10px;}
+.tb-gem-mini{width:26px;height:26px;border-radius:7px;flex-shrink:0;display:inline-flex;
+  align-items:center;justify-content:center;font-size:13px;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  box-shadow:0 0 12px rgba(244,63,94,0.32);}
+.tb-cos-label{font-size:12px;font-weight:800;color:var(--bloom-bright);}
+.tb-actions{display:flex;align-items:center;gap:8px;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.tb-btn-primary{background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  color:#fff;border-color:transparent;box-shadow:0 0 16px rgba(244,63,94,0.28);}
+.tb-btn-primary:hover{opacity:0.88;color:#fff;}
+.content{flex:1;overflow-y:auto;padding:28px 36px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── Hero ── */
+.hero{position:relative;overflow:hidden;border-radius:18px;padding:36px 44px 32px;
+  margin-bottom:24px;
+  background:linear-gradient(135deg,#0C0618 0%,#18072A 38%,#1E0822 68%,#0E061C 100%);
+  border:1px solid rgba(244,63,94,0.14);animation:rise 0.5s var(--ease) 0.05s both;}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 94% 12%,rgba(192,38,211,0.34) 0%,transparent 50%),
+    radial-gradient(ellipse at 6% 88%,rgba(244,63,94,0.26) 0%,transparent 46%),
+    radial-gradient(ellipse at 55% 52%,rgba(168,85,247,0.12) 0%,transparent 58%);}
+.hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);
+  background-size:48px 48px;}
+.hero-inner{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;}
+.hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;
+  color:rgba(255,255,255,0.52);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.hero-pip{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);flex-shrink:0;}
+.hero-greeting{font-size:13px;font-weight:400;color:rgba(255,255,255,0.68);margin-bottom:4px;}
+.hero-name{font-size:clamp(28px,3.2vw,46px);font-weight:900;line-height:1.0;
+  letter-spacing:-0.03em;margin-bottom:10px;
+  background:linear-gradient(92deg,var(--bloom) 0%,var(--magenta) 50%,var(--violet) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.hero-tagline{font-size:12px;color:rgba(255,255,255,0.62);line-height:1.65;max-width:460px;margin-bottom:18px;}
+.hero-date{font-size:11px;color:rgba(255,255,255,0.44);margin-bottom:18px;}
+.hero-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+.cos-name-badge{background:rgba(244,63,94,0.10);border:1px solid rgba(244,63,94,0.24);
+  border-radius:12px;padding:14px 20px;text-align:center;min-width:140px;}
+.cos-name-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.42);margin-bottom:6px;}
+.cos-name-val{font-size:17px;font-weight:900;color:var(--ink);margin-bottom:2px;}
+.cos-name-title{font-size:10px;color:var(--bloom-bright);font-weight:700;}
+.cos-name-edit{font-size:9px;color:rgba(255,255,255,0.36);cursor:pointer;margin-top:4px;border:none;background:none;font-family:var(--font);}
+.cos-name-edit:hover{color:var(--bloom-bright);}
+
+/* ── Section head ── */
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sec-title{font-size:13px;font-weight:800;color:var(--ink);}
+.sec-pill{font-size:8px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;
+  padding:2px 8px;border-radius:99px;
+  background:var(--bloom-status);color:var(--bloom-bright);border:1px solid var(--bloom-border);}
+.mb24{margin-bottom:24px;}
+
+/* ── Health strip ── */
+.health-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;animation:rise 0.5s var(--ease) 0.12s both;}
+.health-kpi{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;
+  padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;}
+.health-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0;}
+.hk-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.hk-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.hk-rose::before   {background:linear-gradient(90deg,#F9A8D4,var(--rose-gold));}
+.hk-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.health-kpi:hover{box-shadow:0 4px 20px rgba(244,63,94,0.08);}
+.hk-bloom:hover  {border-color:rgba(244,63,94,0.26);}
+.hk-magenta:hover{border-color:rgba(192,38,211,0.26);}
+.hk-rose:hover   {border-color:rgba(249,168,212,0.26);}
+.hk-violet:hover {border-color:rgba(168,85,247,0.26);}
+.hk-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;color:var(--ink-muted);margin-bottom:6px;}
+.hk-val{font-size:28px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:3px;}
+.hk-bloom   .hk-val{color:var(--bloom-bright);}
+.hk-magenta .hk-val{color:var(--magenta-bright);}
+.hk-rose    .hk-val{color:var(--rose-gold);}
+.hk-violet  .hk-val{color:var(--violet-bright);}
+.hk-sub{font-size:10px;color:var(--ink-muted);}
+
+/* ── Priority actions ── */
+.priorities{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;animation:rise 0.5s var(--ease) 0.18s both;}
+.priority-card{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-radius:12px;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  transition:background 0.15s,border-color 0.15s;cursor:default;}
+.priority-card:hover{background:rgba(244,63,94,0.06);border-color:rgba(244,63,94,0.18);}
+.p-urgency-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.p-dot-high  {background:var(--bloom);}
+.p-dot-medium{background:var(--magenta-bright);}
+.p-dot-low   {background:var(--violet-bright);}
+.p-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.p-body{flex:1;min-width:0;}
+.p-label{font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.94);line-height:1.5;margin-bottom:3px;}
+.p-meta{font-size:10px;color:rgba(255,255,255,0.50);}
+.p-tag{display:inline-flex;align-items:center;font-size:8px;font-weight:700;padding:2px 8px;
+  border-radius:99px;border:1px solid;text-transform:uppercase;letter-spacing:0.08em;flex-shrink:0;align-self:center;white-space:nowrap;}
+.pt-high  {background:rgba(244,63,94,0.10);color:var(--bloom-bright);border-color:rgba(244,63,94,0.28);}
+.pt-medium{background:rgba(192,38,211,0.10);color:var(--magenta-bright);border-color:rgba(192,38,211,0.28);}
+.pt-low   {background:rgba(168,85,247,0.10);color:var(--violet-bright);border-color:rgba(168,85,247,0.28);}
+.p-resolve{background:none;border:1px solid rgba(52,211,153,0.28);color:rgba(52,211,153,0.70);
+  border-radius:6px;padding:3px 9px;font-size:9px;font-weight:700;cursor:pointer;font-family:var(--font);
+  flex-shrink:0;align-self:center;transition:background 0.15s,color 0.15s,border-color 0.15s;white-space:nowrap;}
+.p-resolve:hover{background:rgba(52,211,153,0.12);color:var(--green);border-color:rgba(52,211,153,0.50);}
+.p-resolve.done{background:rgba(52,211,153,0.12);color:var(--green);border-color:rgba(52,211,153,0.30);cursor:default;}
+
+/* ── Add priority ── */
+.add-priority{display:flex;gap:8px;align-items:center;padding:11px 16px;border-radius:11px;
+  border:1px dashed rgba(244,63,94,0.22);background:rgba(244,63,94,0.03);margin-bottom:8px;}
+.add-priority-input{flex:1;background:transparent;border:none;color:var(--ink);font-family:var(--font);
+  font-size:12px;outline:none;}
+.add-priority-input::placeholder{color:rgba(255,255,255,0.24);}
+.add-select{background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  border-radius:7px;color:var(--ink-dim);font-family:var(--font);font-size:11px;padding:5px 8px;cursor:pointer;outline:none;}
+.add-select option{background:#150D28;}
+.add-btn{padding:6px 14px;border-radius:99px;border:1px solid rgba(244,63,94,0.35);
+  background:rgba(244,63,94,0.10);color:var(--bloom-bright);font-size:10px;font-weight:800;
+  cursor:pointer;font-family:var(--font);white-space:nowrap;transition:background 0.15s;}
+.add-btn:hover{background:rgba(244,63,94,0.20);}
+
+/* ── Radar / Calendar ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;animation:rise 0.5s var(--ease) 0.24s both;}
+.radar-card,.notes-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;padding:20px 22px;}
+.radar-list{display:flex;flex-direction:column;gap:7px;}
+.radar-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:9px;
+  background:rgba(255,255,255,0.024);border:1px solid rgba(255,255,255,0.05);
+  transition:background 0.15s;}
+.radar-item:hover{background:rgba(255,255,255,0.044);}
+.radar-date{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+  padding:3px 8px;border-radius:6px;flex-shrink:0;}
+.rd-risk      {background:rgba(244,63,94,0.12);color:var(--bloom-bright);}
+.rd-governance{background:rgba(192,38,211,0.12);color:var(--magenta-bright);}
+.rd-cqbr      {background:rgba(168,85,247,0.12);color:var(--violet-bright);}
+.rd-intel     {background:rgba(232,165,152,0.12);color:var(--rose-gold);}
+.rd-intake    {background:rgba(52,211,153,0.10);color:var(--green);}
+.radar-label{font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.86);flex:1;line-height:1.35;}
+.radar-del{background:none;border:none;color:rgba(255,255,255,0.22);font-size:14px;cursor:pointer;
+  padding:0 3px;flex-shrink:0;line-height:1;transition:color 0.12s;}
+.radar-del:hover{color:var(--bloom-bright);}
+.add-radar{display:flex;gap:7px;margin-top:10px;}
+.radar-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border-soft);
+  border-radius:7px;padding:7px 11px;color:var(--ink);font-family:var(--font);font-size:12px;outline:none;}
+.radar-input:focus{border-color:rgba(244,63,94,0.40);}
+.radar-input::placeholder{color:rgba(255,255,255,0.24);}
+.radar-date-input{width:128px;background:rgba(255,255,255,0.04);border:1px solid var(--border-soft);
+  border-radius:7px;padding:7px 11px;color:var(--ink);font-family:var(--font);font-size:12px;outline:none;}
+.radar-date-input:focus{border-color:rgba(244,63,94,0.40);}
+
+/* ── Notes / Scratchpad ── */
+.notes-area{width:100%;min-height:180px;background:rgba(255,255,255,0.03);
+  border:1px solid var(--border-soft);border-radius:9px;padding:12px 14px;
+  color:var(--ink);font-family:var(--font);font-size:12px;line-height:1.7;resize:vertical;outline:none;}
+.notes-area:focus{border-color:rgba(244,63,94,0.35);}
+.notes-area::placeholder{color:rgba(255,255,255,0.24);}
+.notes-saved{font-size:9px;color:rgba(255,255,255,0.28);margin-top:5px;height:14px;transition:opacity 0.5s;}
+
+/* ── Insight / Portfolio ── */
+.insight-card{background:linear-gradient(135deg,rgba(244,63,94,0.08),rgba(192,38,211,0.08));
+  border:1px solid rgba(244,63,94,0.16);border-left:3px solid var(--bloom);
+  border-radius:13px;padding:20px 24px;margin-bottom:24px;animation:rise 0.5s var(--ease) 0.30s both;}
+.insight-label{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--bloom-bright);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.insight-text{font-size:13px;color:rgba(255,255,255,0.88);line-height:1.72;}
+.insight-text strong{color:var(--bloom-bright);}
+.insight-edit-area{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(244,63,94,0.28);
+  border-radius:8px;padding:10px 14px;color:var(--ink);font-family:var(--font);font-size:13px;
+  line-height:1.7;resize:vertical;min-height:80px;outline:none;margin-top:8px;}
+.insight-edit-area:focus{border-color:rgba(244,63,94,0.50);}
+
+/* ── Integrations hub ── */
+.integrations-panel{margin-bottom:24px;}
+.send-all-btn{width:100%;padding:13px;border-radius:12px;margin-bottom:14px;cursor:pointer;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta),var(--violet));
+  border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:800;
+  letter-spacing:0.02em;box-shadow:0 0 28px rgba(244,63,94,0.30);transition:opacity 0.15s;}
+.send-all-btn:hover{opacity:0.88;}
+.int-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.int-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;
+  padding:18px 20px;display:flex;flex-direction:column;gap:10px;transition:border-color 0.2s;}
+.int-card:hover{border-color:rgba(244,63,94,0.22);}
+.int-header{display:flex;align-items:center;gap:10px;}
+.int-icon{font-size:22px;flex-shrink:0;}
+.int-header-text{flex:1;}
+.int-title{font-size:12.5px;font-weight:800;color:var(--ink);}
+.int-sub{font-size:10px;color:var(--ink-muted);}
+.int-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,0.18);}
+.int-dot.ready{background:var(--green);}
+.int-dot.set{background:var(--amber);}
+.int-config{display:flex;flex-direction:column;gap:6px;}
+.int-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  border-radius:7px;padding:7px 10px;color:var(--ink);font-family:var(--font);font-size:11px;outline:none;}
+.int-input:focus{border-color:rgba(244,63,94,0.40);}
+.int-input::placeholder{color:rgba(255,255,255,0.22);}
+.int-note{font-size:10.5px;color:var(--ink-muted);line-height:1.6;padding:8px 10px;
+  background:rgba(255,255,255,0.03);border-radius:7px;border:1px solid var(--border);}
+.int-actions{display:flex;gap:7px;}
+.int-btn{flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--border-soft);
+  background:rgba(255,255,255,0.06);color:var(--ink-dim);font-size:10px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,color 0.15s;}
+.int-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.int-btn-primary{background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  color:#fff;border-color:transparent;box-shadow:0 0 12px rgba(244,63,94,0.22);}
+.int-btn-primary:hover{opacity:0.88;color:#fff;}
+.int-help{font-size:9.5px;color:rgba(255,255,255,0.28);line-height:1.6;}
+.int-status-msg{font-size:10px;min-height:14px;line-height:1.5;}
+@media(max-width:780px){.int-grid{grid-template-columns:1fr;}}
+
+/* ── Briefing history ── */
+.history-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:9px;
+  background:rgba(255,255,255,0.024);border:1px solid rgba(255,255,255,0.05);margin-bottom:7px;
+  transition:background 0.15s;}
+.history-row:hover{background:rgba(255,255,255,0.044);}
+.history-date{font-size:10px;font-weight:800;color:var(--ink-dim);width:80px;flex-shrink:0;}
+.history-actions-count{font-size:10px;color:var(--bloom-bright);width:72px;flex-shrink:0;}
+.history-note{font-size:11px;color:var(--ink-muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-del{background:none;border:none;color:rgba(255,255,255,0.18);font-size:12px;cursor:pointer;flex-shrink:0;}
+.history-del:hover{color:var(--bloom);}
+
+/* ── COS name editor ── */
+.up-overlay{position:fixed;inset:0;z-index:600;background:rgba(7,4,17,0.94);
+  backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center;padding:24px;}
+.up-overlay.hidden{display:none;}
+.up-panel{width:100%;max-width:420px;animation:rise 0.4s var(--ease) both;text-align:center;}
+.up-gem{width:52px;height:52px;border-radius:15px;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 0 36px rgba(244,63,94,0.42);}
+.up-title{font-size:22px;font-weight:900;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom),var(--magenta),var(--violet));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.up-sub{font-size:12px;color:var(--ink-muted);margin-bottom:22px;line-height:1.6;}
+.up-input{width:100%;padding:12px 16px;border-radius:10px;margin-bottom:12px;
+  background:rgba(255,255,255,0.06);border:1px solid var(--border-soft);
+  color:var(--ink);font-family:var(--font);font-size:15px;font-weight:700;text-align:center;outline:none;
+  transition:border-color 0.15s;}
+.up-input:focus{border-color:var(--bloom-border);}
+.up-input::placeholder{color:var(--ink-muted);}
+.up-go{width:100%;padding:12px;border-radius:99px;cursor:pointer;
+  background:linear-gradient(90deg,var(--bloom),var(--magenta));
+  border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:800;
+  box-shadow:0 0 22px rgba(244,63,94,0.30);transition:opacity 0.15s;}
+.up-go:hover{opacity:0.88;}
+
+/* ── PDF export ── */
+.export-bar{display:flex;align-items:center;gap:10px;margin-bottom:24px;animation:rise 0.5s var(--ease) 0.36s both;}
+
+/* ── Inbox Triage panel ── */
+.inbox-panel{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;
+  padding:18px 22px;margin-bottom:24px;}
+.inbox-connect-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.inbox-conn-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:rgba(255,255,255,0.06);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.inbox-conn-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.inbox-conn-btn.connected{background:rgba(52,211,153,0.10);border-color:rgba(52,211,153,0.30);color:var(--green);}
+.inbox-conn-btn .conn-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.inbox-fetch-btn{padding:7px 16px;border-radius:99px;border:none;cursor:pointer;font-family:var(--font);
+  font-size:10px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta));color:#fff;
+  box-shadow:0 0 14px rgba(244,63,94,0.24);transition:opacity 0.15s;}
+.inbox-fetch-btn:hover{opacity:0.86;}
+.inbox-status{font-size:10px;color:var(--ink-muted);flex:1;}
+.inbox-feed{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.inbox-feed::-webkit-scrollbar{width:4px;}
+.inbox-feed::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+.inbox-item{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:9px;
+  background:rgba(255,255,255,0.024);border:1px solid rgba(255,255,255,0.05);
+  animation:rise 0.3s var(--ease) both;}
+.inbox-item.dismissed{opacity:0.28;pointer-events:none;}
+.inbox-source{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;
+  flex-shrink:0;padding:2px 7px;border-radius:5px;margin-top:2px;white-space:nowrap;}
+.src-slack{background:rgba(168,85,247,0.14);color:var(--violet-bright);}
+.src-gmail{background:rgba(244,63,94,0.12);color:var(--bloom-bright);}
+.inbox-body{flex:1;min-width:0;}
+.inbox-from{font-size:10px;font-weight:700;color:var(--ink-dim);margin-bottom:2px;}
+.inbox-text{font-size:11.5px;color:var(--ink);line-height:1.45;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.inbox-time{font-size:9px;color:var(--ink-muted);}
+.inbox-actions{display:flex;gap:5px;flex-shrink:0;align-self:center;}
+.ia-btn{padding:4px 9px;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;
+  border:1px solid;font-family:var(--font);transition:background 0.12s;white-space:nowrap;}
+.ia-priority{background:rgba(244,63,94,0.10);color:var(--bloom-bright);border-color:rgba(244,63,94,0.28);}
+.ia-priority:hover{background:rgba(244,63,94,0.22);}
+.ia-radar{background:rgba(168,85,247,0.10);color:var(--violet-bright);border-color:rgba(168,85,247,0.28);}
+.ia-radar:hover{background:rgba(168,85,247,0.20);}
+.ia-dismiss{background:rgba(255,255,255,0.04);color:var(--ink-muted);border-color:rgba(255,255,255,0.10);}
+.ia-dismiss:hover{background:rgba(255,255,255,0.10);}
+.inbox-empty{text-align:center;padding:22px 0;color:rgba(255,255,255,0.28);font-size:11px;}
+.inbox-config{margin-top:12px;padding:12px 14px;border-radius:9px;
+  background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);}
+.inbox-config-title{font-size:9px;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.12em;color:var(--ink-muted);margin-bottom:8px;}
+.inbox-config-row{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap;}
+.inbox-config-row:last-child{margin-bottom:0;}
+.inbox-config-lbl{font-size:10px;color:var(--ink-muted);width:80px;flex-shrink:0;}
+.inbox-cfg-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  border-radius:7px;padding:5px 9px;color:var(--ink);font-family:var(--font);
+  font-size:11px;outline:none;min-width:0;}
+.inbox-cfg-input:focus{border-color:rgba(244,63,94,0.35);}
+
+/* ── Footer ── */
+.portal-footer{margin-top:8px;padding:12px 16px;
+  background:rgba(244,63,94,0.04);border:1px solid rgba(244,63,94,0.10);border-radius:10px;
+  display:flex;align-items:center;gap:10px;font-size:10px;color:var(--ink-muted);line-height:1.65;}
+.portal-footer strong{color:var(--ink-dim);}
+
+@media(max-width:1100px){.two-col{grid-template-columns:1fr;}.health-strip{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.content{padding:16px 16px 40px;}.health-strip{grid-template-columns:1fr 1fr;}.topbar{padding:0 16px;}.hero{padding:24px 22px 20px;}}
+</style>
+</head>
+<body data-portal="true">
+<div class="scan" aria-hidden="true"></div>
+
+<!-- COS Name Picker -->
+<div class="up-overlay hidden" id="up-overlay">
+  <div class="up-panel">
+    <div class="up-gem">&#129504;</div>
+    <div class="up-title">What do you want to call this?</div>
+    <div class="up-sub">Give your personal dashboard a name — it shows in the header, PDF exports, and Slack posts. Your name, a nickname, or just "Briefing" works great.</div>
+    <input type="text" class="up-input" id="cos-name-input" placeholder="e.g. Casey, My Briefing, Daily CoS…" maxlength="32">
+    <button class="up-go" onclick="_saveCosName()">Save name &#8594;</button>
+  </div>
+</div>
+
+<div class="shell-wrap">
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <span class="tb-gem-mini">&#129504;</span>
+        <span class="tb-cos-label" id="tb-cos-name">Chief of Staff</span>
+        <span class="tb-crumb-sep">&middot;</span>
+        <span class="tb-crumb-meta">Personal Work Dashboard</span>
+      </div>
+      <div class="tb-actions">
+        <button type="button" class="tb-btn tb-btn-primary" onclick="_exportPDF()">&#11015; Export Briefing</button>
+        <button type="button" class="tb-btn" onclick="_saveBriefingSnapshot()">&#128190; Save Snapshot</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div>
+            <div class="hero-eyebrow"><span class="hero-pip"></span>Personal Work Dashboard &nbsp;&middot;&nbsp; <span id="hero-date-eyebrow"></span></div>
+            <div class="hero-greeting" id="hero-greeting">Good morning,</div>
+            <div class="hero-name" id="hero-name">Chief of Staff.</div>
+            <p class="hero-tagline" id="hero-tagline">Your personal daily command center — priorities, deadlines, notes, and Slack posting in one place. Fully private, saves locally, exports to PDF.</p>
+            <div class="hero-date" id="hero-date"></div>
+          </div>
+          <div class="hero-right">
+            <div class="cos-name-badge">
+              <div class="cos-name-label">&#129504; Your CoS</div>
+              <div class="cos-name-val" id="cos-display-name">Unnamed</div>
+              <div class="cos-name-title">Chief of Staff</div>
+              <button class="cos-name-edit" onclick="_openNamePicker()">Rename &#9998;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEALTH STRIP — click any number to edit -->
+      <div class="health-strip">
+        <div class="health-kpi hk-bloom">
+          <div class="hk-label">Open Items</div>
+          <div class="hk-val" id="hk-intake">—</div>
+          <div class="hk-sub">Tap to set your number</div>
+        </div>
+        <div class="health-kpi hk-magenta">
+          <div class="hk-label">This Week</div>
+          <div class="hk-val" id="hk-vendors">—</div>
+          <div class="hk-sub">Meetings / deliverables</div>
+        </div>
+        <div class="health-kpi hk-rose">
+          <div class="hk-label">Watching</div>
+          <div class="hk-val" id="hk-contracts">—</div>
+          <div class="hk-sub">Contracts / decisions</div>
+        </div>
+        <div class="health-kpi hk-violet">
+          <div class="hk-label">Streak</div>
+          <div class="hk-val" id="hk-risk">—</div>
+          <div class="hk-sub">Days using this tool</div>
+        </div>
+      </div>
+
+      <!-- PRIORITY ACTIONS -->
+      <div class="sec-head">
+        <div class="sec-title">&#9889; Priority Actions</div>
+        <span class="sec-pill" id="priority-pill">0 items</span>
+      </div>
+
+      <!-- Add priority -->
+      <div class="add-priority">
+        <span style="font-size:15px;color:var(--bloom-bright);">&#10133;</span>
+        <input type="text" class="add-priority-input" id="add-p-input" placeholder="Add a priority action… (e.g. 'Review Accenture SOW with Legal by EOD')">
+        <select class="add-select" id="add-p-urgency">
+          <option value="high">🔴 High</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <button class="add-btn" onclick="_addPriority()">Add</button>
+      </div>
+
+      <div class="priorities" id="priorities-list"></div>
+
+      <!-- RADAR + NOTES -->
+      <div class="two-col mb24">
+
+        <!-- On the Radar -->
+        <div class="radar-card">
+          <div class="sec-head" style="margin-bottom:12px;">
+            <div class="sec-title">&#128197; On the Radar</div>
+          </div>
+          <div class="radar-list" id="radar-list"></div>
+          <div class="add-radar">
+            <input type="date" class="radar-date-input" id="add-r-date">
+            <input type="text" class="radar-input" id="add-r-label" placeholder="Event or deadline…">
+            <select class="add-select" id="add-r-type">
+              <option value="risk">Risk</option>
+              <option value="governance">Governance</option>
+              <option value="cqbr">CQBR</option>
+              <option value="intel">Intel</option>
+              <option value="intake">Intake</option>
+            </select>
+            <button class="add-btn" onclick="_addRadar()">+</button>
+          </div>
+        </div>
+
+        <!-- Director Notes / Scratchpad -->
+        <div class="notes-card">
+          <div class="sec-head" style="margin-bottom:12px;">
+            <div class="sec-title">&#128221; Director Notes</div>
+          </div>
+          <textarea class="notes-area" id="notes-area" placeholder="Freeform notes, talking points, decisions made, context for the team…&#10;&#10;Auto-saves as you type."></textarea>
+          <div class="notes-saved" id="notes-saved"></div>
+        </div>
+
+      </div>
+
+      <!-- PORTFOLIO INSIGHT -->
+      <div class="insight-card mb24">
+        <div class="insight-label">&#128161; Portfolio Insight &nbsp;&middot;&nbsp; <span style="font-weight:400;text-transform:none;letter-spacing:0;color:rgba(255,255,255,0.50);font-size:10px;">Click to edit</span></div>
+        <div class="insight-text" id="insight-display" onclick="_editInsight()" style="cursor:pointer;" title="Click to edit"></div>
+        <textarea class="insight-edit-area hidden" id="insight-edit" placeholder="Write your portfolio insight…"></textarea>
+        <div style="display:none;margin-top:8px;gap:8px;" id="insight-actions">
+          <button class="add-btn" onclick="_saveInsight()">Save</button>
+          <button onclick="_cancelInsight()" style="background:none;border:none;color:var(--ink-muted);font-size:11px;cursor:pointer;font-family:var(--font);">Cancel</button>
+        </div>
+      </div>
+
+      <!-- INTEGRATIONS -->
+      <div class="sec-head">
+        <div class="sec-title">&#128268; Send Briefing</div>
+        <span class="sec-pill" id="integrations-pill">3 channels</span>
+      </div>
+      <div class="integrations-panel">
+        <button class="send-all-btn" onclick="_sendAll()">&#9889; Send to All Connected Channels</button>
+        <div class="int-grid">
+
+          <!-- Slack -->
+          <div class="int-card">
+            <div class="int-header">
+              <span class="int-icon">&#129695;</span>
+              <div class="int-header-text">
+                <div class="int-title">Slack</div>
+                <div class="int-sub">Post to any channel or DM</div>
+              </div>
+              <div class="int-dot" id="slack-dot"></div>
+            </div>
+            <div class="int-config">
+              <input type="text" class="int-input" id="slack-webhook" placeholder="https://hooks.slack.com/services/T…">
+              <input type="text" class="int-input" id="slack-channel" placeholder="#channel or @yourself">
+            </div>
+            <div class="int-note">
+              Slack → <em>Apps → Incoming Webhooks → Add New Webhook</em> → pick your channel → copy the URL above. DM yourself for a private daily reminder.
+            </div>
+            <div class="int-actions">
+              <button class="int-btn" onclick="_testSlack()">&#9654; Test</button>
+              <button class="int-btn int-btn-primary" onclick="_postToSlack()">&#128229; Post</button>
+            </div>
+            <div class="int-status-msg" id="slack-status"></div>
+          </div>
+
+          <!-- Gmail -->
+          <div class="int-card">
+            <div class="int-header">
+              <span class="int-icon">&#128140;</span>
+              <div class="int-header-text">
+                <div class="int-title">Gmail</div>
+                <div class="int-sub">Email briefing to yourself</div>
+              </div>
+              <div class="int-dot" id="gmail-dot"></div>
+            </div>
+            <div class="int-config">
+              <input type="email" class="int-input" id="gmail-service-id" placeholder="EmailJS Service ID (e.g. service_abc123)">
+              <input type="text" class="int-input" id="gmail-template-id" placeholder="EmailJS Template ID (e.g. template_xyz)">
+              <input type="text" class="int-input" id="gmail-user-key" placeholder="EmailJS Public Key">
+              <input type="email" class="int-input" id="gmail-to" placeholder="Your email (e.g. casey@salesforce.com)">
+            </div>
+            <div class="int-note">
+              Free setup: <em>emailjs.com → Add Service (Gmail) → Create Template → copy IDs above.</em> Template should use <code style="color:var(--bloom-bright);">{{subject}}</code>, <code style="color:var(--bloom-bright);">{{message}}</code>, <code style="color:var(--bloom-bright);">{{to_email}}</code>.
+            </div>
+            <div class="int-actions">
+              <button class="int-btn" onclick="_testGmail()">&#9654; Test</button>
+              <button class="int-btn int-btn-primary" onclick="_sendGmail()">&#128140; Send</button>
+            </div>
+            <div class="int-status-msg" id="gmail-status"></div>
+          </div>
+
+          <!-- Calendar -->
+          <div class="int-card">
+            <div class="int-header">
+              <span class="int-icon">&#128197;</span>
+              <div class="int-header-text">
+                <div class="int-title">Calendar</div>
+                <div class="int-sub">Export radar as .ics events</div>
+              </div>
+              <div class="int-dot ready" id="cal-dot"></div>
+            </div>
+            <div class="int-config">
+              <input type="text" class="int-input" id="cal-prefix" placeholder="Event prefix (e.g. [VER]) — optional">
+            </div>
+            <div class="int-note">
+              Downloads a <strong>.ics file</strong> — open it to import all your Radar deadlines into Google Calendar, Outlook, or Apple Calendar in one click. No login required.
+            </div>
+            <div class="int-actions">
+              <button class="int-btn int-btn-primary" onclick="_exportCalendar()" style="flex:1;">&#11015; Export .ics</button>
+            </div>
+            <div class="int-status-msg" id="cal-status"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INBOX TRIAGE -->
+      <div class="sec-head">
+        <div class="sec-title">&#128236; Inbox Triage</div>
+        <span class="sec-pill" id="inbox-pill">Pull from Slack &amp; Gmail</span>
+      </div>
+      <div class="inbox-panel">
+        <div class="inbox-connect-row">
+          <button type="button" class="inbox-conn-btn" id="slack-conn-btn" onclick="_connectSlackInbox()">
+            <span class="conn-dot"></span> &#129695; Slack
+          </button>
+          <button type="button" class="inbox-conn-btn" id="gmail-conn-btn" onclick="_connectGmailInbox()">
+            <span class="conn-dot"></span> &#128140; Gmail
+          </button>
+          <button type="button" class="inbox-fetch-btn" onclick="_fetchInbox()">&#8635; Fetch</button>
+          <span class="inbox-status" id="inbox-status">Connect a source to pull messages.</span>
+        </div>
+
+        <!-- Slack config (bot token + channel) -->
+        <div class="inbox-config" id="slack-inbox-config" style="display:none;">
+          <div class="inbox-config-title">&#129695; Slack — Bot Token</div>
+          <div class="inbox-config-row">
+            <span class="inbox-config-lbl">Bot Token</span>
+            <input type="text" class="inbox-cfg-input" id="slack-bot-token" placeholder="xoxb-…">
+          </div>
+          <div class="inbox-config-row">
+            <span class="inbox-config-lbl">Channel ID</span>
+            <input type="text" class="inbox-cfg-input" id="slack-inbox-channel" placeholder="C0123ABC456 (not #name)">
+          </div>
+          <div style="font-size:9.5px;color:rgba(255,255,255,0.28);margin-top:6px;line-height:1.6;">
+            Slack → <em>Your App → OAuth & Permissions → Bot Token</em>. Add scopes: <code style="color:var(--violet-bright);">channels:history</code> <code style="color:var(--violet-bright);">im:history</code>. Channel ID: right-click a channel in Slack → Copy Link → last segment.
+          </div>
+        </div>
+
+        <!-- Gmail config (Google Client ID) -->
+        <div class="inbox-config" id="gmail-inbox-config" style="display:none;">
+          <div class="inbox-config-title">&#128140; Gmail — Google OAuth</div>
+          <div class="inbox-config-row">
+            <span class="inbox-config-lbl">Client ID</span>
+            <input type="text" class="inbox-cfg-input" id="gmail-client-id" placeholder="123456789-abc….apps.googleusercontent.com">
+          </div>
+          <div style="font-size:9.5px;color:rgba(255,255,255,0.28);margin-top:6px;line-height:1.6;">
+            <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" style="color:var(--bloom-bright);">Google Cloud Console</a> → New Project → Enable Gmail API → Credentials → OAuth Client ID (Web) → add <code style="color:var(--violet-bright);">http://localhost</code> &amp; your file URL as origins. Paste Client ID above → click Authorize → Google consent popup → done.
+          </div>
+          <button type="button" class="inbox-conn-btn" id="gmail-auth-btn" onclick="_authorizeGmail()" style="margin-top:10px;">&#128275; Authorize Gmail</button>
+        </div>
+
+        <div class="inbox-feed" id="inbox-feed">
+          <div class="inbox-empty" id="inbox-empty">Fetch messages to see them here. Add to your priorities or radar with one click.</div>
+        </div>
+      </div>
+
+      <!-- BRIEFING HISTORY -->
+      <div class="sec-head">
+        <div class="sec-title">&#128336; Briefing History</div>
+        <span class="sec-pill" id="history-pill">Saved snapshots</span>
+      </div>
+      <div id="history-list" style="margin-bottom:28px;"></div>
+
+      <div class="portal-footer">
+        <span style="font-size:15px;">&#128274;</span>
+        <span><strong>Private.</strong> Chief of Staff &middot; Personal Work Dashboard &middot; Data saved in this browser only. <a href="team_portal.html" style="color:var(--bloom-bright);text-decoration:none;">&#8617; Back to Portal</a></span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   STORAGE KEYS
+═══════════════════════════════════════════════════════ */
+var COS_KEY           = 'ver-cos-standalone';
+var COS_NAME_KEY      = 'ver-cos-name';
+var COS_NOTES_KEY     = 'ver-cos-notes';
+var COS_INSIGHT_KEY   = 'ver-cos-insight';
+var COS_HISTORY_KEY   = 'ver-cos-history';
+var SLACK_WEBHOOK_KEY  = 'ver-cos-slack-webhook';
+var SLACK_CHANNEL_KEY  = 'ver-cos-slack-channel';
+
+/* ═══════════════════════════════════════════════════════
+   DEFAULT DATA
+═══════════════════════════════════════════════════════ */
+var DEFAULT_PRIORITIES = [
+  { id:'p001', label:'Add your first priority action — what needs to happen before end of day?', urgency:'high',   done:false, meta:'Replace this with something real · tap + to add more' },
+  { id:'p002', label:'Set up your Slack webhook to enable one-click daily briefing posting.',    urgency:'medium', done:false, meta:'Slack Integration · 2 min setup below' },
+  { id:'p003', label:'Edit your health stats (the 4 tiles above) — make them meaningful to you.', urgency:'low',  done:false, meta:'Click any number to edit it' }
+];
+
+var DEFAULT_RADAR = [
+  { id:'r001', date:'2026-07-10', label:'Add an upcoming deadline or event here',    type:'intel' },
+  { id:'r002', date:'2026-07-14', label:'Add a meeting or decision point',           type:'governance' },
+  { id:'r003', date:'2026-07-22', label:'Add a review or deliverable',               type:'cqbr' }
+];
+
+var DEFAULT_INSIGHT = 'Click here to write your own portfolio insight. Use <strong>**bold text**</strong> for emphasis — it renders when you save. This is a good place for a weekly north-star statement or a key decision you are tracking.';
+
+/* ═══════════════════════════════════════════════════════
+   LOAD / SAVE STATE
+═══════════════════════════════════════════════════════ */
+function _loadState() {
+  try {
+    var s = JSON.parse(localStorage.getItem(COS_KEY));
+    if (s && s.priorities) return s;
+  } catch(e){}
+  return { priorities: DEFAULT_PRIORITIES.map(function(p){ return Object.assign({},p); }),
+           radar:      DEFAULT_RADAR.map(function(r){ return Object.assign({},r); }) };
+}
+
+function _saveState(state) {
+  try { localStorage.setItem(COS_KEY, JSON.stringify(state)); } catch(e){}
+}
+
+/* ═══════════════════════════════════════════════════════
+   COS NAME
+═══════════════════════════════════════════════════════ */
+function _getCosName() {
+  try { return localStorage.getItem(COS_NAME_KEY) || ''; } catch(e){ return ''; }
+}
+
+function _openNamePicker() {
+  var n = _getCosName();
+  document.getElementById('cos-name-input').value = n;
+  document.getElementById('up-overlay').classList.remove('hidden');
+  setTimeout(function(){ document.getElementById('cos-name-input').focus(); }, 80);
+}
+
+function _saveCosName() {
+  var val = document.getElementById('cos-name-input').value.trim();
+  if (!val) return;
+  try { localStorage.setItem(COS_NAME_KEY, val); } catch(e){}
+  document.getElementById('up-overlay').classList.add('hidden');
+  _applyName(val);
+}
+
+function _applyName(name) {
+  if (!name) name = 'Chief of Staff';
+  document.getElementById('cos-display-name').textContent = name;
+  document.getElementById('tb-cos-name').textContent = name;
+  document.getElementById('hero-name').textContent = name + '.';
+}
+
+document.getElementById('cos-name-input').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') _saveCosName();
+  if (e.key === 'Escape') document.getElementById('up-overlay').classList.add('hidden');
+});
+document.getElementById('up-overlay').addEventListener('click', function(e){
+  if (e.target === document.getElementById('up-overlay')) document.getElementById('up-overlay').classList.add('hidden');
+});
+
+/* ═══════════════════════════════════════════════════════
+   GREETING / DATE
+═══════════════════════════════════════════════════════ */
+function _getGreeting() {
+  var h = new Date().getHours();
+  if (h >= 5  && h < 12) return 'Good morning,';
+  if (h >= 12 && h < 17) return 'Good afternoon,';
+  if (h >= 17 && h < 21) return 'Good evening,';
+  return 'Burning the midnight oil,';
+}
+
+function _dateStr() {
+  var now = new Date();
+  var days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRIORITIES
+═══════════════════════════════════════════════════════ */
+function _renderPriorities() {
+  var state = _loadState();
+  var list  = document.getElementById('priorities-list');
+  var pill  = document.getElementById('priority-pill');
+  var open  = state.priorities.filter(function(p){ return !p.done; });
+  pill.textContent = open.length + (open.length === 1 ? ' item' : ' items');
+
+  if (!state.priorities.length) {
+    list.innerHTML = '<div style="color:rgba(255,255,255,0.28);font-size:12px;padding:16px 0;text-align:center;">No priority actions — all clear! &#10003;</div>';
+    return;
+  }
+
+  var urgIcons = { high:'🔴', medium:'🟡', low:'🟢' };
+
+  list.innerHTML = state.priorities.map(function(p) {
+    return '<div class="priority-card" style="'+(p.done?'opacity:0.45;':'')+'">'+
+      '<span class="p-urgency-dot p-dot-'+p.urgency+'"></span>'+
+      '<span class="p-icon">'+(p.urgency==='high'?'&#9889;':p.urgency==='medium'?'&#128203;':'&#128161;')+'</span>'+
+      '<div class="p-body">'+
+        '<div class="p-label" style="'+(p.done?'text-decoration:line-through;color:rgba(255,255,255,0.38);':'')+'">'+_esc(p.label)+'</div>'+
+        (p.meta?'<div class="p-meta">'+_esc(p.meta)+'</div>':'')+
+      '</div>'+
+      '<span class="p-tag pt-'+p.urgency+'">'+urgIcons[p.urgency]+' '+p.urgency+'</span>'+
+      (p.done
+        ? '<button class="p-resolve done" onclick="_unresolveP(\''+p.id+'\')" title="Mark open">&#8635;</button>'
+        : '<button class="p-resolve" onclick="_resolveP(\''+p.id+'\')" title="Mark done">&#10003; Done</button>'
+      )+
+      '<button onclick="_deleteP(\''+p.id+'\')" style="background:none;border:none;color:rgba(255,255,255,0.18);font-size:14px;cursor:pointer;padding:0 4px;flex-shrink:0;align-self:center;" title="Delete">&#215;</button>'+
+    '</div>';
+  }).join('');
+}
+
+function _addPriority() {
+  var input = document.getElementById('add-p-input');
+  var label = input.value.trim();
+  if (!label) return;
+  var urgency = document.getElementById('add-p-urgency').value;
+  var state = _loadState();
+  state.priorities.unshift({ id:'p-'+Date.now(), label:label, urgency:urgency, done:false, meta:'' });
+  _saveState(state);
+  input.value = '';
+  _renderPriorities();
+}
+
+document.getElementById('add-p-input').addEventListener('keydown', function(e){ if (e.key==='Enter') _addPriority(); });
+
+function _resolveP(id) {
+  var state = _loadState();
+  state.priorities = state.priorities.map(function(p){ return p.id===id ? Object.assign({},p,{done:true}) : p; });
+  _saveState(state);
+  _renderPriorities();
+}
+
+function _unresolveP(id) {
+  var state = _loadState();
+  state.priorities = state.priorities.map(function(p){ return p.id===id ? Object.assign({},p,{done:false}) : p; });
+  _saveState(state);
+  _renderPriorities();
+}
+
+function _deleteP(id) {
+  var state = _loadState();
+  state.priorities = state.priorities.filter(function(p){ return p.id !== id; });
+  _saveState(state);
+  _renderPriorities();
+}
+
+/* ═══════════════════════════════════════════════════════
+   RADAR
+═══════════════════════════════════════════════════════ */
+function _renderRadar() {
+  var state  = _loadState();
+  var list   = document.getElementById('radar-list');
+  var sorted = state.radar.slice().sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+
+  if (!sorted.length) {
+    list.innerHTML = '<div style="color:rgba(255,255,255,0.28);font-size:11px;padding:10px 0;text-align:center;">Nothing on the radar.</div>';
+    return;
+  }
+
+  list.innerHTML = sorted.map(function(r) {
+    var d = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+    return '<div class="radar-item">'+
+      '<span class="radar-date rd-'+r.type+'">'+d+'</span>'+
+      '<span class="radar-label">'+_esc(r.label)+'</span>'+
+      '<button class="radar-del" onclick="_deleteR(\''+r.id+'\')" title="Remove">&#215;</button>'+
+    '</div>';
+  }).join('');
+}
+
+function _addRadar() {
+  var dateVal  = document.getElementById('add-r-date').value;
+  var labelVal = document.getElementById('add-r-label').value.trim();
+  if (!labelVal) return;
+  var type = document.getElementById('add-r-type').value;
+  var state = _loadState();
+  state.radar.push({ id:'r-'+Date.now(), date:dateVal, label:labelVal, type:type });
+  _saveState(state);
+  document.getElementById('add-r-label').value = '';
+  document.getElementById('add-r-date').value  = '';
+  _renderRadar();
+}
+
+document.getElementById('add-r-label').addEventListener('keydown', function(e){ if(e.key==='Enter') _addRadar(); });
+
+function _deleteR(id) {
+  var state = _loadState();
+  state.radar = state.radar.filter(function(r){ return r.id !== id; });
+  _saveState(state);
+  _renderRadar();
+}
+
+/* ═══════════════════════════════════════════════════════
+   NOTES
+═══════════════════════════════════════════════════════ */
+function _loadNotes() {
+  try { return localStorage.getItem(COS_NOTES_KEY) || ''; } catch(e){ return ''; }
+}
+
+var _notesTimer = null;
+document.getElementById('notes-area').addEventListener('input', function() {
+  clearTimeout(_notesTimer);
+  _notesTimer = setTimeout(function(){
+    try { localStorage.setItem(COS_NOTES_KEY, document.getElementById('notes-area').value); } catch(e){}
+    var s = document.getElementById('notes-saved');
+    s.textContent = 'Saved ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    s.style.opacity = '1';
+    setTimeout(function(){ s.style.opacity = '0'; }, 2500);
+  }, 800);
+});
+
+/* ═══════════════════════════════════════════════════════
+   INSIGHT
+═══════════════════════════════════════════════════════ */
+function _loadInsight() {
+  try { return localStorage.getItem(COS_INSIGHT_KEY) || DEFAULT_INSIGHT; } catch(e){ return DEFAULT_INSIGHT; }
+}
+
+function _renderInsight() {
+  document.getElementById('insight-display').innerHTML = _loadInsight();
+}
+
+function _editInsight() {
+  var disp = document.getElementById('insight-display');
+  var edit = document.getElementById('insight-edit');
+  var acts = document.getElementById('insight-actions');
+  edit.value = disp.innerHTML.replace(/<strong>/g,'**').replace(/<\/strong>/g,'**');
+  disp.classList.add('hidden');
+  edit.classList.remove('hidden');
+  acts.style.display = 'flex';
+  edit.focus();
+}
+
+function _saveInsight() {
+  var raw = document.getElementById('insight-edit').value
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  try { localStorage.setItem(COS_INSIGHT_KEY, raw); } catch(e){}
+  document.getElementById('insight-display').innerHTML = raw;
+  document.getElementById('insight-display').classList.remove('hidden');
+  document.getElementById('insight-edit').classList.add('hidden');
+  document.getElementById('insight-actions').style.display = 'none';
+}
+
+function _cancelInsight() {
+  document.getElementById('insight-display').classList.remove('hidden');
+  document.getElementById('insight-edit').classList.add('hidden');
+  document.getElementById('insight-actions').style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════════
+   BRIEFING HISTORY
+═══════════════════════════════════════════════════════ */
+function _loadHistory() {
+  try { return JSON.parse(localStorage.getItem(COS_HISTORY_KEY)) || []; } catch(e){ return []; }
+}
+
+function _saveBriefingSnapshot() {
+  var state   = _loadState();
+  var history = _loadHistory();
+  var open    = state.priorities.filter(function(p){ return !p.done; });
+  history.unshift({
+    id:      'h-'+Date.now(),
+    date:    new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    time:    new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}),
+    actions: open.length,
+    radar:   state.radar.length,
+    note:    open.length ? open[0].label.slice(0,70)+(open[0].label.length>70?'…':'') : 'No open priorities'
+  });
+  if (history.length > 20) history = history.slice(0,20);
+  try { localStorage.setItem(COS_HISTORY_KEY, JSON.stringify(history)); } catch(e){}
+  _renderHistory();
+  _toast('&#128190; Snapshot saved');
+}
+
+function _renderHistory() {
+  var history = _loadHistory();
+  var list    = document.getElementById('history-list');
+  var pill    = document.getElementById('history-pill');
+  pill.textContent = history.length + ' saved';
+
+  if (!history.length) {
+    list.innerHTML = '<div style="color:rgba(255,255,255,0.28);font-size:11px;padding:14px;text-align:center;">No snapshots yet — click "Save Snapshot" to save the current briefing state.</div>';
+    return;
+  }
+
+  list.innerHTML = history.map(function(h) {
+    return '<div class="history-row">'+
+      '<span class="history-date">'+h.date+'</span>'+
+      '<span class="history-actions-count">'+h.actions+' open</span>'+
+      '<span class="history-note" title="'+_esc(h.note)+'">'+_esc(h.note)+'</span>'+
+      '<button class="history-del" onclick="_deleteHistory(\''+h.id+'\')" title="Delete">&#215;</button>'+
+    '</div>';
+  }).join('');
+}
+
+function _deleteHistory(id) {
+  var h = _loadHistory().filter(function(x){ return x.id !== id; });
+  try { localStorage.setItem(COS_HISTORY_KEY, JSON.stringify(h)); } catch(e){}
+  _renderHistory();
+}
+
+/* ═══════════════════════════════════════════════════════
+   INTEGRATIONS — STORAGE KEYS
+═══════════════════════════════════════════════════════ */
+var GMAIL_SERVICE_KEY  = 'ver-cos-gmail-service';
+var GMAIL_TEMPLATE_KEY = 'ver-cos-gmail-template';
+var GMAIL_USERKEY_KEY  = 'ver-cos-gmail-userkey';
+var GMAIL_TO_KEY       = 'ver-cos-gmail-to';
+var CAL_PREFIX_KEY     = 'ver-cos-cal-prefix';
+
+/* ── Persist all integration inputs on change ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var fields = [
+    ['slack-webhook',    SLACK_WEBHOOK_KEY],
+    ['slack-channel',    SLACK_CHANNEL_KEY],
+    ['gmail-service-id', GMAIL_SERVICE_KEY],
+    ['gmail-template-id',GMAIL_TEMPLATE_KEY],
+    ['gmail-user-key',   GMAIL_USERKEY_KEY],
+    ['gmail-to',         GMAIL_TO_KEY],
+    ['cal-prefix',       CAL_PREFIX_KEY]
+  ];
+  fields.forEach(function(pair){
+    var el = document.getElementById(pair[0]);
+    if (!el) return;
+    try { el.value = localStorage.getItem(pair[1]) || ''; } catch(e){}
+    el.addEventListener('change', function(){
+      try { localStorage.setItem(pair[1], el.value); } catch(e){}
+      _updateIntDots();
+    });
+  });
+  _updateIntDots();
+});
+
+function _updateIntDots() {
+  var slackReady = !!(document.getElementById('slack-webhook').value.trim());
+  var gmailReady = !!(document.getElementById('gmail-service-id').value.trim()
+    && document.getElementById('gmail-template-id').value.trim()
+    && document.getElementById('gmail-user-key').value.trim()
+    && document.getElementById('gmail-to').value.trim());
+
+  var sd = document.getElementById('slack-dot');
+  var gd = document.getElementById('gmail-dot');
+  if (sd) { sd.className = 'int-dot' + (slackReady ? ' ready' : ' set'); }
+  if (gd) { gd.className = 'int-dot' + (gmailReady ? ' ready' : ' set'); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   BRIEFING TEXT BUILDER (shared by all channels)
+═══════════════════════════════════════════════════════ */
+function _buildBriefingText() {
+  var state    = _loadState();
+  var open     = state.priorities.filter(function(p){ return !p.done; });
+  var cosName  = _getCosName() || 'Chief of Staff';
+  var upcoming = state.radar.slice().sort(function(a,b){ return a.date<b.date?-1:1; }).slice(0,6);
+  var insight  = _loadInsight().replace(/<[^>]+>/g,'').replace(/&mdash;/g,'—').replace(/&middot;/g,'·');
+
+  var lines = [];
+  lines.push('Daily Briefing — ' + _dateStr());
+  lines.push(cosName + ' · Chief of Staff · Personal Work Dashboard');
+  lines.push('');
+
+  if (open.length) {
+    lines.push('⚡ PRIORITY ACTIONS (' + open.length + ' open)');
+    var urgIcon = { high:'🔴', medium:'🟡', low:'🟢' };
+    open.slice(0,8).forEach(function(p){ lines.push((urgIcon[p.urgency]||'•') + ' ' + p.label); });
+    lines.push('');
+  }
+
+  if (upcoming.length) {
+    lines.push('📅 ON THE RADAR');
+    upcoming.forEach(function(r){
+      var d = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+      lines.push(d + ' — ' + r.label);
+    });
+    lines.push('');
+  }
+
+  if (insight) {
+    lines.push('💡 PORTFOLIO INSIGHT');
+    lines.push(insight);
+    lines.push('');
+  }
+
+  lines.push('—');
+  lines.push('Chief of Staff · Personal Work Dashboard · ' + _dateStr());
+  return lines.join('\n');
+}
+
+/* ═══════════════════════════════════════════════════════
+   SLACK
+═══════════════════════════════════════════════════════ */
+function _buildSlackPayload(test) {
+  var state   = _loadState();
+  var open    = state.priorities.filter(function(p){ return !p.done; });
+  var cosName = _getCosName() || 'Chief of Staff';
+  var channel = document.getElementById('slack-channel').value.trim();
+
+  var blocks = [
+    { type:'header', text:{ type:'plain_text', text:(test?'[TEST] ':'')+'Daily Briefing — '+_dateStr(), emoji:true }},
+    { type:'section', text:{ type:'mrkdwn', text:'*'+cosName+'* · Chief of Staff · Personal Work Dashboard' }},
+    { type:'divider' }
+  ];
+
+  if (open.length) {
+    var urgIcon = { high:':red_circle:', medium:':yellow_circle:', low:':green_circle:' };
+    blocks.push({ type:'section', text:{ type:'mrkdwn', text:'*⚡ Priority Actions — '+open.length+' open*\n'+
+      open.slice(0,6).map(function(p){ return (urgIcon[p.urgency]||'•')+' '+p.label; }).join('\n')
+    }});
+  }
+
+  var upcoming = state.radar.slice().sort(function(a,b){ return a.date<b.date?-1:1; }).slice(0,5);
+  if (upcoming.length) {
+    blocks.push({ type:'section', text:{ type:'mrkdwn', text:'*📅 On the Radar*\n'+
+      upcoming.map(function(r){
+        var d = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+        return '*'+d+'* — '+r.label;
+      }).join('\n')
+    }});
+  }
+
+  var insight = _loadInsight().replace(/<[^>]+>/g,'').replace(/&mdash;/g,'—').replace(/&middot;/g,'·');
+  if (insight) {
+    blocks.push({ type:'section', text:{ type:'mrkdwn', text:'*💡 Portfolio Insight*\n'+insight.slice(0,280) }});
+  }
+
+  blocks.push({ type:'divider' });
+  blocks.push({ type:'context', elements:[{ type:'mrkdwn', text:'Chief of Staff · Personal Work Dashboard · Posted from browser' }]});
+
+  var payload = { blocks:blocks };
+  if (channel) payload.channel = channel;
+  return payload;
+}
+
+function _testSlack() {
+  var webhook = document.getElementById('slack-webhook').value.trim();
+  if (!webhook) { _intStatus('slack-status', 'Enter a webhook URL first.', false); return; }
+  _postSlack(webhook, _buildSlackPayload(true));
+}
+
+function _postToSlack() {
+  var webhook = document.getElementById('slack-webhook').value.trim();
+  if (!webhook) { _intStatus('slack-status', 'Enter a webhook URL first.', false); return; }
+  _saveBriefingSnapshot();
+  _postSlack(webhook, _buildSlackPayload(false));
+}
+
+function _postSlack(url, payload) {
+  _intStatus('slack-status', 'Posting…', null);
+  fetch(url, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body:JSON.stringify(payload)
+  }).then(function(res){
+    if (res.ok) { _intStatus('slack-status', '✓ Posted to Slack!', true); }
+    else { res.text().then(function(t){ _intStatus('slack-status', 'Error: '+t.slice(0,80), false); }); }
+  }).catch(function(){
+    _intStatus('slack-status', 'Could not reach Slack — check webhook URL.', false);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   GMAIL via EmailJS
+═══════════════════════════════════════════════════════ */
+function _loadEmailJS(cb) {
+  if (window.emailjs) { cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+  s.onload = function(){ cb(); };
+  s.onerror = function(){ _intStatus('gmail-status', 'Could not load EmailJS — check your internet connection.', false); };
+  document.head.appendChild(s);
+}
+
+function _testGmail() {
+  var svc = document.getElementById('gmail-service-id').value.trim();
+  var tpl = document.getElementById('gmail-template-id').value.trim();
+  var key = document.getElementById('gmail-user-key').value.trim();
+  var to  = document.getElementById('gmail-to').value.trim();
+  if (!svc||!tpl||!key||!to) { _intStatus('gmail-status', 'Fill in all four Gmail fields first.', false); return; }
+  _sendGmailPayload(svc, tpl, key, to, true);
+}
+
+function _sendGmail() {
+  var svc = document.getElementById('gmail-service-id').value.trim();
+  var tpl = document.getElementById('gmail-template-id').value.trim();
+  var key = document.getElementById('gmail-user-key').value.trim();
+  var to  = document.getElementById('gmail-to').value.trim();
+  if (!svc||!tpl||!key||!to) { _intStatus('gmail-status', 'Fill in all four Gmail fields first.', false); return; }
+  _sendGmailPayload(svc, tpl, key, to, false);
+}
+
+function _sendGmailPayload(svc, tpl, key, to, test) {
+  _intStatus('gmail-status', 'Sending…', null);
+  _loadEmailJS(function(){
+    emailjs.init(key);
+    var params = {
+      to_email: to,
+      subject:  (test?'[TEST] ':'') + 'Daily Briefing — ' + _dateStr(),
+      message:  _buildBriefingText()
+    };
+    emailjs.send(svc, tpl, params).then(function(){
+      _intStatus('gmail-status', '✓ Email sent!', true);
+    }, function(err){
+      _intStatus('gmail-status', 'Error: ' + (err.text||JSON.stringify(err)).slice(0,80), false);
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   CALENDAR — .ics export
+═══════════════════════════════════════════════════════ */
+function _exportCalendar() {
+  var state  = _loadState();
+  var prefix = (document.getElementById('cal-prefix').value.trim() + ' ').trimStart();
+  var cosName = _getCosName() || 'Chief of Staff';
+
+  if (!state.radar.length) {
+    _intStatus('cal-status', 'No radar items to export.', false);
+    return;
+  }
+
+  function _icsDate(dateStr) {
+    var d = new Date(dateStr + 'T09:00:00');
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + 'T090000';
+  }
+
+  function _icsEscape(s) {
+    return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+  }
+
+  var now = new Date();
+  var stamp = now.getFullYear()
+    + String(now.getMonth()+1).padStart(2,'0')
+    + String(now.getDate()).padStart(2,'0')
+    + 'T' + String(now.getHours()).padStart(2,'0')
+    + String(now.getMinutes()).padStart(2,'0')
+    + String(now.getSeconds()).padStart(2,'0') + 'Z';
+
+  var lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Chief of Staff//VER Intelligence Hub//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:' + _icsEscape(cosName + ' · Radar'),
+    'X-WR-TIMEZONE:America/Los_Angeles'
+  ];
+
+  state.radar.forEach(function(r){
+    if (!r.date) return;
+    var uid = 'ver-cos-' + r.id + '@ver-intelligence-hub';
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:' + uid);
+    lines.push('DTSTAMP:' + stamp);
+    lines.push('DTSTART;VALUE=DATE:' + r.date.replace(/-/g,''));
+    lines.push('DTEND;VALUE=DATE:' + r.date.replace(/-/g,''));
+    lines.push('SUMMARY:' + _icsEscape(prefix + r.label));
+    lines.push('DESCRIPTION:' + _icsEscape('Type: ' + r.type + '\\nSource: Chief of Staff · VER Intelligence Hub'));
+    lines.push('CATEGORIES:' + r.type.toUpperCase());
+    lines.push('END:VEVENT');
+  });
+
+  lines.push('END:VCALENDAR');
+
+  var blob = new Blob([lines.join('\r\n')], { type:'text/calendar;charset=utf-8' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'VER_CoS_Radar_' + new Date().toISOString().slice(0,10) + '.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  _intStatus('cal-status', '✓ ' + state.radar.filter(function(r){return r.date;}).length + ' events exported!', true);
+}
+
+/* ═══════════════════════════════════════════════════════
+   SEND ALL
+═══════════════════════════════════════════════════════ */
+function _sendAll() {
+  var slackWh = document.getElementById('slack-webhook').value.trim();
+  var gmailSvc = document.getElementById('gmail-service-id').value.trim();
+  var gmailTpl = document.getElementById('gmail-template-id').value.trim();
+  var gmailKey = document.getElementById('gmail-user-key').value.trim();
+  var gmailTo  = document.getElementById('gmail-to').value.trim();
+
+  var sent = 0;
+  if (slackWh) { _saveBriefingSnapshot(); _postSlack(slackWh, _buildSlackPayload(false)); sent++; }
+  if (gmailSvc && gmailTpl && gmailKey && gmailTo) { _sendGmailPayload(gmailSvc, gmailTpl, gmailKey, gmailTo, false); sent++; }
+  _exportCalendar();
+  sent++;
+
+  if (sent === 0) { _toast('No integrations configured — set up Slack or Gmail first.'); }
+  else { _toast('&#9889; Briefing sent to ' + sent + ' channel' + (sent>1?'s':'')); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SHARED STATUS HELPER
+═══════════════════════════════════════════════════════ */
+function _intStatus(elId, msg, ok) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = ok === true ? 'var(--green)' : ok === false ? 'var(--red)' : 'var(--amber)';
+  if (ok !== null) setTimeout(function(){ el.textContent = ''; }, 5000);
+}
+
+/* ═══════════════════════════════════════════════════════
+   INBOX TRIAGE
+═══════════════════════════════════════════════════════ */
+var SLACK_BOT_TOKEN_KEY   = 'ver-cos-slack-bot-token';
+var SLACK_INBOX_CH_KEY    = 'ver-cos-slack-inbox-channel';
+var GMAIL_CLIENT_ID_KEY   = 'ver-cos-gmail-client-id';
+
+var _gmailAccessToken = null;
+var _inboxItems = [];   // { id, source, from, text, time, ts, dismissed }
+
+/* ── Connect / toggle config panels ── */
+function _connectSlackInbox() {
+  var cfg = document.getElementById('slack-inbox-config');
+  var btn = document.getElementById('slack-conn-btn');
+  var isOpen = cfg.style.display !== 'none';
+  cfg.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    try { document.getElementById('slack-bot-token').value    = localStorage.getItem(SLACK_BOT_TOKEN_KEY) || ''; } catch(e){}
+    try { document.getElementById('slack-inbox-channel').value = localStorage.getItem(SLACK_INBOX_CH_KEY)  || ''; } catch(e){}
+    document.getElementById('slack-bot-token').addEventListener('change', function(){
+      try { localStorage.setItem(SLACK_BOT_TOKEN_KEY, this.value); } catch(e){}
+      _updateInboxDots();
+    }, { once: false });
+    document.getElementById('slack-inbox-channel').addEventListener('change', function(){
+      try { localStorage.setItem(SLACK_INBOX_CH_KEY, this.value); } catch(e){}
+      _updateInboxDots();
+    }, { once: false });
+  }
+  _updateInboxDots();
+}
+
+function _connectGmailInbox() {
+  var cfg = document.getElementById('gmail-inbox-config');
+  var isOpen = cfg.style.display !== 'none';
+  cfg.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    try { document.getElementById('gmail-client-id').value = localStorage.getItem(GMAIL_CLIENT_ID_KEY) || ''; } catch(e){}
+    document.getElementById('gmail-client-id').addEventListener('change', function(){
+      try { localStorage.setItem(GMAIL_CLIENT_ID_KEY, this.value); } catch(e){}
+    }, { once: false });
+  }
+}
+
+function _updateInboxDots() {
+  var slackReady = !!(
+    (localStorage.getItem(SLACK_BOT_TOKEN_KEY)||'').trim() &&
+    (localStorage.getItem(SLACK_INBOX_CH_KEY)||'').trim()
+  );
+  var gmailReady = !!_gmailAccessToken;
+  var sb = document.getElementById('slack-conn-btn');
+  var gb = document.getElementById('gmail-conn-btn');
+  if (sb) sb.classList.toggle('connected', slackReady);
+  if (gb) gb.classList.toggle('connected', gmailReady);
+}
+
+/* ── Authorize Gmail via Google Identity Services ── */
+function _authorizeGmail() {
+  var clientId = (document.getElementById('gmail-client-id').value || localStorage.getItem(GMAIL_CLIENT_ID_KEY) || '').trim();
+  if (!clientId) {
+    _inboxStatus('Enter your Google Client ID first.', false);
+    return;
+  }
+  _loadGIS(function() {
+    var client = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: 'https://www.googleapis.com/auth/gmail.readonly',
+      callback: function(resp) {
+        if (resp.error) { _inboxStatus('Auth error: ' + resp.error, false); return; }
+        _gmailAccessToken = resp.access_token;
+        _inboxStatus('✓ Gmail authorized — click Fetch to pull messages.', true);
+        document.getElementById('gmail-conn-btn').classList.add('connected');
+        document.getElementById('gmail-auth-btn').textContent = '✓ Authorized';
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+function _loadGIS(cb) {
+  if (window.google && window.google.accounts) { cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client';
+  s.onload = cb;
+  s.onerror = function() { _inboxStatus('Could not load Google Identity Services.', false); };
+  document.head.appendChild(s);
+}
+
+/* ── Fetch from all connected sources ── */
+function _fetchInbox() {
+  var slackToken = (localStorage.getItem(SLACK_BOT_TOKEN_KEY) || '').trim();
+  var slackCh    = (localStorage.getItem(SLACK_INBOX_CH_KEY)  || '').trim();
+  var hasSlack   = !!(slackToken && slackCh);
+  var hasGmail   = !!_gmailAccessToken;
+
+  if (!hasSlack && !hasGmail) {
+    _inboxStatus('Connect at least one source first.', false);
+    return;
+  }
+
+  _inboxStatus('Fetching…', null);
+  _inboxItems = [];
+  var pending = 0;
+
+  if (hasSlack) {
+    pending++;
+    _fetchSlackMessages(slackToken, slackCh, function(items) {
+      _inboxItems = _inboxItems.concat(items);
+      pending--;
+      if (pending === 0) _renderInboxFeed();
+    });
+  }
+
+  if (hasGmail) {
+    pending++;
+    _fetchGmailMessages(_gmailAccessToken, function(items) {
+      _inboxItems = _inboxItems.concat(items);
+      pending--;
+      if (pending === 0) _renderInboxFeed();
+    });
+  }
+}
+
+/* ── Slack fetch ── */
+function _fetchSlackMessages(token, channel, done) {
+  fetch('https://slack.com/api/conversations.history?channel=' + encodeURIComponent(channel) + '&limit=20', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.ok) { _inboxStatus('Slack error: ' + data.error, false); done([]); return; }
+    var items = (data.messages || [])
+      .filter(function(m) { return m.type === 'message' && m.text && !m.bot_id; })
+      .slice(0, 12)
+      .map(function(m) {
+        var ts   = parseFloat(m.ts) * 1000;
+        var time = new Date(ts).toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+        return { id: 'sl-' + m.ts, source: 'slack', from: m.username || m.user || 'Slack', text: m.text, time: time, ts: ts, dismissed: false };
+      });
+    done(items);
+  })
+  .catch(function(e) { _inboxStatus('Slack fetch failed — check token and channel ID.', false); done([]); });
+}
+
+/* ── Gmail fetch ── */
+function _fetchGmailMessages(token, done) {
+  fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=15&labelIds=INBOX&q=is:unread', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.messages || !data.messages.length) { done([]); return; }
+    var msgs = data.messages.slice(0, 10);
+    var results = [];
+    var remaining = msgs.length;
+    msgs.forEach(function(m) {
+      fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/' + m.id + '?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(msg) {
+        var headers = {};
+        (msg.payload && msg.payload.headers || []).forEach(function(h) { headers[h.name] = h.value; });
+        var from = (headers['From'] || '').replace(/<[^>]+>/, '').trim() || 'Gmail';
+        var subj = headers['Subject'] || '(no subject)';
+        var ts   = parseInt(msg.internalDate) || Date.now();
+        var time = new Date(ts).toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+        results.push({ id: 'gm-' + m.id, source: 'gmail', from: from, text: subj, time: time, ts: ts, dismissed: false });
+        remaining--;
+        if (remaining === 0) done(results.sort(function(a,b){ return b.ts - a.ts; }));
+      })
+      .catch(function() { remaining--; if (remaining === 0) done(results); });
+    });
+  })
+  .catch(function() { _inboxStatus('Gmail fetch failed — try re-authorizing.', false); done([]); });
+}
+
+/* ── Render feed ── */
+function _renderInboxFeed() {
+  var feed  = document.getElementById('inbox-feed');
+  var empty = document.getElementById('inbox-empty');
+  var pill  = document.getElementById('inbox-pill');
+  var active = _inboxItems.filter(function(i) { return !i.dismissed; });
+
+  pill.textContent = active.length + ' item' + (active.length !== 1 ? 's' : '');
+
+  if (!_inboxItems.length) {
+    empty.style.display = 'block';
+    _inboxStatus('No messages found.', false);
+    return;
+  }
+
+  empty.style.display = 'none';
+  _inboxStatus('✓ ' + _inboxItems.length + ' messages fetched.', true);
+
+  feed.innerHTML = _inboxItems.map(function(item) {
+    var srcCls = item.source === 'slack' ? 'src-slack' : 'src-gmail';
+    var srcLbl = item.source === 'slack' ? '&#129695; Slack' : '&#128140; Gmail';
+    return '<div class="inbox-item' + (item.dismissed ? ' dismissed' : '') + '" id="ii-' + item.id + '">'
+      + '<span class="inbox-source ' + srcCls + '">' + srcLbl + '</span>'
+      + '<div class="inbox-body">'
+        + '<div class="inbox-from">' + _esc(item.from) + ' <span class="inbox-time">· ' + item.time + '</span></div>'
+        + '<div class="inbox-text" title="' + _esc(item.text) + '">' + _esc(item.text) + '</div>'
+      + '</div>'
+      + '<div class="inbox-actions">'
+        + '<button type="button" class="ia-btn ia-priority" onclick="_inboxAddPriority(\'' + item.id + '\')">+ Priority</button>'
+        + '<button type="button" class="ia-btn ia-radar"    onclick="_inboxAddRadar(\''    + item.id + '\')">+ Radar</button>'
+        + '<button type="button" class="ia-btn ia-dismiss"  onclick="_inboxDismiss(\''    + item.id + '\')">✕</button>'
+      + '</div>'
+    + '</div>';
+  }).join('');
+}
+
+/* ── Triage actions ── */
+function _getInboxItem(id) {
+  return _inboxItems.find(function(i) { return i.id === id; });
+}
+
+function _inboxAddPriority(id) {
+  var item = _getInboxItem(id);
+  if (!item) return;
+  var state = _loadState();
+  state.priorities.unshift({ id: 'p-' + Date.now(), label: item.text.slice(0, 200), urgency: 'medium', done: false, meta: 'From ' + item.source + ' · ' + item.from + ' · ' + item.time });
+  _saveState(state);
+  _renderPriorities();
+  _inboxDismiss(id);
+  _toast('&#9889; Added to Priority Actions');
+}
+
+function _inboxAddRadar(id) {
+  var item = _getInboxItem(id);
+  if (!item) return;
+  var state = _loadState();
+  var today = new Date().toISOString().slice(0, 10);
+  state.radar.push({ id: 'r-' + Date.now(), date: today, label: item.text.slice(0, 120), type: 'intel' });
+  _saveState(state);
+  _renderRadar();
+  _inboxDismiss(id);
+  _toast('&#128197; Added to Radar');
+}
+
+function _inboxDismiss(id) {
+  var item = _getInboxItem(id);
+  if (!item) return;
+  item.dismissed = true;
+  var el = document.getElementById('ii-' + id);
+  if (el) el.classList.add('dismissed');
+  var pill = document.getElementById('inbox-pill');
+  var active = _inboxItems.filter(function(i) { return !i.dismissed; });
+  if (pill) pill.textContent = active.length + ' item' + (active.length !== 1 ? 's' : '');
+}
+
+/* ── Status helper ── */
+function _inboxStatus(msg, ok) {
+  var el = document.getElementById('inbox-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = ok === true ? 'var(--green)' : ok === false ? 'var(--red)' : 'var(--amber)';
+}
+
+/* ═══════════════════════════════════════════════════════
+   PDF EXPORT
+═══════════════════════════════════════════════════════ */
+function _exportPDF() {
+  var state   = _loadState();
+  var cosName = _getCosName() || 'Chief of Staff';
+  var open    = state.priorities.filter(function(p){ return !p.done; });
+  var insight = _loadInsight().replace(/<strong>/g,'').replace(/<\/strong>/g,'').replace(/&mdash;/g,'—').replace(/&middot;/g,'·');
+  var sorted  = state.radar.slice().sort(function(a,b){ return a.date<b.date?-1:1; });
+
+  var urgColor = { high:'#F43F5E', medium:'#E879F9', low:'#C084FC' };
+
+  var rows = open.map(function(p){
+    return '<tr style="border-bottom:1px solid #eee;">'
+      +'<td style="padding:8px;width:12px;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+urgColor[p.urgency]+';"></span></td>'
+      +'<td style="padding:8px 10px;font-size:12px;color:#1a1a2e;">'+p.label+'</td>'
+      +(p.meta?'<td style="padding:8px;font-size:9.5px;color:#888;">'+p.meta+'</td>':'<td></td>')
+      +'</tr>';
+  }).join('');
+
+  var radarRows = sorted.map(function(r){
+    var d = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+    var color = r.type==='risk'?'#F43F5E':r.type==='governance'?'#C026D3':r.type==='cqbr'?'#A855F7':'#E8A598';
+    return '<tr style="border-bottom:1px solid #eee;">'
+      +'<td style="padding:7px 10px;font-size:11px;font-weight:700;color:'+color+';white-space:nowrap;">'+d+'</td>'
+      +'<td style="padding:7px 10px;font-size:12px;color:#1a1a2e;">'+r.label+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Briefing — '+_dateStr()+'</title>'
+    +'<style>body{font-family:"Segoe UI",Arial,sans-serif;margin:0;padding:0;color:#1a1a2e;background:#fff;}'
+    +'.page{max-width:720px;margin:0 auto;padding:40px 48px;}'
+    +'.hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;padding-bottom:14px;border-bottom:3px solid #F43F5E;}'
+    +'.hdr-l .ey{font-size:9px;text-transform:uppercase;letter-spacing:0.16em;color:#F43F5E;font-weight:800;margin-bottom:5px;}'
+    +'.hdr-l .ti{font-size:26px;font-weight:900;letter-spacing:-0.02em;color:#0D0420;margin-bottom:2px;}'
+    +'.hdr-l .su{font-size:11px;color:#888;}'
+    +'.hdr-r{font-size:10px;color:#aaa;text-align:right;line-height:1.7;}'
+    +'.sec{font-size:8.5px;text-transform:uppercase;letter-spacing:0.16em;font-weight:800;color:#C026D3;margin:20px 0 7px;border-bottom:1px solid #f0e0ff;padding-bottom:4px;}'
+    +'table{width:100%;border-collapse:collapse;}'
+    +'.insight{padding:13px 15px;border-radius:7px;background:#fff5f7;border-left:3px solid #F43F5E;font-size:12px;color:#333;line-height:1.65;}'
+    +'.foot{margin-top:30px;padding-top:10px;border-top:1px solid #eee;font-size:9px;color:#bbb;display:flex;justify-content:space-between;}'
+    +'@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}'
+    +'</style></head><body><div class="page">'
+    +'<div class="hdr"><div class="hdr-l"><div class="ey">Chief of Staff · Personal Work Dashboard</div>'
+    +'<div class="ti">Daily Briefing</div><div class="su">'+_dateStr()+'</div></div>'
+    +'<div class="hdr-r">'+cosName+'<br>Chief of Staff<br><span style="color:#F43F5E;font-weight:700;">Private</span></div></div>'
+    +'<div class="sec">Priority Actions</div><table>'+rows+'</table>'
+    +'<div class="sec">On the Radar</div><table>'+radarRows+'</table>'
+    +'<div class="sec">Portfolio Insight</div><div class="insight">'+insight+'</div>'
+    +'<div class="foot"><span>Chief of Staff · Personal Work Dashboard</span><span>'+_dateStr()+'</span></div>'
+    +'</div></body></html>';
+
+  var win = window.open('','_blank','width=820,height=740,scrollbars=yes');
+  if (!win) { _toast('Allow pop-ups to export PDF'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function(){ win.print(); }, 400);
+}
+
+/* ═══════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════ */
+function _esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function _toast(msg) {
+  var t = document.createElement('div');
+  t.innerHTML = msg;
+  t.style.cssText = 'position:fixed;bottom:28px;right:28px;z-index:900;padding:10px 20px;'
+    +'background:linear-gradient(135deg,#F43F5E,#C026D3);color:#fff;border-radius:99px;'
+    +'font-size:12px;font-weight:800;box-shadow:0 0 22px rgba(244,63,94,0.36);pointer-events:none;'
+    +'animation:rise 0.3s cubic-bezier(0.16,1,0.3,1) both;';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2600);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Greeting + date
+  document.getElementById('hero-greeting').textContent = _getGreeting();
+  document.getElementById('hero-date').textContent = _dateStr();
+  var eyebrow = document.getElementById('hero-date-eyebrow');
+  if (eyebrow) eyebrow.textContent = _dateStr();
+
+  // CoS name
+  var name = _getCosName();
+  if (!name) {
+    setTimeout(_openNamePicker, 800);
+  } else {
+    _applyName(name);
+  }
+
+
+  // Render all sections
+  _renderPriorities();
+  _renderRadar();
+  _renderInsight();
+  _renderHistory();
+
+  // Notes
+  document.getElementById('notes-area').value = _loadNotes();
+
+  // Health stats (editable inline)
+  ['hk-intake','hk-vendors','hk-contracts','hk-risk'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('contenteditable','true');
+    el.style.cursor = 'text';
+    el.setAttribute('title','Click to edit');
+    el.addEventListener('blur', function(){
+      var key = 'ver-cos-stat-'+id;
+      try{localStorage.setItem(key, el.textContent);}catch(e){}
+    });
+    var saved = null;
+    try{saved = localStorage.getItem('ver-cos-stat-'+id);}catch(e){}
+    if (saved) el.textContent = saved;
+  });
+
+  // Set radar default date to tomorrow
+  var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+  document.getElementById('add-r-date').value = tomorrow.toISOString().slice(0,10);
+});
+</script>
+</body>
+</html>

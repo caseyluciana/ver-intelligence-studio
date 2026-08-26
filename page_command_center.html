@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Decision Horizon &mdash; VER Intelligence Hub</title>
+<style>
+/* ── tokens ── */
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --orange:#EA580C;--orange2:#7C2D12;--orange3:#FFF7ED;
+  --blue:#2563EB;--blue2:#1E40AF;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F3F4F6;--gray2:#F9FAFB;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--navy);color:#fff;min-height:100vh;}
+
+/* ── top bar ── */
+.top-bar{position:sticky;top:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:10px 28px;background:linear-gradient(90deg,rgba(15,30,60,0.98),rgba(10,22,40,0.98));border-bottom:1px solid rgba(255,255,255,0.07);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.top-bar-left{display:flex;align-items:center;gap:14px;}
+.top-bar-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;}
+.top-bar-back:hover{color:var(--teal);}
+.top-bar-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.top-bar-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:.04em;}
+.top-bar-right{display:flex;align-items:center;gap:10px;}
+.top-bar-meta{font-size:7.5pt;color:rgba(255,255,255,0.3);}
+.top-bar-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.top-bar-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+[data-theme=dark] .top-bar-btn{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── stage / hero ── */
+.stage{padding:36px 0 28px;background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 55%,#061020 100%);border-bottom:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden;}
+.stage::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(13,148,136,0.09) 0%,transparent 60%),radial-gradient(ellipse at 15% 60%,rgba(124,58,237,0.06) 0%,transparent 50%);pointer-events:none;}
+.stage-inner{max-width:1280px;margin:0 auto;padding:0 48px;}
+.stage-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.16em;margin-bottom:8px;}
+.stage-title{font-size:26pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:6px;letter-spacing:-.02em;}
+.stage-title .title-accent{color:var(--teal);}
+.stage-sub{font-size:9.5pt;color:rgba(255,255,255,0.5);margin-bottom:22px;max-width:620px;line-height:1.65;}
+
+
+/* ── intel brief strip ── */
+.intel-brief{background:linear-gradient(90deg,#060F1E 0%,#091525 50%,#060F1E 100%);border-bottom:1px solid rgba(255,255,255,0.07);}
+.intel-brief-inner{max-width:1280px;margin:0 auto;padding:14px 48px;display:flex;align-items:center;gap:20px;}
+.ib-eyebrow{font-size:6pt;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.2em;white-space:nowrap;flex-shrink:0;writing-mode:horizontal-tb;}
+.ib-eyebrow-sep{width:1px;height:40px;background:rgba(255,255,255,0.08);flex-shrink:0;}
+.ib-panels{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;flex:1;align-items:start;}
+.ib-divider{width:1px;background:rgba(255,255,255,0.07);margin:0 24px;min-height:44px;}
+.ib-panel{display:flex;flex-direction:column;gap:2px;}
+.ib-label{font-size:5.5pt;font-weight:800;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:.16em;margin-bottom:2px;}
+.ib-headline{font-size:10pt;font-weight:900;color:#fff;line-height:1.25;}
+.ib-headline.ib-red{color:#F87171;}
+.ib-headline.ib-amber{color:#FBBF24;}
+.ib-headline.ib-teal{color:#5EEAD4;}
+.ib-context{font-size:7.5pt;color:rgba(255,255,255,0.4);line-height:1.6;max-width:320px;}
+@media(max-width:1024px){.intel-brief-inner{flex-direction:column;align-items:flex-start;gap:10px;}.ib-panels{grid-template-columns:1fr;row-gap:12px;}.ib-divider{display:none;}.ib-eyebrow-sep{display:none;}}
+@media(max-width:900px){.intel-brief-inner{padding-left:20px;padding-right:20px;}}
+
+/* ── tab bar ── */
+.tab-bar{position:sticky;top:45px;z-index:200;background:var(--white);border-bottom:2px solid var(--border);}
+[data-theme=dark] .tab-bar{background:#0D1626;border-color:rgba(255,255,255,0.08);}
+.tab-bar-inner{max-width:1280px;margin:0 auto;padding:0 48px;display:flex;align-items:stretch;}
+.tab-btn{display:flex;align-items:center;gap:8px;padding:13px 22px;border:none;background:transparent;cursor:pointer;font-family:inherit;font-size:9pt;font-weight:700;color:var(--ink4);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;}
+.tab-btn:hover{color:var(--navy);}
+.tab-btn.tab-active{color:var(--navy);border-bottom-color:var(--teal);}
+[data-theme=dark] .tab-btn{color:rgba(255,255,255,0.4);}
+[data-theme=dark] .tab-btn:hover{color:rgba(255,255,255,0.8);}
+[data-theme=dark] .tab-btn.tab-active{color:#fff;border-bottom-color:var(--teal);}
+.tab-icon{font-size:11pt;opacity:.7;}
+.tab-btn.tab-active .tab-icon{opacity:1;}
+.tab-badge{font-size:6.5pt;font-weight:800;padding:2px 7px;border-radius:10px;background:var(--red3);color:var(--red);}
+.tab-badge.tab-badge-teal{background:var(--teal3);color:var(--teal2);}
+[data-theme=dark] .tab-badge{background:rgba(220,38,38,0.2);color:#FCA5A5;}
+[data-theme=dark] .tab-badge.tab-badge-teal{background:rgba(13,148,136,0.2);color:#5EEAD4;}
+
+/* ── filter bar ── */
+.filter-bar{position:sticky;top:93px;z-index:150;background:var(--gray2);border-bottom:1px solid var(--border);}
+[data-theme=dark] .filter-bar{background:#0D1626;border-color:rgba(255,255,255,0.07);}
+.filter-bar-inner{max-width:1280px;margin:0 auto;padding:9px 48px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.filter-label{font-size:7.5pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;}
+.filter-sep{width:1px;height:20px;background:var(--border2);flex-shrink:0;}
+.filter-chip{font-size:7.5pt;padding:4px 10px;border-radius:16px;cursor:pointer;border:1.5px solid var(--border2);background:var(--gray3);font-family:inherit;transition:all .15s;font-weight:600;color:var(--ink4);}
+.filter-chip.chip-active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.filter-chip:hover:not(.chip-active){border-color:var(--navy);color:var(--navy);}
+[data-theme=dark] .filter-chip{background:#1A2D47;border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.45);}
+[data-theme=dark] .filter-chip.chip-active{background:var(--teal);border-color:var(--teal);color:#fff;}
+[data-theme=dark] .filter-chip:hover:not(.chip-active){border-color:var(--teal);color:var(--teal);}
+.filter-select{font-size:7.5pt;padding:4px 8px;border-radius:6px;font-family:inherit;border:1.5px solid var(--border2);background:var(--gray3);color:var(--ink4);cursor:pointer;font-weight:600;outline:none;}
+.filter-select:focus{border-color:var(--navy);}
+[data-theme=dark] .filter-select{background:#1A2D47;border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.55);}
+.filter-count{font-size:7.5pt;color:var(--ink4);margin-left:auto;white-space:nowrap;}
+
+/* ── page body ── */
+.page-body{background:var(--gray);color:var(--ink2);min-height:60vh;}
+[data-theme=dark] .page-body{background:#0D1626;}
+.page-inner{max-width:1280px;margin:0 auto;padding:24px 48px 56px;}
+.tab-panel{display:none;}
+.tab-panel.panel-active{display:block;}
+
+/* ── swimlane (FQ grouping) ── */
+.swimlane{margin-bottom:8px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+[data-theme=dark] .swimlane{border-color:#1E3A5F;}
+.swimlane-header{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;-webkit-user-select:none;user-select:none;transition:background .15s;}
+.swimlane-header:hover{background:rgba(0,0,0,0.03);}
+[data-theme=dark] .swimlane-header:hover{background:rgba(255,255,255,0.03);}
+.swimlane.lane-fq2 .swimlane-header{background:#FEF2F2;border-bottom:1px solid #FECACA;}
+[data-theme=dark] .swimlane.lane-fq2 .swimlane-header{background:rgba(220,38,38,0.12);border-bottom:1px solid rgba(220,38,38,0.25);}
+.swimlane.lane-fq3 .swimlane-header{background:#FFFBEB;border-bottom:1px solid #FDE68A;}
+[data-theme=dark] .swimlane.lane-fq3 .swimlane-header{background:rgba(217,119,6,0.1);border-bottom:1px solid rgba(217,119,6,0.25);}
+.swimlane.lane-fq4 .swimlane-header{background:#F0FDF9;border-bottom:1px solid #99F6E4;}
+[data-theme=dark] .swimlane.lane-fq4 .swimlane-header{background:rgba(13,148,136,0.08);border-bottom:1px solid rgba(13,148,136,0.2);}
+.swimlane.lane-inprogress .swimlane-header{background:var(--gray2);border-bottom:1px solid var(--border);}
+[data-theme=dark] .swimlane.lane-inprogress .swimlane-header{background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.07);}
+.lane-icon{font-size:13pt;flex-shrink:0;}
+.lane-title{font-size:9pt;font-weight:800;flex:1;color:var(--ink2);}
+[data-theme=dark] .lane-title{color:rgba(255,255,255,0.85);}
+.swimlane.lane-fq2 .lane-title{color:var(--red);}
+.swimlane.lane-fq3 .lane-title{color:var(--amber2);}
+.swimlane.lane-fq4 .lane-title{color:var(--teal2);}
+[data-theme=dark] .swimlane.lane-fq2 .lane-title{color:#F87171;}
+[data-theme=dark] .swimlane.lane-fq3 .lane-title{color:#FBBF24;}
+[data-theme=dark] .swimlane.lane-fq4 .lane-title{color:#5EEAD4;}
+.lane-count{font-size:7pt;font-weight:800;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,0.08);color:var(--ink3);}
+[data-theme=dark] .lane-count{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);}
+.lane-exposure{font-size:8pt;font-weight:700;color:var(--ink4);}
+[data-theme=dark] .lane-exposure{color:rgba(255,255,255,0.4);}
+.lane-chevron{font-size:9pt;color:var(--ink4);transition:transform .2s;flex-shrink:0;}
+[data-theme=dark] .lane-chevron{color:rgba(255,255,255,0.3);}
+.swimlane.lane-open .lane-chevron{transform:rotate(180deg);}
+.swimlane-body{display:none;background:var(--white);}
+[data-theme=dark] .swimlane-body{background:#111F35;}
+.swimlane.lane-open .swimlane-body{display:block;}
+
+/* ── decision strip on action card ── */
+.acard-dec-strip{border-top:1px solid var(--gray3);padding:7px 13px;display:flex;align-items:flex-start;gap:8px;background:var(--gray2);}
+[data-theme=dark] .acard-dec-strip{background:rgba(255,255,255,0.025);border-color:rgba(255,255,255,0.06);}
+.acard-dec-label{font-size:5.5pt;font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:.12em;flex-shrink:0;padding-top:2px;}
+[data-theme=dark] .acard-dec-label{color:rgba(255,255,255,0.3);}
+.acard-dec-text{font-size:7pt;color:var(--ink3);line-height:1.5;flex:1;}
+[data-theme=dark] .acard-dec-text{color:rgba(255,255,255,0.45);}
+.acard-dec-status{font-size:6pt;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0;}
+.dec-open{background:var(--red3);color:var(--red);}
+.dec-pending{background:var(--amber3);color:var(--amber2);}
+.dec-approved{background:var(--green3);color:var(--green2);}
+.dec-inprogress{background:var(--teal3);color:var(--teal2);}
+[data-theme=dark] .dec-open{background:rgba(220,38,38,0.18);color:#FCA5A5;}
+[data-theme=dark] .dec-pending{background:rgba(217,119,6,0.18);color:#FDE68A;}
+[data-theme=dark] .dec-approved{background:rgba(5,150,105,0.18);color:#6EE7B7;}
+[data-theme=dark] .dec-inprogress{background:rgba(13,148,136,0.18);color:#5EEAD4;}
+
+
+/* ── action card grid ── */
+.action-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;}
+[data-theme=dark] .action-card-grid{background:#111F35;}
+
+/* ── action card ── */
+.action-card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.action-card:hover{box-shadow:0 6px 18px rgba(0,0,0,0.1);transform:translateY(-2px);border-color:var(--border2);}
+[data-theme=dark] .action-card{background:#0F1E3C;border-color:#1E3A5F;}
+[data-theme=dark] .action-card:hover{box-shadow:0 6px 18px rgba(0,0,0,0.3);}
+.acard-top-bar{height:3px;flex-shrink:0;}
+.acard-top-bar.accent-critical{background:var(--red);}
+.acard-top-bar.accent-high{background:var(--amber);}
+.acard-top-bar.accent-medium{background:var(--teal);}
+.acard-top-bar.accent-low{background:var(--gray3);}
+.accent-critical.accent-pulse{animation:pulse-red 2s ease-in-out infinite;}
+@keyframes pulse-red{0%,100%{background:var(--red);}50%{background:rgba(220,38,38,0.35);}}
+.acard-body{padding:11px 13px 9px;flex:1;display:flex;flex-direction:column;gap:6px;}
+.acard-badges{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.acard-title{font-size:8.5pt;font-weight:800;color:var(--ink);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+[data-theme=dark] .acard-title{color:rgba(255,255,255,0.92);}
+.acard-vendor{font-size:7pt;color:var(--ink4);margin-top:-2px;}
+[data-theme=dark] .acard-vendor{color:rgba(255,255,255,0.35);}
+.acard-rec{border-left:2px solid var(--teal);background:var(--teal3);padding:6px 10px;border-radius:0 5px 5px 0;font-size:7pt;color:var(--green2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex-shrink:0;}
+[data-theme=dark] .acard-rec{background:rgba(13,148,136,0.12);color:rgba(255,255,255,0.55);}
+.acard-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 13px;border-top:1px solid var(--gray3);background:var(--gray2);gap:6px;flex-shrink:0;}
+[data-theme=dark] .acard-footer{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.06);}
+.acard-footer-left{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.acard-impact{font-size:9pt;font-weight:900;color:var(--navy);}
+[data-theme=dark] .acard-impact{color:rgba(255,255,255,0.85);}
+.acard-btn{font-size:6.5pt;font-weight:700;padding:3px 9px;border-radius:7px;background:var(--navy);color:#fff;border:none;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.acard-btn:hover{background:var(--teal);}
+[data-theme=dark] .acard-btn{background:rgba(13,148,136,0.25);color:#5EEAD4;}
+[data-theme=dark] .acard-btn:hover{background:var(--teal);color:#fff;}
+
+/* ── responsive card grids ── */
+@media(max-width:720px){.action-card-grid{grid-template-columns:1fr;}}
+
+/* ── badges ── */
+.badge{display:inline-flex;align-items:center;font-size:6.5pt;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge-red{background:var(--red3);color:var(--red2);}
+.badge-amber{background:var(--amber3);color:var(--amber2);}
+.badge-teal{background:var(--teal3);color:var(--teal2);}
+.badge-green{background:var(--green3);color:var(--green2);}
+.badge-navy{background:var(--navy3);color:var(--navy2);}
+.badge-gray{background:var(--gray2);color:var(--ink4);}
+.badge-purple{background:var(--purple3);color:var(--purple2);}
+.priority-badge{font-size:6.5pt;padding:2px 9px;border-radius:12px;font-weight:800;letter-spacing:.04em;}
+.prio-critical{background:var(--red3);color:var(--red);}
+.prio-high{background:var(--amber3);color:var(--amber);}
+.prio-medium{background:var(--teal3);color:var(--teal2);}
+.prio-low{background:var(--gray2);color:var(--ink4);}
+[data-theme=dark] .prio-low{background:#1A2D47;}
+.due-pill{font-size:6.5pt;font-weight:700;padding:2px 9px;border-radius:10px;display:inline-flex;align-items:center;gap:4px;}
+.due-overdue{background:var(--red3);color:var(--red);}
+.due-this-week{background:var(--red3);color:var(--red);}
+.due-this-month{background:var(--amber3);color:var(--amber);}
+.due-future{background:var(--gray2);color:var(--ink4);}
+.due-inprogress{background:var(--teal3);color:var(--teal2);}
+.due-resolved{background:var(--green3);color:var(--green2);}
+[data-theme=dark] .due-overdue{background:rgba(220,38,38,0.18);color:#FCA5A5;}
+[data-theme=dark] .due-this-month{background:rgba(217,119,6,0.18);color:#FDE68A;}
+[data-theme=dark] .due-future{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);}
+[data-theme=dark] .due-resolved{background:rgba(5,150,105,0.18);color:#6EE7B7;}
+.status-open{background:var(--red3);color:var(--red2);}
+.status-pending{background:var(--amber3);color:var(--amber2);}
+.status-approved{background:var(--teal3);color:var(--teal2);}
+.status-declined{background:var(--gray3);color:var(--ink4);}
+.status-resolved{background:var(--green3);color:var(--green2);}
+[data-theme=dark] .status-open{background:rgba(220,38,38,0.18);color:#FCA5A5;}
+[data-theme=dark] .status-pending{background:rgba(217,119,6,0.18);color:#FDE68A;}
+[data-theme=dark] .status-approved{background:rgba(13,148,136,0.18);color:#5EEAD4;}
+[data-theme=dark] .status-declined{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.45);}
+[data-theme=dark] .status-resolved{background:rgba(5,150,105,0.18);color:#6EE7B7;}
+.cat-renewal{background:var(--navy3);color:var(--navy2);}
+.cat-commercial{background:var(--blue3);color:var(--blue2);}
+.cat-governance{background:var(--purple3);color:var(--purple2);}
+.cat-sow{background:var(--orange3);color:var(--orange2);}
+.cat-vendor-risk{background:var(--red3);color:var(--red2);}
+[data-theme=dark] .cat-renewal{background:rgba(30,58,95,0.5);color:#93C5FD;}
+[data-theme=dark] .cat-commercial{background:rgba(37,99,235,0.18);color:#93C5FD;}
+[data-theme=dark] .cat-governance{background:rgba(124,58,237,0.18);color:#C4B5FD;}
+[data-theme=dark] .cat-sow{background:rgba(234,88,12,0.18);color:#FDBA74;}
+[data-theme=dark] .cat-vendor-risk{background:rgba(220,38,38,0.18);color:#FCA5A5;}
+
+/* ── section bar ── */
+.section-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0 10px;}
+.section-bar-title{font-size:8pt;font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:.12em;}
+.section-bar-count{font-size:8pt;color:var(--ink4);}
+
+/* ── empty state ── */
+.empty-state{padding:48px 24px;text-align:center;color:var(--ink4);}
+.empty-icon{font-size:28pt;margin-bottom:12px;opacity:.4;}
+.empty-title{font-size:9pt;font-weight:700;color:var(--ink3);margin-bottom:4px;}
+
+/* ── advisory footer ── */
+.advisory{margin-top:28px;background:linear-gradient(135deg,var(--navy) 0%,#1a2f50 100%);border-radius:12px;padding:18px 24px;border:1px solid rgba(255,255,255,0.06);}
+.advisory-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;}
+.advisory-text{font-size:9pt;color:rgba(255,255,255,0.65);line-height:1.75;}
+.advisory-footer{font-size:7.5pt;color:rgba(255,255,255,0.3);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);}
+
+/* ── modal ── */
+.modal-backdrop{position:fixed;inset:0;z-index:400;background:rgba(6,13,26,0.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .22s ease;}
+.modal-backdrop.modal-open{opacity:1;pointer-events:all;}
+.modal-box{background:var(--white);border-radius:16px;border:1px solid var(--border);box-shadow:0 32px 80px rgba(0,0,0,0.38),0 8px 24px rgba(0,0,0,0.18);width:100%;max-width:700px;max-height:92vh;display:flex;flex-direction:column;transform:translateY(28px) scale(.97);transition:transform .22s ease;}
+.modal-backdrop.modal-open .modal-box{transform:translateY(0) scale(1);}
+[data-theme=dark] .modal-box{background:#0F1E3C;border-color:rgba(255,255,255,0.1);}
+.modal-signal{height:4px;flex-shrink:0;border-radius:16px 16px 0 0;}
+.modal-header{display:flex;align-items:flex-start;gap:14px;padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+[data-theme=dark] .modal-header{border-color:rgba(255,255,255,0.08);}
+.modal-header-info{flex:1;min-width:0;}
+.modal-cats{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
+.modal-title{font-size:12pt;font-weight:900;color:var(--navy);margin-bottom:3px;line-height:1.25;}
+[data-theme=dark] .modal-title{color:rgba(255,255,255,0.95);}
+.modal-subtitle{font-size:8.5pt;color:var(--ink4);}
+[data-theme=dark] .modal-subtitle{color:rgba(255,255,255,0.4);}
+.modal-financial{text-align:right;flex-shrink:0;}
+.modal-fin-value{font-size:16pt;font-weight:900;color:var(--navy);line-height:1;}
+[data-theme=dark] .modal-fin-value{color:rgba(255,255,255,0.9);}
+.modal-fin-label{font-size:7.5pt;color:var(--ink4);margin-top:2px;}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--gray2);color:var(--ink4);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;flex-shrink:0;font-family:inherit;}
+.modal-close:hover{background:var(--red3);color:var(--red);}
+[data-theme=dark] .modal-close{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);}
+[data-theme=dark] .modal-close:hover{background:rgba(220,38,38,0.25);color:#FCA5A5;}
+.modal-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);flex-shrink:0;}
+[data-theme=dark] .modal-kpis{background:rgba(255,255,255,0.06);}
+.modal-kpi{padding:12px 16px;background:var(--white);}
+[data-theme=dark] .modal-kpi{background:#0F1E3C;}
+.modal-kpi-value{font-size:13pt;font-weight:900;color:var(--navy);line-height:1.2;}
+[data-theme=dark] .modal-kpi-value{color:rgba(255,255,255,0.9);}
+.modal-kpi-label{font-size:7.5pt;color:var(--ink4);margin-top:3px;text-transform:uppercase;letter-spacing:.06em;}
+.modal-body{padding:20px 24px;overflow-y:auto;flex:1;}
+.modal-section-label{font-size:7.5pt;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.modal-desc{font-size:9pt;color:var(--ink2);line-height:1.75;margin-bottom:16px;}
+[data-theme=dark] .modal-desc{color:rgba(255,255,255,0.65);}
+.modal-rec{border-left:3px solid var(--teal);border-radius:0 8px 8px 0;background:var(--teal3);padding:12px 16px;margin-bottom:16px;font-size:9pt;color:var(--green2);line-height:1.7;}
+[data-theme=dark] .modal-rec{background:rgba(13,148,136,0.12);color:rgba(255,255,255,0.6);}
+.modal-rec strong{color:var(--teal2);display:block;margin-bottom:4px;font-size:8pt;text-transform:uppercase;letter-spacing:.07em;}
+[data-theme=dark] .modal-rec strong{color:var(--teal);}
+.modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.modal-info-cell{background:var(--gray2);border-radius:8px;padding:10px 14px;}
+[data-theme=dark] .modal-info-cell{background:rgba(255,255,255,0.05);}
+.modal-info-label{font-size:7pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+[data-theme=dark] .modal-info-label{color:rgba(255,255,255,0.35);}
+.modal-info-value{font-size:9pt;font-weight:700;color:var(--ink);}
+[data-theme=dark] .modal-info-value{color:rgba(255,255,255,0.85);}
+.modal-timeline{margin-bottom:16px;}
+.modal-timeline-row{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--gray2);}
+[data-theme=dark] .modal-timeline-row{border-color:rgba(255,255,255,0.06);}
+.modal-timeline-row:last-child{border-bottom:none;}
+.modal-timeline-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.modal-timeline-date{font-size:7.5pt;color:var(--ink4);flex-shrink:0;min-width:72px;}
+[data-theme=dark] .modal-timeline-date{color:rgba(255,255,255,0.35);}
+.modal-timeline-text{font-size:8.5pt;color:var(--ink3);line-height:1.6;}
+[data-theme=dark] .modal-timeline-text{color:rgba(255,255,255,0.55);}
+.modal-next{border-left:3px solid var(--amber);border-radius:0 8px 8px 0;background:var(--amber3);padding:12px 16px;font-size:8.5pt;color:var(--amber2);line-height:1.7;}
+[data-theme=dark] .modal-next{background:rgba(217,119,6,0.12);color:rgba(255,255,255,0.6);}
+.modal-next strong{color:var(--amber);display:block;font-size:8pt;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:8px;}
+[data-theme=dark] .modal-footer{border-color:rgba(255,255,255,0.08);}
+.modal-footer-note{font-size:7.5pt;color:var(--ink4);}
+[data-theme=dark] .modal-footer-note{color:rgba(255,255,255,0.3);}
+
+/* ── utility ── */
+.hidden{display:none!important;}
+
+/* ── dark mode overrides ── */
+[data-theme=dark]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+  --purple3:rgba(124,58,237,0.15);--orange3:rgba(234,88,12,0.15);--blue3:rgba(37,99,235,0.15);
+  --amber2:#FDE68A;--red2:#FCA5A5;--green2:#6EE7B7;
+  --teal2:#5EEAD4;--orange2:#FDBA74;--blue2:#93C5FD;--purple2:#C4B5FD;
+}
+[data-theme=dark] body{background:var(--gray);}
+[data-theme=dark] .page-body{background:var(--gray);}
+[data-theme=dark] .swimlane-body{background:#111F35;}
+
+/* ── responsive ── */
+/* ── stage hero 2-col ── */
+.stage-hero-grid{display:grid;grid-template-columns:1fr 220px;align-items:center;gap:32px;}
+.stage-hero-left{min-width:0;}
+.stage-hero-right{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;}
+.hero-ring-label{font-size:7pt;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.12em;text-align:center;}
+.hero-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;}
+.hero-stat{display:flex;flex-direction:column;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;min-width:88px;}
+.hero-stat-value{font-size:18pt;font-weight:900;color:#fff;line-height:1;}
+.hero-stat-label{font-size:6pt;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:.09em;margin-top:3px;}
+.hero-stat.stat-red{border-top:2px solid var(--red);}.hero-stat.stat-red .hero-stat-value{color:#F87171;}
+.hero-stat.stat-amber{border-top:2px solid var(--amber);}.hero-stat.stat-amber .hero-stat-value{color:#FBBF24;}
+.hero-stat.stat-teal{border-top:2px solid var(--teal);}.hero-stat.stat-teal .hero-stat-value{color:#5EEAD4;}
+
+/* ── body layout ── */
+.body-layout{display:grid;grid-template-columns:252px 1fr;gap:20px;align-items:start;}
+.sidebar{position:sticky;top:140px;display:flex;flex-direction:column;gap:12px;}
+.main-content{min-width:0;}
+
+/* ── sidebar card ── */
+.sidebar-card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+[data-theme=dark] .sidebar-card{background:#111F35;border-color:#1E3A5F;}
+.sidebar-card-hdr{padding:9px 13px;background:var(--navy);display:flex;align-items:center;gap:7px;}
+.sidebar-card-title{font-size:6.5pt;font-weight:700;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:.1em;}
+
+/* ── sidebar mini KPIs ── */
+.sidebar-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);}
+[data-theme=dark] .sidebar-kpi-grid{background:rgba(255,255,255,0.07);}
+.skpi{padding:10px 12px;background:var(--white);border-top:2px solid transparent;}
+[data-theme=dark] .skpi{background:#111F35;}
+.skpi.skpi-red{border-top-color:var(--red);}
+.skpi.skpi-amber{border-top-color:var(--amber);}
+.skpi.skpi-purple{border-top-color:var(--purple);}
+.skpi.skpi-green{border-top-color:var(--green);}
+.skpi.skpi-teal{border-top-color:var(--teal);}
+.skpi-value{font-size:15pt;font-weight:900;color:var(--ink);line-height:1;margin-bottom:2px;}
+[data-theme=dark] .skpi-value{color:rgba(255,255,255,0.9);}
+.skpi.skpi-red .skpi-value{color:var(--red);}
+.skpi.skpi-amber .skpi-value{color:var(--amber);}
+.skpi.skpi-purple .skpi-value{color:var(--purple);}
+.skpi.skpi-green .skpi-value{color:var(--green);}
+.skpi-label{font-size:5.5pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;}
+
+/* ── sidebar donut ── */
+.sidebar-donut-wrap{padding:14px 14px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.donut-legend{display:flex;flex-direction:column;gap:5px;width:100%;}
+.legend-row{display:flex;align-items:center;gap:7px;font-size:7pt;color:var(--ink3);}
+[data-theme=dark] .legend-row{color:rgba(255,255,255,0.5);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-label{flex:1;}
+.legend-count{font-weight:800;color:var(--ink);font-size:7.5pt;}
+[data-theme=dark] .legend-count{color:rgba(255,255,255,0.85);}
+
+/* ── exposure bars ── */
+.exp-bars-wrap{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+.exp-bar-row{display:flex;flex-direction:column;gap:3px;}
+.exp-bar-hdr{display:flex;align-items:center;justify-content:space-between;}
+.exp-bar-label{font-size:6.5pt;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;}
+[data-theme=dark] .exp-bar-label{color:rgba(255,255,255,0.5);}
+.exp-bar-amount{font-size:7.5pt;font-weight:800;color:var(--ink);}
+[data-theme=dark] .exp-bar-amount{color:rgba(255,255,255,0.8);}
+.exp-bar-track{height:6px;background:var(--gray3);border-radius:3px;overflow:hidden;}
+[data-theme=dark] .exp-bar-track{background:rgba(255,255,255,0.08);}
+.exp-bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+
+/* ── responsive ── */
+@media(max-width:1024px){
+  .body-layout{grid-template-columns:1fr;}
+  .sidebar{position:static;}
+  .stage-hero-grid{grid-template-columns:1fr;}
+  .stage-hero-right{display:none;}
+}
+@media(max-width:900px){
+  .stage-inner,.page-inner,.filter-bar-inner,.tab-bar-inner{padding-left:20px;padding-right:20px;}
+  .modal-info-grid{grid-template-columns:1fr;}
+  .modal-kpis{grid-template-columns:1fr;}
+}
+
+@media print{.top-bar,.tab-bar,.filter-bar,.modal-backdrop{display:none!important;}.page-inner{padding:12px!important;}}
+</style>
+</head>
+<body>
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <a href="index.html" class="top-bar-back">&#8592; VER Intelligence Hub</a>
+    <div class="top-bar-divider"></div>
+    <span class="top-bar-brand">Decision Horizon</span>
+  </div>
+  <div class="top-bar-right">
+    <span class="top-bar-meta">FY27 &middot; Salesforce DET &middot; Confidential</span>
+    <button type="button" class="top-bar-btn" onclick="window.print()">&#128438; Print</button>
+    <button type="button" class="top-bar-btn" id="dm-btn" onclick="toggleDarkMode()">&#9789; Dark Mode</button>
+  </div>
+</div>
+
+<!-- ── Stage / Hero ── -->
+<div class="stage">
+  <div class="stage-inner">
+    <div class="stage-hero-grid">
+      <div class="stage-hero-left">
+        <div class="stage-eyebrow">VER Intelligence Hub &middot; FY27</div>
+        <div class="stage-title">Decision <span class="title-accent">Horizon</span></div>
+        <div class="stage-sub">The active decisions the DET portfolio is waiting on &mdash; who owns each one, what VER advises, and the financial consequence of delay.</div>
+        <div class="hero-stats">
+          <div class="hero-stat stat-red">
+            <div class="hero-stat-value" id="kpi-critical">0</div>
+            <div class="hero-stat-label">Critical</div>
+          </div>
+          <div class="hero-stat stat-amber">
+            <div class="hero-stat-value" id="kpi-high">0</div>
+            <div class="hero-stat-label">High Priority</div>
+          </div>
+          <div class="hero-stat stat-teal">
+            <div class="hero-stat-value" id="kpi-open-dec">0</div>
+            <div class="hero-stat-label">Open Decisions</div>
+          </div>
+          <div class="hero-stat stat-amber">
+            <div class="hero-stat-value" id="kpi-due-mo">0</div>
+            <div class="hero-stat-label">Due This Month</div>
+          </div>
+        </div>
+      </div>
+      <div class="stage-hero-right">
+        <div class="hero-ring-label">Engagement Scope</div>
+        <svg id="hero-ring" width="190" height="190" viewBox="0 0 190 190" aria-label="Portfolio risk ring chart">
+          <circle cx="95" cy="95" r="72" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="18"/>
+          <circle id="ring-overdue"    cx="95" cy="95" r="72" fill="none" stroke="#DC2626" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 452" stroke-dashoffset="113" transform="rotate(-90 95 95)"/>
+          <circle id="ring-thismonth" cx="95" cy="95" r="72" fill="none" stroke="#D97706" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 452" stroke-dashoffset="113" transform="rotate(-90 95 95)"/>
+          <circle id="ring-quarter"   cx="95" cy="95" r="72" fill="none" stroke="#0D9488" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 452" stroke-dashoffset="113" transform="rotate(-90 95 95)"/>
+          <text x="95" y="88" text-anchor="middle" fill="white" font-size="11" font-weight="700" font-family="Segoe UI,system-ui,sans-serif" opacity="0.5">IN SCOPE</text>
+          <text id="ring-total-text" x="95" y="108" text-anchor="middle" fill="white" font-size="22" font-weight="900" font-family="Segoe UI,system-ui,sans-serif">$0</text>
+        </svg>
+        <div class="hero-ring-label">combined engagement scope</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Intel Brief Strip ── -->
+<div class="intel-brief" id="intel-brief">
+  <div class="intel-brief-inner">
+    <div class="ib-eyebrow">What This<br>Is Telling You</div>
+    <div class="ib-eyebrow-sep"></div>
+    <div class="ib-panels">
+      <div class="ib-panel">
+        <div class="ib-label">Total Engagement Scope</div>
+        <div class="ib-headline ib-red" id="ib-exposure-headline"></div>
+        <div class="ib-context" id="ib-exposure-context"></div>
+      </div>
+      <div class="ib-divider"></div>
+      <div class="ib-panel">
+        <div class="ib-label">Requires Direction</div>
+        <div class="ib-headline ib-amber" id="ib-urgent-headline"></div>
+        <div class="ib-context" id="ib-urgent-context"></div>
+      </div>
+      <div class="ib-divider"></div>
+      <div class="ib-panel">
+        <div class="ib-label">Largest Undecided Engagement</div>
+        <div class="ib-headline ib-teal" id="ib-delay-headline"></div>
+        <div class="ib-context" id="ib-delay-context"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tab Bar ── -->
+<div class="tab-bar">
+  <div class="tab-bar-inner">
+    <button type="button" class="tab-btn tab-active" id="tab-q-btn">
+      <span class="tab-icon">&#9889;</span> Open Decisions
+      <span class="tab-badge" id="tbadge-q">5 open</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── Filter Bar: Queue ── -->
+<div class="filter-bar" id="fb-q">
+  <div class="filter-bar-inner" id="fb-q-inner">
+    <span class="filter-label">Priority</span>
+    <button type="button" class="filter-chip chip-active" data-fq="priority" data-fv="all">All</button>
+    <button type="button" class="filter-chip" data-fq="priority" data-fv="critical">Critical</button>
+    <button type="button" class="filter-chip" data-fq="priority" data-fv="high">High</button>
+    <button type="button" class="filter-chip" data-fq="priority" data-fv="medium">Medium</button>
+    <button type="button" class="filter-chip" data-fq="priority" data-fv="low">Low</button>
+    <div class="filter-sep"></div>
+    <span class="filter-label">Category</span>
+    <button type="button" class="filter-chip chip-active" data-fq="category" data-fv="all">All</button>
+    <button type="button" class="filter-chip" data-fq="category" data-fv="renewal">Renewal</button>
+    <button type="button" class="filter-chip" data-fq="category" data-fv="governance">Governance</button>
+    <button type="button" class="filter-chip" data-fq="category" data-fv="sow">SOW</button>
+    <button type="button" class="filter-chip" data-fq="category" data-fv="commercial">Commercial</button>
+    <div class="filter-sep"></div>
+    <span class="filter-label">Sort</span>
+    <select class="filter-select" id="sort-sel" title="Sort actions" aria-label="Sort actions">
+      <option value="priority">Priority</option>
+      <option value="due">Due Date</option>
+      <option value="impact">Engagement Scope</option>
+    </select>
+    <span class="filter-count" id="q-fc">Showing 5 of 5</span>
+  </div>
+</div>
+
+
+<!-- ── Page Body ── -->
+<div class="page-body">
+  <div class="page-inner">
+    <div class="body-layout">
+
+      <!-- ── Sidebar ── -->
+      <aside class="sidebar">
+
+        <!-- Mini KPIs -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-hdr"><span class="sidebar-card-title">Portfolio Status</span></div>
+          <div class="sidebar-kpi-grid">
+            <div class="skpi skpi-red">
+              <div class="skpi-value" id="skpi-critical">0</div>
+              <div class="skpi-label">Critical</div>
+            </div>
+            <div class="skpi skpi-amber">
+              <div class="skpi-value" id="skpi-high">0</div>
+              <div class="skpi-label">High</div>
+            </div>
+            <div class="skpi skpi-purple">
+              <div class="skpi-value" id="skpi-pending">0</div>
+              <div class="skpi-label">Pending Owner</div>
+            </div>
+            <div class="skpi skpi-teal">
+              <div class="skpi-value" id="skpi-open-dec">0</div>
+              <div class="skpi-label">Open Decisions</div>
+            </div>
+            <div class="skpi skpi-amber">
+              <div class="skpi-value" id="skpi-due-mo">0</div>
+              <div class="skpi-label">Due This Month</div>
+            </div>
+            <div class="skpi skpi-green">
+              <div class="skpi-value" id="skpi-resolved">0</div>
+              <div class="skpi-label">Resolved</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Priority Donut -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-hdr"><span class="sidebar-card-title">Priority Breakdown</span></div>
+          <div class="sidebar-donut-wrap">
+            <svg id="priority-donut" width="120" height="120" viewBox="0 0 120 120" aria-label="Priority distribution donut chart">
+              <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="16"/>
+              <circle id="donut-critical" cx="60" cy="60" r="44" fill="none" stroke="#DC2626" stroke-width="16" stroke-linecap="butt" stroke-dasharray="0 277" stroke-dashoffset="69" transform="rotate(-90 60 60)"/>
+              <circle id="donut-high"     cx="60" cy="60" r="44" fill="none" stroke="#D97706" stroke-width="16" stroke-linecap="butt" stroke-dasharray="0 277" stroke-dashoffset="69" transform="rotate(-90 60 60)"/>
+              <circle id="donut-medium"   cx="60" cy="60" r="44" fill="none" stroke="#0D9488" stroke-width="16" stroke-linecap="butt" stroke-dasharray="0 277" stroke-dashoffset="69" transform="rotate(-90 60 60)"/>
+              <circle id="donut-low"      cx="60" cy="60" r="44" fill="none" stroke="#9CA3AF" stroke-width="16" stroke-linecap="butt" stroke-dasharray="0 277" stroke-dashoffset="69" transform="rotate(-90 60 60)"/>
+              <text x="60" y="56" text-anchor="middle" fill="currentColor" font-size="18" font-weight="900" font-family="Segoe UI,system-ui,sans-serif" id="donut-center-num">8</text>
+              <text x="60" y="70" text-anchor="middle" fill="currentColor" font-size="7" font-weight="700" font-family="Segoe UI,system-ui,sans-serif" opacity="0.5">ACTIONS</text>
+            </svg>
+            <div class="donut-legend" id="donut-legend"></div>
+          </div>
+        </div>
+
+        <!-- Exposure Bars -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-hdr"><span class="sidebar-card-title">Scope by Quarter</span></div>
+          <div class="exp-bars-wrap" id="exp-bars"></div>
+        </div>
+
+      </aside>
+
+      <!-- ── Main Content ── -->
+      <div class="main-content">
+
+        <!-- Queue Panel -->
+        <div class="tab-panel panel-active" id="panel-q">
+          <div class="section-bar">
+            <span class="section-bar-title">Open Decisions</span>
+            <span class="section-bar-count" id="q-sec-c">5 decisions across 4 categories</span>
+          </div>
+          <div id="q-swimlanes"></div>
+          <div class="advisory">
+            <div class="advisory-eyebrow">VER Advisory &mdash; Decision Horizon &middot; FY27</div>
+            <div class="advisory-text">The Decision Horizon surfaces the active decisions the DET portfolio is waiting on. Items are sourced from Coupa SOW data, QBR outputs, and VER advisory tracking. Grouped by fiscal quarter so leadership can see what requires a direction this period versus what is on the near horizon.</div>
+            <div class="advisory-footer">VER Intelligence Hub &middot; Decision Horizon &middot; FY27 &middot; Salesforce DET &middot; Confidential</div>
+          </div>
+        </div>
+
+      </div><!-- /main-content -->
+    </div><!-- /body-layout -->
+  </div>
+</div>
+
+<!-- ── Action Modal ── -->
+<div class="modal-backdrop" id="aq-backdrop">
+  <div class="modal-box" id="aq-modal" role="dialog" aria-modal="true">
+    <div class="modal-signal" id="aq-signal"></div>
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-cats" id="aq-cats"></div>
+        <div class="modal-title" id="aq-title"></div>
+        <div class="modal-subtitle" id="aq-sub"></div>
+      </div>
+      <div class="modal-financial">
+        <div class="modal-fin-value" id="aq-impact"></div>
+        <div class="modal-fin-label">Financial Impact</div>
+      </div>
+      <button type="button" class="modal-close" id="aq-close">&times;</button>
+    </div>
+    <div class="modal-kpis" id="aq-kpis"></div>
+    <div class="modal-body" id="aq-body"></div>
+  </div>
+</div>
+
+<script>
+/* FY27 fiscal quarters: Q1=Feb-Apr, Q2=May-Jul, Q3=Aug-Oct, Q4=Nov-Jan */
+function getFQ(d){
+  if(!d)return'FQ4';
+  var dt=new Date(d),m=dt.getMonth()+1;
+  if(m>=2&&m<=4)return'FQ1';
+  if(m>=5&&m<=7)return'FQ2';
+  if(m>=8&&m<=10)return'FQ3';
+  return'FQ4';
+}
+function getFQLabel(fq){return{FQ1:'FY27 Q1 · Feb–Apr',FQ2:'FY27 Q2 · May–Jul',FQ3:'FY27 Q3 · Aug–Oct',FQ4:'FY27 Q4 · Nov–Jan'}[fq]||fq;}
+
+var ACTIONS=[
+  {id:1,priority:'high',category:'renewal',
+   title:'NTT Data AD — Non-Renewal Transition',vendor:'NTT Data',
+   desc:'NTT Data AD engagement confirmed not renewing. Contract expires Aug 31 2026. ~140 resources across DA&O pillars require transition planning. $10M remaining contract value. Individual PO model preserved through expiry — no reversion to master contract. DA&O Lead owns transition execution.',
+   action:'DA&O Lead to finalize resource offboarding plan and confirm knowledge transfer completion before Aug 31. VER available to support continuity risk documentation and post-engagement record closure on request.',
+   owner:'DA&O Lead',dueDate:'2026-08-31',dueDateDisplay:'Aug 31, 2026',impact:'$10M',impactNum:10,status:'In Progress',
+   dec:{status:'Approved',recommendation:'Non-renewal confirmed. Individual PO model retained through expiry. No reversion to master contract.',decisionOwner:'DA&O Lead'},
+   timeline:[{date:'Apr 2026',text:'AD restructure completed. 24 individual POs executed. $9.0M savings realized.',col:'#0D9488'},{date:'Jul 2026',text:'Non-renewal confirmed by DA&O Lead. Transition planning initiated.',col:'#059669'},{date:'Aug 31, 2026',text:'Contract expiry. All resources to be offboarded. Knowledge transfer must be complete.',col:'#D97706'}],
+   nextStep:'DA&O Lead to confirm offboarding schedule and knowledge transfer plan. VER can archive the savings story and close the engagement record once DA&O Lead confirms wind-down is complete.'},
+  {id:2,priority:'high',category:'governance',
+   title:'Workday ADAMS Governance Gap',vendor:'Cognizant',
+   desc:'Cognizant Workday ADAMS FINS engagement: internal dependency backlog at 27 days vs. <21-day target. Metric absent from governance scorecard — masking a material SLA risk. Cognizant FY27 Coupa: $9.47M total; ADAMS FINS SOW value: $5.4M.',
+   action:'SF on SF Lead to direct Cognizant account team to add internal dependency aging to the ADAMS FINS governance scorecard. Target: <21 days. Current: 27 days. VER can provide advisory framing and benchmark context to support the conversation.',
+   owner:'SF on SF Lead',dueDate:'2026-07-01',dueDateDisplay:'Jul 1, 2026',impact:'$5.4M',impactNum:5.4,status:'Open',
+   dec:{status:'Open',recommendation:'Add dependency aging metric to scorecard before Q2 release. SF on SF Lead and Cognizant account team own the update.',decisionOwner:'SF on SF Lead'},
+   timeline:[{date:'Q4 FY26',text:'Workday ADAMS FINS year 2 of 2. SLA performance tracking established.',col:'#0D9488'},{date:'May 2026',text:'Internal dependency aging identified as gap in scorecard coverage.',col:'#D97706'},{date:'Jun 2026',text:'Backlog at 27d vs <21d target. Metric not on scorecard. VER advisory issued.',col:'#DC2626'}],
+   nextStep:'SF on SF Lead to direct Cognizant to update the scorecard. VER available to provide benchmark framing or advisory context if needed.'},
+  {id:3,priority:'high',category:'renewal',
+   title:'Google Cloud Renewal — EDP Analysis',vendor:'Google Cloud',
+   desc:'GCP FY27 spend: $14.0M (Coupa actuals). EDP commitment value pending formal analysis — not yet confirmed. Engineering Lead owns this engagement and its budget. VER (including FinOps) in advisory capacity. 90-day notice window active ahead of Aug 1.',
+   action:'Engineering Lead to engage VER on EDP options analysis before Aug 1. VER can model committed spend tiers, discount structures, and consumption patterns through FinOps if engaged; Engineering Lead makes the commercial direction call.',
+   owner:'Engineering Lead',dueDate:'2026-08-01',dueDateDisplay:'Aug 1, 2026',impact:'$14.0M',impactNum:14.0,status:'Open',
+   dec:{status:'Open',recommendation:'Do not extend or expand without VER advisory review — including EDP modeling through VER FinOps.',decisionOwner:'Engineering Lead'},
+   timeline:[{date:'Q3 FY26',text:'GCP EDP commitment established. Renewal window flagged by VER in forward calendar.',col:'#0D9488'},{date:'May 2026',text:'VER FinOps usage review completed. EDP analysis not yet formally initiated.',col:'#D97706'},{date:'Jun 2026',text:'VER advisory issued. Renewal action elevated to High Priority.',col:'#D97706'}],
+   nextStep:'Engineering Lead to confirm engagement with VER within 5 business days. VER available to deliver GCP benchmark comparison (committed vs. on-demand, EDP tier modeling) once engaged.'},
+  {id:4,priority:'high',category:'commercial',
+   title:'Figma Seat Audit',vendor:'Figma',
+   desc:'FY27 Coupa spend: $3.15M. Renewal baseline set Sep 2026. Without a seat utilization audit DET risks renewing at inflated headcount. Digital Marketing owns this engagement. License count not reconciled against active users in 90+ days.',
+   action:'Complete seat utilization audit before Sep 1 renewal baseline is set. Remove unused/inactive seats to reduce renewal footprint.',
+   owner:'Digital Mktg Lead',dueDate:'2026-09-01',dueDateDisplay:'Sep 1, 2026',impact:'$3.15M',impactNum:3.15,status:'Pending Owner',
+   dec:{status:'Pending',recommendation:'Complete seat audit before any renewal baseline is set or commitment is made.',decisionOwner:'Digital Mktg Lead'},
+   timeline:[{date:'Q1 FY27',text:'Figma renewal horizon flagged by VER. Owner assignment requested.',col:'#0D9488'},{date:'Jun 2026',text:'Owner confirmation pending. No utilization audit initiated.',col:'#D97706'},{date:'Jun 2026',text:'VER issued Pending Owner status.',col:'#DC2626'}],
+   nextStep:'Digital Mktg Lead to confirm ownership and initiate Figma admin audit report pull. VER available to advise on seat reduction negotiation strategy once audit results are in hand.'},
+  {id:5,priority:'medium',category:'sow',
+   title:'Deloitte Agentic SOW Extension',vendor:'Deloitte',
+   desc:'Deloitte Agentic AI SOW expires Aug 18 2026. FY27 Coupa spend: $9.1M. Current extension path is T&M continuation — VER does not recommend extending on T&M without milestone confirmation from the Agentic Lead.',
+   action:'Agentic Lead to confirm milestone completion and direct extension scope. VER advisory: milestone-based extension only. Do not extend T&M without VER review.',
+   owner:'Agentic Lead',dueDate:'2026-08-18',dueDateDisplay:'Aug 18, 2026',impact:'$9.1M',impactNum:9.1,status:'Pending Owner',
+   dec:{status:'Pending',recommendation:'Milestone-based extension only — no T&M continuation without milestone confirmation and VER advisory sign-off.',decisionOwner:'Agentic Lead'},
+   timeline:[{date:'Q4 FY26',text:'Deloitte Agentic SOW executed. T&M structure approved for initial phase.',col:'#0D9488'},{date:'Jun 2026',text:'SOW approaching expiry. T&M extension path surfaced.',col:'#D97706'},{date:'Jun 2026',text:'VER advisory issued. Milestone restructure required. Owner pending.',col:'#DC2626'}],
+   nextStep:'Agentic Lead to confirm milestone completion by Jul 20. VER available to review extension SOW terms and provide advisory before Aug 1 if engaged.'},
+];
+/* ── helpers ── */
+var D=document;
+var TODAY=new Date('2026-07-17');
+var PRIO={critical:0,high:1,medium:2,low:3};
+
+function el(t,c){var e=D.createElement(t);if(c)e.className=c;return e;}
+function mk(t,c,s){var e=el(t,c);if(s!=null)e.textContent=s;return e;}
+function tx(s){return D.createTextNode(s==null?'':String(s));}
+function ap(p){for(var i=1;i<arguments.length;i++)if(arguments[i]!=null)p.appendChild(arguments[i]);return p;}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function clr(id){var e=D.getElementById(id);while(e.firstChild)e.removeChild(e.firstChild);return e;}
+
+/* ── badge factories ── */
+function prioBadge(p){var m={critical:'priority-badge prio-critical',high:'priority-badge prio-high',medium:'priority-badge prio-medium',low:'priority-badge prio-low'};return mk('span',m[p]||'priority-badge prio-low',cap(p));}
+function catBadgeQ(c){var m={renewal:'badge cat-renewal',governance:'badge cat-governance',sow:'badge cat-sow',commercial:'badge cat-commercial'};return mk('span',m[c]||'badge badge-gray',cap(c));}
+function statusBadgeQ(s){var m={'Open':'badge badge-navy','Overdue':'badge badge-red','Pending Owner':'badge badge-purple','In Progress':'badge badge-teal'};return mk('span',m[s]||'badge badge-gray',s);}
+
+/* ── date helpers ── */
+function parseDue(d){if(!d)return null;var p=d.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function duePillQ(a){
+  if(!a.dueDate)return mk('span','due-pill due-inprogress',a.dueDateDisplay||'TBD');
+  var dt=new Date(a.dueDate),diff=Math.floor((dt-TODAY)/86400000);
+  if(a.status==='Overdue'||diff<0)return mk('span','due-pill due-overdue','Overdue — '+a.dueDateDisplay);
+  if(a.status==='In Progress')return mk('span','due-pill due-inprogress','In Progress · '+a.dueDateDisplay);
+  if(diff<=7)return mk('span','due-pill due-this-week',a.dueDateDisplay);
+  if(diff<=31)return mk('span','due-pill due-this-month',a.dueDateDisplay);
+  return mk('span','due-pill due-future',a.dueDateDisplay);
+}
+
+/* ── lane assignment by fiscal quarter ── */
+function getLane(a){
+  if(a.status==='In Progress')return 'inprogress';
+  return getFQ(a.dueDate).toLowerCase();
+}
+
+/* ── KPI counters with animation ── */
+function animateCount(el,target,suffix){
+  suffix=suffix||'';
+  var start=0,dur=900,step=16,steps=Math.ceil(dur/step);
+  var inc=target/steps,cur=0,count=0;
+  var id=setInterval(function(){
+    count++;cur+=inc;
+    var v=count>=steps?target:Math.floor(cur);
+    el.textContent=v+suffix;
+    if(count>=steps){el.textContent=target+suffix;clearInterval(id);}
+  },step);
+}
+
+function buildKPIs(){
+  var critical=ACTIONS.filter(function(a){return a.priority==='critical';}).length;
+  var high=ACTIONS.filter(function(a){return a.priority==='high';}).length;
+  var pend=ACTIONS.filter(function(a){return a.status==='Pending Owner';}).length;
+  var openDec=ACTIONS.filter(function(a){return a.dec&&(a.dec.status==='Open'||a.dec.status==='Pending');}).length;
+  var resolved=ACTIONS.filter(function(a){return a.dec&&a.dec.status==='Approved';}).length;
+  var dueMo=0;
+  ACTIONS.forEach(function(a){if(!a.dueDate)return;var dt=new Date(a.dueDate);if(dt.getFullYear()===TODAY.getFullYear()&&dt.getMonth()===TODAY.getMonth()&&a.status!=='In Progress')dueMo++;});
+  /* hero stats */
+  animateCount(D.getElementById('kpi-critical'),critical);
+  animateCount(D.getElementById('kpi-high'),high);
+  animateCount(D.getElementById('kpi-open-dec'),openDec);
+  animateCount(D.getElementById('kpi-due-mo'),dueMo);
+  /* sidebar mini KPIs */
+  animateCount(D.getElementById('skpi-critical'),critical);
+  animateCount(D.getElementById('skpi-high'),high);
+  animateCount(D.getElementById('skpi-pending'),pend);
+  animateCount(D.getElementById('skpi-open-dec'),openDec);
+  animateCount(D.getElementById('skpi-due-mo'),dueMo);
+  animateCount(D.getElementById('skpi-resolved'),resolved);
+  var openAQ=ACTIONS.filter(function(a){return a.status==='Open'||a.status==='Overdue'||a.status==='Pending Owner';}).length;
+  D.getElementById('tbadge-q').textContent=openAQ+' open';
+  return {critical:critical,high:high,pend:pend,openDec:openDec,dueMo:dueMo,resolved:resolved};
+}
+
+/* ── animated SVG ring (hero) ── */
+function buildHeroRing(){
+  var circ=2*Math.PI*72; /* r=72 */
+  var laneExp={fq2:0,fq3:0,fq4:0};
+  ACTIONS.forEach(function(a){
+    if(a.status==='In Progress')return;
+    var lane=getLane(a);
+    if(laneExp[lane]!==undefined)laneExp[lane]+=a.impactNum;
+  });
+  var total=laneExp.fq2+laneExp.fq3+laneExp.fq4;
+  if(total===0)return;
+  var rtxt=D.getElementById('ring-total-text');
+  var totalRnd=Math.round(total);
+  (function(){var dur=900,step=16,steps=Math.ceil(dur/step),inc=totalRnd/steps,cur=0,cnt=0;
+  var rid=setInterval(function(){cnt++;cur+=inc;var v=cnt>=steps?totalRnd:Math.floor(cur);rtxt.textContent='$'+v+'M';if(cnt>=steps)clearInterval(rid);},step);})();
+  var segments=[
+    {id:'ring-overdue',   val:laneExp.fq2,  color:'#DC2626'},
+    {id:'ring-thismonth', val:laneExp.fq3,  color:'#D97706'},
+    {id:'ring-quarter',   val:laneExp.fq4,  color:'#0D9488'}
+  ];
+  var offset=0;
+  segments.forEach(function(seg){
+    var arc=(seg.val/total)*circ;
+    var el2=D.getElementById(seg.id);
+    if(!el2||arc<=0)return;
+    el2.setAttribute('stroke-dashoffset',String(-(offset)+(circ*0.25)));
+    el2.setAttribute('stroke-dasharray','0 '+circ);
+    el2.style.transition='stroke-dasharray 1.2s cubic-bezier(.22,1,.36,1) '+(0.1+offset/circ*0.4)+'s';
+    setTimeout(function(){el2.setAttribute('stroke-dasharray',arc+' '+(circ-arc));},30);
+    offset+=arc;
+  });
+}
+
+/* ── priority donut ── */
+function buildPriorityDonut(){
+  var circ=2*Math.PI*44; /* r=44 */
+  var counts={critical:0,high:0,medium:0,low:0};
+  ACTIONS.forEach(function(a){counts[a.priority]=(counts[a.priority]||0)+1;});
+  var total=ACTIONS.length;
+  D.getElementById('donut-center-num').textContent=total;
+  var segs=[
+    {id:'donut-critical',key:'critical',color:'#DC2626',label:'Critical'},
+    {id:'donut-high',    key:'high',    color:'#D97706',label:'High'},
+    {id:'donut-medium',  key:'medium',  color:'#0D9488',label:'Medium'},
+    {id:'donut-low',     key:'low',     color:'#9CA3AF',label:'Low'}
+  ];
+  var offset=0;
+  var legend=D.getElementById('donut-legend');
+  while(legend.firstChild)legend.removeChild(legend.firstChild);
+  segs.forEach(function(seg){
+    var cnt=counts[seg.key]||0;
+    if(cnt===0)return;
+    var arc=(cnt/total)*circ;
+    var el2=D.getElementById(seg.id);
+    if(el2){
+      el2.setAttribute('stroke-dashoffset',String(circ*0.25-offset));
+      el2.setAttribute('stroke-dasharray','0 '+circ);
+      el2.style.transition='stroke-dasharray 1s cubic-bezier(.22,1,.36,1) '+(0.15+offset/circ*0.4)+'s';
+      setTimeout(function(){el2.setAttribute('stroke-dasharray',arc+' '+(circ-arc));},30);
+    }
+    offset+=arc;
+    var row=el('div','legend-row');
+    var dot=el('div','legend-dot');dot.style.background=seg.color;
+    ap(row,dot,mk('span','legend-label',seg.label),mk('span','legend-count',cnt));
+    legend.appendChild(row);
+  });
+}
+
+/* ── exposure bars ── */
+function buildExpBars(){
+  var laneData=[
+    {key:'fq2',label:'FY27 Q2 · Jul',  color:'#DC2626'},
+    {key:'fq3',label:'FY27 Q3 · Oct',  color:'#D97706'},
+    {key:'fq4',label:'FY27 Q4 · Jan',  color:'#0D9488'}
+  ];
+  var laneExp={fq2:0,fq3:0,fq4:0};
+  ACTIONS.forEach(function(a){
+    if(a.status==='In Progress')return;
+    var lane=getLane(a);
+    if(laneExp[lane]!==undefined)laneExp[lane]+=a.impactNum;
+  });
+  var maxExp=Math.max(laneExp.fq2,laneExp.fq3,laneExp.fq4)||1;
+  var wrap=D.getElementById('exp-bars');
+  while(wrap.firstChild)wrap.removeChild(wrap.firstChild);
+  laneData.forEach(function(ld){
+    var val=laneExp[ld.key]||0;
+    var pct=val/maxExp*100;
+    var row=el('div','exp-bar-row');
+    var hdr=el('div','exp-bar-hdr');
+    ap(hdr,mk('span','exp-bar-label',ld.label),mk('span','exp-bar-amount',val>0?'$'+val.toFixed(1)+'M':'—'));
+    var track=el('div','exp-bar-track');
+    var fill=el('div','exp-bar-fill');fill.style.background=ld.color;
+    track.appendChild(fill);
+    ap(row,hdr,track);
+    wrap.appendChild(row);
+    setTimeout(function(){fill.style.width=pct+'%';},80);
+  });
+}
+
+/* ── intel brief ── */
+function buildIntelBrief(){
+  /* panel 1 — total engagement scope, excluding In Progress (matches ring) */
+  var totalExp=ACTIONS.filter(function(a){return a.status!=='In Progress';}).reduce(function(s,a){return s+(a.impactNum||0);},0);
+  var pendingCount=ACTIONS.filter(function(a){return a.dec&&(a.dec.status==='Open'||a.dec.status==='Pending');}).length;
+  var pillarOwners=ACTIONS.reduce(function(owners,a){if(a.owner&&owners.indexOf(a.owner)<0)owners.push(a.owner);return owners;},[]);
+  D.getElementById('ib-exposure-headline').textContent='$'+totalExp.toFixed(1)+'M combined engagement scope';
+  D.getElementById('ib-exposure-context').textContent=pendingCount+' decisions awaiting confirmation across '+pillarOwners.length+' DET pillar leads. Each item on this page represents a contract, commercial, or governance consequence that grows with delay.';
+
+  /* panel 2 — earliest due high/critical open item (not in progress) */
+  var urgent=ACTIONS.filter(function(a){
+    return a.status!=='In Progress'&&(a.priority==='critical'||a.priority==='high');
+  }).sort(function(a,b){return new Date(a.dueDate)-new Date(b.dueDate);})[0];
+  if(urgent){
+    D.getElementById('ib-urgent-headline').textContent=urgent.vendor+' — '+urgent.dec.decisionOwner;
+    D.getElementById('ib-urgent-context').textContent=urgent.title+'. VER advisory position is on record and available on request.';
+  }
+
+  /* panel 3 — largest single undecided engagement by scope */
+  var topImpact=ACTIONS.filter(function(a){
+    return a.status!=='In Progress'&&a.impactNum>0&&a.dec&&(a.dec.status==='Open'||a.dec.status==='Pending');
+  }).sort(function(a,b){return b.impactNum-a.impactNum;})[0];
+  if(topImpact){
+    D.getElementById('ib-delay-headline').textContent=topImpact.vendor+' — '+topImpact.impact;
+    D.getElementById('ib-delay-context').textContent=cap(topImpact.category)+' decision — '+topImpact.dec.decisionOwner+' to confirm direction. VER advisory is available to support when the pillar lead is ready to move.';
+  }
+}
+
+
+/* ── queue rendering ── */
+var qState={priority:'all',category:'all',sort:'priority'};
+
+function filteredActions(){
+  return ACTIONS.filter(function(a){
+    if(qState.priority!=='all'&&a.priority!==qState.priority)return false;
+    if(qState.category!=='all'&&a.category!==qState.category)return false;
+    return true;
+  }).sort(function(a,b){
+    if(qState.sort==='priority'){var pd=PRIO[a.priority]-PRIO[b.priority];if(pd!==0)return pd;return new Date(a.dueDate)-new Date(b.dueDate);}
+    if(qState.sort==='due')return new Date(a.dueDate)-new Date(b.dueDate);
+    if(qState.sort==='impact')return b.impactNum-a.impactNum;
+    return 0;
+  });
+}
+
+function decStripClass(s){return{Open:'dec-open',Pending:'dec-pending',Approved:'dec-approved','In Progress':'dec-inprogress'}[s]||'dec-open';}
+
+function buildActionCard(a){
+  var isCritical=a.priority==='critical';
+  var card=el('div','action-card');
+  card.setAttribute('data-id',a.id);
+  card.setAttribute('tabindex','0');
+  card.setAttribute('role','button');
+  card.setAttribute('aria-label','Action: '+a.title);
+  var topBar=el('div','acard-top-bar accent-'+a.priority+(isCritical?' accent-pulse':''));
+  var body=el('div','acard-body');
+  var badges=el('div','acard-badges');
+  ap(badges,prioBadge(a.priority),catBadgeQ(a.category),statusBadgeQ(a.status));
+  var title=mk('div','acard-title',a.title);
+  var vendor=mk('div','acard-vendor',a.vendor);
+  var rec=el('div','acard-rec');rec.textContent=a.action;
+  ap(body,badges,title,vendor,rec);
+  var footer=el('div','acard-footer');
+  var footLeft=el('div','acard-footer-left');
+  ap(footLeft,duePillQ(a),mk('span','acard-impact',a.impact));
+  var btn=mk('button','acard-btn','Details →');btn.type='button';
+  ap(footer,footLeft,btn);
+  /* decision strip */
+  var strip=el('div','acard-dec-strip');
+  var dlabel=mk('span','acard-dec-label','Decision');
+  var dtext=mk('span','acard-dec-text',a.dec?a.dec.recommendation:'—');
+  var dstat=a.dec?mk('span','acard-dec-status '+decStripClass(a.dec.status),a.dec.status):null;
+  ap(strip,dlabel,dtext);if(dstat)strip.appendChild(dstat);
+  ap(card,topBar,body,footer,strip);
+  return card;
+}
+
+var LANES=[
+  {key:'fq2',cls:'lane-fq2',icon:'⚡',label:'FY27 Q2 · Due by Jul 31',open:true},
+  {key:'fq3',cls:'lane-fq3',icon:'📅',label:'FY27 Q3 · Due by Oct 31',open:true},
+  {key:'fq4',cls:'lane-fq4',icon:'🕒',label:'FY27 Q4 · Due by Jan 31',open:true},
+  {key:'inprogress',cls:'lane-inprogress',icon:'↻',label:'In Progress',open:false}
+];
+
+function renderQueue(){
+  var items=filteredActions();
+  D.getElementById('q-fc').textContent='Showing '+items.length+' of '+ACTIONS.length;
+  var cats={};items.forEach(function(a){cats[a.category]=true;});
+  var nc=Object.keys(cats).length;
+  D.getElementById('q-sec-c').textContent=items.length+' action'+(items.length!==1?'s':'')+' across '+nc+' categor'+(nc!==1?'ies':'y');
+  var container=D.getElementById('q-swimlanes');
+  while(container.firstChild)container.removeChild(container.firstChild);
+  if(!items.length){
+    var es=el('div','empty-state');
+    ap(es,mk('div','empty-icon','✓'),mk('div','empty-title','No actions match this filter'));
+    container.appendChild(es);return;
+  }
+  LANES.forEach(function(lane){
+    var laneItems=items.filter(function(a){return getLane(a)===lane.key;});
+    if(!laneItems.length)return;
+    var exposure=laneItems.reduce(function(s,a){return s+a.impactNum;},0);
+    var sw=el('div','swimlane '+lane.cls+(lane.open?' lane-open':''));
+    var hdr=el('div','swimlane-header');
+    var icon=mk('span','lane-icon',lane.icon);
+    var title=mk('span','lane-title',lane.label);
+    var cnt=mk('span','lane-count',laneItems.length+' item'+(laneItems.length!==1?'s':''));
+    var exp=exposure>0?mk('span','lane-exposure','$'+exposure.toFixed(1)+'M in scope'):null;
+    var chev=mk('span','lane-chevron','⌄');
+    ap(hdr,icon,title,cnt);if(exp)ap(hdr,exp);ap(hdr,chev);
+    hdr.addEventListener('click',function(){sw.classList.toggle('lane-open');});
+    var body=el('div','swimlane-body');
+    var cardGrid=el('div','action-card-grid');
+    laneItems.forEach(function(a){
+      var card=buildActionCard(a);
+      card.addEventListener('click',function(e){
+        openActionModal(a.id);
+      });
+      card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openActionModal(a.id);}});
+      cardGrid.appendChild(card);
+    });
+    body.appendChild(cardGrid);
+    ap(sw,hdr,body);
+    container.appendChild(sw);
+  });
+}
+
+/* ── action modal ── */
+function openActionModal(id){
+  var a=ACTIONS.find(function(x){return x.id===id;});if(!a)return;
+  var sigMap={critical:'#DC2626',high:'#D97706',medium:'#0D9488',low:'#9CA3AF'};
+  D.getElementById('aq-signal').style.background=sigMap[a.priority]||'#0D9488';
+  var cats=clr('aq-cats');ap(cats,prioBadge(a.priority),mk('span',null,' '),catBadgeQ(a.category));
+  D.getElementById('aq-title').textContent=a.title;
+  var sub=clr('aq-sub');sub.appendChild(statusBadgeQ(a.status));
+  D.getElementById('aq-impact').textContent=a.impact;
+  var kpis=clr('aq-kpis');
+  [[a.impact,'Financial Impact'],[a.dueDateDisplay,'Due Date'],[a.status,'Status']].forEach(function(p){
+    var k=el('div','modal-kpi');ap(k,mk('div','modal-kpi-value',p[0]),mk('div','modal-kpi-label',p[1]));kpis.appendChild(k);
+  });
+  var bdy=clr('aq-body');
+  ap(bdy,mk('div','modal-section-label','Description'),mk('div','modal-desc',a.desc));
+  var rec=el('div','modal-rec');ap(rec,mk('strong',null,'Recommended Action'),tx(a.action));bdy.appendChild(rec);
+  var grid=el('div','modal-info-grid');
+  function mic(l,v){var c=el('div','modal-info-cell');ap(c,mk('div','modal-info-label',l),mk('div','modal-info-value',v));return c;}
+  var decOwner=a.dec?a.dec.decisionOwner:a.owner;
+  ap(grid,mic('Engagement Owner',decOwner),mic('Due Date',a.dueDateDisplay),mic('Engagement Value',a.impact),mic('VER Advisory',a.dec?a.dec.recommendation:'See action'));
+  bdy.appendChild(grid);
+  ap(bdy,mk('div','modal-section-label','Status History'));
+  var tl=el('div','modal-timeline');
+  a.timeline.forEach(function(t){
+    var r2=el('div','modal-timeline-row');var dot=el('div','modal-timeline-dot');dot.style.background=t.col;
+    ap(r2,dot,mk('span','modal-timeline-date',t.date),mk('span','modal-timeline-text',t.text));tl.appendChild(r2);
+  });
+  bdy.appendChild(tl);
+  var nxt=el('div','modal-next');ap(nxt,mk('strong',null,'Next Step'),tx(a.nextStep));bdy.appendChild(nxt);
+  D.getElementById('aq-backdrop').classList.add('modal-open');
+  D.getElementById('aq-modal').scrollTop=0;
+  D.body.style.overflow='hidden';
+}
+function closeActionModal(){D.getElementById('aq-backdrop').classList.remove('modal-open');D.body.style.overflow='';}
+(function(){
+  var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t)t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  D.documentElement.setAttribute('data-theme',t);
+  D.addEventListener('DOMContentLoaded',function(){
+    var btn=D.getElementById('dm-btn');
+    if(btn)btn.textContent=t==='dark'?'☾ Light Mode':'☉ Dark Mode';
+  });
+})();
+
+/* ── init ── */
+D.addEventListener('DOMContentLoaded',function(){
+  buildKPIs();
+  buildIntelBrief();
+  renderQueue();
+  /* charts fire after a brief paint delay so animation is visible */
+  setTimeout(function(){
+    buildHeroRing();
+    buildPriorityDonut();
+    buildExpBars();
+  },120);
+
+  /* queue filter chips */
+  D.getElementById('fb-q-inner').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-fq]');if(!btn)return;
+    var ft=btn.getAttribute('data-fq'),fv=btn.getAttribute('data-fv');
+    qState[ft]=fv;
+    D.querySelectorAll('[data-fq="'+ft+'"]').forEach(function(b){b.classList.remove('chip-active');});
+    btn.classList.add('chip-active');
+    renderQueue();
+  });
+  D.getElementById('sort-sel').addEventListener('change',function(e){qState.sort=e.target.value;renderQueue();});
+
+  /* modal closes */
+  D.getElementById('aq-close').addEventListener('click',closeActionModal);
+  D.getElementById('aq-backdrop').addEventListener('click',function(e){if(e.target===this)closeActionModal();});
+  D.addEventListener('keydown',function(e){if(e.key==='Escape'){closeActionModal();}});
+});
+</script>
+</body>
+</html>

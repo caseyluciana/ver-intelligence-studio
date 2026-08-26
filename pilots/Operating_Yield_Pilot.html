@@ -1,0 +1,1197 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Operating Yield · VER Intelligence Hub</title>
+<script src="../assets/vendors.js" defer></script>
+<script src="../assets/coupa_spend.js" defer></script>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --blue:#2563EB;--blue2:#1D4ED8;--blue3:#EFF6FF;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+[data-theme="dark"]{
+  --gray:#080F1E;--gray2:#111F35;--gray3:#1A2D47;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --white:#0F1E3C;--ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --red3:rgba(220,38,38,0.15);--red2:#FCA5A5;
+  --amber3:rgba(217,119,6,0.15);--amber2:#FCD34D;
+  --green3:rgba(5,150,105,0.15);--green2:#6EE7B7;
+  --blue3:rgba(37,99,235,0.15);--blue2:#93C5FD;
+  --purple3:rgba(124,58,237,0.15);--purple2:#C4B5FD;
+  --teal3:rgba(13,148,136,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .card,[data-theme="dark"] .yield-card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .exec-brief{background:linear-gradient(135deg,#0F1E3C,#1A0F2E);}
+[data-theme="dark"] .card-title{color:var(--ink);}
+[data-theme="dark"] input,[data-theme="dark"] textarea{background:var(--gray2);color:var(--ink);border-color:var(--border2);}
+[data-theme="dark"] select:not(.vselect-select){background:var(--gray2);color:var(--ink);border-color:var(--border2);}
+[data-theme="dark"] table{background:var(--white);}
+[data-theme="dark"] td{color:var(--ink2);border-bottom-color:var(--border);}
+[data-theme="dark"] .factor-track{background:var(--gray3);}
+[data-theme="dark"] .yield-badge{background:rgba(255,255,255,0.08)!important;color:var(--ink2)!important;}
+[data-theme="dark"] .score-badge{background:rgba(255,255,255,0.08)!important;color:var(--ink2)!important;}
+[data-theme="dark"] .dial-inner{background:var(--gray2);}
+[data-theme="dark"] .dial-score{color:var(--ink);}
+[data-theme="dark"] th{color:var(--ink4);border-bottom-color:var(--border);}
+[data-theme="dark"] td{color:var(--ink2);border-bottom-color:var(--border);}
+[data-theme="dark"] tr:hover td{background:var(--gray2);}
+[data-theme="dark"] select:not(.vselect-select){background:var(--gray2);color:var(--ink);border-color:var(--border2);}
+[data-theme="dark"] .btn-sec{background:var(--gray2);color:var(--ink);border-color:var(--border2);}
+[data-theme="dark"] .btn-danger{background:var(--gray2);color:#FCA5A5;border-color:rgba(220,38,38,0.25);}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;-webkit-font-smoothing:antialiased;}
+
+/* ── TOP BAR ─────────────────────────────────────────── */
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;
+  background:rgba(10,18,38,0.96);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.07);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8pt;color:rgba(255,255,255,0.45);text-decoration:none;font-weight:600;
+  display:flex;align-items:center;gap:5px;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.1);}
+.htb-brand{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.02em;}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-tag{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.25);padding:3px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:4px;}
+.top-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:6px;
+  border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);
+  color:rgba(255,255,255,0.5);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.top-btn:hover{background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.4);color:#C4B5FD;}
+
+/* ── HERO ─────────────────────────────────────────────── */
+.hero{background:linear-gradient(150deg,#0D1830 0%,#0D1428 40%,#141A30 100%);
+  padding:22px 0 18px;position:relative;overflow:hidden;}
+.hero-glow-1{position:absolute;top:-60px;right:-80px;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.12),transparent 65%);pointer-events:none;
+  animation:glowPulse 6s ease-in-out infinite;}
+.hero-glow-2{position:absolute;bottom:-80px;left:5%;width:400px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(13,148,136,0.08),transparent 65%);pointer-events:none;}
+@keyframes glowPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(1.05);}}
+.hero-wrap{max-width:1280px;margin:0 auto;padding:0 52px;position:relative;}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.hero-eyebrow-text{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;
+  color:rgba(255,255,255,0.45);}
+.hero-eyebrow-dot{width:4px;height:4px;border-radius:50%;background:rgba(167,139,250,0.8);}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.05;margin-bottom:6px;
+  letter-spacing:-0.02em;}
+.hero-title span{color:#C4B5FD;}
+.hero-sub{font-size:9pt;line-height:1.6;color:rgba(255,255,255,0.6);max-width:580px;margin-bottom:14px;}
+.hero-data-source{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;
+  font-size:7pt;color:rgba(255,255,255,0.45);font-weight:600;letter-spacing:0.05em;margin-bottom:20px;}
+.hero-data-source-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;
+  box-shadow:0 0 6px #22C55E;animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.hero-kpis{display:flex;gap:14px;flex-wrap:wrap;}
+.hkpi{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:15px 18px;min-width:145px;position:relative;overflow:hidden;
+  transition:border-color 0.2s,background 0.2s;}
+.hkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0.7;}
+.hkpi.c-purple::before{background:linear-gradient(90deg,#7C3AED,transparent);}
+.hkpi.c-teal::before{background:linear-gradient(90deg,#0D9488,transparent);}
+.hkpi.c-amber::before{background:linear-gradient(90deg,#D97706,transparent);}
+.hkpi.c-red::before{background:linear-gradient(90deg,#DC2626,transparent);}
+.hkpi:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.16);}
+.hkpi-val{font-size:20pt;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.02em;}
+.hkpi.c-purple .hkpi-val{color:#C4B5FD;}
+.hkpi.c-teal .hkpi-val{color:#5EEAD4;}
+.hkpi.c-amber .hkpi-val{color:#FCD34D;}
+.hkpi.c-red .hkpi-val{color:#F0ABAB;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.45);margin-top:5px;}
+
+/* ── EXEC BRIEF ───────────────────────────────────────── */
+.exec-brief{background:linear-gradient(135deg,#0F1E3C 0%,#1A0F2E 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);padding:28px 0;}
+.exec-brief-wrap{max-width:1280px;margin:0 auto;padding:0 52px;}
+.eb-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.3);margin-bottom:16px;}
+.eb-insights{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.eb-insight{padding:16px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.03);}
+.eb-insight.critical{border-left:3px solid #9B2C32;background:rgba(155,44,50,0.05);}
+.eb-insight.warning{border-left:3px solid #D97706;background:rgba(217,119,6,0.06);}
+.eb-insight.info{border-left:3px solid #7C3AED;background:rgba(124,58,237,0.06);}
+.ebi-number{font-size:22pt;font-weight:900;color:rgba(255,255,255,0.12);float:right;
+  line-height:1;margin-left:8px;margin-top:-2px;font-variant-numeric:tabular-nums;}
+.ebi-headline{font-size:9.5pt;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;}
+.ebi-body{font-size:8pt;color:rgba(255,255,255,0.45);line-height:1.6;}
+
+/* ── MAIN LAYOUT ── */
+.wrap{max-width:1280px;margin:0 auto;padding:0;}
+.layout{display:grid;grid-template-columns:400px 1fr;gap:20px;align-items:start}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.card__title{font-size:15px;font-weight:800;color:var(--ink2);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+
+/* ── FORM ── */
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.field--full{grid-column:1/-1}
+.field label{display:block;font-size:10px;font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.field input,.field select,.field textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--border2);border-radius:8px;
+  font:inherit;font-size:13px;background:#fff;color:var(--ink);
+  transition:border-color .15s,box-shadow .15s
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,0.12)
+}
+.field textarea{min-height:64px;resize:vertical}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.btn{border:0;border-radius:9px;padding:9px 15px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s,box-shadow .15s}
+.btn:hover{opacity:.88}
+.btn--teal{background:var(--teal);color:#fff}
+.btn--secondary{background:#fff;color:var(--ink3);border:1px solid var(--border2)}
+.btn--danger{background:#fff;color:var(--red);border:1px solid #fecaca}
+
+/* ── YIELD PROFILE ── */
+.score-display{display:flex;align-items:flex-start;gap:16px;margin-bottom:18px}
+.score-number{font-size:64px;font-weight:900;line-height:1;color:var(--ink);letter-spacing:-.04em}
+.score-number small{font-size:18px;color:var(--ink4)}
+.score-meta{display:flex;flex-direction:column;gap:8px;padding-top:8px}
+.score-badge{display:inline-block;border-radius:99px;padding:5px 12px;font-size:11px;font-weight:800}
+.score-badge--green{background:var(--green3);color:var(--green2)}
+.score-badge--amber{background:var(--amber3);color:var(--amber2)}
+.score-badge--red{background:var(--red3);color:var(--red2)}
+.score-label{font-size:12px;color:var(--ink4)}
+
+/* ── METRIC TILES ── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.metric-tile{background:var(--gray2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.metric-tile__val{font-size:20px;font-weight:800;color:var(--ink2)}
+.metric-tile__lbl{font-size:11px;color:var(--ink4);margin-top:3px}
+
+/* ── FACTOR BARS ── */
+.factor-bars{display:grid;gap:10px;margin-bottom:16px}
+.factor-row{display:grid;grid-template-columns:150px 1fr 44px;gap:10px;align-items:center}
+.factor-row__label{font-size:12px;color:var(--ink3);font-weight:600}
+.factor-track{height:10px;background:var(--gray3);border-radius:99px;overflow:hidden}
+.factor-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.factor-fill--green{background:var(--green)}
+.factor-fill--amber{background:var(--amber)}
+.factor-fill--red{background:var(--red)}
+.factor-row__val{font-size:12px;font-weight:700;color:var(--ink3);text-align:right}
+
+/* ── EXEC INTERPRETATION ── */
+.exec-interp{background:var(--blue3);border:1px solid #bfdbfe;border-radius:12px;padding:16px 18px;font-size:13px;color:var(--ink2);line-height:1.7;margin-top:4px}
+.exec-interp b{color:var(--blue2)}
+
+/* ── SAVED TABLE ── */
+.table-wrap{overflow-x:auto;margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left}
+th{font-size:10px;font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:.06em;background:var(--gray2)}
+tr:hover td{background:var(--gray)}
+.tbl-badge{border-radius:99px;padding:4px 9px;font-size:10px;font-weight:800}
+.tbl-badge--green{background:var(--green3);color:var(--green2)}
+.tbl-badge--amber{background:var(--amber3);color:var(--amber2)}
+.tbl-badge--red{background:var(--red3);color:var(--red2)}
+.table-empty{text-align:center;color:var(--ink4);padding:28px}
+
+/* ── PAGE BODY ────────────────────────────────────────── */
+.page-wrap{max-width:1280px;margin:0 auto;padding:32px 52px 72px;}
+.sec-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--ink4);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── DATA NOTE ────────────────────────────────────────── */
+.data-note{margin-top:28px;padding:14px 18px;background:var(--white);border:1px solid var(--border);
+  border-radius:10px;display:flex;align-items:flex-start;gap:12px;}
+.dn-icon{font-size:11pt;flex-shrink:0;opacity:0.6;}
+.dn-text{font-size:7.5pt;color:var(--ink4);line-height:1.6;}
+.dn-text strong{color:var(--ink3);}
+
+/* ── VIEWING MODE BANNER ── */
+.viewing-banner{display:flex;align-items:center;gap:10px;padding:9px 16px;margin-bottom:20px;
+  background:var(--teal3);border:1px solid rgba(13,148,136,0.25);border-radius:9px;
+  font-size:7.5pt;font-weight:600;color:var(--teal2);}
+.viewing-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+
+/* ── CLICKABLE TABLE ROWS ── */
+tbody tr.clickable-row{cursor:pointer;}
+tbody tr.clickable-row:hover td{background:var(--teal3);}
+.click-hint{font-size:10px;color:var(--teal2);font-style:italic;margin-top:6px;}
+
+/* ── SCROLL REVEAL ── */
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  .hero-wrap,.exec-brief-wrap,.page-wrap{padding:0 20px;}
+  .page-wrap{padding-top:24px;}
+  .eb-insights{grid-template-columns:1fr;}
+  .layout{grid-template-columns:1fr;}
+  .hero-title{font-size:17pt;}
+  .hero-kpis{flex-wrap:wrap;}
+}
+@media print{
+  .hub-top-bar,.top-btn{display:none!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body{background:#fff!important;}
+  .exec-brief{background:#f8f9fa!important;}
+  .hero{background:#0D1830!important;}
+  .fade-up{opacity:1!important;transform:none!important;}
+  .page-wrap{padding-bottom:0!important;}
+  .card{box-shadow:none;break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="../index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">VER Intelligence Hub</span>
+  </div>
+  <div class="htb-right">
+    <span class="htb-tag">DET Confidential</span>
+    <button type="button" class="top-btn" id="dm-btn" onclick="toggleDark()">☾ Dark</button>
+    <button type="button" class="top-btn" onclick="openYieldHelp()">? How to Use</button>
+    <button type="button" class="top-btn" onclick="window.print()">Print / PDF</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-wrap">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      <span class="hero-eyebrow-text">VER Intelligence Hub &middot; Operating Yield</span>
+    </div>
+    <h1 class="hero-title">What are we getting for<br>the full economic cost?</h1>
+    <p class="hero-sub">Explainable yield scoring across cost efficiency, utilization, outcome attainment, reliability, and internal friction. Every factor is visible and challengeable — nothing is hidden inside a single ROI number.</p>
+    <div class="hero-data-source">
+      <span class="hero-data-source-dot"></span>
+      Live &middot; localStorage &middot; FY27 Vendor Registry
+    </div>
+    <div class="hero-kpis">
+      <div class="hkpi c-purple">
+        <div class="hkpi-val" id="kpi-count">0</div>
+        <div class="hkpi-lbl">Assessments Saved</div>
+      </div>
+      <div class="hkpi c-teal">
+        <div class="hkpi-val" id="kpi-avg">—</div>
+        <div class="hkpi-lbl">Avg Yield Score</div>
+      </div>
+      <div class="hkpi c-amber">
+        <div class="hkpi-val" id="kpi-lowest" style="font-size:14pt;">—</div>
+        <div class="hkpi-lbl">Lowest Yield Engagement</div>
+      </div>
+      <div class="hkpi c-red">
+        <div class="hkpi-val" id="kpi-spend">$0M</div>
+        <div class="hkpi-lbl">Total Spend Assessed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXEC BRIEF -->
+<div class="exec-brief">
+  <div class="exec-brief-wrap">
+    <div class="eb-label">Strategic Intelligence</div>
+    <div class="eb-insights">
+      <div class="eb-insight critical">
+        <div class="ebi-number">1</div>
+        <div class="ebi-headline">Utilization is the most controllable yield factor — and the most ignored at renewal</div>
+        <div class="ebi-body">Vendors renewing at 78% utilization are effectively billing for capacity the business is not consuming. Validate utilization before every renewal negotiation — unused capacity is negotiation leverage.</div>
+      </div>
+      <div class="eb-insight warning">
+        <div class="ebi-number">2</div>
+        <div class="ebi-headline">Internal overhead is frequently excluded from yield calculations</div>
+        <div class="ebi-body">A $4M vendor engagement with $800K of internal coordination cost has a true economic cost of $4.8M — a 20% uplift that changes the negotiation baseline. Always include management overhead in full economic cost.</div>
+      </div>
+      <div class="eb-insight info">
+        <div class="ebi-number">3</div>
+        <div class="ebi-headline">The yield score is explainable by design</div>
+        <div class="ebi-body">Every component is visible so stakeholders can challenge assumptions rather than accept a single number they cannot interrogate. The weakest component always points to the highest-leverage improvement opportunity.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LEGEND STRIP ─────────────────────────────────────── -->
+<style>
+.legend-strip{max-width:1280px;margin:0 auto 0;padding:0 52px;}
+.legend-bar{display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:10px 16px;margin-bottom:16px;}
+[data-theme="dark"] .legend-bar{background:rgba(255,255,255,0.04);border-color:var(--border);}
+.legend-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink4);flex-shrink:0;margin-right:4px;}
+.legend-items{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--ink3);}
+[data-theme="dark"] .legend-item{color:var(--ink4);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-divider{width:1px;height:14px;background:var(--border);flex-shrink:0;}
+@media(max-width:900px){.legend-strip{padding:0 20px;}}
+</style>
+<div class="legend-strip">
+  <div class="legend-bar">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><div class="legend-dot" style="background:#10B981;box-shadow:0 0 0 2px rgba(16,185,129,0.2)"></div>Strong Yield (&ge;80)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;box-shadow:0 0 0 2px rgba(245,158,11,0.2)"></div>Needs Attention (60–79)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#EF4444;box-shadow:0 0 0 2px rgba(239,68,68,0.2)"></div>Weak Yield (&lt;60)</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item" style="font-size:10px;color:var(--ink4);">Score = Outcomes&times;35% + Util&times;20% + Reliability&times;15% + Friction&times;15% + Risk&times;15%</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#059669"></div>Factor high (&ge;80)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>Factor mid (60–79)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#DC2626"></div>Factor low (&lt;60)</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-wrap">
+  <!-- VIEWING MODE BANNER -->
+  <div class="viewing-banner">
+    <div class="viewing-banner-dot"></div>
+    <span>Viewing mode &mdash; adjustments affect the calculator only and are not saved.</span>
+  </div>
+  <p class="sec-label">Yield Assessment Tool</p>
+  <div class="layout">
+
+    <!-- LEFT: FORM -->
+    <section class="card fade-up">
+      <div class="card__title">Yield Assumptions</div>
+      <div class="fields">
+
+        <div class="field field--full">
+          <label for="sel-vendor">Vendor / Engagement</label>
+          <select id="sel-vendor">
+            <option value="">— Select a vendor —</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="inp-spend">Annual Vendor Spend ($M)</label>
+          <input id="inp-spend" type="number" min="0" step="0.1" value="4.0">
+        </div>
+        <div class="field">
+          <label for="inp-overhead">Internal Overhead ($M)</label>
+          <input id="inp-overhead" type="number" min="0" step="0.05" value="0.0">
+        </div>
+
+        <div class="field">
+          <label for="inp-purchased">Capacity Purchased (units)</label>
+          <input id="inp-purchased" type="number" min="0" value="100">
+        </div>
+        <div class="field">
+          <label for="inp-used">Capacity Used (units)</label>
+          <input id="inp-used" type="number" min="0" value="78">
+        </div>
+
+        <div class="field">
+          <label for="inp-outcome">Outcome Attainment (%)</label>
+          <input id="inp-outcome" type="number" min="0" max="100" value="72">
+        </div>
+        <div class="field">
+          <label for="inp-reliability">Reliability / SLA (%)</label>
+          <input id="inp-reliability" type="number" min="0" max="100" value="92">
+        </div>
+
+        <div class="field">
+          <label for="sel-friction">Internal Friction</label>
+          <select id="sel-friction">
+            <option value="90">Low</option>
+            <option value="65" selected>Moderate</option>
+            <option value="35">High</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="sel-risk">Critical Risk Exposure</label>
+          <select id="sel-risk">
+            <option value="90">Low</option>
+            <option value="65" selected>Moderate</option>
+            <option value="35">High</option>
+          </select>
+        </div>
+
+        <div class="field field--full">
+          <label for="inp-evidence">Outcome / Evidence Description</label>
+          <textarea id="inp-evidence" placeholder="What business result is being measured, and from which source?"></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn--teal" id="btn-calc">Calculate</button>
+        <button class="btn btn--secondary" id="btn-csv">Export CSV</button>
+        <button class="btn btn--secondary" id="btn-print">Print</button>
+      </div>
+    </section>
+
+    <!-- RIGHT: YIELD PROFILE -->
+    <section class="card fade-up">
+      <div class="card__title">Operating Yield Profile</div>
+
+      <div class="score-display">
+        <div class="score-number"><span id="score-val">--</span><small>/100</small></div>
+        <div class="score-meta">
+          <span id="score-badge" class="score-badge score-badge--amber">Calculate to assess</span>
+          <span class="score-label">Yield score (0–100, weighted composite)</span>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric-tile">
+          <div class="metric-tile__val" id="met-truecost">--</div>
+          <div class="metric-tile__lbl">Full economic cost ($M)</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-tile__val" id="met-util">--</div>
+          <div class="metric-tile__lbl">Capacity utilization (%)</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-tile__val" id="met-unused">--</div>
+          <div class="metric-tile__lbl">Estimated unused spend ($M)</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-tile__val" id="met-overheadpct">--</div>
+          <div class="metric-tile__lbl">Internal overhead ratio (%)</div>
+        </div>
+      </div>
+
+      <div class="factor-bars" id="factor-bars">
+        <!-- populated by JS -->
+      </div>
+
+      <div class="exec-interp" id="exec-interp">
+        Adjust assumptions and press <strong>Calculate</strong> to produce an executive interpretation.
+      </div>
+    </section>
+
+  </div>
+
+  <p class="sec-label">Saved Yield Assessments</p>
+
+  <section class="card fade-up">
+    <div class="card__title">Saved Yield Assessments</div>
+    <div class="click-hint">Click any row to load that assessment into the calculator for exploration.</div>
+    <div class="table-wrap" id="saved-table"></div>
+  </section>
+
+  <div class="data-note">
+    <div class="dn-icon">&#8505;</div>
+    <div class="dn-text">
+      <strong>Data source:</strong> Vendor registry sourced from VER Intelligence Hub (assets/vendors.js) and Coupa FY27 actuals (assets/coupa_spend.js). Yield scores are decision-support indicators maintained in browser localStorage. For questions contact the VER team.
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ── CONSTANTS ── */
+var LS_KEY = 'ver_operating_yield_v2';
+
+/* ── HELPERS ── */
+function el(tag, cls, text){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(text !== undefined) e.textContent = text;
+  return e;
+}
+function clearEl(node){
+  while(node.firstChild) node.removeChild(node.firstChild);
+}
+function numId(id){ return Number(document.getElementById(id).value) || 0; }
+function valId(id){ return document.getElementById(id).value; }
+
+/* ── ANIMATION HELPERS ── */
+function animateCount(el, target, prefix, suffix, decimals, duration){
+  var start = 0, startTime = null;
+  function step(ts){
+    if(!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = prefix + (start + (target - start) * eased).toFixed(decimals) + suffix;
+    if(progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function initScrollReveal(){
+  if(!('IntersectionObserver' in window)) return;
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, {threshold: 0.08});
+  document.querySelectorAll('.fade-up').forEach(function(el){ obs.observe(el); });
+}
+
+/* ── LOCAL STORAGE ── */
+function loadRows(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch(e){ return []; }
+}
+function saveRows(rows){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
+  catch(e){}
+}
+
+/* ── VENDOR SELECTOR ── */
+function buildVendorSelector(){
+  var sel = document.getElementById('sel-vendor');
+  var vendors = (window.VER_VENDORS || []).slice();
+
+  // Sort: tier 1 first, then 2, then 3+, alphabetically within tier
+  vendors.sort(function(a, b){
+    var ta = a.tier || 99, tb = b.tier || 99;
+    if(ta !== tb) return ta - tb;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+
+  // Group by tier for optgroups
+  var groups = {};
+  vendors.forEach(function(v){
+    var t = v.tier || 99;
+    if(!groups[t]) groups[t] = [];
+    groups[t].push(v);
+  });
+
+  var tierLabels = {1:'Tier 1 — Strategic', 2:'Tier 2 — Preferred', 3:'Tier 3 — Monitored'};
+  [1,2,3].forEach(function(t){
+    var list = groups[t];
+    if(!list || !list.length) return;
+    var og = document.createElement('optgroup');
+    og.label = tierLabels[t] || ('Tier ' + t);
+    list.forEach(function(v){
+      var opt = document.createElement('option');
+      opt.value = v.id;
+      opt.textContent = v.name;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+
+  // Handle remaining tiers
+  Object.keys(groups).forEach(function(t){
+    t = parseInt(t, 10);
+    if(t <= 3) return;
+    var list = groups[t];
+    var og = document.createElement('optgroup');
+    og.label = 'Tier ' + t;
+    list.forEach(function(v){
+      var opt = document.createElement('option');
+      opt.value = v.id;
+      opt.textContent = v.name;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+}
+
+/* ── AUTO-POPULATE FROM VENDOR SELECTION ── */
+function onVendorChange(){
+  var sel = document.getElementById('sel-vendor');
+  var vendorId = sel.value;
+  if(!vendorId) return;
+
+  var vendors = window.VER_VENDORS || [];
+  var vendor = null;
+  for(var i = 0; i < vendors.length; i++){
+    if(vendors[i].id === vendorId){ vendor = vendors[i]; break; }
+  }
+  if(!vendor) return;
+
+  // Determine spend: prefer Coupa fy27 match
+  var spend = 0;
+  var coupaVendors = (window.VER_COUPA && window.VER_COUPA.vendors) || [];
+  var vname = (vendor.name || '').toLowerCase();
+  for(var j = 0; j < coupaVendors.length; j++){
+    var cn = (coupaVendors[j].n || '').toLowerCase();
+    if(cn === vname || vname.indexOf(cn) === 0 || cn.indexOf(vname) === 0){
+      spend = coupaVendors[j].fy27 || 0;
+      break;
+    }
+  }
+  // Fallback: parse vendor.annual_spend string
+  if(!spend && vendor.annual_spend){
+    var parsed = parseFloat(String(vendor.annual_spend).replace(/[^0-9.]/g,''));
+    if(!isNaN(parsed)) spend = parsed;
+  }
+
+  document.getElementById('inp-spend').value = spend ? spend.toFixed(2) : '0.00';
+  document.getElementById('inp-overhead').value = '0.00';
+
+  // Reliability: sla_score is already 0-100
+  if(vendor.sla_score !== undefined){
+    document.getElementById('inp-reliability').value = vendor.sla_score;
+  }
+
+  // Internal friction from delivery_risk
+  var dr = vendor.delivery_risk || 0;
+  var frictionVal = dr < 25 ? '90' : dr <= 55 ? '65' : '35';
+  document.getElementById('sel-friction').value = frictionVal;
+
+  // Critical risk from avg of financial_risk + compliance_risk
+  var avgRisk = ((vendor.financial_risk || 0) + (vendor.compliance_risk || 0)) / 2;
+  var riskVal = avgRisk < 20 ? '90' : avgRisk <= 35 ? '65' : '35';
+  document.getElementById('sel-risk').value = riskVal;
+}
+
+/* ── SCORE COLOR CLASS ── */
+function scoreClass(s){
+  if(s >= 80) return 'green';
+  if(s >= 60) return 'amber';
+  return 'red';
+}
+function scoreBadgeText(s){
+  if(s >= 80) return 'Strong Operating Yield';
+  if(s >= 60) return 'Yield Requires Attention';
+  return 'Weak Operating Yield';
+}
+function factorColor(v){
+  if(v >= 80) return 'factor-fill--green';
+  if(v >= 60) return 'factor-fill--amber';
+  return 'factor-fill--red';
+}
+
+/* ── CALCULATE ── */
+function calculate(){
+  var spend    = numId('inp-spend');
+  var overhead = numId('inp-overhead');
+  var purchased= numId('inp-purchased');
+  var used     = numId('inp-used');
+  var outcomeVal= Math.min(100, numId('inp-outcome'));
+  var reliabilityVal = Math.min(100, numId('inp-reliability'));
+  var frictionVal = Number(valId('sel-friction')) || 65;
+  var riskVal   = Number(valId('sel-risk')) || 65;
+
+  var util  = Math.min(100, purchased ? used / purchased * 100 : 0);
+  var out   = outcomeVal;
+  var rel   = reliabilityVal;
+  var fr    = frictionVal;
+  var risk  = riskVal;
+
+  var score    = Math.round(util * 0.20 + out * 0.35 + rel * 0.15 + fr * 0.15 + risk * 0.15);
+  var trueCost = spend + overhead;
+  var unused   = spend * (1 - util / 100);
+  var overheadPct = spend ? overhead / spend * 100 : 0;
+
+  // ── Score display ──
+  var scoreValEl = document.getElementById('score-val');
+  scoreValEl.textContent = score;
+
+  var badgeEl = document.getElementById('score-badge');
+  var cls = scoreClass(score);
+  badgeEl.className = 'score-badge score-badge--' + cls;
+  badgeEl.textContent = scoreBadgeText(score);
+
+  // ── Metric tiles ──
+  document.getElementById('met-truecost').textContent = '$' + trueCost.toFixed(2) + 'M';
+  document.getElementById('met-util').textContent = util.toFixed(1) + '%';
+  document.getElementById('met-unused').textContent = '$' + unused.toFixed(2) + 'M';
+  document.getElementById('met-overheadpct').textContent = overheadPct.toFixed(1) + '%';
+
+  // ── Factor bars ──
+  var factors = [
+    {label:'Capacity utilization', val:util},
+    {label:'Outcome attainment',   val:out},
+    {label:'Reliability / SLA',    val:rel},
+    {label:'Low internal friction',val:fr},
+    {label:'Risk resilience',      val:risk}
+  ];
+  var barsEl = document.getElementById('factor-bars');
+  clearEl(barsEl);
+  factors.forEach(function(f){
+    var row = el('div','factor-row');
+    var lbl = el('span','factor-row__label', f.label);
+    var track = el('div','factor-track');
+    var fill = el('div','factor-fill ' + factorColor(f.val));
+    fill.style.width = f.val.toFixed(1) + '%';
+    track.appendChild(fill);
+    var valSpan = el('span','factor-row__val', f.val.toFixed(0));
+    row.appendChild(lbl);
+    row.appendChild(track);
+    row.appendChild(valSpan);
+    barsEl.appendChild(row);
+  });
+
+  // ── Executive interpretation (DOM only, no innerHTML) ──
+  var weakest = factors.slice().sort(function(a,b){ return a.val - b.val; })[0];
+  var stateLabel = scoreBadgeText(score);
+  var interpEl = document.getElementById('exec-interp');
+  clearEl(interpEl);
+
+  var prefix = el('b', null, 'Executive interpretation: ');
+  interpEl.appendChild(prefix);
+
+  var stateText = document.createTextNode(stateLabel + '. The largest visible constraint is ');
+  interpEl.appendChild(stateText);
+
+  var weakName = el('b', null, weakest.label);
+  interpEl.appendChild(weakName);
+
+  var weakPct = document.createTextNode(' at ' + weakest.val.toFixed(0) + '%. ');
+  interpEl.appendChild(weakPct);
+
+  if(util < 80){
+    var unusedNote = document.createTextNode('Approximately ');
+    interpEl.appendChild(unusedNote);
+    var unusedVal = el('b', null, '$' + unused.toFixed(2) + 'M');
+    interpEl.appendChild(unusedVal);
+    var unusedSuffix = document.createTextNode(' of vendor spend is associated with unused purchased capacity. ');
+    interpEl.appendChild(unusedSuffix);
+  }
+
+  var closing = document.createTextNode('Validate the outcome measure and address the weakest component before renewal or expansion.');
+  interpEl.appendChild(closing);
+
+  // Return record for save
+  var vendorName = '';
+  var sel = document.getElementById('sel-vendor');
+  if(sel.value){
+    var selectedOpt = sel.options[sel.selectedIndex];
+    vendorName = selectedOpt ? selectedOpt.textContent : sel.value;
+  } else {
+    vendorName = 'Manual Entry';
+  }
+
+  return {
+    vendor: vendorName,
+    spend: spend,
+    overhead: overhead,
+    purchased: purchased,
+    used: used,
+    outcome: out,
+    reliability: rel,
+    friction: fr,
+    risk: risk,
+    score: score,
+    evidence: valId('inp-evidence'),
+    assessed: new Date().toISOString()
+  };
+}
+
+/* ── HERO KPI RECOMPUTE ── */
+function recomputeHeroKPIs(rows){
+  var count = rows.length;
+  var countEl = document.getElementById('kpi-count');
+  var avgEl   = document.getElementById('kpi-avg');
+  var lowEl   = document.getElementById('kpi-lowest');
+  var spendEl = document.getElementById('kpi-spend');
+
+  animateCount(countEl, count, '', '', 0, 600);
+
+  if(count === 0){
+    avgEl.textContent = '--';
+    lowEl.textContent = '--';
+    spendEl.textContent = '$0M';
+    return;
+  }
+
+  var totalScore = 0, totalSpend = 0, lowestScore = Infinity, lowestName = '--';
+  rows.forEach(function(r){
+    totalScore += r.score || 0;
+    totalSpend += r.spend || 0;
+    if((r.score || 0) < lowestScore){
+      lowestScore = r.score || 0;
+      lowestName  = r.vendor || '--';
+    }
+  });
+
+  var avg = totalScore / count;
+  animateCount(avgEl, avg, '', '', 0, 700);
+  lowEl.textContent = lowestName;
+  animateCount(spendEl, totalSpend, '$', 'M', 1, 700);
+}
+
+/* ── LOAD ROW INTO FORM ── */
+function loadRowIntoForm(r){
+  // Match vendor in selector by name
+  var sel = document.getElementById('sel-vendor');
+  var found = false;
+  for(var i = 0; i < sel.options.length; i++){
+    if(sel.options[i].textContent === r.vendor){
+      sel.selectedIndex = i;
+      found = true;
+      break;
+    }
+  }
+  if(!found) sel.selectedIndex = 0;
+
+  document.getElementById('inp-spend').value    = (r.spend || 0).toFixed(2);
+  document.getElementById('inp-overhead').value = (r.overhead || 0).toFixed(2);
+  document.getElementById('inp-purchased').value= r.purchased || 100;
+  document.getElementById('inp-used').value     = r.used || 0;
+  document.getElementById('inp-outcome').value  = r.outcome || 0;
+  document.getElementById('inp-reliability').value = r.reliability || 0;
+  document.getElementById('sel-friction').value = String(r.friction || 65);
+  document.getElementById('sel-risk').value     = String(r.risk || 65);
+  document.getElementById('inp-evidence').value = r.evidence || '';
+
+  // Trigger calculate and scroll to form
+  calculate();
+  var formEl = document.querySelector('.layout');
+  if(formEl) formEl.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ── RENDER SAVED TABLE ── */
+function renderSaved(rows){
+  var container = document.getElementById('saved-table');
+  clearEl(container);
+
+  if(!rows.length){
+    var empty = el('div','table-empty','No yield assessments saved yet. The VER team portal will push assessments here automatically.');
+    container.appendChild(empty);
+    return;
+  }
+
+  var tbl = el('table');
+  var thead = el('thead');
+  var headerRow = el('tr');
+  ['Engagement','Annual Spend','Overhead','Utilization','Outcome','Yield Score','Assessed',''].forEach(function(h){
+    headerRow.appendChild(el('th', null, h));
+  });
+  thead.appendChild(headerRow);
+  tbl.appendChild(thead);
+
+  var tbody = el('tbody');
+  rows.forEach(function(r){
+    var tr = el('tr', 'clickable-row');
+    tr.title = 'Click to load into calculator';
+
+    var tdVendor = el('td');
+    tdVendor.appendChild(el('b', null, r.vendor || '--'));
+    tr.appendChild(tdVendor);
+
+    tr.appendChild(el('td', null, '$' + Number(r.spend || 0).toFixed(1) + 'M'));
+    tr.appendChild(el('td', null, '$' + Number(r.overhead || 0).toFixed(2) + 'M'));
+
+    var util = r.purchased ? (r.used / r.purchased * 100) : 0;
+    tr.appendChild(el('td', null, util.toFixed(0) + '%'));
+    tr.appendChild(el('td', null, Number(r.outcome || 0).toFixed(0) + '%'));
+
+    var tdScore = el('td');
+    var sc = r.score || 0;
+    var badge = el('span', 'tbl-badge tbl-badge--' + scoreClass(sc), String(sc));
+    tdScore.appendChild(badge);
+    tr.appendChild(tdScore);
+
+    tr.appendChild(el('td', null, new Date(r.assessed).toLocaleDateString()));
+
+    // View action
+    var tdAct = el('td');
+    var viewBtn = el('button', 'btn btn--secondary', 'Load');
+    viewBtn.style.cssText = 'padding:4px 10px;font-size:10px;border-radius:6px;';
+    (function(row){
+      viewBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        loadRowIntoForm(row);
+      });
+    })(r);
+    tdAct.appendChild(viewBtn);
+    tr.appendChild(tdAct);
+
+    // Row click
+    (function(row){
+      tr.addEventListener('click', function(){ loadRowIntoForm(row); });
+    })(r);
+
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+  container.appendChild(tbl);
+}
+
+/* ── EXPORT CSV ── */
+function exportCSV(rows){
+  var head = ['Engagement','Spend_M','Internal_Overhead_M','Capacity_Purchased','Capacity_Used',
+              'Outcome_Pct','Reliability_Pct','Friction_Component','Risk_Component','Yield_Score',
+              'Evidence','Assessed'];
+  function csvCell(x){
+    return '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
+  }
+  var lines = [head.map(csvCell).join(',')];
+  rows.forEach(function(r){
+    lines.push([
+      r.vendor, r.spend, r.overhead, r.purchased, r.used,
+      r.outcome, r.reliability, r.friction, r.risk, r.score,
+      r.evidence, r.assessed
+    ].map(csvCell).join(','));
+  });
+  var content = lines.join('\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], {type:'text/csv'}));
+  a.download = 'operating-yield-assessments.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ── Seed default data ───────────────────────────────── */
+function seedDefaultData(){
+  if(localStorage.getItem(LS_KEY)) return; // never overwrite existing data
+
+  // 10 tier 2-3 vendors — utilization/outcome/reliability derived from VER_VENDORS sla_score,
+  // delivery_risk, and financial_risk fields. Score = util*0.20 + outcome*0.35 + rel*0.15 + fr*0.15 + risk*0.15
+  var seed = [
+    {
+      vendor: 'Tech Mahindra',
+      spend: 6.5, overhead: 0.5,
+      purchased: 100, used: 72,
+      outcome: 68, reliability: 82,
+      friction: 35, risk: 35,
+      score: 59,
+      evidence: 'Techforce Service Desk. 3 SLA metrics below target. Delivery risk 68. Active VER monitoring.',
+      assessed: '2026-06-15T10:00:00.000Z'
+    },
+    {
+      vendor: 'IBM',
+      spend: 14.3, overhead: 1.2,
+      purchased: 100, used: 85,
+      outcome: 76, reliability: 91,
+      friction: 65, risk: 65,
+      score: 75,
+      evidence: 'Enterprise application and data services. Renewal Aug 2026 under active review.',
+      assessed: '2026-06-20T10:00:00.000Z'
+    },
+    {
+      vendor: 'Google Cloud',
+      spend: 14.0, overhead: 0.4,
+      purchased: 100, used: 91,
+      outcome: 88, reliability: 99,
+      friction: 90, risk: 90,
+      score: 91,
+      evidence: 'GCP and Workspace nominal. Gemini AI usage growing. High yield engagement.',
+      assessed: '2026-06-22T10:00:00.000Z'
+    },
+    {
+      vendor: 'BCG',
+      spend: 6.0, overhead: 0.8,
+      purchased: 100, used: 65,
+      outcome: 60, reliability: 78,
+      friction: 35, risk: 35,
+      score: 52,
+      evidence: 'Strategic consulting. Delivery risk 70. VER Director engaged. Yield below threshold.',
+      assessed: '2026-06-25T10:00:00.000Z'
+    },
+    {
+      vendor: 'ServiceNow',
+      spend: 0.9, overhead: 0.1,
+      purchased: 100, used: 88,
+      outcome: 85, reliability: 96,
+      friction: 90, risk: 90,
+      score: 89,
+      evidence: 'ITSM platform for DET operations workflows. SLA 96. Low risk. Strong yield.',
+      assessed: '2026-07-01T10:00:00.000Z'
+    },
+    {
+      vendor: 'Splunk',
+      spend: 0.7, overhead: 0.08,
+      purchased: 100, used: 82,
+      outcome: 80, reliability: 95,
+      friction: 90, risk: 90,
+      score: 86,
+      evidence: 'SIEM and log analytics. Cisco acquisition — monitor renewal terms. Current yield strong.',
+      assessed: '2026-07-03T10:00:00.000Z'
+    },
+    {
+      vendor: 'Atos',
+      spend: 3.5, overhead: 0.4,
+      purchased: 100, used: 70,
+      outcome: 65, reliability: 85,
+      friction: 65, risk: 35,
+      score: 63,
+      evidence: 'IT services EMEA. Financial health under monitoring. Delivery risk 35. Yield requires attention.',
+      assessed: '2026-07-05T10:00:00.000Z'
+    },
+    {
+      vendor: 'DXC Technology',
+      spend: 2.8, overhead: 0.3,
+      purchased: 100, used: 74,
+      outcome: 68, reliability: 84,
+      friction: 65, risk: 65,
+      score: 69,
+      evidence: 'IT services and solutions. Delivery risk 35. Compliance risk 25. Mid-range yield.',
+      assessed: '2026-07-08T10:00:00.000Z'
+    },
+    {
+      vendor: 'Snowflake',
+      spend: 1.1, overhead: 0.05,
+      purchased: 100, used: 90,
+      outcome: 88, reliability: 96,
+      friction: 90, risk: 90,
+      score: 91,
+      evidence: 'Cloud data warehouse. Query optimization completed. FY27 compute costs reduced ~20%.',
+      assessed: '2026-07-10T10:00:00.000Z'
+    },
+    {
+      vendor: 'Verizon Business',
+      spend: 2.4, overhead: 0.2,
+      purchased: 100, used: 80,
+      outcome: 74, reliability: 88,
+      friction: 65, risk: 65,
+      score: 74,
+      evidence: 'Enterprise network and connectivity. Delivery risk 22, financial risk 20. Stable yield.',
+      assessed: '2026-07-12T10:00:00.000Z'
+    }
+  ];
+
+  saveRows(seed);
+}
+
+/* ── LIVE COUPA API ENHANCEMENT ── */
+function fetchCoupaSpend(vendorName){
+  fetch('/api/coupa/invoices?status=Approved&limit=50')
+    .then(function(res){
+      if(!res.ok) throw new Error('not ok');
+      return res.json();
+    })
+    .then(function(data){
+      if(!Array.isArray(data)) return;
+      var nameLower = (vendorName || '').toLowerCase();
+      var total = 0;
+      data.forEach(function(inv){
+        var supplier = (inv.supplier || inv.vendor || inv.name || '').toLowerCase();
+        if(supplier === nameLower || supplier.indexOf(nameLower) >= 0 || nameLower.indexOf(supplier) >= 0){
+          total += parseFloat(inv.amount || inv.total || 0) || 0;
+        }
+      });
+      if(total > 0){
+        var inM = total > 1000 ? total / 1000000 : total;
+        document.getElementById('inp-spend').value = inM.toFixed(2);
+      }
+    })
+    .catch(function(){
+      // Silently fall back to static data already pre-populated
+    });
+}
+
+/* ── STORAGE EVENT — auto-inject from portal ── */
+window.addEventListener('storage', function(e){
+  if(e.key === LS_KEY){
+    var rows = loadRows();
+    renderSaved(rows);
+    recomputeHeroKPIs(rows);
+  }
+});
+
+/* ── INIT ── */
+function init(){
+  // Seed default data on first load (no-op if data already exists)
+  seedDefaultData();
+
+  var rows = loadRows();
+
+  // Build vendor selector (may be empty if scripts not yet loaded)
+  buildVendorSelector();
+
+  // Wire events
+  document.getElementById('sel-vendor').addEventListener('change', function(){
+    onVendorChange();
+    var sel = document.getElementById('sel-vendor');
+    if(sel.value){
+      var vendors = window.VER_VENDORS || [];
+      for(var i = 0; i < vendors.length; i++){
+        if(vendors[i].id === sel.value){
+          fetchCoupaSpend(vendors[i].name);
+          break;
+        }
+      }
+    }
+  });
+  document.getElementById('btn-calc').addEventListener('click', function(){
+    calculate();
+  });
+  document.getElementById('btn-csv').addEventListener('click', function(){
+    var r = loadRows();
+    if(!r.length){
+      var record = calculate();
+      exportCSV([record]);
+    } else {
+      exportCSV(r);
+    }
+  });
+  document.getElementById('btn-print').addEventListener('click', function(){
+    window.print();
+  });
+
+  // Initial render
+  renderSaved(rows);
+  recomputeHeroKPIs(rows);
+
+  // Run initial calculation with default values
+  calculate();
+
+  // Scroll reveal
+  initScrollReveal();
+}
+
+// Wait for deferred scripts (vendors.js, coupa_spend.js) to load
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){
+    // Give deferred scripts a tick to execute
+    setTimeout(init, 0);
+  });
+} else {
+  setTimeout(init, 0);
+}
+
+})();
+</script>
+<script>
+(function(){var t=localStorage.getItem('ver-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+function toggleDark(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('ver-theme',next);
+  var btn=document.getElementById('dm-btn');
+  if(btn)btn.textContent=next==='dark'?'☾ Light':'☽ Dark';
+}
+</script>
+<script src="../assets/help-modal.js"></script>
+<script>
+function openYieldHelp(){
+  HelpModal.open({
+    title: 'Operating Yield',
+    what: 'Operating Yield answers: "What are we actually getting for the full economic cost of this engagement?" It calculates a composite score across five dimensions — utilization, outcomes, reliability, friction, and risk — to surface which vendor relationships are delivering full value and which are burning budget without equivalent return.',
+    steps: [
+      '<strong>Select a vendor</strong> — fields auto-populate from VER data: spend from Coupa FY27 actuals, SLA score (→ Reliability), delivery risk (→ Friction), and financial/compliance risk (→ Risk).',
+      '<strong>Adjust the five factors</strong> — Utilization, Outcomes Delivered, Reliability, Friction Cost, and Risk Exposure. Each is scored 0–100 (where 100 = best possible yield).',
+      '<strong>Read the composite Yield Score</strong> — a weighted average showing overall operating yield for this engagement. High is good.',
+      '<strong>Review the factor bars</strong> — color-coded fills show which dimensions are strong (green), marginal (amber), or dragging the score down (red).',
+      '<strong>Review the Saved Assessments table</strong> below — click any row to load it into the calculator and explore adjusted scenarios. The VER team maintains and publishes assessments to this view.'
+    ],
+    glossary: [
+      {term:'Yield Score: High', color:'#10B981', def:'70 or above. The engagement is delivering strong value relative to cost across most dimensions. Standard renewal consideration.'},
+      {term:'Yield Score: Medium', color:'#F59E0B', def:'45–69. Yield is acceptable but there are addressable gaps. Identify the lowest-scoring factor and include improvement targets in the next renewal.'},
+      {term:'Yield Score: Low', color:'#EF4444', def:'Below 45. The engagement is underperforming significantly. Flag for renegotiation, scope reduction, or exit planning.'},
+      {term:'Utilization (20%)', color:'#3B82F6', def:'How fully the contracted capacity is being used. Low utilization means budget is allocated but work is not flowing through the engagement.'},
+      {term:'Outcomes Delivered (35%)', color:'#8B5CF6', def:'The most heavily weighted factor. Measures whether the engagement is producing the agreed deliverables, milestones, and business outcomes — not just activity.'},
+      {term:'Reliability (15%)', color:'#10B981', def:'SLA compliance rate and delivery predictability. Derived from the vendor\'s SLA score in VER data. Low reliability = high operational management overhead.'},
+      {term:'Friction Cost (15%)', color:'#F59E0B', def:'Inverse of delivery risk — measures how much management burden, escalation, and rework the engagement generates. High friction = resource drain beyond the invoice.'},
+      {term:'Risk Exposure (15%)', color:'#EF4444', def:'Composite of financial risk and compliance risk from VER vendor data. High risk engagements have a yield penalty even if output looks acceptable.'},
+      {term:'Weighted Score Formula', color:null, def:'Yield = (Utilization × 0.20) + (Outcomes × 0.35) + (Reliability × 0.15) + (Friction × 0.15) + (Risk × 0.15). Outcomes is the dominant driver by design.'},
+      {term:'Total Economic Cost', color:null, def:'Full cost of the engagement including direct spend, management overhead, and risk-adjusted exposure. Not just the invoice — the true cost to operate the relationship.'},
+      {term:'Source: Coupa DEV + VER', color:null, def:'Spend from Coupa DEV actuals (FY27). SLA, delivery risk, and risk scores from VER vendor registry (window.VER_VENDORS). Factors are pre-populated but editable.'}
+    ],
+    footNote: 'FY27 · Salesforce DET · Confidential'
+  });
+}
+</script>
+</body>
+</html>

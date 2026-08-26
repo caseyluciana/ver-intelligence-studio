@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Savings Pipeline · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --blue:#2563EB;--blue2:#1D4ED8;--blue3:#EFF6FF;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.35);line-height:1.4;}
+.top-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;
+  border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.55);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.top-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+@media print{.hub-top-bar,.controls-bar,.top-btn{display:none!important;}
+  .hero{-webkit-print-color-adjust:exact;print-color-adjust:exact;}body{background:#fff!important;}}
+
+.hero{background:linear-gradient(135deg,#0A1628 0%,#0F2D1A 50%,#061A0F 100%);
+  padding:30px 0 26px;position:relative;overflow:hidden;}
+.hero-wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+.hero::before{content:'';position:absolute;top:-30px;right:-30px;width:300px;height:300px;
+  border-radius:50%;background:radial-gradient(circle,rgba(5,150,105,0.15),transparent 70%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-20px;left:38%;width:380px;height:200px;
+  border-radius:50%;background:radial-gradient(circle,rgba(13,148,136,0.10),transparent 70%);pointer-events:none;}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;position:relative;z-index:1;}
+.hero-eyebrow{font-size:6.5pt;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.15;margin-bottom:6px;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.6);line-height:1.6;max-width:540px;}
+.hero-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;position:relative;z-index:1;}
+.hkpi{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:13px 15px;}
+.hkpi-val{font-size:17pt;font-weight:900;color:#fff;line-height:1;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.45);margin-top:4px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.4);margin-top:2px;}
+.hkpi.green .hkpi-val{color:#6EE7B7;}
+.hkpi.amber .hkpi-val{color:#FCD34D;}
+.hkpi.teal .hkpi-val{color:#5EEAD4;}
+.hkpi.blue .hkpi-val{color:#93C5FD;}
+
+.controls-bar{background:var(--white);border-bottom:1px solid var(--border);padding:10px 48px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.filter-label{font-size:7.5pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.08em;}
+.filter-btn{font-size:7.5pt;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:inherit;
+  border:1px solid var(--border2);background:var(--gray2);color:var(--ink3);transition:all 0.15s;}
+.filter-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal3);}
+.filter-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+.filter-sep{width:1px;height:18px;background:var(--border);}
+.controls-right{margin-left:auto;display:flex;gap:8px;}
+.export-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:6px;
+  border:1px solid var(--border2);background:var(--white);color:var(--ink3);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.export-btn:hover{border-color:var(--teal);color:var(--teal);}
+
+.page-content{max-width:1280px;margin:0 auto;padding:24px 48px 60px;}
+
+.funnel-bar{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;gap:0;margin-bottom:28px;align-items:stretch;}
+.funnel-stage{border-radius:12px;padding:18px 20px;}
+.fs-identified{background:linear-gradient(135deg,var(--blue3),#DBEAFE);border:2px solid #BFDBFE;}
+.fs-negotiation{background:linear-gradient(135deg,var(--amber3),#FDE68A);border:2px solid #FCD34D;}
+.fs-closed{background:linear-gradient(135deg,var(--green3),#A7F3D0);border:2px solid #6EE7B7;}
+.fs-arrow{display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink4);}
+.fs-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.fs-label{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;}
+.fs-label.blue{color:var(--blue2);}
+.fs-label.amber{color:var(--amber2);}
+.fs-label.green{color:var(--green2);}
+.fs-count{font-size:7.5pt;font-weight:700;padding:2px 8px;border-radius:99px;}
+.fs-count.blue{background:rgba(37,99,235,0.15);color:var(--blue);}
+.fs-count.amber{background:rgba(217,119,6,0.15);color:var(--amber);}
+.fs-count.green{background:rgba(5,150,105,0.15);color:var(--green);}
+.fs-value{font-size:22pt;font-weight:900;line-height:1;margin-bottom:4px;}
+.fs-value.blue{color:var(--blue);}
+.fs-value.amber{color:var(--amber2);}
+.fs-value.green{color:var(--green);}
+.fs-sub{font-size:7.5pt;color:var(--ink4);}
+.fs-bar{height:5px;border-radius:99px;margin-top:12px;}
+.fs-bar.blue{background:linear-gradient(90deg,var(--blue),#93C5FD);}
+.fs-bar.amber{background:linear-gradient(90deg,var(--amber),#FCD34D);}
+.fs-bar.green{background:linear-gradient(90deg,var(--green),#34D399);}
+
+.pipeline-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:32px;}
+.pipeline-col{display:flex;flex-direction:column;gap:12px;}
+.col-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:8px;margin-bottom:2px;}
+.col-header.blue{background:var(--blue3);border:1px solid #BFDBFE;}
+.col-header.amber{background:var(--amber3);border:1px solid #FCD34D;}
+.col-header.green{background:var(--green3);border:1px solid #6EE7B7;}
+.col-h-title{font-size:8.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;}
+.col-h-title.blue{color:var(--blue2);}
+.col-h-title.amber{color:var(--amber2);}
+.col-h-title.green{color:var(--green2);}
+.col-h-total{font-size:8.5pt;font-weight:800;}
+.col-h-total.blue{color:var(--blue);}
+.col-h-total.amber{color:var(--amber);}
+.col-h-total.green{color:var(--green);}
+
+.deal-card{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;cursor:pointer;transition:box-shadow 0.15s,border-color 0.15s;position:relative;}
+.deal-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);border-color:var(--border2);}
+.deal-card.identified:hover{border-color:#93C5FD;}
+.deal-card.negotiation:hover{border-color:#FCD34D;}
+.deal-card.closed:hover{border-color:#6EE7B7;}
+.deal-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:10px 0 0 10px;}
+.deal-card.identified::before{background:var(--blue);}
+.deal-card.negotiation::before{background:var(--amber);}
+.deal-card.closed::before{background:var(--green);}
+.dc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.dc-vendor{font-size:9.5pt;font-weight:700;color:var(--ink);line-height:1.2;}
+.dc-value{font-size:11pt;font-weight:900;}
+.dc-value.blue{color:var(--blue);}
+.dc-value.amber{color:var(--amber);}
+.dc-value.green{color:var(--green);}
+.dc-category{font-size:7.5pt;color:var(--ink4);margin-bottom:8px;}
+.dc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.dc-tag{font-size:6.5pt;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.03em;}
+.dct-blue{background:var(--blue3);color:var(--blue2);}
+.dct-amber{background:var(--amber3);color:var(--amber2);}
+.dct-green{background:var(--green3);color:var(--green2);}
+.dct-gray{background:var(--gray2);color:var(--ink3);}
+.dc-meta{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);}
+.dc-owner{font-size:7.5pt;color:var(--ink4);}
+.dc-date{font-size:7.5pt;color:var(--ink4);}
+.dc-priority{font-size:6.5pt;font-weight:700;padding:2px 7px;border-radius:10px;}
+.dcp-high{background:var(--red3);color:var(--red2);}
+.dcp-med{background:var(--amber3);color:var(--amber2);}
+.dcp-low{background:var(--green3);color:var(--green2);}
+
+.trend-section{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:28px;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
+.card-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;}
+.card-title-lbl{display:flex;align-items:center;gap:8px;}
+.card-badge{font-size:7pt;font-weight:700;padding:2px 8px;border-radius:10px;}
+.cb-teal{background:var(--teal3);color:var(--teal2);}
+.cb-green{background:var(--green3);color:var(--green2);}
+
+.month-bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding-bottom:28px;position:relative;}
+.month-bars::after{content:'';position:absolute;bottom:28px;left:0;right:0;height:1px;background:var(--border);}
+.mb-col{flex:1;display:flex;flex-direction:column-reverse;align-items:center;position:relative;}
+.mb-fill{width:100%;max-width:36px;border-radius:4px 4px 0 0;transition:height 1.2s cubic-bezier(0.16,1,0.3,1);}
+.mb-fill.green{background:linear-gradient(180deg,#059669,#34D399);}
+.mb-fill.teal{background:linear-gradient(180deg,#0D9488,#5EEAD4);}
+.mb-label{position:absolute;bottom:-22px;font-size:7.5pt;color:var(--ink4);white-space:nowrap;}
+.mb-val{position:absolute;top:-18px;font-size:7.5pt;font-weight:700;color:var(--ink3);white-space:nowrap;}
+
+.cat-list{display:flex;flex-direction:column;gap:10px;}
+.cat-row{display:flex;align-items:center;gap:10px;}
+.cat-name{font-size:8.5pt;color:var(--ink2);width:130px;flex-shrink:0;}
+.cat-bar-wrap{flex:1;height:7px;background:var(--gray3);border-radius:99px;overflow:hidden;}
+.cat-bar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(0.16,1,0.3,1);}
+.cbf-teal{background:linear-gradient(90deg,var(--teal),#14B8A6);}
+.cbf-blue{background:linear-gradient(90deg,var(--blue),#60A5FA);}
+.cbf-green{background:linear-gradient(90deg,var(--green),#34D399);}
+.cat-amt{font-size:8.5pt;font-weight:700;color:var(--ink);width:52px;text-align:right;flex-shrink:0;}
+.cat-pct{font-size:7.5pt;color:var(--ink4);width:30px;text-align:right;flex-shrink:0;}
+
+.win-wrap{text-align:center;padding:12px 0;}
+.win-ring{width:110px;height:110px;margin:0 auto 12px;position:relative;}
+.win-ring svg{width:110px;height:110px;}
+.win-ring-val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.win-pct{font-size:22pt;font-weight:900;color:var(--green);}
+.win-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);}
+.win-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.win-stat{text-align:center;padding:10px;background:var(--gray);border-radius:8px;border:1px solid var(--border);}
+.win-stat-val{font-size:13pt;font-weight:900;color:var(--ink);}
+.win-stat-val.green{color:var(--green);}
+.win-stat-val.red{color:var(--red);}
+.win-stat-lbl{font-size:7pt;color:var(--ink4);margin-top:2px;}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:14px;width:560px;max-width:94vw;max-height:88vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-size:11.5pt;font-weight:800;color:var(--ink);}
+.modal-sub{font-size:8pt;color:var(--ink4);margin-top:3px;}
+.modal-close{background:none;border:none;font-size:16pt;color:var(--ink4);cursor:pointer;line-height:1;padding:0 2px;}
+.modal-close:hover{color:var(--ink);}
+.modal-body{padding:20px 24px 24px;}
+.m-section{margin-bottom:18px;}
+.m-section-title{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink4);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.m-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;
+  border-bottom:1px solid var(--gray2);font-size:8.5pt;}
+.m-row:last-child{border-bottom:none;}
+.m-row-lbl{color:var(--ink4);}
+.m-row-val{font-weight:700;color:var(--ink);}
+.m-notes{font-size:8.5pt;color:var(--ink3);line-height:1.65;background:var(--gray);
+  border-radius:6px;padding:10px 12px;border:1px solid var(--border);}
+.m-actions{display:flex;gap:8px;margin-top:16px;}
+.ma-btn{flex:1;padding:8px;border-radius:6px;font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.ma-primary{background:var(--teal);border:1px solid var(--teal);color:#fff;}
+.ma-primary:hover{background:var(--teal2);}
+.ma-secondary{background:var(--white);border:1px solid var(--border2);color:var(--ink3);}
+.ma-secondary:hover{border-color:var(--teal);color:var(--teal);}
+
+.sum-table{width:100%;border-collapse:collapse;}
+.sum-table th{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink4);padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);}
+.sum-table td{font-size:8.5pt;color:var(--ink2);padding:10px 12px;border-bottom:1px solid var(--border);}
+.sum-table tr:hover td{background:var(--gray2);}
+.sum-table tr:last-child td{border-bottom:none;}
+.stage-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+.sd-blue{background:var(--blue);}
+.sd-amber{background:var(--amber);}
+.sd-green{background:var(--green);}
+</style>
+</head>
+<body>
+
+<div class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">← Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">Savings Pipeline</span>
+  </div>
+  <div class="htb-right">
+    <div class="htb-meta">VER Intelligence Hub · FY27<br>DET Confidential</div>
+    <button class="top-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="top-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-wrap">
+    <div class="hero-top">
+      <div>
+        <div class="hero-eyebrow">Financial Intelligence · FY27</div>
+        <div class="hero-title">Savings Pipeline</div>
+        <div class="hero-sub">Full-funnel visibility from opportunity identification through negotiation close — tracking every dollar in flight across DET's third-party spend portfolio.</div>
+      </div>
+    </div>
+    <div class="hero-kpis">
+      <div class="hkpi teal"><div class="hkpi-val">$22.8M</div><div class="hkpi-lbl">Total Pipeline</div><div class="hkpi-note">Identified + In Flight</div></div>
+      <div class="hkpi blue"><div class="hkpi-val">$12.1M</div><div class="hkpi-lbl">Identified</div><div class="hkpi-note">6 opportunities</div></div>
+      <div class="hkpi amber"><div class="hkpi-val">$4.9M</div><div class="hkpi-lbl">In Negotiation</div><div class="hkpi-note">3 active deals</div></div>
+      <div class="hkpi green"><div class="hkpi-val">$10.2M</div><div class="hkpi-lbl">Closed / Realized</div><div class="hkpi-note">5 wins · FY27 YTD</div></div>
+      <div class="hkpi"><div class="hkpi-val">78%</div><div class="hkpi-lbl">Win Rate</div><div class="hkpi-note">vs 62% prior year</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls-bar">
+  <span class="filter-label">Stage:</span>
+  <button class="filter-btn active" onclick="filterStage('all',this)">All</button>
+  <button class="filter-btn" onclick="filterStage('identified',this)">Identified</button>
+  <button class="filter-btn" onclick="filterStage('negotiation',this)">In Negotiation</button>
+  <button class="filter-btn" onclick="filterStage('closed',this)">Closed</button>
+  <div class="filter-sep"></div>
+  <span class="filter-label">Category:</span>
+  <button class="filter-btn active" onclick="filterCategory('all',this)">All</button>
+  <button class="filter-btn" onclick="filterCategory('Software',this)">Software</button>
+  <button class="filter-btn" onclick="filterCategory('Services',this)">Services</button>
+  <button class="filter-btn" onclick="filterCategory('Infrastructure',this)">Infrastructure</button>
+  <div class="controls-right">
+    <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+  </div>
+</div>
+
+<div class="page-content">
+
+  <div class="funnel-bar">
+    <div class="funnel-stage fs-identified">
+      <div class="fs-top"><span class="fs-label blue">Identified</span><span class="fs-count blue">6 opportunities</span></div>
+      <div class="fs-value blue">$12.1M</div>
+      <div class="fs-sub">Opportunities scoped, not yet in active negotiation</div>
+      <div class="fs-bar blue"></div>
+    </div>
+    <div class="fs-arrow">▶</div>
+    <div class="funnel-stage fs-negotiation">
+      <div class="fs-top"><span class="fs-label amber">In Negotiation</span><span class="fs-count amber">3 active deals</span></div>
+      <div class="fs-value amber">$4.9M</div>
+      <div class="fs-sub">Active negotiations in progress with counterparty</div>
+      <div class="fs-bar amber"></div>
+    </div>
+    <div class="fs-arrow">▶</div>
+    <div class="funnel-stage fs-closed">
+      <div class="fs-top"><span class="fs-label green">Closed / Realized</span><span class="fs-count green">5 wins YTD</span></div>
+      <div class="fs-value green">$10.2M</div>
+      <div class="fs-sub">Savings captured, contractually locked, or in effect</div>
+      <div class="fs-bar green"></div>
+    </div>
+  </div>
+
+  <div class="pipeline-grid" id="pipeline-grid"></div>
+
+  <div class="trend-section">
+    <div class="card">
+      <div class="card-title"><div class="card-title-lbl">Monthly Savings Capture <span class="card-badge cb-green">FY27 YTD</span></div></div>
+      <div class="month-bars" id="month-bars"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="card-title-lbl">Win Rate &amp; Velocity <span class="card-badge cb-teal">FY27</span></div></div>
+      <div class="win-wrap">
+        <div class="win-ring">
+          <svg viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="46" fill="none" stroke="#E5E7EB" stroke-width="10"/>
+            <circle cx="55" cy="55" r="46" fill="none" stroke="#059669" stroke-width="10"
+              stroke-dasharray="289" stroke-dashoffset="63.6" stroke-linecap="round"
+              transform="rotate(-90 55 55)"/>
+          </svg>
+          <div class="win-ring-val"><div class="win-pct">78%</div><div class="win-lbl">Win Rate</div></div>
+        </div>
+        <div class="win-stats">
+          <div class="win-stat"><div class="win-stat-val green">5</div><div class="win-stat-lbl">Won YTD</div></div>
+          <div class="win-stat"><div class="win-stat-val red">1</div><div class="win-stat-lbl">Lost / No-Go</div></div>
+          <div class="win-stat"><div class="win-stat-val">42d</div><div class="win-stat-lbl">Avg Cycle</div></div>
+          <div class="win-stat"><div class="win-stat-val">$2.0M</div><div class="win-stat-lbl">Avg Deal Size</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-title"><div class="card-title-lbl">Pipeline by Category <span class="card-badge cb-teal">Total $22.8M</span></div></div>
+    <div class="cat-list" id="cat-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-title-lbl">All Deals <span class="card-badge cb-teal">14 total</span></div></div>
+    <table class="sum-table" id="sum-table">
+      <thead><tr><th>Vendor / Opportunity</th><th>Category</th><th>Stage</th><th>Est. Value</th><th>Owner</th><th>Target / Close</th></tr></thead>
+      <tbody id="sum-tbody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div><div class="modal-title" id="modal-title"></div><div class="modal-sub" id="modal-sub"></div></div>
+      <button class="modal-close" id="modal-close">&#215;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+var DEALS = [
+  {id:'d1',stage:'identified',vendor:'Gartner Research Consolidation',category:'Software · Market Intelligence',value:'$2.1M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Aug 2026',priority:'High',priorityCls:'dcp-high',leverage:'License consolidation across 4 DET teams. Duplicate seat coverage identified in Q4 FY26 audit.',strategy:'Consolidate to single enterprise agreement. Use competitive alternatives (Forrester, IDC) as leverage. Target 22% reduction on renewed seats.',concessions:'Prior cycle: extended payment terms + 2 complimentary seats added. No rate reduction granted.',notes:'Gartner historically responsive to consolidation plays. Prior cycle achieved 14% reduction. Aim higher given market softness in analyst contracts.',tags:['Consolidation','Annual Renewal','Q2 Target'],tagCls:['dct-blue','dct-gray','dct-gray']},
+  {id:'d2',stage:'identified',vendor:'Infosys Rate Optimization',category:'Services · Managed Services',value:'$2.8M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Sep 2026',priority:'High',priorityCls:'dcp-high',leverage:'Contract renewal window Q3. India offshore blended rates above market by 12-15% per benchmark data. Infosys headcount below contracted minimum.',strategy:'Request role-level rate reclassification. Benchmark comparison to Tech Mahindra and Cognizant current cards. Volume commitment as offset.',concessions:'No prior concessions on record. First formal renegotiation since FY24 contract.',notes:'Key risk: Infosys holds institutional knowledge on 3 critical platforms. Transition cost must be factored into walk-away math.',tags:['Rate Renegotiation','Blended Rate'],tagCls:['dct-blue','dct-gray']},
+  {id:'d3',stage:'identified',vendor:'SaaS License Rationalization',category:'Software · Productivity & Dev Tools',value:'$1.4M',owner:'VER Team',ownerFull:'VER Team',target:'Jul 2026',priority:'Medium',priorityCls:'dcp-med',leverage:'5 vendors with overlapping functionality. Usage audit shows 35% of licenses unused in trailing 90 days.',strategy:'Eliminate 2 redundant vendors. Consolidate remaining 3 with volume pricing. Target $1.4M in combined savings.',concessions:'N/A — new rationalization play',notes:'Stakeholder change management required — some teams have strong vendor preference despite overlap.',tags:['License Audit','5 Vendors'],tagCls:['dct-blue','dct-gray']},
+  {id:'d4',stage:'identified',vendor:'AWS Reserved Capacity',category:'Infrastructure · Cloud',value:'$1.9M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Oct 2026',priority:'Medium',priorityCls:'dcp-med',leverage:'DET cloud spend is growing. Moving from on-demand to 3-year reserved offers 40-60% savings on committed compute.',strategy:'Commit on predictable workloads (90%+ utilization). Keep 10% on-demand for burst capacity. Total savings ~$1.9M over term.',concessions:'N/A — pricing tier model',notes:'Requires infra team alignment. Finance approval for multi-year commitment needed.',tags:['Committed Use','3-Year Term'],tagCls:['dct-blue','dct-gray']},
+  {id:'d5',stage:'identified',vendor:'Fractal Analytics Renewal',category:'Services · Analytics',value:'$2.2M',owner:'VER Team',ownerFull:'VER Team',target:'Nov 2026',priority:'Low',priorityCls:'dcp-low',leverage:'Renewal not until Q4. Current engagement below original scope. Competing bids from Mu Sigma available.',strategy:'Right-size scope to actual delivery. Evaluate competitive alternatives. Target 18% reduction on renewal.',concessions:'Prior renewal: added 2 FTEs at no cost increase.',notes:'Fractal performance has been solid. Reduction ask will be scope-driven not performance-driven.',tags:['Renewal','Scope Review'],tagCls:['dct-blue','dct-gray']},
+  {id:'d6',stage:'identified',vendor:'New Relic Observability',category:'Software · Monitoring',value:'$1.7M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Dec 2026',priority:'Low',priorityCls:'dcp-low',leverage:'Datadog and Dynatrace both pitched DET in Q1. Current contract has 20% headroom vs alternative pricing.',strategy:'Use competitive bids to drive 15-20% price reduction. Evaluate consolidation with existing Sentry IO contract.',concessions:'N/A — first competitive cycle',notes:'Product teams will resist vendor change. Pure pricing play — no migration needed if New Relic matches.',tags:['Volume Pricing','Competitive Alt.'],tagCls:['dct-blue','dct-gray']},
+  {id:'n1',stage:'negotiation',vendor:'Cognizant FY27 Renewal',category:'Services · Managed Services',value:'$3.2M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Jul 31, 2026',priority:'High',priorityCls:'dcp-high',leverage:'Contract expires Aug 2026. Cognizant headcount has declined 15% YoY. Market rates for equivalent roles are 8-11% below current card.',strategy:'Target 12% blended rate reduction + headcount right-sizing. LOI in place. Final negotiation session scheduled Jul 24.',concessions:'Prior cycle (FY26): 5% rate hold + 3 additional roles added. No new positions for FY27 — savings only.',notes:'Cognizant is a Tier 1 preferred supplier. Relationship is strategic — goal is savings without disruption. Walk-away is 6% reduction minimum.',tags:['Active LOI','Rate + Headcount','Expiry Aug 2026'],tagCls:['dct-amber','dct-gray','dct-amber']},
+  {id:'n2',stage:'negotiation',vendor:'Tech Mahindra Rate Card',category:'Services · Offshore Dev',value:'$1.1M',owner:'VER Team',ownerFull:'VER Team',target:'Aug 15, 2026',priority:'Medium',priorityCls:'dcp-med',leverage:'Role mix has shifted — more junior roles billed at mid-level rates. Benchmark shows 12% overpayment on current classification.',strategy:'Role reclassification + blended rate adjustment. TechM has been cooperative in past renegotiations.',concessions:'FY26: extended payment terms. No rate reduction prior.',notes:'Smaller dollar value but important precedent for role-based billing accuracy across all service vendors.',tags:['Blended Rate','Role Reclassification'],tagCls:['dct-amber','dct-gray']},
+  {id:'n3',stage:'negotiation',vendor:'Conviva License Renewal',category:'Software · Analytics',value:'$600K',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Aug 1, 2026',priority:'High',priorityCls:'dcp-high',leverage:"Usage is 60% of licensed volume. Contract is auto-renewing. Current pricing is above Conviva's list price due to legacy contract.",strategy:'Reduce licensed volume to match actual usage. Renegotiate to current list pricing. Target $600K savings vs auto-renewal.',concessions:'None on record.',notes:'Vendor relationship is good. Usage data is the lever — they cannot dispute it. Quick close expected.',tags:['Volume Reduction','Usage Review'],tagCls:['dct-amber','dct-gray']},
+  {id:'c1',stage:'closed',vendor:'NTT SLA Credit Recovery',category:'Services · Network',value:'$1.2M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Jan 2026',priority:'Realized',priorityCls:'dcp-low',leverage:'3 consecutive quarters of SLA misses. Credit calculation per contract terms.',strategy:'Invoked SLA credit clause per contract. Credit applied to FY27 invoices.',concessions:'N/A — contractual recovery',notes:'Full SLA credit recovered. Process documented for future enforcement. NTT has since improved SLA performance.',tags:['Closed Jan 2026','Credit Applied'],tagCls:['dct-green','dct-gray']},
+  {id:'c2',stage:'closed',vendor:'Cognizant PD Termination',category:'Services · Professional Dev',value:'$2.4M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Feb 2026',priority:'Realized',priorityCls:'dcp-low',leverage:'PD program not delivering expected outcomes. Contract had 90-day termination clause.',strategy:'Invoked termination clause. Clean exit with no penalty.',concessions:'N/A',notes:'Savings are ongoing (annual) — $2.4M represents FY27 run-rate avoidance.',tags:['Closed Feb 2026','Contract Terminated'],tagCls:['dct-green','dct-gray']},
+  {id:'c3',stage:'closed',vendor:'MFT Scope Optimization',category:'Services · Managed Services',value:'$3.1M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'Mar 2026',priority:'Realized',priorityCls:'dcp-low',leverage:'MFT scope included services no longer required post-org restructure.',strategy:'Reduced scope to active workstreams only. Renegotiated to match actual delivery.',concessions:'Vendor agreed to scope reduction with no penalty or minimum billing.',notes:'Largest single savings item FY27. Achieved through scope discipline, not price reduction.',tags:['Closed Mar 2026','Scope Reduction'],tagCls:['dct-green','dct-gray']},
+  {id:'c4',stage:'closed',vendor:'Software Renewal Bundle',category:'Software · Enterprise',value:'$1.8M',owner:'VER Team',ownerFull:'VER Team',target:'Apr 2026',priority:'Realized',priorityCls:'dcp-low',leverage:'5 renewals bundled for collective negotiation leverage.',strategy:'Bundled renewals into single negotiation. Used aggregate spend as volume leverage.',concessions:'Extended payment terms accepted by 3 of 5 vendors.',notes:'Bundling tactic proved effective — vendors responded to consolidated ask.',tags:['Closed Apr 2026','Multi-Year Term'],tagCls:['dct-green','dct-gray']},
+  {id:'c5',stage:'closed',vendor:'Vendor Consolidation (4 to 2)',category:'Services · Consulting',value:'$1.7M',owner:'Casey CL',ownerFull:'Casey Luciana Candelaria-Logan',target:'May 2026',priority:'Realized',priorityCls:'dcp-low',leverage:'4 consulting vendors with overlapping capabilities. Stakeholder review confirmed 2 preferred providers.',strategy:'Consolidated to 2 preferred vendors. Eliminated 2 contracts.',concessions:'N/A',notes:'Stakeholder alignment was the key enabler — VER facilitated the decision, stakeholders owned it.',tags:['Closed May 2026','Rationalization'],tagCls:['dct-green','dct-gray']}
+];
+
+var stageMap = {identified:{valueCls:'blue',colId:'col-identified',cardCls:'identified',dotCls:'sd-blue'},
+  negotiation:{valueCls:'amber',colId:'col-negotiation',cardCls:'negotiation',dotCls:'sd-amber'},
+  closed:{valueCls:'green',colId:'col-closed',cardCls:'closed',dotCls:'sd-green'}};
+
+var stageLabel = {identified:'Identified',negotiation:'In Negotiation',closed:'Closed'};
+
+function buildKanban() {
+  var grid = document.getElementById('pipeline-grid');
+  grid.textContent = '';
+
+  var cols = {
+    identified:{hdrCls:'blue',icon:'🔍',title:'Identified',total:'$12.1M'},
+    negotiation:{hdrCls:'amber',icon:'⚖️',title:'In Negotiation',total:'$4.9M'},
+    closed:{hdrCls:'green',icon:'✅',title:'Closed / Realized',total:'$10.2M'}
+  };
+
+  ['identified','negotiation','closed'].forEach(function(stage) {
+    var col = document.createElement('div');
+    col.className = 'pipeline-col';
+    col.id = 'col-' + stage;
+
+    var hdr = document.createElement('div');
+    hdr.className = 'col-header ' + cols[stage].hdrCls;
+    var htitle = document.createElement('span');
+    htitle.className = 'col-h-title ' + cols[stage].hdrCls;
+    htitle.textContent = cols[stage].icon + ' ' + cols[stage].title;
+    var htotal = document.createElement('span');
+    htotal.className = 'col-h-total ' + cols[stage].hdrCls;
+    htotal.textContent = cols[stage].total;
+    hdr.appendChild(htitle); hdr.appendChild(htotal);
+    col.appendChild(hdr);
+    grid.appendChild(col);
+  });
+
+  DEALS.forEach(function(d) {
+    var sm = stageMap[d.stage];
+    var col = document.getElementById('col-' + d.stage);
+
+    var card = document.createElement('div');
+    card.className = 'deal-card ' + sm.cardCls;
+    card.dataset.stage = d.stage;
+    card.dataset.category = d.category;
+    card.addEventListener('click', function() { openDeal(d.id); });
+
+    var top = document.createElement('div'); top.className = 'dc-top';
+    var vend = document.createElement('div'); vend.className = 'dc-vendor'; vend.textContent = d.vendor;
+    var val = document.createElement('div'); val.className = 'dc-value ' + sm.valueCls; val.textContent = d.value;
+    top.appendChild(vend); top.appendChild(val);
+
+    var cat = document.createElement('div'); cat.className = 'dc-category'; cat.textContent = d.category;
+
+    var tags = document.createElement('div'); tags.className = 'dc-tags';
+    d.tags.forEach(function(t, i) {
+      var tg = document.createElement('span');
+      tg.className = 'dc-tag ' + d.tagCls[i];
+      tg.textContent = t;
+      tags.appendChild(tg);
+    });
+
+    var meta = document.createElement('div'); meta.className = 'dc-meta';
+    var own = document.createElement('span'); own.className = 'dc-owner'; own.textContent = '👤 ' + d.owner;
+    var dt = document.createElement('span'); dt.className = 'dc-date'; dt.textContent = d.stage === 'closed' ? 'Closed: ' + d.target : 'Target: ' + d.target;
+    var pri = document.createElement('span'); pri.className = 'dc-priority ' + d.priorityCls; pri.textContent = d.priority;
+    meta.appendChild(own); meta.appendChild(dt); meta.appendChild(pri);
+
+    card.appendChild(top); card.appendChild(cat); card.appendChild(tags); card.appendChild(meta);
+    col.appendChild(card);
+  });
+}
+
+function openDeal(id) {
+  var d = DEALS.find(function(x) { return x.id === id; });
+  if (!d) return;
+  var sm = stageMap[d.stage];
+
+  var titleEl = document.getElementById('modal-title');
+  var subEl = document.getElementById('modal-sub');
+  var bodyEl = document.getElementById('modal-body');
+  titleEl.textContent = d.vendor;
+  subEl.textContent = d.category + ' · ' + stageLabel[d.stage];
+  bodyEl.textContent = '';
+
+  function makeSection(title, content) {
+    var sec = document.createElement('div'); sec.className = 'm-section';
+    var t = document.createElement('div'); t.className = 'm-section-title'; t.textContent = title;
+    sec.appendChild(t);
+    if (typeof content === 'function') { content(sec); } else { sec.appendChild(content); }
+    bodyEl.appendChild(sec);
+  }
+
+  function makeRow(lbl, val, colorCls, bigFont) {
+    var row = document.createElement('div'); row.className = 'm-row';
+    var l = document.createElement('span'); l.className = 'm-row-lbl'; l.textContent = lbl;
+    var v = document.createElement('span'); v.className = 'm-row-val';
+    if (colorCls) v.style.color = colorCls;
+    if (bigFont) v.style.fontSize = '13pt';
+    v.textContent = val;
+    row.appendChild(l); row.appendChild(v);
+    return row;
+  }
+
+  function makeNotes(text) {
+    var n = document.createElement('div'); n.className = 'm-notes'; n.textContent = text;
+    return n;
+  }
+
+  var stageColor = d.stage === 'identified' ? 'var(--blue)' : d.stage === 'negotiation' ? 'var(--amber)' : 'var(--green)';
+
+  makeSection('Deal Summary', function(sec) {
+    sec.appendChild(makeRow('Estimated Value', d.value, stageColor, true));
+    sec.appendChild(makeRow('Stage', stageLabel[d.stage]));
+    sec.appendChild(makeRow('Priority', d.priority));
+    sec.appendChild(makeRow('Owner', d.ownerFull));
+    sec.appendChild(makeRow('Target / Close', d.target));
+  });
+  if (d.leverage) makeSection('Leverage & Rationale', makeNotes(d.leverage));
+  if (d.strategy) makeSection('Strategy', makeNotes(d.strategy));
+  if (d.concessions) makeSection('Historical Concessions', makeNotes(d.concessions));
+  if (d.notes) makeSection('Notes', makeNotes(d.notes));
+
+  var actions = document.createElement('div'); actions.className = 'm-actions';
+  var closeBtn = document.createElement('button'); closeBtn.className = 'ma-btn ma-secondary'; closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', closeModal);
+  var printBtn = document.createElement('button'); printBtn.className = 'ma-btn ma-primary'; printBtn.textContent = 'Print Brief';
+  printBtn.addEventListener('click', function() { window.print(); });
+  actions.appendChild(closeBtn); actions.appendChild(printBtn);
+  bodyEl.appendChild(actions);
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+var activeStage = 'all', activeCategory = 'all';
+function filterStage(stage, btn) {
+  activeStage = stage;
+  document.querySelectorAll('.controls-bar .filter-btn').forEach(function(b, i) { if (i < 4) b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+function filterCategory(cat, btn) {
+  activeCategory = cat;
+  var btns = document.querySelectorAll('.controls-bar .filter-btn');
+  for (var i = 4; i < btns.length - 1; i++) btns[i].classList.remove('active');
+  btn.classList.add('active');
+  applyFilters();
+}
+function applyFilters() {
+  document.querySelectorAll('.deal-card').forEach(function(card) {
+    var stageMatch = activeStage === 'all' || card.dataset.stage === activeStage;
+    var catMatch = activeCategory === 'all' || card.dataset.category.indexOf(activeCategory) > -1;
+    card.style.display = (stageMatch && catMatch) ? '' : 'none';
+  });
+}
+
+// Month bars
+var months = [{m:'Jan',v:'$1.2M',pct:38,type:'green'},{m:'Feb',v:'$2.4M',pct:75,type:'green'},
+  {m:'Mar',v:'$3.1M',pct:97,type:'green'},{m:'Apr',v:'$1.8M',pct:56,type:'green'},
+  {m:'May',v:'$1.7M',pct:53,type:'teal'},{m:'Jun',v:'',pct:0,type:'teal'},{m:'Jul',v:'',pct:0,type:'teal'}];
+var mbWrap = document.getElementById('month-bars');
+months.forEach(function(m) {
+  var col = document.createElement('div'); col.className = 'mb-col';
+  var fill = document.createElement('div'); fill.className = 'mb-fill ' + m.type; fill.style.height = '0px';
+  var lbl = document.createElement('span'); lbl.className = 'mb-label'; lbl.textContent = m.m;
+  col.appendChild(fill); col.appendChild(lbl);
+  if (m.v) { var vl = document.createElement('span'); vl.className = 'mb-val'; vl.textContent = m.v; col.appendChild(vl); }
+  mbWrap.appendChild(col);
+  setTimeout(function() { fill.style.height = (m.pct * 0.92) + 'px'; }, 200);
+});
+
+// Category bars
+var cats = [{name:'Services',amt:'$15.4M',pct:67,cls:'cbf-teal'},
+  {name:'Software',amt:'$5.5M',pct:24,cls:'cbf-blue'},
+  {name:'Infrastructure',amt:'$1.9M',pct:9,cls:'cbf-green'}];
+var catList = document.getElementById('cat-list');
+cats.forEach(function(c) {
+  var row = document.createElement('div'); row.className = 'cat-row';
+  var name = document.createElement('span'); name.className = 'cat-name'; name.textContent = c.name;
+  var wrap = document.createElement('div'); wrap.className = 'cat-bar-wrap';
+  var fill = document.createElement('div'); fill.className = 'cat-bar-fill ' + c.cls; fill.style.width = '0%';
+  wrap.appendChild(fill);
+  var amt = document.createElement('span'); amt.className = 'cat-amt'; amt.textContent = c.amt;
+  var pct = document.createElement('span'); pct.className = 'cat-pct'; pct.textContent = c.pct + '%';
+  row.appendChild(name); row.appendChild(wrap); row.appendChild(amt); row.appendChild(pct);
+  catList.appendChild(row);
+  setTimeout(function() { fill.style.width = c.pct + '%'; }, 300);
+});
+
+// Summary table
+var tbody = document.getElementById('sum-tbody');
+DEALS.forEach(function(d) {
+  var sm = stageMap[d.stage];
+  var tr = document.createElement('tr');
+  var cells = [d.vendor, d.category.split(' · ')[0], '', d.value, d.owner, d.target];
+  cells.forEach(function(c, i) {
+    var td = document.createElement('td');
+    if (i === 2) {
+      var dot = document.createElement('span'); dot.className = 'stage-dot ' + sm.dotCls;
+      td.appendChild(dot); td.appendChild(document.createTextNode(stageLabel[d.stage]));
+    } else {
+      td.textContent = c;
+      if (i === 3) { td.style.color = i === 3 ? (d.stage === 'identified' ? 'var(--blue)' : d.stage === 'negotiation' ? 'var(--amber)' : 'var(--green)') : ''; td.style.fontWeight = '700'; }
+    }
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+});
+
+function exportCSV() {
+  var rows = [['Vendor','Category','Stage','Value','Owner','Target/Close']];
+  DEALS.forEach(function(d) {
+    rows.push([d.vendor, d.category, stageLabel[d.stage], d.value, d.ownerFull, d.target]);
+  });
+  var csv = rows.map(function(r) { return r.map(function(c) { return '"' + c + '"'; }).join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'savings_pipeline_fy27.csv';
+  a.click();
+}
+
+buildKanban();
+</script>
+</body>
+</html>

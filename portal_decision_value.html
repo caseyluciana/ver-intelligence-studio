@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Decision to Value · VER Team Portal</title>
+<style>
+:root {
+  --bloom:#F43F5E; --bloom-dim:#E11D48; --bloom-bright:#FB7185;
+  --bloom-glow:rgba(244,63,94,0.16); --bloom-border:rgba(244,63,94,0.30);
+  --bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3; --magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14); --mag-border:rgba(192,38,211,0.28);
+  --violet:#A855F7; --violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12); --vio-border:rgba(168,85,247,0.28);
+  --rose-gold:#E8A598;
+  --bg:#070411; --bg-side:#130D26; --bg-surface:rgba(255,255,255,0.034);
+  --bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96); --ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52); --ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06); --border-soft:rgba(255,255,255,0.10);
+  --green:#34D399; --amber:#FBBF24; --red-dim:#F43F5E;
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);
+  font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.22) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.18) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 48%,rgba(168,85,247,0.07) 0%,transparent 60%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(244,63,94,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,63,94,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+
+/* ── SIDEBAR ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sb-gem{width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  box-shadow:0 0 24px rgba(244,63,94,0.42),0 0 8px rgba(192,38,211,0.28);}
+.sb-logo-title{font-size:13.5px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.55);margin-top:2px;}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;font-size:8px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);
+  animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.sb-nav{flex:1;padding:10px 0;}
+.sb-section{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.42);padding:12px 20px 5px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:8px 0;}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;
+  font-size:9px;color:rgba(255,255,255,0.50);line-height:1.7;}
+.sb-user{margin:0 12px 10px;padding:10px 14px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:20px;line-height:1;}
+.sb-user-name{font-size:11.5px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:9px;color:rgba(255,255,255,0.55);}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.80);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-actions{display:flex;align-items:center;gap:8px;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;white-space:nowrap;}
+.tb-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.tb-btn.primary{background:linear-gradient(90deg,var(--bloom-dim),var(--magenta));
+  border-color:transparent;color:#fff;box-shadow:0 0 16px rgba(244,63,94,0.24);}
+.tb-btn.primary:hover{opacity:0.88;}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── PAGE HEADER ── */
+.page-head{margin-bottom:22px;}
+.page-eyebrow{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.18em;
+  color:var(--bloom-bright);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.page-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--bloom);
+  animation:pulse 2.5s ease-in-out infinite;}
+.page-title{font-size:26px;font-weight:900;letter-spacing:-0.02em;
+  background:linear-gradient(92deg,var(--bloom) 0%,var(--magenta) 55%,var(--violet) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:inline-block;margin-bottom:5px;}
+.page-sub{font-size:12px;color:var(--ink-muted);line-height:1.55;}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+.kpi-tile{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;
+  padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0;}
+.t-gray::before   {background:linear-gradient(90deg,#9CA3AF,#D1D5DB);}
+.t-amber::before  {background:linear-gradient(90deg,#FBBF24,#FDE68A);}
+.t-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.t-blue::before   {background:linear-gradient(90deg,#60A5FA,#93C5FD);}
+.t-green::before  {background:linear-gradient(90deg,#34D399,#6EE7B7);}
+.t-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.t-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.kpi-ico-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico{font-size:18px;}
+.kpi-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.kb-gray   {background:rgba(156,163,175,0.14);color:#D1D5DB;}
+.kb-amber  {background:rgba(251,191,36,0.14);color:#FDE68A;}
+.kb-violet {background:rgba(168,85,247,0.12);color:var(--violet-bright);}
+.kb-blue   {background:rgba(96,165,250,0.14);color:#93C5FD;}
+.kb-green  {background:rgba(52,211,153,0.14);color:#6EE7B7;}
+.kb-bloom  {background:rgba(244,63,94,0.14);color:var(--bloom-bright);}
+.kb-magenta{background:rgba(192,38,211,0.12);color:var(--magenta-bright);}
+.kpi-val{font-size:30px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.t-gray   .kpi-val{color:#D1D5DB;}
+.t-amber  .kpi-val{color:#FDE68A;}
+.t-violet .kpi-val{color:var(--violet-bright);}
+.t-blue   .kpi-val{color:#93C5FD;}
+.t-green  .kpi-val{color:#6EE7B7;}
+.t-bloom  .kpi-val{color:var(--bloom-bright);}
+.t-magenta .kpi-val{color:var(--magenta-bright);}
+.kpi-val-sm{font-size:20px;}
+.kpi-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:var(--ink-muted);}
+
+/* ── FORM SECTION ── */
+.section-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--ink-muted);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.form-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:14px;
+  padding:22px 24px;margin-bottom:22px;}
+.form-card-title{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-full{grid-column:1/-1;}
+.form-label{display:block;font-size:9px;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.10em;color:var(--ink-muted);margin-bottom:6px;}
+.form-input{width:100%;padding:9px 13px;border-radius:8px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  color:var(--ink);font-family:var(--font);font-size:12.5px;outline:none;
+  transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--bloom-border);}
+.form-input::placeholder{color:var(--ink-muted);}
+.form-input.invalid{border-color:var(--bloom)!important;background:rgba(244,63,94,0.05);}
+select.form-input option{background:#1C1030;color:var(--ink);}
+.form-error{display:none;background:rgba(244,63,94,0.10);border:1px solid rgba(244,63,94,0.24);
+  border-radius:7px;padding:8px 12px;font-size:10.5px;color:var(--bloom-bright);
+  margin-top:10px;grid-column:1/-1;}
+.form-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;grid-column:1/-1;}
+.btn-add{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;
+  background:linear-gradient(90deg,var(--bloom-dim),var(--magenta));border:none;
+  color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);
+  box-shadow:0 0 16px rgba(244,63,94,0.24);transition:opacity 0.15s;}
+.btn-add:hover{opacity:0.88;}
+.btn-reset{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;
+  background:transparent;border:1px solid var(--border-soft);color:var(--ink-muted);
+  font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all 0.15s;}
+.btn-reset:hover{background:var(--bg-surface);color:var(--ink);}
+.edit-mode-badge{display:none;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;
+  background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.24);
+  font-size:9.5px;font-weight:700;color:var(--violet-bright);}
+.edit-mode-badge.visible{display:inline-flex;}
+
+/* ── TABLE ── */
+.table-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:14px;
+  overflow:hidden;margin-bottom:22px;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:10px 14px;border-bottom:1px solid var(--border-soft);text-align:left;
+  font-size:9px;font-weight:800;color:var(--ink-muted);text-transform:uppercase;
+  letter-spacing:0.08em;white-space:nowrap;background:rgba(255,255,255,0.02);}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--ink-dim);vertical-align:middle;}
+tbody tr{cursor:pointer;transition:background 0.12s;}
+tbody tr:hover td{background:rgba(244,63,94,0.04);}
+tbody tr:last-child td{border-bottom:none;}
+.col-name{font-weight:700;color:var(--ink);}
+.col-name-sub{font-size:10px;color:var(--ink-muted);margin-top:1px;}
+.late-date{color:#FB7185;font-weight:700;}
+
+/* Stage badges */
+.stage-badge{display:inline-flex;align-items:center;gap:4px;
+  font-size:8.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;}
+.sb-identified{background:rgba(156,163,175,0.14);color:#D1D5DB;border:1px solid rgba(156,163,175,0.20);}
+.sb-decided   {background:rgba(96,165,250,0.14);color:#93C5FD;border:1px solid rgba(96,165,250,0.20);}
+.sb-approved  {background:rgba(168,85,247,0.14);color:var(--violet-bright);border:1px solid rgba(168,85,247,0.22);}
+.sb-executed  {background:rgba(251,191,36,0.14);color:#FDE68A;border:1px solid rgba(251,191,36,0.22);}
+.sb-realized  {background:rgba(52,211,153,0.14);color:#6EE7B7;border:1px solid rgba(52,211,153,0.22);}
+
+/* Action buttons in table */
+.row-btn{display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px;
+  font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);
+  border:1px solid;transition:all 0.15s;white-space:nowrap;}
+.row-btn-edit{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.24);
+  color:var(--violet-bright);}
+.row-btn-edit:hover{background:rgba(168,85,247,0.20);}
+.row-btn-realized{background:rgba(52,211,153,0.10);border-color:rgba(52,211,153,0.24);
+  color:#6EE7B7;margin-left:5px;}
+.row-btn-realized:hover{background:rgba(52,211,153,0.20);}
+.row-btn-del{background:transparent;border-color:rgba(244,63,94,0.22);color:var(--bloom-bright);
+  margin-left:5px;padding:4px 8px;}
+.row-btn-del:hover{background:rgba(244,63,94,0.10);}
+
+/* Empty state */
+.empty-row td{text-align:center;color:var(--ink-muted);padding:36px;font-style:italic;cursor:default;}
+.empty-row:hover td{background:transparent!important;}
+
+/* Toast */
+.success-toast{display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  z-index:9999;border-radius:12px;padding:13px 22px;font-size:11px;font-weight:700;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);align-items:center;gap:10px;
+  background:linear-gradient(135deg,rgba(52,211,153,0.18),rgba(52,211,153,0.10));
+  border:1px solid rgba(52,211,153,0.32);color:#34D399;backdrop-filter:blur(12px);}
+.toast-dismiss{background:rgba(255,255,255,0.10);border:none;color:rgba(255,255,255,0.60);
+  border-radius:6px;padding:2px 8px;cursor:pointer;font-size:13px;margin-left:6px;}
+
+/* Theme toggle */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+
+/* Animations */
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-head{animation:rise 0.45s var(--ease) 0.05s both;}
+.kpi-strip{animation:rise 0.45s var(--ease) 0.12s both;}
+.form-card{animation:rise 0.45s var(--ease) 0.18s both;}
+.table-card{animation:rise 0.45s var(--ease) 0.24s both;}
+
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode::before{background:radial-gradient(ellipse at 80% 0%,rgba(192,38,211,0.12) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.10) 0%,transparent 50%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title{color:#1A0818;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .form-input{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .form-input::placeholder{color:#B06080;}
+body.light-mode select.form-input option{background:#FFF0F4;color:#1A0818;}
+body.light-mode th{background:rgba(26,8,24,0.02);}
+body.light-mode td{border-bottom-color:#F5C6D3;}
+body.light-mode tbody tr:hover td{background:rgba(244,63,94,0.03);}
+body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+
+@media(max-width:1200px){.kpi-strip{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:900px){.form-grid{grid-template-columns:1fr;}.form-full{grid-column:1;}}
+@media(max-width:640px){.sidebar{display:none;}.content{padding:16px 16px 40px;}
+  .kpi-strip{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body data-portal="true">
+
+<!-- TOAST -->
+<div class="success-toast" id="toast">
+  <span id="toast-msg">Record saved.</span>
+  <button type="button" class="toast-dismiss" onclick="document.getElementById('toast').style.display='none'">&#215;</button>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-user">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Casey</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html" class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"       class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"           class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"        class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"     class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"   class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"   class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html" class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html" class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html" class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"          class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html"  class="sb-item active"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Decision to Value</span>
+      </div>
+      <div class="tb-actions">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button type="button" class="tb-btn" onclick="exportCSV()">&#8659; Export CSV</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-head">
+        <div class="page-eyebrow"><span class="page-eyebrow-dot"></span>VER Intelligence Hub &nbsp;&middot;&nbsp; Assessments</div>
+        <div class="page-title">Decision to Value</div>
+        <div class="page-sub">Track every approved vendor initiative from identification through commercial execution and verified value realization. Close the gap between what was decided and what was delivered.</div>
+      </div>
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip" id="kpi-strip">
+        <div class="kpi-tile t-gray">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128269;</span><span class="kpi-badge kb-gray">stage 1</span></div>
+          <div class="kpi-val" id="kpi-identified">0</div>
+          <div class="kpi-label">Identified</div>
+        </div>
+        <div class="kpi-tile t-blue">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#9889;</span><span class="kpi-badge kb-blue">stage 2</span></div>
+          <div class="kpi-val" id="kpi-decided">0</div>
+          <div class="kpi-label">Decided</div>
+        </div>
+        <div class="kpi-tile t-violet">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#10003;</span><span class="kpi-badge kb-violet">stage 3</span></div>
+          <div class="kpi-val" id="kpi-approved">0</div>
+          <div class="kpi-label">Approved</div>
+        </div>
+        <div class="kpi-tile t-amber">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#9654;</span><span class="kpi-badge kb-amber">stage 4</span></div>
+          <div class="kpi-val" id="kpi-executed">0</div>
+          <div class="kpi-label">Executed</div>
+        </div>
+        <div class="kpi-tile t-green">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#127381;</span><span class="kpi-badge kb-green">stage 5</span></div>
+          <div class="kpi-val" id="kpi-realized">0</div>
+          <div class="kpi-label">Realized</div>
+        </div>
+        <div class="kpi-tile t-magenta" style="grid-column:span 2;">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128181;</span><span class="kpi-badge kb-magenta">total pipeline</span></div>
+          <div class="kpi-val kpi-val-sm" id="kpi-total-value">$0.00M</div>
+          <div class="kpi-label">Total Potential Value</div>
+        </div>
+        <div class="kpi-tile t-bloom" style="grid-column:span 3;">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128200;</span><span class="kpi-badge kb-bloom" id="kpi-rate-badge">healthy &gt; 60%</span></div>
+          <div class="kpi-val kpi-val-sm" id="kpi-realization-rate">0%</div>
+          <div class="kpi-label">Realization Rate</div>
+        </div>
+      </div>
+
+      <!-- ADD / EDIT FORM -->
+      <div class="section-label">Log a Value Decision</div>
+      <div class="form-card">
+        <div class="form-card-title">
+          <span id="form-mode-label">&#43; New Record</span>
+          <span class="edit-mode-badge" id="edit-badge">Editing record</span>
+        </div>
+        <input type="hidden" id="f-edit-id">
+        <div class="form-grid">
+
+          <div class="form-full">
+            <label class="form-label" for="f-vendor-sel">Vendor (from VER list)</label>
+            <select class="form-input" id="f-vendor-sel">
+              <option value="">&#8212; Select a vendor &#8212;</option>
+            </select>
+          </div>
+
+          <div class="form-full">
+            <label class="form-label" for="f-name">Initiative / Opportunity Name *</label>
+            <input class="form-input" type="text" id="f-name" placeholder="e.g. Renegotiate Workday pricing tier">
+          </div>
+
+          <div>
+            <label class="form-label" for="f-type">Value Type</label>
+            <select class="form-input" id="f-type">
+              <option value="Cost Reduction">Cost Reduction</option>
+              <option value="Risk Mitigation">Risk Mitigation</option>
+              <option value="Capability">Capability</option>
+              <option value="Compliance">Compliance</option>
+              <option value="Strategic">Strategic</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label" for="f-expected">Annual Value ($M)</label>
+            <input class="form-input" type="number" id="f-expected" min="0" step="0.01" value="0">
+          </div>
+
+          <div>
+            <label class="form-label" for="f-stage">Stage</label>
+            <select class="form-input" id="f-stage">
+              <option value="Identified">Identified</option>
+              <option value="Decided">Decided</option>
+              <option value="Approved">Approved</option>
+              <option value="Executed">Executed</option>
+              <option value="Realized">Realized</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label" for="f-target">Target Date</label>
+            <input class="form-input" type="date" id="f-target">
+          </div>
+
+          <div class="form-full">
+            <label class="form-label" for="f-notes">Notes / Evidence</label>
+            <textarea class="form-input" id="f-notes" rows="3" placeholder="Baseline source, methodology, approving stakeholder, contract reference..."></textarea>
+          </div>
+
+          <div class="form-error" id="f-error"></div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-add" id="btn-submit" onclick="submitRecord()">&#43; Add Record</button>
+            <button type="button" class="btn-reset" onclick="resetForm()">Reset</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PIPELINE TABLE -->
+      <div class="section-label">Value Realization Records</div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Initiative</th>
+                <th>Vendor</th>
+                <th>Type</th>
+                <th>Value ($M)</th>
+                <th>Stage</th>
+                <th>Target</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="records-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script src="assets/vendors.js" defer></script>
+<script src="assets/coupa_spend.js" defer></script>
+<script>
+/* ============================================================
+   STORAGE
+   ============================================================ */
+var LS_KEY = 'ver_decision_value_v2';
+var TODAY_STR = new Date().toISOString().slice(0, 10);
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveRecords(recs) {
+  localStorage.setItem(LS_KEY, JSON.stringify(recs));
+  // Dispatch storage event so hub page picks up changes
+  try {
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: LS_KEY,
+      newValue: JSON.stringify(recs),
+      storageArea: localStorage
+    }));
+  } catch(ex) {}
+}
+
+/* ============================================================
+   SEED DATA
+   ============================================================ */
+function seedDefaultData() {
+  if (localStorage.getItem(LS_KEY)) return;
+  var seed = [
+    {
+      id: 1700000001000,
+      name: 'Renegotiate Workday pricing tier',
+      vendor: 'Workday',
+      type: 'Cost Reduction',
+      expected: 2.37,
+      realized: 0,
+      stage: 'Approved',
+      decision: '2026-06-15',
+      target: '2026-11-01',
+      evidence: 'Renewal due Nov 2026. Highest spend vendor $23.7M. Benchmark shows 10% reduction opportunity.',
+      updated: '2026-07-01T10:00:00.000Z'
+    },
+    {
+      id: 1700000002000,
+      name: 'IBM application services scope reduction',
+      vendor: 'IBM',
+      type: 'Cost Reduction',
+      expected: 1.43,
+      realized: 0,
+      stage: 'Decided',
+      decision: '2026-06-20',
+      target: '2026-09-30',
+      evidence: 'Renewal Aug 2026. Active review with Procurement. Enterprise app and data services overlap identified.',
+      updated: '2026-07-02T10:00:00.000Z'
+    },
+    {
+      id: 1700000003000,
+      name: 'Microsoft 365 seat consolidation',
+      vendor: 'Microsoft',
+      type: 'Cost Reduction',
+      expected: 0.18,
+      realized: 0.18,
+      stage: 'Realized',
+      decision: '2026-05-01',
+      target: '2026-06-30',
+      evidence: 'M365 renewal Jun 2026. Seat audit reduced unused licenses. $180K confirmed in Coupa actuals.',
+      updated: '2026-07-10T10:00:00.000Z'
+    },
+    {
+      id: 1700000004000,
+      name: 'Deloitte scope consolidation — HR and Tax',
+      vendor: 'Deloitte',
+      type: 'Cost Reduction',
+      expected: 0.91,
+      realized: 0,
+      stage: 'Identified',
+      decision: '2026-07-01',
+      target: '2027-01-31',
+      evidence: 'Renewal Dec 2026. Overlap between HR Consulting and Payroll Advisory scopes. Validate before renewal.',
+      updated: '2026-07-05T10:00:00.000Z'
+    },
+    {
+      id: 1700000005000,
+      name: 'BCG advisory engagement exit',
+      vendor: 'BCG',
+      type: 'Strategic',
+      expected: 1.20,
+      realized: 0,
+      stage: 'Approved',
+      decision: '2026-06-10',
+      target: '2026-09-30',
+      evidence: 'Renewal Jun 2026. Delivery risk high (score 70). VER Director engaged. Business case for exit approved.',
+      updated: '2026-07-08T10:00:00.000Z'
+    },
+    {
+      id: 1700000006000,
+      name: 'NTT Data PO consolidation — reduce active POs',
+      vendor: 'NTT Data',
+      type: 'Cost Reduction',
+      expected: 1.14,
+      realized: 0,
+      stage: 'Executed',
+      decision: '2026-04-15',
+      target: '2026-08-31',
+      evidence: '24 active POs. Target consolidation to 18 POs. AD restructure complete Apr 2026. Tracking in Fieldglass.',
+      updated: '2026-07-15T10:00:00.000Z'
+    },
+    {
+      id: 1700000007000,
+      name: 'AWS EDP renegotiation — commit adjustment',
+      vendor: 'AWS',
+      type: 'Cost Reduction',
+      expected: 0.86,
+      realized: 0,
+      stage: 'Identified',
+      decision: '2026-07-10',
+      target: '2027-03-01',
+      evidence: 'EDP renewal Mar 2027. Usage within committed spend envelope. Early renegotiation window opens Q4 FY27.',
+      updated: '2026-07-10T10:00:00.000Z'
+    },
+    {
+      id: 1700000008000,
+      name: 'Snowflake usage optimization — query cost reduction',
+      vendor: 'Snowflake',
+      type: 'Cost Reduction',
+      expected: 0.22,
+      realized: 0.22,
+      stage: 'Realized',
+      decision: '2026-05-15',
+      target: '2026-08-15',
+      evidence: 'Query optimization initiative reduced compute costs by ~20%. Validated in FY27 Coupa actuals.',
+      updated: '2026-07-20T10:00:00.000Z'
+    },
+    {
+      id: 1700000009000,
+      name: 'Figma license hygiene before renewal',
+      vendor: 'Figma',
+      type: 'Cost Reduction',
+      expected: 0.48,
+      realized: 0,
+      stage: 'Decided',
+      decision: '2026-07-05',
+      target: '2027-01-31',
+      evidence: 'Renewal Jan 2027. Seat count review required. $3.2M baseline — reduce unused seats before new term.',
+      updated: '2026-07-05T10:00:00.000Z'
+    },
+    {
+      id: 1700000010000,
+      name: 'Tech Mahindra SLA penalty recovery',
+      vendor: 'Tech Mahindra',
+      type: 'Risk Mitigation',
+      expected: 0.65,
+      realized: 0,
+      stage: 'Approved',
+      decision: '2026-06-25',
+      target: '2026-10-31',
+      evidence: '3 SLA metrics below target. Contract penalty clauses confirmed. Credits negotiation in progress.',
+      updated: '2026-07-12T10:00:00.000Z'
+    }
+  ];
+  saveRecords(seed);
+}
+
+/* ============================================================
+   VENDOR DROPDOWN
+   ============================================================ */
+function populateVendorSelect() {
+  var sel = document.getElementById('f-vendor-sel');
+  // Clear all but first placeholder option
+  while (sel.options.length > 1) sel.remove(1);
+
+  var vendors = [];
+  if (window.VER_VENDORS && Array.isArray(window.VER_VENDORS)) {
+    vendors = window.VER_VENDORS.slice();
+  }
+  vendors.sort(function(a, b) { return a.name.localeCompare(b.name); });
+  vendors.forEach(function(v) {
+    var opt = document.createElement('option');
+    opt.value = v.name;
+    opt.textContent = v.name;
+    sel.appendChild(opt);
+  });
+}
+
+/* ============================================================
+   KPI BAR
+   ============================================================ */
+function updateKPIs(recs) {
+  var counts = { Identified: 0, Decided: 0, Approved: 0, Executed: 0, Realized: 0 };
+  var totalExpected = 0;
+  var totalRealized = 0;
+
+  recs.forEach(function(r) {
+    if (counts[r.stage] !== undefined) counts[r.stage]++;
+    totalExpected += (parseFloat(r.expected) || 0);
+    totalRealized += (parseFloat(r.realized) || 0);
+  });
+
+  var rate = totalExpected > 0 ? Math.round((totalRealized / totalExpected) * 100) : 0;
+
+  document.getElementById('kpi-identified').textContent = counts.Identified;
+  document.getElementById('kpi-decided').textContent = counts.Decided;
+  document.getElementById('kpi-approved').textContent = counts.Approved;
+  document.getElementById('kpi-executed').textContent = counts.Executed;
+  document.getElementById('kpi-realized').textContent = counts.Realized;
+  document.getElementById('kpi-total-value').textContent = '$' + totalExpected.toFixed(2) + 'M';
+  document.getElementById('kpi-realization-rate').textContent = rate + '%';
+
+  var badge = document.getElementById('kpi-rate-badge');
+  if (badge) {
+    if (rate >= 60) {
+      badge.textContent = 'healthy';
+    } else if (rate >= 40) {
+      badge.textContent = 'watch';
+    } else {
+      badge.textContent = 'needs focus';
+    }
+  }
+}
+
+/* ============================================================
+   STAGE BADGE HELPER
+   ============================================================ */
+function stageBadgeCls(stage) {
+  var map = {
+    'Identified': 'sb-identified',
+    'Decided':    'sb-decided',
+    'Approved':   'sb-approved',
+    'Executed':   'sb-executed',
+    'Realized':   'sb-realized'
+  };
+  return map[stage] || 'sb-identified';
+}
+
+/* ============================================================
+   DOM HELPERS — no innerHTML with variable data
+   ============================================================ */
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function clearEl(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+/* ============================================================
+   TABLE RENDER
+   ============================================================ */
+function renderTable() {
+  var recs = loadRecords();
+  var tbody = document.getElementById('records-tbody');
+  clearEl(tbody);
+
+  if (!recs.length) {
+    var erow = document.createElement('tr');
+    erow.className = 'empty-row';
+    var etd = document.createElement('td');
+    etd.colSpan = 8;
+    etd.textContent = 'No records yet. Add your first value decision above.';
+    erow.appendChild(etd);
+    tbody.appendChild(erow);
+    return;
+  }
+
+  recs.forEach(function(r) {
+    var tr = document.createElement('tr');
+    tr.setAttribute('data-id', r.id);
+
+    // Clicking the row loads it into the form for editing
+    (function(recId) {
+      tr.addEventListener('click', function(e) {
+        // Don't trigger if a button inside was clicked
+        if (e.target.tagName === 'BUTTON') return;
+        loadIntoForm(recId);
+      });
+    })(r.id);
+
+    // Initiative / name
+    var tdName = document.createElement('td');
+    var nameDiv = el('div', 'col-name');
+    nameDiv.textContent = r.name || '—';
+    var subDiv = el('div', 'col-name-sub');
+    subDiv.textContent = r.decision ? 'Decision: ' + r.decision : '';
+    tdName.appendChild(nameDiv);
+    if (r.decision) tdName.appendChild(subDiv);
+    tr.appendChild(tdName);
+
+    // Vendor
+    tr.appendChild(el('td', null, r.vendor || '—'));
+
+    // Type
+    tr.appendChild(el('td', null, r.type || '—'));
+
+    // Value
+    var expVal = (parseFloat(r.expected) || 0).toFixed(2);
+    var realVal = (parseFloat(r.realized) || 0);
+    var valTd = document.createElement('td');
+    var valSpan = el('span', null, '$' + expVal + 'M');
+    valTd.appendChild(valSpan);
+    if (realVal > 0) {
+      var realSpan = el('span', 'col-name-sub');
+      realSpan.textContent = 'Realized: $' + realVal.toFixed(2) + 'M';
+      valTd.appendChild(realSpan);
+    }
+    tr.appendChild(valTd);
+
+    // Stage badge
+    var stageTd = document.createElement('td');
+    var badge = el('span', 'stage-badge ' + stageBadgeCls(r.stage), r.stage || '—');
+    stageTd.appendChild(badge);
+    tr.appendChild(stageTd);
+
+    // Target date
+    var targetTd = document.createElement('td');
+    if (r.target) {
+      var isLate = (r.target < TODAY_STR && r.stage !== 'Realized');
+      var dateSpan = document.createElement('span');
+      if (isLate) dateSpan.className = 'late-date';
+      dateSpan.textContent = r.target + (isLate ? ' ⚠' : '');
+      targetTd.appendChild(dateSpan);
+    } else {
+      targetTd.textContent = '—';
+    }
+    tr.appendChild(targetTd);
+
+    // Notes (truncated)
+    var notesTd = document.createElement('td');
+    notesTd.style.maxWidth = '180px';
+    notesTd.style.overflow = 'hidden';
+    notesTd.style.textOverflow = 'ellipsis';
+    notesTd.style.whiteSpace = 'nowrap';
+    notesTd.title = r.evidence || '';
+    notesTd.textContent = r.evidence || '—';
+    tr.appendChild(notesTd);
+
+    // Actions
+    var actTd = document.createElement('td');
+    actTd.style.whiteSpace = 'nowrap';
+
+    var btnEdit = el('button', 'row-btn row-btn-edit', 'Edit');
+    (function(recId) {
+      btnEdit.addEventListener('click', function() { loadIntoForm(recId); });
+    })(r.id);
+    actTd.appendChild(btnEdit);
+
+    // Show "Set Realized" button only for Approved or Executed
+    if (r.stage === 'Approved' || r.stage === 'Executed') {
+      var btnReal = el('button', 'row-btn row-btn-realized', 'Set Realized');
+      (function(recId) {
+        btnReal.addEventListener('click', function() { setRealized(recId); });
+      })(r.id);
+      actTd.appendChild(btnReal);
+    }
+
+    var btnDel = el('button', 'row-btn row-btn-del', '✕');
+    (function(recId) {
+      btnDel.addEventListener('click', function() {
+        if (confirm('Delete this record? This cannot be undone.')) {
+          deleteRecord(recId);
+        }
+      });
+    })(r.id);
+    actTd.appendChild(btnDel);
+
+    tr.appendChild(actTd);
+    tbody.appendChild(tr);
+  });
+}
+
+/* ============================================================
+   MASTER RENDER
+   ============================================================ */
+function renderAll() {
+  var recs = loadRecords();
+  updateKPIs(recs);
+  renderTable();
+}
+
+/* ============================================================
+   FORM — ADD / EDIT
+   ============================================================ */
+var _editId = null;
+
+function loadIntoForm(id) {
+  var recs = loadRecords();
+  var r = null;
+  for (var i = 0; i < recs.length; i++) {
+    if (String(recs[i].id) === String(id)) { r = recs[i]; break; }
+  }
+  if (!r) return;
+
+  _editId = r.id;
+  document.getElementById('f-edit-id').value = r.id;
+  document.getElementById('f-vendor-sel').value = r.vendor || '';
+  document.getElementById('f-name').value = r.name || '';
+  document.getElementById('f-type').value = r.type || 'Cost Reduction';
+  document.getElementById('f-expected').value = r.expected || 0;
+  document.getElementById('f-stage').value = r.stage || 'Identified';
+  document.getElementById('f-target').value = r.target || '';
+  document.getElementById('f-notes').value = r.evidence || '';
+
+  document.getElementById('form-mode-label').textContent = 'Editing Record';
+  document.getElementById('edit-badge').classList.add('visible');
+  document.getElementById('btn-submit').textContent = 'Save Changes';
+
+  // Scroll to form
+  document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetForm() {
+  _editId = null;
+  document.getElementById('f-edit-id').value = '';
+  document.getElementById('f-vendor-sel').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-type').value = 'Cost Reduction';
+  document.getElementById('f-expected').value = '0';
+  document.getElementById('f-stage').value = 'Identified';
+  document.getElementById('f-target').value = '';
+  document.getElementById('f-notes').value = '';
+
+  document.getElementById('form-mode-label').textContent = '+ New Record';
+  document.getElementById('edit-badge').classList.remove('visible');
+  document.getElementById('btn-submit').textContent = '+ Add Record';
+
+  var errEl = document.getElementById('f-error');
+  errEl.style.display = 'none';
+  errEl.textContent = '';
+
+  // Remove invalid markers
+  ['f-name'].forEach(function(fid) {
+    var el2 = document.getElementById(fid);
+    if (el2) el2.classList.remove('invalid');
+  });
+}
+
+function submitRecord() {
+  var nameEl = document.getElementById('f-name');
+  var errEl  = document.getElementById('f-error');
+
+  nameEl.classList.remove('invalid');
+  errEl.style.display = 'none';
+  errEl.textContent = '';
+
+  var name = nameEl.value.trim();
+  if (!name) {
+    nameEl.classList.add('invalid');
+    errEl.textContent = 'Initiative name is required.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  var vendor   = document.getElementById('f-vendor-sel').value || '';
+  var type     = document.getElementById('f-type').value;
+  var expected = parseFloat(document.getElementById('f-expected').value) || 0;
+  var stage    = document.getElementById('f-stage').value;
+  var target   = document.getElementById('f-target').value;
+  var evidence = document.getElementById('f-notes').value.trim();
+  var now      = new Date().toISOString();
+  var todayDate = now.slice(0, 10);
+
+  var recs = loadRecords();
+
+  if (_editId !== null) {
+    // Update existing record
+    for (var i = 0; i < recs.length; i++) {
+      if (String(recs[i].id) === String(_editId)) {
+        recs[i].name     = name;
+        recs[i].vendor   = vendor;
+        recs[i].type     = type;
+        recs[i].expected = expected;
+        recs[i].stage    = stage;
+        recs[i].target   = target;
+        recs[i].evidence = evidence;
+        recs[i].updated  = now;
+        break;
+      }
+    }
+    saveRecords(recs);
+    showToast('Record updated.');
+  } else {
+    // New record
+    var newRec = {
+      id:       Date.now(),
+      name:     name,
+      vendor:   vendor,
+      type:     type,
+      expected: expected,
+      realized: 0,
+      stage:    stage,
+      decision: todayDate,
+      target:   target,
+      evidence: evidence,
+      updated:  now
+    };
+    recs.unshift(newRec);
+    saveRecords(recs);
+    showToast('Record added to pipeline.');
+  }
+
+  resetForm();
+  renderAll();
+}
+
+/* ============================================================
+   SET REALIZED
+   ============================================================ */
+function setRealized(id) {
+  var val = prompt('Enter realized value ($M):');
+  if (val === null) return;
+  var num = parseFloat(val);
+  if (isNaN(num) || num < 0) {
+    alert('Please enter a valid number (e.g. 1.25).');
+    return;
+  }
+  var recs = loadRecords();
+  for (var i = 0; i < recs.length; i++) {
+    if (String(recs[i].id) === String(id)) {
+      recs[i].realized = num;
+      if (num > 0) recs[i].stage = 'Realized';
+      recs[i].updated = new Date().toISOString();
+      break;
+    }
+  }
+  saveRecords(recs);
+  showToast('Realized value recorded.');
+  renderAll();
+}
+
+/* ============================================================
+   DELETE
+   ============================================================ */
+function deleteRecord(id) {
+  var recs = loadRecords().filter(function(r) { return String(r.id) !== String(id); });
+  saveRecords(recs);
+  showToast('Record deleted.');
+  renderAll();
+}
+
+/* ============================================================
+   EXPORT CSV
+   ============================================================ */
+function exportCSV() {
+  var recs = loadRecords();
+  if (!recs.length) { alert('No records to export.'); return; }
+  var headers = ['ID', 'Initiative', 'Vendor', 'Type', 'Stage', 'Expected_M', 'Realized_M',
+                 'Decision_Date', 'Target_Date', 'Notes', 'Updated'];
+  var lines = [headers];
+  recs.forEach(function(r) {
+    function esc(v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }
+    lines.push([
+      r.id,
+      esc(r.name),
+      esc(r.vendor),
+      esc(r.type),
+      esc(r.stage),
+      (parseFloat(r.expected) || 0).toFixed(2),
+      (parseFloat(r.realized) || 0).toFixed(2),
+      esc(r.decision || ''),
+      esc(r.target || ''),
+      esc(r.evidence || ''),
+      esc(r.updated || '')
+    ]);
+  });
+  var csv = lines.map(function(row) { return row.join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'decision-to-value-' + TODAY_STR + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  var m = document.getElementById('toast-msg');
+  if (m) m.textContent = msg || 'Saved.';
+  t.style.display = 'flex';
+  setTimeout(function() { t.style.display = 'none'; }, 4500);
+}
+
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+function _toggleTheme() {
+  var b = document.body;
+  var cur = b.classList.contains('light-mode') ? 'light' : b.classList.contains('mid-mode') ? 'mid' : 'dark';
+  var next = cur === 'dark' ? 'mid' : cur === 'mid' ? 'light' : 'dark';
+  b.classList.remove('light-mode', 'mid-mode');
+  if (next === 'light') b.classList.add('light-mode');
+  if (next === 'mid')   b.classList.add('mid-mode');
+  var btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = next === 'light' ? '☄ Dark' : next === 'mid' ? '☆ Light' : '☆ Mid';
+  try { localStorage.setItem('ver-portal-theme', next); } catch(e) {}
+}
+
+(function() {
+  try {
+    var t = localStorage.getItem('ver-portal-theme');
+    var btn = document.getElementById('theme-toggle-btn');
+    if (t === 'light') { document.body.classList.add('light-mode'); if (btn) btn.textContent = '☄ Dark'; }
+    else if (t === 'mid') { document.body.classList.add('mid-mode'); if (btn) btn.textContent = '☆ Light'; }
+  } catch(e) {}
+})();
+
+/* ============================================================
+   SIDEBAR USER BLOCK
+   ============================================================ */
+(function() {
+  try {
+    var u = JSON.parse(localStorage.getItem('ver-team-user') || 'null');
+    if (u) {
+      var e = document.getElementById('sb-user-emoji');
+      var n = document.getElementById('sb-user-name');
+      var r = document.getElementById('sb-user-role');
+      if (e) e.textContent = u.emoji || '👤';
+      if (n) n.textContent = u.name || 'Casey';
+      if (r) r.textContent = u.role || 'VER Team';
+    }
+  } catch(ex) {}
+})();
+
+/* ============================================================
+   INIT — defer-safe (vendors.js loads with defer)
+   ============================================================ */
+function init() {
+  seedDefaultData();
+  populateVendorSelect();
+  renderAll();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 150); });
+} else {
+  setTimeout(init, 150);
+}
+</script>
+</body>
+</html>

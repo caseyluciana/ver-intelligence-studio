@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Change Order Generator &middot; VER Vendor Platform</title>
+<style>
+/* ── Import hub/platform palette ── */
+:root {
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber3:#FEF3C7;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* Layout */
+.vp-wrap{display:flex;min-height:100vh;}
+.vp-side{width:220px;background:var(--navy);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.vp-main{flex:1;padding:24px 28px;overflow-x:hidden;}
+
+/* Sidebar */
+.vp-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vp-logo-title{font-size:10.5pt;font-weight:800;color:#fff;line-height:1.2;}
+.vp-logo-sub{font-size:8pt;color:rgba(255,255,255,0.65);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+.vp-nav{padding:12px 0;}
+.vp-nav-section{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.60);padding:10px 18px 4px;}
+.vp-nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;font-size:8.5pt;font-weight:600;color:rgba(255,255,255,0.85);text-decoration:none;transition:all 0.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.vp-nav-item:hover,.vp-nav-item.active{background:rgba(255,255,255,0.10);color:#fff;}
+.vp-nav-item.active{border-left:3px solid var(--teal);}
+.vp-nav-icon{font-size:12pt;flex-shrink:0;}
+.vp-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0;}
+.vp-side-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);font-size:8pt;color:rgba(255,255,255,0.55);}
+
+/* Top bar */
+.vp-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.vp-page-title{font-size:15pt;font-weight:900;color:var(--navy);}
+.vp-page-sub{font-size:8.5pt;color:var(--ink4);margin-top:2px;}
+
+/* Callout */
+.vp-callout{background:var(--navy3);border:1px solid #BFDBFE;border-left:4px solid var(--navy);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;font-size:8.5pt;color:var(--navy2);}
+.vp-callout.teal{background:var(--teal3);border-color:#A7F3D0;border-left-color:var(--teal);color:var(--green2);}
+
+/* Section card */
+.sow-section{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.sow-section-header{background:var(--navy);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+.sow-section-num{font-size:8pt;font-weight:800;background:rgba(255,255,255,0.15);padding:2px 8px;border-radius:8px;}
+.sow-section-title{font-size:9.5pt;font-weight:700;}
+.sow-section-body{padding:18px;}
+.sow-section-body.collapsed{display:none;}
+
+/* Form elements */
+.sow-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.sow-row.full{grid-template-columns:1fr;}
+.sow-row.three{grid-template-columns:1fr 1fr 1fr;}
+.sow-label{font-size:8pt;font-weight:700;color:var(--ink2);margin-bottom:4px;display:block;}
+.sow-label .req{color:var(--teal);margin-left:2px;}
+.sow-input{width:100%;font-size:8.5pt;padding:7px 10px;border:1px solid var(--border2);border-radius:6px;font-family:inherit;color:var(--ink2);background:#fff;}
+.sow-input:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.sow-textarea{width:100%;font-size:8.5pt;padding:7px 10px;border:1px solid var(--border2);border-radius:6px;font-family:inherit;color:var(--ink2);resize:vertical;line-height:1.6;}
+.sow-textarea:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.sow-select{width:100%;font-size:8.5pt;padding:7px 10px;border:1px solid var(--border2);border-radius:6px;font-family:inherit;color:var(--ink2);background:#fff;cursor:pointer;}
+.sow-hint{font-size:7.5pt;color:var(--ink4);margin-top:3px;font-style:italic;}
+
+/* Dynamic rows */
+.dynamic-row{display:grid;gap:8px;align-items:start;padding:8px;background:var(--gray);border-radius:6px;margin-bottom:6px;position:relative;}
+.dynamic-row.milestone-row{grid-template-columns:1.5fr 2.5fr 1fr 1fr 32px;}
+.dynamic-row.personnel-row{grid-template-columns:2fr 2fr 32px;}
+.dynamic-row.deliverable-row{grid-template-columns:1fr 32px;}
+.del-row-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);background:#fff;cursor:pointer;color:var(--ink4);font-size:14pt;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:center;transition:all 0.12s;}
+.del-row-btn:hover{background:var(--red3,#FEE2E2);color:#DC2626;border-color:#FECACA;}
+.add-row-btn{font-size:8pt;padding:5px 12px;border-radius:6px;border:1px dashed var(--border2);background:#fff;cursor:pointer;color:var(--ink4);font-family:inherit;transition:all 0.12s;margin-top:4px;}
+.add-row-btn:hover{border-color:var(--teal);color:var(--teal);}
+
+/* Checkbox group */
+.checkbox-group{display:flex;flex-direction:column;gap:8px;}
+.checkbox-item{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--gray);cursor:pointer;transition:all 0.12s;}
+.checkbox-item:hover{border-color:var(--teal);background:var(--teal3);}
+.checkbox-item input{margin-top:1px;accent-color:var(--teal);flex-shrink:0;}
+.checkbox-item-text{font-size:8.5pt;color:var(--ink2);}
+.checkbox-item-sub{font-size:7.5pt;color:var(--ink4);margin-top:1px;}
+
+/* Generate button */
+.gen-bar{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-top:4px;}
+.btn-gen{background:var(--navy);color:#fff;border:none;padding:11px 28px;border-radius:8px;font-size:10pt;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;display:flex;align-items:center;gap:8px;}
+.btn-gen:hover{background:var(--navy2);}
+.btn-gen:disabled{background:var(--ink4);cursor:not-allowed;}
+.btn-preview{background:var(--teal3);color:var(--teal2);border:1px solid #A7F3D0;padding:11px 20px;border-radius:8px;font-size:9pt;font-weight:600;cursor:pointer;font-family:inherit;}
+.gen-note{font-size:8pt;color:var(--ink4);}
+
+/* Progress */
+.gen-progress{display:none;align-items:center;gap:10px;font-size:8.5pt;color:var(--ink3);}
+.gen-progress.show{display:flex;}
+.spinner{width:18px;height:18px;border:2px solid var(--gray3);border-top-color:var(--teal);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Total display */
+.total-display{background:var(--navy3);border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;}
+.total-label{font-size:8pt;font-weight:700;color:var(--navy2);}
+.total-value{font-size:13pt;font-weight:900;color:var(--navy);}
+
+@media print{.vp-side,.gen-bar,.add-row-btn,.del-row-btn{display:none!important;}}
+
+/* ── Badge classes (hub + platform shared) ── */
+.bg{background:#D1FAE5;color:#065F46;}
+.ba{background:#FEF3C7;color:#78350F;}
+.br{background:#FEE2E2;color:#7F1D1D;}
+.bn{background:#EFF6FF;color:#1E3A5F;}
+.bt{background:#F0FDF9;color:#0F766E;}
+.bp{background:#F5F3FF;color:#7C3AED;}
+.bz{background:#F3F4F6;color:#6B7280;}
+.bo{background:#FFF7ED;color:#EA580C;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;
+  font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;}
+
+/* ── Change Order specific ── */
+.co-section { background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:18px 20px;margin-bottom:14px; }
+.co-section-hdr { display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;user-select:none; }
+.co-section-title { font-size:9pt;font-weight:800;color:var(--navy);
+  display:flex;align-items:center;gap:8px; }
+.co-section-num { width:22px;height:22px;border-radius:50%;background:var(--navy);
+  color:#fff;font-size:8pt;font-weight:900;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0; }
+.co-section-body { margin-top:14px; }
+.co-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px; }
+.co-grid-3 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px; }
+.co-label { font-size:8pt;font-weight:700;color:var(--ink2);margin-bottom:4px;display:block; }
+.co-req { color:var(--red); }
+.co-input { width:100%;font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);box-sizing:border-box;
+  transition:border-color 0.15s; }
+.co-input:focus { outline:none;border-color:var(--teal);
+  box-shadow:0 0 0 2px rgba(13,148,136,0.12); }
+.co-input.invalid { border-color:var(--red); }
+.co-select { width:100%;font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);background:#fff;box-sizing:border-box; }
+.co-textarea { width:100%;font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);resize:vertical;
+  min-height:90px;box-sizing:border-box; }
+.co-table { width:100%;border-collapse:collapse;font-size:8.5pt;margin-bottom:10px; }
+.co-table th { background:var(--navy);color:#fff;padding:7px 10px;text-align:left;
+  font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.04em; }
+.co-table th.r { text-align:right; }
+.co-table td { padding:6px 8px;border-bottom:1px solid var(--gray2);vertical-align:middle; }
+.co-table td input { width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);
+  border-radius:4px;font-family:inherit;box-sizing:border-box; }
+.co-table .total-row td { background:var(--navy3);font-weight:800;color:var(--navy);
+  border-top:2px solid var(--navy); }
+.co-table .total-row td.r { text-align:right; }
+.add-row-btn { font-size:8pt;padding:5px 12px;border-radius:6px;background:var(--gray2);
+  border:1px dashed var(--border2);color:var(--ink3);cursor:pointer;
+  font-family:inherit;transition:all 0.15s;margin-top:6px; }
+.add-row-btn:hover { background:var(--teal3);border-color:var(--teal);color:var(--teal2); }
+.del-row-btn { background:var(--red3);border:none;border-radius:4px;color:var(--red2);
+  font-size:9pt;font-weight:700;cursor:pointer;padding:2px 7px;line-height:1; }
+.del-row-btn:hover { background:var(--red);color:#fff; }
+.gen-btn { width:100%;padding:13px;background:var(--navy);color:#fff;border:none;
+  border-radius:8px;font-size:10pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;letter-spacing:0.02em; }
+.gen-btn:hover { background:#1E3A5F; }
+.co-preview { display:none;background:#fff;border:1px solid var(--border);
+  border-radius:10px;padding:28px 32px;margin-bottom:16px;
+  font-family:Arial,sans-serif;font-size:9pt;line-height:1.6;color:#111; }
+.co-preview h1 { font-size:13pt;font-weight:700;text-align:center;margin-bottom:4px; }
+.co-preview h2 { font-size:10pt;font-weight:700;margin:16px 0 4px; }
+.co-preview table { width:100%;border-collapse:collapse;margin:10px 0;font-size:8.5pt; }
+.co-preview table td,.co-preview table th { padding:5px 8px;border:1px solid #ccc; }
+.co-preview table th { background:#f3f4f6;font-weight:700; }
+.co-preview .legal { font-size:8pt;color:#555;margin-top:10px; }
+.co-preview .sig-table td { border:none;padding:4px 8px; }
+.co-preview .sig-line { border-bottom:1px solid #333;min-width:180px;display:inline-block; }
+@media print { .vp-side,.gen-btn,.add-row-btn,.del-row-btn,
+  .back-btn,.vp-topbar { display:none!important; }
+  .co-preview { display:block!important;border:none;padding:0; }
+  .co-section { display:none!important; }
+  body { background:#fff!important; } }
+</style>
+</head>
+<body>
+<div class="vp-wrap">
+<div class="vp-side">
+  <div class="vp-logo">
+    <div class="vp-logo-title">VER Vendor<br>Platform</div>
+    <div class="vp-logo-sub">DET &middot; FY27</div>
+  </div>
+  <nav class="vp-nav">
+    <div class="vp-nav-section">Platform</div>
+    <a href="vendor_home.html" class="vp-nav-item"><span class="vp-nav-icon">&#127968;</span>Portfolio Overview</a>
+    <a href="vendor_registry.html" class="vp-nav-item"><span class="vp-nav-icon">&#128203;</span>Vendor Registry</a>
+    <a href="vendor_risk.html" class="vp-nav-item"><span class="vp-nav-icon">&#9888;&#65039;</span>Risk Dashboard</a>
+    <div class="vp-nav-section">Tools</div>
+    <a href="vendor_selector.html" class="vp-nav-item"><span class="vp-nav-icon">&#127919;</span>Vendor Selector</a>
+    <a href="spend_benchmarking.html" class="vp-nav-item"><span class="vp-nav-icon">&#128178;</span>Spend Benchmarking</a>
+    
+    
+    <a href="vendor_sow.html" class="vp-nav-item"><span class="vp-nav-icon">&#128196;</span>SOW Builder</a>
+    <a href="vendor_co.html" class="vp-nav-item active"><span class="vp-nav-icon">&#128260;</span>Change Order</a>
+    <div class="vp-nav-divider"></div>
+    <a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a>
+  </nav>
+  <div class="vp-side-footer">VER Vendor Platform<br>Salesforce DET &middot; FY27</div>
+</div>
+<div class="vp-main">
+
+  <div class="vp-topbar">
+    <div>
+      <div class="vp-page-title">Change Order Generator</div>
+      <div class="vp-page-sub">Generate a pre-populated Salesforce Change Order to an existing SOW &middot; VER advisory tool</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button type="button" onclick="openCoHelp()"
+        style="padding:6px 14px;border-radius:6px;background:var(--gray2);
+        border:1px solid var(--border2);color:var(--ink3);font-size:8pt;
+        font-weight:600;cursor:pointer;font-family:inherit;"
+        onmouseover="this.style.background='var(--navy)';this.style.color='#fff'"
+        onmouseout="this.style.background='var(--gray2)';this.style.color='var(--ink3)'">
+        &#63; How to Use</button>
+      <button onclick="togglePreview()"
+        style="padding:6px 14px;border-radius:6px;background:var(--teal);color:#fff;
+        border:none;font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;">
+        &#128065; Preview CO
+      </button>
+      <button onclick="window.print()"
+        style="padding:6px 14px;border-radius:6px;background:var(--gray2);
+        border:1px solid var(--border2);color:var(--ink3);font-size:8pt;
+        font-weight:600;cursor:pointer;font-family:inherit;"
+        onmouseover="this.style.background='var(--navy)';this.style.color='#fff'"
+        onmouseout="this.style.background='var(--gray2)';this.style.color='var(--ink3)'">
+        Print</button>
+    </div>
+  </div>
+
+  <div class="callout c-warn" style="margin-bottom:14px;">
+    <strong>Important:</strong> This tool generates a structured starting point based on the
+    Salesforce standard Change Order template. The output requires review and approval by
+    <strong>VER, Procurement, and Legal</strong> before execution.
+    It does not constitute a binding agreement.
+  </div>
+
+  <!-- ══ COUPA PO LOOKUP ══ -->
+  <div class="co-section" id="coupa-lookup-section">
+    <div class="co-section-hdr" onclick="toggleSection(this)">
+      <div class="co-section-title">
+        <span class="co-section-num" style="background:var(--teal);">&#128269;</span>
+        Coupa PO Lookup <span style="font-size:8pt;font-weight:400;color:rgba(255,255,255,0.65);margin-left:6px;">Optional &mdash; search Coupa to pre-fill supplier &amp; PO details</span>
+      </div>
+      <span style="color:var(--ink4);font-size:10pt;">&#9660;</span>
+    </div>
+    <div class="co-section-body">
+      <div style="font-size:8.5pt;color:var(--ink4);margin-bottom:10px;line-height:1.6;">
+        Search your Coupa POs by vendor name. Selecting a PO will pre-fill the supplier name, address, original cost, and PO number in the form below.
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <input type="text" id="coupa-search-input" class="co-input" placeholder="Search vendor name (e.g. NTT Data, Deloitte&hellip;)" style="flex:1;" onkeydown="if(event.key==='Enter')coupaPOSearch()">
+        <button type="button" id="coupa-search-btn" onclick="coupaPOSearch()"
+          style="padding:8px 18px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:8.5pt;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s;"
+          onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--navy)'">
+          Search Coupa
+        </button>
+        <button type="button" id="coupa-clear-btn" onclick="coupaClearSearch()"
+          style="padding:8px 12px;background:var(--gray2);color:var(--ink3);border:1px solid var(--border2);border-radius:6px;font-size:8.5pt;font-weight:600;cursor:pointer;font-family:inherit;display:none;"
+          onmouseover="this.style.background='var(--gray3)'" onmouseout="this.style.background='var(--gray2)'">
+          Clear
+        </button>
+      </div>
+      <div id="coupa-status" style="font-size:8pt;color:var(--ink4);margin-bottom:8px;min-height:18px;"></div>
+      <div id="coupa-results"></div>
+      <div id="coupa-selected-banner" style="display:none;background:var(--teal3);border:1px solid #A7F3D0;border-left:4px solid var(--teal);border-radius:0 8px 8px 0;padding:10px 14px;font-size:8.5pt;color:var(--green2);font-weight:600;"></div>
+    </div>
+  </div>
+
+  <!-- ══ PREVIEW PANEL (hidden until toggled) ══ -->
+  <div class="co-preview" id="co-preview-panel"></div>
+
+  <!-- ══ SECTION 1: Reference Documents ══ -->
+  <div class="co-section">
+    <div class="co-section-hdr" onclick="toggleSection(this)">
+      <div class="co-section-title">
+        <span class="co-section-num">1</span>
+        Parties &amp; Reference Documents
+      </div>
+      <span style="color:var(--ink4);font-size:10pt;">&#9660;</span>
+    </div>
+    <div class="co-section-body">
+      <div class="co-grid" style="margin-bottom:12px;">
+        <div>
+          <label class="co-label" for="co-num">Change Order Number <span class="co-req">*</span></label>
+          <input type="text" id="co-num" class="co-input" placeholder="e.g. CO-001" oninput="autoRef()">
+        </div>
+        <div>
+          <label class="co-label" for="co-eff-date">Effective Date <span class="co-req">*</span></label>
+          <input type="date" id="co-eff-date" class="co-input">
+        </div>
+      </div>
+      <div class="co-grid" style="margin-bottom:12px;">
+        <div>
+          <label class="co-label" for="co-supplier">Supplier Legal Name <span class="co-req">*</span></label>
+          <input type="text" id="co-supplier" class="co-input" placeholder="e.g. NTT Data Services LLC">
+        </div>
+        <div>
+          <label class="co-label" for="co-supplier-addr">Supplier Principal Address</label>
+          <input type="text" id="co-supplier-addr" class="co-input" placeholder="Street, City, State, ZIP">
+        </div>
+      </div>
+      <div class="co-grid" style="margin-bottom:12px;">
+        <div>
+          <label class="co-label" for="co-master-agmt">Master Agreement Reference <span class="co-req">*</span></label>
+          <input type="text" id="co-master-agmt" class="co-input"
+            placeholder="e.g. Global Services Agreement dated Jan 1, 2020">
+        </div>
+        <div>
+          <label class="co-label" for="co-sow-ref">SOW / Child Document Reference <span class="co-req">*</span></label>
+          <input type="text" id="co-sow-ref" class="co-input"
+            placeholder="e.g. Statement of Work effective Mar 15, 2024">
+        </div>
+      </div>
+      <div>
+        <label class="co-label" for="co-summary">Summary of Change <span class="co-req">*</span></label>
+        <input type="text" id="co-summary" class="co-input"
+          placeholder="Brief one-line summary of the change (appears in header table)">
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2: Description of Change ══ -->
+  <div class="co-section">
+    <div class="co-section-hdr" onclick="toggleSection(this)">
+      <div class="co-section-title">
+        <span class="co-section-num">2</span>
+        Description of Change
+      </div>
+      <span style="color:var(--ink4);font-size:10pt;">&#9660;</span>
+    </div>
+    <div class="co-section-body">
+      <div style="margin-bottom:12px;">
+        <label class="co-label" for="co-change-title">Change Title / Scope Summary <span class="co-req">*</span></label>
+        <input type="text" id="co-change-title" class="co-input"
+          placeholder="e.g. Addition of 2 Senior Software Engineers for Q3 delivery sprint">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label class="co-label" for="co-change-desc">
+          Description of Change &amp; Items Accommodated <span class="co-req">*</span>
+        </label>
+        <textarea id="co-change-desc" class="co-textarea" rows="5"
+          placeholder="Describe what is changing and why. List the specific items this Change Order accommodates (e.g., additional roles, extended timeline, new deliverables, revised scope)."></textarea>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label class="co-label" for="co-revised-date">Revised Completion Date <span class="co-req">*</span></label>
+        <input type="date" id="co-revised-date" class="co-input">
+      </div>
+      <div>
+        <label class="co-label" for="co-governing-law">Governing Law</label>
+        <input type="text" id="co-governing-law" class="co-input"
+          value="the State of California"
+          placeholder="Must match Master Agreement — e.g. the State of California">
+        <div style="font-size:7.5pt;color:var(--amber2);margin-top:4px;">
+          &#9432; Governing law must match the underlying Master Agreement.
+          Confirm with Legal before generating.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3: Financial Impact ══ -->
+  <div class="co-section">
+    <div class="co-section-hdr" onclick="toggleSection(this)">
+      <div class="co-section-title">
+        <span class="co-section-num">3</span>
+        Financial Impact
+      </div>
+      <span style="color:var(--ink4);font-size:10pt;">&#9660;</span>
+    </div>
+    <div class="co-section-body">
+      <div style="margin-bottom:10px;font-size:8.5pt;color:var(--ink4);">
+        Enter each role, milestone, or cost item for this Change Order.
+        Rate &times; Hours = Cost is calculated automatically.
+      </div>
+      <table class="co-table" id="co-fin-table">
+        <thead>
+          <tr>
+            <th style="width:30%;">Role / Milestone</th>
+            <th class="r" style="width:18%;">Rate / Fee ($/hr)</th>
+            <th class="r" style="width:15%;">Hours</th>
+            <th class="r" style="width:20%;">Cost (USD)</th>
+            <th style="width:7%;"></th>
+          </tr>
+        </thead>
+        <tbody id="co-fin-body">
+          <tr>
+            <td><input class="co-role" type="text" class="co-input" placeholder="e.g. Sr Software Engineer"
+              style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;"></td>
+            <td><input class="co-rate" type="number" min="0" step="0.01"
+              style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;text-align:right;"
+              oninput="calcRow(this)" placeholder="0.00"></td>
+            <td><input class="co-hrs" type="number" min="0"
+              style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;text-align:right;"
+              oninput="calcRow(this)" placeholder="0"></td>
+            <td style="text-align:right;font-weight:700;color:var(--navy);" class="co-cost">$0.00</td>
+            <td style="text-align:center;"><button class="del-row-btn" onclick="delRow(this)" title="Remove">&#215;</button></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="3">Estimated CO Cost</td>
+            <td class="r" id="co-total-new">$0.00</td>
+            <td></td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3">Original SOW Cost</td>
+            <td class="r"><input type="text" id="co-orig-cost"
+              style="width:100%;font-size:8.5pt;padding:3px 6px;border:1px solid var(--navy);
+              border-radius:4px;text-align:right;background:var(--navy3);font-weight:700;"
+              placeholder="e.g. $250,000.00"></td>
+            <td></td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="font-weight:900;">Total Revised SOW Cost</td>
+            <td class="r" id="co-total-revised" style="font-weight:900;font-size:10pt;">—</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <button class="add-row-btn" onclick="addRow()">+ Add Row</button>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 4: Signatories ══ -->
+  <div class="co-section">
+    <div class="co-section-hdr" onclick="toggleSection(this)">
+      <div class="co-section-title">
+        <span class="co-section-num">4</span>
+        Signatories
+      </div>
+      <span style="color:var(--ink4);font-size:10pt;">&#9660;</span>
+    </div>
+    <div class="co-section-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div>
+          <div style="font-size:8.5pt;font-weight:800;color:var(--navy);
+            margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--navy);">
+            Supplier Signatory
+          </div>
+          <div style="margin-bottom:10px;">
+            <label class="co-label" for="co-sup-name">Name <span class="co-req">*</span></label>
+            <input type="text" id="co-sup-name" class="co-input" placeholder="Full name">
+          </div>
+          <div style="margin-bottom:10px;">
+            <label class="co-label" for="co-sup-title">Title</label>
+            <input type="text" id="co-sup-title" class="co-input" placeholder="e.g. Vice President">
+          </div>
+          <div>
+            <label class="co-label" for="co-sup-date">Date</label>
+            <input type="date" id="co-sup-date" class="co-input">
+          </div>
+        </div>
+        <div>
+          <div style="font-size:8.5pt;font-weight:800;color:var(--navy);
+            margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--navy);">
+            Salesforce Signatory
+          </div>
+          <div style="margin-bottom:10px;">
+            <label class="co-label" for="co-sf-name">Name <span class="co-req">*</span></label>
+            <input type="text" id="co-sf-name" class="co-input" placeholder="Full name">
+          </div>
+          <div style="margin-bottom:10px;">
+            <label class="co-label" for="co-sf-title">Title</label>
+            <input type="text" id="co-sf-title" class="co-input" placeholder="e.g. Director">
+          </div>
+          <div style="margin-bottom:10px;">
+            <label class="co-label" for="co-sf-date">Date</label>
+            <input type="date" id="co-sf-date" class="co-input">
+          </div>
+          <div>
+            <label class="co-label" for="co-po-num">SFDC PO Number</label>
+            <input type="text" id="co-po-num" class="co-input" placeholder="e.g. PO-4500123456">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GENERATE ══ -->
+  <div style="background:var(--gray);border:1px solid var(--border);border-radius:10px;
+    padding:16px 20px;margin-bottom:14px;">
+    <div style="font-size:8.5pt;color:var(--ink4);line-height:1.7;margin-bottom:12px;">
+      By generating this Change Order, you confirm the information above is accurate.
+      This document must be reviewed and approved by <strong>VER, Procurement, and Legal</strong>
+      before either party executes. Execution without approval is not permitted.
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;">
+      <button class="gen-btn" onclick="generateCO()">
+        &#128196; Generate Change Order Document
+      </button>
+      <button onclick="clearCO()"
+        style="padding:13px 20px;background:var(--gray2);color:var(--ink3);
+        border:1px solid var(--border2);border-radius:8px;font-size:9pt;
+        font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;
+        transition:all 0.15s;"
+        onmouseover="this.style.background='var(--red3)';this.style.color='var(--red2)'"
+        onmouseout="this.style.background='var(--gray2)';this.style.color='var(--ink3)'">
+        &#10005; Clear
+      </button>
+    </div>
+    <div id="co-error" style="color:var(--red);font-size:8pt;margin-top:8px;display:none;"></div>
+    <div id="co-draft-status" style="font-size:7.5pt;color:var(--ink4);margin-top:6px;"></div>
+  </div>
+
+  <div class="callout c-info" style="margin-bottom:16px;">
+    <strong>Also need a new SOW?</strong>
+    <a href="vendor_sow.html" style="color:var(--teal);font-weight:700;">
+      Use the SOW Generator &#8594;
+    </a>
+    &nbsp;&middot;&nbsp;
+    <strong>Need to request a new vendor?</strong>
+    <a href="vendor_intake.html" style="color:var(--teal);font-weight:700;">
+      Submit an Intake Request &#8594;
+    </a>
+  </div>
+
+</div><!-- /vp-main -->
+</div>
+<script>
+
+// ── Coupa PO Lookup ────────────────────────────────────────────
+var _coupaPOCache = null;
+
+function coupaPOSearch() {
+  var query = (document.getElementById('coupa-search-input').value || '').trim().toLowerCase();
+  if (!query) { document.getElementById('coupa-status').textContent = 'Enter a vendor name to search.'; return; }
+  var statusEl = document.getElementById('coupa-status');
+  var btn = document.getElementById('coupa-search-btn');
+  btn.disabled = true;
+  btn.textContent = 'Searching…';
+
+  function doSearch(allPOs) {
+    var results = allPOs.filter(function(po) {
+      var supplier = (po.supplier && po.supplier.name ? po.supplier.name : '').toLowerCase();
+      return supplier.indexOf(query) !== -1;
+    });
+    renderCoupaResults(results, query);
+    btn.disabled = false;
+    btn.textContent = 'Search Coupa';
+  }
+
+  if (_coupaPOCache) {
+    statusEl.textContent = 'Searching ' + _coupaPOCache.length + ' cached POs…';
+    doSearch(_coupaPOCache);
+    return;
+  }
+
+  function fetchPage(offset, page) {
+    statusEl.textContent = 'Fetching POs… (' + (offset) + ' loaded so far)';
+    return fetch('/api/coupa/purchase_orders?limit=50&offset=' + offset)
+      .then(function(r) { return r.ok ? r.json() : Promise.reject('HTTP ' + r.status); })
+      .then(function(rows) {
+        rows = Array.isArray(rows) ? rows : [];
+        if (rows.length === 50 && page < 10) {
+          return fetchPage(offset + 50, page + 1).then(function(more) { return rows.concat(more); });
+        }
+        return rows;
+      });
+  }
+
+  fetchPage(0, 1)
+    .then(function(all) {
+      _coupaPOCache = all;
+      doSearch(all);
+    })
+    .catch(function(err) {
+      statusEl.textContent = 'Coupa unavailable — enter fields manually. (' + err + ')';
+      btn.disabled = false;
+      btn.textContent = 'Search Coupa';
+    });
+}
+
+function renderCoupaResults(results, query) {
+  var container = document.getElementById('coupa-results');
+  while (container.firstChild) container.removeChild(container.firstChild);
+  document.getElementById('coupa-clear-btn').style.display = results.length || query ? '' : 'none';
+
+  if (!results.length) {
+    document.getElementById('coupa-status').textContent = 'No POs found for "' + query + '". Check the vendor name or enter details manually.';
+    return;
+  }
+  document.getElementById('coupa-status').textContent = results.length + ' PO' + (results.length !== 1 ? 's' : '') + ' found for "' + query + '" — click a row to pre-fill the form.';
+
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:4px;';
+
+  var hdrRow = document.createElement('div');
+  hdrRow.style.cssText = 'display:grid;grid-template-columns:2fr 2fr 1.2fr 1fr 1fr;background:var(--navy);padding:7px 12px;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.75);letter-spacing:.04em;text-transform:uppercase;';
+  ['PO Number','Supplier','Status','Total (USD)','End Date'].forEach(function(t) {
+    var c = document.createElement('span'); c.textContent = t; hdrRow.appendChild(c);
+  });
+  wrap.appendChild(hdrRow);
+
+  results.slice(0, 50).forEach(function(po, i) {
+    var supplier = po.supplier && po.supplier.name ? po.supplier.name : '—';
+    var poNum    = po['order-header-message'] || po.po_number || po.id || '—';
+    var status   = po.status || '—';
+    var total    = po['total'] != null ? '$' + parseFloat(po['total']).toLocaleString('en-US', {minimumFractionDigits:2}) : '—';
+    var endDate  = po['end-date'] || po.end_date || '—';
+    var addr     = '';
+    if (po.supplier && po.supplier['primary-address']) {
+      var a = po.supplier['primary-address'];
+      addr = [a.street1, a.city, a.state, a.zip].filter(Boolean).join(', ');
+    }
+
+    var row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:2fr 2fr 1.2fr 1fr 1fr;padding:9px 12px;font-size:8pt;cursor:pointer;border-top:1px solid var(--gray3);transition:background .12s;align-items:center;' + (i % 2 === 0 ? 'background:#fff;' : 'background:var(--gray2);');
+    row.addEventListener('mouseover', function() { this.style.background = 'var(--teal3)'; });
+    row.addEventListener('mouseout',  function() { this.style.background = i % 2 === 0 ? '#fff' : 'var(--gray2)'; });
+
+    var cells = [poNum, supplier, status, total, endDate];
+    cells.forEach(function(v, ci) {
+      var td = document.createElement('span');
+      td.textContent = v;
+      if (ci === 0) { td.style.fontWeight = '700'; td.style.color = 'var(--navy)'; }
+      if (ci === 1) { td.style.fontWeight = '600'; }
+      row.appendChild(td);
+    });
+
+    row.addEventListener('click', function() {
+      applyCoupa(supplier, addr, poNum, po['total']);
+      container.style.display = 'none';
+      document.getElementById('coupa-status').textContent = '';
+    });
+    wrap.appendChild(row);
+  });
+  container.appendChild(wrap);
+}
+
+function applyCoupa(supplier, addr, poNum, total) {
+  var fields = [
+    ['co-supplier', supplier],
+    ['co-supplier-addr', addr],
+    ['co-po-num', poNum]
+  ];
+  fields.forEach(function(pair) {
+    var el = document.getElementById(pair[0]);
+    if (el && pair[1]) el.value = pair[1];
+  });
+  if (total != null) {
+    var origEl = document.getElementById('co-orig-cost');
+    if (origEl && !origEl.value) {
+      origEl.value = '$' + parseFloat(total).toLocaleString('en-US', {minimumFractionDigits:2});
+      calcTotals();
+    }
+  }
+  var banner = document.getElementById('coupa-selected-banner');
+  banner.textContent = 'Pre-filled from Coupa: ' + supplier + (poNum !== '—' ? ' · PO ' + poNum : '') + '. Review all fields before generating.';
+  banner.style.display = 'block';
+}
+
+function coupaClearSearch() {
+  var container = document.getElementById('coupa-results');
+  while (container.firstChild) container.removeChild(container.firstChild);
+  document.getElementById('coupa-search-input').value = '';
+  document.getElementById('coupa-status').textContent = '';
+  document.getElementById('coupa-clear-btn').style.display = 'none';
+  document.getElementById('coupa-selected-banner').style.display = 'none';
+}
+
+// ── Section toggle ─────────────────────────────────────────────
+function toggleSection(hdr) {
+  var body = hdr.parentElement.querySelector('.co-section-body');
+  var arrow = hdr.querySelector('span:last-child');
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.textContent = isOpen ? '▶' : '▼';
+}
+
+// ── Auto-generate CO reference ─────────────────────────────────
+function autoRef() {
+  var coNum = (document.getElementById('co-num').value||'').trim();
+  var sowRef = (document.getElementById('co-sow-ref').value||'').trim();
+  // Update preview title if visible
+  var previewEl = document.getElementById('co-preview-panel');
+  if (previewEl && previewEl.style.display !== 'none') buildPreview();
+}
+
+// ── Row calculations ───────────────────────────────────────────
+function calcRow(input) {
+  var row  = input.closest('tr');
+  var rate = parseFloat(row.querySelector('.co-rate').value) || 0;
+  var hrs  = parseFloat(row.querySelector('.co-hrs').value)  || 0;
+  var cost = rate * hrs;
+  var costEl = row.querySelector('.co-cost');
+  if (costEl) costEl.textContent = '$' + cost.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  calcTotals();
+}
+
+function calcTotals() {
+  var rows = document.querySelectorAll('#co-fin-body tr');
+  var total = 0;
+  rows.forEach(function(row) {
+    var rate = parseFloat(row.querySelector('.co-rate') ? row.querySelector('.co-rate').value : 0) || 0;
+    var hrs  = parseFloat(row.querySelector('.co-hrs')  ? row.querySelector('.co-hrs').value  : 0) || 0;
+    total += rate * hrs;
+  });
+  var totalEl = document.getElementById('co-total-new');
+  if (totalEl) totalEl.textContent = '$' + total.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // Calc revised total
+  var origStr = (document.getElementById('co-orig-cost').value||'').replace(/[$,]/g,'');
+  var orig    = parseFloat(origStr) || 0;
+  var revised = total + orig;
+  var revEl   = document.getElementById('co-total-revised');
+  if (revEl) revEl.textContent = orig > 0
+    ? '$' + revised.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+    : '—';
+}
+
+// ── Add / remove rows ──────────────────────────────────────────
+function addRow() {
+  var tbody = document.getElementById('co-fin-body');
+  if (!tbody) return;
+  var row = document.createElement('tr');
+  row.innerHTML =
+    '<td><input class="co-role" type="text" placeholder="Role / Milestone"' +
+      ' style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;"></td>' +
+    '<td><input class="co-rate" type="number" min="0" step="0.01" placeholder="0.00"' +
+      ' style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;text-align:right;"' +
+      ' oninput="calcRow(this)"></td>' +
+    '<td><input class="co-hrs" type="number" min="0" placeholder="0"' +
+      ' style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;text-align:right;"' +
+      ' oninput="calcRow(this)"></td>' +
+    '<td style="text-align:right;font-weight:700;color:var(--navy);" class="co-cost">$0.00</td>' +
+    '<td style="text-align:center;"><button class="del-row-btn" onclick="delRow(this)">&#215;</button></td>';
+  tbody.appendChild(row);
+}
+
+function delRow(btn) {
+  var tbody = document.getElementById('co-fin-body');
+  if (!tbody || tbody.rows.length <= 1) return;
+  btn.closest('tr').remove();
+  calcTotals();
+}
+
+// ── Validate ───────────────────────────────────────────────────
+function validateCO() {
+  var required = [
+    ['co-num','Change Order Number'],
+    ['co-eff-date','Effective Date'],
+    ['co-supplier','Supplier Legal Name'],
+    ['co-master-agmt','Master Agreement Reference'],
+    ['co-sow-ref','SOW Reference'],
+    ['co-summary','Summary of Change'],
+    ['co-change-title','Change Title'],
+    ['co-change-desc','Description of Change'],
+    ['co-revised-date','Revised Completion Date'],
+    ['co-sup-name','Supplier Signatory Name'],
+    ['co-sf-name','Salesforce Signatory Name'],
+  ];
+  var missing = [];
+  required.forEach(function(pair) {
+    var el = document.getElementById(pair[0]);
+    if (!el || !el.value.trim()) {
+      missing.push(pair[1]);
+      if (el) el.classList.add('invalid');
+    } else {
+      if (el) el.classList.remove('invalid');
+    }
+  });
+  return missing;
+}
+
+function g(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function fmtDate(val) {
+  if (!val) return '_______________';
+  try {
+    return new Date(val + 'T12:00:00').toLocaleDateString('en-US',
+      {year:'numeric',month:'long',day:'numeric'});
+  } catch(e) { return val; }
+}
+
+// ── Build row table for preview ────────────────────────────────
+function buildRowTable() {
+  var rows = document.querySelectorAll('#co-fin-body tr');
+  var html = '<table><thead><tr><th>Role / Milestone</th><th style="text-align:right">Rate/Fee</th>' +
+    '<th style="text-align:right">Hours</th><th style="text-align:right">Cost (USD)</th></tr></thead><tbody>';
+  rows.forEach(function(row) {
+    var role = row.querySelector('.co-role') ? row.querySelector('.co-role').value || '—' : '—';
+    var rate = row.querySelector('.co-rate') ? row.querySelector('.co-rate').value || '—' : '—';
+    var hrs  = row.querySelector('.co-hrs')  ? row.querySelector('.co-hrs').value  || '—' : '—';
+    var cost = row.querySelector('.co-cost') ? row.querySelector('.co-cost').textContent : '—';
+    html += '<tr><td>'+role+'</td><td style="text-align:right">$'+rate+'</td>' +
+      '<td style="text-align:right">'+hrs+'</td><td style="text-align:right">'+cost+'</td></tr>';
+  });
+  var coTotal   = document.getElementById('co-total-new')     ? document.getElementById('co-total-new').textContent     : '—';
+  var origCost  = g('co-orig-cost') || '—';
+  var revTotal  = document.getElementById('co-total-revised') ? document.getElementById('co-total-revised').textContent : '—';
+  html += '</tbody><tfoot>' +
+    '<tr><th colspan="3">Estimated CO Cost</th><th style="text-align:right">'+coTotal+'</th></tr>' +
+    '<tr><th colspan="3">Original SOW Cost</th><th style="text-align:right">'+origCost+'</th></tr>' +
+    '<tr><th colspan="3" style="font-size:10pt;">Total Revised SOW Cost</th><th style="text-align:right;font-size:10pt;">'+revTotal+'</th></tr>' +
+    '</tfoot></table>';
+  return html;
+}
+
+// ── Build preview HTML ─────────────────────────────────────────
+function buildPreview() {
+  var coNum      = g('co-num')         || '__';
+  var effDate    = fmtDate(g('co-eff-date'));
+  var supplier   = g('co-supplier')    || '[SUPPLIER]';
+  var supAddr    = g('co-supplier-addr') || '[ADDRESS]';
+  var masterAgmt = g('co-master-agmt') || '[MASTER AGREEMENT]';
+  var sowRef     = g('co-sow-ref')     || '[SOW REFERENCE]';
+  var summary    = g('co-summary')     || '[SUMMARY]';
+  var chgTitle   = g('co-change-title') || '[CHANGE TITLE]';
+  var chgDesc    = g('co-change-desc') || '[DESCRIPTION]';
+  var revDate    = fmtDate(g('co-revised-date'));
+  var govLaw     = g('co-governing-law') || 'the State of California';
+  var supName    = g('co-sup-name')    || '_______________';
+  var supTitle   = g('co-sup-title')   || '_______________';
+  var supDate    = fmtDate(g('co-sup-date'));
+  var sfName     = g('co-sf-name')     || '_______________';
+  var sfTitle    = g('co-sf-title')    || '_______________';
+  var sfDate     = fmtDate(g('co-sf-date'));
+  var poNum      = g('co-po-num')      || '_______________';
+
+  var html = '<div style="text-align:center;margin-bottom:18px;">' +
+    '<img src="" alt="" style="display:none">' +
+    '<div style="font-size:11pt;font-weight:700;">Salesforce, Inc.</div>' +
+    '<div style="font-size:14pt;font-weight:900;margin:6px 0;">CHANGE ORDER #' + coNum + ' TO ' + sowRef.toUpperCase() + '</div>' +
+  '</div>' +
+
+  '<p>THIS CHANGE ORDER #' + coNum + ' TO THE ' + sowRef.toUpperCase() +
+  ' (this &ldquo;Change Order&rdquo;) is made and entered into as of ' + effDate +
+  ' by and between SFDC and Supplier (each as defined below).</p>' +
+
+  '<p>Capitalized terms used but not defined in this Change Order shall have the meanings ' +
+  'ascribed to them in the Agreement and/or SOW.</p>' +
+
+  '<table><tr><td><strong>&ldquo;SFDC&rdquo;</strong></td><td>Salesforce, Inc.</td></tr>' +
+  '<tr><td>having its principal place of business at</td><td>Salesforce Tower, 415 Mission Street, 3rd Floor, San Francisco, CA 94105</td></tr>' +
+  '<tr><td><strong>&ldquo;Supplier&rdquo;</strong></td><td>' + supplier + '</td></tr>' +
+  '<tr><td>having its principal place of business at</td><td>' + supAddr + '</td></tr>' +
+  '<tr><td><strong>&ldquo;Agreement&rdquo;</strong></td><td>' + masterAgmt + '</td></tr>' +
+  '<tr><td><strong>&ldquo;SOW&rdquo;</strong></td><td>' + sowRef + '</td></tr>' +
+  '<tr><td><strong>Summary of Change</strong></td><td>' + summary + '</td></tr>' +
+  '</table>' +
+
+  '<h2>1. Description of Change.</h2>' +
+  '<p>A Change Order to the SOW to: <strong>' + chgTitle + '</strong>. ' +
+  'The Change Order is needed to accommodate the following items:</p>' +
+  '<p style="white-space:pre-wrap;background:#f9fafb;padding:10px;border-radius:4px;">' + chgDesc + '</p>' +
+
+  '<h2>2. Schedule.</h2>' +
+  '<p>Based on the standard assumption regarding SFDC participation, timeliness, and risk factors, ' +
+  'Supplier estimates the timeline for this project to be increased through: <strong>' + revDate + '</strong></p>' +
+
+  '<h2>3. Impact to Original Estimate.</h2>' +
+  buildRowTable() +
+  '<p>This addition of scope to the SOW results in an increase to the original project budget ' +
+  'as outlined above for a revised project cost not to exceed the Total Revised SOW Cost shown.</p>' +
+
+  '<h2>4. Effect of Change Order; Ratification.</h2>' +
+  '<p class="legal">Except to the extent the SOW is modified by this Change Order, the terms and provisions ' +
+  'of the SOW shall remain unmodified and in full force and effect. In the event of conflict between the terms ' +
+  'of the SOW and the terms of this Change Order, the terms of this Change Order shall prevail.</p>' +
+
+  '<h2>5. Counterparts; Authority To Execute CO.</h2>' +
+  '<p class="legal">This CO may be executed by SFDC and Supplier in one or more counterparts, each of which ' +
+  'when so executed and delivered shall be deemed to be an original, and all of which counterparts together ' +
+  'shall constitute one and the same instrument.</p>' +
+
+  '<h2>6. Governing Law.</h2>' +
+  '<p class="legal">This CO shall be governed by and construed in accordance with the laws of ' + govLaw + '.</p>' +
+
+  '<h2>7. Entire Agreement.</h2>' +
+  '<p class="legal">This CO sets forth the entire understanding of the parties in connection with the subject ' +
+  'matter of this CO. There are no agreements between SFDC and Supplier relating to the SOW other than those ' +
+  'set forth in writing and signed by the parties.</p>' +
+
+  '<p style="margin-top:20px;"><strong>IN WITNESS WHEREOF,</strong> the Parties have executed this Change Order ' +
+  'through their authorized representatives.</p>' +
+
+  '<table class="sig-table" style="width:100%;margin-top:16px;">' +
+  '<tr>' +
+    '<td style="width:45%;vertical-align:top;padding:0 20px 0 0;">' +
+      '<div style="font-weight:800;margin-bottom:12px;">' + supplier.toUpperCase() + '</div>' +
+      '<div style="margin-bottom:16px;">By: <span class="sig-line" style="width:200px;display:inline-block;border-bottom:1px solid #333;">&nbsp;</span></div>' +
+      '<div style="margin-bottom:8px;">Name: <strong>' + supName + '</strong></div>' +
+      '<div style="margin-bottom:8px;">Title: <strong>' + supTitle + '</strong></div>' +
+      '<div>Date: <strong>' + supDate + '</strong></div>' +
+    '</td>' +
+    '<td style="width:10%;"></td>' +
+    '<td style="width:45%;vertical-align:top;">' +
+      '<div style="font-weight:800;margin-bottom:12px;">SALESFORCE, INC.</div>' +
+      '<div style="margin-bottom:16px;">By: <span class="sig-line" style="width:200px;display:inline-block;border-bottom:1px solid #333;">&nbsp;</span></div>' +
+      '<div style="margin-bottom:8px;">Name: <strong>' + sfName + '</strong></div>' +
+      '<div style="margin-bottom:8px;">Title: <strong>' + sfTitle + '</strong></div>' +
+      '<div style="margin-bottom:8px;">Date: <strong>' + sfDate + '</strong> (&ldquo;Effective Date&rdquo;)</div>' +
+      '<div>SFDC PO Number: <strong>' + poNum + '</strong></div>' +
+    '</td>' +
+  '</tr>' +
+  '</table>' +
+
+  '<div style="margin-top:20px;padding:10px;background:#FEF3C7;border-radius:6px;font-size:7.5pt;color:#78350F;">' +
+  '&#9432; DRAFT &mdash; For review purposes only. This Change Order requires approval by VER, Procurement, and Legal before execution.' +
+  '</div>';
+
+  return html;
+}
+
+// ── Toggle preview panel ───────────────────────────────────────
+function togglePreview() {
+  var panel = document.getElementById('co-preview-panel');
+  if (!panel) return;
+  if (panel.style.display === 'none' || !panel.style.display) {
+    panel.innerHTML = buildPreview();
+    panel.style.display = 'block';
+    panel.scrollIntoView({behavior:'smooth', block:'start'});
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+// ── Generate CO ────────────────────────────────────────────────
+function generateCO() {
+  var missing = validateCO();
+  var errEl   = document.getElementById('co-error');
+
+  if (missing.length) {
+    if (errEl) {
+      errEl.textContent = 'Please complete required fields: ' + missing.join(', ');
+      errEl.style.display = 'block';
+    }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+
+  // Build preview and show
+  var panel = document.getElementById('co-preview-panel');
+  if (panel) {
+    panel.innerHTML = buildPreview();
+    panel.style.display = 'block';
+    panel.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  // Offer print after short delay
+  setTimeout(function() {
+    if (confirm('Change Order is ready. Print or save as PDF now?')) {
+      window.print();
+    }
+  }, 400);
+}
+
+// ── Clear form ─────────────────────────────────────────────────
+function clearCO() {
+  if (!confirm('Clear all fields and start over?')) return;
+  clearCODraft();
+  document.querySelectorAll('.co-input,.co-select,.co-textarea').forEach(function(el) {
+    el.value = '';
+    el.classList.remove('invalid');
+  });
+  // Reset governing law default
+  var gl = document.getElementById('co-governing-law');
+  if (gl) gl.value = 'the State of California';
+  // Reset financial table to one empty row
+  var tbody = document.getElementById('co-fin-body');
+  if (tbody) {
+    tbody.innerHTML = '<tr>' +
+      '<td><input class="co-role" type="text" placeholder="Role / Milestone"' +
+        ' style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;"></td>' +
+      '<td><input class="co-rate" type="number" min="0" step="0.01" placeholder="0.00"' +
+        ' style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;text-align:right;"' +
+        ' oninput="calcRow(this)"></td>' +
+      '<td><input class="co-hrs" type="number" min="0" placeholder="0"' +
+        ' style="width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);border-radius:4px;text-align:right;"' +
+        ' oninput="calcRow(this)"></td>' +
+      '<td style="text-align:right;font-weight:700;color:var(--navy);" class="co-cost">$0.00</td>' +
+      '<td style="text-align:center;"><button class="del-row-btn" onclick="delRow(this)">&#215;</button></td>' +
+    '</tr>';
+  }
+  // Reset totals
+  var tn = document.getElementById('co-total-new');
+  var tr = document.getElementById('co-total-revised');
+  if (tn) tn.textContent = '$0.00';
+  if (tr) tr.textContent = '—';
+  // Hide preview
+  var panel = document.getElementById('co-preview-panel');
+  if (panel) panel.style.display = 'none';
+  // Scroll to top
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Draft persistence ──────────────────────────────────────────
+var CO_DRAFT_KEY = 'ver_co_draft';
+var CO_DRAFT_FIELDS = [
+  'co-num','co-eff-date','co-supplier','co-supplier-addr','co-master-agmt',
+  'co-sow-ref','co-summary','co-change-title','co-change-desc','co-revised-date',
+  'co-governing-law','co-orig-cost','co-sup-name','co-sup-title','co-sup-date',
+  'co-sf-name','co-sf-title','co-sf-date','co-po-num'
+];
+var _draftTimer = null;
+
+function saveCODraft() {
+  var draft = {};
+  CO_DRAFT_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) draft[id] = el.value;
+  });
+  try {
+    localStorage.setItem(CO_DRAFT_KEY, JSON.stringify(draft));
+    var ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    var el = document.getElementById('co-draft-status');
+    if (el) el.textContent = 'Draft saved at ' + ts;
+  } catch(e) {}
+}
+
+function loadCODraft() {
+  try {
+    var raw = localStorage.getItem(CO_DRAFT_KEY);
+    if (!raw) return false;
+    var draft = JSON.parse(raw);
+    var filled = 0;
+    CO_DRAFT_FIELDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && draft[id]) { el.value = draft[id]; filled++; }
+    });
+    if (filled > 0) {
+      calcTotals();
+      var el = document.getElementById('co-draft-status');
+      if (el) el.textContent = 'Draft restored — ' + filled + ' fields loaded.';
+    }
+    return filled > 0;
+  } catch(e) { return false; }
+}
+
+function clearCODraft() {
+  try { localStorage.removeItem(CO_DRAFT_KEY); } catch(e) {}
+  var el = document.getElementById('co-draft-status');
+  if (el) el.textContent = '';
+}
+
+// ── Init ───────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // Pre-fill from vendor dossier query params
+  (function(){
+    var p = new URLSearchParams(window.location.search);
+    var supplier  = p.get('supplier')   ? decodeURIComponent(p.get('supplier'))   : null;
+    var addr      = p.get('supplier_addr') ? decodeURIComponent(p.get('supplier_addr')) : null;
+    var origCost  = p.get('orig_cost')  ? decodeURIComponent(p.get('orig_cost'))  : null;
+    if(supplier){
+      var el = document.getElementById('co-supplier'); if(el && !el.value) el.value = supplier;
+    }
+    if(addr){
+      var el = document.getElementById('co-supplier-addr'); if(el && !el.value) el.value = addr;
+    }
+    if(origCost){
+      var el = document.getElementById('co-orig-cost'); if(el && !el.value) el.value = origCost;
+    }
+    if(supplier){
+      var banner = document.createElement('div');
+      banner.style.cssText='background:#F0FDF9;border:1px solid #0D9488;border-radius:8px;padding:10px 14px;font-size:8.5pt;color:#0F766E;font-weight:600;margin-bottom:14px;';
+      banner.textContent='Vendor info pre-filled from ' + supplier + ' dossier. Add the original SOW reference and PO number to complete.';
+      var form = document.querySelector('.co-section');
+      if(form) form.parentNode.insertBefore(banner, form);
+    }
+  })();
+
+  // Wire orig cost input to update totals
+  var origInput = document.getElementById('co-orig-cost');
+  if (origInput) origInput.addEventListener('input', calcTotals);
+
+  // Set today as default effective date (only if no draft)
+  var hasDraft = loadCODraft();
+  if (!hasDraft) {
+    var today = new Date().toISOString().split('T')[0];
+    var effDate = document.getElementById('co-eff-date');
+    if (effDate && !effDate.value) effDate.value = today;
+  }
+
+  // Autosave on any input change (debounced 800ms)
+  CO_DRAFT_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', function() {
+        clearTimeout(_draftTimer);
+        _draftTimer = setTimeout(saveCODraft, 800);
+      });
+    }
+  });
+});
+
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openCoHelp(){
+  HelpModal.open({
+    title: 'Change Order Generator',
+    what: 'The Change Order Generator creates <strong>formal contract amendments for in-flight vendor engagements</strong> — scope changes, rate adjustments, term extensions, and resource additions. It ensures every change to a live contract is documented, compliant, and approved before work begins.',
+    steps: [
+      '<strong>Select the original SOW</strong> being amended — the generator loads the current contract terms as the baseline for the change.',
+      '<strong>Define the change type</strong> — Scope Addition, Rate Change, Term Extension, Resource Change, or Budget Reallocation. Each type has specific fields and approval thresholds.',
+      '<strong>Quantify the impact</strong> — additional cost, time impact, and any changes to deliverables or acceptance criteria must be documented.',
+      '<strong>Complete the justification</strong> — why the change is needed and why it cannot be accommodated within the existing SOW scope. This is required for all change orders above $25K.',
+      '<strong>Route for approval</strong> — change orders above threshold values follow the same approval path as the original SOW. Below threshold, pillar lead approval is sufficient.'
+    ],
+    tips: [
+      { icon: '&#x26A0;', title: 'No verbal change orders', body: 'No work should start on a change until the CO is signed. Verbal agreements for scope changes are not binding and create audit exposure.' },
+      { icon: '&#x1F4B0;', title: 'Cumulative changes need review', body: 'If cumulative change orders on a single SOW exceed 20% of the original value, VER triggers a full contract review. Watch the running total.' },
+      { icon: '&#x23F0;', title: 'Route early, not at deadline', body: 'Approval routing takes time. Submit change orders at least 5 business days before the work needs to start, not the day before.' },
+      { icon: '&#x1F4DC;', title: 'Change orders amend, not replace', body: 'A change order modifies the original SOW — all other terms remain in effect. Only the explicitly changed sections are updated.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

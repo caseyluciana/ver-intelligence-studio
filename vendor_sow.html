@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SOW Builder · VER Vendor Platform</title>
+<style>
+/* ── Import hub/platform palette ── */
+:root {
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber3:#FEF3C7;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* Layout */
+.vp-wrap{display:flex;min-height:100vh;}
+.vp-side{width:220px;background:var(--navy);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.vp-main{flex:1;padding:24px 28px;overflow-x:hidden;}
+
+/* Sidebar */
+.vp-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vp-logo-title{font-size:10.5pt;font-weight:800;color:#fff;line-height:1.2;}
+.vp-logo-sub{font-size:8pt;color:rgba(255,255,255,0.65);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+.vp-nav{padding:12px 0;}
+.vp-nav-section{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.60);padding:10px 18px 4px;}
+.vp-nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;font-size:8.5pt;font-weight:600;color:rgba(255,255,255,0.85);text-decoration:none;transition:all 0.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.vp-nav-item:hover,.vp-nav-item.active{background:rgba(255,255,255,0.10);color:#fff;}
+.vp-nav-item.active{border-left:3px solid var(--teal);}
+.vp-nav-icon{font-size:12pt;flex-shrink:0;}
+.vp-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0;}
+.vp-side-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);font-size:8pt;color:rgba(255,255,255,0.55);}
+
+/* Top bar */
+.vp-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.vp-page-title{font-size:15pt;font-weight:900;color:var(--navy);}
+.vp-page-sub{font-size:8.5pt;color:var(--ink4);margin-top:2px;}
+
+/* Callout */
+.vp-callout{background:var(--navy3);border:1px solid #BFDBFE;border-left:4px solid var(--navy);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;font-size:8.5pt;color:var(--navy2);}
+.vp-callout.teal{background:var(--teal3);border-color:#A7F3D0;border-left-color:var(--teal);color:var(--green2);}
+
+/* Section card */
+.sow-section{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.sow-section-header{background:var(--navy);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+.sow-section-num{font-size:8pt;font-weight:800;background:rgba(255,255,255,0.15);padding:2px 8px;border-radius:8px;}
+.sow-section-title{font-size:9.5pt;font-weight:700;}
+.sow-section-body{padding:18px;}
+.sow-section-body.collapsed{display:none;}
+
+/* Form elements */
+.sow-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.sow-row.full{grid-template-columns:1fr;}
+.sow-row.three{grid-template-columns:1fr 1fr 1fr;}
+.sow-label{font-size:8pt;font-weight:700;color:var(--ink2);margin-bottom:4px;display:block;}
+.sow-label .req{color:var(--teal);margin-left:2px;}
+.sow-input{width:100%;font-size:8.5pt;padding:7px 10px;border:1px solid var(--border2);border-radius:6px;font-family:inherit;color:var(--ink2);background:#fff;}
+.sow-input:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.sow-textarea{width:100%;font-size:8.5pt;padding:7px 10px;border:1px solid var(--border2);border-radius:6px;font-family:inherit;color:var(--ink2);resize:vertical;line-height:1.6;}
+.sow-textarea:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.sow-select{width:100%;font-size:8.5pt;padding:7px 10px;border:1px solid var(--border2);border-radius:6px;font-family:inherit;color:var(--ink2);background:#fff;cursor:pointer;}
+.sow-hint{font-size:7.5pt;color:var(--ink4);margin-top:3px;font-style:italic;}
+
+/* Dynamic rows */
+.dynamic-row{display:grid;gap:8px;align-items:start;padding:8px;background:var(--gray);border-radius:6px;margin-bottom:6px;position:relative;}
+.dynamic-row.milestone-row{grid-template-columns:1.5fr 2.5fr 1fr 1fr 32px;}
+.dynamic-row.personnel-row{grid-template-columns:2fr 2fr 32px;}
+.dynamic-row.deliverable-row{grid-template-columns:1fr 32px;}
+.del-row-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);background:#fff;cursor:pointer;color:var(--ink4);font-size:14pt;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:center;transition:all 0.12s;}
+.del-row-btn:hover{background:var(--red3,#FEE2E2);color:#DC2626;border-color:#FECACA;}
+.add-row-btn{font-size:8pt;padding:5px 12px;border-radius:6px;border:1px dashed var(--border2);background:#fff;cursor:pointer;color:var(--ink4);font-family:inherit;transition:all 0.12s;margin-top:4px;}
+.add-row-btn:hover{border-color:var(--teal);color:var(--teal);}
+
+/* Checkbox group */
+.checkbox-group{display:flex;flex-direction:column;gap:8px;}
+.checkbox-item{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--gray);cursor:pointer;transition:all 0.12s;}
+.checkbox-item:hover{border-color:var(--teal);background:var(--teal3);}
+.checkbox-item input{margin-top:1px;accent-color:var(--teal);flex-shrink:0;}
+.checkbox-item-text{font-size:8.5pt;color:var(--ink2);}
+.checkbox-item-sub{font-size:7.5pt;color:var(--ink4);margin-top:1px;}
+
+/* Generate button */
+.gen-bar{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-top:4px;}
+.btn-gen{background:var(--navy);color:#fff;border:none;padding:11px 28px;border-radius:8px;font-size:10pt;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;display:flex;align-items:center;gap:8px;}
+.btn-gen:hover{background:var(--navy2);}
+.btn-gen:disabled{background:var(--ink4);cursor:not-allowed;}
+.btn-preview{background:var(--teal3);color:var(--teal2);border:1px solid #A7F3D0;padding:11px 20px;border-radius:8px;font-size:9pt;font-weight:600;cursor:pointer;font-family:inherit;}
+.gen-note{font-size:8pt;color:var(--ink4);}
+
+/* Progress */
+.gen-progress{display:none;align-items:center;gap:10px;font-size:8.5pt;color:var(--ink3);}
+.gen-progress.show{display:flex;}
+.spinner{width:18px;height:18px;border:2px solid var(--gray3);border-top-color:var(--teal);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Total display */
+.total-display{background:var(--navy3);border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;}
+.total-label{font-size:8pt;font-weight:700;color:var(--navy2);}
+.total-value{font-size:13pt;font-weight:900;color:var(--navy);}
+
+@media print{.vp-side,.gen-bar,.add-row-btn,.del-row-btn{display:none!important;}}
+
+/* ── Badge classes (hub + platform shared) ── */
+.bg{background:#D1FAE5;color:#065F46;}
+.ba{background:#FEF3C7;color:#78350F;}
+.br{background:#FEE2E2;color:#7F1D1D;}
+.bn{background:#EFF6FF;color:#1E3A5F;}
+.bt{background:#F0FDF9;color:#0F766E;}
+.bp{background:#F5F3FF;color:#7C3AED;}
+.bz{background:#F3F4F6;color:#6B7280;}
+.bo{background:#FFF7ED;color:#EA580C;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;
+  font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;}
+
+/* ── SOW Builder specific ── */
+.sow-section { background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:18px 20px;margin-bottom:14px; }
+.sow-section-title { font-size:9pt;font-weight:800;color:var(--navy);
+  display:flex;align-items:center;gap:8px;margin-bottom:4px; }
+.sow-num { width:22px;height:22px;border-radius:50%;background:var(--navy);
+  color:#fff;font-size:8pt;font-weight:900;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0; }
+.sow-sub { font-size:8pt;color:var(--ink4);margin-bottom:14px; }
+.sow-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px; }
+.sow-grid-3 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px; }
+.sow-label { font-size:8pt;font-weight:700;color:var(--ink2);margin-bottom:4px;display:block; }
+.sow-req { color:var(--red); }
+.sow-input { width:100%;font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);box-sizing:border-box;transition:border-color 0.15s; }
+.sow-input:focus { outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(13,148,136,0.12); }
+.sow-input.invalid { border-color:var(--red); }
+.sow-select { width:100%;font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);background:#fff;box-sizing:border-box; }
+.sow-textarea { width:100%;font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);resize:vertical;min-height:80px;box-sizing:border-box; }
+.sow-table { width:100%;border-collapse:collapse;font-size:8.5pt;margin-bottom:8px; }
+.sow-table th { background:var(--navy);color:#fff;padding:7px 10px;text-align:left;
+  font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.04em; }
+.sow-table td { padding:6px 8px;border-bottom:1px solid var(--gray2);vertical-align:top; }
+.sow-table td input,.sow-table td textarea,.sow-table td select {
+  width:100%;font-size:8pt;padding:4px 6px;border:1px solid var(--border2);
+  border-radius:4px;font-family:inherit;box-sizing:border-box;resize:vertical; }
+.add-row-btn { font-size:8pt;padding:5px 12px;border-radius:6px;background:var(--gray2);
+  border:1px dashed var(--border2);color:var(--ink3);cursor:pointer;
+  font-family:inherit;transition:all 0.15s;margin-top:6px; }
+.add-row-btn:hover { background:var(--teal3);border-color:var(--teal);color:var(--teal2); }
+.del-row-btn { background:var(--red3);border:none;border-radius:4px;color:var(--red2);
+  font-size:9pt;font-weight:700;cursor:pointer;padding:2px 7px;line-height:1; }
+.del-row-btn:hover { background:var(--red);color:#fff; }
+.gen-btn { width:100%;padding:13px;background:var(--navy);color:#fff;border:none;
+  border-radius:8px;font-size:10pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;letter-spacing:0.02em; }
+.gen-btn:hover { background:#1E3A5F; }
+.sow-preview { display:none;background:#fff;border:1px solid var(--border);
+  border-radius:10px;padding:32px 36px;margin-bottom:16px;
+  font-family:Arial,sans-serif;font-size:9pt;line-height:1.6;color:#111; }
+.sow-preview h1 { font-size:14pt;font-weight:700;text-align:center;
+  text-transform:uppercase;margin-bottom:16px;letter-spacing:0.04em; }
+.sow-preview h2 { font-size:10pt;font-weight:700;margin:18px 0 6px;
+  text-decoration:underline; }
+.sow-preview h3 { font-size:9.5pt;font-weight:700;margin:12px 0 4px; }
+.sow-preview table { width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:8.5pt; }
+.sow-preview table td,.sow-preview table th { padding:5px 8px;border:1px solid #ccc; }
+.sow-preview table th { background:#f3f4f6;font-weight:700;text-align:left; }
+.sow-preview .sig-table td { border:none;padding:4px 8px;vertical-align:top; }
+.sow-preview .sig-line { border-bottom:1px solid #333;min-width:180px;
+  display:inline-block;width:200px; }
+.sow-preview .legal { font-size:8.5pt;color:#444;font-style:italic; }
+.sow-preview .draft-banner { text-align:center;background:#FEF3C7;border:1px solid #D97706;
+  border-radius:6px;padding:6px;font-size:8pt;color:#78350F;margin-bottom:16px;font-weight:700; }
+@media print {
+  .vp-side,.gen-btn,.add-row-btn,.del-row-btn,.back-btn,.vp-topbar { display:none!important; }
+  .sow-preview { display:block!important;border:none;padding:0;margin:0; }
+  .sow-section { display:none!important; }
+  body { background:#fff!important; } }
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.sow-preview-btn{padding:6px 14px;border-radius:6px;background:var(--teal);color:#fff;border:none;font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;}
+.sow-print-btn{padding:6px 14px;border-radius:6px;background:var(--gray2);border:1px solid var(--border2);color:var(--ink3);font-size:8pt;font-weight:600;cursor:pointer;font-family:inherit;}
+.sow-print-btn:hover{background:var(--navy);color:#fff;}
+.callout-mb14{margin-bottom:14px;}
+.callout-mb16{margin-bottom:16px;}
+.sow-grid-mb{margin-bottom:12px;}
+.sow-form-row{margin-bottom:12px;}
+.sow-input-mb{margin-bottom:12px;}
+.tbl-overflow{overflow-x:auto;}
+.tbl-wide{min-width:900px;}
+.td-center{text-align:center;}
+.section-subtitle{font-size:8.5pt;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.section-subtitle-mt{font-size:8.5pt;font-weight:700;color:var(--navy);margin:14px 0 6px;}
+.loc-select{width:100%;font-size:8pt;padding:4px;border:1px solid var(--border2);border-radius:4px;}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.sig-heading{font-size:8.5pt;font-weight:800;color:var(--navy);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--navy);}
+.sig-field{margin-bottom:10px;}
+.gen-panel{background:var(--gray);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:14px;}
+.gen-disclaimer{font-size:8.5pt;color:var(--ink4);line-height:1.7;margin-bottom:12px;}
+.gen-actions{display:grid;grid-template-columns:1fr auto;gap:10px;}
+.gen-clear-btn{padding:13px 20px;background:var(--gray2);color:var(--ink3);border:1px solid var(--border2);border-radius:8px;font-size:9pt;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s;}
+.gen-clear-btn:hover{background:var(--red3);color:var(--red2);}
+.sow-error{color:var(--red);font-size:8pt;margin-top:8px;}
+.sow-draft-status{font-size:7.5pt;color:var(--ink4);margin-top:6px;}
+.link-teal-bold{color:var(--teal);font-weight:700;text-decoration:none;}
+.sow-hidden{display:none;}
+.pay-amount-input{background:var(--gray);font-weight:700;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.w-4{width:4%;}.w-8{width:8%;}.w-10{width:10%;}.w-12{width:12%;}.w-14{width:14%;}
+.w-15{width:15%;}.w-16{width:16%;}.w-18{width:18%;}.w-20{width:20%;}
+.w-22{width:22%;}.w-25{width:25%;}.w-28{width:28%;}.w-45{width:45%;}
+</style>
+</head>
+<body>
+<div class="vp-wrap">
+<div class="vp-side">
+  <div class="vp-logo">
+    <div class="vp-logo-title">VER Vendor<br>Platform</div>
+    <div class="vp-logo-sub">DET · FY27</div>
+  </div>
+  <nav class="vp-nav">
+    <div class="vp-nav-section">Platform</div>
+    <a href="vendor_home.html" class="vp-nav-item"><span class="vp-nav-icon">🏠</span>Portfolio Overview</a>
+    <a href="vendor_registry.html" class="vp-nav-item"><span class="vp-nav-icon">📋</span>Vendor Registry</a>
+    <a href="vendor_risk.html" class="vp-nav-item"><span class="vp-nav-icon">⚠️</span>Risk Dashboard</a>
+    <div class="vp-nav-section">Tools</div>
+    <a href="vendor_selector.html" class="vp-nav-item"><span class="vp-nav-icon">🎯</span>Vendor Selector</a>
+    <a href="spend_benchmarking.html" class="vp-nav-item"><span class="vp-nav-icon">&#128178;</span>Spend Benchmarking</a>
+    
+    <a href="vendor_sow.html" class="vp-nav-item active"><span class="vp-nav-icon">📄</span>SOW Builder</a>
+    <a href="vendor_co.html" class="vp-nav-item"><span class="vp-nav-icon">&#128260;</span>Change Order</a>
+    <div class="vp-nav-divider"></div>
+    <a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a>
+  </nav>
+  <div class="vp-side-footer">VER Vendor Platform<br>Salesforce DET · FY27</div>
+</div>
+
+<!-- MAIN -->
+
+<div class="vp-main">
+
+  <div class="vp-topbar">
+    <div>
+      <div class="vp-page-title">SOW Builder</div>
+      <div class="vp-page-sub">Generate a Salesforce Milestone-Based Consulting SOW &middot; VER advisory tool</div>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" class="sow-print-btn" onclick="openVendorSowHelp()">&#63; How to Use</button>
+      <button type="button" class="sow-preview-btn" onclick="togglePreview()">&#128065; Preview SOW</button>
+      <button type="button" class="sow-print-btn" onclick="window.print()">Print</button>
+    </div>
+  </div>
+
+  <div class="callout c-warn callout-mb14">
+    <strong>Important:</strong> This tool generates a structured SOW based on the Salesforce
+    Milestone-Based Consulting SOW template. The output requires review and approval by
+    <strong>VER, Procurement, and Legal</strong> before execution.
+    It does not constitute a binding agreement.
+  </div>
+
+  <!-- PREVIEW PANEL -->
+  <div class="sow-preview" id="sow-preview-panel"></div>
+
+  <!-- ══ SECTION 1: Parties & Agreement ══ -->
+  <div class="sow-section">
+    <div class="sow-section-title"><span class="sow-num">1</span>Parties &amp; Agreement</div>
+    <div class="sow-sub">SOW header — parties, agreement reference, and effective date</div>
+    <div class="sow-grid sow-grid-mb">
+      <div>
+        <label class="sow-label" for="s-project-name">Project Name <span class="sow-req">*</span></label>
+        <input type="text" id="s-project-name" class="sow-input" placeholder="e.g. DET Data Platform Implementation Phase 2">
+      </div>
+      <div>
+        <label class="sow-label" for="s-eff-date">Effective Date <span class="sow-req">*</span></label>
+        <input type="date" id="s-eff-date" class="sow-input">
+      </div>
+    </div>
+    <div class="sow-grid sow-grid-mb">
+      <div>
+        <label class="sow-label" for="s-supplier">Supplier Legal Name <span class="sow-req">*</span></label>
+        <input type="text" id="s-supplier" class="sow-input" placeholder="e.g. NTT Data Services LLC">
+      </div>
+      <div>
+        <label class="sow-label" for="s-supplier-type">Entity Type</label>
+        <input type="text" id="s-supplier-type" class="sow-input" placeholder="e.g. a Delaware limited liability company">
+      </div>
+    </div>
+    <div class="sow-grid sow-grid-mb">
+      <div>
+        <label class="sow-label" for="s-supplier-addr">Supplier Principal Address</label>
+        <input type="text" id="s-supplier-addr" class="sow-input" placeholder="Street, City, State, ZIP">
+      </div>
+      <div>
+        <label class="sow-label" for="s-supplier-notice">Supplier Notice Address</label>
+        <input type="text" id="s-supplier-notice" class="sow-input" placeholder="Same as above or different address &amp; Attn:">
+      </div>
+    </div>
+    <div class="sow-grid">
+      <div>
+        <label class="sow-label" for="s-agreement">Master Agreement Reference <span class="sow-req">*</span></label>
+        <input type="text" id="s-agreement" class="sow-input" placeholder="e.g. Global Services Agreement dated Jan 1, 2020">
+      </div>
+      <div>
+        <label class="sow-label" for="s-po-num">SFDC PO Number</label>
+        <input type="text" id="s-po-num" class="sow-input" placeholder="e.g. PO-4500123456">
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2: Term & Scope ══ -->
+  <div class="sow-section">
+    <div class="sow-section-title"><span class="sow-num">2</span>Term &amp; Scope of Services</div>
+    <div class="sow-sub">Project timeline and general scope description</div>
+    <div class="sow-grid sow-grid-mb">
+      <div>
+        <label class="sow-label" for="s-start">Start Date <span class="sow-req">*</span></label>
+        <input type="date" id="s-start" class="sow-input">
+      </div>
+      <div>
+        <label class="sow-label" for="s-end">End Date <span class="sow-req">*</span></label>
+        <input type="date" id="s-end" class="sow-input">
+      </div>
+    </div>
+    <div class="sow-form-row">
+      <label class="sow-label" for="s-scope-general">General Scope Description <span class="sow-req">*</span></label>
+      <textarea id="s-scope-general" class="sow-textarea" rows="4"
+        placeholder="Describe the project generally — what work is being done, which SFDC group/dept, and specific deliverables expected. Include: why the project is needed, background and impact, definition of engagement, benefits and efficiencies to be achieved."></textarea>
+    </div>
+    <div class="sow-form-row">
+      <label class="sow-label" for="s-support-training">Support &amp; Training Requirements</label>
+      <textarea id="s-support-training" class="sow-textarea" rows="2"
+        placeholder="Insert any required support or training for Supplier Personnel. Or enter N/A."></textarea>
+    </div>
+    <div class="sow-form-row">
+      <label class="sow-label" for="s-knowledge-transfer">Knowledge Transfer Plan</label>
+      <textarea id="s-knowledge-transfer" class="sow-textarea" rows="2"
+        placeholder="Insert knowledge transfer plan or details to ensure future success of the project."></textarea>
+    </div>
+    <div>
+      <label class="sow-label" for="s-supplier-materials">Supplier Materials</label>
+      <textarea id="s-supplier-materials" class="sow-textarea" rows="2"
+        placeholder="List Supplier-provided materials, if any. Clarify what is provided and what is licensed. Or enter N/A."></textarea>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3: Key Milestones ══ -->
+  <div class="sow-section">
+    <div class="sow-section-title"><span class="sow-num">3</span>Key Milestones &amp; Timeline</div>
+    <div class="sow-sub">Identify key milestones, outcomes/deliverables, and agreed timeline</div>
+    <table class="sow-table" id="milestones-table">
+      <thead><tr>
+        <th class="w-25">Key Milestone</th>
+        <th class="w-45">Outcomes / Business Objective</th>
+        <th class="w-22">Timeline (Start – End)</th>
+        <th class="w-8"></th>
+      </tr></thead>
+      <tbody id="milestones-body">
+        <tr>
+          <td><input type="text" placeholder="e.g. Phase 1 — Discovery"></td>
+          <td><textarea rows="2" placeholder="Outcome or business objective"></textarea></td>
+          <td><input type="text" placeholder="e.g. Jun 1 – Jul 31, 2026"></td>
+          <td class="td-center"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addMilestoneRow()">+ Add Milestone</button>
+  </div>
+
+  <!-- ══ SECTION 4: Deliverables ══ -->
+  <div class="sow-section">
+    <div class="sow-section-title"><span class="sow-num">4</span>Deliverables Table</div>
+    <div class="sow-sub">Detail each deliverable, supplier &amp; SFDC activities, assumptions, and format</div>
+    <div class="tbl-overflow">
+      <table class="sow-table tbl-wide" id="deliverables-table">
+        <thead><tr>
+          <th class="w-12">Milestone</th>
+          <th class="w-14">Deliverable</th>
+          <th class="w-16">Description</th>
+          <th class="w-16">Supplier Activities</th>
+          <th class="w-14">SFDC Activities</th>
+          <th class="w-14">Assumptions</th>
+          <th class="w-10">Format</th>
+          <th class="w-4"></th>
+        </tr></thead>
+        <tbody id="deliverables-body">
+          <tr>
+            <td><input type="text" placeholder="Milestone 1"></td>
+            <td><input type="text" placeholder="Deliverable name"></td>
+            <td><textarea rows="2" placeholder="Description &amp; specs"></textarea></td>
+            <td><textarea rows="2" placeholder="Supplier tasks"></textarea></td>
+            <td><textarea rows="2" placeholder="SFDC tasks"></textarea></td>
+            <td><textarea rows="2" placeholder="Assumptions"></textarea></td>
+            <td><input type="text" placeholder="e.g. Google Sheets"></td>
+            <td class="td-center"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button type="button" class="add-row-btn" onclick="addDeliverableRow()">+ Add Deliverable</button>
+  </div>
+
+  <!-- ══ SECTION 5: Personnel ══ -->
+  <div class="sow-section">
+    <div class="sow-section-title"><span class="sow-num">5</span>Supplier &amp; SFDC Personnel</div>
+    <div class="sow-sub">Key people engaged on each side of this engagement</div>
+    <div>
+      <label class="sow-label" for="s-supplier-rep">Supplier Representative <span class="sow-req">*</span></label>
+      <input type="text" id="s-supplier-rep" class="sow-input sow-input-mb" placeholder="Name of main Supplier contact">
+    </div>
+    <div class="section-subtitle">Supplier Personnel</div>
+    <table class="sow-table" id="supplier-personnel-table">
+      <thead><tr>
+        <th>Name</th><th>Title</th><th>Key Responsibilities</th>
+        <th>Location</th><th>% Allocation</th><th></th>
+      </tr></thead>
+      <tbody id="supplier-personnel-body">
+        <tr>
+          <td><input type="text" placeholder="Name"></td>
+          <td><input type="text" placeholder="Title"></td>
+          <td><input type="text" placeholder="Responsibilities"></td>
+          <td><select class="loc-select" aria-label="Location">
+            <option>Onshore</option><option>Offshore</option><option>Hybrid</option>
+          </select></td>
+          <td><input type="text" placeholder="100%"></td>
+          <td class="td-center"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addPersonnelRow('supplier-personnel-body','supplier')">+ Add Supplier Personnel</button>
+    <div class="section-subtitle-mt">SFDC Personnel (Key Decision Makers)</div>
+    <table class="sow-table" id="sfdc-personnel-table">
+      <thead><tr>
+        <th>Name</th><th>Title</th><th>Key Responsibilities</th><th></th>
+      </tr></thead>
+      <tbody id="sfdc-personnel-body">
+        <tr>
+          <td><input type="text" placeholder="Name"></td>
+          <td><input type="text" placeholder="Title"></td>
+          <td><input type="text" placeholder="Responsibilities"></td>
+          <td class="td-center"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addPersonnelRow('sfdc-personnel-body','sfdc')">+ Add SFDC Personnel</button>
+  </div>
+
+  <!-- ══ SECTION 6: Payment ══ -->
+  <div class="sow-section">
+    <div class="sow-section-title"><span class="sow-num">6</span>Professional Services Payment</div>
+    <div class="sow-sub">Fixed fee schedule, milestone payments, and expenses</div>
+    <div class="sow-grid sow-grid-mb">
+      <div>
+        <label class="sow-label" for="s-total-fee">Total Fixed Fee <span class="sow-req">*</span></label>
+        <input type="text" id="s-total-fee" class="sow-input" placeholder="e.g. $250,000.00">
+      </div>
+      <div>
+        <label class="sow-label" for="s-expenses">Expenses</label>
+        <select id="s-expenses" class="sow-select">
+          <option value="none">None</option>
+          <option value="cap">Not to exceed amount</option>
+        </select>
+      </div>
+    </div>
+    <div id="s-expense-cap-wrap" class="sow-form-row sow-hidden">
+      <label class="sow-label" for="s-expense-cap">Expense Cap Amount</label>
+      <input type="text" id="s-expense-cap" class="sow-input" placeholder="e.g. $10,000.00">
+    </div>
+    <div class="section-subtitle">Milestone Payment Schedule</div>
+    <table class="sow-table" id="payment-table">
+      <thead><tr>
+        <th class="w-28">Milestone</th>
+        <th class="w-15">Due Date</th>
+        <th class="w-18">Est. Invoice Date</th>
+        <th class="w-15">% of Total Fee</th>
+        <th class="w-20">Amount Invoiced</th>
+        <th class="w-4"><span class="sr-only">Actions</span></th>
+      </tr></thead>
+      <tbody id="payment-body">
+        <tr>
+          <td><input type="text" placeholder="Milestone name"></td>
+          <td><input type="date" aria-label="Due date"></td>
+          <td><input type="date" aria-label="Est. invoice date"></td>
+          <td><input type="text" placeholder="e.g. 25%" oninput="calcPayment(this)"></td>
+          <td><input type="text" placeholder="Auto-calculated" id="pay-amount-0" readonly class="pay-amount-input"></td>
+          <td class="td-center"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addPaymentRow()">+ Add Payment Milestone</button>
+  </div>
+
+  <!-- ══ SECTION 7: Signatories ══ -->
+  <div class="sow-section">
+    <div class="sow-section-title"><span class="sow-num">7</span>Signatories</div>
+    <div class="sow-sub">Authorized representatives for both parties</div>
+    <div class="sig-grid">
+      <div>
+        <div class="sig-heading">Supplier Signatory</div>
+        <div class="sig-field">
+          <label class="sow-label" for="s-sup-name">Name <span class="sow-req">*</span></label>
+          <input type="text" id="s-sup-name" class="sow-input" placeholder="Full name">
+        </div>
+        <div class="sig-field">
+          <label class="sow-label" for="s-sup-title">Title</label>
+          <input type="text" id="s-sup-title" class="sow-input" placeholder="e.g. Vice President">
+        </div>
+        <div>
+          <label class="sow-label" for="s-sup-date">Date</label>
+          <input type="date" id="s-sup-date" class="sow-input">
+        </div>
+      </div>
+      <div>
+        <div class="sig-heading">Salesforce Signatory</div>
+        <div class="sig-field">
+          <label class="sow-label" for="s-sf-name">Name <span class="sow-req">*</span></label>
+          <input type="text" id="s-sf-name" class="sow-input" placeholder="Full name">
+        </div>
+        <div class="sig-field">
+          <label class="sow-label" for="s-sf-title">Title</label>
+          <input type="text" id="s-sf-title" class="sow-input" placeholder="e.g. Director">
+        </div>
+        <div>
+          <label class="sow-label" for="s-sf-date">Date</label>
+          <input type="date" id="s-sf-date" class="sow-input">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GENERATE ══ -->
+  <div class="gen-panel">
+    <div class="gen-disclaimer">
+      By generating this SOW, you confirm that all information is accurate.
+      This document must be reviewed by <strong>VER, Procurement, and Legal</strong>
+      before either party executes. Do not execute without appropriate approvals.
+    </div>
+    <div class="gen-actions">
+      <button type="button" class="gen-btn" onclick="generateSOW()">&#128196; Generate SOW Document</button>
+      <button type="button" class="gen-clear-btn" onclick="clearSOW()">&#10005; Clear</button>
+    </div>
+    <div id="sow-error" class="sow-error sow-hidden"></div>
+    <div id="sow-draft-status" class="sow-draft-status"></div>
+  </div>
+
+  <div class="callout c-info callout-mb16">
+    <strong>Modifying an existing SOW?</strong>
+    <a href="vendor_co.html" class="link-teal-bold">Generate a Change Order instead &#8594;</a>
+  </div>
+
+</div>
+</div>
+<script>
+
+
+// ── Helpers ───────────────────────────────────────────────────
+function g(id) { var el=document.getElementById(id); return el?(el.value||'').trim():''; }
+function fmtDate(v) {
+  if(!v) return '_______________';
+  try { return new Date(v+'T12:00:00').toLocaleDateString('en-US',
+    {year:'numeric',month:'long',day:'numeric'}); } catch(e){return v;}
+}
+function getRows(tbodyId) {
+  var rows=[];
+  var tbody=document.getElementById(tbodyId);
+  if(!tbody) return rows;
+  Array.from(tbody.rows).forEach(function(row) {
+    var cells=[];
+    Array.from(row.cells).forEach(function(cell,i) {
+      // Skip last cell (del button)
+      if(i===row.cells.length-1) return;
+      var inp=cell.querySelector('input,textarea,select');
+      cells.push(inp?(inp.value||'').trim():'');
+    });
+    if(cells.some(function(c){return c;})) rows.push(cells);
+  });
+  return rows;
+}
+
+// ── Add row helpers ────────────────────────────────────────────
+function delRow(btn) { btn.closest('tr').remove(); }
+
+function addMilestoneRow() {
+  var tbody=document.getElementById('milestones-body');
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td><input type="text" placeholder="Milestone name"></td>'+
+    '<td><textarea rows="2" placeholder="Outcome / business objective"></textarea></td>'+
+    '<td><input type="text" placeholder="Start – End dates"></td>'+
+    '<td style="text-align:center;"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>';
+  tbody.appendChild(tr);
+}
+
+function addDeliverableRow() {
+  var tbody=document.getElementById('deliverables-body');
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td><input type="text" placeholder="Milestone"></td>'+
+    '<td><input type="text" placeholder="Deliverable name"></td>'+
+    '<td><textarea rows="2" placeholder="Description"></textarea></td>'+
+    '<td><textarea rows="2" placeholder="Supplier activities"></textarea></td>'+
+    '<td><textarea rows="2" placeholder="SFDC activities"></textarea></td>'+
+    '<td><textarea rows="2" placeholder="Assumptions"></textarea></td>'+
+    '<td><input type="text" placeholder="Format"></td>'+
+    '<td style="text-align:center;"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>';
+  tbody.appendChild(tr);
+}
+
+function addPersonnelRow(tbodyId, type) {
+  var tbody=document.getElementById(tbodyId);
+  var tr=document.createElement('tr');
+  if(type==='supplier') {
+    tr.innerHTML='<td><input type="text" placeholder="Name"></td>'+
+      '<td><input type="text" placeholder="Title"></td>'+
+      '<td><input type="text" placeholder="Responsibilities"></td>'+
+      '<td><select style="width:100%;font-size:8pt;padding:4px;border:1px solid var(--border2);border-radius:4px;">'+
+        '<option>Onshore</option><option>Offshore</option><option>Hybrid</option></select></td>'+
+      '<td><input type="text" placeholder="100%"></td>'+
+      '<td style="text-align:center;"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>';
+  } else {
+    tr.innerHTML='<td><input type="text" placeholder="Name"></td>'+
+      '<td><input type="text" placeholder="Title"></td>'+
+      '<td><input type="text" placeholder="Responsibilities"></td>'+
+      '<td style="text-align:center;"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>';
+  }
+  tbody.appendChild(tr);
+}
+
+function addPaymentRow() {
+  var tbody=document.getElementById('payment-body');
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td><input type="text" placeholder="Milestone name"></td>'+
+    '<td><input type="date"></td>'+
+    '<td><input type="date"></td>'+
+    '<td><input type="text" placeholder="e.g. 25%" oninput="calcPayment(this)"></td>'+
+    '<td><input type="text" placeholder="Amount" readonly style="background:var(--gray);font-weight:700;"></td>'+
+    '<td style="text-align:center;"><button type="button" class="del-row-btn" onclick="delRow(this)">&#215;</button></td>';
+  tbody.appendChild(tr);
+}
+
+// ── Payment calc ───────────────────────────────────────────────
+function calcPayment(input) {
+  var totalStr = g('s-total-fee').replace(/[$,]/g,'');
+  var total    = parseFloat(totalStr) || 0;
+  if(!total) return;
+  var row   = input.closest('tr');
+  var pctStr= input.value.replace('%','').trim();
+  var pct   = parseFloat(pctStr) || 0;
+  var amt   = total * (pct/100);
+  var amtEl = row.querySelector('td:nth-child(5) input');
+  if(amtEl) amtEl.value = amt>0 ? '$'+amt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
+}
+
+// ── Draft persistence ──────────────────────────────────────────
+var SOW_DRAFT_KEY = 'ver_sow_draft';
+var SOW_DRAFT_FIELDS = [
+  's-project-name','s-eff-date','s-supplier','s-supplier-type','s-supplier-addr',
+  's-supplier-notice','s-agreement','s-po-num','s-start','s-end',
+  's-scope-general','s-support-training','s-knowledge-transfer','s-supplier-materials',
+  's-supplier-rep','s-total-fee','s-expenses','s-expense-cap',
+  's-sup-name','s-sup-title','s-sup-date','s-sf-name','s-sf-title','s-sf-date'
+];
+var _sowDraftTimer = null;
+
+function saveSOWDraft() {
+  var draft = {};
+  SOW_DRAFT_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) draft[id] = el.value;
+  });
+  try {
+    localStorage.setItem(SOW_DRAFT_KEY, JSON.stringify(draft));
+    var ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    var el = document.getElementById('sow-draft-status');
+    if (el) el.textContent = 'Draft saved at ' + ts;
+  } catch(e) {}
+}
+
+function loadSOWDraft() {
+  try {
+    var raw = localStorage.getItem(SOW_DRAFT_KEY);
+    if (!raw) return false;
+    var draft = JSON.parse(raw);
+    var filled = 0;
+    SOW_DRAFT_FIELDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && draft[id]) { el.value = draft[id]; filled++; }
+    });
+    if (filled > 0) {
+      // Restore expense cap visibility
+      var expCap = document.getElementById('s-expense-cap-wrap');
+      var expSel = document.getElementById('s-expenses');
+      if (expCap && expSel) expCap.style.display = expSel.value === 'cap' ? 'block' : 'none';
+      var el = document.getElementById('sow-draft-status');
+      if (el) el.textContent = 'Draft restored — ' + filled + ' fields loaded.';
+    }
+    return filled > 0;
+  } catch(e) { return false; }
+}
+
+function clearSOWDraft() {
+  try { localStorage.removeItem(SOW_DRAFT_KEY); } catch(e) {}
+  var el = document.getElementById('sow-draft-status');
+  if (el) el.textContent = '';
+}
+
+// ── Expense toggle + init ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // Pre-fill from vendor dossier query params
+  (function(){
+    var p = new URLSearchParams(window.location.search);
+    var map = {supplier:'s-supplier', supplier_addr:'s-supplier-addr', supplier_notice:'s-supplier-notice', supplier_rep:'s-supplier-rep'};
+    Object.keys(map).forEach(function(k){
+      var val = p.get(k);
+      var el  = document.getElementById(map[k]);
+      if(val && el && !el.value) el.value = decodeURIComponent(val);
+    });
+    if(p.get('supplier')){
+      var banner = document.createElement('div');
+      banner.style.cssText='background:#F0FDF9;border:1px solid #0D9488;border-radius:8px;padding:10px 14px;font-size:8.5pt;color:#0F766E;font-weight:600;margin-bottom:14px;';
+      banner.textContent='Vendor info pre-filled from ' + decodeURIComponent(p.get('supplier')) + ' dossier. Review and complete remaining fields.';
+      var form = document.querySelector('.sow-form') || document.querySelector('.sow-section');
+      if(form) form.parentNode.insertBefore(banner, form);
+    }
+  })();
+
+  var expSel = document.getElementById('s-expenses');
+  var expCap = document.getElementById('s-expense-cap-wrap');
+
+  // Restore draft first so expense toggle reflects saved value
+  var hasDraft = loadSOWDraft();
+
+  if (!hasDraft) {
+    var today = new Date().toISOString().split('T')[0];
+    var eff   = document.getElementById('s-eff-date');
+    if (eff && !eff.value) eff.value = today;
+  }
+
+  if (expSel && expCap) {
+    expSel.addEventListener('change', function() {
+      expCap.style.display = this.value === 'cap' ? 'block' : 'none';
+    });
+  }
+
+  // Autosave on any input change (debounced 800ms)
+  SOW_DRAFT_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', function() {
+        clearTimeout(_sowDraftTimer);
+        _sowDraftTimer = setTimeout(saveSOWDraft, 800);
+      });
+      el.addEventListener('change', function() {
+        clearTimeout(_sowDraftTimer);
+        _sowDraftTimer = setTimeout(saveSOWDraft, 800);
+      });
+    }
+  });
+});
+
+// ── Validate ───────────────────────────────────────────────────
+function validateSOW() {
+  var required = [
+    ['s-project-name','Project Name'],
+    ['s-eff-date','Effective Date'],
+    ['s-supplier','Supplier Legal Name'],
+    ['s-agreement','Master Agreement Reference'],
+    ['s-start','Start Date'],
+    ['s-end','End Date'],
+    ['s-scope-general','Scope of Services'],
+    ['s-supplier-rep','Supplier Representative'],
+    ['s-total-fee','Total Fixed Fee'],
+    ['s-sup-name','Supplier Signatory Name'],
+    ['s-sf-name','Salesforce Signatory Name'],
+  ];
+  var missing=[];
+  required.forEach(function(pair) {
+    var el=document.getElementById(pair[0]);
+    if(!el||!el.value.trim()){missing.push(pair[1]);if(el)el.classList.add('invalid');}
+    else {if(el)el.classList.remove('invalid');}
+  });
+  return missing;
+}
+
+// ── Build table HTML for preview ──────────────────────────────
+function buildTableRows(rows, cols) {
+  if(!rows.length) return '<tr><td colspan="'+cols+'" style="color:#999;font-style:italic;">No entries</td></tr>';
+  return rows.map(function(row) {
+    return '<tr>'+row.map(function(c){return '<td>'+(c||'—')+'</td>';}).join('')+'</tr>';
+  }).join('');
+}
+
+// ── Build SOW preview HTML ─────────────────────────────────────
+function buildSOWPreview() {
+  var projectName = g('s-project-name') || '[PROJECT NAME]';
+  var effDate     = fmtDate(g('s-eff-date'));
+  var supplier    = g('s-supplier')     || '[SUPPLIER]';
+  var supType     = g('s-supplier-type') || '[entity type]';
+  var supAddr     = g('s-supplier-addr') || '[ADDRESS]';
+  var supNotice   = g('s-supplier-notice') || supAddr;
+  var agreement   = g('s-agreement')   || '[MASTER AGREEMENT]';
+  var poNum       = g('s-po-num')       || '_______________';
+  var startDate   = fmtDate(g('s-start'));
+  var endDate     = fmtDate(g('s-end'));
+  var scopeDesc   = (g('s-scope-general')||'').replace(/\\n/g,'<br>');
+  var support     = g('s-support-training') || 'N/A';
+  var kt          = g('s-knowledge-transfer') || 'N/A';
+  var supMats     = g('s-supplier-materials') || 'N/A';
+  var supRep      = g('s-supplier-rep') || '_______________';
+  var totalFee    = g('s-total-fee')    || '$XX';
+  var expType     = g('s-expenses');
+  var expCap      = expType==='cap' ? g('s-expense-cap')||'___' : null;
+  var supName     = g('s-sup-name')     || '_______________';
+  var supTitle    = g('s-sup-title')    || '_______________';
+  var supDate     = fmtDate(g('s-sup-date'));
+  var sfName      = g('s-sf-name')      || '_______________';
+  var sfTitle     = g('s-sf-title')     || '_______________';
+  var sfDate      = fmtDate(g('s-sf-date'));
+
+  var milestones  = getRows('milestones-body');
+  var deliverables= getRows('deliverables-body');
+  var supPersonnel= getRows('supplier-personnel-body');
+  var sfPersonnel = getRows('sfdc-personnel-body');
+  var payments    = getRows('payment-body');
+
+  // Total amount table
+  var feeAmt  = totalFee;
+  var expAmt  = expCap || (expType==='none' ? '$0' : '$X');
+  var totalAmt= totalFee;
+
+  return '<div class="draft-banner">DRAFT &mdash; For review purposes only &mdash; Requires VER, Procurement &amp; Legal approval before execution</div>'+
+
+  '<h1>STATEMENT OF WORK<br>"' + projectName + '"</h1>'+
+
+  '<p>This STATEMENT OF WORK ("<strong>SOW</strong>") is made and entered into as of '+effDate+
+  ' by and between SFDC and Supplier subject to the terms of the Agreement (each as defined below). '+
+  'Terms not otherwise defined herein shall take on the meaning ascribed to them in the underlying Agreement.</p>'+
+
+  '<table>'+
+    '<tr><td><strong>&ldquo;SFDC&rdquo;</strong></td><td>Salesforce, Inc.</td></tr>'+
+    '<tr><td>having its principal place of business at</td><td>Salesforce Tower, 415 Mission Street, 3rd Floor, San Francisco, CA 94105</td></tr>'+
+    '<tr><td>with notices to be delivered to:</td><td>Salesforce Tower, 415 Mission Street, 3rd Floor, San Francisco, CA 94105</td></tr>'+
+    '<tr><td><strong>&ldquo;Supplier&rdquo;</strong></td><td>'+supplier+', '+supType+'</td></tr>'+
+    '<tr><td>having its principal place of business at</td><td>'+supAddr+'</td></tr>'+
+    '<tr><td>with notices to be delivered to:</td><td>'+supNotice+'</td></tr>'+
+    '<tr><td><strong>&ldquo;Agreement&rdquo;</strong></td><td>'+agreement+'</td></tr>'+
+  '</table>'+
+
+  '<p><strong>IN WITNESS WHEREOF,</strong> the parties have executed this SOW through their authorized representatives.</p>'+
+
+  '<table class="sig-table">'+
+    '<tr>'+
+      '<td style="width:45%;vertical-align:top;padding:0 20px 0 0;">'+
+        '<div style="font-weight:800;margin-bottom:12px;">'+supplier.toUpperCase()+'</div>'+
+        '<div style="margin-bottom:14px;">By: <span class="sig-line">&nbsp;</span></div>'+
+        '<div style="margin-bottom:6px;">Name: <strong>'+supName+'</strong></div>'+
+        '<div style="margin-bottom:6px;">Title: <strong>'+supTitle+'</strong></div>'+
+        '<div>Date: <strong>'+supDate+'</strong></div>'+
+      '</td>'+
+      '<td style="width:10%;"></td>'+
+      '<td style="width:45%;vertical-align:top;">'+
+        '<div style="font-weight:800;margin-bottom:12px;">SALESFORCE, INC.</div>'+
+        '<div style="margin-bottom:14px;">By: <span class="sig-line">&nbsp;</span></div>'+
+        '<div style="margin-bottom:6px;">Name: <strong>'+sfName+'</strong></div>'+
+        '<div style="margin-bottom:6px;">Title: <strong>'+sfTitle+'</strong></div>'+
+        '<div style="margin-bottom:6px;">Date: <strong>'+sfDate+'</strong> (&ldquo;Effective Date&rdquo;)</div>'+
+        '<div>SFDC PO Number: <strong>'+poNum+'</strong></div>'+
+      '</td>'+
+    '</tr>'+
+  '</table>'+
+
+  '<hr style="margin:20px 0;border:none;border-top:2px solid #333;">'+
+  '<h2 style="text-align:center;text-decoration:none;font-size:12pt;">Statement of Work</h2>'+
+
+  '<h2>1. Term</h2>'+
+  '<p><strong>Start Date:</strong> '+startDate+'<br>'+
+  '<strong>End Date:</strong> '+endDate+'</p>'+
+
+  '<h2>2. Scope of Services</h2>'+
+  '<p>'+scopeDesc+'</p>'+
+  '<p><strong>Support and Training:</strong> '+support+'</p>'+
+  '<p><strong>Knowledge Transfer Plan:</strong> '+kt+'</p>'+
+  '<p><strong>Supplier Materials:</strong> '+supMats+'</p>'+
+
+  '<h2>3. Key Milestones and Timeline Table</h2>'+
+  '<p>Supplier shall deliver the following milestones:</p>'+
+  '<table><thead><tr><th>Key Milestones</th><th>Outcomes</th><th>Timeline</th></tr></thead>'+
+  '<tbody>'+buildTableRows(milestones,3)+'</tbody></table>'+
+
+  '<h2>4. Deliverables Table</h2>'+
+  '<table><thead><tr><th>Key Milestones</th><th>Deliverables</th><th>Description</th>'+
+  '<th>Supplier Activities</th><th>SFDC Activities</th><th>Assumptions</th><th>Format</th></tr></thead>'+
+  '<tbody>'+buildTableRows(deliverables,7)+'</tbody></table>'+
+
+  '<h2>5. Supplier Representative &amp; Personnel</h2>'+
+  '<p><strong>Supplier Representative:</strong> '+supRep+'</p>'+
+  '<h3>Supplier Personnel</h3>'+
+  '<table><thead><tr><th>Name</th><th>Title</th><th>Key Responsibilities</th><th>Location</th><th>% Allocation</th></tr></thead>'+
+  '<tbody>'+buildTableRows(supPersonnel,5)+'</tbody></table>'+
+  '<h3>SFDC Personnel (Key Decision Makers)</h3>'+
+  '<table><thead><tr><th>Name</th><th>Title</th><th>Key Responsibilities</th></tr></thead>'+
+  '<tbody>'+buildTableRows(sfPersonnel,3)+'</tbody></table>'+
+
+  '<h2>6. Professional Services Payment</h2>'+
+  '<h3>6.1 Fixed Fee</h3>'+
+  '<p>Supplier will perform the Services on a fixed-fee basis. Supplier&rsquo;s fees for the Services will be <strong>'+totalFee+'</strong>.</p>'+
+  '<p>Upon Deliverable Acceptance, Supplier will invoice SFDC the fixed fee amounts listed below:</p>'+
+  '<table><thead><tr><th>Milestone</th><th>Due Date</th><th>Est. Invoice Date</th><th>% of Total Fee</th><th>Amount Invoiced</th></tr></thead>'+
+  '<tbody>'+buildTableRows(payments,5)+'</tbody>'+
+  '<tfoot><tr><th colspan="4">Total</th><th>'+totalFee+'</th></tr></tfoot></table>'+
+  '<p>Under this SOW, the total fees billed to SFDC shall not exceed '+totalFee+
+  ' without SFDC&rsquo;s prior written approval. All time sheets must be approved by SFDC personnel prior to payment.</p>'+
+
+  '<h3>6.2 Expenses</h3>'+
+  '<p>Subject to the SFDC Non-Employee Travel and Expense Policy, the following expenses shall be reimbursed:</p>'+
+  '<p>['+(expType==='none'?'X':' ')+'] None &nbsp;&nbsp;&nbsp; ['+(expType==='cap'?'X':' ')+'] Not to exceed in the aggregate: '+(expCap||'N/A')+'</p>'+
+
+  '<h3>6.3 Total Amounts</h3>'+
+  '<table><thead><tr><th>Payment Type</th><th>Total Cost or Not to Exceed Amount</th></tr></thead>'+
+  '<tbody>'+
+    '<tr><td>Section 8.1 Fees</td><td>'+feeAmt+'</td></tr>'+
+    '<tr><td>Section 8.2 Expenses</td><td>'+expAmt+'</td></tr>'+
+    '<tr><th>TOTAL AMOUNT;</th><th>'+totalAmt+'</th></tr>'+
+  '</tbody></table>'+
+
+  '<h2>7. Acceptance</h2>'+
+  '<p class="legal">"Acceptance" of Deliverables by SFDC shall be deemed to occur upon achievement of all of the following: '+
+  '1) each Deliverable conforms to the relevant specifications as provided herein; '+
+  '2) each Deliverable meets the applicable warranties set forth in the Agreement; '+
+  '3) each Deliverable has documented 100% of all SFDC acceptance test cases passing; and '+
+  '4) each Deliverable is approved in writing by an authorized representative of SFDC.</p>'+
+
+  '<h2>8. Additional Terms</h2>'+
+  '<p>[ ] None</p>'+
+  '<p>[X] As follows:</p>'+
+  '<p><strong>Return of SFDC Equipment.</strong> Supplier Personnel shall promptly return to SFDC any SFDC-issued laptops or other equipment, in accordance with the instructions provided by SFDC, upon the earlier of: (i) termination or expiration of the SOW, and (ii) SFDC\'s written request at any time during or after the term of this SOW. Supplier shall be liable to SFDC for the replacement cost of any SFDC-issued laptop or equipment that Supplier fails to return within the timeframe communicated by SFDC.</p>';
+}
+
+// ── Toggle preview ─────────────────────────────────────────────
+function togglePreview() {
+  var panel=document.getElementById('sow-preview-panel');
+  if(!panel) return;
+  if(panel.style.display==='none'||!panel.style.display) {
+    panel.innerHTML=buildSOWPreview();
+    panel.style.display='block';
+    panel.scrollIntoView({behavior:'smooth',block:'start'});
+  } else {
+    panel.style.display='none';
+  }
+}
+
+// ── Generate SOW ───────────────────────────────────────────────
+function generateSOW() {
+  var missing=validateSOW();
+  var errEl=document.getElementById('sow-error');
+  if(missing.length) {
+    if(errEl){errEl.textContent='Please complete required fields: '+missing.join(', ');errEl.style.display='block';}
+    return;
+  }
+  if(errEl) errEl.style.display='none';
+  var panel=document.getElementById('sow-preview-panel');
+  if(panel){panel.innerHTML=buildSOWPreview();panel.style.display='block';
+    panel.scrollIntoView({behavior:'smooth',block:'start'});}
+  setTimeout(function(){
+    if(confirm('SOW is ready. Print or save as PDF now?')) window.print();
+  },400);
+}
+
+// ── Clear ──────────────────────────────────────────────────────
+function clearSOW() {
+  if(!confirm('Clear all fields and start over?')) return;
+  clearSOWDraft();
+  document.querySelectorAll('.sow-input,.sow-select,.sow-textarea').forEach(function(el){
+    el.value=''; el.classList.remove('invalid');
+  });
+  var eff=document.getElementById('s-eff-date');
+  if(eff) eff.value=new Date().toISOString().split('T')[0];
+  // Reset tables to one row each
+  ['milestones-body','deliverables-body','supplier-personnel-body',
+   'sfdc-personnel-body','payment-body'].forEach(function(id){
+    var tb=document.getElementById(id);
+    if(tb && tb.rows.length>1) while(tb.rows.length>1) tb.deleteRow(1);
+  });
+  var panel=document.getElementById('sow-preview-panel');
+  if(panel) panel.style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openVendorSowHelp(){
+  HelpModal.open({
+    title: 'SOW Builder',
+    what: 'The SOW Builder <strong>drafts, validates, and exports vendor statements of work</strong> — structured to DET commercial standards with scope guardrails, milestone structure, and rate card validation built in. Use it to generate a clean, approval-ready SOW before any engagement starts.',
+    steps: [
+      '<strong>Select the engagement type</strong> — Fixed Fee, Time & Materials, Managed Service, or Staff Augmentation. Each type loads the relevant template with required sections.',
+      '<strong>Complete the scope section</strong> — deliverables, acceptance criteria, and milestones. Be specific: vague scope is the root cause of most SOW disputes.',
+      '<strong>Build the rate card</strong> — enter roles, levels, and proposed rates. The tool validates each rate against DET benchmarks and flags anything above P75.',
+      '<strong>Review the compliance check</strong> — required clauses (IP ownership, data residency, audit rights, termination) are verified. Missing clauses must be resolved before submission.',
+      '<strong>Submit for approval</strong> — the completed SOW routes automatically based on contract value: >$250K to VP, >$1M to CPO.'
+    ],
+    tips: [
+      { icon: '&#x1F4DC;', title: 'Use templates, not blank starts', body: 'Starting from a DET-standard template ensures you never miss a required clause. Blank-start SOWs routinely fail compliance checks.' },
+      { icon: '&#x1F4B3;', title: 'Rate card validation is enforced', body: 'Rates above P90 hard-block submission. Rates between P75 and P90 require written justification. The benchmark data is your reference.' },
+      { icon: '&#x26A0;', title: 'Vague scope = cost overrun risk', body: '"Provide consulting support" is not a deliverable. "Deliver a documented integration architecture for [system] by [date]" is. Be specific.' },
+      { icon: '&#x1F517;', title: 'Syncs to vendor record', body: 'Submitted SOWs automatically attach to the vendor\'s registry record and feed the Governance Queue for tracking.' }
+    ],
+    ai: '<strong>AI Augmentation:</strong> SOWs for AI/agentic service engagements have additional required sections auto-inserted: model governance, output audit rights, training data restrictions, and human-in-loop requirements.',
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VER Risk Intelligence · VER Vendor Platform</title>
+<style>/* ══════════════════════════════════════════════════════════════════
+   VER VENDOR PLATFORM — SHARED STYLES
+   Extends the hub design system
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --navy:   #0F1E3C; --navy2:  #1E3A5F; --navy3:  #EFF6FF;
+  --teal:   #0D9488; --teal2:  #0F766E; --teal3:  #F0FDF9;
+  --green:  #059669; --green2: #065F46; --green3: #D1FAE5;
+  --amber:  #D97706; --amber2: #78350F; --amber3: #FEF3C7;
+  --red:    #DC2626; --red2:   #7F1D1D; --red3:   #FEE2E2;
+  --purple: #7C3AED; --purple3:#F5F3FF;
+  --ink:    #111827; --ink2:   #1F2937; --ink3:   #374151; --ink4: #6B7280;
+  --gray:   #F9FAFB; --gray2:  #F3F4F6; --gray3:  #E5E7EB;
+  --border: #E5E7EB; --border2:#D1D5DB;
+  --white:  #FFFFFF;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',Arial,Helvetica,sans-serif; background:var(--gray); color:var(--ink2); font-size:9pt; }
+
+/* ── LAYOUT ── */
+.vp-wrap  { display:flex; min-height:100vh; }
+.vp-side  { width:220px; background:var(--navy); flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto; z-index:100; }
+.vp-main  { flex:1; padding:24px 28px; overflow-x:hidden; }
+
+/* ── SIDEBAR ── */
+.vp-logo  { padding:20px 18px 16px; border-bottom:1px solid rgba(255,255,255,0.08); }
+.vp-logo-title { font-size:10.5pt; font-weight:800; color:#fff; line-height:1.2; }
+.vp-logo-sub   { font-size:8pt; color:rgba(255,255,255,0.65); margin-top:2px; letter-spacing:0.05em; text-transform:uppercase; }
+
+.vp-nav   { padding:12px 0; }
+.vp-nav-section { font-size:8pt; font-weight:800; text-transform:uppercase; letter-spacing:0.08em;
+  color:rgba(255,255,255,0.60); padding:10px 18px 4px; }
+.vp-nav-item { display:flex; align-items:center; gap:9px; padding:8px 18px;
+  font-size:8.5pt; font-weight:600; color:rgba(255,255,255,0.85);
+  text-decoration:none; transition:all 0.15s; cursor:pointer; border:none; background:none; width:100%; text-align:left; }
+.vp-nav-item:hover, .vp-nav-item.active { background:rgba(255,255,255,0.10); color:#fff; }
+.vp-nav-item.active { border-left:3px solid var(--teal); }
+.vp-nav-icon { font-size:12pt; flex-shrink:0; }
+.vp-nav-divider { height:1px; background:rgba(255,255,255,0.08); margin:8px 0; }
+
+.vp-side-footer { padding:14px 18px; border-top:1px solid rgba(255,255,255,0.08);
+  font-size:8pt; color:rgba(255,255,255,0.55); margin-top:auto; }
+
+/* ── TOP BAR ── */
+.vp-topbar { display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+.vp-page-title { font-size:15pt; font-weight:900; color:var(--navy); }
+.vp-page-sub   { font-size:8.5pt; color:var(--ink4); margin-top:2px; }
+.vp-topbar-actions { display:flex; gap:8px; align-items:center; }
+
+/* ── STAT TILES ── */
+.vp-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+.vp-stat  { background:#fff; border:1px solid var(--border); border-radius:10px;
+  padding:14px 16px; border-top:3px solid var(--navy); }
+.vp-stat.teal   { border-top-color:var(--teal); }
+.vp-stat.green  { border-top-color:var(--green); }
+.vp-stat.amber  { border-top-color:var(--amber); }
+.vp-stat.red    { border-top-color:var(--red); }
+.vp-stat-val  { font-size:20pt; font-weight:900; color:var(--navy); line-height:1; margin-bottom:3px; }
+.vp-stat.teal  .vp-stat-val { color:var(--teal); }
+.vp-stat.green .vp-stat-val { color:var(--green); }
+.vp-stat.amber .vp-stat-val { color:var(--amber); }
+.vp-stat.red   .vp-stat-val { color:var(--red); }
+.vp-stat-lbl  { font-size:8.5pt; font-weight:600; color:var(--ink4); text-transform:uppercase; letter-spacing:0.06em; }
+.vp-stat-note { font-size:8pt; color:var(--ink3); margin-top:4px; }
+
+/* ── CARDS ── */
+.vp-card { background:#fff; border:1px solid var(--border); border-radius:10px;
+  padding:16px 18px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+.vp-card-title { font-size:9.5pt; font-weight:800; color:var(--ink); margin-bottom:6px; }
+.vp-card-sub   { font-size:8pt; color:var(--ink4); margin-bottom:12px; }
+
+/* ── VENDOR CARD (registry) ── */
+.vc-card { background:#fff; border:1px solid var(--border); border-radius:10px;
+  overflow:hidden; transition:box-shadow 0.15s; cursor:pointer; }
+.vc-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+.vc-header { padding:14px 16px 10px; border-bottom:1px solid var(--gray2); display:flex; gap:12px; align-items:flex-start; }
+.vc-icon   { width:40px; height:40px; border-radius:8px; background:var(--gray2);
+  display:flex; align-items:center; justify-content:center; font-size:18pt; flex-shrink:0; }
+.vc-name   { font-size:10.5pt; font-weight:800; color:var(--ink); margin-bottom:3px; }
+.vc-meta   { font-size:7.5pt; color:var(--ink4); margin-bottom:5px; }
+.vc-badges { display:flex; gap:5px; flex-wrap:wrap; }
+.vc-body   { padding:12px 16px; }
+.vc-kv     { display:flex; justify-content:space-between; padding:4px 0;
+  border-bottom:1px solid var(--gray2); font-size:8pt; }
+.vc-kv:last-child { border-bottom:none; }
+.vc-kv-l   { color:var(--ink4); }
+.vc-kv-v   { font-weight:600; color:var(--ink2); text-align:right; }
+.vc-tags   { display:flex; flex-wrap:wrap; gap:4px; padding:10px 16px 12px; border-top:1px solid var(--gray2); }
+.vc-tag    { font-size:7pt; padding:2px 8px; border-radius:8px; background:var(--navy3); color:var(--navy2); font-weight:600; }
+
+/* ── RISK METER ── */
+.risk-bar-wrap { background:var(--gray2); border-radius:4px; height:8px; margin:4px 0; }
+.risk-bar      { height:8px; border-radius:4px; transition:width 0.5s; }
+
+/* ── TABLE ── */
+.vp-table { width:100%; border-collapse:collapse; font-size:8.5pt; }
+.vp-table th { background:var(--navy); color:#fff; padding:8px 12px; text-align:left;
+  font-size:7.5pt; font-weight:700; letter-spacing:0.03em; position:sticky; top:0; }
+.vp-table td { padding:9px 12px; border-bottom:1px solid var(--gray2); vertical-align:middle; color:var(--ink2); }
+.vp-table tr:hover td { background:var(--gray); cursor:pointer; }
+.vp-table tr:last-child td { border-bottom:none; }
+
+/* ── FILTERS ── */
+.vp-filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.vp-filter-select { font-size:8pt; padding:6px 10px; border:1px solid var(--border2);
+  border-radius:6px; background:#fff; color:var(--ink2); cursor:pointer; font-family:inherit; }
+.vp-search { font-size:8pt; padding:6px 12px; border:1px solid var(--border2);
+  border-radius:6px; background:#fff; color:var(--ink2); font-family:inherit; min-width:200px; }
+.vp-search:focus, .vp-filter-select:focus { outline:2px solid var(--teal); border-color:var(--teal); }
+.vp-filter-btn { font-size:8pt; padding:6px 14px; border-radius:6px; cursor:pointer;
+  border:1px solid var(--border2); background:#fff; font-family:inherit; transition:all 0.15s; }
+.vp-filter-btn.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+.vp-filter-btn:hover:not(.active) { background:var(--gray2); }
+
+/* ── SELECTOR / RECOMMENDATION ── */
+.sel-form   { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:20px; }
+.sel-row    { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.sel-label  { font-size:8pt; font-weight:700; color:var(--ink2); margin-bottom:5px; display:block; }
+.sel-input  { width:100%; font-size:8.5pt; padding:7px 10px; border:1px solid var(--border2);
+  border-radius:6px; font-family:inherit; color:var(--ink2); }
+.sel-input:focus { outline:2px solid var(--teal); border-color:var(--teal); }
+.sel-tags   { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.sel-tag    { font-size:7.5pt; padding:3px 10px; border-radius:10px; cursor:pointer;
+  border:1.5px solid var(--border2); background:#fff; transition:all 0.12s; color:var(--ink3); }
+.sel-tag.selected { background:var(--navy); color:#fff; border-color:var(--navy); }
+.sel-slider { width:100%; accent-color:var(--teal); }
+.sel-btn    { background:var(--navy); color:#fff; border:none; padding:10px 24px;
+  border-radius:8px; font-size:9pt; font-weight:700; cursor:pointer; font-family:inherit;
+  transition:background 0.15s; }
+.sel-btn:hover { background:var(--navy2); }
+
+/* Recommendation cards */
+.rec-grid   { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px; }
+.rec-card   { background:#fff; border:1.5px solid var(--border); border-radius:12px; overflow:hidden;
+  position:relative; transition:box-shadow 0.15s; }
+.rec-card.rank-1 { border-color:var(--teal); box-shadow:0 4px 20px rgba(13,148,136,0.15); }
+.rec-rank   { position:absolute; top:10px; right:10px; font-size:7pt; font-weight:800;
+  padding:2px 8px; border-radius:8px; }
+.rec-rank.r1 { background:var(--teal); color:#fff; }
+.rec-rank.r2 { background:var(--navy3); color:var(--navy); }
+.rec-rank.r3 { background:var(--gray2); color:var(--ink3); }
+.rec-top    { padding:16px 16px 12px; border-bottom:1px solid var(--gray2); }
+.rec-name   { font-size:11pt; font-weight:800; color:var(--ink); margin-bottom:5px; }
+.rec-score  { font-size:8pt; color:var(--ink4); margin-bottom:8px; }
+.rec-score strong { color:var(--teal); font-size:11pt; }
+.rec-body   { padding:12px 16px; }
+.rec-section-label { font-size:7pt; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.07em; color:var(--ink4); margin:8px 0 4px; }
+.rec-pro    { font-size:8pt; color:var(--green2); padding:2px 0 2px 12px; position:relative; }
+.rec-pro::before { content:'✓'; position:absolute; left:0; font-weight:700; }
+.rec-con    { font-size:8pt; color:var(--amber2); padding:2px 0 2px 12px; position:relative; }
+.rec-con::before { content:'△'; position:absolute; left:0; font-size:9pt; }
+.rec-rationale { font-size:8pt; color:var(--ink3); line-height:1.55; font-style:italic;
+  background:var(--teal3); border-radius:6px; padding:8px 10px; margin-top:8px; }
+.rec-suggested { background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);
+  border-radius:10px; padding:16px 20px; margin-bottom:20px; color:#fff; }
+.rec-suggested-label { font-size:7pt; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.1em; color:rgba(255,255,255,0.5); margin-bottom:6px; }
+.rec-suggested-name  { font-size:14pt; font-weight:900; color:#fff; margin-bottom:4px; }
+.rec-suggested-why   { font-size:9pt; color:rgba(255,255,255,0.78); line-height:1.6; }
+
+/* ── RISK DASHBOARD ── */
+.risk-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:20px; }
+.risk-band-card { border-radius:10px; padding:14px 16px; }
+.risk-band-card.low    { background:var(--green3); border:1px solid #A7F3D0; }
+.risk-band-card.medium { background:var(--amber3); border:1px solid #FDE68A; }
+.risk-band-card.high   { background:var(--red3);   border:1px solid #FECACA; }
+.risk-band-title { font-size:9pt; font-weight:800; margin-bottom:10px; }
+.risk-band-card.low    .risk-band-title { color:var(--green2); }
+.risk-band-card.medium .risk-band-title { color:var(--amber2); }
+.risk-band-card.high   .risk-band-title { color:var(--red2); }
+
+/* ── INTAKE FORM ── */
+.intake-card  { background:#fff; border:1px solid var(--border); border-radius:10px;
+  padding:16px 18px; margin-bottom:10px; }
+.intake-hdr   { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+.intake-title { font-size:9.5pt; font-weight:700; color:var(--ink); }
+.intake-meta  { font-size:7.5pt; color:var(--ink4); margin-top:2px; }
+.intake-status-sel { font-size:7.5pt; padding:3px 8px; border:1px solid var(--border2);
+  border-radius:5px; background:var(--gray); font-family:inherit; cursor:pointer; }
+
+/* ── BUTTONS ── */
+.btn { font-size:8pt; padding:7px 16px; border-radius:7px; cursor:pointer;
+  border:none; font-weight:600; font-family:inherit; transition:all 0.15s; }
+.btn-primary { background:var(--navy); color:#fff; }
+.btn-primary:hover { background:var(--navy2); }
+.btn-teal { background:var(--teal); color:#fff; }
+.btn-teal:hover { background:var(--teal2); }
+.btn-ghost { background:transparent; color:var(--ink3); border:1px solid var(--border2); }
+.btn-ghost:hover { background:var(--gray2); }
+.btn-sm { font-size:7.5pt; padding:4px 10px; }
+
+/* ── MODAL ── */
+.vp-modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:500;
+  align-items:flex-start; justify-content:center; padding:40px 20px; overflow-y:auto; }
+.vp-modal-bg.open { display:flex; }
+.vp-modal { background:#fff; border-radius:14px; padding:28px 32px; max-width:680px;
+  width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+.vp-modal-title { font-size:13pt; font-weight:800; color:var(--navy); margin-bottom:16px; }
+.vp-modal-close { float:right; background:none; border:none; font-size:18pt;
+  cursor:pointer; color:var(--ink4); margin-top:-4px; }
+
+/* ── DETAIL SECTIONS ── */
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.detail-block { background:var(--gray); border:1px solid var(--border); border-radius:8px; padding:14px; }
+.detail-block-title { font-size:7.5pt; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.07em; color:var(--ink4); margin-bottom:10px; }
+
+/* ── VIEW TOGGLE ── */
+.view-toggle { display:flex; gap:4px; margin-bottom:16px; }
+.view-btn { font-size:8pt; padding:5px 14px; border-radius:6px; cursor:pointer;
+  border:1px solid var(--border2); background:#fff; font-family:inherit; transition:all 0.12s; }
+.view-btn.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+
+/* ── CALLOUT ── */
+.vp-callout { background:var(--navy3); border:1px solid #BFDBFE; border-left:4px solid var(--navy);
+  border-radius:0 8px 8px 0; padding:12px 16px; margin-bottom:16px; font-size:8.5pt; color:var(--navy2); }
+.vp-callout.teal { background:var(--teal3); border-color:#A7F3D0; border-left-color:var(--teal); color:var(--green2); }
+
+/* ── PRINT ── */
+@media print {
+  .vp-side { display:none!important; }
+  .vp-main { padding:12px!important; }
+  .vp-filters,.btn,.sel-btn,.vp-modal-bg { display:none!important; }
+}
+
+/* ── Badge classes (hub + platform shared) ── */
+.bg{background:#D1FAE5;color:#065F46;}
+.ba{background:#FEF3C7;color:#78350F;}
+.br{background:#FEE2E2;color:#7F1D1D;}
+.bn{background:#EFF6FF;color:#1E3A5F;}
+.bt{background:#F0FDF9;color:#0F766E;}
+.bp{background:#F5F3FF;color:#7C3AED;}
+.bz{background:#F3F4F6;color:#6B7280;}
+.bo{background:#FFF7ED;color:#EA580C;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;
+  font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;}
+
+.qa-card { display:flex;flex-direction:column;align-items:flex-start;
+  gap:4px;padding:14px 14px;border-radius:8px;transition:all 0.15s;
+  cursor:pointer;text-decoration:none;box-sizing:border-box; }
+.qa-card:hover { filter:brightness(0.92); }
+.qa-navy  { background:var(--navy3);border:1px solid var(--navy); }
+.qa-teal  { background:var(--teal3);border:1px solid var(--teal); }
+.qa-green { background:var(--green3);border:1px solid var(--green); }
+.qa-red   { background:var(--red3);border:1px solid #FECACA; }
+.qa-label { font-size:8.5pt;font-weight:700;display:block; }
+.qa-sub   { font-size:7.5pt;color:var(--ink4);margin-top:1px; }
+.qa-navy .qa-label  { color:var(--navy); }
+.qa-teal .qa-label  { color:var(--teal2); }
+.qa-green .qa-label { color:var(--green2); }
+.qa-red .qa-label   { color:var(--red2); }
+
+@media print {
+  .vp-side, .vp-topbar, .risk-toolbar, .risk-summary,
+  .risk-left, .rd-close, .rd-actions,
+  .assess-panel, #controls, .wm { display:none !important; }
+  .vp-wrap, .vp-main { display:block !important; }
+  .risk-detail { display:block !important; width:100% !important;
+    border:none !important; max-height:none !important;
+    box-shadow:none !important; }
+  .risk-content { display:block !important; }
+  .rd-header { background:#0F1E3C !important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .dim-score-fill { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .rd-score-circle { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body { background:#fff !important; }
+  .pdf-header { display:block !important; }
+}
+.pdf-header { display:none; padding:10px 20px;
+  font-size:8pt; color:var(--ink4); border-bottom:1px solid var(--border); }
+
+/* ── Legend ── */
+.legend-bar{background:var(--gray);border-bottom:1px solid var(--border);
+  padding:0 20px;}
+.legend-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;
+  cursor:pointer;font-size:8.5pt;font-weight:700;color:var(--ink3);
+  user-select:none;}
+.legend-toggle:hover{color:var(--navy);}
+.legend-body{display:none;padding:12px 0 16px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.legend-body.open{display:grid;}
+.legend-section-title{font-size:8pt;font-weight:800;color:var(--navy);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.legend-items{display:flex;flex-direction:column;gap:5px;}
+.legend-item{display:flex;gap:8px;align-items:flex-start;font-size:8.5pt;}
+.legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0;margin-top:2px;}
+.legend-text{color:var(--ink3);line-height:1.4;}
+.legend-text strong{color:var(--ink2);}
+
+/* ── VER Dark Mode ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+  --purple3:rgba(124,58,237,0.15);--orange3:rgba(234,88,12,0.15);
+  --blue3:rgba(37,99,235,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .card,[data-theme="dark"] .stat{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .card-title,[data-theme="dark"] .stat-val{color:var(--ink);}
+[data-theme="dark"] .vp-table th{background:#162942;}
+[data-theme="dark"] .vp-table td,[data-theme="dark"] .vp-table tr:hover td{background:var(--gray2);}
+[data-theme="dark"] .vp-table tr:hover td{background:var(--gray3);}
+[data-theme="dark"] .callout.info,[data-theme="dark"] .c-info{background:#0F1E3C;border-left-color:var(--navy2);color:var(--ink3);}
+[data-theme="dark"] .callout.teal,[data-theme="dark"] .c-teal{background:rgba(13,148,136,0.12);}
+[data-theme="dark"] .callout.amber,[data-theme="dark"] .c-amber{background:rgba(217,119,6,0.12);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{
+  background:var(--gray2)!important;color:var(--ink2)!important;border-color:var(--border2)!important;}
+[data-theme="dark"] .back-btn,[data-theme="dark"] .back{
+  background:var(--gray2);border-color:var(--border2);color:var(--ink3);}
+[data-theme="dark"] .hub-nav,[data-theme="dark"] .page-wrap>.top-bar{border-bottom-color:var(--border);}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid var(--border2);background:var(--gray2);
+  color:var(--ink4);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+[data-theme="dark"] .vp-side{background:#060e1c;}
+[data-theme="dark"] .vp-main{background:var(--gray);}
+[data-theme="dark"] .vp-card,[data-theme="dark"] .vs-card,
+[data-theme="dark"] .vi-card,[data-theme="dark"] .vc-card{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .search-input,[data-theme="dark"] .filter-select,
+[data-theme="dark"] .vp-filter-select,[data-theme="dark"] .vp-search{
+  background:var(--gray2)!important;color:var(--ink2)!important;border-color:var(--border2)!important;}
+.vp-dm-row{display:flex;justify-content:flex-end;margin-bottom:8px;}
+.vp-dm-row-padded{padding:8px 20px 0;}
+.vp-topbar-padded{padding:14px 20px;}
+.ls-green{background:var(--green);}
+.ls-amber{background:var(--amber);}
+.ls-red{background:var(--red);}
+.ls-teal{background:var(--teal);}
+.ls-navy{background:var(--navy);}
+.ls-purple{background:var(--purple);}
+.ls-teal-outline{background:var(--teal3);border:1px solid var(--teal);}
+.ls-gray-outline{background:var(--gray2);border:1px solid var(--border2);}
+.ls-amber-outline{background:var(--amber3);border:1px solid var(--amber);}
+.dim-header-teal{border-color:#0D9488;}
+.dim-header-navy{border-color:#0F1E3C;}
+.dim-header-purple{border-color:#7C3AED;}
+.dim-header-amber{border-color:#D97706;}
+.dim-header-red{border-color:#DC2626;}
+.dim-weight-teal{color:#0D9488;}
+.dim-weight-navy{color:#0F1E3C;}
+.dim-weight-purple{color:#7C3AED;}
+.dim-weight-amber{color:#D97706;}
+.dim-weight-red{color:#DC2626;}
+.table-view-panel{display:none;padding:16px;}
+.vp-main-risk{padding:0;overflow:hidden;display:flex;flex-direction:column;}
+.assess-vendor-input{min-width:260px;}
+</style>
+<style>
+/* ══ Risk Platform Styles ══ */
+
+/* ── Toolbar ── */
+.risk-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding:14px 20px;background:var(--white);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;}
+.risk-toolbar select,.risk-toolbar input{
+  padding:7px 12px;border:1px solid var(--border2);border-radius:6px;
+  font-size:9pt;font-family:inherit;color:var(--ink2);background:var(--white);
+  outline:none;transition:border-color 0.15s;}
+.risk-toolbar select:focus,.risk-toolbar input:focus{border-color:var(--teal);}
+.risk-toolbar input{min-width:200px;}
+.view-toggle{display:flex;border:1px solid var(--border2);border-radius:6px;
+  overflow:hidden;}
+.vt-btn{padding:7px 14px;font-size:9pt;font-weight:600;cursor:pointer;
+  border:none;font-family:inherit;transition:all 0.15s;background:var(--white);
+  color:var(--ink3);}
+.vt-btn.active{background:var(--navy);color:#fff;}
+.assess-btn{padding:7px 16px;background:var(--teal);color:#fff;border:none;
+  border-radius:6px;font-size:9pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;margin-left:auto;}
+.assess-btn:hover{background:var(--teal2);}
+
+/* ── Portfolio summary strip ── */
+.risk-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  padding:16px 20px;background:var(--gray);border-bottom:1px solid var(--border);}
+.rs-card{background:var(--white);border-radius:8px;padding:14px 16px;
+  border:1px solid var(--border);text-align:center;}
+.rs-val{font-size:22pt;font-weight:800;color:var(--navy);line-height:1;}
+.rs-label{font-size:8pt;color:var(--ink4);margin-top:4px;
+  text-transform:uppercase;letter-spacing:0.08em;}
+
+/* ── Heat map grid ── */
+.heatmap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:12px;padding:20px;}
+.hm-card{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:14px;cursor:pointer;transition:all 0.2s;position:relative;
+  overflow:hidden;}
+.hm-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.1);
+  border-color:var(--navy);}
+.hm-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;}
+.hm-card.risk-green::before{background:var(--green);}
+.hm-card.risk-amber::before{background:var(--amber);}
+.hm-card.risk-red::before{background:var(--red);}
+.hm-logo{width:36px;height:36px;border-radius:6px;object-fit:contain;
+  background:#fff;padding:2px;border:1px solid var(--border);}
+.hm-logo-fb{width:36px;height:36px;border-radius:6px;display:flex;
+  align-items:center;justify-content:center;font-size:12pt;font-weight:800;
+  color:#fff;flex-shrink:0;}
+.hm-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.hm-name{font-size:9.5pt;font-weight:700;color:var(--navy);flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hm-score{font-size:18pt;font-weight:900;line-height:1;}
+.risk-green .hm-score{color:var(--green);}
+.risk-amber .hm-score{color:var(--amber);}
+.risk-red .hm-score{color:var(--red);}
+.hm-score-label{font-size:7.5pt;color:var(--ink4);text-transform:uppercase;
+  letter-spacing:0.08em;margin-top:1px;}
+.hm-bars{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+.hm-bar-row{display:flex;align-items:center;gap:6px;}
+.hm-bar-label{font-size:7.5pt;color:var(--ink4);width:64px;flex-shrink:0;}
+.hm-bar-track{flex:1;height:4px;background:var(--gray2);border-radius:2px;
+  overflow:hidden;}
+.hm-bar-fill{height:100%;border-radius:2px;transition:width 0.3s;}
+.hm-pillar{font-size:7.5pt;color:var(--ink4);margin-top:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ── Risk detail panel ── */
+.risk-detail{display:none;background:var(--white);border-left:1px solid var(--border);
+  width:460px;flex-shrink:0;overflow-y:auto;
+  max-height:calc(100vh - 120px);align-self:flex-start;}
+.risk-detail.open{display:block;}
+.rd-header{padding:20px;background:var(--navy);color:#fff;position:sticky;top:0;}
+.rd-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);
+  border:none;color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;
+  font-size:11pt;font-family:inherit;}
+.rd-vendor-name{font-size:16pt;font-weight:800;margin-bottom:4px;}
+.rd-meta{font-size:9pt;color:rgba(255,255,255,0.6);}
+.rd-score-hero{display:flex;align-items:center;gap:16px;padding:16px 20px;
+  border-bottom:1px solid var(--border);}
+.rd-score-circle{width:72px;height:72px;border-radius:50%;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  flex-shrink:0;}
+.rd-score-num{font-size:18pt;font-weight:900;line-height:1;}
+.rd-score-label{font-size:7.5pt;text-transform:uppercase;letter-spacing:0.08em;}
+.rd-overall-label{font-size:11pt;font-weight:700;color:var(--ink2);}
+.rd-overall-sub{font-size:9pt;color:var(--ink4);margin-top:2px;}
+
+/* ── Radar chart ── */
+.radar-wrap{padding:20px;border-bottom:1px solid var(--border);text-align:center;}
+.radar-title{font-size:9pt;font-weight:700;color:var(--ink2);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;}
+canvas#radarChart{max-width:100%;}
+
+/* ── Dimension score cards ── */
+.dim-scores{padding:16px 20px;border-bottom:1px solid var(--border);}
+.dim-score-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.dim-score-icon{font-size:14pt;width:28px;text-align:center;}
+.dim-score-label{font-size:9pt;font-weight:600;color:var(--ink2);flex:1;}
+.dim-score-bar-wrap{flex:2;}
+.dim-score-track{height:8px;background:var(--gray2);border-radius:4px;
+  overflow:hidden;}
+.dim-score-fill{height:100%;border-radius:4px;transition:width 0.5s;}
+.dim-score-val{font-size:9pt;font-weight:700;width:36px;text-align:right;}
+
+/* ── VER Notes ── */
+.rd-notes{padding:16px 20px;border-bottom:1px solid var(--border);}
+.rd-notes-label{font-size:8pt;font-weight:800;color:var(--navy);
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
+.rd-notes-text{font-size:9pt;color:var(--ink3);line-height:1.65;}
+.rd-actions{padding:16px 20px;display:flex;gap:8px;flex-wrap:wrap;}
+.rd-action-btn{padding:7px 14px;border-radius:6px;font-size:8.5pt;font-weight:700;
+  cursor:pointer;font-family:inherit;border:1px solid;transition:all 0.15s;}
+.rd-action-btn.primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+.rd-action-btn.secondary{background:var(--white);color:var(--teal2);
+  border-color:var(--teal);}
+.rd-action-btn:hover{opacity:0.85;}
+
+/* ── Assessment Panel ── */
+.assess-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+  z-index:200;overflow-y:auto;}
+.assess-panel.open{display:block;}
+.assess-inner{background:var(--white);max-width:860px;margin:40px auto;
+  border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+.assess-top{background:var(--navy);padding:20px 24px;color:#fff;
+  display:flex;align-items:center;gap:16px;}
+.assess-title{flex:1;}
+.assess-title h2{font-size:14pt;font-weight:800;margin-bottom:2px;}
+.assess-title p{font-size:9pt;color:rgba(255,255,255,0.6);}
+.assess-close{background:rgba(255,255,255,0.15);border:none;color:#fff;
+  border-radius:6px;padding:6px 12px;cursor:pointer;font-family:inherit;
+  font-size:11pt;}
+
+/* Vendor selector in assessment */
+.assess-vendor-select{padding:16px 24px;border-bottom:1px solid var(--border);
+  background:var(--gray);display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.avs-label{font-size:9pt;font-weight:700;color:var(--ink2);}
+.avs-select{padding:7px 12px;border:1px solid var(--border2);border-radius:6px;
+  font-family:inherit;font-size:9pt;color:var(--ink2);background:var(--white);
+  min-width:200px;}
+
+/* Live radar in assessment */
+.assess-body{display:grid;grid-template-columns:1fr 280px;gap:0;}
+.assess-questions{padding:20px 24px;overflow-y:auto;max-height:65vh;}
+.assess-live{padding:20px;background:var(--gray);border-left:1px solid var(--border);
+  position:sticky;top:0;display:flex;flex-direction:column;align-items:center;}
+.alv-title{font-size:8.5pt;font-weight:700;color:var(--ink2);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;
+  text-align:center;}
+.alv-score{font-size:28pt;font-weight:900;color:var(--navy);
+  text-align:center;line-height:1;}
+.alv-score-label{font-size:8pt;color:var(--ink4);text-transform:uppercase;
+  letter-spacing:0.08em;margin-top:2px;text-align:center;}
+.alv-progress{font-size:8.5pt;color:var(--ink4);margin-top:12px;text-align:center;}
+canvas#liveRadar{max-width:100%;margin:12px 0;}
+.alv-dims{width:100%;display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.alv-dim-row{display:flex;align-items:center;gap:6px;}
+.alv-dim-icon{font-size:10pt;width:20px;}
+.alv-dim-label{font-size:8pt;color:var(--ink3);flex:1;}
+.alv-dim-val{font-size:8.5pt;font-weight:700;color:var(--navy);width:30px;
+  text-align:right;}
+
+/* Question blocks */
+.dim-group{margin-bottom:20px;}
+.dim-header{display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--gray);border-radius:8px;border-left:3px solid;
+  margin-bottom:12px;}
+.dim-icon{font-size:14pt;}
+.dim-label{font-size:10pt;font-weight:700;color:var(--ink2);flex:1;}
+.dim-weight{font-size:8pt;font-weight:600;}
+.q-block{margin-bottom:14px;padding:12px 14px;border:1px solid var(--border);
+  border-radius:8px;transition:border-color 0.2s;}
+.q-block.answered{border-color:var(--teal);background:var(--teal3);}
+.q-text{font-size:9.5pt;font-weight:600;color:var(--ink2);margin-bottom:10px;
+  display:flex;gap:8px;align-items:flex-start;}
+.q-num{background:var(--navy);color:#fff;border-radius:4px;padding:2px 7px;
+  font-size:8pt;font-weight:700;flex-shrink:0;}
+.q-options{display:flex;flex-direction:column;gap:6px;}
+.q-opt{display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:6px 8px;border-radius:6px;transition:background 0.15s;}
+.q-opt:hover{background:var(--gray);}
+.q-opt input{display:none;}
+.q-opt-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);
+  flex-shrink:0;transition:all 0.15s;}
+.q-opt input:checked + .q-opt-dot{border-color:var(--teal);background:var(--teal);}
+.q-opt-text{font-size:9pt;color:var(--ink3);line-height:1.4;}
+.q-opt input:checked ~ .q-opt-text{color:var(--teal2);font-weight:600;}
+
+/* Assessment footer */
+.assess-footer{padding:16px 24px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--gray);}
+.af-progress{font-size:9pt;color:var(--ink4);}
+.af-progress strong{color:var(--navy);}
+.af-btns{display:flex;gap:8px;}
+.af-btn{padding:8px 18px;border-radius:6px;font-size:9pt;font-weight:700;
+  cursor:pointer;font-family:inherit;border:1px solid;transition:all 0.15s;}
+.af-btn.save{background:var(--navy);color:#fff;border-color:var(--navy);}
+.af-btn.save:disabled{opacity:0.4;cursor:not-allowed;}
+.af-btn.cancel{background:var(--white);color:var(--ink3);border-color:var(--border2);}
+
+/* Risk level badge */
+.risk-badge{display:inline-block;padding:3px 10px;border-radius:12px;
+  font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;}
+.rb-green{background:var(--green3);color:var(--green2);}
+.rb-amber{background:var(--amber3);color:var(--amber2);}
+.rb-red{background:var(--red3);color:var(--red2);}
+
+/* Watch list chip — embedded in summary strip */
+.wl-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px 4px 8px;
+  border-radius:20px;border:1.5px solid rgba(220,38,38,0.35);
+  background:var(--red3);color:var(--red2);
+  font-size:8pt;font-weight:700;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;user-select:none;}
+.wl-chip:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.wl-chip.active{background:var(--red);color:#fff;border-color:var(--red);}
+.wl-chip-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;}
+.wl-chip.active .wl-chip-dot,.wl-chip:hover .wl-chip-dot{background:#fff;}
+
+/* Main content area with side panel */
+.risk-content{display:flex;flex:1;overflow:hidden;}
+.risk-left{flex:1;overflow-y:auto;}
+</style>
+</head>
+<body>
+<div class="vp-wrap">
+<div class="vp-side"><div class="vp-logo">
+  <div class="vp-logo-title">VER Vendor<br>Platform</div>
+  <div class="vp-logo-sub">DET · FY27</div>
+</div><nav class="vp-nav"><div class="vp-nav-section">Platform</div><a href="vendor_home.html" class="vp-nav-item"><span class="vp-nav-icon">🏠</span>Portfolio Overview</a><a href="vendor_registry.html" class="vp-nav-item"><span class="vp-nav-icon">📋</span>Vendor Registry</a><a href="vendor_risk.html" class="vp-nav-item active"><span class="vp-nav-icon">⚠️</span>Risk Dashboard</a><div class="vp-nav-section">Tools</div><a href="vendor_selector.html" class="vp-nav-item "><span class="vp-nav-icon">🎯</span>Vendor Selector</a><a href="spend_benchmarking.html" class="vp-nav-item"><span class="vp-nav-icon">&#128178;</span>Spend Benchmarking</a><a href="vendor_sow.html" class="vp-nav-item "><span class="vp-nav-icon">📄</span>SOW Builder</a>
+    <a href="vendor_co.html" class="vp-nav-item"><span class="vp-nav-icon">&#128260;</span>Change Order</a><div class="vp-nav-divider"></div><a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a></nav><div class="vp-side-footer">VER Vendor Platform<br>Salesforce DET · FY27</div>
+</div>
+
+
+
+<div class="vp-main vp-main-risk">
+<div class="vp-dm-row vp-dm-row-padded"><button type="button" class="dm-toggle" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button></div>
+
+  <!-- Topbar -->
+  <div class="vp-topbar vp-topbar-padded">
+    <div>
+      <div class="vp-page-title">VER Risk Intelligence</div>
+      <div class="vp-page-sub">Portfolio-wide vendor risk intelligence · Perform assessments · Five-dimension scoring · VER advisory tool</div>
+    </div>
+    <div class="vp-topbar-actions">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="openVendorRiskHelp()">&#63; How to Read</button>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="risk-toolbar">
+    <input type="text" id="search-input" placeholder="🔍  Search vendors..."
+      oninput="filterVendors()">
+    <select id="risk-filter" onchange="filterVendors()">
+      <option value="all">All Risk Levels</option>
+      <option value="red">🔴 High Risk</option>
+      <option value="amber">🟡 Monitor</option>
+      <option value="green">🟢 Healthy</option>
+    </select>
+    <select id="type-filter" onchange="filterVendors()">
+      <option value="all">All Types</option>
+      <option value="assessed">&#10003; VER Assessed</option>
+      <option value="derived">&#9678; Derived</option>
+    </select>
+    <select id="region-filter" onchange="filterVendors()">
+      <option value="all">All Regions</option>
+      <option value="AMER">AMER</option>
+      <option value="EMEA">EMEA</option>
+      <option value="APAC">APAC</option>
+      <option value="LATAM">LATAM</option>
+      <option value="JAPAC">JAPAC</option>
+      <option value="Global">Global</option>
+    </select>
+    <div class="view-toggle">
+      <button class="vt-btn active" id="vt-heatmap"
+        onclick="setView('heatmap')">Heat Map</button>
+      <button class="vt-btn" id="vt-table"
+        onclick="setView('table')">Table</button>
+    </div>
+    <button class="assess-btn" onclick="openAssessment()">
+      + New Assessment
+    </button>
+  </div>
+
+
+  <!-- Legend -->
+  <div class="legend-bar">
+    <div class="legend-toggle" onclick="toggleLegend()">
+      <span id="legend-arrow">▶</span>
+      <span>Scoring Methodology & Legend</span>
+    </div>
+    <div class="legend-body" id="legend-body">
+      <div>
+        <div class="legend-section-title">Risk Bands</div>
+        <div class="legend-items">
+          <div class="legend-item">
+            <div class="legend-swatch ls-green"></div>
+            <div class="legend-text"><strong>Healthy (0–35):</strong> Low risk — standard VER monitoring cadence. No immediate action required.</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch ls-amber"></div>
+            <div class="legend-text"><strong>Monitor (36–55):</strong> Elevated risk — VER is actively watching. Advisory engagement recommended within 30 days.</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch ls-red"></div>
+            <div class="legend-text"><strong>High Risk (56+):</strong> Action required — VER escalation recommended. Pillar Lead should be engaged immediately.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="legend-section-title">Five Dimensions</div>
+        <div class="legend-items">
+          <div class="legend-item">
+            <div class="legend-swatch ls-teal"></div>
+            <div class="legend-text"><strong>🚚 Delivery:</strong> SLA performance, milestone delivery rate, attrition, escalation frequency, evidence quality.</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch ls-navy"></div>
+            <div class="legend-text"><strong>💰 Financial:</strong> Spend concentration, rate vs benchmark, budget variance, invoice compliance.</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch ls-purple"></div>
+            <div class="legend-text"><strong>🤝 Relationship:</strong> Responsiveness, key person dependency, transparency, requirements comprehension.</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch ls-amber"></div>
+            <div class="legend-text"><strong>📊 Market:</strong> Vendor financial health, competitive alternatives, rate trend vs market.</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch ls-red"></div>
+            <div class="legend-text"><strong>📋 Compliance:</strong> SOW currency, security documentation, portal registration, change order governance.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="legend-section-title">Score Types</div>
+        <div class="legend-items">
+          <div class="legend-item">
+            <div class="legend-swatch ls-teal-outline"></div>
+            <div class="legend-text"><strong>✓ VER Assessed:</strong> Score derived from a formal 20-question VER assessment. All five dimensions independently evaluated. Most reliable signal.</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch ls-gray-outline"></div>
+            <div class="legend-text"><strong>◎ Derived:</strong> Score computed automatically from vendors.csv fields — SLA score, tier, category, spend, renewal proximity, and existing risk fields. Indicative only. Perform a formal VER assessment for a definitive score.</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch ls-amber-outline"></div>
+            <div class="legend-text"><strong>Renewal proximity:</strong> Vendors expiring within 180 days automatically receive a compliance risk adjustment — +8 pts (90–180 days), +15 pts (&lt;90 days), +25 pts (expired).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary strip -->
+  <div class="risk-summary" id="summary-strip"></div>
+
+  <!-- Main content -->
+  <div class="risk-content">
+    <div class="risk-left">
+      <!-- Heat map -->
+      <div id="heatmap-view" class="heatmap-grid"></div>
+      <!-- Table view -->
+      <div id="table-view" class="table-view-panel">
+        <table class="vp-table" id="risk-table" style="width:100%;">
+          <thead><tr>
+            <th>Vendor</th><th>Pillar</th><th>Category</th>
+            <th>Delivery</th><th>Financial</th>
+            <th>Relationship</th><th>Market</th><th>Compliance</th>
+            <th>Overall</th><th>Level</th>
+          </tr></thead>
+          <tbody id="risk-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Detail panel -->
+    <div class="risk-detail" id="risk-detail">
+      <div class="rd-header">
+        <button class="rd-close" onclick="closeDetail()">✕</button>
+        <div class="rd-vendor-name" id="rd-name">—</div>
+        <div class="rd-meta" id="rd-meta">—</div>
+      </div>
+      <div class="rd-score-hero">
+        <div class="rd-score-circle" id="rd-score-circle">
+          <div class="rd-score-num" id="rd-score-num">—</div>
+          <div class="rd-score-label">Risk Score</div>
+        </div>
+        <div>
+          <div class="rd-overall-label" id="rd-overall-label">—</div>
+          <div class="rd-overall-sub" id="rd-overall-sub">—</div>
+        </div>
+      </div>
+      <div class="radar-wrap">
+        <div class="radar-title">Risk Profile — Five Dimensions</div>
+        <canvas id="radarChart" width="380" height="280"></canvas>
+      </div>
+      <div class="dim-scores" id="dim-scores"></div>
+      <div class="rd-notes">
+        <div class="rd-notes-label">VER Advisory Notes</div>
+        <div class="rd-notes-text" id="rd-notes">—</div>
+      </div>
+      <div class="rd-actions">
+        <button type="button" class="rd-action-btn primary"
+          onclick="openAssessmentForVendor()">
+          ✏️ Perform Assessment
+        </button>
+        <button type="button" class="rd-action-btn secondary"
+          onclick="window.location.href='vendor_detail.html?id='+(selectedVendor&&selectedVendor.id||'')">
+          🔍 View 360 Dossier
+        </button>
+        <button type="button" class="rd-action-btn secondary"
+          onclick="window.location.href='page_scenario.html?id='+(selectedVendor&&selectedVendor.id||'')">
+          📐 Model Scenario
+        </button>
+        <button type="button" class="rd-action-btn secondary"
+          onclick="exportBrief()">
+          📋 Copy Risk Brief
+        </button>
+        <button type="button" class="rd-action-btn secondary"
+          onclick="printRiskProfile()">
+          📄 Download PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Assessment Panel -->
+<div class="assess-panel" id="assess-panel">
+  <div class="assess-inner">
+    <div class="assess-top">
+      <div class="assess-title">
+        <h2>Perform Risk Assessment</h2>
+        <p>Answer 20 questions to generate a VER risk score · Chart updates live</p>
+      </div>
+      <button class="assess-close" onclick="closeAssessment()">✕</button>
+    </div>
+    <div class="assess-vendor-select">
+      <span class="avs-label">Assessing:</span>
+      <input type="text" class="avs-select assess-vendor-input" id="assess-vendor-input"
+        placeholder="Search all 1,375 vendors..."
+        oninput="onAssessVendorInput(this.value)"
+        autocomplete="off">
+      <datalist id="vendor-datalist"></datalist>
+      <input type="hidden" id="assess-vendor-id">
+      <select class="avs-select" id="assess-pillar-select">
+        <option value="All Pillars">All Pillars</option>
+<option value="Salesforce on Salesforce Technology">Salesforce on Salesforce Technology</option>
+<option value="Engineering Development & Delivery">Engineering Development & Delivery</option>
+<option value="IT">IT</option>
+<option value="Delivery Assurance & Operations">Delivery Assurance & Operations</option>
+<option value="Digital Marketing Technology">Digital Marketing Technology</option>
+<option value="Data Solutions">Data Solutions</option>
+<option value="Agentic Transformation">Agentic Transformation</option>
+<option value="Office of the CDO">Office of the CDO</option>
+<option value="Emerging Technology">Emerging Technology</option>
+      </select>
+    </div>
+    <div class="assess-body">
+      <div class="assess-questions" id="assess-questions">
+
+<div class="dim-group" data-dim="delivery">
+  <div class="dim-header dim-header-teal">
+    <span class="dim-icon">🚚</span>
+    <span class="dim-label">Delivery & Reliability</span>
+    <span class="dim-weight dim-weight-teal">
+      12× weight
+    </span>
+  </div>
+  <div class="q-block" data-q="1" data-dim="delivery" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q1</span>
+      SLA performance trend (last 3 quarters)
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q1" value="100"
+          onchange="onAnswer(1,'delivery',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Met all targets consistently</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q1" value="80"
+          onchange="onAnswer(1,'delivery',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Met most — 1-2 minor misses</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q1" value="60"
+          onchange="onAnswer(1,'delivery',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Borderline — recurring borderline</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q1" value="40"
+          onchange="onAnswer(1,'delivery',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Missed 1+ critical SLA</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q1" value="20"
+          onchange="onAnswer(1,'delivery',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Repeated critical misses</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="2" data-dim="delivery" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q2</span>
+      Milestone delivery rate this quarter
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q2" value="100"
+          onchange="onAnswer(2,'delivery',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">100% on time</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q2" value="80"
+          onchange="onAnswer(2,'delivery',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Minor delays — no impact</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q2" value="60"
+          onchange="onAnswer(2,'delivery',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Some delays with impact</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q2" value="40"
+          onchange="onAnswer(2,'delivery',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Material delays or scope gaps</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q2" value="20"
+          onchange="onAnswer(2,'delivery',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Significant delivery failure</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="3" data-dim="delivery" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q3</span>
+      Attrition rate and continuity plan
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q3" value="100"
+          onchange="onAnswer(3,'delivery',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text"><5% — plan on file</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q3" value="80"
+          onchange="onAnswer(3,'delivery',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">5-8% — plan in progress</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q3" value="60"
+          onchange="onAnswer(3,'delivery',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">8-12% — plan not submitted</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q3" value="40"
+          onchange="onAnswer(3,'delivery',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">12-15% — no plan</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q3" value="20"
+          onchange="onAnswer(3,'delivery',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">15%+ — active continuity risk</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="4" data-dim="delivery" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q4</span>
+      Escalation frequency this quarter
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q4" value="100"
+          onchange="onAnswer(4,'delivery',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Zero escalations</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q4" value="80"
+          onchange="onAnswer(4,'delivery',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">1 minor escalation</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q4" value="60"
+          onchange="onAnswer(4,'delivery',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">2 escalations — resolved</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q4" value="40"
+          onchange="onAnswer(4,'delivery',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">3+ escalations</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q4" value="20"
+          onchange="onAnswer(4,'delivery',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Active unresolved escalation</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="5" data-dim="delivery" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q5</span>
+      Evidence quality — self-reported vs supported
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q5" value="100"
+          onchange="onAnswer(5,'delivery',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">All claims supported by data</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q5" value="80"
+          onchange="onAnswer(5,'delivery',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Most claims supported</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q5" value="60"
+          onchange="onAnswer(5,'delivery',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Mixed — some self-reported</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q5" value="40"
+          onchange="onAnswer(5,'delivery',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Primarily self-reported</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q5" value="20"
+          onchange="onAnswer(5,'delivery',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">No supporting data provided</span>
+      </label>
+    </div>
+  </div></div>
+<div class="dim-group" data-dim="financial">
+  <div class="dim-header dim-header-navy">
+    <span class="dim-icon">💰</span>
+    <span class="dim-label">Financial & Spend</span>
+    <span class="dim-weight dim-weight-navy">
+      10× weight
+    </span>
+  </div>
+  <div class="q-block" data-q="6" data-dim="financial" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q6</span>
+      Spend concentration vs pillar total
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q6" value="100"
+          onchange="onAnswer(6,'financial',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text"><20% of pillar spend</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q6" value="80"
+          onchange="onAnswer(6,'financial',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">20-35% of pillar spend</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q6" value="60"
+          onchange="onAnswer(6,'financial',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">35-50% of pillar spend</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q6" value="40"
+          onchange="onAnswer(6,'financial',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">50-70% of pillar spend</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q6" value="20"
+          onchange="onAnswer(6,'financial',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">>70% of pillar spend</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="7" data-dim="financial" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q7</span>
+      Rate competitiveness vs VER benchmark
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q7" value="100"
+          onchange="onAnswer(7,'financial',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">At or below benchmark</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q7" value="80"
+          onchange="onAnswer(7,'financial',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">1-5% above benchmark</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q7" value="60"
+          onchange="onAnswer(7,'financial',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">5-10% above benchmark</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q7" value="40"
+          onchange="onAnswer(7,'financial',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">10-20% above benchmark</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q7" value="20"
+          onchange="onAnswer(7,'financial',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">>20% above — review required</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="8" data-dim="financial" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q8</span>
+      Budget vs actuals variance this quarter
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q8" value="100"
+          onchange="onAnswer(8,'financial',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Within 3%</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q8" value="80"
+          onchange="onAnswer(8,'financial',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">3-7% variance</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q8" value="60"
+          onchange="onAnswer(8,'financial',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">7-12% variance</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q8" value="40"
+          onchange="onAnswer(8,'financial',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">12-20% variance</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q8" value="20"
+          onchange="onAnswer(8,'financial',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">>20% — unexplained variance</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="9" data-dim="financial" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q9</span>
+      Invoice compliance and payment terms
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q9" value="100"
+          onchange="onAnswer(9,'financial',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">100% compliant</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q9" value="80"
+          onchange="onAnswer(9,'financial',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">1-2 minor issues</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q9" value="60"
+          onchange="onAnswer(9,'financial',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Recurring minor issues</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q9" value="40"
+          onchange="onAnswer(9,'financial',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Material non-compliance</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q9" value="20"
+          onchange="onAnswer(9,'financial',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Significant disputes</span>
+      </label>
+    </div>
+  </div></div>
+<div class="dim-group" data-dim="relationship">
+  <div class="dim-header dim-header-purple">
+    <span class="dim-icon">🤝</span>
+    <span class="dim-label">Relationship & Responsiveness</span>
+    <span class="dim-weight dim-weight-purple">
+      10× weight
+    </span>
+  </div>
+  <div class="q-block" data-q="10" data-dim="relationship" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q10</span>
+      Responsiveness and communication quality
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q10" value="100"
+          onchange="onAnswer(10,'relationship',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Proactive — anticipates needs</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q10" value="80"
+          onchange="onAnswer(10,'relationship',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Responsive — prompt replies</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q10" value="60"
+          onchange="onAnswer(10,'relationship',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Adequate — some delays</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q10" value="40"
+          onchange="onAnswer(10,'relationship',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Reactive only</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q10" value="20"
+          onchange="onAnswer(10,'relationship',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Poor — chronic delays</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="11" data-dim="relationship" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q11</span>
+      Key person dependency exposure
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q11" value="100"
+          onchange="onAnswer(11,'relationship',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Strong bench — no single points</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q11" value="80"
+          onchange="onAnswer(11,'relationship',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Minor dependency — plan exists</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q11" value="60"
+          onchange="onAnswer(11,'relationship',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Moderate dependency</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q11" value="40"
+          onchange="onAnswer(11,'relationship',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">High dependency — 1-2 critical people</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q11" value="20"
+          onchange="onAnswer(11,'relationship',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Critical dependency — no coverage</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="12" data-dim="relationship" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q12</span>
+      Transparency vs accountability patterns
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q12" value="100"
+          onchange="onAnswer(12,'relationship',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Fully transparent — owns issues</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q12" value="80"
+          onchange="onAnswer(12,'relationship',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Generally transparent</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q12" value="60"
+          onchange="onAnswer(12,'relationship',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Selective disclosure</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q12" value="40"
+          onchange="onAnswer(12,'relationship',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Minimizes issues</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q12" value="20"
+          onchange="onAnswer(12,'relationship',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Deflects accountability</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="13" data-dim="relationship" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q13</span>
+      Requirements comprehension and execution
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q13" value="100"
+          onchange="onAnswer(13,'relationship',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">First-time right — minimal back-and-forth</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q13" value="80"
+          onchange="onAnswer(13,'relationship',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Minor clarifications needed</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q13" value="60"
+          onchange="onAnswer(13,'relationship',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Regular back-and-forth</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q13" value="40"
+          onchange="onAnswer(13,'relationship',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Frequent misunderstandings</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q13" value="20"
+          onchange="onAnswer(13,'relationship',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Persistent requirement gaps</span>
+      </label>
+    </div>
+  </div></div>
+<div class="dim-group" data-dim="market">
+  <div class="dim-header dim-header-amber">
+    <span class="dim-icon">📊</span>
+    <span class="dim-label">Market & Strategic</span>
+    <span class="dim-weight dim-weight-amber">
+      8× weight
+    </span>
+  </div>
+  <div class="q-block" data-q="14" data-dim="market" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q14</span>
+      Vendor financial health and stability
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q14" value="100"
+          onchange="onAnswer(14,'market',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Publicly traded — strong financials</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q14" value="80"
+          onchange="onAnswer(14,'market',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Private — stable known financials</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q14" value="60"
+          onchange="onAnswer(14,'market',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Private — limited visibility</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q14" value="40"
+          onchange="onAnswer(14,'market',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Some market concerns</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q14" value="20"
+          onchange="onAnswer(14,'market',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Active M&A or financial concern</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="15" data-dim="market" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q15</span>
+      Competitive alternatives available
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q15" value="100"
+          onchange="onAnswer(15,'market',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">3+ qualified alternatives</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q15" value="80"
+          onchange="onAnswer(15,'market',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">2 alternatives</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q15" value="60"
+          onchange="onAnswer(15,'market',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">1 credible alternative</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q15" value="40"
+          onchange="onAnswer(15,'market',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Limited alternatives</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q15" value="20"
+          onchange="onAnswer(15,'market',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">No viable alternative</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="16" data-dim="market" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q16</span>
+      Rate trend vs market benchmark (12 months)
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q16" value="100"
+          onchange="onAnswer(16,'market',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Rates declining or flat</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q16" value="80"
+          onchange="onAnswer(16,'market',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">1-3% increase — market normal</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q16" value="60"
+          onchange="onAnswer(16,'market',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">3-6% increase — above market</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q16" value="40"
+          onchange="onAnswer(16,'market',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">6-10% increase</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q16" value="20"
+          onchange="onAnswer(16,'market',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">10%+ increase — unsustainable</span>
+      </label>
+    </div>
+  </div></div>
+<div class="dim-group" data-dim="compliance">
+  <div class="dim-header dim-header-red">
+    <span class="dim-icon">📋</span>
+    <span class="dim-label">Governance & Compliance</span>
+    <span class="dim-weight dim-weight-red">
+      10× weight
+    </span>
+  </div>
+  <div class="q-block" data-q="17" data-dim="compliance" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q17</span>
+      SOW and contract currency
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q17" value="100"
+          onchange="onAnswer(17,'compliance',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">All SOWs current — 6+ months remaining</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q17" value="80"
+          onchange="onAnswer(17,'compliance',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">1 SOW expiring within 6 months</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q17" value="60"
+          onchange="onAnswer(17,'compliance',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Multiple expiring within 6 months</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q17" value="40"
+          onchange="onAnswer(17,'compliance',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">1+ already expired</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q17" value="20"
+          onchange="onAnswer(17,'compliance',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Multiple expired — governance gap</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="18" data-dim="compliance" data-weight="3">
+    <div class="q-text">
+      <span class="q-num">Q18</span>
+      Security and compliance documentation
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q18" value="100"
+          onchange="onAnswer(18,'compliance',3,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">All certs current — filed with VER</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q18" value="80"
+          onchange="onAnswer(18,'compliance',3,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Minor gaps — in progress</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q18" value="60"
+          onchange="onAnswer(18,'compliance',3,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Some outdated documentation</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q18" value="40"
+          onchange="onAnswer(18,'compliance',3,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Material compliance gaps</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q18" value="20"
+          onchange="onAnswer(18,'compliance',3,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">No documentation on file</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="19" data-dim="compliance" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q19</span>
+      Supplier portal registration status
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q19" value="100"
+          onchange="onAnswer(19,'compliance',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Fully registered — current</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q19" value="80"
+          onchange="onAnswer(19,'compliance',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Registered — minor updates needed</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q19" value="60"
+          onchange="onAnswer(19,'compliance',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Partially registered</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q19" value="40"
+          onchange="onAnswer(19,'compliance',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Not registered — engagement active</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q19" value="20"
+          onchange="onAnswer(19,'compliance',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Not registered — no engagement record</span>
+      </label>
+    </div>
+  </div>
+  <div class="q-block" data-q="20" data-dim="compliance" data-weight="2">
+    <div class="q-text">
+      <span class="q-num">Q20</span>
+      Change order governance adherence
+    </div>
+    <div class="q-options">
+      <label class="q-opt" data-score="100">
+        <input type="radio" name="q20" value="100"
+          onchange="onAnswer(20,'compliance',2,100)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">All COs through VER process</span>
+      </label>
+      <label class="q-opt" data-score="80">
+        <input type="radio" name="q20" value="80"
+          onchange="onAnswer(20,'compliance',2,80)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Minor exceptions — corrected</span>
+      </label>
+      <label class="q-opt" data-score="60">
+        <input type="radio" name="q20" value="60"
+          onchange="onAnswer(20,'compliance',2,60)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Some informal changes</span>
+      </label>
+      <label class="q-opt" data-score="40">
+        <input type="radio" name="q20" value="40"
+          onchange="onAnswer(20,'compliance',2,40)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">Regular informal scope changes</span>
+      </label>
+      <label class="q-opt" data-score="20">
+        <input type="radio" name="q20" value="20"
+          onchange="onAnswer(20,'compliance',2,20)">
+        <span class="q-opt-dot"></span>
+        <span class="q-opt-text">No CO governance — all informal</span>
+      </label>
+    </div>
+  </div></div>
+      </div>
+      <div class="assess-live">
+        <div class="alv-title">Live Risk Profile</div>
+        <canvas id="liveRadar" width="240" height="200"></canvas>
+        <div class="alv-score" id="alv-score">—</div>
+        <div class="alv-score-label">Composite Score</div>
+        <div class="alv-progress" id="alv-progress">0 / 20 answered</div>
+        <div class="alv-dims" id="alv-dims"></div>
+      </div>
+    </div>
+    <div class="assess-footer">
+      <div class="af-progress" id="af-progress">
+        Complete all 20 questions to save the assessment.
+      </div>
+      <div class="af-btns">
+        <button class="af-btn cancel" onclick="closeAssessment()">Cancel</button>
+        <button class="af-btn save" id="save-btn" disabled
+          onclick="saveAssessment()">Save Assessment</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendors.js"></script>
+<script>
+var BF = '1idLxwmT7Sv6VAWJq9j';
+var RISK_DATA = [{"id": "R001", "vendor_id": "V001", "name": "NTT Data", "domain": "nttdata.com", "category": "Professional Services", "tier": "1", "pillar": "", "region": "AMER|APAC|EMEA", "concentration": 85, "financial": 15, "delivery": 20, "compliance": 10, "overall": 40, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 10, "market": 10}, {"id": "R002", "vendor_id": "V002", "name": "Cognizant", "domain": "cognizant.com", "category": "Professional Services", "tier": "1", "pillar": "", "region": "AMER|APAC|EMEA", "concentration": 60, "financial": 20, "delivery": 15, "compliance": 12, "overall": 31, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 10, "market": 15}, {"id": "R003", "vendor_id": "V003", "name": "Tech Mahindra", "domain": "techmahindra.com", "category": "Professional Services", "tier": "2", "pillar": "", "region": "Global", "concentration": 50, "financial": 30, "delivery": 55, "compliance": 40, "overall": 46, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 45, "market": 25}, {"id": "R004", "vendor_id": "V004", "name": "Workday", "domain": "workday.com", "category": "Software / SaaS", "tier": "1", "pillar": "", "region": "Global", "concentration": 90, "financial": 10, "delivery": 10, "compliance": 8, "overall": 38, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 10, "market": 10}, {"id": "R005", "vendor_id": "V005", "name": "AWS", "domain": "aws.amazon.com", "category": "Cloud & Managed Services", "tier": "1", "pillar": "", "region": "Global", "concentration": 80, "financial": 8, "delivery": 10, "compliance": 12, "overall": 34, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 10, "market": 10}, {"id": "R006", "vendor_id": "V006", "name": "IBM", "domain": "ibm.com", "category": "Professional Services", "tier": "2", "pillar": "", "region": "AMER|EMEA", "concentration": 55, "financial": 35, "delivery": 40, "compliance": 30, "overall": 43, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 30, "market": 30}, {"id": "R007", "vendor_id": "V007", "name": "Google", "domain": "cloud.google.com", "category": "Cloud & Managed Services", "tier": "2", "pillar": "", "region": "Global", "concentration": 65, "financial": 10, "delivery": 12, "compliance": 10, "overall": 30, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 10, "market": 10}, {"id": "R008", "vendor_id": "V008", "name": "Deloitte", "domain": "deloitte.com", "category": "Professional Services", "tier": "2", "pillar": "", "region": "AMER|EMEA", "concentration": 40, "financial": 25, "delivery": 30, "compliance": 20, "overall": 31, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 20, "market": 20}, {"id": "R009", "vendor_id": "V009", "name": "BCG", "domain": "bcg.com", "category": "Professional Services", "tier": "2", "pillar": "", "region": "AMER", "concentration": 30, "financial": 40, "delivery": 70, "compliance": 50, "overall": 47, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 60, "market": 35}, {"id": "R010", "vendor_id": "V010", "name": "Gartner", "domain": "gartner.com", "category": "Software / SaaS", "tier": "3", "pillar": "", "region": "AMER", "concentration": 15, "financial": 20, "delivery": 18, "compliance": 15, "overall": 17, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 10, "market": 15}, {"id": "R011", "vendor_id": "V011", "name": "Conviva", "domain": "conviva.com", "category": "Software / SaaS", "tier": "3", "pillar": "", "region": "AMER", "concentration": 20, "financial": 22, "delivery": 25, "compliance": 18, "overall": 22, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 15, "market": 17}, {"id": "R012", "vendor_id": "V012", "name": "New Relic", "domain": "newrelic.com", "category": "Software / SaaS", "tier": "3", "pillar": "", "region": "AMER", "concentration": 15, "financial": 15, "delivery": 12, "compliance": 10, "overall": 13, "notes": "Initial FY27 baseline", "date": "2026-04-01", "relationship": 10, "market": 10}, {"id": "R013", "vendor_id": "V013", "name": "Accenture", "domain": "accenture.com", "category": "Consulting", "tier": "1", "pillar": "Salesforce on Salesforce Technology", "concentration": 70, "financial": 20, "delivery": 25, "compliance": 15, "relationship": 30, "market": 25, "overall": 33, "notes": "Strategic SI partner \u2014 renewal Q2 FY27"}, {"id": "R014", "vendor_id": "V014", "name": "Deloitte", "domain": "deloitte.com", "category": "Consulting", "tier": "1", "pillar": "Data Solutions", "concentration": 55, "financial": 25, "delivery": 20, "compliance": 20, "relationship": 22, "market": 28, "overall": 30, "notes": "Data analytics lead \u2014 strong delivery"}, {"id": "R015", "vendor_id": "V015", "name": "BCG", "domain": "bcg.com", "category": "Consulting", "tier": "1", "pillar": "Office of the CDO", "concentration": 92, "financial": 10, "delivery": 15, "compliance": 10, "relationship": 12, "market": 18, "overall": 29, "notes": "Strategic advisory \u2014 BCG dominates CDO pillar spend"}, {"id": "R016", "vendor_id": "V016", "name": "Computacenter", "domain": "computacenter.com", "category": "Hardware", "tier": "2", "pillar": "IT", "concentration": 45, "financial": 40, "delivery": 45, "compliance": 35, "relationship": 38, "market": 42, "overall": 48, "notes": "Hardware procurement \u2014 rate review pending"}, {"id": "R017", "vendor_id": "V017", "name": "JLL", "domain": "jll.com", "category": "Facilities", "tier": "2", "pillar": "IT", "concentration": 60, "financial": 30, "delivery": 30, "compliance": 25, "relationship": 28, "market": 35, "overall": 38, "notes": "Facilities management \u2014 stable engagement"}, {"id": "R018", "vendor_id": "V018", "name": "Capgemini", "domain": "capgemini.com", "category": "Professional Services", "tier": "2", "pillar": "Data Solutions", "concentration": 40, "financial": 35, "delivery": 40, "compliance": 30, "relationship": 35, "market": 38, "overall": 42, "notes": "Data engineering partner"}, {"id": "R019", "vendor_id": "V019", "name": "Informatica", "domain": "informatica.com", "category": "Software", "tier": "2", "pillar": "Data Solutions", "concentration": 50, "financial": 55, "delivery": 35, "compliance": 30, "relationship": 32, "market": 62, "overall": 53, "notes": "M&A exposure \u2014 acquired by Salesforce watch"}, {"id": "R020", "vendor_id": "V020", "name": "Akamai", "domain": "akamai.com", "category": "Telecom", "tier": "2", "pillar": "Digital Marketing Technology", "concentration": 65, "financial": 20, "delivery": 20, "compliance": 18, "relationship": 22, "market": 30, "overall": 32, "notes": "CDN services \u2014 stable"}];
+
+var currentView   = 'heatmap';
+var selectedVendor = null;
+var filteredData   = [...RISK_DATA];
+var assessAnswers  = {};
+var assessVendorId = null;
+
+// ── Risk helpers ──────────────────────────────────────────────
+function riskLevel(score){
+  if(score <= 35) return 'green';
+  if(score <= 55) return 'amber';
+  return 'red';
+}
+function riskLabel(score){
+  if(score <= 35) return 'Healthy';
+  if(score <= 55) return 'Monitor';
+  return 'High Risk';
+}
+function barColor(score){
+  if(score <= 35) return 'var(--green)';
+  if(score <= 55) return 'var(--amber)';
+  return 'var(--red)';
+}
+function vlogoErr(img){ img.style.display='none'; var fb=img.nextElementSibling; if(fb) fb.style.display='flex'; }
+function logoHtml(domain, name, size){
+  size = size||36;
+  var ini = (name||'?').split(' ').map(function(w){return w[0]||'';;}).join('').slice(0,2).toUpperCase();
+  var colors = ['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669'];
+  var lc = colors[(name||'').length % colors.length];
+  var fb = '<div class="hm-logo-fb" style="background:'+lc+';width:'+size+'px;height:'+size+'px;display:none;">'+ini+'</div>';
+  if(!domain) return '<div class="hm-logo-fb" style="background:'+lc+';width:'+size+'px;height:'+size+'px;">'+ini+'</div>';
+  return '<img class="hm-logo" src="https://cdn.brandfetch.io/'+domain+'?c='+BF+'" alt="'+name+'" '
+    +'style="width:'+size+'px;height:'+size+'px;" onerror="vlogoErr(this)">'
+    +fb;
+}
+
+// ── Filter ────────────────────────────────────────────────────
+function filterVendors(){
+  var search     = document.getElementById('search-input').value.toLowerCase();
+  var riskFil    = document.getElementById('risk-filter').value;
+  var typeFil    = document.getElementById('type-filter').value;
+  var regionFil  = document.getElementById('region-filter').value;
+  var _s = window.ALL_VENDORS || RISK_DATA;
+  filteredData = _s.filter(function(v){
+    if(search && !v.name.toLowerCase().includes(search) && !(v.category||'').toLowerCase().includes(search)) return false;
+    if(riskFil !== 'all' && riskLevel(v.overall) !== riskFil) return false;
+    if(typeFil !== 'all' && (v.scoreType||'derived') !== typeFil) return false;
+    if(regionFil !== 'all' && !(v.region||'').includes(regionFil)) return false;
+    return true;
+  });
+  renderAll();
+}
+
+// ── Summary strip ─────────────────────────────────────────────
+function renderSummary(){
+  var total  = filteredData.length;
+  var green  = filteredData.filter(function(v){return riskLevel(v.overall)==='green';}).length;
+  var amber  = filteredData.filter(function(v){return riskLevel(v.overall)==='amber';}).length;
+  var red    = filteredData.filter(function(v){return riskLevel(v.overall)==='red';}).length;
+  var vrA=filteredData.filter(function(v){return v.scoreType==='assessed';}).length;
+  var isWLActive = document.getElementById('risk-filter') && document.getElementById('risk-filter').value === 'red';
+  var chipHtml = red > 0
+    ? '<div class="rs-card" style="display:flex;align-items:center;justify-content:center;">'
+      +'<span class="wl-chip'+(isWLActive?' active':'')+'" onclick="toggleWatchFilter()" title="Filter heat map to High Risk only">'
+      +'<span class="wl-chip-dot"></span>'
+      +'&#9888;&nbsp;'+red+' High Risk'+(red===1?' Vendor':' Vendors')
+      +'</span></div>'
+    : '<div class="rs-card"><div class="rs-val" style="color:var(--green)">&#10003;</div><div class="rs-label">No High Risk</div></div>';
+  document.getElementById('summary-strip').innerHTML=
+    '<div class="rs-card"><div class="rs-val">'+total+'</div><div class="rs-label">In Portfolio</div></div>'
+   +'<div class="rs-card"><div class="rs-val" style="color:var(--teal)">'+vrA+'</div><div class="rs-label">VER Assessed</div></div>'
+   +chipHtml
+   +'<div class="rs-card"><div class="rs-val" style="color:var(--amber)">'+amber+'</div><div class="rs-label">Monitor</div></div>'
+   +'<div class="rs-card"><div class="rs-val" style="color:var(--green)">'+green+'</div><div class="rs-label">Healthy</div></div>';
+}
+
+// ── Watch filter chip toggle ───────────────────────────────────
+function toggleWatchFilter(){
+  var sel = document.getElementById('risk-filter');
+  if(!sel) return;
+  sel.value = sel.value === 'red' ? 'all' : 'red';
+  filterVendors();
+}
+
+function renderWatchList(){ /* no-op — watch list is now the chip in the summary strip */ }
+
+// ── Heat map ──────────────────────────────────────────────────
+function renderHeatmap(){
+  var dims = [
+    {key:'delivery',    label:'Delivery',    icon:'🚚'},
+    {key:'financial',   label:'Financial',   icon:'💰'},
+    {key:'relationship',label:'Relationship',icon:'🤝'},
+    {key:'compliance',  label:'Compliance',  icon:'📋'},
+  ];
+  var html = filteredData.map(function(v){
+    var lvl = riskLevel(v.overall);
+    var bars = dims.map(function(d){
+      var val = v[d.key]||0;
+      return '<div class="hm-bar-row">'
+        +'<div class="hm-bar-label">'+d.icon+' '+d.label+'</div>'
+        +'<div class="hm-bar-track"><div class="hm-bar-fill" style="width:'+val+'%;background:'+barColor(val)+'"></div></div>'
+        +'</div>';
+    }).join('');
+    var sb=v.scoreType==='assessed'?'<span style="font-size:7pt;background:var(--teal3);color:var(--teal2);padding:1px 5px;border-radius:3px;font-weight:700">✓ VER</span>':'<span style="font-size:7pt;background:var(--gray2);color:var(--ink4);padding:1px 5px;border-radius:3px">Derived</span>';
+    return '<div class="hm-card risk-'+lvl+'" data-vid="'+v.id+'">'
+      +'<div class="hm-header">'+logoHtml(v.domain,v.name,32)
+      +'<span class="hm-name">'+v.name+'</span></div>'
+      +'<div style="display:flex;align-items:baseline;gap:5px;"><div class="hm-score">'+v.overall+'</div>'+sb+'</div>'
+      +'<div class="hm-score-label">'+riskLabel(v.overall)+'</div>'
+      +'<div class="hm-bars">'+bars+'</div>'
+      +'<div class="hm-pillar">'+((v.pillar||'').split(' ').slice(0,4).join(' ')||'Not assigned')+'</div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('heatmap-view').innerHTML = html || '<div style="padding:40px;color:var(--ink4);text-align:center;">No vendors match the current filters.</div>';
+}
+
+// ── Table view ────────────────────────────────────────────────
+function renderTable(){
+  var html = filteredData.map(function(v){
+    var lvl = riskLevel(v.overall);
+    return '<tr style="cursor:pointer" data-vid="'+v.id+'">'
+      +'<td><strong>'+v.name+'</strong></td>'
+      +'<td style="font-size:8pt;color:var(--ink4)">'+((v.pillar||'').split(' ').slice(0,3).join(' ')||'—')+'</td>'
+      +'<td style="font-size:8pt">'+( v.category||'—')+'</td>'
+      +'<td><span style="color:'+barColor(v.delivery||0)+'">'+( v.delivery||0)+'</span></td>'
+      +'<td><span style="color:'+barColor(v.financial||0)+'">'+( v.financial||0)+'</span></td>'
+      +'<td><span style="color:'+barColor(v.relationship||0)+'">'+( v.relationship||0)+'</span></td>'
+      +'<td><span style="color:'+barColor(v.market||0)+'">'+( v.market||0)+'</span></td>'
+      +'<td><span style="color:'+barColor(v.compliance||0)+'">'+( v.compliance||0)+'</span></td>'
+      +'<td><strong style="color:'+barColor(v.overall)+'">'+v.overall+'</strong></td>'
+      +'<td><span class="risk-badge rb-'+lvl+'">'+riskLabel(v.overall)+'</span></td>'
+      +'</tr>';
+  }).join('');
+  document.getElementById('risk-table-body').innerHTML = html;
+}
+
+// ── View toggle ───────────────────────────────────────────────
+function setView(view){
+  currentView = view;
+  document.getElementById('heatmap-view').style.display = view==='heatmap' ? '' : 'none';
+  document.getElementById('table-view').style.display   = view==='table'   ? '' : 'none';
+  document.getElementById('vt-heatmap').classList.toggle('active', view==='heatmap');
+  document.getElementById('vt-table').classList.toggle('active',   view==='table');
+}
+
+// ── Radar chart ───────────────────────────────────────────────
+function drawRadar(canvasId, scores, labels, colors){
+  var canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx = W/2, cy = H/2;
+  var R  = Math.min(W,H)/2 - 28;
+  var n  = scores.length;
+  ctx.clearRect(0,0,W,H);
+
+  // Grid rings
+  [0.25,0.5,0.75,1].forEach(function(frac){
+    ctx.beginPath();
+    for(var i=0;i<n;i++){
+      var angle = (i/n)*Math.PI*2 - Math.PI/2;
+      var x = cx + R*frac*Math.cos(angle);
+      var y = cy + R*frac*Math.sin(angle);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    if(frac===0.5||frac===1){
+      ctx.fillStyle='rgba(0,0,0,0.06)';
+      ctx.font='8px Arial';
+      ctx.textAlign='center';
+      ctx.fillText(frac===0.5?'50':'100', cx+3, cy-R*frac-3);
+    }
+  });
+
+  // Axis lines
+  for(var i=0;i<n;i++){
+    var angle = (i/n)*Math.PI*2 - Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx+R*Math.cos(angle), cy+R*Math.sin(angle));
+    ctx.strokeStyle='rgba(0,0,0,0.1)';
+    ctx.lineWidth=1;
+    ctx.stroke();
+  }
+
+  // Data polygon
+  ctx.beginPath();
+  scores.forEach(function(score,i){
+    var angle = (i/n)*Math.PI*2 - Math.PI/2;
+    var r = (score/100)*R;
+    var x = cx + r*Math.cos(angle);
+    var y = cy + r*Math.sin(angle);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(13,148,136,0.15)';
+  ctx.fill();
+  ctx.strokeStyle = '#0D9488';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Data points
+  scores.forEach(function(score,i){
+    var angle = (i/n)*Math.PI*2 - Math.PI/2;
+    var r = (score/100)*R;
+    ctx.beginPath();
+    ctx.arc(cx+r*Math.cos(angle), cy+r*Math.sin(angle), 4, 0, Math.PI*2);
+    ctx.fillStyle = score > 55 ? '#DC2626' : score > 35 ? '#D97706' : '#059669';
+    ctx.fill();
+  });
+
+  // Labels
+  ctx.fillStyle='#374151';
+  ctx.font='bold 9px Arial';
+  ctx.textAlign='center';
+  labels.forEach(function(label,i){
+    var angle = (i/n)*Math.PI*2 - Math.PI/2;
+    var r = R + 18;
+    var x = cx + r*Math.cos(angle);
+    var y = cy + r*Math.sin(angle) + 4;
+    ctx.fillText(label, x, y);
+  });
+}
+
+// ── Select vendor ─────────────────────────────────────────────
+function selectVendor(id){
+  var src = window.ALL_VENDORS || RISK_DATA;
+  var v = src.find(function(r){return r.id===id;});
+  if(!v) return;
+  selectedVendor = v;
+  var lvl = riskLevel(v.overall);
+
+  document.getElementById('rd-name').textContent = v.name;
+  document.getElementById('rd-meta').textContent = (v.category||'') + (v.pillar?' · '+v.pillar.split(' ').slice(0,3).join(' '):'');
+
+  var circle = document.getElementById('rd-score-circle');
+  var colors = {green:'var(--green3)',amber:'var(--amber3)',red:'var(--red3)'};
+  var textC  = {green:'var(--green2)',amber:'var(--amber2)',red:'var(--red2)'};
+  circle.style.background = colors[lvl];
+  document.getElementById('rd-score-num').style.color = textC[lvl];
+  document.getElementById('rd-score-num').textContent = v.overall;
+  document.getElementById('rd-overall-label').textContent = riskLabel(v.overall);
+  document.getElementById('rd-overall-sub').textContent=v.scoreType==='assessed'?'VER Assessment · '+(v.date||'Unknown'):'Derived from vendors.csv · Pending VER assessment';
+
+  // Draw radar
+  var dims = [
+    {key:'delivery',    label:'Delivery'},
+    {key:'financial',   label:'Financial'},
+    {key:'relationship',label:'Relations'},
+    {key:'market',      label:'Market'},
+    {key:'compliance',  label:'Compliance'},
+  ];
+  var scores = dims.map(function(d){return v[d.key]||0;});
+  var labels = dims.map(function(d){return d.label;});
+  setTimeout(function(){drawRadar('radarChart',scores,labels,[]);;},50);
+
+  // Dimension score cards
+  var dimDefs = [
+    {key:'delivery',     label:'Delivery & Reliability',    icon:'🚚'},
+    {key:'financial',    label:'Financial & Spend',         icon:'💰'},
+    {key:'relationship', label:'Relationship & Responsiveness',icon:'🤝'},
+    {key:'market',       label:'Market & Strategic',        icon:'📊'},
+    {key:'compliance',   label:'Governance & Compliance',   icon:'📋'},
+  ];
+  document.getElementById('dim-scores').innerHTML = dimDefs.map(function(d){
+    var val = v[d.key]||0;
+    var col = barColor(val);
+    return '<div class="dim-score-row">'
+      +'<div class="dim-score-icon">'+d.icon+'</div>'
+      +'<div class="dim-score-label">'+d.label+'</div>'
+      +'<div class="dim-score-bar-wrap"><div class="dim-score-track">'
+      +'<div class="dim-score-fill" style="width:'+val+'%;background:'+col+'"></div>'
+      +'</div></div>'
+      +'<div class="dim-score-val" style="color:'+col+'">'+val+'</div>'
+      +'</div>';
+  }).join('');
+
+  var notesEl = document.getElementById('rd-notes');
+  if(v.scoreType === 'assessed' && v.notes && v.notes.trim()){
+    notesEl.textContent = v.notes;
+    notesEl.style.fontStyle = 'normal';
+    notesEl.style.color = '';
+  } else if(v.scoreType === 'assessed'){
+    notesEl.textContent = 'No VER advisory notes on file for this vendor.';
+    notesEl.style.fontStyle = 'italic';
+    notesEl.style.color = 'var(--ink4)';
+  } else {
+    notesEl.textContent = 'No VER advisory notes on file. Perform a formal assessment to generate advisory notes for this vendor.';
+    notesEl.style.fontStyle = 'italic';
+    notesEl.style.color = 'var(--ink4)';
+  }
+  document.getElementById('risk-detail').classList.add('open');
+}
+
+function closeDetail(){
+  document.getElementById('risk-detail').classList.remove('open');
+  selectedVendor = null;
+}
+
+// ── Assessment ────────────────────────────────────────────────
+function populateVendorDatalist(){
+  var dl = document.getElementById('vendor-datalist');
+  if(!dl || !window.ALL_VENDORS) return;
+  var _s2=window.ALL_VENDORS||RISK_DATA;
+  dl.innerHTML=_s2.map(function(v){
+    return '<option value="'+v.name+'" data-id="'+v.id+'">'+(v.category?'('+v.category+')':'')+'</option>';
+  }).join('');
+}
+function populateVendorSelect(){ populateVendorDatalist(); }
+
+function onAssessVendorInput(val){
+  // Find matching vendor by name
+  var match = window.ALL_VENDORS && window.ALL_VENDORS.find(function(v){
+    return v.name.toLowerCase() === val.toLowerCase();
+  });
+  var hiddenId = document.getElementById('assess-vendor-id');
+  if(match){
+    hiddenId.value = match.hasScore ? match.riskId : match.id;
+    // Pre-fill pillar if available
+    if(match.pillar){
+      var ps = document.getElementById('assess-pillar-select');
+      if(ps) {
+        for(var i=0;i<ps.options.length;i++){
+          if(ps.options[i].value === match.pillar){ ps.selectedIndex=i; break; }
+        }
+      }
+    }
+    onAssessVendorChange();
+  } else {
+    hiddenId.value = '';
+  }
+}
+
+function openAssessment(vendorId){
+  assessAnswers = {};
+  document.querySelectorAll('.q-block').forEach(function(el){el.classList.remove('answered');});
+  document.querySelectorAll('input[type=radio]').forEach(function(el){el.checked=false;});
+  updateLiveScore();
+  var inp = document.getElementById('assess-vendor-input');
+  var hid = document.getElementById('assess-vendor-id');
+  if(vendorId){
+    // Find vendor name for display
+    var allV = window.ALL_VENDORS || RISK_DATA;
+    var v = allV.find(function(v){ return v.id===vendorId||v.riskId===vendorId||v.vendor_id===vendorId; });
+    if(!v) v = RISK_DATA.find(function(r){ return r.id===vendorId; });
+    if(inp) inp.value = v ? v.name : '';
+    if(hid) hid.value = vendorId;
+  } else {
+    if(inp) inp.value = '';
+    if(hid) hid.value = '';
+  }
+  document.getElementById('assess-panel').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function openAssessmentForVendor(){
+  if(selectedVendor) openAssessment(selectedVendor.id);
+}
+
+function closeAssessment(){
+  document.getElementById('assess-panel').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function onAssessVendorChange(){
+  assessAnswers = {};
+  document.querySelectorAll('.q-block').forEach(function(el){el.classList.remove('answered');});
+  document.querySelectorAll('input[type=radio]').forEach(function(el){el.checked=false;});
+  updateLiveScore();
+}
+
+var QUESTIONS = [["delivery", 3, "SLA performance trend (last 3 quarters)", ["Met all targets consistently", "Met most — 1-2 minor misses", "Borderline — recurring borderline", "Missed 1+ critical SLA", "Repeated critical misses"]], ["delivery", 3, "Milestone delivery rate this quarter", ["100% on time", "Minor delays — no impact", "Some delays with impact", "Material delays or scope gaps", "Significant delivery failure"]], ["delivery", 2, "Attrition rate and continuity plan", ["<5% — plan on file", "5-8% — plan in progress", "8-12% — plan not submitted", "12-15% — no plan", "15%+ — active continuity risk"]], ["delivery", 2, "Escalation frequency this quarter", ["Zero escalations", "1 minor escalation", "2 escalations — resolved", "3+ escalations", "Active unresolved escalation"]], ["delivery", 2, "Evidence quality — self-reported vs supported", ["All claims supported by data", "Most claims supported", "Mixed — some self-reported", "Primarily self-reported", "No supporting data provided"]], ["financial", 3, "Spend concentration vs pillar total", ["<20% of pillar spend", "20-35% of pillar spend", "35-50% of pillar spend", "50-70% of pillar spend", ">70% of pillar spend"]], ["financial", 3, "Rate competitiveness vs VER benchmark", ["At or below benchmark", "1-5% above benchmark", "5-10% above benchmark", "10-20% above benchmark", ">20% above — review required"]], ["financial", 2, "Budget vs actuals variance this quarter", ["Within 3%", "3-7% variance", "7-12% variance", "12-20% variance", ">20% — unexplained variance"]], ["financial", 2, "Invoice compliance and payment terms", ["100% compliant", "1-2 minor issues", "Recurring minor issues", "Material non-compliance", "Significant disputes"]], ["relationship", 3, "Responsiveness and communication quality", ["Proactive — anticipates needs", "Responsive — prompt replies", "Adequate — some delays", "Reactive only", "Poor — chronic delays"]], ["relationship", 3, "Key person dependency exposure", ["Strong bench — no single points", "Minor dependency — plan exists", "Moderate dependency", "High dependency — 1-2 critical people", "Critical dependency — no coverage"]], ["relationship", 2, "Transparency vs accountability patterns", ["Fully transparent — owns issues", "Generally transparent", "Selective disclosure", "Minimizes issues", "Deflects accountability"]], ["relationship", 2, "Requirements comprehension and execution", ["First-time right — minimal back-and-forth", "Minor clarifications needed", "Regular back-and-forth", "Frequent misunderstandings", "Persistent requirement gaps"]], ["market", 3, "Vendor financial health and stability", ["Publicly traded — strong financials", "Private — stable known financials", "Private — limited visibility", "Some market concerns", "Active M&A or financial concern"]], ["market", 3, "Competitive alternatives available", ["3+ qualified alternatives", "2 alternatives", "1 credible alternative", "Limited alternatives", "No viable alternative"]], ["market", 2, "Rate trend vs market benchmark (12 months)", ["Rates declining or flat", "1-3% increase — market normal", "3-6% increase — above market", "6-10% increase", "10%+ increase — unsustainable"]], ["compliance", 3, "SOW and contract currency", ["All SOWs current — 6+ months remaining", "1 SOW expiring within 6 months", "Multiple expiring within 6 months", "1+ already expired", "Multiple expired — governance gap"]], ["compliance", 3, "Security and compliance documentation", ["All certs current — filed with VER", "Minor gaps — in progress", "Some outdated documentation", "Material compliance gaps", "No documentation on file"]], ["compliance", 2, "Supplier portal registration status", ["Fully registered — current", "Registered — minor updates needed", "Partially registered", "Not registered — engagement active", "Not registered — no engagement record"]], ["compliance", 2, "Change order governance adherence", ["All COs through VER process", "Minor exceptions — corrected", "Some informal changes", "Regular informal scope changes", "No CO governance — all informal"]]];
+
+function onAnswer(qNum, dim, weight, score){
+  assessAnswers[qNum] = {dim:dim, weight:weight, score:score};
+  var block = document.querySelector('[data-q="'+qNum+'"]');
+  if(block) block.classList.add('answered');
+  updateLiveScore();
+}
+
+function updateLiveScore(){
+  var answered = Object.keys(assessAnswers).length;
+  var total    = QUESTIONS.length;
+
+  // Compute per-dimension scores
+  var dimSums    = {delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  var dimWeights = {delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  Object.values(assessAnswers).forEach(function(a){
+    dimSums[a.dim]    += a.score * a.weight;
+    dimWeights[a.dim] += 100 * a.weight;
+  });
+
+  // Possible weights per dimension from all questions
+  var totalW = {delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  QUESTIONS.forEach(function(q){ totalW[q[0]] += q[1]; });
+
+  // Normalize each dim score 0-100
+  var dimScores = {};
+  Object.keys(dimSums).forEach(function(dim){
+    var maxPossible = totalW[dim] * 100;
+    var earned      = dimSums[dim];
+    dimScores[dim]  = maxPossible > 0
+      ? Math.round((1 - earned/maxPossible) * 100)
+      : (answered > 0 ? 50 : 0);
+  });
+
+  // Overall = average of dim scores (where answered)
+  var filledDims = Object.keys(dimScores).filter(function(d){return dimWeights[d]>0;});
+  var overall = filledDims.length
+    ? Math.round(filledDims.reduce(function(s,d){return s+dimScores[d];},0)/filledDims.length)
+    : 0;
+
+  // Update live score
+  var scoreEl = document.getElementById('alv-score');
+  if(answered > 0){
+    scoreEl.textContent = overall;
+    var lvl = riskLevel(overall);
+    var cols = {green:'var(--green)',amber:'var(--amber)',red:'var(--red)'};
+    scoreEl.style.color = cols[lvl];
+  } else {
+    scoreEl.textContent = '—';
+    scoreEl.style.color = 'var(--navy)';
+  }
+
+  document.getElementById('alv-progress').textContent = answered+' / '+total+' answered';
+
+  // Live radar
+  var dims = ['delivery','financial','relationship','market','compliance'];
+  var labels = ['Delivery','Financial','Relations','Market','Compliance'];
+  var scores = dims.map(function(d){return answered>0&&dimWeights[d]>0 ? dimScores[d] : 0;});
+  drawRadar('liveRadar', scores, labels, []);
+
+  // Dim scores list
+  var dimIcons = {delivery:'🚚',financial:'💰',relationship:'🤝',market:'📊',compliance:'📋'};
+  document.getElementById('alv-dims').innerHTML = dims.map(function(d){
+    var val = dimWeights[d]>0 ? dimScores[d] : null;
+    var col = val!==null ? barColor(val) : 'var(--ink4)';
+    return '<div class="alv-dim-row">'
+      +'<div class="alv-dim-icon">'+dimIcons[d]+'</div>'
+      +'<div class="alv-dim-label">'+d.charAt(0).toUpperCase()+d.slice(1)+'</div>'
+      +'<div class="alv-dim-val" style="color:'+col+'">'+(val!==null?val:'—')+'</div>'
+      +'</div>';
+  }).join('');
+
+  // Progress and save button
+  var saveBtn = document.getElementById('save-btn');
+  var progEl  = document.getElementById('af-progress');
+  if(answered === total){
+    saveBtn.disabled = false;
+    progEl.innerHTML = '<strong style="color:var(--teal)">✓ Assessment complete — ready to save</strong>';
+  } else {
+    saveBtn.disabled = true;
+    progEl.innerHTML = answered+' of '+total+' questions answered. Complete all to save.';
+  }
+}
+
+function saveAssessment(){
+  var vendorId = document.getElementById('assess-vendor-id').value;
+  if(!vendorId){
+    var inputVal = document.getElementById('assess-vendor-input').value;
+    alert('Please select a vendor from the list. You typed: '+inputVal);
+    return;
+  }
+  // If vendor not in RISK_DATA yet, create a new entry
+  var _allSrc = window.ALL_VENDORS || RISK_DATA;
+  var vendor = _allSrc.find(function(v){ return v.id===vendorId||v.vendor_id===vendorId; });
+  if(!vendor && window.ALL_VENDORS){
+    var rawV = window.ALL_VENDORS.find(function(v){ return v.id===vendorId; });
+    if(rawV){
+      var newId = 'R'+(RISK_DATA.length+1).toString().padStart(3,'0');
+      vendor = {
+        id: newId, vendor_id: rawV.id, name: rawV.name,
+        domain: rawV.domain||'', category: rawV.category||'',
+        pillar: rawV.pillar||'', overall:0, delivery:0,
+        financial:0, relationship:0, market:0, compliance:0,
+        date:'', notes:'New assessment'
+      };
+      RISK_DATA.push(vendor);
+      vendorId = newId;
+    }
+  }
+  var pillar   = document.getElementById('assess-pillar-select').value;
+  var vendor   = RISK_DATA.find(function(v){return v.id===vendorId;});
+  if(!vendor) return;
+
+  // Compute final scores
+  var dimSums    = {delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  var dimWeights = {delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  Object.values(assessAnswers).forEach(function(a){
+    dimSums[a.dim]    += a.score * a.weight;
+    dimWeights[a.dim] += 100 * a.weight;
+  });
+  var totalW = {delivery:0,financial:0,relationship:0,market:0,compliance:0};
+  QUESTIONS.forEach(function(q){ totalW[q[0]] += q[1]; });
+  var dimScores = {};
+  Object.keys(dimSums).forEach(function(dim){
+    var maxP = totalW[dim]*100;
+    dimScores[dim] = maxP>0 ? Math.round((1-dimSums[dim]/maxP)*100) : 50;
+  });
+  var overall = Math.round(Object.values(dimScores).reduce(function(s,v){return s+v;},0)/5);
+
+  // Update in memory
+  vendor.delivery     = dimScores.delivery;
+  vendor.financial    = dimScores.financial;
+  vendor.relationship = dimScores.relationship;
+  vendor.market       = dimScores.market;
+  vendor.compliance   = dimScores.compliance;
+  vendor.overall      = overall;
+  vendor.date         = new Date().toISOString().split('T')[0];
+  if(pillar !== 'All Pillars') vendor.pillar = pillar;
+
+  // Build CSV export row
+  var today  = vendor.date;
+  var csvRow = [
+    'R'+(RISK_DATA.length+1).toString().padStart(3,'0'),
+    vendor.vendor_id || vendorId,
+    vendor.name,
+    today,
+    dimScores.delivery,
+    dimScores.financial,
+    dimScores.compliance,
+    overall,
+    'VER assessment '+today
+  ].join(',');
+
+  closeAssessment();
+  renderAll();
+
+  // Show saved confirmation
+  if(confirm('Assessment saved for '+vendor.name+'\n\nOverall Score: '+overall+' ('+riskLabel(overall)+')\n\nCopy CSV row to clipboard for risk_scores.csv?')){
+    navigator.clipboard && navigator.clipboard.writeText(csvRow).then(function(){
+      alert('CSV row copied! Paste into risk_scores.csv and push to repo.');
+    });
+  }
+
+  // Reopen detail for this vendor
+  selectVendor(vendorId);
+}
+
+// ── Export brief ──────────────────────────────────────────────
+function exportBrief(){
+  if(!selectedVendor) return;
+  var v  = selectedVendor;
+  var lvl = riskLabel(v.overall);
+  var brief = [
+    'VER RISK BRIEF',
+    '══════════════════════════════════════════',
+    'Vendor: '+v.name,
+    'Category: '+(v.category||'—'),
+    'Pillar: '+(v.pillar||'—'),
+    'Assessment Date: '+(v.date||'Not yet assessed'),
+    '',
+    'OVERALL RISK SCORE: '+v.overall+' — '+lvl,
+    '',
+    'DIMENSION BREAKDOWN',
+    '─────────────────────────────────────────',
+    'Delivery & Reliability:       '+v.delivery,
+    'Financial & Spend:            '+v.financial,
+    'Relationship & Responsiveness:'+v.relationship,
+    'Market & Strategic:           '+v.market,
+    'Governance & Compliance:      '+v.compliance,
+    '',
+    'VER ADVISORY NOTES',
+    '─────────────────────────────────────────',
+    v.notes||'No notes recorded.',
+    '',
+    '══════════════════════════════════════════',
+    'Prepared by VER Intelligence · Salesforce DET · Confidential',
+    'Vendor Engagement & Reliability · DET DA&O',
+  ].join('\n');
+  navigator.clipboard && navigator.clipboard.writeText(brief).then(function(){
+    alert('Risk Brief copied to clipboard.');
+  });
+}
+
+// ── Render all ────────────────────────────────────────────────
+function renderAll(){
+  renderSummary();
+  renderWatchList();
+  renderHeatmap();
+  renderTable();
+}
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('click', function(e){
+    var t=e.target.closest('[data-vid]');
+    if(t) selectVendor(t.getAttribute('data-vid'));
+  });
+
+  // Build full vendor list from canonical vendors.js (1,375 vendors),
+  // overlaying any assessed RISK_DATA entries by vendor name match.
+  if (window.VER_VENDORS && window.VER_VENDORS.length > 50) {
+    var amap = {};
+    RISK_DATA.forEach(function(r){ amap[r.name.toLowerCase()] = r; });
+    var all = window.VER_VENDORS.map(function(v, i) {
+      var a = amap[v.name.toLowerCase()];
+      return {
+        id: a ? a.id : ('VR-' + v.id),
+        vendor_id: v.id,
+        name: v.name,
+        domain: v.domain || '',
+        category: v.category || '',
+        tier: String(v.tier || 3),
+        pillar: v.pillar || '',
+        region: v.region || '',
+        annual_spend: v.annual_spend || '',
+        renewal_date: v.renewal_date || '',
+        concentration: a ? a.concentration : v.concentration_risk || 30,
+        delivery: a ? a.delivery : v.delivery_risk || 20,
+        financial: a ? a.financial : v.financial_risk || 20,
+        compliance: a ? a.compliance : v.compliance_risk || 15,
+        relationship: a ? a.relationship : 20,
+        market: a ? a.market : 20,
+        overall: a ? a.overall : v.risk_score || Math.round((v.concentration_risk||30)*0.3+(v.delivery_risk||20)*0.3+(v.financial_risk||20)*0.2+(v.compliance_risk||15)*0.2),
+        notes: (a ? a.notes : v.notes) || '',
+        date: a ? a.date : '',
+        scoreType: a ? 'assessed' : 'derived'
+      };
+    });
+    window.ALL_VENDORS = all;
+    filteredData = all.slice();
+    renderAll();
+    populateVendorDatalist();
+  } else {
+    filteredData = RISK_DATA.slice();
+    renderAll();
+    populateVendorDatalist();
+  }
+});
+
+function parseCSVRow(line){
+  var res=[],cur='',q=false;
+  for(var i=0;i<line.length;i++){
+    var ch=line[i];
+    if(ch==='"'){q=!q;}
+    else if(ch===','&&!q){res.push(cur.replace(/^"|"$/g,'').trim());cur='';}
+    else{cur+=ch;}
+  }
+  res.push(cur.replace(/^"|"$/g,'').trim());
+  return res;
+}
+function safeN(v,d){ var n=parseInt(v,10); return isNaN(n)?d:n; }
+
+function buildFullVendorList(txt){
+  var lines=txt.trim().split('\n');
+  var hdr=parseCSVRow(lines[0]);
+  var ix={};
+  hdr.forEach(function(h,i){ ix[h]=i; });
+  var now=new Date('2026-05-13');
+  var amap={};
+  RISK_DATA.forEach(function(r){ amap[r.vendor_id]=r; });
+  var all=[];
+  for(var i=1;i<lines.length;i++){
+    if(!lines[i].trim()) continue;
+    var cols=parseCSVRow(lines[i]);
+    var vid=cols[ix['id']]||''; var vname=cols[ix['name']]||'';
+    if(!vid||!vname) continue;
+    var conc=safeN(cols[ix['concentration_risk']],20);
+    var fin=safeN(cols[ix['financial_risk']],18);
+    var deliv=safeN(cols[ix['delivery_risk']],20);
+    var comp=safeN(cols[ix['compliance_risk']],15);
+    var ovr=safeN(cols[ix['risk_score']],20);
+    var sla=safeN(cols[ix['sla_score']],90);
+    var tier=safeN(cols[ix['tier']],3);
+    var cat=cols[ix['category']]||'';
+    var rel=Math.min(100,Math.round((100-sla)*1.2+deliv*0.2));
+    var catR={'Software / SaaS':15,'Cloud & Managed Services':20,
+      'Professional Services':18,'Contingent Workforce':25,
+      'Hardware & Infrastructure':30}[cat]||20;
+    var mkt=Math.min(100,Math.round(catR+({1:5,2:15,3:25}[tier]||25)+fin*0.3));
+    var rdays=999;
+    try{
+      var rd=new Date(cols[ix['renewal_date']]);
+      rdays=Math.round((rd-now)/86400000);
+      if(rdays<0) comp=Math.min(100,comp+25);
+      else if(rdays<90) comp=Math.min(100,comp+15);
+      else if(rdays<180) comp=Math.min(100,comp+8);
+    }catch(ex){}
+    var a=amap[vid];
+    all.push({id:a?a.id:'VR-'+vid,vendor_id:vid,name:vname,
+      domain:cols[ix['domain']]||'',category:cat,tier:String(tier),
+      pillar:cols[ix['pillar']]||'',region:cols[ix['region']]||'',
+      annual_spend:cols[ix['annual_spend']]||'',
+      renewal_date:cols[ix['renewal_date']]||'',renewalDays:rdays,
+      concentration:a?a.concentration:conc,delivery:a?a.delivery:deliv,
+      financial:a?a.financial:fin,relationship:a?a.relationship:rel,
+      market:a?a.market:mkt,compliance:a?a.compliance:comp,
+      overall:a?a.overall:ovr,
+      notes:(a?a.notes:cols[ix['notes']])||'',
+      date:a?a.date:'',scoreType:a?'assessed':'derived'});
+  }
+  window.ALL_VENDORS=all;
+  filteredData=all.slice();
+  renderAll();
+  populateVendorDatalist();
+  console.log('Loaded '+all.length+' vendors');
+}
+
+
+// ── Print / PDF ────────────────────────────────────────────────
+function printRiskProfile(){
+  if(!selectedVendor) return;
+  // Add a print header with timestamp
+  var hdr = document.querySelector('.pdf-header');
+  if(!hdr){
+    hdr = document.createElement('div');
+    hdr.className = 'pdf-header';
+    document.getElementById('risk-detail').insertBefore(
+      hdr, document.getElementById('risk-detail').firstChild);
+  }
+  hdr.innerHTML = 'VER Risk Intelligence &nbsp;·&nbsp; '
+    +selectedVendor.name+' Risk Profile &nbsp;·&nbsp; '
+    +'Prepared by VER Intelligence &nbsp;·&nbsp; '
+    +'Salesforce DET &nbsp;·&nbsp; '
+    +new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})
+    +'&nbsp;·&nbsp; Confidential';
+  window.print();
+}
+
+function toggleLegend(){
+  var body = document.getElementById('legend-body');
+  var arrow = document.getElementById('legend-arrow');
+  var open = body.classList.toggle('open');
+  arrow.textContent = open ? '▼' : '▶';
+}
+
+function _dmToggle(){
+  var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+}
+(function(){
+  var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+})();
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openVendorRiskHelp(){
+  HelpModal.open({
+    title: 'VER Risk Intelligence',
+    what: 'VER Risk Intelligence scores <strong>every DET vendor across five risk dimensions</strong> — Financial Stability, Operational Reliability, Security Posture, Compliance Status, and Strategic Alignment. It is the early warning system for vendor risk before it becomes a contract problem.',
+    steps: [
+      '<strong>Read the risk distribution summary</strong> at the top — how many vendors are at Critical, High, Medium, and Low risk overall.',
+      '<strong>Filter by risk dimension</strong> to identify which area is driving the most exposure across the portfolio — Financial risk and Security risk are typically the highest-value flags.',
+      '<strong>Sort by risk score</strong> to prioritize — highest-risk vendors with the largest contract values are your priority review targets.',
+      '<strong>Click any vendor row</strong> to open the full risk profile — dimension-level scores, evidence sources, recommended mitigations, and links to the contract and governance record.',
+      '<strong>Flag for action</strong> — vendors at High or Critical risk can be escalated to the Action Queue or Governance module directly from the risk profile.'
+    ],
+    tips: [
+      { icon: '&#x1F534;', title: 'Critical risk = immediate review', body: 'Any vendor at Critical risk on any dimension needs a contract review scheduled within 30 days. Critical + high contract value = escalate to VP.' },
+      { icon: '&#x1F4B0;', title: 'Financial risk is leading indicator', body: 'Financial stability scores are the best leading indicator of vendor failure. Deteriorating scores 6-12 months before a contract event give you time to act.' },
+      { icon: '&#x1F512;', title: 'Security risk affects data governance', body: 'Vendors with low Security Posture scores handling Salesforce or customer data require additional contractual security controls — flag these for Legal review.' },
+      { icon: '&#x1F501;', title: 'Scores update quarterly', body: 'Risk scores are refreshed quarterly using a combination of external data sources and internal performance data. A vendor can improve or deteriorate between reviews.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

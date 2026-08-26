@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MFT Forecasted Spend · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --orange:#EA580C;--orange3:#FFF7ED;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+.page-wrap{max-width:1100px;margin:0 auto;padding:24px 28px;}
+
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.top-bar-left{display:flex;align-items:center;gap:12px;}
+.back-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;
+  border-radius:6px;background:var(--gray2);border:1px solid var(--border2);
+  color:var(--ink3);font-size:8pt;font-weight:600;text-decoration:none;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;}
+.back-btn:hover{background:var(--navy);color:#fff;}
+.page-title{font-size:15pt;font-weight:900;color:var(--navy);}
+.page-sub{font-size:8.5pt;color:var(--ink4);margin-top:2px;}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.card-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.card-sub{font-size:8pt;color:var(--ink4);margin-bottom:12px;}
+
+/* STAT TILES */
+.stat-grid{display:grid;gap:12px;margin-bottom:20px;}
+.stat-grid.g4{grid-template-columns:repeat(4,1fr);}
+.stat-grid.g3{grid-template-columns:repeat(3,1fr);}
+.stat{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;border-top:3px solid var(--navy);}
+.stat.teal{border-top-color:var(--teal);}
+.stat.green{border-top-color:var(--green);}
+.stat.amber{border-top-color:var(--amber);}
+.stat.red{border-top-color:var(--red);}
+.stat.purple{border-top-color:var(--purple);}
+.stat-val{font-size:20pt;font-weight:900;color:var(--navy);line-height:1;margin-bottom:3px;}
+.stat.teal .stat-val{color:var(--teal);}
+.stat.green .stat-val{color:var(--green);}
+.stat.amber .stat-val{color:var(--amber);}
+.stat.red .stat-val{color:var(--red);}
+.stat.purple .stat-val{color:var(--purple);}
+.stat-lbl{font-size:7.5pt;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.06em;}
+.stat-note{font-size:7pt;color:var(--ink4);margin-top:4px;}
+
+/* PROGRESS BAR */
+.prog-wrap{background:var(--gray2);border-radius:4px;height:10px;margin:4px 0;overflow:hidden;}
+.prog-bar{height:10px;border-radius:4px;transition:width 0.8s ease;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.b-green{background:var(--green3);color:var(--green2);}
+.b-amber{background:var(--amber3);color:var(--amber2);}
+.b-red{background:var(--red3);color:var(--red2);}
+.b-navy{background:var(--navy3);color:var(--navy2);}
+.b-teal{background:var(--teal3);color:var(--teal2);}
+.b-purple{background:var(--purple3);color:var(--purple);}
+.b-gray{background:var(--gray2);color:var(--ink4);}
+.b-orange{background:var(--orange3);color:var(--orange);}
+
+/* TABLE */
+.vp-table{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.vp-table th{background:var(--navy);color:#fff;padding:8px 12px;text-align:left;
+  font-size:7.5pt;font-weight:700;letter-spacing:0.03em;position:sticky;top:0;}
+.vp-table td{padding:9px 12px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.vp-table tr:hover td{background:var(--gray);}
+.vp-table tr:last-child td{border-bottom:none;}
+
+/* CALLOUT */
+.callout{border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;
+  border-left:4px solid;font-size:8.5pt;line-height:1.6;}
+.callout.info{background:var(--navy3);border-color:var(--navy2);color:var(--navy2);}
+.callout.teal{background:var(--teal3);border-color:var(--teal);color:var(--green2);}
+.callout.amber{background:var(--amber3);border-color:var(--amber);color:var(--amber2);}
+
+/* SECTION HEADER */
+.section-hdr{font-size:10pt;font-weight:800;color:var(--navy);margin:20px 0 10px;
+  display:flex;align-items:center;gap:8px;padding-bottom:8px;
+  border-bottom:2px solid var(--gray3);}
+
+/* PILL TABS */
+.tab-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{font-size:8pt;padding:6px 14px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--border2);background:#fff;font-family:inherit;
+  transition:all 0.15s;font-weight:600;color:var(--ink4);}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+
+/* PIE CHART (CSS-only) */
+.pie-wrap{position:relative;width:160px;height:160px;margin:0 auto;}
+.pie-legend{margin-top:12px;}
+.pie-legend-item{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:8pt;}
+.pie-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
+/* PRINT */
+@media print{
+  .back-btn,.tab-bar{display:none!important;}
+  .page-wrap{padding:12px;}
+}
+
+
+
+/* ── Badge classes (hub + platform shared) ── */
+.bg{background:#D1FAE5;color:#065F46;}
+.ba{background:#FEF3C7;color:#78350F;}
+.br{background:#FEE2E2;color:#7F1D1D;}
+.bn{background:#EFF6FF;color:#1E3A5F;}
+.bt{background:#F0FDF9;color:#0F766E;}
+.bp{background:#F5F3FF;color:#7C3AED;}
+.bz{background:#F3F4F6;color:#6B7280;}
+.bo{background:#FFF7ED;color:#EA580C;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;
+  font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;}
+
+.shdr{font-size:10pt;font-weight:800;color:var(--navy);margin:20px 0 10px;
+  display:flex;align-items:center;gap:8px;padding-bottom:8px;
+  border-bottom:2px solid var(--gray3);}
+.prog{background:var(--gray2);border-radius:4px;height:8px;overflow:hidden;}
+.prog-bar{height:8px;border-radius:4px;}
+.tbl{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.tbl th{text-align:left;padding:6px 10px;font-size:7.5pt;color:var(--ink4);
+  font-weight:700;text-transform:uppercase;border-bottom:2px solid var(--gray3);
+  background:var(--gray);position:sticky;top:0;z-index:1;}
+.tbl td{padding:6px 10px;border-bottom:1px solid var(--gray2);color:var(--ink2);}
+.tbl tr:hover td{background:var(--gray);}
+.tbl-wrap{max-height:540px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:16px;}
+.flt{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.flt select,.flt input{font-size:8pt;padding:5px 10px;border:1px solid var(--border2);
+  border-radius:6px;background:#fff;font-family:inherit;color:var(--ink2);}
+.flt input{width:200px;}
+.footer{margin-top:24px;padding-top:12px;border-top:1px solid var(--border);
+  font-size:7.5pt;color:var(--ink4);text-align:center;font-style:italic;}
+@media print{.back-btn,.print-btn,.flt{display:none!important;}
+  .tbl-wrap{max-height:none!important;overflow:visible!important;}
+  body{background:#fff!important;}}
+.mft-vendor{font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mft-pillar{font-size:7.5pt;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mft-sub,.mft-mgr{font-size:7.5pt;color:var(--ink4);}
+.mft-type{font-size:7.5pt;}
+.mft-spend{text-align:right;font-weight:700;color:var(--navy);}
+.mft-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:7pt;font-weight:700;}
+#mft-pagination{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-top:1px solid var(--border);background:#fff;
+  border-radius:0 0 8px 8px;font-size:8pt;color:var(--ink3);}
+#mft-pagination .pg-btns{display:flex;gap:6px;}
+#mft-pagination .pg-btn{padding:4px 12px;border-radius:6px;border:1px solid var(--border2);
+  background:var(--gray2);font-size:8pt;cursor:pointer;font-family:inherit;font-weight:600;}
+#mft-pagination .pg-btn:disabled{opacity:0.4;cursor:default;}
+
+/* ── VER Dark Mode ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+  --purple3:rgba(124,58,237,0.15);--orange3:rgba(234,88,12,0.15);
+  --blue3:rgba(37,99,235,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .card,[data-theme="dark"] .stat{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .card-title,[data-theme="dark"] .stat-val{color:var(--ink);}
+[data-theme="dark"] .vp-table th{background:#162942;}
+[data-theme="dark"] .vp-table td,[data-theme="dark"] .vp-table tr:hover td{background:var(--gray2);}
+[data-theme="dark"] .vp-table tr:hover td{background:var(--gray3);}
+[data-theme="dark"] .callout.info,[data-theme="dark"] .c-info{background:#0F1E3C;border-left-color:var(--navy2);color:var(--ink3);}
+[data-theme="dark"] .callout.teal,[data-theme="dark"] .c-teal{background:rgba(13,148,136,0.12);}
+[data-theme="dark"] .callout.amber,[data-theme="dark"] .c-amber{background:rgba(217,119,6,0.12);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{
+  background:var(--gray2)!important;color:var(--ink2)!important;border-color:var(--border2)!important;}
+[data-theme="dark"] .back-btn,[data-theme="dark"] .back{
+  background:var(--gray2);border-color:var(--border2);color:var(--ink3);}
+[data-theme="dark"] .hub-nav,[data-theme="dark"] .page-wrap>.top-bar{border-bottom-color:var(--border);}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid var(--border2);background:var(--gray2);
+  color:var(--ink4);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── Hub Top Bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.45);line-height:1.4;}
+.htb-meta-sub{font-size:7pt;}
+
+/* ── Hero Stage ── */
+.stage{background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 60%,#061020 100%);position:relative;overflow:hidden;
+  padding:52px 0 40px;}
+.stage::before{content:'';position:absolute;top:-80px;right:-80px;width:560px;height:560px;
+  background:radial-gradient(circle,rgba(13,148,136,0.08) 0%,transparent 70%);pointer-events:none;}
+.stage-inner{max-width:1200px;margin:0 auto;padding:0 48px;}
+.stage-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+.stage-title{font-size:28pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:6px;}
+.stage-accent{color:var(--teal);}
+.stage-pos{font-size:9pt;color:rgba(255,255,255,0.55);margin-bottom:28px;}
+.kpi-strip{display:flex;gap:24px;flex-wrap:wrap;}
+.kpi{min-width:120px;}
+.kpi-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;}
+.kpi.teal .kpi-val{color:var(--teal);}
+.kpi.green .kpi-val{color:#34D399;}
+.kpi.amber .kpi-val{color:#FBBF24;}
+.kpi-lbl{font-size:7.5pt;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;}
+
+/* ── Main Content ── */
+.mft-main{max-width:1200px;margin:0 auto;padding:28px 48px;}
+
+/* ── Named layout classes ── */
+.stat-grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.breakdown-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.stat.gray{border-top-color:var(--ink4);}
+.stat.gray .stat-val{color:var(--ink4);}
+.card-inner-hdr{font-size:8.5pt;font-weight:800;color:var(--navy);margin-bottom:10px;}
+.callout-top{margin-bottom:20px;}
+
+/* Status breakdown table */
+.st-table{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.st-thead-row{border-bottom:2px solid var(--gray3);}
+.st-th{text-align:left;padding:5px 6px;font-size:7.5pt;color:var(--ink4);font-weight:700;text-transform:uppercase;}
+.st-th-c{text-align:center;padding:5px 6px;font-size:7.5pt;color:var(--ink4);font-weight:700;text-transform:uppercase;}
+.st-th-r{text-align:right;padding:5px 6px;font-size:7.5pt;color:var(--ink4);font-weight:700;text-transform:uppercase;}
+.st-tr{border-bottom:1px solid var(--gray2);}
+.st-td{padding:6px;}
+.st-td-c{padding:6px;text-align:center;color:var(--ink3);}
+.st-td-r{padding:6px;text-align:right;color:var(--ink4);}
+.st-status-cell{display:inline-flex;align-items:center;gap:5px;}
+.st-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.st-dot-green{background:var(--green);}
+.st-dot-indigo{background:#6366F1;}
+.st-dot-amber{background:var(--amber);}
+.st-dot-gray{background:var(--ink4);}
+.st-name{font-weight:600;}
+.st-amt{font-weight:700;}
+.st-amt-green{color:var(--green);}
+.st-amt-indigo{color:#6366F1;}
+.st-amt-amber{color:var(--amber);}
+.st-amt-gray{color:var(--ink4);}
+.st-tfoot-row{border-top:2px solid var(--gray3);background:var(--gray);}
+.st-tfoot-td{padding:7px;font-weight:800;color:var(--navy);}
+.st-tfoot-td-c{padding:7px;text-align:center;font-weight:800;color:var(--navy);}
+.st-tfoot-td-r{padding:7px;text-align:right;font-weight:900;color:var(--navy);}
+.st-tfoot-td-r2{padding:7px;text-align:right;font-weight:800;color:var(--navy);}
+
+/* Stacked status bar */
+.mft-stack{margin-top:12px;background:var(--gray2);border-radius:6px;height:12px;overflow:hidden;display:flex;}
+.mft-seg-green{width:10%;background:var(--green);height:12px;}
+.mft-seg-indigo{width:8%;background:#6366F1;height:12px;}
+.mft-seg-amber{width:7%;background:var(--amber);height:12px;}
+.mft-seg-pipeline{width:75%;background:var(--gray3);height:12px;}
+.mft-leg{display:flex;gap:10px;margin-top:5px;font-size:7pt;color:var(--ink4);flex-wrap:wrap;}
+.mft-leg-swatch{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px;vertical-align:middle;}
+.leg-green{background:var(--green);}
+.leg-indigo{background:#6366F1;}
+.leg-amber{background:var(--amber);}
+.leg-pipeline{background:var(--gray3);}
+
+/* Pillar bars */
+.pb-wrap{display:flex;flex-direction:column;gap:8px;}
+.pb-head{display:flex;justify-content:space-between;font-size:8.5pt;margin-bottom:3px;}
+.pb-name{color:var(--ink2);font-weight:600;}
+.pb-amt{font-weight:800;color:var(--navy);}
+.pb-cnt{font-size:7pt;color:var(--ink4);}
+.pb-bar-navy{width:100%;background:#0F1E3C;}
+.pb-bar-purple{width:28%;background:#7C3AED;}
+.pb-bar-teal{width:20%;background:#0D9488;}
+.pb-bar-blue{width:8%;background:#2563EB;}
+.pb-bar-green2{width:2%;background:#059669;}
+
+/* MFT badge status classes (referenced from JS) */
+.mft-s-approved{background:#D1FAE5;color:#065F46;}
+.mft-s-new{background:#EDE9FE;color:#6D28D9;}
+.mft-s-review{background:#FEF3C7;color:#78350F;}
+.mft-s-other{background:#F3F4F6;color:#6B7280;}
+
+/* Print button in hub bar */
+.print-btn{padding:6px 14px;border-radius:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.6);font-size:8pt;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.print-btn:hover{background:rgba(255,255,255,0.15);color:#fff;}
+
+/* Filter reset */
+.flt-reset{font-size:8pt;padding:5px 10px;border-radius:6px;border:1px solid var(--border2);
+  background:var(--gray2);cursor:pointer;font-family:inherit;}
+.mft-count-lbl{font-size:8pt;color:var(--ink4);}
+.tbl-sort{cursor:pointer;}
+
+/* Scroll fade */
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+/* Advisory close footer */
+.advisory-close{background:linear-gradient(135deg,var(--navy) 0%,#1a2f50 100%);color:rgba(255,255,255,0.6);
+  padding:32px 48px;margin-top:40px;}
+.advisory-close-inner{max-width:1200px;margin:0 auto;}
+.advisory-title{font-size:9pt;font-weight:800;color:rgba(255,255,255,0.9);margin-bottom:8px;}
+.advisory-text{font-size:8pt;line-height:1.7;}
+.advisory-meta{margin-top:12px;font-size:7.5pt;color:rgba(255,255,255,0.35);}
+
+@media print{
+  .hub-top-bar,.print-btn,.flt,.stage{display:none!important;}
+  .mft-main{padding:12px;}
+}
+</style>
+</head>
+<body>
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">MFT Forecasted Spend</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="print-btn" onclick="openMftHelp()">&#63; How to Use</button>
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button>
+    <button type="button" class="print-btn" onclick="window.print()">Print</button>
+    <div class="htb-meta">DET Portfolio Intelligence &mdash; Powered by VER<br><span class="htb-meta-sub">Updated: May 2026 &middot; Salesforce DET &middot; Confidential</span></div>
+  </div>
+</nav>
+
+<section class="stage">
+  <div class="stage-inner">
+    <div class="stage-eyebrow">FY27 · Master Forecast Tool · 351 Line Items</div>
+    <div class="stage-title">MFT <span class="stage-accent">Forecasted Spend</span></div>
+    <div class="stage-pos">DET Portfolio Intelligence · VER Advisory Oversight</div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-val" data-count="93.4" data-prefix="$" data-suffix="M">$0M</div><div class="kpi-lbl">FY27 Total</div></div>
+      <div class="kpi green"><div class="kpi-val" data-count="9.3" data-prefix="$" data-suffix="M">$0M</div><div class="kpi-lbl">Approved</div></div>
+      <div class="kpi amber"><div class="kpi-val" data-count="14.1" data-prefix="$" data-suffix="M">$0M</div><div class="kpi-lbl">In-Flight</div></div>
+      <div class="kpi"><div class="kpi-val">351</div><div class="kpi-lbl">Line Items</div></div>
+      <div class="kpi"><div class="kpi-val">5</div><div class="kpi-lbl">DET Pillars</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="mft-main">
+
+  <div class="callout c-info callout-top">
+    <strong>MFT Forecasted Spend — FY27 (Budget Forecast, not actuals) · Source: FY27_MFT_Analysis.xlsx · Master_Data_Projects</strong><br>
+    The Master Forecast Tool (MFT) captures all projected FY27 technology spend across DET pillars.
+    VER monitors MFT approval status, pillar distribution, and forecasting accuracy.
+    351 line items totaling $93.4M.
+  </div>
+
+  <!-- KPI TILES -->
+  <div class="stat-grid-2col fade-in">
+    <div class="stat"><div class="stat-val">$93.4M</div>
+      <div class="stat-lbl">FY27 Total Forecast</div>
+      <div class="stat-note">351 line items · All pillars</div></div>
+    <div class="stat green"><div class="stat-val">$9.3M</div>
+      <div class="stat-lbl">Approved</div>
+      <div class="stat-note">45 items · 10% of total</div></div>
+    <div class="stat amber"><div class="stat-val">$14.1M</div>
+      <div class="stat-lbl">In Flight</div>
+      <div class="stat-note">New + Under Review · 74 items</div></div>
+    <div class="stat gray">
+      <div class="stat-val">$70.0M</div>
+      <div class="stat-lbl">Pipeline / Other</div>
+      <div class="stat-note">232 items · 75% of total</div></div>
+  </div>
+
+  <!-- STATUS + PILLAR BREAKDOWN -->
+  <div class="breakdown-grid fade-in">
+    <div class="card">
+      <div class="card-inner-hdr">Approval Status Detail</div>
+      <table class="st-table">
+        <thead><tr class="st-thead-row">
+          <th class="st-th">Status</th>
+          <th class="st-th-c">Items</th>
+          <th class="st-th-r">Amount</th>
+          <th class="st-th-r">%</th>
+        </tr></thead>
+        <tbody>
+          <tr class="st-tr">
+            <td class="st-td"><span class="st-status-cell"><span class="st-dot st-dot-green"></span><span class="st-name">Approved</span></span></td>
+            <td class="st-td-c">45</td>
+            <td class="st-td-r st-amt st-amt-green">$9.3M</td>
+            <td class="st-td-r">10%</td>
+          </tr>
+          <tr class="st-tr">
+            <td class="st-td"><span class="st-status-cell"><span class="st-dot st-dot-indigo"></span><span class="st-name">New — Not Submitted</span></span></td>
+            <td class="st-td-c">44</td>
+            <td class="st-td-r st-amt st-amt-indigo">$7.4M</td>
+            <td class="st-td-r">8%</td>
+          </tr>
+          <tr class="st-tr">
+            <td class="st-td"><span class="st-status-cell"><span class="st-dot st-dot-amber"></span><span class="st-name">Under Review</span></span></td>
+            <td class="st-td-c">30</td>
+            <td class="st-td-r st-amt st-amt-amber">$6.7M</td>
+            <td class="st-td-r">7%</td>
+          </tr>
+          <tr class="st-tr">
+            <td class="st-td"><span class="st-status-cell"><span class="st-dot st-dot-gray"></span><span class="st-name">Other — Pipeline</span></span></td>
+            <td class="st-td-c">232</td>
+            <td class="st-td-r st-amt st-amt-gray">$70.0M</td>
+            <td class="st-td-r">75%</td>
+          </tr>
+        </tbody>
+        <tfoot><tr class="st-tfoot-row">
+          <td class="st-tfoot-td">Total FY27</td>
+          <td class="st-tfoot-td-c">351</td>
+          <td class="st-tfoot-td-r">$93.4M</td>
+          <td class="st-tfoot-td-r2">100%</td>
+        </tr></tfoot>
+      </table>
+      <div class="mft-stack">
+        <div class="mft-seg-green" title="Approved"></div>
+        <div class="mft-seg-indigo" title="New"></div>
+        <div class="mft-seg-amber" title="Under Review"></div>
+        <div class="mft-seg-pipeline" title="Other"></div>
+      </div>
+      <div class="mft-leg">
+        <span><span class="mft-leg-swatch leg-green"></span>Approved</span>
+        <span><span class="mft-leg-swatch leg-indigo"></span>New</span>
+        <span><span class="mft-leg-swatch leg-amber"></span>Under Review</span>
+        <span><span class="mft-leg-swatch leg-pipeline"></span>Pipeline</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-inner-hdr">Forecasted Spend by DET Pillar</div>
+      <div class="pb-wrap">
+        <div>
+          <div class="pb-head"><span class="pb-name">Data Solutions</span><span class="pb-amt">$58.9M <span class="pb-cnt">(205 items)</span></span></div>
+          <div class="prog"><div class="prog-bar pb-bar-navy"></div></div>
+        </div>
+        <div>
+          <div class="pb-head"><span class="pb-name">Digital Marketing Technology</span><span class="pb-amt">$16.7M <span class="pb-cnt">(89 items)</span></span></div>
+          <div class="prog"><div class="prog-bar pb-bar-purple"></div></div>
+        </div>
+        <div>
+          <div class="pb-head"><span class="pb-name">Salesforce on Salesforce</span><span class="pb-amt">$11.8M <span class="pb-cnt">(43 items)</span></span></div>
+          <div class="prog"><div class="prog-bar pb-bar-teal"></div></div>
+        </div>
+        <div>
+          <div class="pb-head"><span class="pb-name">Engineering Dev &amp; Delivery</span><span class="pb-amt">$4.8M <span class="pb-cnt">(7 items)</span></span></div>
+          <div class="prog"><div class="prog-bar pb-bar-blue"></div></div>
+        </div>
+        <div>
+          <div class="pb-head"><span class="pb-name">IT</span><span class="pb-amt">$1.2M <span class="pb-cnt">(7 items)</span></span></div>
+          <div class="prog"><div class="prog-bar pb-bar-green2"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL LINE ITEM TABLE -->
+  <div class="shdr">&#128200; Full MFT Line Items — 351 Records</div>
+  <div class="flt">
+    <input id="mft-search" type="text" placeholder="Search vendor or resource..." oninput="renderMFT()">
+    <select id="mft-status" onchange="renderMFT()">
+      <option value="">All Statuses</option>
+      <option>Approved</option><option>New</option><option>Under Review</option><option>Other</option>
+    </select>
+    <select id="mft-pillar" onchange="renderMFT()">
+      <option value="">All Pillars</option><option>Data Solutions</option><option>Digital Marketing Technology</option><option>Engineering Development & Delivery</option><option>IT</option><option>Salesforce on Salesforce</option>
+    </select>
+    <select id="mft-type" onchange="renderMFT()">
+      <option value="">All Types</option><option>Contractor</option><option>FTE</option><option>ProServ</option><option>SAAS</option><option>SW On Premises</option>
+    </select>
+    <span id="mft-count" class="mft-count-lbl"></span>
+    <button type="button" class="flt-reset" onclick="document.getElementById('mft-search').value='';
+      ['mft-status','mft-pillar','mft-type'].forEach(function(id){document.getElementById(id).value='';}); renderMFT();">Reset</button>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr>
+        <th class="tbl-sort" onclick="sortMFT('vendor')">Vendor / Resource &#8597;</th>
+        <th class="tbl-sort" onclick="sortMFT('pillar')">Pillar &#8597;</th>
+        <th class="tbl-sort" onclick="sortMFT('sub_pillar')">Sub-Pillar &#8597;</th>
+        <th class="tbl-sort" onclick="sortMFT('type')">Type &#8597;</th>
+        <th class="tbl-sort" onclick="sortMFT('status')">Status &#8597;</th>
+        <th class="tbl-sort" onclick="sortMFT('mgr')">Hiring Manager &#8597;</th>
+        <th class="tbl-sort" onclick="sortMFT('total')">FY27 Total &#8597;</th>
+      </tr></thead>
+      <tbody id="mft-tbody"></tbody>
+    </table>
+    <div id="mft-pagination">
+      <span id="mft-page-info"></span>
+      <div class="pg-btns">
+        <button type="button" id="mft-prev" class="pg-btn" onclick="changeMFTPage(-1)">&#8592; Prev</button>
+        <button type="button" id="mft-next" class="pg-btn" onclick="changeMFTPage(1)">Next &#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout c-teal fade-in">
+    <strong>Data Source:</strong> FY27_MFT_Analysis.xlsx · Master_Data_Projects worksheet ·
+    Figures as of April 2026. MFT data is owned by Finance and updated monthly.
+    VER advisory role is monitoring and escalation — spend decisions rest with Pillar Leads and Finance.
+  </div>
+
+</div>
+
+<footer class="advisory-close">
+  <div class="advisory-close-inner">
+    <div class="advisory-title">VER Intelligence Hub · Advisory Notice</div>
+    <div class="advisory-text">MFT Forecasted Spend data is sourced from FY27_MFT_Analysis.xlsx (Master_Data_Projects worksheet).
+    This view is for DET portfolio intelligence and VER advisory oversight only. Spend approval authority rests with Pillar Leads and Finance.
+    All figures as of April 2026 and subject to change.</div>
+    <div class="advisory-meta">DET Portfolio Intelligence &mdash; Powered by VER &middot; Salesforce DET &middot; Confidential &middot; FY27</div>
+  </div>
+</footer>
+<script>
+var MFT_DATA = [{"vendor": "Acquia - FY27 Renewal (Mulesoft)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 106149.0, "po": "91981.0", "role": "2026-06-11 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Adobe AEM - FY26 Renewal", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 0.0, "po": "97410.0", "role": "2026-05-01 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Acquia - FY27 Website Backup & Disaster Recovery Renewal (Tableau)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 46034.0, "po": "93808.0", "role": "2026-06-22 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Akamai - FY27 Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 720000.0, "po": "65919.0", "role": "2026-07-31 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Cloudflare CDN - Salesforce.org / Testforce.org", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 2198.0, "po": "85452.0", "role": "2026-12-31 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Neo4J - FY27 Professional Services", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 49500.0, "po": "107046.0", "role": "2026-11-25 00:00:00", "notes": "Agent Engineering Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Neo4J - FY27 Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 232500.0, "po": "107046.0", "role": "2026-11-25 00:00:00", "notes": "Agent Engineering Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Okta - FY27 Renewal", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 1274604.0, "po": "108714.0", "role": "2028-11-30 00:00:00", "notes": "Identity Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Optimizely - FY26 Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 230000.0, "po": "97424.0", "role": "2026-07-31 00:00:00", "notes": "Digital Platform Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Pantheon - FY27 Subscription (Tableau)", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 175000.0, "po": "", "role": "2027-01-31 00:00:00", "notes": "[NEW FORECAST ITEM[", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Progress - FY27 Professional Services", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 10400.0, "po": "", "role": "As Needed", "notes": "Digital Platform Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Progress - FY27 Renewal Semaphore", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 172400.0, "po": "113239.0", "role": "2027-01-31 00:00:00", "notes": "Digital Platform Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Testmail", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 90.0, "po": "", "role": "", "notes": "Digital Platform Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Vidyard - FY27 Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 242201.1, "po": "52925.0", "role": "2026-03-31 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "WordPress VIP - FY27 Renewal Enterprise", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 658324.0, "po": "110799.0", "role": "2028-02-01 00:00:00", "notes": "Builder Tools Fixed Software", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Bitly - Licenses", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 2700.0, "po": "", "role": "", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Eventbase - FY27 License Renewal", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 48500.0, "po": "109668.0", "role": "2027-01-31 00:00:00", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Eventbase - FY27 Renewal Live Session Audio (Translations and Captions Integration for Mobile App)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 60000.0, "po": "114230.0", "role": "2026-12-31 00:00:00", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Evinced - FY27 Renewal Accessibility Software", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 321360.0, "po": "114374.0", "role": "2027-02-01 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Hardware - Yasmine May", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 1984.0, "po": "", "role": "N/A", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "IBM - FY27 Renewal Video Streaming (Backup Provider)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 105844.0, "po": "112440.0", "role": "2026-02-01 00:00:00", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Kaltura - FY27 Renewal - Media Services (SF+ Platform)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 1312790.0, "po": "115002.0", "role": "2026-03-01 00:00:00", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "ON24 - FY27 Webinar Platform Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 913691.0, "po": "62621.0", "role": "2026-06-27 00:00:00", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "ON24 - FY27 Utilization Overage", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 13500.0, "po": "", "role": "As Needed", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Pointr - FY27 Subscription (Wayfinding)", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 25000.0, "po": "", "role": "2025-04-01 00:00:00", "notes": "[NEW FORECAST ITEM]", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Splash - FY27 Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 542810.0, "po": "57364.0", "role": "2026-06-10 00:00:00", "notes": "Events Technology Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Usertesting - FY27 Platform Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 100740.0, "po": "93260.0", "role": "2026-09-22 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "AddEvent - App", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 3000.0, "po": "", "role": "", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Algolia - FY27 Blog Search (MuleSoft)", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 220.0, "po": "", "role": "", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Brightcove - FY27 Renewal Video Management (Tableau)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 246085.0, "po": "107083.0", "role": "2026-12-19 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Smartling - FY27 Renewal (SFDC)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 100500.0, "po": "114865.0", "role": "2027-03-31 00:00:00", "notes": "Localization/Translation Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "npm - App", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 1008.0, "po": "", "role": "", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Prerender.io - FY27 Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 29700.0, "po": "96867.0", "role": "2026-09-16 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "RWS SDL - Language Weaver AALPs (Auto-Adaptive Language Pairs)", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 70851.0, "po": "97201.0", "role": "2026-07-31 00:00:00", "notes": "Localization/Translation Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Smartling - FY27 Renewal (MuleSoft)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 45928.0, "po": "111263.0", "role": "2027-01-31 00:00:00", "notes": "Localization/Translation Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Spartan Argo Connector - FY26 Renewal", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 72000.0, "po": "111785.0", "role": "2027-01-31 00:00:00", "notes": "Localization/Translation Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Theia Smart Thumbnails - App", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 240.0, "po": "", "role": "", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "WorldServer - FY27 Renewal (Tableau)", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 81445.0, "po": "86214.0", "role": "2026-03-31 00:00:00", "notes": "Localization/Translation Fixed Software", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Provar - FY26 Renewal", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 28929.0, "po": "57364.0", "role": "2026-03-24 00:00:00", "notes": "Email & Messaging Platform Fixed Software", "sub_pillar": "", "mgr": "Tony Castiglioni"}, {"vendor": "Catchpoint - FY27 Renewal", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "SAAS", "total": 70320.0, "po": "107734.0", "role": "2026-02-01 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Umesh Tiwari"}, {"vendor": "Speedcurve - FY27 Renewal", "pillar": "Digital Marketing Technology", "status": "New", "type": "SAAS", "total": 19530.0, "po": "101183.0", "role": "2025-10-19 00:00:00", "notes": "Websites Fixed Software", "sub_pillar": "", "mgr": "Umesh Tiwari"}, {"vendor": "NTT contractors for AEM forms migration", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "ProServ", "total": 121778.0, "po": "", "role": "", "notes": "Forms Replacement", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Kaltura - Enhanced Event Support (Contract Add-On)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 0.0, "po": "414597.0", "role": "2026-02-28 00:00:00", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Okta - Professional Services", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "ProServ", "total": 69607.0, "po": "112055.0", "role": "2026-04-30 00:00:00", "notes": "Identity Enhancements", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Answerlab - Acessibility User Research", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "ProServ", "total": 314148.0, "po": "148972.0", "role": "2027-01-29 00:00:00", "notes": "Websites Platform Enhancements", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Ology (previously Lift Innovate) - User Research", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "ProServ", "total": 500000.0, "po": "111438.0", "role": "", "notes": "Websites Platform Enhancements", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "ON24 Professional Services - Ongoing Operations", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 74000.0, "po": "", "role": "", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Events Tech - PageBuilder platform migration (3X)", "pillar": "Digital Marketing Technology", "status": "New", "type": "Contractor", "total": 119472.0, "po": "", "role": "", "notes": "Unified Event Experience", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Splash  - Professional Services (Enhancements)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 30000.0, "po": "", "role": "", "notes": "Events Technology Enhancements", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "TBH - GSI", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 235200.0, "po": "", "role": "Developer (Dev)", "notes": "", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Splash - Professional Services & Technical Consultant (Andrew Stefanik)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 85000.0, "po": "", "role": "", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "3PlayMedia - Video Subtitling and Captioning", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 100000.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "JBI - Video Localization", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 140000.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "RWS - Moravia (HQ General)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 483252.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "RWS - Moravia (MuleSoft + Tableau Migration to PB)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 350000.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "RWS - Moravia (MuleSoft Marketing Collaterals)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 49428.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "RWS - Moravia (P&I Continuous Updates)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 933292.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "RWS - Moravia (Tableau.com Page + Campaigns)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 300000.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "WeAreVery - WAV (HQ General)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 248000.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "WeAreVery - WAV (MuleSoft + Tableau Migration to PB)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 179500.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "WeAreVery - WAV (MuleSoft Marketing Collaterals)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 188404.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "WeAreVery - WAV (P&I Continuous Updates)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 225000.0, "po": "", "role": "", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Fractal Analytics - Email Analytics & Data Science (Targeted Insights & Analysis)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "ProServ", "total": 535600.0, "po": "99027.0", "role": "2026-04-30 00:00:00", "notes": "Email & Messaging Platform Enhancements", "sub_pillar": "", "mgr": "Tony Castiglioni"}, {"vendor": "NTT - Managed Service Provider", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 80000.0, "po": "", "role": "", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Umesh Tiwari"}, {"vendor": "LOA Asae Dean", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 20800.0, "po": "106790.0", "role": "2026-03-13 00:00:00", "notes": "Content Management Agent", "sub_pillar": "", "mgr": "Asae Dean"}, {"vendor": "MTS/Development Engineer II - Karri, Abhishek", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 194979.0, "po": "100480.0", "role": "2027-01-31 00:00:00", "notes": "Identity KLO", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Developer - Web IV - Zhao, Jieyu", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 180957.0, "po": "113554.0", "role": "2026-10-30 00:00:00", "notes": "Unified Event Experience", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Events Tech - PageBuilder platform migration (3X)", "pillar": "Digital Marketing Technology", "status": "New", "type": "Contractor", "total": 139536.0, "po": "", "role": "", "notes": "Unified Event Experience", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Contractor TPM", "pillar": "IT", "status": "Other", "type": "Contractor", "total": 189728.0, "po": "", "role": "Proj Manager (PM)", "notes": "Contractor TPM", "sub_pillar": "IT", "mgr": ""}, {"vendor": "UX Prompt Engineer - Stephen Cosgrove", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 266885.0, "po": "92073.0", "role": "2027-01-31 00:00:00", "notes": "Website Agent as Digital Seller", "sub_pillar": "", "mgr": "Barry Kusumo"}, {"vendor": "Sr. Product Manager - Krayem, Rami", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 266885.0, "po": "107564.0", "role": "2027-01-31 00:00:00", "notes": "Events Technology Enhancements", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Business Analyst - Kayalani Bodao", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 112133.0, "po": "79864.0", "role": "2027-01-31 00:00:00", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Business Analyst II - Angel Feeney", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 112133.0, "po": "62177.0", "role": "2026-06-27 00:00:00", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "[LOA Coverage - Rajat Dutta] Product Manager II - Wilson, Lavelle", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 135000.0, "po": "103833.0", "role": "2026-04-30 00:00:00", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "System Engineer - Lakshmi Priyanka Kota (Self-Service Events Staff Aug - HYD)", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 140640.0, "po": "90550.0", "role": "2026-04-30 00:00:00", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "UX Designer - Senior - Reynolds, Sean", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 203181.0, "po": "113520.0", "role": "2026-10-30 00:00:00", "notes": "Unified Event Experience", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "UX Designer - Senior - Ngo, Dave", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 205954.0, "po": "112407.0", "role": "2026-12-10 00:00:00", "notes": "Unified Event Experience", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "UX Designer - II (Chore, Namrata) [LOA Coverage for Alex Johnson]", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 59269.0, "po": "114868.0", "role": "2026-07-13 00:00:00", "notes": "Unified Event Experience", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "[LOA Coverge for Trent Husak] Sys Admin IV - Santhi Kumar, Vyshali", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 76173.0, "po": "115253.0", "role": "2026-07-03 00:00:00", "notes": "[NEW FORECAST ITEM]", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Continuous Localization Technical Operations - Exequiel Arias", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 158704.0, "po": "69867.0", "role": "2026-09-28 00:00:00", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Continuous Localization Technical Operations - Guerrero, Juan Felipe", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 115938.0, "po": "84758.0", "role": "2027-01-31 00:00:00", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Continuous Localization Technical Operations - Mellusso, Ayelen", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 114192.0, "po": "104098.0", "role": "2026-09-28 00:00:00", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Sonali Sharad Shinge - Revenue Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 0.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Through 01/29/2025\nPillar: DET Revenue\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Continuous Localization Technical Operations - Noelia Coronil", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 114192.0, "po": "69771.0", "role": "2026-09-28 00:00:00", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Continuous Localization Technical Operations- Gattei, Daniela", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 115938.0, "po": "112146.0", "role": "2027-01-31 00:00:00", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Global Campaigns Localization Program Manager - Samantha Sullivan", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 107120.0, "po": "73470.0", "role": "2026-07-31 00:00:00", "notes": "Continuous Localization", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "Websites & Localization TPM - Williams, Donshea", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 266885.0, "po": "93914.0", "role": "2027-01-31 00:00:00", "notes": "Developer, Admin, & Architect on Digital Platform", "sub_pillar": "", "mgr": "Sylvie Mwila-Jonath"}, {"vendor": "LOA Coverge for Alison Ma (3/15 - 8/30)", "pillar": "Digital Marketing Technology", "status": "New", "type": "Contractor", "total": 87360.0, "po": "", "role": "", "notes": "[NEW FORECAST ITEM]", "sub_pillar": "", "mgr": "Tony Castiglioni"}, {"vendor": "Zensar - SMTS Engineer", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 92848.0, "po": "96896.0", "role": "2027-01-31 00:00:00", "notes": "Builder Tools KLO", "sub_pillar": "", "mgr": "Umesh Tiwari"}, {"vendor": "LOA - Prasanna Kumar Kodali [HM: Umesh Tiwari ]", "pillar": "Digital Marketing Technology", "status": "Approved", "type": "Contractor", "total": 29500.0, "po": "106966.0", "role": "2026-05-22 00:00:00", "notes": "Digital Platform KLO", "sub_pillar": "", "mgr": "Umesh Tiwari"}, {"vendor": "Derek Piotrowski", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 191360.0, "po": "", "role": "Product Owner (PO)", "notes": "Consumption selling and Usage Upsell \nO8", "sub_pillar": "Sales Analytics", "mgr": "Jonathan Norton"}, {"vendor": "Jaclyn Stewart", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 73920.0, "po": "113786.0", "role": "Product Owner (PO)", "notes": "GDSO transform PM", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Cap Gemini - DE - Sridhar Mutyala", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for CDT / Pipelines scrum (Q1 and Q2) from CDT Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "T Ravi Kumar", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 93600.0, "po": "PR149180", "role": "Developer (Dev)", "notes": "KLO - Data Operations", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Praveen Chaudhary", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 93600.0, "po": "PR149180", "role": "Developer (Dev)", "notes": "KLO - Data Operations", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Cap Gemini - DE - Hemalatha G", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for CDT / Pipelines scrum (Q1 and Q2) from CDT Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "Mamatha Mekala", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 26820.0, "po": "PR149180", "role": "Developer (Dev)", "notes": "Monetization: RUL Dashboards", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Jeevan Pandianda Joyappa", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 93600.0, "po": "PR149180", "role": "Developer (Dev)", "notes": "Seller HPC Metrics +Seller & Product Participation", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Cap Gemini - DE - Sai Kumar", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for CDT / Pipelines scrum (Q1 and Q2) from CDT Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "Sai Chaitanya Gonugunta", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 93600.0, "po": "PR149180", "role": "Developer (Dev)", "notes": "Seller HPC Metrics +Seller & Product Participation", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Goutam Sahoo", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 270400.0, "po": "147009.0", "role": "Developer (Dev)", "notes": "Team: DET DS", "sub_pillar": "NNAOV", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Raghav Nayak", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 270400.0, "po": "147009.0", "role": "Developer (Dev)", "notes": "Team: DET DS", "sub_pillar": "NNAOV", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Nagamani", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 15872.0, "po": "PR417192", "role": "Product Owner (PO)", "notes": "", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "TBH Data Engineer", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 230400.0, "po": "Budget", "role": "Developer (Dev)", "notes": "C360 Activation\nO6 Split PM", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "TBH - Platform Operations", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 211200.0, "po": "", "role": "Developer (Dev)", "notes": "KLO - Data Operations", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "TBH - Platform Operations", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 86400.0, "po": "", "role": "Developer (Dev)", "notes": "KLO - Data Operations", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "TBH -Data Ops KLO", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 86400.0, "po": "", "role": "Developer (Dev)", "notes": "KLO - Data Operations", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "TBH - EG & PQ", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 211200.0, "po": "", "role": "Developer (Dev)", "notes": "Einstein Guidance +Pipeline Quality", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "TBH - Next gen Account Hierarchy & Territory Management", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 211200.0, "po": "", "role": "Developer (Dev)", "notes": "", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Public Cloud Engineers (EHC) - LATAM", "pillar": "IT", "status": "Other", "type": "Contractor", "total": 97464.0, "po": "TBD", "role": "Ops Engineer", "notes": "Seattle DC and Tableau Decom", "sub_pillar": "IT", "mgr": "Keshav K"}, {"vendor": "TBH - Pipeline Scrum team", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 558080.0, "po": "", "role": "Developer (Dev)", "notes": "", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "No Kidding Spend - 12 months NTT AD FY27 PSA", "pillar": "Salesforce on Salesforce", "status": "Under Review", "type": "ProServ", "total": 533144.0, "po": "50934.0", "role": "", "notes": "8 resources - 7 PSA (1 SAIL)", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 6 months NTT AD PSA", "pillar": "Salesforce on Salesforce", "status": "Under Review", "type": "ProServ", "total": 99840.0, "po": "50934.0", "role": "", "notes": "2 resources - PSA", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 3 months NTT AD PSA", "pillar": "Salesforce on Salesforce", "status": "Under Review", "type": "ProServ", "total": 66048.0, "po": "50934.0", "role": "", "notes": "4 resources - PSA (3 engg 1 product)", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 3 months Accenture FY27 (Vinita Kumari) PSA", "pillar": "Salesforce on Salesforce", "status": "Under Review", "type": "Contractor", "total": 23040.0, "po": "113578.0", "role": "Developer (Dev)", "notes": "1 resource - PSA", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 12 months Certinia SOW FY27 PSA", "pillar": "Salesforce on Salesforce", "status": "Under Review", "type": "ProServ", "total": 428600.0, "po": "TBD", "role": "", "notes": "Certinia SOW - PSA", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 6 months NTT AD FY27 SAIL", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 137280.0, "po": "50934.0", "role": "", "notes": "4 resources - SAIL", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 3 months NTT AD FY27 SAIL", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 84480.0, "po": "50934.0", "role": "", "notes": "5 resources - SAIL (4 engg 1 product)", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 12 months NTT AD FY27 Services Org", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 212880.0, "po": "50934.0", "role": "", "notes": "3 resources", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 6 months NTT AD FY27 Services Org", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 32320.0, "po": "50934.0", "role": "", "notes": "1 resource", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - 3 months NTT AD FY27 Services Org", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 50688.0, "po": "50934.0", "role": "", "notes": "3 resources", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - Globant DET PS Services Org FY27 - Rohan Mahale", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 61680.0, "po": "TBD", "role": "", "notes": "1 resource", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "No Kidding Spend - NTT AD (F&E folks) 12 months", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 313200.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "5 resources", "sub_pillar": "PS", "mgr": "Joe Wagner"}, {"vendor": "Hardik Gupta, Venkatesh M R / Nucleusteq Inc", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 200000.0, "po": "TBD", "role": "", "notes": "PDP: 2 Devs \nHM: Rounak Mehta?\nHardik Gupta, Venkatesh M R\n200k combined annual\nCounting Q1 5/1/25-4/30/26 contract above\nAssuming ext 4/30/26-1/31/27", "sub_pillar": "Technology and Product Analytics", "mgr": ""}, {"vendor": "Data TPM (Placeholder)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 22560.0, "po": "TBD", "role": "Proj Manager (PM)", "notes": "", "sub_pillar": "Next Gen Account", "mgr": "Norris Lee"}, {"vendor": "Mahendra Umath / Nucleusteq Inc", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 100000.0, "po": "89255.0", "role": "Developer (Dev)", "notes": "Agentforce (Foundational Data), Data Eng (India)\nHM: Yichin Lew (Talha Aftab)\nOrig SOW above\n2/1-4/30 extension $25k \n- Plan Q1Q2 Extension, reevaluate for H2", "sub_pillar": "Technology and Product Analytics", "mgr": "Yichin Lew"}, {"vendor": "TBH", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 50000.0, "po": "TBD", "role": "Developer (Dev)", "notes": "PLG: 1 Data Engineer\nHM: Talha Aftab\n50k for 6m, target starting mid-March thru mid-Sept", "sub_pillar": "Technology and Product Analytics", "mgr": "Talha Aftab"}, {"vendor": "Amit Agrawal / Nucleusteq Inc", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 25000.0, "po": "89255.0", "role": "Dev Manager", "notes": "Agentforce (Funnel analytics), Decision Science (India)\nHM: Yichin Lew (Talha Aftab)\nQ1 Extension only", "sub_pillar": "Technology and Product Analytics", "mgr": "Yichin Lew"}, {"vendor": "Ranveer Singh Chouhan / Nucleusteq Inc", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 96000.0, "po": "TBD", "role": "Developer (Dev)", "notes": "Product Growth: Data Engineer\nHM: Saurabh Asija (under Alison Brace)\n*Projected FY27Q1 extension $25k\nNeed FY Extension", "sub_pillar": "Technology and Product Analytics", "mgr": "Saurabh Asija"}, {"vendor": "TBH", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 90000.0, "po": "TBD", "role": "Developer (Dev)", "notes": "Product Growth: Data Eng\nHM: Ali Brace\nTBH mid-late March", "sub_pillar": "Technology and Product Analytics", "mgr": "Alison Brace"}, {"vendor": "TBH", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 100000.0, "po": "TBD", "role": "Developer (Dev)", "notes": "Mulesoft Growth: Software Engineer\nHM: Sukumar Surya\nTBH mid-late March", "sub_pillar": "Technology and Product Analytics", "mgr": ""}, {"vendor": "Data TPM (Abhishek backfill) - Q2 - Q4", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 80190.0, "po": "TBD", "role": "Developer (Dev)", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Lookr", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 31733.0, "po": "97564.0", "role": "", "notes": "Own Looker Renewal contract: $63,466.95 (8/1/2025-7/31/2026)\n$31,733.475 for Q1Q2 ?\nFunding to be transfered from T&P M&A via BT Finance?", "sub_pillar": "Technology and Product Analytics", "mgr": "Irina Malkova"}, {"vendor": "Andrew Blotky", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 30000.0, "po": "", "role": "", "notes": "CSDP: Narrative influence coach\nFull year\nHM: Alexander Smith", "sub_pillar": "Technology and Product Analytics", "mgr": ""}, {"vendor": "PHDATA LLC", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR152338", "role": "Ops Engineer", "notes": "Contractor for Next Best Engagement Engine POC", "sub_pillar": "Marketing Data Science", "mgr": "Julia Kosheleva-Coats"}, {"vendor": "FRACTAL ANALYTICS INC", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR152410", "role": "Ops Engineer", "notes": "Contractor for Next Best Engagement Engine POC", "sub_pillar": "Marketing Data Science", "mgr": "Julia Kosheleva-Coats"}, {"vendor": "Andrew Blotky", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 30000.0, "po": "", "role": "", "notes": "Narrative influence coach\nFull year\nHM: Talha Aftaf", "sub_pillar": "Technology and Product Analytics", "mgr": ""}, {"vendor": "Microsoft", "pillar": "IT", "status": "Other", "type": "SW On Premises", "total": 521413.0, "po": "100831.0", "role": "", "notes": "", "sub_pillar": "IT", "mgr": "Shawn Blakeney"}, {"vendor": "FRACTAL ANALYTICS INC", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR152409", "role": "Ops Engineer", "notes": "Contractors for Campaign Data Transformation from Attribution Project", "sub_pillar": "Marketing Data Science", "mgr": "Julia Kosheleva-Coats"}, {"vendor": "CAPGEMINI AMERICA INC", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150330", "role": "Ops Engineer", "notes": "", "sub_pillar": "Marketing Data Science", "mgr": "Chandrasekhar Bellamkonda"}, {"vendor": "Microsoft", "pillar": "IT", "status": "Other", "type": "SW On Premises", "total": 6534.0, "po": "96878.0", "role": "", "notes": "", "sub_pillar": "IT", "mgr": "Shawn Blakeney"}, {"vendor": "Vendor Data as a Service Platform", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 1999800.0, "po": "TBD", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Unified Knowledge Graph (Placeholder for Anna)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 899910.0, "po": "TBD", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Deloitte", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 94287.0, "po": "TBD", "role": "Developer (Dev)", "notes": "$31,429 reallocated to the shared Deloitte Activations contract covered under PO #112336. This line represents the remaining funds for Q2 - Q4.", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Network Engineers (SEA3) - AMER", "pillar": "IT", "status": "Other", "type": "Contractor", "total": 188760.0, "po": "P106171", "role": "Network Deployment", "notes": "Seattle DC and Tableau Decom", "sub_pillar": "IT", "mgr": ""}, {"vendor": "NTT - Goutham Sura (1 Resource)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 284960.0, "po": "TBD", "role": "Developer (Dev)", "notes": "2/1/26 - 1/29/27 - Account Hierarchy + Account Merge + Company Deprecation", "sub_pillar": "Next Gen Account", "mgr": "Jeyanthi Jeyaram"}, {"vendor": "TATA - Ramyadevi Shanmugadeivamani (1 Resource)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 232320.0, "po": "TBD", "role": "Developer (Dev)", "notes": "2/1/26 - 1/29/27 - Account Hierarchy + Account Merge + Company Deprecation", "sub_pillar": "Next Gen Account", "mgr": "Jeyanthi Jeyaram"}, {"vendor": "Swoon - Veera K", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 206331.0, "po": "TBD", "role": "Developer (Dev)", "notes": "2/1/26 - 1/29/27 - Account Hierarchy + Account Merge + Company Deprecation", "sub_pillar": "Next Gen Account", "mgr": "Jeyanthi Jeyaram"}, {"vendor": "Net New", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 192000.0, "po": "TBD", "role": "Product Owner (PO)", "notes": "3/1/26 - 1/29/27 - Account Hierarchy + Account Merge + Company Deprecation", "sub_pillar": "Next Gen Account", "mgr": "Daniel Zamani"}, {"vendor": "NTT - Madhuri", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 14400.0, "po": "TBD", "role": "Product Owner (PO)", "notes": "2/1/26 - 2/28/26 - Account Hierarchy (1 month only - extend existing resource)", "sub_pillar": "Next Gen Account", "mgr": "Daniel Zamani"}, {"vendor": "Deloitte MDM SOW", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 3967113.0, "po": "112131.0", "role": "Developer (Dev)", "notes": "Feb-Apr - 1.75 (first quarter), spread the rest over 9 months remaining.", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Insight Global (MDM)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 460500.0, "po": "112623.0", "role": "Developer (Dev)", "notes": "Pratima Vempaty.", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Enterprise API (MDM work)", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 160000.0, "po": "TBD", "role": "Developer (Dev)", "notes": "Enterprise API team - Sravan (work for MDM) - Vikas/Eshwari", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Informatica Pro Serv - $500K", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 500000.0, "po": "TBD", "role": "Developer (Dev)", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "TPM Placeholder", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 458883.0, "po": "", "role": "Proj Manager (PM)", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data TPM (Abhishek) - Q1", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 69000.0, "po": "96898.0", "role": "Proj Manager (PM)", "notes": "", "sub_pillar": "Next Gen Account", "mgr": "Norris Lee"}, {"vendor": "TBH -Data Ops KLO", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 344960.0, "po": "", "role": "Developer (Dev)", "notes": "", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "RM Accenture Jayasudha: HM: Ankur", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 78000.0, "po": "113122.0", "role": "Product Owner (PO)", "notes": "", "sub_pillar": "Next Gen Account", "mgr": "Ankur Kapoor"}, {"vendor": "Software: Address standardization service annual fee - Informatica", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 200000.0, "po": "TBD", "role": "", "notes": "Informatica software placeholder. Not sure if this will be added to the same cost center or  a separate one post aquisition.", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Zhiheng (Charles) Yi (Aditi) (Data Analyst JP/KR)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 400000.0, "po": "PR148992", "role": "Bus Sys Analyst (BSA)", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": "Ridhima Gupta"}, {"vendor": "Rushabh Rupak (Aditi) (Data Analyst)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 294000.0, "po": "PR148992", "role": "Bus Sys Analyst (BSA)", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": "Ridhima Gupta"}, {"vendor": "Kofi Okine (Unify) (Data Analyst)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 205000.0, "po": "PR148834", "role": "Bus Sys Analyst (BSA)", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": "Ridhima Gupta"}, {"vendor": "Shreya Chidambaram (Unify) (Data Analyst)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 390000.0, "po": "PR148834", "role": "Bus Sys Analyst (BSA)", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": "Ridhima Gupta"}, {"vendor": "Kristi Sunde (Unify) (Pilot Planning & Execution)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 390000.0, "po": "PR148834", "role": "Bus Sys Analyst (BSA)", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": "Caitlin Taylor"}, {"vendor": "Tracy Casem-Smith (Unify) (Business Analyst)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 340000.0, "po": "PR148834", "role": "Bus Sys Analyst (BSA)", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": "Fuschia Miller"}, {"vendor": "Rituja Kekatpure (Nucleus Tec) (Data Automations)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 100000.0, "po": "TBD", "role": "Developer (Dev)", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "B  Raghavendra Raju (Nucleus Tec) (Data Automations)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 100000.0, "po": "TBD", "role": "Developer (Dev)", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "GBS - Customer Data Ops", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 1113000.0, "po": "TBD", "role": "Sys Specialist", "notes": "Courtney's Team\n$1,113,000 to be transferred from Sales", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "GBS - Slack Ops", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 320000.0, "po": "TBD", "role": "Sys Specialist", "notes": "Courtney's Team\n$320,000 to be transferred from Sales", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "GBS - Marketing & Event Ops", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 164000.0, "po": "TBD", "role": "Sys Specialist", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Software: Cuneiform (Peernova) - Project Lighthouse/Data Governance", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 72000.0, "po": "TBD", "role": "", "notes": "Courtney's Team\nExpires 4/30/26", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Rainfocus - AF Performance Testing (2-Days)", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 12000.0, "po": "", "role": "", "notes": "Unified Event Experience", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Data Vendor: Leadspace", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 1750000.0, "po": "TBD", "role": "", "notes": "$2,300,000 to be transferred from Sales", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Data Vendor: G2", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 740000.0, "po": "TBD", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Data Vendor: Demandbase", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 2000000.0, "po": "TBD", "role": "", "notes": "$2,400,000 ACV - $2M to be transferred from Sales. $350k in Unified Activation MFT.", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Data Vendor: Moody's", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 1900000.0, "po": "104939.0", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Splash - Elite Support", "pillar": "Digital Marketing Technology", "status": "New", "type": "ProServ", "total": 108562.0, "po": "", "role": "2027-06-10 00:00:00", "notes": "Events Technology KLO", "sub_pillar": "", "mgr": "Rosalind Litchfield"}, {"vendor": "Data TPM (Yifan Wang)", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 126500.0, "po": "TBD", "role": "Proj Manager (PM)", "notes": "PO intake request# 10314", "sub_pillar": "Next Gen Account", "mgr": "Kamal Chennappan"}, {"vendor": "DNA.inc BV", "pillar": "Engineering Development & Delivery", "status": "Other", "type": "ProServ", "total": 855354.0, "po": "109277.0", "role": "", "notes": "SOW 12/19/26 - 2/28/26 (2 sprints in Feb. '26)", "sub_pillar": "Events Mobile App", "mgr": ""}, {"vendor": "DNA.inc BV", "pillar": "Engineering Development & Delivery", "status": "Other", "type": "ProServ", "total": 998983.0, "po": "153530.0", "role": "", "notes": "Expected SOW 3/1/26 - 4/30/26", "sub_pillar": "Events Mobile App", "mgr": ""}, {"vendor": "Xebia", "pillar": "Engineering Development & Delivery", "status": "Other", "type": "ProServ", "total": 412577.0, "po": "108520.0", "role": "", "notes": "SOW 12/19/26 - 2/28/26 (2 sprints in Feb. '26)", "sub_pillar": "Events Mobile App", "mgr": ""}, {"vendor": "Xebia", "pillar": "Engineering Development & Delivery", "status": "Other", "type": "ProServ", "total": 226940.0, "po": "", "role": "", "notes": "Expected SOW 3/1/26 - 4/30/26", "sub_pillar": "Events Mobile App", "mgr": ""}, {"vendor": "FY26-FY27 Contractor. Network Engineer", "pillar": "IT", "status": "Other", "type": "Contractor", "total": 0.0, "po": "N/A", "role": "Network Deployment", "notes": "Seattle DC and Tableau Decom", "sub_pillar": "IT", "mgr": ""}, {"vendor": "ITech", "pillar": "Engineering Development & Delivery", "status": "Other", "type": "ProServ", "total": 835620.0, "po": "PR152714", "role": "", "notes": "Expected SOW 4/1/26 - 7/31/26", "sub_pillar": "Events Mobile App", "mgr": ""}, {"vendor": "Next Gen Account Hierarchy & Account Master - Org62", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Esther Onohwosa?", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 200000.0, "po": "TBD", "role": "Principal Program Mgr", "notes": "CSS: TPM\nHiring Manager; Norris Lee\nCurrent contract through Q1 - $60k tracked under DPS\nFull time TPM TBH Q2+", "sub_pillar": "Technology and Product Analytics", "mgr": ""}, {"vendor": "Adobe", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 240000.0, "po": "105127.0", "role": "", "notes": "", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Database Health, Ops, Audiences Placeholder", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 43985.0, "po": "", "role": "", "notes": "Placeholder for FY27 Funds for Database Health, Ops, Audiences", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "GBS", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 121015.0, "po": "106920.0", "role": "Developer (Dev)", "notes": "GBS resources to support segmentation for Ali Zaman's team. Budget is provided via the Database Health, Ops, Audiences budget line. \n\nNote: PO # refrenced in this line is the overall PO for GBS which encompasses many resources across multiple teams in the company. Our resources are only a single line in the PO. Funding is managed via cross-charge to the 6003 BU.", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Next Best Pipeline Engine Placeholder", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 1897493.0, "po": "", "role": "", "notes": "Placeholder for remaining FY27 Funds for Next Best Action Program", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Next Gen Account Hierarchy & Account Master - MDM", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Deloitte", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 175279.0, "po": "112268.0", "role": "Developer (Dev)", "notes": "Data Engineering resources to support Next Best Action in Q1 only", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Brillio", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 306100.0, "po": "112332.0", "role": "Developer (Dev)", "notes": "Data Engineering resources to support Next Best Action in Q1 only", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Omotoyinbo, Temitayo", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 252269.0, "po": "PR152896", "role": "Developer (Dev)", "notes": "Full Stack Developer for the Next Best Pipeline Action Engine Program", "sub_pillar": "Unified Activation Services", "mgr": "Srinivas Surabhi"}, {"vendor": "Agarwal, Gourav", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 256224.0, "po": "PR152933", "role": "Developer (Dev)", "notes": "Full Stack Developer for the Next Best Pipeline Action Engine Program", "sub_pillar": "Unified Activation Services", "mgr": "Srinivas Surabhi"}, {"vendor": "FCDO Campaigns", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 639342.0, "po": "", "role": "", "notes": "Placeholder for remaining FY27 FCDO Campaigns funding", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "FY27 Proserv for onsite Hardware removal/ecycle", "pillar": "IT", "status": "Other", "type": "ProServ", "total": 200000.0, "po": "", "role": "", "notes": "Seattle DC and Tableau Decom", "sub_pillar": "IT", "mgr": ""}, {"vendor": "Deloitte", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 74699.0, "po": "112336.0", "role": "Developer (Dev)", "notes": "Data Engineering resources to support Activations in Q1 only. \n$43,270 reallocated from FDCO & Consent\n$31,429 from Data Buys & Enrichment", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Brillio", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 122388.0, "po": "112530.0", "role": "Developer (Dev)", "notes": "Data Engineering resources to support Activations in Q1 only. Reallocated from FCDO & Consent budget lines.", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "DNA.inc BV", "pillar": "Engineering Development & Delivery", "status": "Other", "type": "ProServ", "total": 1000000.0, "po": "", "role": "", "notes": "Expected SOW 5/1/26 - 6/30/26", "sub_pillar": "Events Mobile App", "mgr": ""}, {"vendor": "Next Gen Account Hierarchy - Customer Data Strategy & Operations", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "TBD", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Optizmo", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 54000.0, "po": "112844.0", "role": "", "notes": "Annual License for Email Suppression", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Optizmo", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 13200.0, "po": "112522.0", "role": "", "notes": "Annual License for Phone/DNC Suppression", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "AtData", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 35000.0, "po": "112176.0", "role": "", "notes": "Annual License for Email Deliverability/Validation", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Smarty", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 9670.0, "po": "TBD", "role": "", "notes": "Annual License Mailing Address Validation and Standardization", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Demandbase", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 289115.0, "po": "114116.0", "role": "", "notes": "Annual License for Intent", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Demandbase", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 558887.0, "po": "112393.0", "role": "", "notes": "Annual License for Platform", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "DNA.inc BV", "pillar": "Engineering Development & Delivery", "status": "Other", "type": "ProServ", "total": 500000.0, "po": "", "role": "", "notes": "Expected SOW 7/1/26 - 8/31/26", "sub_pillar": "Events Mobile App", "mgr": ""}, {"vendor": "eCore Services", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 445537.0, "po": "114531.0", "role": "", "notes": "Annual Agreement for Contact Enrichment / Acquistion", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Clay", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 50000.0, "po": "113548.0", "role": "", "notes": "Annual Agreement for Contact Enrichment \n\nPIR Link", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Cognition", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 50000.0, "po": "PR151017", "role": "", "notes": "Annual Agreement for Contact Acquisiton", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Datamatics", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 300000.0, "po": "115001.0", "role": "", "notes": "Annual Agreement for Contact & Account Enrichment / Acquisition", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Data Governance - Customer Data Strategy & Operations", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "Activations Placeholder", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 11640.0, "po": "", "role": "", "notes": "Placeholder for remaining FY27 Funds for Activations", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Centralized Data Vendor Mgmt & Vendor DaaS - Customer Data Strategy & Operations", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "5 FTEs", "pillar": "Data Solutions", "status": "Other", "type": "FTE", "total": 0.0, "po": "TBD", "role": "", "notes": "Courtney's Team", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "GBS", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18360.0, "po": "45710.0", "role": "", "notes": "Executive Assistant for Jen Atkins. \n\nNote: PO# P45710 refrenced in this line is the overall PO for GBS which encompasses many resources across multiple teams in the company. Our resources are only a single line in the PO. Funding is managed via cross-charge to the 6003 BU.", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "TPM (Philip Yip) - Data 360 Co-dev", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 175398.0, "po": "91704.0", "role": "Proj Manager (PM)", "notes": "FY27 Q1 Extension", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data Vendor: D&B (covered by Andy White)", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 0.0, "po": "TBD", "role": "", "notes": "1650000.0", "sub_pillar": "Next Gen Account", "mgr": ""}, {"vendor": "TPM (Chandra Harris) - Data 360 Data Governance", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 149944.0, "po": "91287.0", "role": "Proj Manager (PM)", "notes": "FY27 Q1 Extension", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "TPM (Victor Swamy) -", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 64512.0, "po": "82964.0", "role": "Proj Manager (PM)", "notes": "FY27 Q1 Extension", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "TPM (Cecile Kwekam)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 180000.0, "po": "P83650", "role": "Proj Manager (PM)", "notes": "FY27 Q1 Extension", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "TPM (Esther Onohwosa)", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 180000.0, "po": "P83651", "role": "Proj Manager (PM)", "notes": "FY27 Q1 Extension", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data Platform: Data Governance = $0.55", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 550000.0, "po": "", "role": "", "notes": "FY27 Q2 and Q3 spend (spread across 2 quarters)", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Catalog, Quality, Observability 1", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 700000.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Catalog, Quality, Observability 2", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 448850.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data 360 Platform Operations", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 900000.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "NTT Operations support -Change order", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 450000.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data Platform: Enteprise Mulesoft API Platform = $0.27", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 270000.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Ingestion", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 135000.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data Platform Services", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 834660.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data Platform Engineer", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 345000.0, "po": "", "role": "Developer (Dev)", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Snowflake Additional (01/01/2026 to 12/31/2026)", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 7500000.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "SCUBA ANALYTICS INC (monthly)", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 276000.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "SCUBA ANALYTICS INC", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 225973.0, "po": "P93414", "role": "", "notes": "Scuba Analytics Software \u2013 License for UIP / Digital Intelligence", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "TOPQUADRANT INC", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 137514.0, "po": "108115.0", "role": "", "notes": "Top Braid EDG Platform Subscription 12-15-2025 to 12-14-2026", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "TOPQUADRANT INC", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 23143.0, "po": "108115.0", "role": "", "notes": "Top Braid EDG Platform Subscription 12-15-2026 to 12-14-2027", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "NEO4J INC", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 170242.0, "po": "107187.0", "role": "", "notes": "Pre-paid Aura Consumption Units (ACUs)", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "NEO4J INC", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 29290.0, "po": "107187.0", "role": "", "notes": "Pre-paid Aura Consumption Units (ACUs)", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "NEO4J INC", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 122587.0, "po": "107046.0", "role": "", "notes": "Consulting for Platform and Implementation support, PFT, Help Agent use cases", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "NEO4J INC", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 40864.0, "po": "107046.0", "role": "", "notes": "Salesforce Non Employee Travel and Expenses", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Monte Carlo Data Inc", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 786172.0, "po": "P108531", "role": "", "notes": "Monte Carlo Monitor Credits", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Monte Carlo Data Inc", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 113962.0, "po": "P108531", "role": "", "notes": "Monte Carlo Monitor Credits", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Mulesoft AP Platform/Integration platform Core Services.", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 15840.0, "po": "P112723", "role": "", "notes": "Professional Services for GitHub Enterprise Managed User (EMU) Migration and Agent Fabric Automation. [This PR is for Backfill for the recent attritions]\nThis PR is for Backfill for Santosh's attrition.", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Mulesoft AP Platform/Integration platform Core Services.", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 15840.0, "po": "P111985", "role": "", "notes": "Professional Services for APP360X Integration and Governance Automation. [This PR is for Backfill for the recent attritions]\nThis PR is for Backfill for Bharath's attrition.", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Mulesoft AP Platform/Enterprise API and Strategic Delivery", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 35200.0, "po": "P112056", "role": "", "notes": "M&A Informatica and Campfire\n\\ Nirbhay's Attrition coverage.", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Mulesoft AP Platform/Enterprise API and Strategic Delivery", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 40800.0, "po": "P112606", "role": "", "notes": "Ataccama Migration to Informatica Data Validations\n\\ Shoban's parental leave coverage", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Mulesoft AP Platform/Enterprise API and Strategic Delivery", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 24000.0, "po": "P112606", "role": "", "notes": "Data Solutions- DPS- Enterprise API - Career Connect Program\n\\Tarun's \nAttrition coverage with Surge funding Line", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Mulesoft AP Platform/Agent Fabric & API Management", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 28800.0, "po": "P111881", "role": "", "notes": "API Security and Protection - Flex Gateway and Wallarm for Non Mule APIs\nShravani LOA Backfill", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Mulesoft AP Platform/Agent Fabric & API Management", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 96000.0, "po": "P112723", "role": "", "notes": "Integration Platform - Agent Fabric and Agentic Resource Center Q1 FY27\nKarthik LOA Backfill", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "NTT Operations support -Change order", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 93300.0, "po": "P105135", "role": "", "notes": "Additional staff members (8) to support job failures for all pillar teams", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Tableau contractor", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 55688.0, "po": "PR149615 -", "role": "", "notes": "GSA = \u201cGlobal Services Agreement between SFDC and Supplier dated July 17, 2012, as amended to date\u201d\nVENDOR = Altimetrik Corp\nAgreement ID = a0K7y00000feCCXEA2", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Tableau contractor", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 59904.0, "po": "PR150455 -", "role": "", "notes": "30 Days Written Notice for Breach; 90 Days Written Notice otherwise\nVENDOR = Relanto Inc", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "NUCLEUSTEQ INC", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 450000.0, "po": "#P93069", "role": "", "notes": "DS DPS Trust and Discovery - Integrations and Upgrades (Vikas Dalal)", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "NUCLEUSTEQ INC", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 150000.0, "po": "#P89969", "role": "", "notes": "DS DPS Trust and Discovery -Data Quality (Vikas Dalal)", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Included in No Kidding $$: NTT AD - Maintain through AUG-JAN", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 400000.0, "po": "50934.0", "role": "", "notes": "21 resources", "sub_pillar": "DEX", "mgr": ""}, {"vendor": "NTT AD POD", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 2356067.0, "po": "92519.0", "role": "", "notes": "PR# 115898", "sub_pillar": "CS", "mgr": "Jennifer Moore"}, {"vendor": "FY27 PLM Design Concentrix SOW", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 810000.0, "po": "105048.0", "role": "", "notes": "6 Design Contractors", "sub_pillar": "DEX", "mgr": "Matthew Phillips"}, {"vendor": "FY27 PLM Design UserTesting Software", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "SAAS", "total": 40000.0, "po": "111753.0", "role": "", "notes": "Requisition # 148553", "sub_pillar": "DEX", "mgr": "Matthew Phillips"}, {"vendor": "FY27 PLM Intell Workplace: Oktana", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 40000.0, "po": "104452.0", "role": "", "notes": "1 ENG - - Michael Hiebert", "sub_pillar": "DEX", "mgr": ""}, {"vendor": "FY27 PLM CAPS: Email Specialist - JAPAC - Josiah", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 40000.0, "po": "135634.0", "role": "", "notes": "", "sub_pillar": "DEX", "mgr": ""}, {"vendor": "FY27 PLM CAPS: Email Specialist - EMEA - Mark Doyle", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 105000.0, "po": "133172.0", "role": "", "notes": "", "sub_pillar": "DEX", "mgr": ""}, {"vendor": "Not Included in No Kidding $$ NTT AD - Release Feb", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 191000.0, "po": "50934.0", "role": "", "notes": "Release date 2/9 - Notifications to 7 people", "sub_pillar": "DEX", "mgr": ""}, {"vendor": "Included in No Kidding $$: NTT AD- Maintain through Aug", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 1280000.0, "po": "50934.0", "role": "", "notes": "21 resources", "sub_pillar": "DEX", "mgr": ""}, {"vendor": "Not Included in No Kidding $$ NTT AD - Release March", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 40000.0, "po": "50934.0", "role": "", "notes": "Release date 3/15 - Notifications to 3 people", "sub_pillar": "DEX", "mgr": ""}, {"vendor": "Digital Analytics Platform", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 670000.0, "po": "", "role": "Ops Engineer", "notes": "WFF", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Avinash Kumar Jain - Revenue Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 45904.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Through 8/31/2026\nPillar: DET Revenue\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Charanjeet Singh - Revenue Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 32048.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Through 8/31/2026\nPillar: DET Revenue\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Manikant Dubey- Revenue Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 45904.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Through 8/31/2026\nPillar: DET Revenue\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Sashi V - Revenue Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 41072.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Through 8/31/2026\nPillar: DET Revenue\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Shilpa Godumagadda - Revenue Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 26576.0, "po": "50934.0", "role": "Quality Engineer (QE)", "notes": "Through 8/31/2026\nPillar: DET Revenue\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Kudupudi Sailaja - Revenue Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 32616.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Through 8/31/2026\nPillar: DET Revenue\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Pratap Singh"}, {"vendor": "Data Platform: Catalog, Quality, Observability = $1.148850", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Shashi Bhushan Yadav - Revenue Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 41072.0, "po": "50934.0", "role": "Quality Engineer (QE)", "notes": "Through 8/31/2026\nPillar: DET Revenue\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Pratap Singh"}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Shahna S S - Sales Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 45904.0, "po": "50934.0", "role": "Quality Engineer (QE)", "notes": "Through 8/31/2026\nPillar: DET Sales\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Hariharan Sethuraman"}, {"vendor": "Data Platform:Enterprise Automation = $0.0", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Enterprise Automation", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data Platform: Data 360 Platform = $0.9", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Not Included in No Kidding $$ NTT AD - [Included in No Kidding $$: NTT AD [NK] - [Manmohan Kaur - Sales Resource]", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "Contractor", "total": 45904.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Through 8/31/2026\nPillar: DET Sales\nVendor: NTT", "sub_pillar": "Revenue", "mgr": "Hariharan Sethuraman"}, {"vendor": "Data Platform:Tableau Cloud = $0.0", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Tableau Cloud & TabNext", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "SOW - Placeholder", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 1509345.0, "po": "", "role": "Developer (Dev)", "notes": "DET Partner - SOWs to be entered", "sub_pillar": "Revenue", "mgr": "Melissa Burnell"}, {"vendor": "DCAM - Data Capability Assessment Maturity  - Protiviti", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "SOW - Accenture Miguel Funded for Revenue", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 55135.0, "po": "152963.0", "role": "Developer (Dev)", "notes": "Through 1/31/2027\nPillar: DET Revenue\nVendor: Accenture", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Mulesoft Platform Operations", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "Data Platform: Enterprise Ingestion = $0.135", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "SOW - Accenture Miguel Funded for Revenue", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 49107.0, "po": "152964.0", "role": "Developer (Dev)", "notes": "Through 1/31/2027\nPillar: DET Revenue\nVendor: Accenture", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Data Platform: Infrastructure Enhancements = $.27", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "SOW - Accenture Miguel Funded for Revenue", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 141328.0, "po": "", "role": "Developer (Dev)", "notes": "Through 1/31/2027\nPillar: DET Revenue\nVendor: Accenture", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "Data Platform: Platform Tools & Developer Support = $1.17", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "SOW - Oktana Miguel Funded for Revenue", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 124992.0, "po": "", "role": "Developer (Dev)", "notes": "Through 1/31/2027\nPillar: DET Revenue\nVendor: Oktana", "sub_pillar": "Revenue", "mgr": "Vishnu Vardhan Reddy Pati"}, {"vendor": "SOW - Thinkvibes Miguel Funded for Partner Baseline", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 874797.0, "po": "152405.0", "role": "Developer (Dev)", "notes": "Through 1/31/2027\nPillar: DET Partner\nVendor: Thinkvibes", "sub_pillar": "Partner", "mgr": "Rakesh Yadav"}, {"vendor": "SOW - Thinkvibes Miguel Funded for Partner Geo Expansion", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 233280.0, "po": "152418.0", "role": "Developer (Dev)", "notes": "Through 1/31/2027\nPillar: DET Partner\nVendor: Thinkvibes", "sub_pillar": "Partner", "mgr": "Rakesh Yadav"}, {"vendor": "Data Platform:Software Spend = $23.02mil", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 0.0, "po": "", "role": "", "notes": "", "sub_pillar": "Data Platform Services", "mgr": ""}, {"vendor": "A&C DCIT Cognizant SOW (FY26 + FY27)", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "ProServ", "total": 930300.0, "po": "50553.0", "role": "", "notes": "Shadow IT, transferred to BT\n\nPillar: DET Partner\nVendor: Cognizant", "sub_pillar": "Partner", "mgr": "Dinesh Khatwani"}, {"vendor": "PartnerTap Account Matching (Amortized)", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "SAAS", "total": 81818.0, "po": "62979.0", "role": "", "notes": "Transferred from A&C\nThrough 6/15/2026\nPillar: DET Partner\nVendor: PartnerTap", "sub_pillar": "Partner", "mgr": ""}, {"vendor": "Appinium Licenses", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "SAAS", "total": 65000.0, "po": "", "role": "", "notes": "Transferred from A&C\nPillar: DET Partner\nVendor: Appinium", "sub_pillar": "Partner", "mgr": ""}, {"vendor": "ProVar Licenses", "pillar": "Salesforce on Salesforce", "status": "Other", "type": "SAAS", "total": 50000.0, "po": "", "role": "", "notes": "QA Automation Software", "sub_pillar": "Partner", "mgr": ""}, {"vendor": "Digital Analytics Platform", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 528433.0, "po": "", "role": "Ops Engineer", "notes": "Total Program", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Deloitte", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 475000.0, "po": "TBD", "role": "", "notes": "Team: DET Finance APM", "sub_pillar": "NNAOV", "mgr": "Bharath Nanduri"}, {"vendor": "Marketing Data Warehouse -- srinivas", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 550000.0, "po": "", "role": "Ops Engineer", "notes": "WFF", "sub_pillar": "Marketing Data Science", "mgr": "Srinivas Vemuru"}, {"vendor": "Next Best Pipeline Engine", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 2035948.0, "po": "", "role": "Ops Engineer", "notes": "WFF", "sub_pillar": "Marketing Data Science", "mgr": "Julia Kosheleva-Coats"}, {"vendor": "FCDO Campaigns", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 1004564.0, "po": "", "role": "Ops Engineer", "notes": "WFF", "sub_pillar": "Marketing Data Science", "mgr": "Julia Kosheleva-Coats"}, {"vendor": "Attribution", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 1450000.0, "po": "", "role": "Ops Engineer", "notes": "WFF", "sub_pillar": "Marketing Data Science", "mgr": "Julia Kosheleva-Coats"}, {"vendor": "Cardinal Path - Lauren Norton", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Proj Manager (PM)", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Amardeep Singh", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Matt Spence", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Roi Dayao", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Dhrumil Malaviya", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Euclide Arroyo", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Mike Anderson", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Mahmoud Taha", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Lauren Norton", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Karon Narine", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Ezequiel", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Ops Engineer", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Cardinal Path - Joyce King", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 18542.0, "po": "PR122261", "role": "Proj Manager (PM)", "notes": "Contractor for Digital Analytics Platform WFF budget (Q1)", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "NEUSTAR INFORMATION SERVICES INC", "pillar": "Data Solutions", "status": "Other", "type": "SAAS", "total": 99066.0, "po": "PR150580", "role": "", "notes": "Yearly service to capture details of visitors to SF sites", "sub_pillar": "Marketing Data Science", "mgr": "Laura Castrillo"}, {"vendor": "Aditi Consulting LLC", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 105840.0, "po": "113783.0", "role": "Ops Engineer", "notes": "Contractor for MDW Agentforce & Web scrum (Q1 and Q2) from Next Best Pipe Engine Project", "sub_pillar": "Marketing Data Science", "mgr": "Ananth Varma"}, {"vendor": "Accenture Solutions Private Limited", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 403328.0, "po": "110984.0", "role": "", "notes": "Team: DET Revenue Order\nIntake", "sub_pillar": "NNAOV", "mgr": "Vinod Kumar"}, {"vendor": "PwC", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 275000.0, "po": "111280.0", "role": "", "notes": "Team: DET Finance R2R\nReduced from 700 to 275\nIntake", "sub_pillar": "NNAOV", "mgr": "Vineet Gupta"}, {"vendor": "Deloitte", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 195000.0, "po": "112277.0", "role": "", "notes": "Team: DET Finance APM", "sub_pillar": "NNAOV", "mgr": "Maithili Pabitwar"}, {"vendor": "NTT", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 100000.0, "po": "149708.0", "role": "", "notes": "Team: DET Finance APM\nIntake ID # - 8937", "sub_pillar": "NNAOV", "mgr": "Maithili Pabitwar"}, {"vendor": "Global Infotech", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 656000.0, "po": "111827.0", "role": "", "notes": "Team: DET Sales Comp\nIntake", "sub_pillar": "NNAOV", "mgr": "Nate Manley"}, {"vendor": "Naveen Sabune - NTT AD", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 76960.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Team: DET Sales Comp", "sub_pillar": "NNAOV", "mgr": "Nate Manley"}, {"vendor": "Mukesh Tatikonda - NTT AD", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 76960.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Team: DET Sales Comp", "sub_pillar": "NNAOV", "mgr": "Nate Manley"}, {"vendor": "Akshay Gaikwad - NTT AD", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 68640.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Team: DET Sales Comp", "sub_pillar": "NNAOV", "mgr": "Nate Manley"}, {"vendor": "Anshul Arora - NTT AD", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 170560.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Team: DET Sales Comp", "sub_pillar": "NNAOV", "mgr": "Nate Manley"}, {"vendor": "Abraham Rivero - NTT AD", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 191360.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Team: DET Sales Comp", "sub_pillar": "NNAOV", "mgr": "Nate Manley"}, {"vendor": "Aditti", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 185120.0, "po": "91595.0", "role": "Product Owner (PO)", "notes": "Team: DET Sales Oppty (Product)\nChange Request", "sub_pillar": "NNAOV", "mgr": "Satya Chaluvadi"}, {"vendor": "Oktana Corporation", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 389120.0, "po": "110270.0", "role": "", "notes": "Team: DET Sales Oppty (Engineering)\nIntake", "sub_pillar": "NNAOV", "mgr": "Swapna Mandava"}, {"vendor": "Insait", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 140072.0, "po": "111758.0", "role": "", "notes": "Team: DET Sales Renewals\nIntake", "sub_pillar": "NNAOV", "mgr": "Ramana Ramkumar"}, {"vendor": "Aditti", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 241920.0, "po": "111575.0", "role": "", "notes": "Team: DET SFonSF Shared Services\nPR", "sub_pillar": "NNAOV", "mgr": "Harry Mann"}, {"vendor": "Aditti", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 241920.0, "po": "112314.0", "role": "", "notes": "Team: DET SFonSF Shared Services\nIntake", "sub_pillar": "NNAOV", "mgr": "Harry Mann"}, {"vendor": "Kumar Vikash - NTT AD", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 70054.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Team: DET Sales Renewals", "sub_pillar": "NNAOV", "mgr": "Arun Kumar Anela"}, {"vendor": "Shyam Ganesh Balakrishnan - NTT AD", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 78541.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Team: DET Sales Renewals", "sub_pillar": "NNAOV", "mgr": "Arun Kumar Anela"}, {"vendor": "Naresh Reddy Gaddam - NTT AD", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 78541.0, "po": "50934.0", "role": "Developer (Dev)", "notes": "Team: DET Sales Renewals", "sub_pillar": "NNAOV", "mgr": "Arun Kumar Anela"}, {"vendor": "TBH - Pipeline Scrum team", "pillar": "Data Solutions", "status": "Other", "type": "Contractor", "total": 156960.0, "po": "", "role": "Developer (Dev)", "notes": "", "sub_pillar": "Sales Analytics", "mgr": "Vijaya Tirumalareddy"}, {"vendor": "Ashish Sharma", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 191360.0, "po": "106357.0", "role": "Developer (Dev)", "notes": "Team: DET DS", "sub_pillar": "NNAOV", "mgr": "Jonathan Norton"}, {"vendor": "TBD", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 408009.0, "po": "PR152972", "role": "", "notes": "Move from Fin to DS", "sub_pillar": "NNAOV", "mgr": "Zena Filice"}, {"vendor": "Deepti Baghel", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 260875.0, "po": "110259.0", "role": "Developer (Dev)", "notes": "Team: DET DS", "sub_pillar": "NNAOV", "mgr": "Bharath Nanduri"}, {"vendor": "Cap Gemini - DE - Srinivasulu T", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for MDW Data Ops scrum (Q1 and Q2) from MDW Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "Cap Gemini - DE - Sai Laxami", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for MDW Data Ops scrum (Q1 and Q2) from MDW Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "Cap Gemini - DE - Krunal Umesh", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for MDW Email scrum (Q1 and Q2) from MDW Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "Cap Gemini - DE - Kiran Kumar", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for MDW PMM scrum (Q1 and Q2) from CDT Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "Cap  Gemini - DE - Mohd Muheeb", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for MDW Web & Agentforce scrum (Q1 and Q2) from CDT Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "Cap Gemini - Tab - Lineker", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "PR150316", "role": "Ops Engineer", "notes": "Contractor for MDW Web & Agentforce scrum (Q1 and Q2) from CDT Project", "sub_pillar": "Marketing Data Science", "mgr": "Archit Kumar"}, {"vendor": "Deloitte", "pillar": "Data Solutions", "status": "Under Review", "type": "ProServ", "total": 330480.0, "po": "TBD", "role": "", "notes": "Team: DET Finance APM", "sub_pillar": "NNAOV", "mgr": "Bharath Nanduri"}, {"vendor": "Consent", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 165000.0, "po": "", "role": "", "notes": "Placeholder for remaining FY27 Consent funding", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Data Buys & Enrichment Placeholder", "pillar": "Data Solutions", "status": "Other", "type": "", "total": 43875.0, "po": "", "role": "", "notes": "Placeholder for remaining FY27 budget in Data Buys & Enrichment", "sub_pillar": "Unified Activation Services", "mgr": ""}, {"vendor": "Kakarlapudi Seshasai Sitabhavani Ashwini", "pillar": "Data Solutions", "status": "Under Review", "type": "Contractor", "total": 20000.0, "po": "92000.0", "role": "", "notes": "Pamela's contractor", "sub_pillar": "NNAOV", "mgr": "Bharath Nanduri"}, {"vendor": "TBD", "pillar": "Data Solutions", "status": "Other", "type": "ProServ", "total": 0.0, "po": "TBD", "role": "", "notes": "", "sub_pillar": "NNAOV", "mgr": "Bharti Vatwani"}];
+var MFT_SORT    = {col:'total', dir:1};
+var MFT_PAGE    = 1;
+var MFT_PER_PAGE = 50;
+var MFT_FILTERED = [];
+
+function sortMFT(col) {
+  if(MFT_SORT.col===col) MFT_SORT.dir*=-1; else {MFT_SORT.col=col; MFT_SORT.dir=1;}
+  MFT_PAGE = 1;
+  renderMFT();
+}
+
+function changeMFTPage(delta) {
+  var totalPages = Math.max(1, Math.ceil(MFT_FILTERED.length / MFT_PER_PAGE));
+  MFT_PAGE = Math.min(Math.max(1, MFT_PAGE + delta), totalPages);
+  renderMFTPage();
+}
+
+function renderMFT() {
+  var search = (document.getElementById('mft-search').value||'').toLowerCase();
+  var status = document.getElementById('mft-status').value;
+  var pillar = document.getElementById('mft-pillar').value;
+  var type   = document.getElementById('mft-type').value;
+
+  MFT_FILTERED = MFT_DATA.filter(function(r) {
+    if(search && !r.vendor.toLowerCase().includes(search)) return false;
+    if(status) {
+      var s = (r.status||'').toLowerCase();
+      if(status==='Approved'     && s!=='approved') return false;
+      if(status==='New'          && s.indexOf('new')===-1) return false;
+      if(status==='Under Review' && s.indexOf('review')===-1) return false;
+      if(status==='Other'        && s!=='other') return false;
+    }
+    if(pillar && r.pillar !== pillar) return false;
+    if(type && r.type !== type) return false;
+    return true;
+  });
+
+  var col = MFT_SORT.col, dir = MFT_SORT.dir;
+  MFT_FILTERED.sort(function(a,b) {
+    if(col==='total') return dir*(b.total-a.total);
+    var av=a[col]||'', bv=b[col]||'';
+    return dir*(av<bv?-1:av>bv?1:0);
+  });
+
+  var el = document.getElementById('mft-count');
+  if(el) el.textContent = MFT_FILTERED.length.toLocaleString() + ' records';
+
+  MFT_PAGE = 1;
+  renderMFTPage();
+}
+
+function getStatusClass(s) {
+  var sl = (s||'').toLowerCase();
+  if(sl==='approved') return 'mft-s-approved';
+  if(sl.indexOf('new')!==-1) return 'mft-s-new';
+  if(sl.indexOf('review')!==-1) return 'mft-s-review';
+  return 'mft-s-other';
+}
+
+function renderMFTPage() {
+  var totalPages = Math.max(1, Math.ceil(MFT_FILTERED.length / MFT_PER_PAGE));
+  var start  = (MFT_PAGE - 1) * MFT_PER_PAGE;
+  var end    = Math.min(start + MFT_PER_PAGE, MFT_FILTERED.length);
+  var page   = MFT_FILTERED.slice(start, end);
+
+  var tbody = document.getElementById('mft-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = page.map(function(r) {
+    var sc    = getStatusClass(r.status);
+    var spend = r.total>=1e6 ? '$'+(r.total/1e6).toFixed(2)+'M'
+              : r.total>0   ? '$'+(r.total/1e3).toFixed(0)+'K' : '—';
+    return '<tr>' +
+      '<td class="mft-vendor" title="'+r.vendor+'">'+r.vendor+'</td>' +
+      '<td class="mft-pillar">'+r.pillar+'</td>' +
+      '<td class="mft-sub">'+r.sub_pillar+'</td>' +
+      '<td class="mft-type">'+r.type+'</td>' +
+      '<td><span class="mft-badge '+sc+'">'+r.status+'</span></td>' +
+      '<td class="mft-mgr">'+r.mgr+'</td>' +
+      '<td class="mft-spend">'+spend+'</td>' +
+    '</tr>';
+  }).join('');
+
+  // Update pagination controls
+  var info = document.getElementById('mft-page-info');
+  if(info) info.textContent = 'Page ' + MFT_PAGE + ' of ' + totalPages
+    + '  (' + (start+1) + '–' + end + ' of ' + MFT_FILTERED.length.toLocaleString() + ' records)';
+
+  var prev = document.getElementById('mft-prev');
+  var next = document.getElementById('mft-next');
+  if(prev) prev.disabled = MFT_PAGE <= 1;
+  if(next) next.disabled = MFT_PAGE >= totalPages;
+}
+
+function animateCounter(el) {
+  var target = parseFloat(el.dataset.count) || 0;
+  var prefix = el.dataset.prefix || '';
+  var suffix = el.dataset.suffix || '';
+  var start = performance.now();
+  var dur = 1200;
+  function ease(t){ return 1 - Math.pow(1 - t, 3); }
+  function tick(now) {
+    var p = Math.min((now - start) / dur, 1);
+    var v = target * ease(p);
+    var disp = target >= 10 ? v.toFixed(1) : v.toFixed(1);
+    el.textContent = prefix + disp + suffix;
+    if(p < 1) requestAnimationFrame(tick);
+    else el.textContent = prefix + target + suffix;
+  }
+  requestAnimationFrame(tick);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  renderMFT();
+
+  // KPI counters
+  var kpiEls = document.querySelectorAll('.kpi-val[data-count]');
+  var kpiObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if(e.isIntersecting) { animateCounter(e.target); kpiObs.unobserve(e.target); }
+    });
+  }, {threshold:0.3});
+  kpiEls.forEach(function(el){ kpiObs.observe(el); });
+
+  // Scroll fade
+  var fadeEls = document.querySelectorAll('.fade-in');
+  var fadeObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if(e.isIntersecting) { e.target.classList.add('visible'); fadeObs.unobserve(e.target); }
+    });
+  }, {threshold:0.1});
+  fadeEls.forEach(function(el){ fadeObs.observe(el); });
+});
+
+function _dmToggle(){
+  var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+}
+(function(){
+  var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+})();
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openMftHelp(){
+  HelpModal.open({
+    title: 'MFT Intelligence',
+    what: 'The MFT (Managed for Talent) Intelligence page surfaces <strong>contractor workforce data from Fieldglass and internal MFT tracking</strong> — headcount, tenure, rate compliance, and engagement risk. It is the operational complement to the Rate Benchmarks and Governance tools.',
+    steps: [
+      '<strong>Review the workforce summary</strong> — active CW headcount, average tenure, and rate compliance rate are the top-line metrics. High tenure with no review flag is a risk signal.',
+      '<strong>Use the filters</strong> to slice by pillar, job family, supplier, or tenure band. Long-tenured workers (18+ months) and above-market rates are your first priority.',
+      '<strong>Click any worker row</strong> to see the full engagement record — rate history, job family, supplier, SOW linkage, and compliance flags.',
+      '<strong>Flag for review or action</strong> — you can initiate a rate review, extend or close an engagement, or escalate a compliance issue directly from the detail view.',
+      '<strong>Cross-reference with Rate Benchmarks</strong> — the "Check Rate" button in each worker record opens Rate Benchmarks pre-filtered for that job family and level.'
+    ],
+    tips: [
+      { icon: '&#x23F1;', title: '18-month tenure = mandatory review', body: 'DET policy requires a formal review of any CW engagement exceeding 18 months. The MFT page flags these automatically.' },
+      { icon: '&#x1F4B0;', title: 'Supplier markup is hidden here', body: 'The rate shown is the bill rate — the supplier markup (typically 20–35%) is embedded. Use the Rate Benchmarks tool to assess whether the pay rate is reasonable.' },
+      { icon: '&#x26A0;', title: 'Misclassification risk flag', body: 'Workers with long tenure, single-client engagement, and management oversight patterns are flagged for misclassification risk review.' },
+      { icon: '&#x1F4CB;', title: 'Feeds governance queue', body: 'Rate compliance failures and tenure threshold breaches in MFT automatically create action items in the Governance Queue.' }
+    ],
+    ai: '<strong>AI Augmentation flag:</strong> MFT roles with significant AI/agentic task overlap are flagged with a ✨ indicator. These roles are candidates for AI augmentation — meaning the work scope may be partially automatable, which affects both the rate benchmark and the renewal decision.',
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

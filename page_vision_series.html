@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vision Series · VER Intelligence Hub</title>
+<style>
+:root {
+  --navy:#0F1E3C; --navy2:#1E3A5F; --navy3:#EFF6FF;
+  --teal:#0D9488; --teal2:#0F766E; --teal3:#F0FDF9;
+  --green:#059669; --green2:#065F46; --green3:#D1FAE5;
+  --amber:#D97706; --amber2:#78350F; --amber3:#FEF3C7;
+  --red:#DC2626; --red2:#7F1D1D; --red3:#FEE2E2;
+  --purple:#7C3AED; --purple3:#F5F3FF;
+  --blue:#2563EB; --blue3:#EFF6FF;
+  --ink:#111827; --ink2:#1F2937; --ink3:#374151; --ink4:#6B7280;
+  --gray:#F9FAFB; --gray2:#F3F4F6; --gray3:#E5E7EB;
+  --border:#E5E7EB; --border2:#D1D5DB; --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+.vp-wrap{display:flex;min-height:100vh;}
+.vp-side{width:220px;background:var(--navy);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;}
+.vp-main{flex:1;padding:24px 28px;overflow-x:hidden;}
+.vp-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vp-logo-title{font-size:10.5pt;font-weight:800;color:#fff;line-height:1.2;}
+.vp-logo-sub{font-size:8pt;color:rgba(255,255,255,0.65);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+.vp-nav{padding:12px 0;}
+.vp-nav-section{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.60);padding:10px 18px 4px;}
+.vp-nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;font-size:8.5pt;font-weight:600;color:rgba(255,255,255,0.85);text-decoration:none;transition:all 0.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.vp-nav-item:hover,.vp-nav-item.active{background:rgba(255,255,255,0.10);color:#fff;}
+.vp-nav-item.active{border-left:3px solid var(--teal);}
+.vp-nav-icon{font-size:12pt;flex-shrink:0;}
+.vp-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0;}
+.vp-side-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);font-size:8pt;color:rgba(255,255,255,0.55);margin-top:auto;}
+.vp-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.vp-page-title{font-size:15pt;font-weight:900;color:var(--navy);}
+.vp-page-sub{font-size:9pt;color:var(--ink3);margin-top:2px;}
+
+/* ── Series header ── */
+.series-hdr{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#2E5480 100%);border-radius:14px;padding:28px 32px;margin-bottom:24px;color:#fff;position:relative;overflow:hidden;}
+.series-hdr::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);background-size:48px 48px;}
+.series-eyebrow{font-size:8.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#5EEAD4;margin-bottom:10px;position:relative;z-index:1;}
+.series-title{font-size:22pt;font-weight:900;letter-spacing:-0.03em;margin-bottom:8px;position:relative;z-index:1;}
+.series-title span{color:#5EEAD4;}
+.series-desc{font-size:9.5pt;color:rgba(255,255,255,0.85);line-height:1.6;max-width:600px;position:relative;z-index:1;}
+.series-stats{display:flex;gap:32px;margin-top:20px;position:relative;z-index:1;}
+.series-stat-val{font-size:20pt;font-weight:900;color:#fff;line-height:1;}
+.series-stat-lbl{font-size:8.5pt;color:rgba(255,255,255,0.70);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px;}
+
+/* ── Season tabs ── */
+.season-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.season-tab{padding:6px 16px;border-radius:99px;font-size:8.5pt;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:#fff;color:var(--ink4);transition:all 0.15s;}
+.season-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── Episode grid ── */
+.ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.ep-card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:box-shadow 0.15s,transform 0.15s;text-decoration:none;display:block;}
+.ep-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.09);transform:translateY(-2px);}
+.ep-card.locked{opacity:0.65;cursor:default;}
+.ep-card.locked:hover{box-shadow:none;transform:none;}
+.ep-thumb{height:120px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.ep-thumb-icon{font-size:40pt;opacity:0.9;position:relative;z-index:1;}
+.ep-num{position:absolute;top:10px;left:12px;font-size:8pt;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.8);background:rgba(0,0,0,0.25);padding:2px 8px;border-radius:99px;}
+.ep-status-badge{position:absolute;top:10px;right:12px;font-size:8pt;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:99px;}
+.ep-status-badge.live{background:rgba(5,150,105,0.9);color:#fff;}
+.ep-status-badge.soon{background:rgba(217,119,6,0.9);color:#fff;}
+.ep-body{padding:14px 16px;}
+.ep-topic{font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px;}
+.ep-title{font-size:11pt;font-weight:900;color:var(--navy);margin-bottom:6px;line-height:1.3;}
+.ep-desc{font-size:9pt;color:var(--ink3);line-height:1.55;}
+.ep-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--gray);border-top:1px solid var(--border);}
+.ep-duration{font-size:8.5pt;color:var(--ink4);}
+.ep-cta{font-size:8.5pt;font-weight:700;color:var(--teal);}
+</style>
+</head>
+<body>
+<div class="vp-wrap">
+
+  <!-- Sidebar -->
+  <div class="vp-side">
+    <div class="vp-logo">
+      <div class="vp-logo-title">VER Intelligence<br>Hub</div>
+      <div class="vp-logo-sub">DET · FY27</div>
+    </div>
+    <nav class="vp-nav">
+      <div class="vp-nav-section">Resources</div>
+      <a href="page_cqbr.html" class="vp-nav-item"><span class="vp-nav-icon">&#128196;</span>CQBR Library</a>
+      <a href="page_digest.html" class="vp-nav-item"><span class="vp-nav-icon">&#128240;</span>Monthly Digest</a>
+      <a href="page_vision_series.html" class="vp-nav-item active"><span class="vp-nav-icon">&#127909;</span>Vision Series</a>
+      <a href="page_roadmap.html" class="vp-nav-item"><span class="vp-nav-icon">&#128506;</span>Roadmap</a>
+      <a href="page_team.html" class="vp-nav-item"><span class="vp-nav-icon">&#128105;</span>Team & Charter</a>
+      <a href="page_guide.html" class="vp-nav-item"><span class="vp-nav-icon">&#128216;</span>VER Guide</a>
+      <div class="vp-nav-divider"></div>
+      <a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+    <div class="vp-side-footer">VER Intelligence Hub<br>Salesforce DET · FY27</div>
+  </div>
+
+  <!-- Main -->
+  <div class="vp-main">
+    <div class="vp-topbar">
+      <div>
+        <div class="vp-page-title">&#127909; Vision Series</div>
+        <div class="vp-page-sub">VER's cinematic editorial series — strategy, intelligence, and the future of vendor management</div>
+      </div>
+    </div>
+
+    <!-- Series header -->
+    <div class="series-hdr">
+      <div class="series-eyebrow">VER · Editorial Series</div>
+      <div class="series-title">The VER <span>Vision Series</span></div>
+      <div class="series-desc">A cinematic series exploring who VER is, what we do, and where vendor intelligence is headed. Six episodes in Season 1 — then the series expands to new topics in FY28.</div>
+      <div class="series-stats">
+        <div><div class="series-stat-val">6</div><div class="series-stat-lbl">Season 1 Episodes</div></div>
+        <div><div class="series-stat-val">1</div><div class="series-stat-lbl">Published</div></div>
+        <div><div class="series-stat-val">5</div><div class="series-stat-lbl">Coming Soon</div></div>
+      </div>
+    </div>
+
+    <!-- Season tabs -->
+    <div class="season-tabs">
+      <button class="season-tab active" onclick="setSeason('s1',this)">Season 1 — FY27</button>
+      <button class="season-tab" onclick="setSeason('s2',this)">Season 2 — FY28 <span style="font-size:7pt;opacity:0.6;">(Upcoming)</span></button>
+    </div>
+
+    <!-- Episode grid -->
+    <div class="ep-grid" id="ep-grid"></div>
+  </div>
+</div>
+
+<script>
+var EPISODES = {
+  s1: [
+    {
+      num:'E1', title:'Who Is VER?', topic:'Identity & Mission',
+      desc:'An introduction to the Vendor Engagement & Reliability team — our scope, our mission, and why third-party intelligence matters to DET.',
+      icon:'&#127970;', color:'linear-gradient(135deg,#032D60,#0250D9)',
+      topicColor:'#2563EB', status:'live', duration:'4 min',
+      href:'VER_Vision_Series_E1_WhoIsVER_v2.html'
+    },
+    {
+      num:'E2', title:'The Intelligence Advantage', topic:'Data & Analytics',
+      desc:'How VER turns raw spend data into actionable intelligence — from rate benchmarks to risk signals to savings opportunities.',
+      icon:'&#128202;', color:'linear-gradient(135deg,#0F1E3C,#0D9488)',
+      topicColor:'#0D9488', status:'soon', duration:'~4 min', href:'#'
+    },
+    {
+      num:'E3', title:'FinOps at the Source', topic:'Financial Operations',
+      desc:'A deep dive into VER\'s FinOps practice — total cost of ownership, consumption monitoring, and spend optimization across every vendor category.',
+      icon:'&#128176;', color:'linear-gradient(135deg,#065F46,#059669)',
+      topicColor:'#059669', status:'soon', duration:'~4 min', href:'#'
+    },
+    {
+      num:'E4', title:'Risk, Reimagined', topic:'Vendor Risk',
+      desc:'How VER scores and monitors vendor risk across five dimensions — and how early signals protect DET from costly disruptions.',
+      icon:'&#9888;', color:'linear-gradient(135deg,#7F1D1D,#DC2626)',
+      topicColor:'#DC2626', status:'soon', duration:'~4 min', href:'#'
+    },
+    {
+      num:'E5', title:'The Renewal Horizon', topic:'Contract Strategy',
+      desc:'The art and science of contract renewals — negotiation leverage, benchmark intelligence, and how VER keeps every renewal on the right side of market.',
+      icon:'&#128197;', color:'linear-gradient(135deg,#78350F,#D97706)',
+      topicColor:'#D97706', status:'soon', duration:'~4 min', href:'#'
+    },
+    {
+      num:'E6', title:'Built for What\'s Next', topic:'Strategy & Roadmap',
+      desc:'VER\'s vision for FY28 and beyond — AI cost intelligence, expanded coverage, and the next generation of vendor management at Salesforce.',
+      icon:'&#127919;', color:'linear-gradient(135deg,#4C1D95,#7C3AED)',
+      topicColor:'#7C3AED', status:'soon', duration:'~4 min', href:'#'
+    }
+  ],
+  s2: []
+};
+
+var currentSeason = 's1';
+
+function setSeason(key, btn) {
+  currentSeason = key;
+  document.querySelectorAll('.season-tab').forEach(function(t){ t.classList.remove('active'); });
+  btn.classList.add('active');
+  renderEpisodes();
+}
+
+function renderEpisodes() {
+  var eps = EPISODES[currentSeason] || [];
+  var grid = document.getElementById('ep-grid');
+
+  if (!eps.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink4);">'
+      + '<div style="font-size:36pt;margin-bottom:12px;">&#127909;</div>'
+      + '<div style="font-size:11pt;font-weight:800;color:var(--ink3);margin-bottom:6px;">Season 2 Coming FY28</div>'
+      + '<div style="font-size:8.5pt;">Topics will be announced as we approach the new fiscal year.</div></div>';
+    return;
+  }
+
+  grid.innerHTML = eps.map(function(ep){
+    var locked = ep.status === 'soon';
+    return '<a href="'+(locked?'javascript:void(0)':ep.href)+'" class="ep-card'+(locked?' locked':'')+'">'
+      + '<div class="ep-thumb" style="background:'+ep.color+'">'
+      + '<div class="ep-thumb-icon">'+ep.icon+'</div>'
+      + '<span class="ep-num">'+ep.num+'</span>'
+      + '<span class="ep-status-badge '+(locked?'soon':'live')+'">'+(locked?'Coming Soon':'Live')+'</span>'
+      + '</div>'
+      + '<div class="ep-body">'
+      + '<div class="ep-topic" style="color:'+ep.topicColor+'">'+ep.topic+'</div>'
+      + '<div class="ep-title">'+ep.title+'</div>'
+      + '<div class="ep-desc">'+ep.desc+'</div>'
+      + '</div>'
+      + '<div class="ep-footer">'
+      + '<span class="ep-duration">&#9679; '+ep.duration+'</span>'
+      + (locked ? '<span style="font-size:7.5pt;color:var(--ink4);">&#128274; Not yet published</span>'
+                : '<span class="ep-cta">Watch Now &#8594;</span>')
+      + '</div>'
+      + '</a>';
+  }).join('');
+}
+
+renderEpisodes();
+</script>
+</body>
+</html>

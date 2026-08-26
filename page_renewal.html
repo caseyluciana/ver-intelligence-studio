@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Renewal Calendar &mdash; VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --orange:#EA580C;--orange3:#FFF7ED;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  background:var(--navy);color:#fff;min-height:100vh;}
+
+/* ── Sticky top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 28px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;
+  display:flex;align-items:center;gap:5px;transition:color 0.15s;}
+.htb-back:hover{color:var(--teal);}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:0.04em;}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-meta{font-size:7.5pt;color:rgba(255,255,255,0.3);}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.55);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── Hero stage ── */
+.stage{padding:40px 0 32px;
+  background:linear-gradient(160deg,#0F1E3C 0%,#0a1628 60%,#061020 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden;}
+.stage::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 70% 50%,rgba(217,119,6,0.07) 0%,transparent 65%);
+  pointer-events:none;}
+.stage-inner{max-width:1280px;margin:0 auto;padding:0 48px;}
+.stage-eyebrow{font-size:7.5pt;font-weight:700;color:var(--amber);
+  text-transform:uppercase;letter-spacing:0.16em;margin-bottom:10px;}
+.stage-title{font-size:26pt;font-weight:900;color:#fff;line-height:1.1;
+  margin-bottom:8px;letter-spacing:-0.02em;}
+.stage-title span{color:var(--amber);}
+.stage-position{font-size:10pt;color:rgba(255,255,255,0.55);
+  line-height:1.6;max-width:640px;margin-bottom:24px;}
+.stage-position strong{color:rgba(255,255,255,0.80);}
+
+/* ── KPI strip ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.kpi{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:14px 18px;border-top:2px solid var(--teal);transition:all 0.2s;}
+.kpi:hover{background:rgba(255,255,255,0.08);}
+.kpi-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;margin-bottom:4px;}
+.kpi-lbl{font-size:7.5pt;font-weight:700;color:rgba(255,255,255,0.45);
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;}
+.kpi-note{font-size:7.5pt;color:rgba(255,255,255,0.35);}
+.kpi.red{border-top-color:var(--red);}
+.kpi.red .kpi-val{color:var(--red);}
+.kpi.amber{border-top-color:var(--amber);}
+.kpi.amber .kpi-val{color:var(--amber);}
+.kpi.teal{border-top-color:var(--teal);}
+.kpi.teal .kpi-val{color:var(--teal);}
+/* ── Source / confidence badges ── */
+.src-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.src-badge{display:inline-flex;align-items:center;gap:4px;font-size:6.5pt;font-weight:700;
+  padding:3px 8px;border-radius:10px;white-space:nowrap;letter-spacing:0.04em;}
+.src-coupa{background:rgba(37,99,235,0.18);color:#93C5FD;border:1px solid rgba(37,99,235,0.3);}
+.src-mft{background:rgba(124,58,237,0.18);color:#C4B5FD;border:1px solid rgba(124,58,237,0.3);}
+.src-benchmark{background:rgba(13,148,136,0.18);color:#5EEAD4;border:1px solid rgba(13,148,136,0.3);}
+.src-qbr{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.3);}
+.src-manual{background:rgba(107,114,128,0.2);color:#D1D5DB;border:1px solid rgba(107,114,128,0.3);}
+.conf-high{background:rgba(5,150,105,0.18);color:#6EE7B7;border:1px solid rgba(5,150,105,0.3);}
+.conf-medium{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.3);}
+.conf-low{background:rgba(220,38,38,0.18);color:#FCA5A5;border:1px solid rgba(220,38,38,0.3);}
+.src-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* ── Body ── */
+.page-body{background:var(--gray);color:var(--ink2);}
+.page-inner{max-width:1200px;margin:0 auto;padding:0 48px 48px;}
+
+/* ── Section header ── */
+.sec-hdr{padding:20px 0 12px;display:flex;align-items:center;justify-content:space-between;}
+.sec-title{font-size:8pt;font-weight:800;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.12em;}
+
+/* ── Callout ── */
+.callout{border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:0;
+  border-left:4px solid;font-size:8.5pt;line-height:1.6;}
+.c-amber{background:var(--amber3);border-color:var(--amber);color:var(--amber2);}
+.c-teal{background:var(--teal3);border-color:var(--teal);color:var(--green2);}
+.callout-mt{margin-top:16px;}
+.link-teal{color:var(--teal2);font-weight:700;}
+
+/* ── Tab bar ── */
+.tab-bar{display:flex;gap:6px;flex-wrap:wrap;padding:16px 0 14px;align-items:center;}
+.tab{font-size:8pt;padding:6px 14px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--border2);background:var(--white);font-family:inherit;
+  transition:all 0.15s;font-weight:600;color:var(--ink4);}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+.tab-count{font-size:8pt;color:var(--ink4);margin-left:auto;}
+
+/* ── Print button ── */
+.print-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;
+  border-radius:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.55);font-size:8pt;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;}
+.print-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+
+/* ── Renewal table ── */
+.table-card{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.vt{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.vt th{background:var(--navy);color:#fff;padding:9px 12px;text-align:left;
+  font-size:7.5pt;font-weight:700;letter-spacing:0.03em;}
+.vt td{padding:9px 12px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.vt tr:hover td{background:var(--gray);}
+.vt tr:last-child td{border-bottom:none;}
+
+/* Table cell classes */
+.ren-vendor-cell{display:flex;align-items:center;gap:10px;}
+.ren-vendor{font-weight:700;font-size:9pt;color:var(--ink);}
+.ren-cat{font-size:7.5pt;color:var(--ink4);margin-top:2px;}
+.ren-days{font-weight:700;font-size:9pt;}
+.ren-days-red{color:var(--red);}
+.ren-days-orange{color:var(--orange);}
+.ren-days-amber{color:var(--amber);}
+.ren-days-navy{color:var(--navy);}
+.ren-days-gray{color:var(--ink4);}
+.ren-date{font-size:8.5pt;color:var(--ink3);}
+.ren-value{font-weight:700;color:var(--navy);}
+.ren-pillar{font-size:8pt;color:var(--ink3);}
+.ren-action{font-size:8pt;color:var(--ink3);max-width:240px;line-height:1.5;}
+.ren-risk-badge{margin-top:4px;}
+.ren-contact{font-size:8pt;color:var(--ink4);}
+
+/* Badge classes */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.br{background:var(--red3);color:var(--red2);}
+.ba{background:var(--amber3);color:var(--amber2);}
+.bn{background:var(--navy3);color:var(--navy2);}
+.bt{background:var(--teal3);color:var(--teal2);}
+.bz{background:var(--gray2);color:var(--ink4);}
+.b-analyst{background:rgba(124,58,237,0.1);color:#7C3AED;border:1px solid rgba(124,58,237,0.2);}
+
+/* ── Advisory footer ── */
+.advisory-close{margin-top:20px;
+  background:linear-gradient(135deg,var(--navy) 0%,#1a2f50 100%);
+  border-radius:12px;padding:18px 24px;
+  border:1px solid rgba(255,255,255,0.06);}
+.ac-eyebrow{font-size:7.5pt;font-weight:700;color:var(--teal);
+  text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+.ac-text{font-size:9pt;color:rgba(255,255,255,0.65);line-height:1.75;}
+.ac-footer{font-size:7.5pt;color:rgba(255,255,255,0.30);
+  margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);}
+
+/* ── Renewal modal ── */
+.ren-modal-backdrop{position:fixed;inset:0;z-index:200;
+  background:rgba(6,13,26,0.80);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  opacity:0;pointer-events:none;transition:opacity 0.25s ease;}
+.ren-modal-backdrop.open{opacity:1;pointer-events:all;}
+.ren-modal{background:var(--white);border-radius:14px;
+  border:1px solid var(--border);
+  box-shadow:0 32px 80px rgba(0,0,0,0.35),0 8px 24px rgba(0,0,0,0.18);
+  width:100%;max-width:580px;
+  overflow:hidden;display:flex;flex-direction:column;
+  transform:translateY(28px) scale(0.97);
+  transition:transform 0.25s ease;}
+.ren-modal-backdrop.open .ren-modal{transform:translateY(0) scale(1);}
+.ren-modal-signal{height:4px;flex-shrink:0;}
+.ren-modal-hdr{display:flex;align-items:flex-start;gap:14px;
+  padding:18px 20px 14px;border-bottom:1px solid var(--border);}
+.ren-modal-hdr-info{flex:1;min-width:0;}
+.ren-modal-logo{flex-shrink:0;}
+.ren-modal-vendor-name{font-size:11pt;font-weight:800;color:var(--navy);margin-bottom:3px;}
+.ren-modal-eng-name{font-size:8.5pt;color:var(--ink4);}
+.ren-modal-close{width:34px;height:34px;border-radius:50%;border:none;
+  background:var(--gray2);color:var(--ink4);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all 0.15s;flex-shrink:0;}
+.ren-modal-close:hover{background:var(--red3);color:var(--red);}
+.ren-modal-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
+.ren-modal-kpi{padding:12px 16px;background:var(--white);}
+.ren-modal-kpi-val{font-size:13pt;font-weight:900;color:var(--navy);line-height:1.2;}
+.ren-modal-kpi-lbl{font-size:7.5pt;color:var(--ink4);margin-top:3px;
+  text-transform:uppercase;letter-spacing:0.06em;}
+.ren-modal-body{padding:18px 20px;}
+.ren-modal-lbl{font-size:8pt;font-weight:700;color:var(--ink4);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.ren-modal-action-text{font-size:9pt;color:var(--ink2);line-height:1.7;}
+.ren-modal-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;}
+[data-theme="dark"] .ren-modal{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .ren-modal-vendor-name{color:var(--ink);}
+[data-theme="dark"] .ren-modal-kpi{background:var(--gray2);}
+[data-theme="dark"] .ren-modal-kpi-val{color:var(--ink);}
+[data-theme="dark"] .ren-modal-close{background:var(--gray3);}
+.vt tr.ren-row-clickable{cursor:pointer;}
+.vt tr.ren-row-clickable:hover td{background:var(--teal3);}
+
+/* ── Scroll fade-in ── */
+.fade-in{opacity:0;transform:translateY(14px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+/* ── Dark mode ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--teal3:rgba(13,148,136,0.15);
+  --green3:rgba(5,150,105,0.15);--amber3:rgba(217,119,6,0.15);
+  --red3:rgba(220,38,38,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .page-body{background:var(--gray);}
+[data-theme="dark"] .table-card{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .vt td{border-color:var(--border);}
+[data-theme="dark"] .vt tr:hover td{background:var(--gray3);}
+[data-theme="dark"] .tab{background:var(--gray2);border-color:var(--border);color:var(--ink4);}
+[data-theme="dark"] .tab:hover:not(.active){background:var(--gray3);}
+[data-theme="dark"] .c-amber{background:rgba(217,119,6,0.12);}
+[data-theme="dark"] .c-teal{background:rgba(13,148,136,0.12);}
+[data-theme="dark"] .ren-vendor{color:var(--ink);}
+[data-theme="dark"] .ren-value{color:var(--ink2);}
+
+@media print{.hub-top-bar,.tab-bar{display:none!important;}.page-inner{padding:12px!important;}}
+
+@media(max-width:860px){
+  .stage-inner{padding-left:20px;padding-right:20px;}
+  .page-inner{padding-left:20px;padding-right:20px;}
+  .hub-top-bar{padding:8px 16px;}
+  .kpi-strip{grid-template-columns:1fr 1fr;}
+  .table-card{overflow-x:auto;}
+  .vt{min-width:680px;}
+}
+@media(max-width:600px){
+  .stage-inner{padding-left:14px;padding-right:14px;}
+  .page-inner{padding-left:14px;padding-right:14px;padding-bottom:24px;}
+  .hub-top-bar{padding:8px 12px;}
+  .htb-meta{display:none;}
+  .kpi-strip{grid-template-columns:1fr 1fr;}
+  .stage-title{font-size:20pt;}
+  .tab-bar{gap:4px;}
+  .tab{font-size:7.5pt;padding:5px 10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Sticky top bar -->
+<div class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; VER Intelligence Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">Renewal Calendar</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="htb-btn" onclick="openRenewalHelp()" aria-label="How to use Renewal Horizon">&#63; How to Use</button>
+    <button type="button" class="print-btn" onclick="window.print()">Print</button>
+    <span class="htb-meta">FY27 &middot; Salesforce DET &middot; Confidential</span>
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button>
+  </div>
+</div>
+
+<!-- Hero stage -->
+<div class="stage">
+  <div class="stage-inner">
+  <div class="stage-eyebrow">VER Intelligence Hub &middot; Renewal Calendar &middot; FY27</div>
+  <div class="stage-title">Renewal <span>Horizon</span></div>
+  <div class="stage-position">
+    <strong>12-month forward view.</strong> VER monitors upcoming renewals across the DET
+    portfolio so Pillar Leads and Procurement have the advisory analysis needed to act
+    before deadlines — not after.
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi red">
+      <div class="kpi-lbl">Urgent (&lt;60d)</div>
+      <div class="kpi-val" id="r-urgent">—</div>
+      <div class="kpi-note">Immediate action required</div>
+      <div class="src-row">
+        <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+        <span class="src-badge conf-high"><span class="src-dot"></span>High Confidence</span>
+        <span class="src-badge src-manual">Jun 22</span>
+      </div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-lbl">Within 90 Days</div>
+      <div class="kpi-val" id="r-action90">—</div>
+      <div class="kpi-note">Active planning needed</div>
+      <div class="src-row">
+        <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+        <span class="src-badge conf-high"><span class="src-dot"></span>High Confidence</span>
+        <span class="src-badge src-manual">Jun 22</span>
+      </div>
+    </div>
+    <div class="kpi teal">
+      <div class="kpi-lbl">Planning Phase</div>
+      <div class="kpi-val" id="r-planning">—</div>
+      <div class="kpi-note">&gt;180 days — strategy time</div>
+      <div class="src-row">
+        <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+        <span class="src-badge conf-medium"><span class="src-dot"></span>Medium Confidence</span>
+        <span class="src-badge src-manual">Jun 22</span>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Total Tracked</div>
+      <div class="kpi-val" id="r-total">—</div>
+      <div class="kpi-note">12-month forward view</div>
+      <div class="src-row">
+        <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+        <span class="src-badge conf-high"><span class="src-dot"></span>High Confidence</span>
+        <span class="src-badge src-manual">Jun 22</span>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="page-body">
+<div class="page-inner">
+
+  <div class="sec-hdr fade-in">
+    <div class="sec-title">Renewal Advisory</div>
+  </div>
+  <div class="callout c-amber fade-in">
+    <strong>Proactive Renewal Intelligence.</strong>
+    VER monitors upcoming renewals across the DET portfolio to ensure Pillar Leads and
+    Procurement have the advisory analysis needed to act before deadlines — not after.
+    Renewal decisions rest with Pillar Leads, Procurement, and Finance.
+  </div>
+
+  <div class="tab-bar fade-in">
+    <button type="button" class="tab active" onclick="filterRenewals('all',this)">All Renewals</button>
+    <button type="button" class="tab" onclick="filterRenewals('urgent',this)">Urgent (&lt;90d)</button>
+    <button type="button" class="tab" onclick="filterRenewals('action',this)">Within 180d</button>
+    <button type="button" class="tab" onclick="filterRenewals('planning',this)">Planning Phase</button>
+    <button type="button" class="tab" onclick="filterRenewals('t1',this)">Tier 1 Only</button>
+    <span class="tab-count" id="renewal-count"></span>
+  </div>
+
+  <div class="table-card fade-in">
+    <table class="vt">
+      <thead><tr>
+        <th>Vendor</th><th>Status</th><th>Days Out</th><th>Renewal Date</th>
+        <th>Est. Value</th><th>Pillar</th><th>Recommended Action</th><th>VER Contact</th>
+      </tr></thead>
+      <tbody id="renewal-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="callout c-teal callout-mt fade-in">
+    <strong>VER Renewal Support:</strong> For any renewal requiring advisory analysis, rate benchmarking,
+    or engagement terms review — submit a VER Intake Request via the
+    <a href="vendor_intake.html" class="link-teal">VER Vendor Platform</a>.
+  </div>
+
+  <div class="callout c-teal callout-mt fade-in">
+    <strong>&#128178; Rate benchmarking available:</strong>
+    Before negotiating any renewal, check the
+    <a href="page_rate_benchmarks.html" class="link-teal">Rate Benchmarks module</a>
+    for market ranges, leverage scores, and negotiation playbooks across 35 roles.
+    The <a href="page_sow.html" class="link-teal">SOW &amp; PO Tracker</a>
+    shows expiry timing for all 2,397 active POs by quarter.
+  </div>
+
+  <div class="advisory-close fade-in">
+    <div class="ac-eyebrow">VER Advisory Position &mdash; Renewals &middot; FY27 <span class="badge b-analyst">Analyst-curated intelligence</span></div>
+    <div class="ac-text">
+      The two most time-sensitive renewals are NTT Data AD (Aug 2026, $10M) and Workday ELP
+      (Nov 2026, $23.7M). Both require Pillar Lead engagement and Procurement alignment now.
+      VER is actively benchmarking rates for Workday and monitoring the NTT AMS GSA transition.
+      All other tracked renewals are in advisory view with recommended actions assigned.
+    </div>
+    <div class="ac-footer">
+      VER Intelligence Hub &middot; Renewal Calendar &middot; FY27 &middot;
+      Salesforce DET &middot; Powered by VER &middot; Confidential
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Renewal detail modal -->
+<div class="ren-modal-backdrop" id="ren-modal-backdrop" onclick="if(event.target===this)closeRenModal()">
+  <div class="ren-modal" id="ren-modal">
+    <div class="ren-modal-signal" id="ren-modal-signal"></div>
+    <div class="ren-modal-hdr">
+      <div id="ren-modal-logo" class="ren-modal-logo"></div>
+      <div class="ren-modal-hdr-info">
+        <div class="ren-modal-vendor-name" id="ren-modal-vendor"></div>
+        <div class="ren-modal-eng-name" id="ren-modal-category"></div>
+      </div>
+      <button type="button" class="ren-modal-close" onclick="closeRenModal()">&#10005;</button>
+    </div>
+    <div class="ren-modal-kpis" id="ren-modal-kpis"></div>
+    <div class="ren-modal-body">
+      <div class="ren-modal-lbl">Recommended Action</div>
+      <div class="ren-modal-action-text" id="ren-modal-action"></div>
+      <div class="ren-modal-badges" id="ren-modal-badges"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+var LOGO_COLORS = ['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB','#DC2626','#0891B2'];
+function rLogoColor(name){ return LOGO_COLORS[(name||'').length % LOGO_COLORS.length]; }
+function rInitials(name){ return (name||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase(); }
+function rLogoFallback(img, name){
+  var lc = rLogoColor(name); var ini = rInitials(name);
+  var el = document.createElement('div');
+  el.style.cssText='width:32px;height:32px;border-radius:7px;flex-shrink:0;background:'+lc+';display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:800;color:#fff;font-family:Arial;';
+  el.textContent = ini;
+  img.parentNode.replaceChild(el, img);
+}
+function rVendorLogo(domain, name){
+  var lc = rLogoColor(name); var ini = rInitials(name);
+  if(!domain) return '<div style="width:32px;height:32px;border-radius:7px;flex-shrink:0;background:'+lc+';display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:800;color:#fff;font-family:Arial;">'+ini+'</div>';
+  var esc = name.replace(/"/g,'&quot;');
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'" style="width:32px;height:32px;border-radius:7px;flex-shrink:0;object-fit:contain;background:#fff;" onerror="rLogoFallback(this,&quot;'+esc+'&quot;)" alt="'+esc+'">';
+}
+
+var RENEWALS = [
+  {vendor:'Workday',domain:'workday.com',category:'Software / SaaS',pillar:'SF on Salesforce',
+   value:'$23.7M',renewal:'2026-11-30',days_out:214,status:'Critical',
+   action:'Renewal negotiation — VER advisory support required. Rate benchmark in progress.',
+   tier:1,contact:'VER Team',risk:'High Concentration',icon:'⚠️'},
+  {vendor:'BCG',domain:'bcg.com',category:'Professional Services',pillar:'Multiple',
+   value:'$6.0M',renewal:'2026-06-30',days_out:60,status:'Urgent',
+   action:'Renewal decision required. Pending escalation resolution.',
+   tier:2,contact:'VER Director',risk:'Rate Review',icon:'🔴'},
+  {vendor:'IBM',domain:'ibm.com',category:'Professional Services',pillar:'IT / Tech Services',
+   value:'$14.3M',renewal:'2026-08-01',days_out:92,status:'Action Required',
+   action:'Rate benchmarking underway. VER advisory support to Procurement on renewal terms.',
+   tier:2,contact:'VER Team',risk:'Rate Review',icon:'📋'},
+  {vendor:'Gartner',domain:'gartner.com',category:'Software / SaaS',pillar:'Multiple',
+   value:'$1.2M',renewal:'2026-09-30',days_out:152,status:'Monitor',
+   action:'Seat utilization review before renewal. 13/15 seats active — consider consolidation.',
+   tier:3,contact:'VER Team',risk:'Seat Efficiency',icon:'💺'},
+  {vendor:'Conviva',domain:'conviva.com',category:'Software / SaaS',pillar:'Digital Marketing',
+   value:'$0.8M',renewal:'2026-10-15',days_out:167,status:'Monitor',
+   action:'Usage at 84% of cap. Coordinate with DMT team on capacity planning before renewal.',
+   tier:3,contact:'VER Team',risk:'Cap Approaching',icon:'📈'},
+  {vendor:'Sentry IO',domain:'sentry.io',category:'Software / SaaS',pillar:'Engineering',
+   value:'$0.3M',renewal:'2026-07-31',days_out:91,status:'Action Required',
+   action:'Coordinate with Engineering team. Standard renewal expected.',
+   tier:3,contact:'VER Team',risk:'Low',icon:'✅'},
+  {vendor:'Microsoft (M365)',domain:'microsoft.com',category:'Software / SaaS',pillar:'IT',
+   value:'$1.4M',renewal:'2026-06-30',days_out:60,status:'Urgent',
+   action:'M365 enterprise renewal. Coordinate with IT team. Standard renewal expected.',
+   tier:1,contact:'VER Team',risk:'Low',icon:'✅'},
+  {vendor:'ON24',domain:'on24.com',category:'Software / SaaS',pillar:'Digital Marketing',
+   value:'$0.9M',renewal:'2026-11-30',days_out:214,status:'Planning',
+   action:'Annual webinar platform renewal. Review usage and scope before renewing.',
+   tier:3,contact:'VER Team',risk:'Low',icon:'📊'},
+  {vendor:'NTT AMS',domain:'nttdata.com',category:'Professional Services',pillar:'Multiple',
+   value:'$33M+',renewal:'2028-09-01',days_out:853,status:'Long Range',
+   action:'5-year contract through 2028. VER monitoring. 180-day notice required.',
+   tier:1,contact:'VER Team',risk:'High Concentration',icon:'🗓️'},
+  {vendor:'Cognizant ADAMS ES',domain:'cognizant.com',category:'Professional Services',pillar:'SF on Salesforce',
+   value:'$7.7M',renewal:'2027-02-14',days_out:290,status:'Planning',
+   action:'Year 3 of 3 — final year. Renewal decision required before Feb 2027.',
+   tier:1,contact:'VER Team',risk:'Contract End',icon:'⏰'},
+  {vendor:'Cognizant ADAMS FINS',domain:'cognizant.com',category:'Professional Services',pillar:'SF on Salesforce',
+   value:'$6.5M',renewal:'2027-02-14',days_out:290,status:'Planning',
+   action:'Year 2 of 2. All SLAs meeting targets. Standard renewal expected.',
+   tier:1,contact:'VER Team',risk:'Low',icon:'✅'},
+  {vendor:'Okta',domain:'okta.com',category:'Software / SaaS',pillar:'IT',
+   value:'$0.8M',renewal:'2026-11-30',days_out:214,status:'Planning',
+   action:'FY27 renewal $1.27M already approved in MFT. Coordinate with IT.',
+   tier:2,contact:'VER Team',risk:'Low',icon:'✅'}
+];
+
+var STATUS_META = {
+  'Urgent':          {cls:'br',priority:1},
+  'Critical':        {cls:'br',priority:2},
+  'Action Required': {cls:'ba',priority:3},
+  'Monitor':         {cls:'ba',priority:4},
+  'Planning':        {cls:'bn',priority:5},
+  'Long Range':      {cls:'bz',priority:6}
+};
+
+function getDaysClass(days){
+  if(days < 60)  return 'ren-days-red';
+  if(days < 90)  return 'ren-days-orange';
+  if(days < 180) return 'ren-days-amber';
+  if(days < 365) return 'ren-days-navy';
+  return 'ren-days-gray';
+}
+
+function init(){
+  var urgent   = RENEWALS.filter(function(r){ return ['Urgent','Critical'].includes(r.status); }).length;
+  var action90 = RENEWALS.filter(function(r){ return r.days_out <= 90; }).length;
+  var planning = RENEWALS.filter(function(r){ return r.status === 'Planning'; }).length;
+  document.getElementById('r-urgent').textContent   = urgent;
+  document.getElementById('r-action90').textContent = action90;
+  document.getElementById('r-planning').textContent = planning;
+  document.getElementById('r-total').textContent    = RENEWALS.length;
+  renderRenewals('all');
+}
+
+function filterRenewals(f, el){
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  if(el && el.classList) el.classList.add('active');
+  renderRenewals(f);
+}
+
+var _filteredRenewals = [];
+
+function renderRenewals(filter){
+  var items = RENEWALS.slice().sort(function(a,b){ return a.days_out - b.days_out; });
+  if(filter === 'urgent')   items = items.filter(function(r){ return r.days_out <= 90; });
+  if(filter === 'action')   items = items.filter(function(r){ return r.days_out <= 180; });
+  if(filter === 'planning') items = items.filter(function(r){ return r.days_out > 180; });
+  if(filter === 't1')       items = items.filter(function(r){ return r.tier === 1; });
+  _filteredRenewals = items;
+  document.getElementById('renewal-count').textContent = items.length + ' renewals';
+  document.getElementById('renewal-tbody').innerHTML = items.map(function(r,i){
+    var meta  = STATUS_META[r.status] || STATUS_META['Planning'];
+    var dc    = getDaysClass(r.days_out);
+    return '<tr class="ren-row-clickable" onclick="openRenModal('+i+')">'
+      +'<td><div class="ren-vendor-cell">'
+      +rVendorLogo(r.domain, r.vendor)
+      +'<div><div class="ren-vendor">'+r.vendor+'</div>'
+      +'<div class="ren-cat">'+r.category+'</div></div></div></td>'
+      +'<td><span class="badge '+meta.cls+'">'+r.status+'</span></td>'
+      +'<td><span class="ren-days '+dc+'">'+r.days_out+'d</span></td>'
+      +'<td class="ren-date">'+r.renewal+'</td>'
+      +'<td class="ren-value">'+r.value+'</td>'
+      +'<td class="ren-pillar">'+r.pillar+'</td>'
+      +'<td><div class="ren-action">'+r.action+'</div></td>'
+      +'<td class="ren-contact">'+r.contact+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function openRenModal(i){
+  var r = _filteredRenewals[i];
+  if(!r) return;
+  var meta = STATUS_META[r.status] || STATUS_META['Planning'];
+  var dc   = getDaysClass(r.days_out);
+  var sigColor = r.days_out < 90 ? 'var(--red)' : r.days_out < 180 ? 'var(--amber)' : 'var(--teal)';
+  document.getElementById('ren-modal-signal').style.background = sigColor;
+  document.getElementById('ren-modal-logo').innerHTML = rVendorLogo(r.domain, r.vendor);
+  document.getElementById('ren-modal-vendor').textContent = r.vendor;
+  document.getElementById('ren-modal-category').textContent = r.category+' · '+r.pillar;
+  document.getElementById('ren-modal-kpis').innerHTML =
+    '<div class="ren-modal-kpi"><div class="ren-modal-kpi-val ren-days '+dc+'">'+r.days_out+'d</div><div class="ren-modal-kpi-lbl">Days Out</div></div>'
+    +'<div class="ren-modal-kpi"><div class="ren-modal-kpi-val">'+r.value+'</div><div class="ren-modal-kpi-lbl">Est. Value</div></div>'
+    +'<div class="ren-modal-kpi"><div class="ren-modal-kpi-val">'+r.renewal+'</div><div class="ren-modal-kpi-lbl">Renewal Date</div></div>';
+  document.getElementById('ren-modal-action').textContent = r.action;
+  document.getElementById('ren-modal-badges').innerHTML =
+    '<span class="badge '+meta.cls+'">'+r.status+'</span>'
+    +(r.risk !== 'Low' ? '<span class="badge ba">'+r.risk+'</span>' : '')
+    +'<span class="badge bz">Tier '+r.tier+'</span>'
+    +'<span class="badge bz">'+r.contact+'</span>';
+  document.getElementById('ren-modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeRenModal(){
+  document.getElementById('ren-modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeRenModal(); });
+
+/* ── Scroll fade-in ── */
+(function(){
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  },{threshold:0.08});
+  document.querySelectorAll('.fade-in').forEach(function(el){ obs.observe(el); });
+})();
+
+/* ── Dark mode ── */
+function _dmToggle(){
+  var t = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{ localStorage.setItem('ver-theme',t); }catch(e){}
+  var btn = document.getElementById('dm-btn');
+  if(btn) btn.innerHTML = t==='dark' ? '&#9790; Light Mode' : '&#9789; Dark Mode';
+}
+(function(){
+  var t; try{ t = localStorage.getItem('ver-theme'); }catch(e){}
+  if(!t) t = window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn = document.getElementById('dm-btn');
+  if(btn) btn.innerHTML = t==='dark' ? '&#9790; Light Mode' : '&#9789; Dark Mode';
+})();
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openRenewalHelp(){
+  HelpModal.open({
+    title: 'Renewal Horizon',
+    what: 'The Renewal Horizon is your <strong>forward view of all upcoming contract renewals</strong> across the DET vendor portfolio. It surfaces renewal dates, contract values, risk signals, and recommended actions so you can plan negotiations well ahead of expiry — not reactively at the last minute.',
+    steps: [
+      '<strong>Read the timeline</strong> — contracts are plotted on a rolling 18-month horizon. Red indicates renewal within 90 days; amber is 90–180 days; green is 180+ days.',
+      '<strong>Use the filters</strong> to slice by pillar, vendor tier, contract value, or risk flag. Focus your attention on the highest-value and highest-risk renewals first.',
+      '<strong>Click any vendor card</strong> to open the renewal detail modal — it shows contract history, current rate vs. benchmark, negotiation leverage factors, and a recommended approach.',
+      '<strong>Flag renewals for action</strong> — use the action menu in the modal to assign an owner, set a negotiation target, or escalate to governance review.',
+      '<strong>Track progress</strong> — as renewals are actioned, their status updates in the horizon view so the whole team has visibility.'
+    ],
+    tips: [
+      { icon: '&#x23F0;', title: '90-day window is your leverage point', body: 'Starting renewal conversations 90–120 days out is when you have maximum leverage. Inside 60 days, vendors know you\'re committed.' },
+      { icon: '&#x1F4B0;', title: 'Contract value ≠ renewal priority', body: 'A $500K renewal with high lock-in risk may warrant more attention than a $2M commodity contract with easy alternatives.' },
+      { icon: '&#x1F4CA;', title: 'Benchmark before you negotiate', body: 'Use the Rate Benchmarks tool to pull current market data before entering any renewal conversation. Going in blind is going in weak.' },
+      { icon: '&#x1F517;', title: 'Link to TCO Calculator', body: 'Click "Run TCO" from any renewal card to open the TCO Calculator pre-populated with that vendor\'s contract data.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

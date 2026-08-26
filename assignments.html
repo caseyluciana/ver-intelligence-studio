@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Assign Work · VER Team Portal</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-border:rgba(244,63,94,0.30);--bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --rose-gold:#E8A598;--violet:#A855F7;--violet-bright:#C084FC;
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.034);--bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 75% 0%,rgba(244,63,94,0.20) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(192,38,211,0.18) 0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(244,63,94,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,63,94,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(244,63,94,0.024) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sb-gem{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(244,63,94,0.38);}
+.sb-logo-title{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.42);}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);animation:pulse 2.5s ease-in-out infinite;}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-section{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);padding:12px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+.sb-user{margin:0 12px 8px;padding:9px 13px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;cursor:pointer;transition:background 0.15s;}
+.sb-user:hover{background:rgba(244,63,94,0.12);}
+.sb-user-emoji{font-size:18px;line-height:1;}
+.sb-user-name{font-size:11px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:8.5px;color:rgba(255,255,255,0.52);}
+.sb-user-switch{font-size:8px;font-weight:700;color:var(--bloom-bright);margin-top:2px;letter-spacing:0.04em;}
+.sb-footer{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;font-size:8.5px;color:rgba(255,255,255,0.42);line-height:1.7;}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.tb-btn-primary{background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  color:#fff;border-color:transparent;box-shadow:0 0 16px rgba(244,63,94,0.28);}
+.tb-btn-primary:hover{opacity:0.88;color:#fff;}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── Hero ── */
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:28px 36px 26px;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,#0C0618 0%,#18072A 40%,#0E061C 100%);
+  border:1px solid rgba(244,63,94,0.14);animation:rise 0.5s var(--ease) 0.05s both;}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 90% 10%,rgba(244,63,94,0.26) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(192,38,211,0.18) 0%,transparent 46%);}
+.hero-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;
+  color:rgba(255,255,255,0.50);margin-bottom:8px;}
+.hero-title{font-size:clamp(22px,2.4vw,32px);font-weight:900;letter-spacing:-0.025em;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom) 0%,var(--magenta) 55%,var(--violet) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.58);line-height:1.6;max-width:480px;}
+.hero-stats{display:flex;gap:24px;flex-shrink:0;}
+.hero-stat{text-align:center;}
+.hero-stat-val{font-size:36px;font-weight:900;letter-spacing:-0.04em;line-height:1;
+  background:linear-gradient(135deg,var(--bloom-bright),var(--rose-gold));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;
+  color:rgba(255,255,255,0.44);margin-top:3px;}
+
+/* ── Filters ── */
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.filter-btn{padding:5px 14px;border-radius:99px;border:1px solid var(--border-soft);
+  background:var(--ink-ghost);color:var(--ink-muted);font-size:10px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;
+  letter-spacing:0.05em;}
+.filter-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.filter-btn.active{background:var(--bloom-status);border-color:var(--bloom);color:var(--bloom-bright);}
+.filter-sep{width:1px;height:18px;background:var(--border-soft);}
+
+/* ── Section head ── */
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.sec-title{font-size:13px;font-weight:800;color:var(--ink);}
+.sec-pill{font-size:8px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;
+  padding:2px 8px;border-radius:99px;
+  background:var(--bloom-status);color:var(--bloom-bright);border:1px solid var(--bloom-border);}
+.mb20{margin-bottom:20px;}
+
+/* ── Work item card ── */
+.work-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;}
+.work-item{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border-radius:12px;
+  border:1px solid var(--border-soft);background:var(--bg-surface);
+  transition:background 0.15s,border-color 0.15s;}
+.work-item:hover{background:rgba(244,63,94,0.04);border-color:rgba(244,63,94,0.14);}
+.work-item.assigned{border-color:rgba(52,211,153,0.20);background:rgba(52,211,153,0.03);}
+.wi-urgency{width:3px;align-self:stretch;border-radius:99px;flex-shrink:0;}
+.wu-high{background:var(--bloom);}
+.wu-medium{background:var(--amber);}
+.wu-low{background:var(--violet);}
+.wi-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.wi-body{flex:1;min-width:0;}
+.wi-title{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.wi-meta{font-size:10.5px;color:var(--ink-muted);margin-bottom:6px;line-height:1.5;}
+.wi-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.wi-tag{font-size:8px;font-weight:700;padding:2px 8px;border-radius:99px;
+  text-transform:uppercase;letter-spacing:0.08em;}
+.wt-type{background:rgba(244,63,94,0.10);color:var(--bloom-bright);border:1px solid rgba(244,63,94,0.22);}
+.wt-stakeholder{background:rgba(168,85,247,0.10);color:var(--violet-bright);border:1px solid rgba(168,85,247,0.22);}
+.wt-urgency-high{background:rgba(244,63,94,0.10);color:var(--bloom-bright);}
+.wt-urgency-med{background:rgba(251,191,36,0.10);color:var(--amber);}
+.wt-urgency-low{background:rgba(168,85,247,0.10);color:var(--violet-bright);}
+.wi-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.wi-assign-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
+  border-radius:99px;border:1px solid rgba(244,63,94,0.40);
+  background:rgba(244,63,94,0.10);color:var(--bloom-bright);
+  font-size:10px;font-weight:800;cursor:pointer;font-family:var(--font);
+  transition:background 0.15s,transform 0.12s,box-shadow 0.15s;white-space:nowrap;}
+.wi-assign-btn:hover{background:rgba(244,63,94,0.20);transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(244,63,94,0.20);}
+.wi-assigned-chips{display:flex;flex-direction:column;gap:4px;align-items:flex-end;}
+.wi-assignee-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 6px;
+  border-radius:99px;font-size:9px;font-weight:700;border:1px solid;white-space:nowrap;}
+
+/* ── Queue section ── */
+.queue-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;}
+.queue-member-col{background:var(--bg-surface);border:1px solid var(--border-soft);
+  border-radius:12px;padding:14px 16px;}
+.qmc-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--border);}
+.qmc-emoji{font-size:20px;}
+.qmc-name{font-size:12px;font-weight:800;color:var(--ink);}
+.qmc-role{font-size:9px;color:var(--ink-muted);}
+.qmc-count{margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;
+  border-radius:99px;background:var(--bloom-status);color:var(--bloom-bright);}
+.qmc-item{padding:8px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start;}
+.qmc-item:last-child{border-bottom:none;padding-bottom:0;}
+.qmc-item-icon{font-size:13px;flex-shrink:0;}
+.qmc-item-label{font-size:10.5px;color:var(--ink-dim);flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.qmc-item-due{font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;flex-shrink:0;}
+.qmc-empty{font-size:10px;color:rgba(255,255,255,0.28);text-align:center;padding:12px 0;}
+.qmc-resolve{background:none;border:none;color:rgba(255,255,255,0.28);cursor:pointer;
+  font-size:11px;padding:0 3px;flex-shrink:0;line-height:1;}
+.qmc-resolve:hover{color:var(--green);}
+
+/* ── Add new work item form ── */
+.add-item-bar{display:flex;gap:8px;align-items:center;margin-bottom:20px;
+  padding:12px 16px;border-radius:11px;border:1px dashed rgba(244,63,94,0.20);
+  background:rgba(244,63,94,0.03);}
+.add-input{flex:1;background:transparent;border:none;color:var(--ink);font-family:var(--font);
+  font-size:12px;outline:none;}
+.add-input::placeholder{color:rgba(255,255,255,0.26);}
+.add-type-select{background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  border-radius:7px;color:var(--ink-dim);font-family:var(--font);font-size:11px;padding:5px 8px;
+  cursor:pointer;outline:none;}
+.add-type-select option{background:#150D28;}
+.add-btn{padding:6px 14px;border-radius:99px;border:1px solid rgba(244,63,94,0.35);
+  background:rgba(244,63,94,0.10);color:var(--bloom-bright);font-size:10px;font-weight:800;
+  cursor:pointer;font-family:var(--font);white-space:nowrap;}
+.add-btn:hover{background:rgba(244,63,94,0.20);}
+
+/* ── User picker ── */
+.up-overlay{position:fixed;inset:0;z-index:500;background:rgba(7,4,17,0.96);
+  backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center;padding:24px;}
+.up-overlay.hidden{display:none;}
+.up-panel{width:100%;max-width:500px;animation:slideUp 0.4s var(--ease) both;text-align:center;}
+.up-gem{width:48px;height:48px;border-radius:14px;margin:0 auto 18px;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 0 36px rgba(244,63,94,0.40);}
+.up-title{font-size:22px;font-weight:900;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom),var(--magenta),var(--violet));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.up-sub{font-size:12px;color:var(--ink-muted);margin-bottom:24px;}
+.up-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.up-tile{padding:14px 10px;border-radius:10px;cursor:pointer;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  transition:background 0.15s,border-color 0.15s,transform 0.15s;font-family:var(--font);}
+.up-tile:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);transform:translateY(-2px);}
+.up-tile-emoji{font-size:22px;margin-bottom:6px;display:block;}
+.up-tile-name{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:1px;}
+.up-tile-role{font-size:8.5px;color:var(--ink-muted);}
+
+/* ── Director locked state ── */
+.director-lock{display:none;margin-bottom:20px;padding:14px 18px;border-radius:12px;
+  border:1px solid rgba(244,63,94,0.20);background:rgba(244,63,94,0.06);
+  font-size:12px;color:var(--ink-muted);text-align:center;}
+.director-lock.visible{display:block;}
+.director-lock strong{color:var(--bloom-bright);}
+
+.portal-footer{margin-top:24px;padding:12px 16px;
+  background:rgba(244,63,94,0.04);border:1px solid rgba(244,63,94,0.10);border-radius:10px;
+  display:flex;align-items:center;gap:10px;font-size:10px;color:var(--ink-muted);line-height:1.65;}
+.portal-footer strong{color:var(--ink-dim);}
+
+@media(max-width:1100px){.queue-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.sidebar{display:none;}.content{padding:16px 16px 40px;}.queue-grid{grid-template-columns:1fr;}}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#151E2E;--bg-surface:rgba(255,255,255,0.03);--bg-hover:rgba(244,63,94,0.08);--ink:rgba(255,255,255,0.90);--ink-dim:rgba(255,255,255,0.68);--ink-muted:rgba(255,255,255,0.46);--ink-ghost:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.14);--bloom-border:rgba(244,63,94,0.28);--bloom-glow:rgba(244,63,94,0.12);--green:#34D399;--amber:#FBBF24;--red:#F87171;}
+body.mid-mode::before{background:radial-gradient(ellipse at 88% 0%,rgba(37,99,235,0.04) 0%,transparent 22%),radial-gradient(ellipse at 3% 98%,rgba(99,102,241,0.03) 0%,transparent 18%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#1A2540 0%,#172035 60%,#141B2E 100%);border-right:1px solid rgba(255,255,255,0.10);}
+body.mid-mode .topbar{background:rgba(24,31,48,0.92);}
+/* mid-mode up-overlay / user picker */
+body.mid-mode .up-overlay{background:rgba(20,27,46,0.97);}
+body.mid-mode .up-tile{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.14);}
+body.mid-mode .up-tile:hover{background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.35);}
+body.mid-mode .up-tile-name{color:rgba(255,255,255,0.90);}
+body.mid-mode .up-tile-role{color:rgba(255,255,255,0.50);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title,body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-btn-primary{background:linear-gradient(135deg,#F43F5E,#C026D3);color:#fff;border-color:transparent;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .hero{background:linear-gradient(135deg,#FDE8EE 0%,#FCDDE7 38%,#FEE8F0 68%,#FFF0F4 100%);border:1px solid #F5C6D3;}
+body.light-mode .queue-card,body.light-mode .assign-card,body.light-mode .portal-footer{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .q-title,body.light-mode .page-title,body.light-mode .assign-name{color:#1A0818;}
+body.light-mode .q-meta,body.light-mode .assign-role,body.light-mode .ph-eyebrow{color:#7A4055;}
+body.light-mode .content{background:transparent;}
+body.light-mode .scan{opacity:0.12;}
+body.light-mode .hero-eyebrow{color:#7A4055;}
+body.light-mode .hero-sub{color:#3D1028;}
+body.light-mode .hero-stat-label{color:#7A4055;}
+body.light-mode .hero-stat-val{background:linear-gradient(135deg,#C0143C,#9A0DAF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+body.light-mode .sec-title{color:#1A0818;}
+body.light-mode .work-item{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .work-item:hover{background:rgba(244,63,94,0.04);border-color:rgba(244,63,94,0.18);}
+body.light-mode .work-item.assigned{background:rgba(52,211,153,0.03);border-color:rgba(52,211,153,0.20);}
+body.light-mode .wi-title{color:#1A0818;}
+body.light-mode .wi-meta{color:#7A4055;}
+body.light-mode .filter-btn{background:rgba(26,8,24,0.04);color:#5A2038;border-color:#F5C6D3;}
+body.light-mode .filter-btn:hover{background:rgba(244,63,94,0.08);border-color:rgba(244,63,94,0.28);color:#C0143C;}
+body.light-mode .filter-btn.active{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.40);color:#C0143C;}
+body.light-mode .filter-sep{background:#F5C6D3;}
+body.light-mode .add-item-bar{background:rgba(244,63,94,0.03);border-color:rgba(244,63,94,0.18);}
+body.light-mode .add-input{color:#1A0818;}
+body.light-mode .add-input::placeholder{color:#B06080;}
+body.light-mode .add-type-select{background:#FFF0F4;border-color:#F5C6D3;color:#3D1028;}
+body.light-mode .add-type-select option{background:#FFF0F4;color:#1A0818;}
+body.light-mode .queue-member-col{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .qmc-header{border-bottom-color:#F5C6D3;}
+body.light-mode .qmc-name{color:#1A0818;}
+body.light-mode .qmc-role{color:#7A4055;}
+body.light-mode .qmc-item{border-bottom-color:#F5C6D3;}
+body.light-mode .qmc-item-label{color:#3D1028;}
+body.light-mode .qmc-empty{color:#B06080;}
+body.light-mode .qmc-resolve{color:#B06080;}
+body.light-mode .qmc-resolve:hover{color:#059669;}
+body.light-mode .qmc-count{background:rgba(244,63,94,0.10);color:#C0143C;}
+body.light-mode .director-lock{background:rgba(244,63,94,0.06);border-color:rgba(244,63,94,0.20);color:#7A4055;}
+body.light-mode #topbar-identity{color:#5A2038!important;}
+body.light-mode .portal-footer{background:rgba(244,63,94,0.04);border-color:rgba(244,63,94,0.12);color:#7A4055;}
+body.light-mode .portal-footer strong{color:#3D1028;}
+body.light-mode .up-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .up-overlay{background:rgba(255,240,244,0.97);backdrop-filter:blur(18px);}
+body.light-mode .up-title{-webkit-text-fill-color:initial;background:none;color:#C0143C;}
+body.light-mode .up-sub{color:#7A4055;}
+body.light-mode .up-tile-name{color:#1A0818;}
+body.light-mode .up-tile-role{color:#7A4055;}
+body.light-mode .up-tile:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.35);}
+body.light-mode .up-tile-name{color:#1A0818;}
+body.light-mode .up-tile-role{color:#7A4055;}
+</style>
+</head>
+<body data-portal="true">
+<div class="scan" aria-hidden="true"></div>
+
+<!-- User picker -->
+<div class="up-overlay hidden" id="up-overlay">
+  <div class="up-panel">
+    <div class="up-gem">&#128100;</div>
+    <div class="up-title">Who are you?</div>
+    <div class="up-sub">Personalize your portal experience.</div>
+    <div class="up-grid" id="up-grid"></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="window.location.href='team_portal.html'">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-user" id="sb-user-chip" onclick="_showPicker()">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+          <div class="sb-user-switch">Switch profile &#8594;</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html"    class="sb-item active"><span class="sb-icon">&#10133;</span>Assign Work</a>
+
+
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"   class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"       class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"    class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"        class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"      class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html" class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html"    class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html" class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html"     class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"         class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Assign Work</span>
+      </div>
+      <div class="tb-right">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <span id="topbar-identity" style="font-size:11px;color:rgba(255,255,255,0.46);"></span>
+        <button type="button" class="tb-btn tb-btn-primary" id="tb-switch-btn" onclick="_showPicker()" style="display:none;">&#128100; Switch Profile</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div>
+            <div class="hero-eyebrow">VER Director &middot; Work Distribution</div>
+            <div class="hero-title">Assign Work</div>
+            <div class="hero-sub">Your single place to review incoming stakeholder requests and delegate checks to the team. Set the check type, assignee, due date, and stakeholder context — all in one tray.</div>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-val" id="stat-unassigned">0</div>
+              <div class="hero-stat-label">Unassigned</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-val" id="stat-open" style="background:linear-gradient(135deg,var(--violet-bright),var(--magenta-bright));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">0</div>
+              <div class="hero-stat-label">In Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Director lock message -->
+      <div class="director-lock" id="director-lock">
+        <strong>&#128274; Director access only.</strong> Sign in as Casey to assign work to the team. <button onclick="_showPicker()" style="background:none;border:none;color:var(--bloom-bright);font-weight:800;cursor:pointer;font-size:12px;">Sign in &#8594;</button>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar" id="filter-bar">
+        <button class="filter-btn active" data-filter="all" onclick="_setFilter('all',this)">All Items</button>
+        <button class="filter-btn" data-filter="unassigned" onclick="_setFilter('unassigned',this)">Unassigned</button>
+        <div class="filter-sep"></div>
+        <button class="filter-btn" data-filter="intake"  onclick="_setFilter('intake',this)">&#128229; Intake</button>
+        <button class="filter-btn" data-filter="finops"  onclick="_setFilter('finops',this)">&#128176; FinOps</button>
+        <button class="filter-btn" data-filter="saas"    onclick="_setFilter('saas',this)">&#128193; SaaS</button>
+        <button class="filter-btn" data-filter="risk"    onclick="_setFilter('risk',this)">&#128737; Risk</button>
+        <button class="filter-btn" data-filter="spend"   onclick="_setFilter('spend',this)">&#128200; Spend</button>
+        <button class="filter-btn" data-filter="sow"     onclick="_setFilter('sow',this)">&#128196; SOW</button>
+        <button class="filter-btn" data-filter="rate"    onclick="_setFilter('rate',this)">&#9201; Rate</button>
+      </div>
+
+      <!-- ADD NEW ITEM -->
+      <div class="add-item-bar" id="add-item-bar">
+        <span style="font-size:14px;">&#10133;</span>
+        <input type="text" class="add-input" id="add-item-input" placeholder="Add a new work item… (e.g. 'Workday license audit from Finance')">
+        <select class="add-type-select" id="add-item-type">
+          <option value="intake">Intake Review</option>
+          <option value="finops">FinOps Check</option>
+          <option value="saas">Duplicate SaaS Check</option>
+          <option value="risk">Risk Review</option>
+          <option value="spend">Spend Analysis</option>
+          <option value="sow">SOW Review</option>
+          <option value="rate">Rate Validation</option>
+        </select>
+        <button class="add-btn" onclick="_addWorkItem()">Add</button>
+      </div>
+
+      <!-- WORK ITEMS LIST -->
+      <div class="sec-head">
+        <div class="sec-title">&#128203; Work Queue</div>
+        <span class="sec-pill" id="work-queue-pill">Loading…</span>
+      </div>
+      <div class="work-grid" id="work-grid"><!-- rendered by JS --></div>
+
+      <!-- TEAM QUEUE -->
+      <div class="sec-head">
+        <div class="sec-title">&#128101; Team Queue</div>
+        <span class="sec-pill" id="team-queue-pill">By assignee</span>
+      </div>
+      <div class="queue-grid" id="queue-grid"><!-- rendered by JS --></div>
+
+      <div class="portal-footer">
+        <span style="font-size:15px;">&#128274;</span>
+        <span><strong>Internal Use Only.</strong> VER Team Portal &middot; Salesforce DET &middot; FY27</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/assign.js"></script>
+<script>
+var TEAM_MEMBERS=[
+  {id:'casey',  name:'Casey',  role:'Director',       emoji:'&#128081;',color:'#F43F5E',director:true},
+  {id:'debs',   name:'Debs',   role:'Manager',        emoji:'&#127775;',color:'#C026D3'},
+  {id:'erin',   name:'Erin',   role:'Sr. Manager',    emoji:'&#11088;',color:'#A855F7'},
+  {id:'mahesh', name:'Mahesh', role:'Sr. Manager',    emoji:'&#128171;',  color:'#E879F9'},
+  {id:'aditya', name:'Aditya', role:'Sr. Manager',    emoji:'&#10024;',color:'#E8A598'},
+  {id:'justin', name:'Justin', role:'Sr. Analyst',    emoji:'&#127776;',color:'#C084FC'},
+  {id:'guest',  name:'Guest',  role:'VER Team',       emoji:'&#128100;',color:'#6B7280'}
+];
+
+/* ── Default work items (persisted to localStorage, user can add more) ── */
+var DEFAULT_WORK_ITEMS=[
+  {id:'wi-001',title:'Accenture SOW Extension',       stakeholder:'Pillar 4 PM — Maria',   checkType:'sow',    urgency:'high',   source:'response_tracker'},
+  {id:'wi-002',title:'TCS New Vendor Intake',          stakeholder:'Procurement — James',   checkType:'intake', urgency:'high',   source:'response_tracker'},
+  {id:'wi-003',title:'Capgemini Risk Flag Review',     stakeholder:'Risk Committee',         checkType:'risk',   urgency:'high',   source:'risk_tracker'},
+  {id:'wi-004',title:'Mphasis Financial Assessment',   stakeholder:'Finance — TJ',           checkType:'risk',   urgency:'high',   source:'risk_tracker'},
+  {id:'wi-005',title:'Informatica License Audit',      stakeholder:'FinOps — Denise',        checkType:'finops', urgency:'medium', source:'savings_tracker'},
+  {id:'wi-006',title:'SaaS Consolidation Wave 2',      stakeholder:'IT — Platform Team',     checkType:'saas',   urgency:'medium', source:'savings_tracker'},
+  {id:'wi-007',title:'IBM Pillar 4 Spend Analysis',    stakeholder:'Pillar 4 Director',      checkType:'spend',  urgency:'medium', source:'response_tracker'},
+  {id:'wi-008',title:'Salesforce SI Re-bid Analysis',  stakeholder:'Legal & Sourcing',       checkType:'finops', urgency:'medium', source:'savings_tracker'},
+  {id:'wi-009',title:'Workday HCM Rate Validation',    stakeholder:'HR Tech — Sandra',       checkType:'rate',   urgency:'medium', source:'savings_tracker'},
+  {id:'wi-010',title:'Cognizant Risk Assessment',      stakeholder:'Risk Committee',         checkType:'risk',   urgency:'medium', source:'response_tracker'},
+  {id:'wi-011',title:'Kyndryl Compliance Gap Review',  stakeholder:'Compliance — Legal',     checkType:'risk',   urgency:'medium', source:'risk_tracker'},
+  {id:'wi-012',title:'Duplicate SaaS — Analytics Stack',stakeholder:'IT Architecture',      checkType:'saas',   urgency:'low',    source:'manual'},
+  {id:'wi-013',title:'Cloud Infra Cost Takeout — AWS', stakeholder:'FinOps — Denise',        checkType:'spend',  urgency:'low',    source:'savings_tracker'},
+  {id:'wi-014',title:'Deloitte SOW Review — Q3',       stakeholder:'Sourcing — Amanda',      checkType:'sow',    urgency:'low',    source:'response_tracker'},
+  {id:'wi-015',title:'SAP Rate Benchmark Validation',  stakeholder:'Pillar 2 Finance',       checkType:'rate',   urgency:'low',    source:'response_tracker'}
+];
+
+var WORK_ITEMS_KEY='ver-work-items';
+var _currentFilter='all';
+var _currentUser=null;
+
+/* ── Load / save work items ── */
+function _loadItems(){
+  try{
+    var saved=JSON.parse(localStorage.getItem(WORK_ITEMS_KEY));
+    if(saved&&saved.length)return saved;
+  }catch(e){}
+  _saveItems(DEFAULT_WORK_ITEMS);
+  return DEFAULT_WORK_ITEMS.slice();
+}
+function _saveItems(arr){
+  try{localStorage.setItem(WORK_ITEMS_KEY,JSON.stringify(arr));}catch(e){}
+}
+
+/* ── Filter ── */
+function _setFilter(f,btn){
+  _currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  _renderWorkGrid();
+}
+
+/* ── Add new item ── */
+function _addWorkItem(){
+  var input=document.getElementById('add-item-input');
+  var typeEl=document.getElementById('add-item-type');
+  var title=input.value.trim();
+  if(!title)return;
+  var items=_loadItems();
+  items.unshift({
+    id:'wi-'+Date.now(),
+    title:title,
+    stakeholder:'',
+    checkType:typeEl.value,
+    urgency:'medium',
+    source:'manual'
+  });
+  _saveItems(items);
+  input.value='';
+  _renderWorkGrid();
+  _updateStats();
+}
+
+/* ── Open assign tray from work item ── */
+function _assignItem(itemId){
+  var items=_loadItems();
+  var item=items.find(function(i){return i.id===itemId;});
+  if(!item)return;
+  AssignEngine.open({
+    id:        itemId,
+    label:     item.title,
+    vendor:    item.title,
+    checkType: item.checkType,
+    requestedBy: item.stakeholder||''
+  });
+}
+
+/* ── Render work grid ── */
+function _renderWorkGrid(){
+  var grid=document.getElementById('work-grid');
+  var pill=document.getElementById('work-queue-pill');
+  var items=_loadItems();
+  var assignments=AssignEngine.getAll().filter(function(a){return a.status==='open';});
+  var director=_isDirectorLocal();
+
+  var filtered=items.filter(function(item){
+    if(_currentFilter==='all')return true;
+    if(_currentFilter==='unassigned'){
+      var has=assignments.some(function(a){return a.contextId===item.id;});
+      return !has;
+    }
+    return item.checkType===_currentFilter;
+  });
+
+  pill.textContent=filtered.length+' items';
+
+  if(!filtered.length){
+    grid.innerHTML='<div style="text-align:center;padding:28px;color:var(--ink-muted);font-size:12px;">No items match this filter.</div>';
+    return;
+  }
+
+  var urgencyIcon={high:'🔴',medium:'🟡',low:'🟢'};
+  var checkIcons={intake:'📥',finops:'💰',saas:'🔍',risk:'🛡',spend:'📊',sow:'📄',rate:'⏱'};
+  var checkLabels={intake:'Intake Review',finops:'FinOps Check',saas:'Duplicate SaaS Check',risk:'Risk Review',spend:'Spend Analysis',sow:'SOW Review',rate:'Rate Validation'};
+
+  grid.innerHTML=filtered.map(function(item){
+    var itemAssignments=assignments.filter(function(a){return a.contextId===item.id;});
+    var isAssigned=itemAssignments.length>0;
+    var urgClass={high:'wu-high',medium:'wu-medium',low:'wu-low'}[item.urgency]||'wu-low';
+
+    var chips=itemAssignments.map(function(a){
+      return '<span class="wi-assignee-chip" style="background:'+a.memberColor+'18;color:'+a.memberColor+';border-color:'+a.memberColor+'40;">'
+        +a.memberEmoji+' '+a.memberName
+        +'<span style="opacity:0.55;margin-left:3px;">· '+(checkLabels[a.checkId]||a.checkLabel)+'</span>'
+        +'</span>';
+    }).join('');
+
+    var actionBtn=director
+      ? '<button class="wi-assign-btn" onclick="_assignItem(\''+item.id+'\')">&#43; '+(isAssigned?'Add':'Assign')+'</button>'
+      : '';
+
+    return '<div class="work-item'+(isAssigned?' assigned':'')+'" data-item-id="'+item.id+'">'
+      +'<div class="wi-urgency '+urgClass+'"></div>'
+      +'<div class="wi-icon">'+(checkIcons[item.checkType]||'📋')+'</div>'
+      +'<div class="wi-body">'
+      +  '<div class="wi-title">'+item.title+'</div>'
+      +  '<div class="wi-meta">'+(item.stakeholder?'<span style="color:rgba(168,85,247,0.9);">&#128101; '+item.stakeholder+'</span>':'<span style="color:var(--ink-muted);">No stakeholder noted</span>')+'</div>'
+      +  '<div class="wi-tags">'
+      +    '<span class="wi-tag wt-type">'+(checkLabels[item.checkType]||item.checkType)+'</span>'
+      +    '<span class="wi-tag '+(item.urgency==='high'?'wt-urgency-high':item.urgency==='medium'?'wt-urgency-med':'wt-urgency-low')+'">'+urgencyIcon[item.urgency]+' '+item.urgency+'</span>'
+      +  '</div>'
+      +'</div>'
+      +'<div class="wi-actions">'
+      +  actionBtn
+      +  '<div class="wi-assigned-chips">'+chips+'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+/* ── Render team queue by member ── */
+function _renderTeamQueue(){
+  var qGrid=document.getElementById('queue-grid');
+  var pill=document.getElementById('team-queue-pill');
+  var all=AssignEngine.getAll().filter(function(a){return a.status==='open';});
+  var today=new Date().toISOString().slice(0,10);
+
+  var members=TEAM_MEMBERS.filter(function(m){return m.id!=='guest'&&m.id!=='casey';});
+  // Add Casey last (she might have assignments too)
+  members.push(TEAM_MEMBERS.find(function(m){return m.id==='casey';}));
+
+  var totalOpen=all.length;
+  pill.textContent=totalOpen+(totalOpen===1?' assignment':' assignments');
+
+  qGrid.innerHTML=members.map(function(m){
+    var mine=all.filter(function(a){return a.memberId===m.id;});
+    var items=mine.map(function(a){
+      var dc=a.due<today?'overdue':a.due===today?'today':'upcoming';
+      var dcColor=dc==='overdue'?'#FB7185':dc==='today'?'#E879F9':'#C084FC';
+      return '<div class="qmc-item">'
+        +'<span class="qmc-item-icon">'+a.checkIcon+'</span>'
+        +'<span class="qmc-item-label" title="'+(a.vendor||a.label)+'">'+(a.vendor||a.label)+'</span>'
+        +(a.due?'<span class="qmc-item-due" style="background:'+dcColor+'18;color:'+dcColor+';">'+_dueShort(a.due,today)+'</span>':'')
+        +'<button class="qmc-resolve" onclick="AssignEngine.resolve(\''+a.id+'\',this)" title="Mark done">&#10003;</button>'
+        +'</div>';
+    }).join('');
+
+    return '<div class="queue-member-col">'
+      +'<div class="qmc-header">'
+      +  '<span class="qmc-emoji">'+m.emoji+'</span>'
+      +  '<div><div class="qmc-name">'+m.name+'</div><div class="qmc-role">'+m.role+'</div></div>'
+      +  '<span class="qmc-count">'+mine.length+'</span>'
+      +'</div>'
+      +(items||'<div class="qmc-empty">All clear &#10003;</div>')
+      +'</div>';
+  }).join('');
+}
+
+function _dueShort(due,today){
+  if(due<today)return 'Late';
+  if(due===today)return 'Today';
+  var diff=Math.round((new Date(due)-new Date(today))/86400000);
+  return diff+'d';
+}
+
+/* ── Stats ── */
+function _updateStats(){
+  var items=_loadItems();
+  var assignments=AssignEngine.getAll().filter(function(a){return a.status==='open';});
+  var unassigned=items.filter(function(item){
+    return !assignments.some(function(a){return a.contextId===item.id;});
+  }).length;
+  document.getElementById('stat-unassigned').textContent=unassigned;
+  document.getElementById('stat-open').textContent=assignments.length;
+}
+
+/* ── Director check (reads localStorage directly) ── */
+function _isDirectorLocal(){
+  try{
+    var u=JSON.parse(localStorage.getItem('ver-team-user'));
+    return !!(u&&u.director);
+  }catch(e){return false;}
+}
+
+/* ── User identity ── */
+function _loadUser(){
+  var saved=null;
+  try{saved=JSON.parse(localStorage.getItem('ver-team-user'));}catch(e){}
+  if(saved&&saved.name){_applyUser(saved);return;}
+  _showPicker();
+}
+
+function _applyUser(u){
+  _currentUser=u;
+  try{localStorage.setItem('ver-team-user',JSON.stringify(u));}catch(e){}
+  var e=document.getElementById('sb-user-emoji'),n=document.getElementById('sb-user-name'),r=document.getElementById('sb-user-role');
+  if(e)e.innerHTML=u.emoji;if(n)n.textContent=u.name;if(r)r.textContent=u.role;
+  document.getElementById('up-overlay').classList.add('hidden');
+
+  var lock=document.getElementById('director-lock');
+  var filterBar=document.getElementById('filter-bar');
+  var addBar=document.getElementById('add-item-bar');
+  var topId=document.getElementById('topbar-identity');
+  var switchBtn=document.getElementById('tb-switch-btn');
+
+  if(u.director){
+    lock.classList.remove('visible');
+    filterBar.style.display='';
+    addBar.style.display='';
+    if(topId)topId.textContent='';
+    if(switchBtn)switchBtn.style.display='none';
+  } else {
+    lock.classList.add('visible');
+    if(topId)topId.textContent='Signed in as '+u.name;
+    if(switchBtn)switchBtn.style.display='';
+  }
+
+  _renderAll();
+}
+
+function _showPicker(){
+  var g=document.getElementById('up-grid');
+  g.innerHTML=TEAM_MEMBERS.map(function(m){
+    return '<div class="up-tile" onclick="_pick(\''+m.id+'\')"><span class="up-tile-emoji">'+m.emoji+'<\/span><div class="up-tile-name">'+m.name+'<\/div><div class="up-tile-role">'+m.role+'<\/div><\/div>';
+  }).join('');
+  document.getElementById('up-overlay').classList.remove('hidden');
+}
+
+function _pick(id){
+  var m=TEAM_MEMBERS.find(function(x){return x.id===id;});
+  if(!m)return;
+  _applyUser(m);
+}
+
+function _renderAll(){
+  _renderWorkGrid();
+  _renderTeamQueue();
+  _updateStats();
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  // Wire AssignEngine callbacks so queue refreshes after each save/resolve
+  var _origSave=AssignEngine.save.bind(AssignEngine);
+  AssignEngine.save=function(){
+    _origSave();
+    setTimeout(_renderAll,50);
+  };
+  var _origResolve=AssignEngine.resolve.bind(AssignEngine);
+  AssignEngine.resolve=function(id,btn){
+    _origResolve(id,btn);
+    setTimeout(_renderAll,420);
+  };
+
+  _loadUser();
+});
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+</script>
+</body>
+</html>

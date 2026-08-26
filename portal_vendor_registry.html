@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vendor Registry · VER Team Portal</title>
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   VER TEAM PORTAL — DESIGN SYSTEM (bloom/magenta/violet)
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-border:rgba(244,63,94,0.30);--bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14);--mag-border:rgba(192,38,211,0.28);
+  --rose-gold:#E8A598;--violet:#A855F7;--violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12);--vio-border:rgba(168,85,247,0.28);
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.034);--bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 80% 0%,rgba(244,63,94,0.14) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(192,38,211,0.18) 0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(168,85,247,0.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(168,85,247,0.014) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(244,63,94,0.018) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── Shell ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sb-gem{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(244,63,94,0.38);}
+.sb-logo-title{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.42);}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);animation:pulse 2.5s ease-in-out infinite;}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-section{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);padding:12px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+.sb-user{margin:0 12px 8px;padding:9px 13px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:18px;line-height:1;}
+.sb-user-name{font-size:11px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:8.5px;color:rgba(255,255,255,0.52);}
+.sb-footer{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;font-size:8.5px;color:rgba(255,255,255,0.42);line-height:1.7;}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-actions{display:flex;align-items:center;gap:8px;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.tb-btn-primary{background:linear-gradient(135deg,var(--bloom),var(--bloom-dim));
+  border-color:transparent;color:#fff;}
+.tb-btn-primary:hover{background:linear-gradient(135deg,var(--bloom-dim),var(--magenta));
+  border-color:transparent;color:#fff;}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── Page header ── */
+.page-header{animation:rise 0.5s var(--ease) 0.05s both;margin-bottom:22px;}
+.ph-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;
+  color:rgba(255,255,255,0.42);margin-bottom:8px;}
+.ph-title{font-size:28px;font-weight:900;letter-spacing:-0.025em;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom-bright) 0%,var(--violet-bright) 55%,var(--magenta-bright) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.ph-sub{font-size:12px;color:var(--ink-muted);line-height:1.6;}
+
+/* ── Stats strip ── */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;animation:rise 0.5s var(--ease) 0.12s both;}
+.stat-tile{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:12px;
+  padding:16px 18px;position:relative;overflow:hidden;}
+.stat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0;}
+.st-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.st-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.st-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.st-amber::before  {background:linear-gradient(90deg,#D97706,var(--amber));}
+.stat-val{font-size:28px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.st-bloom  .stat-val{color:var(--bloom-bright);}
+.st-violet .stat-val{color:var(--violet-bright);}
+.st-magenta .stat-val{color:var(--magenta-bright);}
+.st-amber  .stat-val{color:var(--amber);}
+.stat-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;color:var(--ink-muted);margin-bottom:2px;}
+.stat-sub{font-size:10px;color:var(--ink-muted);}
+
+/* ── Connection banner ── */
+.conn-banner{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:8px;
+  padding:8px 16px;margin-bottom:16px;font-size:11px;display:flex;align-items:center;gap:9px;
+  color:var(--ink-muted);animation:rise 0.5s var(--ease) 0.18s both;}
+.conn-icon{font-size:12px;}
+
+/* ── Filters ── */
+.filters-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;
+  animation:rise 0.5s var(--ease) 0.22s both;}
+.pf-search{font-size:11px;padding:7px 14px;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  border-radius:8px;color:var(--ink);font-family:var(--font);min-width:200px;
+  transition:border-color 0.15s,box-shadow 0.15s;}
+.pf-search::placeholder{color:var(--ink-muted);}
+.pf-search:focus{outline:none;border-color:var(--bloom-border);box-shadow:0 0 0 3px rgba(244,63,94,0.12);}
+.pf-select{font-size:11px;padding:7px 10px;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  border-radius:8px;color:var(--ink);font-family:var(--font);cursor:pointer;
+  transition:border-color 0.15s;}
+.pf-select:focus{outline:none;border-color:var(--bloom-border);}
+.pf-select option{background:#1C1030;color:var(--ink);}
+.pf-btn{font-size:10px;padding:7px 14px;border-radius:8px;cursor:pointer;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  color:var(--ink-dim);font-family:var(--font);font-weight:700;
+  transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.pf-btn:hover:not(.pf-active){background:rgba(244,63,94,0.07);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.pf-btn.pf-active{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.pf-count{font-size:10px;color:var(--ink-muted);margin-left:4px;}
+
+/* ── View toggle ── */
+.view-toggle{display:flex;gap:4px;margin-bottom:16px;}
+.vt-btn{font-size:10px;padding:6px 14px;border-radius:8px;cursor:pointer;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  color:var(--ink-dim);font-family:var(--font);font-weight:700;
+  transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.vt-btn.vt-active{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+
+/* ── Vendor card (portal glass style) ── */
+.vc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.vc-card{background:var(--bg-surface);border:1px solid var(--border-soft);
+  border-radius:13px;overflow:hidden;cursor:pointer;
+  transition:border-color 0.15s,box-shadow 0.15s,transform 0.15s;}
+.vc-card:hover{border-color:var(--bloom-border);box-shadow:0 4px 24px rgba(244,63,94,0.14);transform:translateY(-2px);}
+.vc-header{padding:14px 16px 11px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;}
+.vc-logo-wrap{flex-shrink:0;}
+.vc-name{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:3px;}
+.vc-meta{font-size:10px;color:var(--ink-muted);margin-bottom:6px;}
+.vc-badges{display:flex;gap:5px;flex-wrap:wrap;}
+.vc-body{padding:12px 16px;}
+.vc-kv{display:flex;justify-content:space-between;padding:4px 0;
+  border-bottom:1px solid var(--border);font-size:10px;}
+.vc-kv:last-child{border-bottom:none;}
+.vc-kv-l{color:var(--ink-muted);}
+.vc-kv-v{font-weight:700;color:var(--ink-dim);text-align:right;}
+.vc-tags{display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px 13px;border-top:1px solid var(--border);}
+.vc-tag{font-size:8.5px;padding:2px 9px;border-radius:99px;font-weight:700;}
+.vc-tag-bloom  {background:rgba(244,63,94,0.12); color:var(--bloom-bright);  border:1px solid rgba(244,63,94,0.25);}
+.vc-tag-violet {background:rgba(168,85,247,0.12);color:var(--violet-bright); border:1px solid rgba(168,85,247,0.25);}
+.vc-tag-magenta{background:rgba(192,38,211,0.12);color:var(--magenta-bright);border:1px solid rgba(192,38,211,0.25);}
+.vc-tag-amber  {background:rgba(251,191,36,0.12);color:var(--amber);         border:1px solid rgba(251,191,36,0.25);}
+.vc-tag-muted  {background:rgba(255,255,255,0.06);color:var(--ink-muted);    border:1px solid var(--border-soft);}
+
+/* ── Badges (tier / status / risk) ── */
+.badge-tier{font-size:8px;font-weight:800;padding:2px 8px;border-radius:99px;}
+.bt-1{background:rgba(244,63,94,0.12);color:var(--bloom-bright);border:1px solid rgba(244,63,94,0.25);}
+.bt-2{background:rgba(168,85,247,0.12);color:var(--violet-bright);border:1px solid rgba(168,85,247,0.25);}
+.bt-3{background:rgba(192,38,211,0.12);color:var(--magenta-bright);border:1px solid rgba(192,38,211,0.25);}
+.badge-status{display:inline-flex;align-items:center;gap:4px;font-size:8px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.bs-active      {background:rgba(52,211,153,0.12);color:#34D399;border:1px solid rgba(52,211,153,0.25);}
+.bs-review      {background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.25);}
+.bs-inactive    {background:rgba(255,255,255,0.06);color:var(--ink-muted);border:1px solid var(--border-soft);}
+.bs-transition  {background:rgba(168,85,247,0.12);color:var(--violet-bright);border:1px solid rgba(168,85,247,0.25);}
+.bs-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.badge-risk{font-size:8.5px;font-weight:800;padding:3px 9px;border-radius:99px;}
+.br-low {background:rgba(52,211,153,0.12);color:#34D399;border:1px solid rgba(52,211,153,0.25);}
+.br-med {background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.25);}
+.br-high{background:rgba(244,63,94,0.12);color:var(--bloom-bright);border:1px solid rgba(244,63,94,0.25);}
+.portal-badge{font-size:7px;font-weight:800;padding:2px 8px;border-radius:99px;
+  background:rgba(192,38,211,0.12);color:var(--magenta-bright);border:1px solid rgba(192,38,211,0.25);}
+
+/* ── Table view ── */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink-muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.data-table td{font-size:11px;color:var(--ink-dim);padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(244,63,94,0.04);color:var(--ink);cursor:pointer;}
+.td-name{color:var(--ink)!important;font-weight:700;}
+
+/* ── Pagination ── */
+.pag-wrap{display:flex;align-items:center;gap:6px;justify-content:center;padding:16px 0;flex-wrap:wrap;}
+.pag-btn{font-size:10px;padding:5px 11px;border-radius:7px;cursor:pointer;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  color:var(--ink-dim);font-family:var(--font);font-weight:700;
+  transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.pag-btn:hover:not(:disabled){background:rgba(244,63,94,0.08);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.pag-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.pag-btn.pag-active{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.pag-sep{font-size:10px;color:var(--ink-muted);padding:0 4px;}
+.pag-info{font-size:10px;color:var(--ink-muted);margin-left:8px;}
+
+/* ── Modal ── */
+.vp-modal-bg{display:none;position:fixed;inset:0;background:rgba(7,4,17,0.82);
+  backdrop-filter:blur(12px);z-index:500;align-items:flex-start;justify-content:center;
+  padding:40px 20px;overflow-y:auto;}
+.vp-modal-bg.open{display:flex;}
+.vp-modal{background:#150D28;border:1px solid rgba(244,63,94,0.20);border-radius:16px;
+  padding:28px 32px;max-width:700px;width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,0.5),0 0 0 1px rgba(168,85,247,0.10);}
+.vp-modal-title{font-size:16px;font-weight:900;margin-bottom:18px;
+  background:linear-gradient(92deg,var(--bloom-bright),var(--violet-bright));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.vp-modal-close{float:right;background:none;border:none;font-size:20px;
+  cursor:pointer;color:var(--ink-muted);margin-top:-4px;
+  transition:color 0.15s;}
+.vp-modal-close:hover{color:var(--bloom-bright);}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.detail-block{background:rgba(255,255,255,0.03);border:1px solid var(--border-soft);
+  border-radius:10px;padding:14px;}
+.detail-block-title{font-size:8px;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.10em;color:var(--ink-muted);margin-bottom:10px;}
+.detail-kv{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;
+  border-bottom:1px solid var(--border);}
+.detail-kv:last-child{border-bottom:none;}
+.detail-kv-l{color:var(--ink-muted);}
+.detail-kv-v{font-weight:700;color:var(--ink-dim);text-align:right;}
+.risk-bar-wrap{background:rgba(255,255,255,0.07);border-radius:4px;height:7px;margin:4px 0;}
+.risk-bar{height:7px;border-radius:4px;transition:width 0.6s var(--ease);}
+
+/* ── Section ── */
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.sec-title{font-size:13px;font-weight:800;color:var(--ink);}
+.sec-pill{font-size:8px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;
+  padding:2px 8px;border-radius:99px;
+  background:rgba(244,63,94,0.10);color:var(--bloom-bright);border:1px solid rgba(244,63,94,0.25);}
+
+/* ── Footer note ── */
+.portal-footer{margin-top:24px;padding:12px 16px;
+  background:rgba(244,63,94,0.04);border:1px solid rgba(244,63,94,0.10);border-radius:10px;
+  display:flex;align-items:center;gap:10px;font-size:10px;color:var(--ink-muted);line-height:1.65;}
+
+@media(max-width:1100px){.vc-grid{grid-template-columns:repeat(2,1fr);}.stat-strip{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.sidebar{display:none;}.content{padding:16px 16px 40px;}.vc-grid{grid-template-columns:1fr;}}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode::before{background:radial-gradient(ellipse at 80% 0%,rgba(192,38,211,0.12) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.10) 0%,transparent 50%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title,body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .hero{background:linear-gradient(135deg,#FDE8EE 0%,#FCDDE7 38%,#FEE8F0 68%,#FFF0F4 100%);border:1px solid #F5C6D3;}
+body.light-mode .vc-card,body.light-mode .stat-card,body.light-mode .portal-footer{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .vc-name,body.light-mode .stat-val,body.light-mode .page-title,body.light-mode .ph-title{color:#1A0818;}
+body.light-mode .vc-meta,body.light-mode .vc-cat,body.light-mode .stat-label,body.light-mode .ph-eyebrow,body.light-mode .ph-sub{color:#7A4055;}
+body.light-mode .stat-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .conn-banner{background:#FFF8FA;border-color:#F5C6D3;color:#7A4055;}
+body.light-mode .toolbar{background:#FFF8FA;border-bottom-color:#F5C6D3;}
+body.light-mode .toolbar input,body.light-mode .toolbar select{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .vc-card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .vc-card:hover{background:#FFF0F4;border-color:rgba(244,63,94,0.30);}
+body.light-mode .vc-tier-badge{background:#FFF0F4;border-color:#F5C6D3;}
+/* Modal light mode */
+body.light-mode .vp-modal-bg{background:rgba(255,240,244,0.88);}
+body.light-mode .vp-modal{background:#FFF8FA;border-color:#F5C6D3;box-shadow:0 24px 64px rgba(244,63,94,0.15);}
+body.light-mode .vp-modal-title{background:linear-gradient(92deg,#E11D48,#C026D3);-webkit-background-clip:text;background-clip:text;}
+body.light-mode .vp-modal-close{color:#7A4055;}
+body.light-mode .vp-modal-close:hover{color:#E11D48;}
+body.light-mode .detail-block{background:rgba(244,63,94,0.04);border-color:#F5C6D3;}
+body.light-mode .detail-block-title{color:#B06080;}
+body.light-mode .detail-kv{border-bottom-color:#F5C6D3;}
+body.light-mode .detail-kv-l{color:#7A4055;}
+body.light-mode .detail-kv-v{color:#1A0818;}
+body.light-mode .risk-bar-wrap{background:rgba(26,8,24,0.08);}
+body.light-mode .content{background:transparent;}
+body.light-mode .scan{opacity:0.12;}
+body.light-mode .hero-eyebrow{color:#7A4055;}
+body.light-mode .hero-sub{color:#3D1028;}
+body.light-mode .hero-stat-label{color:#7A4055;}
+body.light-mode .hero-stat-val{background:linear-gradient(135deg,#C0143C,#9A0DAF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+</style>
+</head>
+<body data-portal="true">
+
+<div class="scan" aria-hidden="true"></div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="window.location.href='team_portal.html'">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-user" id="sb-user-chip">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html"    class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"       class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"           class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"        class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"     class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"   class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"   class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html" class="sb-item active"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html"  class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html" class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"          class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Vendor Registry</span>
+      </div>
+      <div class="tb-actions">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button class="tb-btn" onclick="openRegistryHelp()">&#63; How to Use</button>
+        <button class="tb-btn" onclick="loadData()">&#8635; Refresh</button>
+        <button class="tb-btn tb-btn-primary" onclick="showAddModal()">+ Add Vendor</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="ph-eyebrow">VER Intelligence Hub &middot; FY27</div>
+        <div class="ph-title">Vendor Registry</div>
+        <div class="ph-sub">All managed vendors &middot; Search, filter, and view full dossiers</div>
+      </div>
+
+      <!-- Stat strip -->
+      <div class="stat-strip" id="stat-strip">
+        <div class="stat-tile st-bloom">
+          <div class="stat-label">Total Vendors</div>
+          <div class="stat-val" id="stat-total">—</div>
+          <div class="stat-sub">Across all tiers</div>
+        </div>
+        <div class="stat-tile st-violet">
+          <div class="stat-label">Tier 1 Strategic</div>
+          <div class="stat-val" id="stat-t1">—</div>
+          <div class="stat-sub">Executive relationships</div>
+        </div>
+        <div class="stat-tile st-magenta">
+          <div class="stat-label">High Risk</div>
+          <div class="stat-val" id="stat-highrisk">—</div>
+          <div class="stat-sub">Score &ge; 67</div>
+        </div>
+        <div class="stat-tile st-amber">
+          <div class="stat-label">Renewal &le; 90 Days</div>
+          <div class="stat-val" id="stat-renewing">—</div>
+          <div class="stat-sub">Action required</div>
+        </div>
+      </div>
+
+      <!-- Connection banner -->
+      <div class="conn-banner">
+        <span class="conn-icon">&#128225;</span>
+        <span id="vp-connection-status">Checking data connection…</span>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-row">
+        <input class="pf-search" id="reg-search" placeholder="&#128269; Search vendors…" oninput="filterRegistry()">
+        <select class="pf-select" id="reg-cat" onchange="filterRegistry()">
+          <option value="">All Categories</option>
+          <option>Software / SaaS</option>
+          <option>Contingent Workforce</option>
+          <option>Hardware &amp; Infrastructure</option>
+          <option>Professional Services</option>
+          <option>Cloud &amp; Managed Services</option>
+        </select>
+        <select class="pf-select" id="reg-tier" onchange="filterRegistry()">
+          <option value="">All Tiers</option>
+          <option value="1">Tier 1 — Strategic</option>
+          <option value="2">Tier 2 — Established</option>
+          <option value="3">Tier 3 — Specialized</option>
+        </select>
+        <select class="pf-select" id="reg-risk" onchange="filterRegistry()">
+          <option value="">All Risk Levels</option>
+          <option value="low">Low Risk (0–33)</option>
+          <option value="medium">Medium Risk (34–66)</option>
+          <option value="high">High Risk (67–100)</option>
+        </select>
+        <select class="pf-select" id="reg-status" onchange="filterRegistry()">
+          <option value="">All Statuses</option>
+          <option>Active</option>
+          <option>Under Review</option>
+          <option>Inactive</option>
+          <option>Transitioning</option>
+          <option value="_portal">Portal Submissions</option>
+        </select>
+        <button class="pf-btn" onclick="clearFilters()">Clear</button>
+        <span class="pf-count" id="reg-count"></span>
+      </div>
+
+      <!-- View toggle -->
+      <div class="view-toggle">
+        <button class="vt-btn vt-active" id="vt-card" onclick="setView('card')">&#8862; Cards</button>
+        <button class="vt-btn" id="vt-table" onclick="setView('table')">&#9776; Table</button>
+      </div>
+
+      <!-- Card View -->
+      <div id="pagination-top"></div>
+      <div id="reg-cards" class="vc-grid"></div>
+      <div id="pagination-bottom"></div>
+
+      <!-- Table View -->
+      <div id="reg-table-wrap" style="display:none;">
+        <table class="data-table">
+          <thead><tr>
+            <th>Vendor</th><th>Category</th><th>Tier</th><th>Risk</th>
+            <th>Status</th><th>Spend</th><th>SLA %</th><th>Renewal</th><th>Capabilities</th>
+          </tr></thead>
+          <tbody id="reg-tbody"></tbody>
+        </table>
+        <div id="pagination-bottom-table"></div>
+      </div>
+
+      <div class="portal-footer">
+        <span>&#128218;</span>
+        <span><strong>Vendor Registry</strong> &mdash; Authoritative directory of all DET managed vendors. Portal submissions sync automatically. For questions contact the VER team.</span>
+      </div>
+
+    </div><!-- .content -->
+  </div><!-- .main -->
+</div><!-- .shell -->
+
+<!-- Modal overlay -->
+<div class="vp-modal-bg" id="vd-modal">
+  <div class="vp-modal" id="vd-modal-inner"></div>
+</div>
+
+<script src="assets/vendors.js"></script>
+<script>
+// ── Brandfetch logo helper ────────────────────────────────────────
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+
+function vlogoErr(img) {
+  img.style.display = 'none';
+  var fb = img.nextElementSibling;
+  if (fb) fb.style.display = 'flex';
+}
+
+function vlogoOk(img) {
+  var fb = img.nextElementSibling;
+  if (fb) fb.style.display = 'none';
+}
+
+function vendorLogo(domain, name, size, extra) {
+  size  = size  || 36;
+  extra = extra || '';
+  var ini = (name || '?').split(' ')
+    .map(function(w){ return w[0] || ''; }).join('').slice(0,2).toUpperCase();
+  var pal = ['#F43F5E','#A855F7','#C026D3','#E8A598','#34D399','#FBBF24'];
+  var lc  = pal[(name || '').length % pal.length];
+  var bs  = 'width:'+size+'px;height:'+size+'px;border-radius:8px;flex-shrink:0;';
+
+  var fallback = '<div style="'+bs+'background:'+lc+
+    ';display:flex;align-items:center;justify-content:center;'+
+    'font-size:'+Math.round(size*0.33)+'pt;font-weight:800;'+
+    'color:#fff;font-family:Arial;'+extra+'">'+ini+'</div>';
+
+  if (!domain) return fallback;
+
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'"'+
+    ' alt="'+name.replace(/"/g,'')+'"'+
+    ' style="'+bs+'object-fit:contain;background:rgba(255,255,255,0.08);padding:3px;'+extra+'"'+
+    ' onerror="vlogoErr(this)" onload="vlogoOk(this)">'+
+    '<div style="'+bs+'background:'+lc+
+    ';display:none;align-items:center;justify-content:center;'+
+    'font-size:'+Math.round(size*0.33)+'pt;font-weight:800;'+
+    'color:#fff;font-family:Arial;'+extra+'">'+ini+'</div>';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VER VENDOR DATA ENGINE (ported from vendor_registry.html)
+// ══════════════════════════════════════════════════════════════════
+const VP = {
+
+  SHEETS: {
+    vendors:     './data/vendors.csv',
+    engagements: './data/engagements.csv',
+    risk:        './data/risk_scores.csv',
+    intake:      './data/intake.csv',
+  },
+
+  SAVE_KEY: 'verVP_registry',
+
+  CATEGORIES: [
+    'Software / SaaS',
+    'Contingent Workforce',
+    'Hardware & Infrastructure',
+    'Professional Services',
+    'Cloud & Managed Services',
+  ],
+
+  TIERS: {
+    1: { label:'Tier 1 — Strategic',   color:'#FB7185', bg:'rgba(244,63,94,0.12)',   desc:'High spend, high dependency, executive relationship required' },
+    2: { label:'Tier 2 — Established', color:'#C084FC', bg:'rgba(168,85,247,0.12)',  desc:'Active managed engagement, recurring spend' },
+    3: { label:'Tier 3 — Specialized', color:'#E879F9', bg:'rgba(192,38,211,0.12)',  desc:'Project-based, niche, or lower spend engagement' },
+  },
+
+  RISK: {
+    low:    { min:0,  max:33,  label:'Low Risk',    color:'#34D399', bg:'rgba(52,211,153,0.12)' },
+    medium: { min:34, max:66,  label:'Medium Risk', color:'#FBBF24', bg:'rgba(251,191,36,0.12)' },
+    high:   { min:67, max:100, label:'High Risk',   color:'#FB7185', bg:'rgba(244,63,94,0.12)'  },
+  },
+
+  CAPABILITY_TAGS: [
+    'Application Development','Application Maintenance','Cloud Infrastructure',
+    'Data Engineering','AI / ML','Security','Staff Augmentation',
+    'ERP / Workday','Service Desk','Hardware Supply','Consulting / Advisory',
+    'QA & Testing','DevOps','Platform Engineering','Analytics & BI',
+    'Managed Services','Network & AV','Identity & Access',
+  ],
+
+  SAMPLE_VENDORS: [
+  { id:'V001', name:'NTT Data', category:'Professional Services', tier:1, status:'Active', region:'AMER|APAC|EMEA', annual_spend:'$22.8M', renewal_date:'2028-09-01', primary_contact:'VER Team', supplier_address:'Suite 600, 7950 Jones Branch Drive, McLean, VA 22102', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Large-scale AMS and Application Development engagement across DET pillars. Strategic partner with 180-day notice period.', sla_score:97, concentration_risk:85, financial_risk:15, delivery_risk:20, compliance_risk:10, risk_score:40, capabilities:['Application Development','Application Maintenance','Staff Augmentation','DevOps','Platform Engineering'], domain:'nttdata.com', notes:'AMS decentralization underway. AD restructure complete Apr 2026. ~140 resources across 24 POs.' },
+  { id:'V002', name:'Cognizant', category:'Professional Services', tier:1, status:'Active', region:'AMER|APAC|EMEA', annual_spend:'$9.5M', renewal_date:'2027-02-14', primary_contact:'VER Team', supplier_address:'300 Frank W. Burr Blvd, Teaneck, NJ 07666', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Workday ADAMS Enterprise Systems and Financials AMS engagements. Yr3 ES and Yr2 FINS.', sla_score:99, concentration_risk:60, financial_risk:20, delivery_risk:15, compliance_risk:12, risk_score:31, capabilities:['ERP / Workday','Application Maintenance','Staff Augmentation','Analytics & BI'], domain:'cognizant.com', notes:'ES Yr3 final year. FINS Yr2. Both meeting/exceeding SLA. Renewal decision Q1 FY28.' },
+  { id:'V004', name:'Workday', category:'Software / SaaS', tier:1, status:'Active', region:'Global', annual_spend:'$23.7M', renewal_date:'2026-11-30', primary_contact:'VER Team', supplier_address:'6110 Stoneridge Mall Road, Pleasanton, CA 94588', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Core HCM, Financials, and enterprise platform license. Highest spend vendor in portfolio.', sla_score:98, concentration_risk:90, financial_risk:10, delivery_risk:10, compliance_risk:8, risk_score:38, capabilities:['ERP / Workday','Analytics & BI','Identity & Access'], domain:'workday.com', notes:'Renewal due Nov 2026. High concentration risk — mission-critical. Negotiations due Q3 FY27.' },
+  { id:'V005', name:'AWS', category:'Cloud & Managed Services', tier:1, status:'Active', region:'Global', annual_spend:'$17.2M', renewal_date:'2027-03-01', primary_contact:'VER Team', supplier_address:'410 Terry Avenue North, Seattle, WA 98109', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Cloud infrastructure and managed services via Enterprise Discount Program across all DET engineering.', sla_score:99, concentration_risk:80, financial_risk:8, delivery_risk:10, compliance_risk:12, risk_score:34, capabilities:['Cloud Infrastructure','DevOps','Security','Managed Services','AI / ML'], domain:'aws.amazon.com', notes:'EDP renewal tracking. Usage within committed spend envelope.' },
+  { id:'V013', name:'Microsoft', category:'Software / SaaS', tier:1, status:'Active', region:'Global', annual_spend:'$1.4M', renewal_date:'2026-06-30', primary_contact:'VER Team', supplier_address:'One Microsoft Way, Redmond, WA 98052', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Microsoft 365, Azure dev tooling, and enterprise licensing.', sla_score:98, concentration_risk:50, financial_risk:10, delivery_risk:8, compliance_risk:10, risk_score:23, capabilities:['Cloud Infrastructure','DevOps','Platform Engineering','Analytics & BI'], domain:'microsoft.com', notes:'M365 and Azure dev. Renewal Jun 2026.' },
+  { id:'V033', name:'McKinsey & Company', category:'Professional Services', tier:1, status:'Active', region:'Global', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'55 East 52nd Street, New York, NY 10055', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Strategic management consulting. Director-managed executive relationship.', sla_score:93, concentration_risk:25, financial_risk:20, delivery_risk:20, compliance_risk:15, risk_score:21, capabilities:['Consulting / Advisory'], domain:'mckinsey.com', notes:'Director-managed. Executive-level strategy engagements only.' },
+  { id:'V003', name:'Tech Mahindra', category:'Professional Services', tier:2, status:'Active', region:'Global', annual_spend:'$6.5M', renewal_date:'2027-04-30', primary_contact:'VER Team', supplier_address:'2 Tower Center Blvd, Suite 2200, East Brunswick, NJ 08816', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Techforce Service Desk and On-Site Services. 3 SLA metrics currently below target.', sla_score:82, concentration_risk:50, financial_risk:30, delivery_risk:68, compliance_risk:55, risk_score:52, capabilities:['Service Desk','Managed Services','Staff Augmentation','Network & AV'], domain:'techmahindra.com', notes:'Active VER advisory monitoring. FY27 baseline.' },
+  { id:'V006', name:'IBM', category:'Professional Services', tier:2, status:'Active', region:'AMER|EMEA', annual_spend:'$14.3M', renewal_date:'2026-08-01', primary_contact:'VER Team', supplier_address:'1 New Orchard Road, Armonk, NY 10504', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Enterprise application and data services. Also provides video streaming platform.', sla_score:91, concentration_risk:55, financial_risk:35, delivery_risk:40, compliance_risk:30, risk_score:43, capabilities:['Application Development','Data Engineering','Security','Analytics & BI','Managed Services'], domain:'ibm.com', notes:'Renewal Aug 2026 — active review with Procurement.' },
+  { id:'V008', name:'Deloitte', category:'Professional Services', tier:2, status:'Active', region:'AMER|EMEA', annual_spend:'$9.1M', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'30 Rockefeller Plaza, New York, NY 10112', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Advisory and implementation services across DET programs. Active SOW supplier in Fieldglass.', sla_score:94, concentration_risk:40, financial_risk:25, delivery_risk:30, compliance_risk:20, risk_score:31, capabilities:['Consulting / Advisory','Application Development','Data Engineering','QA & Testing'], domain:'deloitte.com', notes:'Renewal Dec 2026. Performing to scope.' },
+  { id:'V009', name:'BCG', category:'Professional Services', tier:2, status:'Active', region:'AMER', annual_spend:'$6.0M', renewal_date:'2026-06-30', primary_contact:'VER Team', supplier_address:'200 Pier 4 Blvd, Boston, MA 02210', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Strategic consulting and advisory engagement.', sla_score:78, concentration_risk:30, financial_risk:40, delivery_risk:70, compliance_risk:50, risk_score:47, capabilities:['Consulting / Advisory'], domain:'bcg.com', notes:'Active advisory monitoring. VER Director engaged with business owner. Renewal risk.' },
+  { id:'V029', name:'Accenture', category:'Professional Services', tier:2, status:'Active', region:'Global', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'161 N Clark Street, Chicago, IL 60601', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Global IT services and consulting. Active SOW supplier in Fieldglass. LATAM supplier.', sla_score:88, concentration_risk:45, financial_risk:25, delivery_risk:30, compliance_risk:20, risk_score:33, capabilities:['Application Development','Consulting / Advisory','Data Engineering','Staff Augmentation'], domain:'accenture.com', notes:'Active SOW in Fieldglass (Accenture LLP + International Limited). LATAM approved.' },
+  { id:'V030', name:'PwC', category:'Professional Services', tier:2, status:'Active', region:'AMER', annual_spend:'$0.5M', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'300 Madison Avenue, New York, NY 10017', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Advisory and technology consulting. Active SOW supplier. FY25 Slack Enablement $542K.', sla_score:91, concentration_risk:35, financial_risk:22, delivery_risk:25, compliance_risk:18, risk_score:27, capabilities:['Consulting / Advisory','Application Development','Security'], domain:'pwc.com', notes:'Active SOW in Fieldglass. Coupa spend confirmed FY25.' },
+  { id:'V014', name:'ServiceNow', category:'Software / SaaS', tier:2, status:'Active', region:'Global', annual_spend:'$0.9M', renewal_date:'2026-12-01', primary_contact:'VER Team', supplier_address:'2225 Lawson Lane, Santa Clara, CA 95054', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'ITSM and workflow automation platform supporting DET operations.', sla_score:96, concentration_risk:35, financial_risk:18, delivery_risk:15, compliance_risk:12, risk_score:22, capabilities:['Platform Engineering','Managed Services'], domain:'servicenow.com', notes:'ITSM for DET operations workflows.' },
+  { id:'V015', name:'Splunk', category:'Software / SaaS', tier:2, status:'Active', region:'AMER', annual_spend:'$0.7M', renewal_date:'2027-03-15', primary_contact:'VER Team', supplier_address:'270 Brannan Street, San Francisco, CA 94107', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Security information and event management (SIEM) platform. Active SOW supplier.', sla_score:95, concentration_risk:30, financial_risk:18, delivery_risk:12, compliance_risk:8, risk_score:19, capabilities:['Security','Analytics & BI','DevOps'], domain:'splunk.com', notes:'SIEM and log analytics. Cisco acquisition — monitor terms.' },
+  { id:'V016', name:'Tableau', category:'Software / SaaS', tier:2, status:'Active', region:'Global', annual_spend:'$0.5M', renewal_date:'2026-09-01', primary_contact:'VER Team', supplier_address:'837 N 34th Street, Seattle, WA 98103', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Business intelligence and data visualization platform (Salesforce-owned).', sla_score:97, concentration_risk:25, financial_risk:12, delivery_risk:10, compliance_risk:8, risk_score:15, capabilities:['Analytics & BI','Data Engineering'], domain:'tableau.com', notes:'Enterprise BI platform for DET reporting.' },
+  { id:'V017', name:'Okta', category:'Software / SaaS', tier:2, status:'Active', region:'Global', annual_spend:'$0.8M', renewal_date:'2026-11-30', primary_contact:'VER Team', supplier_address:'100 First Street, Suite 600, San Francisco, CA 94105', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Identity and access management platform. Active SOW and Professional Services.', sla_score:98, concentration_risk:40, financial_risk:15, delivery_risk:10, compliance_risk:10, risk_score:22, capabilities:['Identity & Access','Security'], domain:'okta.com', notes:'SSO and MFA for DET workforce. FY27 renewal approved $1.27M.' },
+  { id:'V018', name:'Atlassian', category:'Software / SaaS', tier:2, status:'Active', region:'AMER|APAC', annual_spend:'$0.6M', renewal_date:'2027-01-15', primary_contact:'VER Team', supplier_address:'350 Bush Street, Floor 13, San Francisco, CA 94104', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Jira, Confluence, and collaboration tooling. Cloud migration complete.', sla_score:96, concentration_risk:30, financial_risk:12, delivery_risk:10, compliance_risk:8, risk_score:17, capabilities:['Platform Engineering','DevOps','QA & Testing'], domain:'atlassian.com', notes:'Engineering collaboration suite.' },
+  { id:'V019', name:'Snowflake', category:'Software / SaaS', tier:2, status:'Active', region:'Global', annual_spend:'$1.1M', renewal_date:'2026-08-15', primary_contact:'VER Team', supplier_address:'450 Concar Drive, San Mateo, CA 94402', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Cloud data warehouse and analytics platform. MFT item for data workloads.', sla_score:96, concentration_risk:35, financial_risk:15, delivery_risk:12, compliance_risk:10, risk_score:20, capabilities:['Data Engineering','Analytics & BI','Cloud Infrastructure'], domain:'snowflake.com', notes:'Data cloud for DET analytics workloads.' },
+  { id:'V007', name:'Google Cloud', category:'Cloud & Managed Services', tier:2, status:'Active', region:'Global', annual_spend:'$14.0M', renewal_date:'2027-01-15', primary_contact:'VER Team', supplier_address:'1600 Amphitheatre Parkway, Mountain View, CA 94043', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Google Cloud Platform, Workspace, and AI/Gemini services across DET engineering.', sla_score:99, concentration_risk:65, financial_risk:10, delivery_risk:12, compliance_risk:10, risk_score:30, capabilities:['Cloud Infrastructure','Analytics & BI','AI / ML','Platform Engineering'], domain:'cloud.google.com', notes:'GCP and Workspace nominal. Gemini AI usage growing.' },
+  { id:'V066', name:'Microsoft Azure', category:'Cloud & Managed Services', tier:2, status:'Active', region:'Global', annual_spend:'$0', renewal_date:'2026-09-30', primary_contact:'VER Team', supplier_address:'One Microsoft Way, Redmond, WA 98052', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Azure cloud computing, AI, and managed services. Alongside M365.', sla_score:97, concentration_risk:55, financial_risk:10, delivery_risk:10, compliance_risk:10, risk_score:26, capabilities:['Cloud Infrastructure','AI / ML','DevOps','Security','Managed Services'], domain:'azure.microsoft.com', notes:'Azure dev and AI workloads. Often paired with M365.' },
+  { id:'V068', name:'Verizon Business', category:'Cloud & Managed Services', tier:2, status:'Active', region:'AMER|EMEA', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'1095 Avenue of the Americas, New York, NY 10036', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Network, security, and managed communication services.', sla_score:88, concentration_risk:40, financial_risk:20, delivery_risk:22, compliance_risk:18, risk_score:27, capabilities:['Network & AV','Security','Managed Services','Cloud Infrastructure'], domain:'verizonbusiness.com', notes:'Enterprise network and connectivity services.' },
+  { id:'V044', name:'Insight Global', category:'Contingent Workforce', tier:2, status:'Active', region:'AMER', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'4170 Ashford Dunwoody Road NE, Suite 250, Atlanta, GA 30319', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'IT staffing and managed services. AMER Elite Partner with approved rate card. WBE certified.', sla_score:87, concentration_risk:35, financial_risk:22, delivery_risk:28, compliance_risk:18, risk_score:28, capabilities:['Staff Augmentation','Application Development','DevOps','QA & Testing','Data Engineering'], domain:'insightglobal.com', notes:'AMER Elite Partner with negotiated rate card. WBE certified. Poland benchmark published.' },
+  { id:'V045', name:'TEKsystems', category:'Contingent Workforce', tier:2, status:'Active', region:'AMER', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'7437 Race Road, Hanover, MD 21076', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'IT staffing and managed services. AMER Elite Partner. MBE (LGBTQ+) certified.', sla_score:87, concentration_risk:35, financial_risk:22, delivery_risk:28, compliance_risk:18, risk_score:28, capabilities:['Staff Augmentation','Application Development','DevOps','QA & Testing'], domain:'teksystems.com', notes:'AMER Elite Partner. MBE (LGBTQ+) certified.' },
+  { id:'V046', name:'Adecco', category:'Contingent Workforce', tier:2, status:'Active', region:'AMER', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'10151 Deerwood Park Blvd, Jacksonville, FL 32256', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'General staffing and workforce solutions. AMER Elite Partner.', sla_score:83, concentration_risk:32, financial_risk:22, delivery_risk:26, compliance_risk:18, risk_score:26, capabilities:['Staff Augmentation'], domain:'adecco.com', notes:'AMER Elite Partner. General staffing.' },
+  { id:'V047', name:'BCForward', category:'Contingent Workforce', tier:2, status:'Active', region:'AMER', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'IT staffing firm. AMER Elite Partner. MBE certified.', sla_score:84, concentration_risk:30, financial_risk:22, delivery_risk:26, compliance_risk:18, risk_score:25, capabilities:['Staff Augmentation','Application Development'], domain:'bcforward.com', notes:'AMER Elite Partner. MBE certified.' },
+  { id:'V048', name:'Spectraforce Technologies', category:'Contingent Workforce', tier:2, status:'Active', region:'AMER', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'100 Perimeter Park Drive, Suite A, Morrisville, NC 27560', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'IT staffing. AMER Elite Partner. WBE certified. Active SOW in Fieldglass.', sla_score:84, concentration_risk:30, financial_risk:22, delivery_risk:26, compliance_risk:18, risk_score:25, capabilities:['Staff Augmentation','Application Development','QA & Testing'], domain:'spectraforce.com', notes:'AMER Elite Partner. WBE certified. Active SOW in Fieldglass.' },
+  { id:'V049', name:'Swoon', category:'Contingent Workforce', tier:2, status:'Active', region:'AMER', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'205 N Michigan Ave, Suite 4000, Chicago, IL 60601', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Technology staffing. AMER Elite Partner. SBA(8) and MBE certified. Active SOW.', sla_score:84, concentration_risk:28, financial_risk:20, delivery_risk:25, compliance_risk:18, risk_score:24, capabilities:['Staff Augmentation','Application Development'], domain:'swoonstaffing.com', notes:'AMER Elite Partner. SBA(8) + MBE + CA DGS certified. Active SOW in Fieldglass.' },
+  { id:'V069', name:'Dell Technologies', category:'Hardware & Infrastructure', tier:2, status:'Active', region:'Global', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'One Dell Way, Round Rock, TX 78682', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Enterprise hardware, servers, storage. Active Coupa spend confirmed (Dell + Dell Financial Services).', sla_score:92, concentration_risk:40, financial_risk:15, delivery_risk:18, compliance_risk:12, risk_score:24, capabilities:['Hardware Supply','Network & AV','Managed Services'], domain:'dell.com', notes:'Coupa spend confirmed. Finance lease + direct purchase. Preferred hardware vendor.' },
+  { id:'V070', name:'HP Inc.', category:'Hardware & Infrastructure', tier:2, status:'Active', region:'Global', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'1501 Page Mill Road, Palo Alto, CA 94304', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Workstations, laptops, and enterprise hardware. Active Coupa spend confirmed.', sla_score:90, concentration_risk:35, financial_risk:15, delivery_risk:18, compliance_risk:12, risk_score:22, capabilities:['Hardware Supply'], domain:'hp.com', notes:'Standard laptop supplier. Coupa spend confirmed (HP ZBook).' },
+  { id:'V071', name:'Insight Direct', category:'Hardware & Infrastructure', tier:2, status:'Active', region:'AMER|EMEA', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'6820 S Harl Avenue, Tempe, AZ 85283', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'IT products and hardware. Highest hardware spend in Coupa. Laptops, mobiles, peripherals.', sla_score:88, concentration_risk:30, financial_risk:15, delivery_risk:18, compliance_risk:12, risk_score:21, capabilities:['Hardware Supply','Managed Services'], domain:'insight.com', notes:'Largest hardware spend in Coupa. Multi-vendor procurement. AMER and Canada active.' },
+  { id:'V072', name:'Cisco', category:'Hardware & Infrastructure', tier:2, status:'Active', region:'Global', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'170 West Tasman Drive, San Jose, CA 95134', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Networking, security, and collaboration infrastructure.', sla_score:92, concentration_risk:45, financial_risk:15, delivery_risk:18, compliance_risk:12, risk_score:26, capabilities:['Network & AV','Security','Cloud Infrastructure'], domain:'cisco.com', notes:'Enterprise networking and Webex.' },
+  { id:'V073', name:'WWT (World Wide Technology)', category:'Hardware & Infrastructure', tier:2, status:'Active', region:'AMER', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'1 World Wide Way, St. Louis, MO 63146', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Technology solutions, integration, and supply chain services.', sla_score:89, concentration_risk:32, financial_risk:16, delivery_risk:18, compliance_risk:14, risk_score:22, capabilities:['Hardware Supply','Network & AV','Cloud Infrastructure','Managed Services'], domain:'wwt.com', notes:'ATC lab capabilities. Existing PO.' },
+  { id:'V074', name:'Computacenter', category:'Hardware & Infrastructure', tier:2, status:'Active', region:'EMEA', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'Hatfield Business Park, Hatfield, Hertfordshire AL10 9TW, UK', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'IT infrastructure, hardware, and managed services. Active Coupa spend confirmed (EMEA).', sla_score:88, concentration_risk:30, financial_risk:15, delivery_risk:18, compliance_risk:12, risk_score:21, capabilities:['Hardware Supply','Managed Services','Network & AV'], domain:'computacenter.com', notes:'Coupa spend confirmed (Ireland entity). EMEA hardware procurement.' },
+  { id:'V010', name:'Gartner', category:'Software / SaaS', tier:3, status:'Active', region:'AMER', annual_spend:'$1.2M', renewal_date:'2026-09-30', primary_contact:'VER Team', supplier_address:'56 Top Gallant Road, Stamford, CT 06902', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Research, advisory, and analyst subscription services.', sla_score:95, concentration_risk:15, financial_risk:20, delivery_risk:18, compliance_risk:15, risk_score:17, capabilities:['Consulting / Advisory','Analytics & BI'], domain:'gartner.com', notes:'Review seat count before renewal.' },
+  { id:'V011', name:'Conviva', category:'Software / SaaS', tier:3, status:'Active', region:'AMER', annual_spend:'$0.8M', renewal_date:'2026-10-15', primary_contact:'VER Team', supplier_address:'989 E Hillsdale Blvd, Foster City, CA 94404', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Video intelligence and streaming analytics platform.', sla_score:93, concentration_risk:20, financial_risk:22, delivery_risk:25, compliance_risk:18, risk_score:22, capabilities:['Analytics & BI','Platform Engineering'], domain:'conviva.com', notes:'Usage at 84% of cap. Monitor monthly.' },
+  { id:'V067', name:'Rackspace', category:'Cloud & Managed Services', tier:3, status:'Active', region:'AMER|EMEA', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'1 Fanatical Place, San Antonio, TX 78218', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Managed cloud services across AWS, Azure, and GCP.', sla_score:85, concentration_risk:30, financial_risk:22, delivery_risk:25, compliance_risk:20, risk_score:25, capabilities:['Cloud Infrastructure','Managed Services','DevOps'], domain:'rackspace.com', notes:'Multi-cloud managed services.' },
+  { id:'V096', name:'Commoneo', category:'Professional Services', tier:3, status:'Active', region:'AMER|EMEA', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'See vendor website', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Consulting / Advisory', sla_score:90, concentration_risk:78, financial_risk:18, delivery_risk:16, compliance_risk:18, risk_score:38, capabilities:['Consulting / Advisory'], domain:'', notes:'Consulting / Advisory' },
+  { id:'V083', name:'iCloud Nexus', category:'Contingent Workforce', tier:3, status:'Active', region:'AMER|APAC', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'See vendor website', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Staff Augmentation', sla_score:90, concentration_risk:80, financial_risk:20, delivery_risk:18, compliance_risk:20, risk_score:40, capabilities:['Staff Augmentation'], domain:'', notes:'Staff Augmentation' },
+  { id:'V106', name:'eTeam Workforce Limited', category:'Contingent Workforce', tier:3, status:'Active', region:'EMEA|APAC', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'See vendor website', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Staff Augmentation', sla_score:90, concentration_risk:75, financial_risk:18, delivery_risk:16, compliance_risk:20, risk_score:38, capabilities:['Staff Augmentation'], domain:'kforce.com', notes:'Staff Augmentation' },
+  { id:'V097', name:'Matata Solutions (Hakuna Studios)', category:'Professional Services', tier:3, status:'Active', region:'LATAM', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'See vendor website', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Application Development, Consulting / Advisory', sla_score:90, concentration_risk:78, financial_risk:20, delivery_risk:18, compliance_risk:22, risk_score:40, capabilities:['Application Development','Consulting / Advisory'], domain:'', notes:'Application Development, Consulting / Advisory' },
+  { id:'V098', name:'Page Interim', category:'Contingent Workforce', tier:3, status:'Active', region:'LATAM', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'See vendor website', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Staff Augmentation', sla_score:90, concentration_risk:75, financial_risk:18, delivery_risk:16, compliance_risk:20, risk_score:38, capabilities:['Staff Augmentation'], domain:'', notes:'Staff Augmentation' },
+  { id:'V126', name:'Pasona', category:'Contingent Workforce', tier:3, status:'Active', region:'JAPAC', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'See vendor website', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Staff Augmentation', sla_score:90, concentration_risk:75, financial_risk:18, delivery_risk:16, compliance_risk:20, risk_score:38, capabilities:['Staff Augmentation'], domain:'', notes:'Staff Augmentation' },
+  { id:'V127', name:'Persol Temp Staff', category:'Contingent Workforce', tier:3, status:'Active', region:'JAPAC', annual_spend:'$0', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'See vendor website', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'Staff Augmentation', sla_score:90, concentration_risk:75, financial_risk:18, delivery_risk:16, compliance_risk:20, risk_score:38, capabilities:['Staff Augmentation'], domain:'', notes:'Staff Augmentation' },
+  { id:'V148', name:'CompuCom', category:'Contingent Workforce', tier:2, status:'Active', region:'AMER', annual_spend:'$0.8M', renewal_date:'2026-12-31', primary_contact:'VER Team', supplier_address:'3000 Technology Drive, Plano, TX 75074', supplier_notice:'Same as principal', supplier_rep_name:'VER Team', supplier_rep_email:'ver@salesforce.com', description:'IT managed services provider specializing in end-user computing, IT asset management, service desk, and field technical services across North America. Active CWF and Asset Management engagement with confirmed Coupa spend ($0.77M FY27, $2.86M FY26).', sla_score:96, concentration_risk:30, financial_risk:12, delivery_risk:10, compliance_risk:8, risk_score:16, capabilities:['Hardware Supply','Service Desk','Managed Services','Staff Augmentation','Application Maintenance'], domain:'compucom.com', notes:'FY27 spend: $0.77M. FY26 spend: $2.86M. Pillar: Asset Management / CWF. Owned by Variant Equity Advisors since 2021 (sold by ODP Corp / Office Depot). Suffered a ransomware attack (DarkSide) in March 2021 — verify current security posture and SOC 2 status. Monitor financial stability under PE ownership.' }
+  ],
+
+  riskBand(score) {
+    if (score <= 33) return this.RISK.low;
+    if (score <= 66) return this.RISK.medium;
+    return this.RISK.high;
+  },
+
+  tierInfo(tier) {
+    return this.TIERS[tier] || this.TIERS[3];
+  },
+
+  formatSpend(val) {
+    if (!val || val === '$0') return '—';
+    return val.toString().startsWith('$') ? val : '$' + val;
+  },
+
+  statusBadge(status) {
+    const map = {
+      'Active':        { cls:'bs-active',     dot:'#34D399' },
+      'Escalation':    { cls:'bs-active',     dot:'#F87171' },
+      'Under Review':  { cls:'bs-review',     dot:'#FBBF24' },
+      'Inactive':      { cls:'bs-inactive',   dot:'rgba(255,255,255,0.3)' },
+      'Transitioning': { cls:'bs-transition', dot:'#C084FC' },
+    };
+    const s = map[status] || map['Active'];
+    return `<span class="badge-status ${s.cls}"><span class="bs-dot" style="background:${s.dot}"></span>${status}</span>`;
+  },
+
+  tierBadge(tier) {
+    const cls = ['','bt-1','bt-2','bt-3'][tier] || 'bt-3';
+    return `<span class="badge-tier ${cls}">T${tier}</span>`;
+  },
+
+  riskBadge(score) {
+    const b = this.riskBand(score);
+    const cls = score <= 33 ? 'br-low' : score <= 66 ? 'br-med' : 'br-high';
+    return `<span class="badge-risk ${cls}">${score}</span>`;
+  },
+
+  parseCSV(text) {
+    const result = [];
+    const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+    let row = [], field = '', inQuote = false, headers = null;
+    for (let i = 0; i <= lines.length; i++) {
+      const ch = lines[i];
+      if (inQuote) {
+        if (ch === '"' && lines[i+1] === '"') { field += '"'; i++; }
+        else if (ch === '"') { inQuote = false; }
+        else { field += ch || ''; }
+      } else {
+        if (ch === '"') { inQuote = true; }
+        else if (ch === ',') { row.push(field.trim()); field = ''; }
+        else if (ch === '\n' || ch === undefined) {
+          row.push(field.trim()); field = '';
+          if (row.some(f => f !== '')) {
+            if (!headers) { headers = row; }
+            else {
+              const obj = {};
+              headers.forEach((h,i) => { obj[h] = row[i] || ''; });
+              ['sla_score','concentration_risk','financial_risk','delivery_risk',
+               'compliance_risk','risk_score'].forEach(f => {
+                if (obj[f] !== undefined && obj[f] !== '')
+                  obj[f] = parseFloat(obj[f]) || 0;
+              });
+              if (obj.tier) obj.tier = parseInt(obj.tier) || 3;
+              if (obj.capabilities) obj.capabilities = obj.capabilities.split('|').map(c=>c.trim()).filter(Boolean);
+              result.push(obj);
+            }
+          }
+          row = [];
+        } else { field += ch || ''; }
+      }
+    }
+    return result;
+  },
+
+  async fetchVendors() {
+    if (window.VER_VENDORS && window.VER_VENDORS.length > 10) {
+      console.log('Loaded ' + window.VER_VENDORS.length + ' vendors from VER_VENDORS');
+      return window.VER_VENDORS;
+    }
+    const paths = ['../data/vendors.csv','./data/vendors.csv','data/vendors.csv'];
+    for (const path of paths) {
+      try {
+        const resp = await fetch(path);
+        if (!resp.ok) continue;
+        const text = await resp.text();
+        const parsed = this.parseCSV(text);
+        if (parsed && parsed.length > 10) {
+          console.log('Loaded ' + parsed.length + ' vendors from ' + path);
+          return parsed;
+        }
+      } catch(e) { continue; }
+    }
+    return this.SAMPLE_VENDORS;
+  },
+};
+
+// ── State ────────────────────────────────────────────────────────
+let ALL_VENDORS = [];
+let FILTERED_VENDORS = [];
+let VIEW_MODE = 'card';
+const PAGE_SIZE_CARD  = 24;
+const PAGE_SIZE_TABLE = 50;
+let CURRENT_PAGE = 1;
+
+var PORTAL_ENDPOINT = 'portal_vendors.csv';
+
+// ── Portal submissions ───────────────────────────────────────────
+async function loadPortalSubmissions() {
+  var resp = await fetch(PORTAL_ENDPOINT);
+  if (!resp.ok) throw new Error('Portal fetch failed: ' + resp.status);
+  var csv = await resp.text();
+  var rows = VP.parseCSV(csv);
+  if (!rows || !rows.length) return [];
+  rows = rows.filter(function(row) {
+    var s = (row['Status'] || '').trim().toLowerCase();
+    return !s || s === 'approved';
+  });
+  return rows.map(function(row, idx) {
+    var name = (row['Legal Company Name'] || row['DBA / Trading Name'] || ('Portal Vendor ' + (idx+1))).trim();
+    var website = (row['Company Website'] || '').replace(/^https?:\/\//,'').replace(/\/.*$/,'').toLowerCase();
+    var caps = (row['Capabilities'] || '').split(/[|,;]/).map(function(c){ return c.trim(); }).filter(Boolean);
+    var cat = row['Vendor Category'] || 'Professional Services';
+    var catNorm = cat.toLowerCase();
+    if (catNorm.includes('software')||catNorm.includes('saas')) cat = 'Software / SaaS';
+    else if (catNorm.includes('contingent')||catNorm.includes('staffing')||catNorm.includes('workforce')) cat = 'Contingent Workforce';
+    else if (catNorm.includes('hardware')||catNorm.includes('infrastructure')) cat = 'Hardware & Infrastructure';
+    else if (catNorm.includes('cloud')||catNorm.includes('managed')) cat = 'Cloud & Managed Services';
+    else cat = 'Professional Services';
+    return {
+      id: (row['Reference Number'] || ('PORTAL-' + idx)),
+      name: name, category: cat, tier: 3, status: 'Active',
+      region: row['Regions Covered'] || 'AMER', annual_spend: '$0',
+      rate_ranges: row['Rate Ranges'] || '', renewal_date: '—',
+      description: row['Company Description'] || '',
+      sla_score:90, concentration_risk:25, financial_risk:20,
+      delivery_risk:20, compliance_risk:15, risk_score:25,
+      capabilities: caps, domain: website,
+      supplier_address: row['Headquarters Location'] || '',
+      notes: 'Portal submission · Contact: ' + (row['Contact Name'] || '') + ' (' + (row['Contact Email'] || '') + ')',
+      primary_contact: row['Contact Name'] || 'Portal Submission',
+      _portal: true, _portal_ref: row['Reference Number'] || '',
+      _portal_contact: row['Contact Name'] || '',
+      _portal_contact_email: row['Contact Email'] || '',
+      _portal_hq: row['Headquarters Location'] || '',
+      _portal_submitted: row['Submission Date'] || row['Timestamp'] || ''
+    };
+  });
+}
+
+// ── Load data ───────────────────────────────────────────────────
+async function loadData() {
+  var statusEl = document.getElementById('vp-connection-status');
+  if (statusEl) statusEl.textContent = 'Loading vendor data…';
+
+  ALL_VENDORS = await VP.fetchVendors();
+
+  if (PORTAL_ENDPOINT) {
+    try {
+      var portalVendors = await loadPortalSubmissions();
+      var existingNames = ALL_VENDORS.map(function(v){ return v.name.toLowerCase(); });
+      portalVendors = portalVendors.filter(function(v){
+        return !existingNames.includes(v.name.toLowerCase());
+      });
+      ALL_VENDORS = ALL_VENDORS.concat(portalVendors);
+      if (statusEl) statusEl.innerHTML = '&#10003;&nbsp;' + ALL_VENDORS.length.toLocaleString() + ' vendors loaded'
+        + (portalVendors.length ? ' &mdash; <strong style="color:var(--magenta-bright)">' + portalVendors.length + ' portal submissions</strong> included' : '');
+    } catch(e) {
+      console.warn('Portal fetch failed:', e);
+      if (statusEl) statusEl.textContent = '✓ ' + ALL_VENDORS.length.toLocaleString() + ' vendors loaded · Portal connection unavailable';
+    }
+  } else {
+    if (statusEl) statusEl.textContent = '✓ ' + ALL_VENDORS.length.toLocaleString() + ' vendors loaded';
+  }
+
+  updateStats();
+  FILTERED_VENDORS = ALL_VENDORS;
+  filterRegistry();
+}
+
+// ── Stats ───────────────────────────────────────────────────────
+function updateStats() {
+  var t1 = ALL_VENDORS.filter(function(v){ return v.tier === 1 || v.tier === '1'; }).length;
+  var hi = ALL_VENDORS.filter(function(v){ return v.risk_score > 66; }).length;
+  var now = new Date();
+  var cutoff = new Date(now.getTime() + 90*24*60*60*1000);
+  var renewing = ALL_VENDORS.filter(function(v){
+    if (!v.renewal_date || v.renewal_date === '—') return false;
+    var d = new Date(v.renewal_date);
+    return d >= now && d <= cutoff;
+  }).length;
+  var el = document.getElementById('stat-total');
+  if (el) el.textContent = ALL_VENDORS.length;
+  el = document.getElementById('stat-t1');
+  if (el) el.textContent = t1;
+  el = document.getElementById('stat-highrisk');
+  if (el) el.textContent = hi;
+  el = document.getElementById('stat-renewing');
+  if (el) el.textContent = renewing;
+}
+
+// ── View toggle ──────────────────────────────────────────────────
+function setView(mode) {
+  VIEW_MODE = mode;
+  document.getElementById('vt-card').className = 'vt-btn' + (mode === 'card' ? ' vt-active' : '');
+  document.getElementById('vt-table').className = 'vt-btn' + (mode === 'table' ? ' vt-active' : '');
+  document.getElementById('reg-cards').style.display = mode === 'card' ? 'grid' : 'none';
+  document.getElementById('reg-table-wrap').style.display = mode === 'table' ? 'block' : 'none';
+  CURRENT_PAGE = 1;
+  renderCurrentPage();
+}
+
+// ── Filter ───────────────────────────────────────────────────────
+function filterRegistry() {
+  const q      = document.getElementById('reg-search').value.toLowerCase();
+  const cat    = document.getElementById('reg-cat').value;
+  const tier   = document.getElementById('reg-tier').value;
+  const riskF  = document.getElementById('reg-risk').value;
+  const status = document.getElementById('reg-status').value;
+
+  FILTERED_VENDORS = ALL_VENDORS.filter(v => {
+    if (q && !v.name.toLowerCase().includes(q) && !v.category.toLowerCase().includes(q)) return false;
+    if (cat && v.category !== cat) return false;
+    if (tier && v.tier != tier) return false;
+    if (status === '_portal') { if (!v._portal) return false; }
+    else if (status && v.status !== status) return false;
+    if (riskF) {
+      if (riskF === 'low'    && v.risk_score > 33)                      return false;
+      if (riskF === 'medium' && (v.risk_score <= 33 || v.risk_score > 66)) return false;
+      if (riskF === 'high'   && v.risk_score <= 66)                     return false;
+    }
+    return true;
+  });
+
+  const countEl = document.getElementById('reg-count');
+  if (countEl) countEl.textContent = FILTERED_VENDORS.length.toLocaleString() + ' vendors';
+  CURRENT_PAGE = 1;
+  renderCurrentPage();
+}
+
+function clearFilters() {
+  ['reg-search','reg-cat','reg-tier','reg-risk','reg-status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  filterRegistry();
+}
+
+// ── Pagination ───────────────────────────────────────────────────
+function renderPagination(total, currentPage, pageSize, containerId) {
+  const totalPages = Math.ceil(total / pageSize);
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+  let pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+      pages.push(i);
+    } else if (pages[pages.length-1] !== '…') {
+      pages.push('…');
+    }
+  }
+
+  el.innerHTML = '<div class="pag-wrap">'
+    + '<button class="pag-btn" onclick="goPage(' + (currentPage-1) + ')"'
+    + (currentPage===1?' disabled':'') + '>&#8592; Prev</button>'
+    + pages.map(p => p === '…'
+        ? '<span class="pag-sep">…</span>'
+        : '<button class="pag-btn' + (p===currentPage?' pag-active':'') + '" onclick="goPage('+p+')">' + p + '</button>'
+      ).join('')
+    + '<button class="pag-btn" onclick="goPage(' + (currentPage+1) + ')"'
+    + (currentPage===totalPages?' disabled':'') + '>Next &#8594;</button>'
+    + '<span class="pag-info">Showing '
+    + Math.min((currentPage-1)*pageSize+1,total) + '–' + Math.min(currentPage*pageSize,total)
+    + ' of ' + total.toLocaleString() + '</span>'
+    + '</div>';
+}
+
+function goPage(page) {
+  const pageSize = VIEW_MODE === 'card' ? PAGE_SIZE_CARD : PAGE_SIZE_TABLE;
+  const totalPages = Math.ceil(FILTERED_VENDORS.length / pageSize);
+  if (page < 1 || page > totalPages) return;
+  CURRENT_PAGE = page;
+  renderCurrentPage();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderCurrentPage() {
+  const pageSize = VIEW_MODE === 'card' ? PAGE_SIZE_CARD : PAGE_SIZE_TABLE;
+  const start = (CURRENT_PAGE - 1) * pageSize;
+  const pageVendors = FILTERED_VENDORS.slice(start, start + pageSize);
+  renderRegistry(pageVendors);
+  renderPagination(FILTERED_VENDORS.length, CURRENT_PAGE, pageSize, 'pagination-top');
+  renderPagination(FILTERED_VENDORS.length, CURRENT_PAGE, pageSize, 'pagination-bottom');
+  renderPagination(FILTERED_VENDORS.length, CURRENT_PAGE, pageSize, 'pagination-bottom-table');
+}
+
+// ── Tag color rotation ────────────────────────────────────────────
+var TAG_CLASSES = ['vc-tag-bloom','vc-tag-violet','vc-tag-magenta','vc-tag-amber','vc-tag-muted'];
+function tagClass(i) { return TAG_CLASSES[i % TAG_CLASSES.length]; }
+
+// ── Render ───────────────────────────────────────────────────────
+function renderRegistry(vendors) {
+  if (VIEW_MODE === 'card') {
+    document.getElementById('reg-cards').innerHTML = vendors.map(v => {
+      const b  = VP.riskBand(v.risk_score);
+      const slaColor = v.sla_score >= 95 ? '#34D399' : v.sla_score >= 85 ? '#FBBF24' : '#F87171';
+      const tags = (v.capabilities || []).map((c, i) =>
+        `<span class="vc-tag ${tagClass(i)}">${c}</span>`).join('');
+      const portalBadge = v._portal
+        ? '<span class="portal-badge">&#127381; Portal</span>' : '';
+
+      return `<div class="vc-card" onclick="openDetail('${v.id}')">
+        <div class="vc-header">
+          <div class="vc-logo-wrap">${vendorLogo(v.domain, v.name, 42)}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="vc-name">${v.name}</div>
+            <div class="vc-meta">${v.category} &middot; ${v.region || 'Global'}</div>
+            <div class="vc-badges">
+              ${VP.tierBadge(v.tier)}
+              ${VP.statusBadge(v.status)}
+              ${portalBadge}
+            </div>
+          </div>
+          ${VP.riskBadge(v.risk_score)}
+        </div>
+        <div class="vc-body">
+          <div class="vc-kv"><span class="vc-kv-l">Annual Spend</span><span class="vc-kv-v">${VP.formatSpend(v.annual_spend)}</span></div>
+          <div class="vc-kv"><span class="vc-kv-l">SLA Score</span><span class="vc-kv-v" style="color:${slaColor}">${v.sla_score || '—'}%</span></div>
+          <div class="vc-kv"><span class="vc-kv-l">Renewal</span><span class="vc-kv-v">${v.renewal_date || '—'}</span></div>
+          <div class="vc-kv"><span class="vc-kv-l">Risk</span><span class="vc-kv-v" style="color:${b.color}">${b.label} (${v.risk_score})</span></div>
+        </div>
+        <div class="vc-tags">${tags || '<span style="color:var(--ink-muted);font-size:10px">No capability tags</span>'}</div>
+      </div>`;
+    }).join('') || '<div style="color:var(--ink-muted);padding:32px;text-align:center;grid-column:1/-1">No vendors match your filters.</div>';
+  } else {
+    document.getElementById('reg-tbody').innerHTML = vendors.map(v => {
+      const slaColor = v.sla_score >= 95 ? '#34D399' : v.sla_score >= 85 ? '#FBBF24' : '#F87171';
+      const caps = (v.capabilities || []).slice(0,2).join(', ') + (v.capabilities && v.capabilities.length > 2 ? '…' : '');
+      const portalBadge = v._portal ? '<span class="portal-badge" style="margin-left:6px">Portal</span>' : '';
+      return `<tr onclick="openDetail('${v.id}')">
+        <td class="td-name"><div style="display:flex;align-items:center;gap:8px;">${vendorLogo(v.domain, v.name, 26)}${v.name}${portalBadge}</div></td>
+        <td>${v.category}</td>
+        <td>${VP.tierBadge(v.tier)}</td>
+        <td>${VP.riskBadge(v.risk_score)}</td>
+        <td>${VP.statusBadge(v.status)}</td>
+        <td style="font-weight:700;color:var(--ink)">${VP.formatSpend(v.annual_spend)}</td>
+        <td style="font-weight:700;color:${slaColor}">${v.sla_score || '—'}%</td>
+        <td style="color:var(--ink-muted)">${v.renewal_date || '—'}</td>
+        <td style="font-size:10px;color:var(--ink-muted)">${caps}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+// ── Detail modal ─────────────────────────────────────────────────
+function openDetail(id) {
+  var v = ALL_VENDORS.find(function(x){ return x.id === id; });
+  if (!v) return;
+  var b = VP.riskBand(v.risk_score);
+  var slaColor = v.sla_score >= 95 ? '#34D399' : v.sla_score >= 85 ? '#FBBF24' : '#F87171';
+
+  var riskBars = [
+    { label:'Concentration', val:v.concentration_risk, color:'#FB7185' },
+    { label:'Financial',     val:v.financial_risk,     color:'#FBBF24' },
+    { label:'Delivery',      val:v.delivery_risk,      color:'#C084FC' },
+    { label:'Compliance',    val:v.compliance_risk,    color:'#E879F9' },
+  ].map(function(r){
+    return '<div style="margin-bottom:8px;">'
+      + '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink-muted);margin-bottom:3px;">'
+      + '<span>'+r.label+'</span><span style="font-weight:700;color:'+r.color+'">'+r.val+'</span></div>'
+      + '<div class="risk-bar-wrap"><div class="risk-bar" style="width:'+r.val+'%;background:'+r.color+';"></div></div>'
+      + '</div>';
+  }).join('');
+
+  var caps = (v.capabilities || []).map(function(c, i){
+    return '<span class="vc-tag '+tagClass(i)+'">'+c+'</span>';
+  }).join('');
+
+  var notesHtml = v.notes ? '<div style="margin-top:12px;padding:10px 12px;background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.18);border-radius:8px;font-size:10px;color:var(--ink-muted);line-height:1.6;font-style:italic;">'+v.notes+'</div>' : '';
+
+  var modalHtml = '<button class="vp-modal-close" onclick="closeModal()">&times;</button>'
+    + '<div class="vp-modal-title" style="display:flex;align-items:center;gap:12px;">'
+    + vendorLogo(v.domain, v.name, 36)
+    + '<span>' + v.name + '</span>'
+    + (v._portal ? '<span class="portal-badge">&#127381; Portal</span>' : '')
+    + '</div>'
+    + '<div style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:6px;">'
+    + VP.tierBadge(v.tier) + VP.statusBadge(v.status) + VP.riskBadge(v.risk_score)
+    + '<span style="font-size:10px;color:var(--ink-muted);padding:2px 8px;">' + v.category + ' &middot; ' + (v.region||'Global') + '</span>'
+    + '</div>'
+    + (v.description ? '<p style="font-size:11px;color:var(--ink-muted);margin-bottom:16px;line-height:1.65;">' + v.description + '</p>' : '')
+    + '<div class="detail-grid">'
+    + '<div class="detail-block"><div class="detail-block-title">Contract & Spend</div>'
+    + '<div class="detail-kv"><span class="detail-kv-l">Annual Spend</span><span class="detail-kv-v" style="color:#34D399;">' + VP.formatSpend(v.annual_spend) + '</span></div>'
+    + '<div class="detail-kv"><span class="detail-kv-l">Renewal Date</span><span class="detail-kv-v">' + (v.renewal_date||'—') + '</span></div>'
+    + '<div class="detail-kv"><span class="detail-kv-l">Region</span><span class="detail-kv-v">' + (v.region||'Global') + '</span></div>'
+    + '<div class="detail-kv"><span class="detail-kv-l">Primary Contact</span><span class="detail-kv-v">' + (v.primary_contact||'—') + '</span></div>'
+    + '</div>'
+    + '<div class="detail-block"><div class="detail-block-title">Performance</div>'
+    + '<div class="detail-kv"><span class="detail-kv-l">SLA Score</span><span class="detail-kv-v" style="color:' + slaColor + ';">' + (v.sla_score||'—') + '%</span></div>'
+    + '<div class="detail-kv"><span class="detail-kv-l">Risk Score</span><span class="detail-kv-v" style="color:'+b.color+';">' + v.risk_score + ' — ' + b.label + '</span></div>'
+    + '<div class="detail-kv"><span class="detail-kv-l">Vendor ID</span><span class="detail-kv-v">' + v.id + '</span></div>'
+    + '</div>'
+    + '</div>'
+    + '<div class="detail-block" style="margin-bottom:14px;"><div class="detail-block-title">Risk Breakdown</div>' + riskBars + '</div>'
+    + (caps ? '<div style="margin-bottom:14px;"><div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:var(--ink-muted);margin-bottom:8px;">Capabilities</div><div style="display:flex;flex-wrap:wrap;gap:5px;">' + caps + '</div></div>' : '')
+    + (v.supplier_address && v.supplier_address !== 'See vendor website' ? '<div style="font-size:10px;color:var(--ink-muted);margin-bottom:10px;"><span style="font-weight:700;color:var(--ink-dim);">Address: </span>' + v.supplier_address + '</div>' : '')
+    + notesHtml;
+
+  document.getElementById('vd-modal-inner').innerHTML = modalHtml;
+  document.getElementById('vd-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('vd-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('vd-modal').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') closeModal();
+});
+
+function showAddModal() {
+  alert('To add a vendor, update the Vendors tab in your Google Sheet — the platform will reflect it on next load.');
+}
+
+// ── How-to help ──────────────────────────────────────────────────
+function openRegistryHelp() {
+  var inner = '<button class="vp-modal-close" onclick="closeModal()">&times;</button>'
+    + '<div class="vp-modal-title">&#128218; How to Use: Vendor Registry</div>'
+    + '<p style="font-size:11px;color:var(--ink-muted);margin-bottom:16px;line-height:1.65;">'
+    + 'The Vendor Registry is the <strong style="color:var(--ink)">authoritative directory of all DET vendors</strong> — managed suppliers with full 360 dossiers, contract data, performance scores, risk ratings, and portal submission history.'
+    + '</p>'
+    + '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">'
+    + ['<strong style="color:var(--bloom-bright)">Search</strong> by vendor name or category — results update instantly.',
+       '<strong style="color:var(--violet-bright)">Filter</strong> by tier, risk level, status, or category using the dropdowns.',
+       '<strong style="color:var(--magenta-bright)">Click any card</strong> to open the full vendor dossier — contract, scorecard, risk breakdown, capabilities.',
+       'Switch between <strong style="color:var(--ink)">Cards</strong> and <strong style="color:var(--ink)">Table</strong> view using the toggle above.',
+       'Portal Submissions filter shows only vendors registered through the supplier self-service portal.'
+      ].map(function(s){
+        return '<div style="display:flex;gap:10px;align-items:flex-start;font-size:11px;color:var(--ink-muted);padding:10px 12px;background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:8px;">'
+          + '<span style="color:var(--bloom-bright);font-size:14px;">&#10003;</span><span>' + s + '</span></div>';
+      }).join('')
+    + '</div>'
+    + '<div style="padding:10px 14px;background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.18);border-radius:8px;font-size:10px;color:var(--ink-muted);">'
+    + 'FY27 &middot; Salesforce DET &middot; VER Intelligence Hub &middot; Confidential</div>';
+
+  document.getElementById('vd-modal-inner').innerHTML = inner;
+  document.getElementById('vd-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// ── User chip (shared portal pattern) ────────────────────────────
+(function(){
+  try {
+    var u = JSON.parse(localStorage.getItem('ver-team-user') || 'null');
+    if (u) {
+      var ne = document.getElementById('sb-user-name');
+      var re = document.getElementById('sb-user-role');
+      var ee = document.getElementById('sb-user-emoji');
+      if (ne) ne.textContent = u.name || 'Team VER';
+      if (re) re.textContent = u.role || 'VER Team';
+      if (ee) ee.innerHTML = u.emoji || '&#128100;';
+    }
+  } catch(e){}
+})();
+
+// ── Boot ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', loadData);
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+</script>
+</body>
+</html>

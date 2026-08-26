@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VER Intelligence Hub · Value Report</title>
+<style>
+
+/* ── Reset & base ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  background: #F8FAFC;
+  color: #1E293B;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── Layout shell ── */
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 40px 32px;
+}
+
+/* ── Header row ── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.header-left { flex: 1; }
+
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: #0D9488;
+  margin-bottom: 8px;
+}
+.slide-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: #0F172A;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.slide-subtitle {
+  font-size: 13px;
+  color: #64748B;
+  max-width: 680px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.outcome-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  align-items: center;
+}
+.outcome-item {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #0F1E3C;
+  white-space: nowrap;
+}
+.outcome-item::before {
+  content: '·';
+  color: #0D9488;
+  margin-right: 6px;
+  font-size: 14px;
+  line-height: 1;
+}
+.outcome-item:first-child::before { display: none; }
+.outcome-divider {
+  width: 1px;
+  height: 12px;
+  background: #CBD5E1;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Salesforce logo badge */
+.sf-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-left: 28px;
+  margin-top: 4px;
+}
+.sf-logo {
+  width: 36px;
+  height: 36px;
+}
+.sf-label {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #00A1E0;
+}
+
+/* ── Hero band ── */
+.hero-band {
+  background: #0F1E3C;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr 1px 1fr;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.hero-divider {
+  background: rgba(255,255,255,0.10);
+  align-self: stretch;
+}
+.hero-col {
+  padding: 30px 28px;
+}
+.hero-col-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.44em;
+  text-transform: uppercase;
+  color: #94A3B8;
+  margin-bottom: 10px;
+}
+.hero-metric {
+  font-size: 44px;
+  font-weight: 900;
+  color: #5EEAD4;
+  line-height: 1;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+.hero-sublabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.70);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.hero-desc {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.52);
+  line-height: 1.55;
+}
+
+/* ── Lower cards ── */
+.cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 20px 20px 18px;
+}
+.card-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: #0D9488;
+  margin-bottom: 8px;
+}
+.card-metric {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0F1E3C;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.card-body {
+  font-size: 11.5px;
+  color: #374151;
+  line-height: 1.55;
+}
+.card-body strong {
+  color: #0F1E3C;
+  font-weight: 700;
+}
+
+/* ── Footer ── */
+.footer {
+  border-top: 1px solid #E2E8F0;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.closing-quote {
+  font-size: 11.5px;
+  font-style: italic;
+  color: #475569;
+  line-height: 1.6;
+  max-width: 900px;
+}
+.source-line {
+  font-size: 9.5px;
+  color: #94A3B8;
+  letter-spacing: 0.06em;
+}
+
+/* ── Print ── */
+@media print {
+  @page { size: landscape; margin: 0.5in; }
+  body { background: #F8FAFC; }
+  .page { padding: 0; max-width: 100%; }
+  .hero-band { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; border: 1px solid #E2E8F0; }
+  .hero-divider { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <div class="header">
+    <div class="header-left">
+      <div class="eyebrow">VER Intelligence Hub &nbsp;·&nbsp; Value Report</div>
+      <h1 class="slide-title">VER Intelligence Hub: The ROI Story</h1>
+      <p class="slide-subtitle">Vendor intelligence platform replacing fragmented spreadsheets + manual analysis — concept to full platform in ~3 months</p>
+      <div class="outcome-row">
+        <span class="outcome-item" style="font-weight:600;color:#0D9488;font-size:11px;letter-spacing:0;">32 hub modules · 4 portals · 8 vendor tools · standalone suite</span>
+        <span class="outcome-divider"></span>
+        <span class="outcome-item">$295M FY27 third-party spend under review</span>
+        <span class="outcome-divider"></span>
+        <span class="outcome-item">1,368 vendors tracked</span>
+        <span class="outcome-divider"></span>
+        <span class="outcome-item">First module live &lt; 1 day · $0 external spend</span>
+      </div>
+    </div>
+    <div class="sf-badge">
+      <svg class="sf-logo" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Salesforce">
+        <circle cx="18" cy="18" r="18" fill="#00A1E0"/>
+        <!-- Cloud shape -->
+        <path d="M11.5 22.5c-2.2 0-4-1.8-4-4 0-1.8 1.2-3.3 2.8-3.8-.1-.3-.1-.6-.1-.9 0-2.5 2-4.5 4.5-4.5 1.2 0 2.3.5 3.1 1.2.7-1.5 2.2-2.5 4-2.5 2.4 0 4.3 1.9 4.3 4.3 0 .3 0 .6-.1.9 1.3.6 2.2 1.9 2.2 3.4 0 2.1-1.7 3.8-3.8 3.8H11.5z" fill="white"/>
+      </svg>
+      <span class="sf-label">Salesforce DET</span>
+    </div>
+  </div>
+
+  <!-- ── Hero band ── -->
+  <div class="hero-band">
+
+    <div class="hero-col">
+      <div class="hero-col-label">Decision Velocity</div>
+      <div class="hero-metric">3 days<br><span style="font-size:22px;opacity:0.55;">→</span> 30 min</div>
+      <div class="hero-sublabel">vendor insight time-to-answer</div>
+      <div class="hero-desc">Manual data assembly replaced by real-time intelligence across rate benchmarks, risk, TCO, and renewal tracking</div>
+    </div>
+
+    <div class="hero-divider"></div>
+
+    <div class="hero-col">
+      <div class="hero-col-label">Cost Intelligence</div>
+      <div class="hero-metric">$295M</div>
+      <div class="hero-sublabel">DET third-party spend under review</div>
+      <div class="hero-desc">Full FY27 actuals connected via Coupa DEV API · rate benchmarks, TCO calculator, and savings pipeline all live</div>
+    </div>
+
+    <div class="hero-divider"></div>
+
+    <div class="hero-col">
+      <div class="hero-col-label">Market Equivalent Value</div>
+      <div class="hero-metric">$930K–$2.18M</div>
+      <div class="hero-sublabel">equivalent market cost — actual cost: $0</div>
+      <div class="hero-desc">Intelligence Hub (32 modules), Vendor Platform (8 tools), 4 portal suites + standalone tools — scope that would take 18–24 months and a full procurement cycle to approximate</div>
+    </div>
+
+  </div>
+
+  <!-- ── Lower cards ── -->
+  <div class="cards-row">
+
+    <div class="card">
+      <div class="card-label">Platform Scale</div>
+      <div class="card-metric">32 hub · 8 vendor · 4 portals · standalone</div>
+      <div class="card-body">
+        <strong>Intelligence Hub:</strong> 32 modules across 5 disciplines · <strong>Vendor Platform:</strong> 8 tools (SOW, risk, registry, scorecards) · <strong>Portals:</strong> Stakeholder, Supplier, Vendor, Team · <strong>Standalone:</strong> Cinematic Generator, TCO, Chief of Staff, 3 assessment pilots
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Team Productivity</div>
+      <div class="card-metric">40–60 hrs/wk eliminated</div>
+      <div class="card-body">
+        QBR prep per vendor: 8–12 hrs → automated · Rate research: 4–6 hrs/request → instant · Monthly digest, risk reports, spend analysis, scenario planning — all automated · Stakeholder intake fully self-service
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Build Velocity</div>
+      <div class="card-metric">&lt; 1 day · first module</div>
+      <div class="card-body">
+        Concept to first live module in under a day · Full platform in ~3 months (April → July 2026) · <strong>None of this existed before FY27</strong> · Still shipping
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <p class="closing-quote">"This is infrastructure for the next phase — where every vendor decision is data-driven, every stakeholder request gets a same-day answer, and the VER team operates at executive altitude."</p>
+    <p class="source-line">VER Intelligence Hub &nbsp;·&nbsp; Salesforce DET &nbsp;·&nbsp; FY27 &nbsp;·&nbsp; Built by Casey Luciana Candelaria-Logan</p>
+  </div>
+
+</div>
+</body>
+</html>

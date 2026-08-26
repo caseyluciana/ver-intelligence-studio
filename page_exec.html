@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Executive Intelligence · VER Intelligence Hub</title>
+<style>
+/* ── Theme tokens ── */
+:root{
+  --body-bg:#020B18;--section-bg:#020B18;
+  --card-bg:rgba(255,255,255,0.03);--card-border:rgba(255,255,255,0.07);
+  --card-hover:rgba(255,255,255,0.05);--card-shadow:rgba(0,0,0,0.3);
+  --text-primary:#fff;--text-secondary:rgba(255,255,255,0.55);
+  --text-muted:rgba(255,255,255,0.35);--text-dim:rgba(255,255,255,0.25);
+  --divider:rgba(13,148,136,0.2);
+  --rt-bg:rgba(255,255,255,0.02);--rt-border:rgba(255,255,255,0.07);
+  --rt-hdr:rgba(255,255,255,0.04);--rt-row-hover:rgba(255,255,255,0.03);
+  --rt-hcell:rgba(255,255,255,0.25);--rt-note:rgba(255,255,255,0.45);
+  --vc-bg:rgba(255,255,255,0.03);--vc-border:rgba(255,255,255,0.07);
+  --vc-hover-bg:rgba(13,148,136,0.06);--vc-hover-border:rgba(13,148,136,0.2);
+  --footer-border:rgba(255,255,255,0.05);--footer-text:rgba(255,255,255,0.2);
+  --top-bar-bg:rgba(2,11,24,0.88);--top-bar-border:rgba(13,148,136,0.15);
+  --ic-action-bg:rgba(13,148,136,0.06);--sec-num-color:rgba(13,148,136,0.12);
+  /* dashboard body tokens */
+  --db-bg:#F3F4F6;--db-white:#fff;--db-border:#E5E7EB;--db-border2:#D1D5DB;
+  --db-ink:#111827;--db-ink2:#1F2937;--db-ink3:#374151;--db-ink4:#6B7280;
+  --db-gray:#F9FAFB;--db-gray2:#F3F4F6;--db-gray3:#E5E7EB;
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+}
+[data-theme="light"]{
+  --body-bg:#F0F4FA;--section-bg:#F0F4FA;
+  --card-bg:#fff;--card-border:#E5E7EB;--card-hover:#F9FAFB;
+  --card-shadow:rgba(0,0,0,0.06);
+  --text-primary:#111827;--text-secondary:#374151;
+  --text-muted:#6B7280;--text-dim:#9CA3AF;
+  --divider:rgba(13,148,136,0.15);
+  --rt-bg:#fff;--rt-border:#E5E7EB;--rt-hdr:#F3F4F6;
+  --rt-row-hover:#F9FAFB;--rt-hcell:#6B7280;--rt-note:#374151;
+  --vc-bg:#fff;--vc-border:#E5E7EB;
+  --vc-hover-bg:rgba(13,148,136,0.04);--vc-hover-border:rgba(13,148,136,0.25);
+  --footer-border:#E5E7EB;--footer-text:#9CA3AF;
+  --top-bar-bg:rgba(15,30,60,0.97);--top-bar-border:rgba(13,148,136,0.2);
+  --ic-action-bg:rgba(13,148,136,0.05);--sec-num-color:rgba(13,148,136,0.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  background:var(--body-bg);color:var(--text-primary);overflow-x:hidden;
+  transition:background 0.3s,color 0.3s;}
+
+/* ── Particles & scanline ── */
+.scanline{position:fixed;left:0;right:0;height:140px;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,transparent,rgba(13,148,136,0.04),transparent);
+  top:0;will-change:transform;animation:scan 7s linear infinite;}
+@keyframes scan{from{transform:translateY(-140px)}to{transform:translateY(100vh)}}
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.6;}
+[data-theme="light"] .scanline{opacity:0.3;}
+[data-theme="light"] #particles{opacity:0.15;}
+
+/* ── Top bar ── */
+.top-bar{position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:50px;
+  background:var(--top-bar-bg);
+  border-bottom:1px solid var(--top-bar-border);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  transition:background 0.3s;}
+.tb-left{display:flex;align-items:center;gap:16px;}
+.tb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;
+  display:flex;align-items:center;gap:5px;transition:color 0.2s;}
+.tb-back:hover{color:#0D9488;}
+.tb-sep{width:1px;height:14px;background:rgba(255,255,255,0.12);}
+.tb-brand{font-size:8.5pt;font-weight:800;letter-spacing:0.06em;color:rgba(255,255,255,0.65);}
+.tb-tabs{display:flex;gap:4px;margin-left:20px;}
+.tb-tab{padding:5px 14px;border-radius:20px;font-size:8pt;font-weight:700;
+  cursor:pointer;border:1.5px solid rgba(255,255,255,0.12);
+  background:transparent;color:rgba(255,255,255,0.45);
+  font-family:inherit;transition:all 0.15s;letter-spacing:0.02em;}
+.tb-tab:hover{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.75);}
+.tb-tab.active{background:rgba(13,148,136,0.2);border-color:#0D9488;color:#5EEAD4;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-live{display:flex;align-items:center;gap:6px;font-size:8pt;font-weight:700;color:#0D9488;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#0D9488;animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(13,148,136,0.4);}
+  50%{opacity:0.6;box-shadow:0 0 0 5px rgba(13,148,136,0);}}
+.tb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:6px;font-size:8pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.18s;letter-spacing:0.04em;border:none;}
+.tb-print{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);}
+.tb-print:hover{background:rgba(13,148,136,0.15);border-color:#0D9488;color:#0D9488;}
+.tb-theme{background:transparent;border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.45);padding:5px 12px;border-radius:6px;
+  font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.18s;}
+.tb-theme:hover{border-color:#0D9488;color:#0D9488;}
+
+/* ── HERO ── */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;text-align:center;z-index:10;
+  padding:80px 48px 50px;}
+.hero-bg{position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(ellipse 80% 70% at 50% 40%,
+    rgba(13,148,136,0.12) 0%,rgba(15,30,60,0.4) 40%,rgba(2,11,24,1) 80%);}
+[data-theme="light"] .hero-bg{background:radial-gradient(ellipse 80% 70% at 50% 40%,
+  rgba(13,148,136,0.18) 0%,rgba(15,30,60,0.6) 40%,rgba(2,11,24,1) 80%);}
+.hero-glow{position:absolute;top:15%;left:50%;transform:translateX(-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(13,148,136,0.08) 0%,transparent 65%);
+  pointer-events:none;z-index:-1;}
+.h-eyebrow{font-size:9pt;font-weight:800;letter-spacing:0.4em;text-transform:uppercase;
+  color:#0D9488;margin-bottom:20px;opacity:0;animation:fadeup 0.7s 0.3s forwards;}
+.h-kicker{font-size:11pt;color:rgba(255,255,255,0.3);font-weight:400;
+  letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;
+  opacity:0;animation:fadeup 0.7s 0.5s forwards;}
+.h-title{font-size:clamp(42pt,8vw,88pt);font-weight:900;letter-spacing:-0.03em;
+  line-height:0.95;margin-bottom:16px;opacity:0;
+  animation:punchin 0.7s 0.7s cubic-bezier(0.22,1,0.36,1) forwards;}
+.h-title .accent{color:#0D9488;}
+.h-rule{width:0;height:2px;background:linear-gradient(90deg,#0D9488,transparent);
+  margin:22px auto;animation:expandW 0.9s 1.2s cubic-bezier(0.22,1,0.36,1) forwards;}
+.h-sub{font-size:clamp(10pt,1.5vw,13pt);color:rgba(255,255,255,0.45);
+  line-height:1.7;max-width:560px;margin:0 auto 36px;
+  opacity:0;animation:fadeup 0.8s 1.3s forwards;}
+/* KPI row */
+.h-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:rgba(13,148,136,0.12);border:1px solid rgba(13,148,136,0.18);
+  border-radius:14px;overflow:hidden;max-width:860px;margin:0 auto;width:100%;
+  opacity:0;animation:fadeup 0.8s 1.5s forwards;}
+.hk{background:rgba(2,11,24,0.85);padding:18px 20px;text-align:left;transition:background 0.2s;}
+.hk:hover{background:rgba(13,148,136,0.08);}
+.hk-val{font-size:clamp(18pt,3vw,26pt);font-weight:900;line-height:1;margin-bottom:4px;color:#fff;}
+.hk-val.teal{color:#5EEAD4;}.hk-val.green{color:#34D399;}
+.hk-val.amber{color:#FBBF24;}.hk-val.red{color:#F87171;}
+.hk-lbl{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:rgba(255,255,255,0.45);margin-bottom:6px;}
+.hk-note{font-size:8pt;color:rgba(255,255,255,0.3);margin-bottom:8px;}
+.src-row{display:flex;gap:4px;flex-wrap:wrap;}
+.src-badge{display:inline-flex;align-items:center;gap:3px;font-size:7.5pt;
+  font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;}
+.sb-coupa{background:rgba(37,99,235,0.2);color:#93C5FD;border:1px solid rgba(37,99,235,0.25);}
+.sb-mft{background:rgba(124,58,237,0.2);color:#C4B5FD;border:1px solid rgba(124,58,237,0.25);}
+.sb-qbr{background:rgba(217,119,6,0.2);color:#FCD34D;border:1px solid rgba(217,119,6,0.25);}
+.sb-manual{background:rgba(100,116,139,0.2);color:#CBD5E1;border:1px solid rgba(100,116,139,0.25);}
+.sb-hi{background:rgba(5,150,105,0.2);color:#6EE7B7;border:1px solid rgba(5,150,105,0.25);}
+.sb-med{background:rgba(217,119,6,0.2);color:#FCD34D;border:1px solid rgba(217,119,6,0.25);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;}
+/* Scroll cue */
+.scroll-cue{margin-top:36px;display:flex;flex-direction:column;align-items:center;
+  gap:8px;color:rgba(255,255,255,0.2);font-size:7.5pt;letter-spacing:0.15em;
+  text-transform:uppercase;opacity:0;animation:fadeup 1s 2s forwards;}
+.scroll-arrow{width:20px;height:20px;border-right:2px solid rgba(13,148,136,0.4);
+  border-bottom:2px solid rgba(13,148,136,0.4);transform:rotate(45deg);
+  animation:bounce 1.8s infinite;}
+@keyframes bounce{0%,100%{transform:rotate(45deg) translateY(0);}50%{transform:rotate(45deg) translateY(5px);}}
+@keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes punchin{from{opacity:0;transform:scale(0.82)}to{opacity:1;transform:scale(1)}}
+@keyframes expandW{from{width:0}to{width:200px}}
+
+/* ── View switcher bar (below hero) ── */
+.view-switcher{position:relative;z-index:10;display:flex;align-items:center;
+  justify-content:center;gap:8px;padding:20px 48px;
+  background:var(--body-bg);border-bottom:1px solid var(--divider);}
+.vs-btn{padding:8px 24px;border-radius:99px;font-size:9pt;font-weight:700;
+  cursor:pointer;border:1.5px solid rgba(255,255,255,0.15);
+  background:transparent;color:rgba(255,255,255,0.45);
+  font-family:inherit;transition:all 0.18s;letter-spacing:0.02em;}
+.vs-btn:hover{border-color:rgba(255,255,255,0.4);color:rgba(255,255,255,0.8);}
+.vs-btn.active{background:rgba(13,148,136,0.18);border-color:#0D9488;color:#5EEAD4;}
+[data-theme="light"] .vs-btn{color:#6B7280;border-color:#D1D5DB;}
+[data-theme="light"] .vs-btn:hover{border-color:#0D9488;color:#0D9488;}
+[data-theme="light"] .vs-btn.active{background:rgba(13,148,136,0.1);border-color:#0D9488;color:#0F766E;}
+
+/* ── View containers ── */
+.v-view{display:none;}
+.v-view.active{display:block;}
+
+/* ══════════════════════════════════════════
+   BRIEF VIEW STYLES
+══════════════════════════════════════════ */
+.section{position:relative;z-index:10;padding:72px 0;background:var(--section-bg);transition:background 0.3s;}
+.section-inner{max-width:1200px;margin:0 auto;padding:0 48px;}
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,var(--divider) 30%,var(--divider) 70%,transparent);max-width:1200px;margin:0 auto;}
+.sec-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:32px;}
+.sec-num{font-size:48pt;font-weight:900;color:var(--sec-num-color);line-height:1;letter-spacing:-0.04em;margin-right:4px;}
+.sec-sup{font-size:8pt;font-weight:800;letter-spacing:0.25em;text-transform:uppercase;color:#0D9488;margin-bottom:4px;}
+.sec-title{font-size:clamp(18pt,2.5vw,26pt);font-weight:900;color:var(--text-primary);letter-spacing:-0.01em;line-height:1.1;}
+.sec-count{margin-left:auto;font-size:8pt;font-weight:700;padding:4px 12px;border-radius:12px;}
+.scc-amber{background:rgba(217,119,6,0.15);color:#FBBF24;border:1px solid rgba(217,119,6,0.2);}
+.scc-red{background:rgba(220,38,38,0.15);color:#F87171;border:1px solid rgba(220,38,38,0.2);}
+.scc-green{background:rgba(5,150,105,0.15);color:#34D399;border:1px solid rgba(5,150,105,0.2);}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.65s ease,transform 0.65s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+/* Item cards */
+.item-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.item-card{background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:12px;padding:20px 22px;transition:all 0.2s;border-left:3px solid transparent;}
+.item-card:hover{background:var(--card-hover);transform:translateY(-2px);box-shadow:0 8px 32px var(--card-shadow);}
+.ic-amber{border-left-color:#D97706;}.ic-red{border-left-color:#DC2626;}
+.ic-green{border-left-color:#059669;}.ic-teal{border-left-color:#0D9488;}
+.ic-vendor{font-size:7.5pt;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px;}
+.ic-title{font-size:10.5pt;font-weight:700;color:var(--text-primary);line-height:1.3;margin-bottom:8px;}
+.ic-body{font-size:8.5pt;color:var(--text-secondary);line-height:1.6;margin-bottom:10px;}
+.ic-action{font-size:8.5pt;font-weight:600;color:#0D9488;border-left:2px solid rgba(13,148,136,0.5);
+  padding:5px 10px;background:var(--ic-action-bg);border-radius:0 6px 6px 0;line-height:1.5;margin-bottom:10px;}
+.ic-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.ic-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.itag{font-size:7.5pt;font-weight:700;padding:2px 8px;border-radius:8px;}
+.it-default{background:rgba(107,114,128,0.1);border:1px solid rgba(107,114,128,0.2);color:var(--text-muted);}
+[data-theme="dark"] .it-default{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.45);}
+.it-red{background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.2);color:#DC2626;}
+[data-theme="dark"] .it-red{color:#F87171;}
+.it-amber{background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.2);color:#B45309;}
+[data-theme="dark"] .it-amber{color:#FBBF24;}
+.it-teal{background:rgba(13,148,136,0.12);border:1px solid rgba(13,148,136,0.2);color:#0F766E;}
+[data-theme="dark"] .it-teal{color:#5EEAD4;}
+.it-green{background:rgba(5,150,105,0.12);border:1px solid rgba(5,150,105,0.2);color:#065F46;}
+[data-theme="dark"] .it-green{color:#34D399;}
+.ic-val{font-size:11pt;font-weight:900;color:var(--text-secondary);}
+/* Risk table */
+.risk-table{background:var(--rt-bg);border:1px solid var(--rt-border);border-radius:12px;overflow:hidden;}
+.rt-header{display:grid;grid-template-columns:180px 1fr 80px 70px 180px;
+  padding:10px 20px;background:var(--rt-hdr);border-bottom:1px solid var(--rt-border);}
+.rt-hcell{font-size:7.5pt;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--rt-hcell);}
+.rt-row{display:grid;grid-template-columns:180px 1fr 80px 70px 180px;
+  padding:14px 20px;border-bottom:1px solid var(--rt-border);align-items:center;transition:background 0.15s;}
+.rt-row:last-child{border-bottom:none;}
+.rt-row:hover{background:var(--rt-row-hover);}
+.rt-vendor{font-size:8.5pt;font-weight:700;color:var(--text-primary);}
+.rt-note{font-size:8pt;color:var(--rt-note);line-height:1.4;padding-right:16px;}
+.rt-score{font-size:11pt;font-weight:900;}
+.score-red{color:#DC2626;}[data-theme="dark"] .score-red{color:#F87171;}
+.score-amber{color:#D97706;}[data-theme="dark"] .score-amber{color:#FBBF24;}
+.score-green{color:#059669;}[data-theme="dark"] .score-green{color:#34D399;}
+.rt-bar-wrap{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;margin-top:4px;}
+.rt-bar{height:4px;border-radius:2px;}
+.bar-red{background:#EF4444;}.bar-amber{background:#F59E0B;}.bar-green{background:#10B981;}
+.rt-delta{font-size:8.5pt;font-weight:800;text-align:center;}
+.delta-up{color:#DC2626;}[data-theme="dark"] .delta-up{color:#F87171;}
+.delta-dn{color:#059669;}[data-theme="dark"] .delta-dn{color:#34D399;}
+/* Value grid */
+.value-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;}
+.value-row:last-child{margin-bottom:0;}
+.value-card{background:var(--vc-bg);border:1px solid var(--vc-border);
+  border-radius:12px;padding:20px 22px;text-align:center;transition:all 0.2s;}
+.value-card:hover{background:var(--vc-hover-bg);border-color:var(--vc-hover-border);}
+.vc-num{font-size:28pt;font-weight:900;line-height:1;margin-bottom:6px;}
+.vc-teal{color:#0D9488;}[data-theme="dark"] .vc-teal{color:#5EEAD4;}
+.vc-green{color:#059669;}[data-theme="dark"] .vc-green{color:#34D399;}
+.vc-amber{color:#D97706;}[data-theme="dark"] .vc-amber{color:#FBBF24;}
+.vc-lbl{font-size:8.5pt;font-weight:700;color:var(--text-primary);margin-bottom:4px;}
+.vc-note{font-size:8pt;color:var(--text-muted);line-height:1.5;}
+
+/* ══════════════════════════════════════════
+   DASHBOARD VIEW STYLES
+══════════════════════════════════════════ */
+.dash-body{background:var(--db-bg);}
+.dash-inner{max-width:1280px;margin:0 auto;padding:0 48px;}
+.d-sec-hdr{padding:20px 0 12px;display:flex;align-items:center;justify-content:space-between;}
+.d-sec-title{font-size:8.5pt;font-weight:800;color:var(--db-ink4);text-transform:uppercase;letter-spacing:0.12em;}
+.d-sec-action{font-size:8.5pt;color:var(--teal);font-weight:600;text-decoration:none;transition:opacity 0.15s;}
+.d-sec-action:hover{opacity:0.7;}
+.d-sec-note{font-size:8.5pt;color:var(--db-ink4);}
+/* Pillar pills */
+.pillar-strip{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;padding-bottom:20px;}
+.p-pill{border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;
+  transition:all 0.2s;text-decoration:none;display:block;border:1px solid rgba(0,0,0,0.06);}
+.p-pill:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.12);}
+.p-name{font-size:7.5pt;font-weight:700;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.p-spend{font-size:7pt;color:rgba(255,255,255,0.65);margin-bottom:5px;}
+.p-risk{font-size:7pt;font-weight:700;padding:2px 6px;border-radius:8px;display:inline-block;}
+.risk-green{background:rgba(5,150,105,0.25);color:#6EE7B7;}
+.risk-amber{background:rgba(217,119,6,0.25);color:#FCD34D;}
+.risk-red{background:rgba(220,38,38,0.25);color:#FCA5A5;}
+/* Savings story */
+.savings-story{margin-bottom:20px;
+  background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);
+  border-radius:12px;padding:20px 24px;border:1px solid rgba(13,148,136,0.3);
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.ss-eyebrow{font-size:8pt;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+.ss-total{font-size:32pt;font-weight:900;color:#fff;line-height:1;margin-bottom:4px;}
+.ss-total span{color:var(--teal);}
+.ss-desc{font-size:8.5pt;color:rgba(255,255,255,0.55);line-height:1.6;}
+.ss-right{display:flex;flex-direction:column;gap:10px;justify-content:center;}
+.ss-item{background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 16px;border-left:3px solid var(--teal);}
+.ss-item-val{font-size:14pt;font-weight:900;color:var(--teal);line-height:1;}
+.ss-item-lbl{font-size:8pt;color:rgba(255,255,255,0.65);margin-top:3px;}
+.ss-item.second{border-left-color:var(--green);}
+.ss-item.second .ss-item-val{color:var(--green);}
+.ss-bar-wrap{margin-top:16px;}
+.ss-bar-track{background:rgba(255,255,255,0.08);border-radius:6px;height:10px;overflow:hidden;display:flex;}
+.ss-bar-fill-teal{height:10px;background:var(--teal);border-radius:6px 0 0 6px;width:88%;}
+.ss-bar-fill-green{height:10px;background:var(--green);width:12%;border-radius:0 6px 6px 0;}
+.ss-bar-labels{display:flex;justify-content:space-between;margin-top:5px;}
+.ss-bar-lbl{font-size:7.5pt;color:rgba(255,255,255,0.40);}
+/* Engagement cards */
+.eng-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:20px;}
+.eng-card{background:var(--db-white);border-radius:10px;overflow:hidden;
+  border:1px solid var(--db-border);transition:all 0.2s;cursor:pointer;}
+.eng-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.eng-signal{height:3px;}
+.eng-signal-green{background:var(--green);}
+.eng-signal-amber{background:var(--amber);}
+.eng-signal-red{background:var(--red);}
+.eng-signal-navy{background:var(--navy);}
+.eng-top{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;}
+.eng-logo{width:36px;height:36px;border-radius:7px;object-fit:contain;
+  border:1px solid var(--db-border);background:#fff;flex-shrink:0;padding:2px;}
+.eng-info{flex:1;min-width:0;}
+.eng-vendor{font-size:9pt;font-weight:800;color:var(--navy);margin-bottom:2px;}
+.eng-name{font-size:8pt;color:var(--db-ink4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.eng-value{text-align:right;flex-shrink:0;}
+.eng-val-num{font-size:14pt;font-weight:900;line-height:1;}
+.eng-val-green{color:var(--green);}.eng-val-amber{color:var(--amber);}
+.eng-val-red{color:var(--red);}.eng-val-navy{color:var(--navy);}
+.eng-val-lbl{font-size:7.5pt;color:var(--db-ink4);margin-top:2px;}
+.eng-badges{padding:0 16px 10px;display:flex;gap:5px;flex-wrap:wrap;}
+.badge{font-size:7.5pt;padding:2px 8px;border-radius:10px;font-weight:700;}
+.b-green{background:var(--green3);color:var(--green2);}
+.b-amber{background:var(--amber3);color:var(--amber2);}
+.b-red{background:var(--red3);color:var(--red2);}
+.b-navy{background:var(--navy3);color:var(--navy);}
+.b-gray{background:#F3F4F6;color:var(--db-ink4);}
+.b-teal{background:var(--teal3);color:var(--teal2);}
+.b-analyst{background:rgba(124,58,237,0.1);color:#7C3AED;border:1px solid rgba(124,58,237,0.2);}
+/* Intel cards */
+.intel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:20px;}
+.intel-card{background:var(--db-white);border-radius:10px;padding:16px;
+  border:1px solid var(--db-border);cursor:pointer;transition:all 0.2s;}
+.intel-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.intel-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.intel-icon{font-size:20pt;}
+.intel-title{font-size:9.5pt;font-weight:800;color:var(--navy);margin-bottom:2px;}
+.intel-sub{font-size:8pt;color:var(--db-ink4);}
+.intel-nav{margin-left:auto;font-size:8.5pt;color:var(--teal);font-weight:600;}
+.q-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.q-cell{text-align:center;padding:8px;border-radius:6px;}
+.q-cell-red{background:var(--red3);}.q-cell-amber{background:var(--amber3);}
+.q-cell-green{background:var(--green3);}.q-cell-navy{background:var(--navy3);}
+.q-num{font-size:13pt;font-weight:900;line-height:1.1;}
+.q-num-red{color:var(--red);}.q-num-amber{color:var(--amber);}
+.q-num-green{color:var(--green);}.q-num-navy{color:var(--navy);}
+.q-lbl{font-size:7pt;font-weight:700;margin-top:2px;}
+.q-lbl-red{color:var(--red2);}.q-lbl-amber{color:var(--amber2);}
+.q-lbl-green{color:var(--green2);}.q-lbl-navy{color:var(--navy2);}
+.q-val{font-size:7pt;color:var(--db-ink4);margin-top:1px;}
+.mft-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.mft-stat{padding:10px;border-radius:6px;}
+.mft-stat-green{background:var(--green3);}.mft-stat-amber{background:var(--amber3);}
+.mft-stat-num{font-size:13pt;font-weight:900;line-height:1;}
+.mft-stat-num-green{color:var(--green);}.mft-stat-num-amber{color:var(--amber);}
+.mft-stat-lbl{font-size:7.5pt;font-weight:700;}
+.mft-stat-lbl-green{color:var(--green2);}.mft-stat-lbl-amber{color:var(--amber2);}
+.mft-bar{background:#F3F4F6;border-radius:4px;height:8px;overflow:hidden;display:flex;margin-top:10px;}
+.mft-seg{height:8px;}
+.mft-seg-green{width:10%;background:var(--green);}
+.mft-seg-indigo{width:8%;background:#6366F1;}
+.mft-seg-amber{width:7%;background:var(--amber);}
+.mft-seg-gray{width:75%;background:#E5E7EB;}
+.mft-legend{font-size:7pt;color:var(--db-ink4);margin-top:5px;}
+/* Open items / blocker */
+.open-items{padding-bottom:20px;}
+.blocker{background:var(--db-white);border-radius:10px;padding:16px;
+  border:1px solid var(--db-border);border-left:4px solid var(--red);
+  display:flex;gap:14px;align-items:flex-start;}
+.blocker-icon{font-size:20pt;flex-shrink:0;}
+.blocker-title{font-size:9pt;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.blocker-desc{font-size:8.5pt;color:var(--db-ink3);line-height:1.6;margin-bottom:8px;}
+.blocker-badges{display:flex;gap:6px;flex-wrap:wrap;}
+/* Advisory close */
+.advisory-close{margin-bottom:32px;
+  background:linear-gradient(135deg,var(--navy) 0%,#1a2f50 100%);
+  border-radius:12px;padding:20px 24px;border:1px solid rgba(255,255,255,0.06);}
+.ac-eyebrow{font-size:8pt;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+.ac-text{font-size:9pt;color:rgba(255,255,255,0.70);line-height:1.75;}
+.ac-footer{font-size:7.5pt;color:rgba(255,255,255,0.30);margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);}
+/* Fade-in for dashboard */
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+/* ── Engagement modal ── */
+.eng-modal-backdrop{position:fixed;inset:0;z-index:300;
+  background:rgba(6,13,26,0.80);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  opacity:0;pointer-events:none;transition:opacity 0.25s ease;}
+.eng-modal-backdrop.open{opacity:1;pointer-events:all;}
+.eng-modal{background:#fff;border-radius:14px;border:1px solid var(--db-border);
+  box-shadow:0 32px 80px rgba(0,0,0,0.35);width:100%;max-width:620px;max-height:88vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  transform:translateY(28px) scale(0.97);transition:transform 0.25s ease;}
+.eng-modal-backdrop.open .eng-modal{transform:translateY(0) scale(1);}
+.eng-modal-signal{height:4px;flex-shrink:0;}
+.eng-modal-hdr{display:flex;align-items:center;gap:14px;padding:18px 20px 14px;
+  border-bottom:1px solid var(--db-border);flex-shrink:0;}
+.eng-modal-logo{width:44px;height:44px;border-radius:8px;object-fit:contain;
+  border:1px solid var(--db-border);background:#fff;flex-shrink:0;padding:3px;}
+.eng-modal-info{flex:1;min-width:0;}
+.eng-modal-vendor{font-size:10pt;font-weight:800;color:var(--navy);margin-bottom:2px;}
+.eng-modal-name{font-size:8.5pt;color:var(--db-ink4);}
+.eng-modal-val{text-align:right;flex-shrink:0;}
+.eng-modal-val-num{font-size:18pt;font-weight:900;line-height:1;}
+.eng-modal-val-lbl{font-size:7.5pt;color:var(--db-ink4);margin-top:2px;}
+.eng-modal-close{width:34px;height:34px;border-radius:50%;border:none;
+  background:#F3F4F6;color:#6B7280;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;flex-shrink:0;}
+.eng-modal-close:hover{background:var(--red3);color:var(--red);}
+.eng-modal-badges{padding:12px 20px;display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--db-border);flex-shrink:0;}
+.eng-modal-body{padding:18px 20px;overflow-y:auto;flex:1;}
+.eng-modal-detail-lbl{font-size:8pt;font-weight:700;color:var(--db-ink4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.eng-modal-detail-text{font-size:9pt;color:var(--db-ink3);line-height:1.7;}
+.eng-modal-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--db-border);}
+.eng-modal-meta-item{background:#F3F4F6;border-radius:8px;padding:10px 12px;}
+.eng-modal-meta-val{font-size:10pt;font-weight:800;color:var(--navy);line-height:1.2;}
+.eng-modal-meta-lbl{font-size:7.5pt;color:var(--db-ink4);margin-top:3px;}
+
+/* ── Footer ── */
+.brief-footer{position:relative;z-index:10;border-top:1px solid var(--footer-border);
+  padding:28px 48px;max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.bf-left{font-size:7.5pt;color:var(--footer-text);line-height:1.7;}
+.bf-right{display:flex;gap:10px;}
+.bf-link{font-size:7.5pt;color:rgba(13,148,136,0.7);text-decoration:none;font-weight:600;transition:color 0.15s;}
+.bf-link:hover{color:#0D9488;}
+
+/* ── Print ── */
+@media print{
+  .top-bar,.scanline,#particles,.view-switcher,.scroll-cue{display:none!important;}
+  body{background:#fff!important;color:#000!important;}
+  .hero{background:#0F1E3C!important;min-height:0;padding:48px;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .h-title,.h-eyebrow,.h-sub,.h-kicker{color:#fff!important;opacity:1!important;}
+  .h-kpi-row,.hk{opacity:1!important;}
+  .section{padding:40px 0;background:#fff!important;}
+  .item-card,.risk-table,.value-card{border:1px solid #ddd!important;
+    background:#fff!important;color:#000!important;break-inside:avoid;}
+  .reveal{opacity:1!important;transform:none!important;}
+  .dash-body{background:#fff!important;}
+  .eng-card,.intel-card,.blocker{break-inside:avoid;}
+}
+@media(max-width:960px){
+  .item-grid{grid-template-columns:1fr;}
+  .h-kpi-row{grid-template-columns:1fr 1fr;}
+  .value-row{grid-template-columns:1fr 1fr;}
+  .rt-header,.rt-row{grid-template-columns:140px 1fr 70px 70px;}
+  .section-inner,.dash-inner{padding:0 24px;}
+  .hero,.view-switcher{padding-left:24px;padding-right:24px;}
+  .pillar-strip{grid-template-columns:repeat(5,1fr);}
+  .eng-grid,.intel-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .section-inner,.dash-inner{padding:0 14px;}
+  .hero,.view-switcher{padding-left:14px;padding-right:14px;}
+  .h-kpi-row{grid-template-columns:1fr;}
+  .value-row{grid-template-columns:1fr;}
+  .pillar-strip{grid-template-columns:repeat(3,1fr);}
+  .brief-footer{padding:16px 14px;flex-direction:column;gap:8px;}
+  .top-bar{padding:0 12px;}
+  .tb-tabs{gap:4px;}
+  .tb-tab{font-size:8pt;padding:5px 10px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div class="scanline"></div>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="tb-left">
+    <a class="tb-back" href="index.html">&#8592; Hub</a>
+    <div class="tb-sep"></div>
+    <span class="tb-brand">VER Intelligence Hub</span>
+    <div class="tb-tabs">
+      <button class="tb-tab active" onclick="switchView('brief',this)">Executive Brief</button>
+      <button class="tb-tab" onclick="switchView('dashboard',this)">Full Dashboard</button>
+    </div>
+  </div>
+  <div class="tb-right">
+    <button type="button" class="tb-btn" onclick="openExecHelp()" aria-label="How to use Executive Snapshot">&#63; How to Use</button>
+    <div class="tb-live"><div class="live-dot"></div>Live &middot; <span id="brief-date"></span></div>
+    <button type="button" class="tb-theme" id="theme-btn" onclick="toggleTheme()">&#9788; Light</button>
+    <button type="button" class="tb-btn tb-print" onclick="window.print()">&#128438; Print</button>
+  </div>
+</div>
+
+<!-- ═══ HERO (shared) ═══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="h-eyebrow">VER Intelligence Hub &middot; FY27 Q2</div>
+  <div class="h-kicker">DET Third-Party Portfolio &middot; Confidential</div>
+  <div class="h-title">Executive<br><span class="accent">Intelligence</span></div>
+  <div class="h-rule"></div>
+  <div class="h-sub">The SVP view. What changed, what needs a decision,<br>where risk is moving, and where VER is creating value.</div>
+  <div class="h-kpi-row">
+    <div class="hk">
+      <div class="hk-lbl">Savings Realized</div>
+      <div class="hk-val green" id="kv-savings">$0M</div>
+      <div class="hk-note">FY27 &middot; NTT AD + Cognizant</div>
+      <div class="src-row">
+        <span class="src-badge sb-qbr"><span class="sb-dot"></span>QBR</span>
+        <span class="src-badge sb-hi"><span class="sb-dot"></span>High</span>
+        <span class="src-badge sb-manual">Jun 22</span>
+      </div>
+    </div>
+    <div class="hk">
+      <div class="hk-lbl">Critical Renewals</div>
+      <div class="hk-val amber" id="kv-renewals">0</div>
+      <div class="hk-note">Within 90 days &middot; $33.7M at risk</div>
+      <div class="src-row">
+        <span class="src-badge sb-coupa"><span class="sb-dot"></span>Coupa</span>
+        <span class="src-badge sb-hi"><span class="sb-dot"></span>High</span>
+        <span class="src-badge sb-manual">Jun 22</span>
+      </div>
+    </div>
+    <div class="hk">
+      <div class="hk-lbl">Active SOWs</div>
+      <div class="hk-val teal" id="kv-sows">0</div>
+      <div class="hk-note">Coupa POs tracked &middot; FY27</div>
+      <div class="src-row">
+        <span class="src-badge sb-coupa"><span class="sb-dot"></span>Coupa</span>
+        <span class="src-badge sb-hi"><span class="sb-dot"></span>High</span>
+        <span class="src-badge sb-manual">Jun 22</span>
+      </div>
+    </div>
+    <div class="hk">
+      <div class="hk-lbl">MFT Forecast</div>
+      <div class="hk-val" id="kv-mft">$0M</div>
+      <div class="hk-note">Approved pipeline &middot; 351 items</div>
+      <div class="src-row">
+        <span class="src-badge sb-mft"><span class="sb-dot"></span>MFT</span>
+        <span class="src-badge sb-med"><span class="sb-dot"></span>Medium</span>
+        <span class="src-badge sb-manual">Jun 2026</span>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <div class="scroll-arrow"></div>
+    <span>Scroll to brief</span>
+  </div>
+</section>
+
+<!-- View switcher -->
+<div class="view-switcher">
+  <button class="vs-btn active" id="vs-brief" onclick="switchView('brief',null,'vs-brief')">&#128196; 5-Minute Executive Brief</button>
+  <button class="vs-btn" id="vs-dashboard" onclick="switchView('dashboard',null,'vs-dashboard')">&#128200; Full Portfolio Dashboard</button>
+</div>
+
+<!-- ════════════════════════════════════
+     BRIEF VIEW
+════════════════════════════════════ -->
+<div class="v-view active" id="view-brief">
+
+  <div class="section-divider"></div>
+
+  <!-- S1: What Changed -->
+  <section class="section">
+  <div class="section-inner">
+    <div class="sec-eyebrow reveal">
+      <div class="sec-num">01</div>
+      <div class="sec-label-wrap">
+        <div class="sec-sup">Last Readout Delta</div>
+        <div class="sec-title">What Changed</div>
+      </div>
+      <span class="sec-count scc-amber" id="changed-count"></span>
+    </div>
+    <div class="item-grid" id="changed-body"></div>
+  </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- S2: Decisions Needed -->
+  <section class="section">
+  <div class="section-inner">
+    <div class="sec-eyebrow reveal">
+      <div class="sec-num">02</div>
+      <div class="sec-label-wrap">
+        <div class="sec-sup">Requires SVP Action</div>
+        <div class="sec-title">Decisions Needed</div>
+      </div>
+      <span class="sec-count scc-red" id="decisions-count"></span>
+    </div>
+    <div class="item-grid" id="decisions-body"></div>
+  </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- S3: Risk -->
+  <section class="section">
+  <div class="section-inner">
+    <div class="sec-eyebrow reveal">
+      <div class="sec-num">03</div>
+      <div class="sec-label-wrap">
+        <div class="sec-sup">Risk Movement</div>
+        <div class="sec-title">Where Risk Is Increasing</div>
+      </div>
+      <span class="sec-count scc-red" id="risk-count"></span>
+    </div>
+    <div class="risk-table reveal" id="risk-body"></div>
+  </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- S4: Value -->
+  <section class="section">
+  <div class="section-inner">
+    <div class="sec-eyebrow reveal">
+      <div class="sec-num">04</div>
+      <div class="sec-label-wrap">
+        <div class="sec-sup">FY27 Impact Evidence</div>
+        <div class="sec-title">Where VER Is Creating Value</div>
+      </div>
+      <span class="sec-count scc-green" id="value-count"></span>
+    </div>
+    <div id="value-body"></div>
+  </div>
+  </section>
+
+  <!-- Footer -->
+  <div class="brief-footer">
+    <div class="bf-left">
+      VER Intelligence Hub &middot; FY27 Q2 Executive Intelligence &middot; Confidential &middot; Salesforce DET<br>
+      Data sources: Coupa FY27 actuals (point-in-time snapshot) &middot; MFT pipeline &middot; QBR cycle May&ndash;Jun 2026 &middot; Global benchmarks compiled by VER
+    </div>
+    <div class="bf-right">
+      <a class="bf-link" href="page_renewal.html">Renewal Horizon</a>
+      <a class="bf-link" href="page_governance.html">Governance Queue</a>
+      <a class="bf-link" href="vendor_registry.html">Vendor Registry</a>
+    </div>
+  </div>
+</div><!-- /view-brief -->
+
+<!-- ════════════════════════════════════
+     DASHBOARD VIEW
+════════════════════════════════════ -->
+<div class="v-view" id="view-dashboard">
+<div class="dash-body" style="padding:24px 0 0;">
+<div class="dash-inner">
+
+  <!-- Pillar health -->
+  <div class="d-sec-hdr fade-in">
+    <div class="d-sec-title">Pillar Portfolio Health</div>
+    <a href="page_pillar.html" class="d-sec-action">View SSI &rarr;</a>
+  </div>
+  <div class="pillar-strip fade-in" id="pillar-strip"></div>
+
+  <!-- Savings -->
+  <div class="d-sec-hdr fade-in"><div class="d-sec-title">Savings &amp; Value Realization</div></div>
+  <div class="savings-story fade-in">
+    <div>
+      <div class="ss-eyebrow">FY27 Advisory Savings</div>
+      <div class="ss-total">$10.<span>236M</span></div>
+      <div class="ss-desc">Realized through VER advisory engagement in FY27. Two engagements restructured or terminated, generating $10.236M in confirmed savings. Pipeline of $3–5M identified for H2 FY27.</div>
+      <div class="ss-bar-wrap">
+        <div class="ss-bar-track">
+          <div class="ss-bar-fill-teal"></div>
+          <div class="ss-bar-fill-green"></div>
+        </div>
+        <div class="ss-bar-labels">
+          <span class="ss-bar-lbl">NTT Data AD &mdash; $9.0M (88%)</span>
+          <span class="ss-bar-lbl">Cognizant &mdash; $1.236M (12%)</span>
+        </div>
+      </div>
+    </div>
+    <div class="ss-right">
+      <div class="ss-item">
+        <div class="ss-item-val">$9.0M</div>
+        <div class="ss-item-lbl">NTT Data AD restructure &middot; DA&amp;O &middot; Apr 2026</div>
+      </div>
+      <div class="ss-item second">
+        <div class="ss-item-val">$1.236M</div>
+        <div class="ss-item-lbl">Cognizant engagement termination &middot; SF on SF &middot; FY27</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key engagements -->
+  <div class="d-sec-hdr fade-in">
+    <div class="d-sec-title">Key Engagements</div>
+    <span class="d-sec-note">Click any card for full detail</span>
+  </div>
+  <div class="eng-grid fade-in" id="eng-grid"></div>
+
+  <!-- SOW & MFT -->
+  <div class="d-sec-hdr fade-in"><div class="d-sec-title">SOW &amp; MFT Intelligence</div></div>
+  <div class="intel-grid fade-in">
+    <div class="intel-card" onclick="window.location.href='page_sow.html'">
+      <div class="intel-header">
+        <div class="intel-icon">&#128203;</div>
+        <div><div class="intel-title">SOW &amp; PO Expiry Tracker</div><div class="intel-sub">2,397 POs &middot; FY27</div></div>
+        <div class="intel-nav">View full &rarr;</div>
+      </div>
+      <div class="q-grid">
+        <div class="q-cell q-cell-red"><div class="q-num q-num-red">800</div><div class="q-lbl q-lbl-red">Q1</div><div class="q-val">$57.6M</div></div>
+        <div class="q-cell q-cell-amber"><div class="q-num q-num-amber">374</div><div class="q-lbl q-lbl-amber">Q2</div><div class="q-val">$88.2M</div></div>
+        <div class="q-cell q-cell-green"><div class="q-num q-num-green">397</div><div class="q-lbl q-lbl-green">Q3</div><div class="q-val">$56.4M</div></div>
+        <div class="q-cell q-cell-navy"><div class="q-num q-num-navy">826</div><div class="q-lbl q-lbl-navy">Q4</div><div class="q-val">$118.2M</div></div>
+      </div>
+    </div>
+    <div class="intel-card" onclick="window.location.href='page_mft.html'">
+      <div class="intel-header">
+        <div class="intel-icon">&#128200;</div>
+        <div><div class="intel-title">MFT Forecasted Spend</div><div class="intel-sub">$93.4M &middot; 351 items &middot; FY27</div></div>
+        <div class="intel-nav">View full &rarr;</div>
+      </div>
+      <div class="mft-stats">
+        <div class="mft-stat mft-stat-green"><div class="mft-stat-num mft-stat-num-green">$9.3M</div><div class="mft-stat-lbl mft-stat-lbl-green">Approved &middot; 45 items</div></div>
+        <div class="mft-stat mft-stat-amber"><div class="mft-stat-num mft-stat-num-amber">$14.1M</div><div class="mft-stat-lbl mft-stat-lbl-amber">In Flight &middot; 74 items</div></div>
+      </div>
+      <div class="mft-bar">
+        <div class="mft-seg mft-seg-green"></div><div class="mft-seg mft-seg-indigo"></div>
+        <div class="mft-seg mft-seg-amber"></div><div class="mft-seg mft-seg-gray"></div>
+      </div>
+      <div class="mft-legend">10% approved &middot; 8% new &middot; 7% under review &middot; 75% pipeline</div>
+    </div>
+  </div>
+
+  <!-- Market & Vendor Intelligence -->
+  <div class="d-sec-hdr fade-in">
+    <div class="d-sec-title">Market &amp; Vendor Intelligence</div>
+    <a href="vendor_registry.html" class="d-sec-action">All Vendors &rarr;</a>
+  </div>
+  <div class="intel-grid fade-in">
+    <div class="intel-card" onclick="window.location.href='page_rate_benchmarks.html'">
+      <div class="intel-header">
+        <div class="intel-icon">&#128178;</div>
+        <div><div class="intel-title">Rate &amp; Benchmark Intelligence</div><div class="intel-sub">35 roles &middot; 9 categories &middot; 4 regions</div></div>
+        <div class="intel-nav">View full &rarr;</div>
+      </div>
+      <div class="q-grid">
+        <div class="q-cell q-cell-red"><div class="q-num q-num-red">8</div><div class="q-lbl">Above market</div></div>
+        <div class="q-cell q-cell-green"><div class="q-num q-num-green">18</div><div class="q-lbl">Inline</div></div>
+        <div class="q-cell q-cell-amber"><div class="q-num q-num-amber">9</div><div class="q-lbl">Below market</div></div>
+        <div class="q-cell q-cell-navy"><div class="q-num q-num-navy">$2.1M</div><div class="q-lbl">Savings opp.</div></div>
+      </div>
+    </div>
+    <div class="intel-card" onclick="window.location.href='vendor_home.html'">
+      <div class="intel-header">
+        <div class="intel-icon">&#127942;</div>
+        <div><div class="intel-title">Vendor Performance Scorecards</div><div class="intel-sub">1,375 vendors &middot; 360° health view</div></div>
+        <div class="intel-nav">View full &rarr;</div>
+      </div>
+      <div class="q-grid">
+        <div class="q-cell q-cell-green"><div class="q-num q-num-green">892</div><div class="q-lbl">Healthy</div></div>
+        <div class="q-cell q-cell-amber"><div class="q-num q-num-amber">341</div><div class="q-lbl">Watch</div></div>
+        <div class="q-cell q-cell-red"><div class="q-num q-num-red">135</div><div class="q-lbl">At Risk</div></div>
+        <div class="q-cell q-cell-navy"><div class="q-num q-num-navy">1,375</div><div class="q-lbl">Total</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Open items -->
+  <div class="d-sec-hdr fade-in">
+    <div class="d-sec-title">Open Items</div>
+    <span class="badge b-red">1 Open</span>
+  </div>
+  <div class="open-items fade-in">
+    <div class="blocker">
+      <div class="blocker-icon">&#9888;</div>
+      <div>
+        <div class="blocker-title">Sonata Software &mdash; SF Support SOW Renewal Decision Required</div>
+        <div class="blocker-desc">Year 3 of Sonata SF Support SOW ended May 15, 2026. Immediate Renew or Wind-Down decision required. 30-day notice period. VER recommends aligning with Procurement and responsible Pillar Lead before any extension is executed.</div>
+        <div class="blocker-badges">
+          <span class="badge b-red">Immediate Action</span>
+          <span class="badge b-gray">Owner: VER + Procurement + Pillar Lead</span>
+          <span class="badge b-gray">M&amp;A Inherited &middot; Informatica</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advisory close -->
+  <div class="advisory-close fade-in">
+    <div class="ac-eyebrow">VER Advisory Position &mdash; FY27 <span class="badge b-analyst">Analyst-curated intelligence</span></div>
+    <div class="ac-text">DET's third-party spend portfolio is performing under active VER advisory. The $10.236M in realized savings demonstrates VER's value in renegotiation and engagement restructuring. The two critical renewals — NTT Data AD (Aug 2026) and Workday ELP (Nov 2026) — represent $33.7M in combined annual spend and require Pillar Lead engagement now. VER is monitoring the GSA re-assignment of NTT AMS and the Informatica M&amp;A implications across the Data Solutions pillar. The portfolio is stable. VER advisory is active.</div>
+    <div class="ac-footer">VER Intelligence Hub &middot; Executive Intelligence &middot; FY27 &middot; Salesforce DET &middot; Powered by VER &middot; Confidential</div>
+  </div>
+
+</div><!-- /dash-inner -->
+</div><!-- /dash-body -->
+</div><!-- /view-dashboard -->
+
+<!-- Engagement modal -->
+<div class="eng-modal-backdrop" id="eng-modal-backdrop" onclick="if(event.target===this)closeEngModal()">
+  <div class="eng-modal" id="eng-modal">
+    <div class="eng-modal-signal" id="eng-modal-signal"></div>
+    <div class="eng-modal-hdr">
+      <img class="eng-modal-logo" id="eng-modal-logo" src="" alt="" onerror="eLogoFallback(this,document.getElementById('eng-modal-vendor').textContent||'')">
+      <div class="eng-modal-info">
+        <div class="eng-modal-vendor" id="eng-modal-vendor"></div>
+        <div class="eng-modal-name" id="eng-modal-name"></div>
+      </div>
+      <div class="eng-modal-val">
+        <div class="eng-modal-val-num" id="eng-modal-val-num"></div>
+        <div class="eng-modal-val-lbl">annual value</div>
+      </div>
+      <button type="button" class="eng-modal-close" onclick="closeEngModal()">&#10005;</button>
+    </div>
+    <div class="eng-modal-badges" id="eng-modal-badges"></div>
+    <div class="eng-modal-body">
+      <div class="eng-modal-detail-lbl">Engagement Detail</div>
+      <div class="eng-modal-detail-text" id="eng-modal-detail"></div>
+      <div class="eng-modal-meta" id="eng-modal-meta"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ THEME ══ */
+(function(){
+  var saved = localStorage.getItem('ver-exec-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  var btn = document.getElementById('theme-btn');
+  if(btn) btn.textContent = saved === 'dark' ? '☀ Light' : '☽ Dark';
+})();
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ver-exec-theme', next);
+  document.getElementById('theme-btn').textContent = next === 'dark' ? '☀ Light' : '☽ Dark';
+}
+
+/* ══ DATE ══ */
+document.getElementById('brief-date').textContent =
+  new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+/* ══ PARTICLES ══ */
+(function(){
+  var c=document.getElementById('particles');
+  var ctx=c.getContext('2d');
+  var W,H,pts=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  for(var i=0;i<55;i++){
+    pts.push({x:Math.random()*9999,y:Math.random()*9999,
+      vx:(Math.random()-0.5)*0.25,vy:(Math.random()-0.5)*0.25,
+      r:Math.random()*1.4+0.4,a:Math.random()*0.35+0.05});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(function(p){
+      p.x=(p.x+p.vx+W)%W; p.y=(p.y+p.vy+H)%H;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(13,148,136,'+p.a+')';ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ══ COUNTER ANIMATION ══ */
+function animateCounter(el, target, prefix, suffix, decimals, duration) {
+  var start=null; var num=parseFloat(target);
+  function step(ts){
+    if(!start) start=ts;
+    var progress=Math.min((ts-start)/duration,1);
+    var ease=1-Math.pow(1-progress,3);
+    var val=num*ease;
+    el.textContent=(prefix||'')+val.toFixed(decimals||0)+(suffix||'');
+    if(progress<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+setTimeout(function(){
+  animateCounter(document.getElementById('kv-savings'),10.2,'$','M',1,1200);
+  animateCounter(document.getElementById('kv-renewals'),2,'','',0,800);
+  animateCounter(document.getElementById('kv-sows'),2397,'','',0,1400);
+  animateCounter(document.getElementById('kv-mft'),93.4,'$','M',1,1200);
+},1600);
+
+/* ══ VIEW SWITCHER ══ */
+function switchView(key, tabBtn, vsId) {
+  document.querySelectorAll('.v-view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById('view-'+key).classList.add('active');
+  // sync top-bar tabs
+  document.querySelectorAll('.tb-tab').forEach(function(t){t.classList.remove('active');});
+  if(tabBtn) tabBtn.classList.add('active');
+  else {
+    var tabs = document.querySelectorAll('.tb-tab');
+    tabs.forEach(function(t,i){ if((i===0&&key==='brief')||(i===1&&key==='dashboard')) t.classList.add('active'); });
+  }
+  // sync view-switcher buttons
+  document.querySelectorAll('.vs-btn').forEach(function(b){b.classList.remove('active');});
+  var vsBtnId = key==='brief' ? 'vs-brief' : 'vs-dashboard';
+  var vsBtn = document.getElementById(vsBtnId);
+  if(vsBtn) vsBtn.classList.add('active');
+  // trigger fade-ins if switching to dashboard
+  if(key==='dashboard'){
+    setTimeout(function(){
+      document.querySelectorAll('#view-dashboard .fade-in').forEach(function(el){
+        var obs2=new IntersectionObserver(function(entries){
+          entries.forEach(function(e){ if(e.isIntersecting){e.target.classList.add('visible');obs2.unobserve(e.target);} });
+        },{threshold:0.05});
+        obs2.observe(el);
+      });
+    },50);
+  }
+}
+
+/* ══ BRIEF DATA ══ */
+var BRIEF = {
+  changed: [
+    { border:'ic-amber', vendor:'NTT Data', title:'AD Restructure — Master PO Closed',
+      body:'Master PO closure shifted FY27 projected spend from ~$19M to ~$10M. Individual PO model eliminates prior restrictive resource floor language. DA&O delivery continuity preserved.',
+      action:'Confirm replacement model and bridge coverage before Aug 31 expiry.',
+      tags:[{l:'$10M Spend',c:'it-default'},{l:'DA&O',c:'it-default'},{l:'Expires Aug 31',c:'it-red'}], val:'$10.0M' },
+    { border:'ic-green', vendor:'Cognizant', title:'Partner Data — Savings Locked at $9.0M',
+      body:'Savings realization confirmed $9.0M vs $8.5M target. SLA attainment 97%. Engagement is now a reference pattern for AD/AMS savings stories across all nine pillars.',
+      action:'Package savings narrative for executive readout and benchmark template.',
+      tags:[{l:'$9.0M Realized',c:'it-green'},{l:'Data Pillar',c:'it-default'},{l:'Healthy',c:'it-teal'}], val:'$9.0M' },
+    { border:'ic-amber', vendor:'Tech Mahindra', title:'Service Desk — Aged Backlog 37% Over Threshold',
+      body:'Aged ticket backlog at 171 vs target of &lt;125. CSAT at 4.2 vs 4.4 target. Resolution improving but tower-level burn-down is uneven. Active VER monitoring in place.',
+      action:'Move aged ticket KPI and knowledge article freshness into formal governance scorecard.',
+      tags:[{l:'Watch',c:'it-amber'},{l:'IT Pillar',c:'it-default'},{l:'CSAT Below Target',c:'it-amber'}], val:'$17.6M' },
+    { border:'ic-amber', vendor:'Workday Finance', title:'ADAMS — Backlog Aging Elevated Two Cycles',
+      body:'Backlog aging at 27d vs &lt;21d target. Release readiness Amber for two consecutive cycles. Scope boundary between vendor action and internal dependency delay remains unclear.',
+      action:'Add internal dependency aging to scorecard before renewal planning starts.',
+      tags:[{l:'Watch',c:'it-amber'},{l:'SF on SF',c:'it-default'},{l:'Renewal May 27',c:'it-default'}], val:'$5.4M' }
+  ],
+  decisions: [
+    { border:'ic-red', vendor:'NTT Data', title:'AD SOW — Renewal or Exit Decision Required',
+      body:'SOW expires Aug 31, 2026 — 62 days out. Decision required: renew under individual PO model, consolidate scope, or begin exit planning. $10M annual spend and DA&O delivery continuity at stake.',
+      action:'Owner: Procurement + DA&O Lead &middot; Due: Jul 15, 2026',
+      tags:[{l:'Urgent',c:'it-red'},{l:'$10M Impact',c:'it-red'},{l:'62 Days',c:'it-amber'}], val:'$10M' },
+    { border:'ic-red', vendor:'Google Cloud', title:'GCP/Workspace — Commercial Strategy Approval',
+      body:'Renewal Jan 2027. At $82.5M this is the largest single commercial decision in the portfolio. Early options analysis needed: EDP structure, Gemini AI credits, Workspace seat baseline.',
+      action:'Owner: Engineering Lead + FinOps &middot; Start analysis by Aug 1, 2026',
+      tags:[{l:'$82.5M Exposure',c:'it-red'},{l:'Jan 2027',c:'it-amber'},{l:'Tier 1',c:'it-default'}], val:'$82.5M' },
+    { border:'ic-amber', vendor:'Figma', title:'License Audit Required Before Renewal Baseline',
+      body:'Renewal Jan 2027 at $3.2M. Seat utilization unvalidated — risk of renewing over-provisioned. Seat hygiene audit must complete before any commercial negotiation begins.',
+      action:'Owner: Digital Mktg Lead &middot; Complete seat audit by Sep 1, 2026',
+      tags:[{l:'$3.2M',c:'it-default'},{l:'Action Required',c:'it-amber'},{l:'Jan 2027',c:'it-default'}], val:'$3.2M' },
+    { border:'ic-amber', vendor:'Deloitte', title:'Agentic SOW — Milestone Extension Only',
+      body:'Advisory extension language under review. Recommend milestone-based extension with explicit acceptance gates. Time-and-material continuation without deliverables creates scope risk.',
+      action:'Owner: Agentic Lead &middot; Align extension terms by Aug 18, 2026',
+      tags:[{l:'$8.7M',c:'it-default'},{l:'Monitor',c:'it-amber'},{l:'Feb 2027',c:'it-default'}], val:'$8.7M' }
+  ],
+  risks: [
+    {vendor:'Tech Mahindra',score:68,prev:52,delta:'+16',barCls:'bar-red',scoreCls:'score-red',deltaCls:'delta-up',
+      note:'SLA below target on 3 metrics. Aged ticket backlog 37% over threshold. VER governance active.'},
+    {vendor:'NTT Data (AD)',score:55,prev:40,delta:'+15',barCls:'bar-amber',scoreCls:'score-amber',deltaCls:'delta-up',
+      note:'Transition risk elevated as master PO closure moves to individual model before Aug 31.'},
+    {vendor:'Workday Finance',score:42,prev:38,delta:'+4',barCls:'bar-amber',scoreCls:'score-amber',deltaCls:'delta-up',
+      note:'Backlog aging elevated. Dependency boundary unclear. Release readiness amber two cycles.'},
+    {vendor:'Cognizant',score:18,prev:31,delta:'−13',barCls:'bar-green',scoreCls:'score-green',deltaCls:'delta-dn',
+      note:'Risk reduced following savings confirmation and SLA stabilization. Reference-grade engagement.'},
+    {vendor:'Xebia',score:19,prev:21,delta:'−2',barCls:'bar-green',scoreCls:'score-green',deltaCls:'delta-dn',
+      note:'Milestone SOW tracking cleanly. Minor reduction from delivery consistency improvement.'}
+  ],
+  value: [
+    {num:'$10.2M',cls:'vc-green',lbl:'Savings Realized FY27',note:'NTT AD restructure ($4.2M) + Cognizant optimization ($6.0M). Ahead of FY27 target.'},
+    {num:'3',cls:'vc-teal',lbl:'Active Governance Actions',note:'NTT AMS, Tech Mahindra, Workday under active VER monitoring with remediation plans.'},
+    {num:'$82.5M',cls:'vc-amber',lbl:'Largest Renewal Positioned Early',note:'Google Cloud analysis initiated 7 months ahead of expiry — ahead of typical advisory window.'},
+    {num:'97%',cls:'vc-teal',lbl:'Cognizant SLA Attainment',note:'Above 95% target. Packaged as repeatable savings and governance reference pattern.'},
+    {num:'1,375',cls:'vc-teal',lbl:'Vendors in Directory',note:'Full portfolio coverage across all 9 DET pillars. Risk scoring updated Jun 2026.'},
+    {num:'9',cls:'vc-teal',lbl:'Pillars Served',note:'SF on SF &middot; Engineering &middot; IT &middot; DA&amp;O &middot; Data &middot; Digital Mktg &middot; Agentic &middot; CDO &middot; Emerging.'}
+  ]
+};
+
+/* ══ BRIEF RENDERERS ══ */
+function itemCard(d){
+  var tags=(d.tags||[]).map(function(t){ return '<span class="itag '+t.c+'">'+t.l+'</span>'; }).join('');
+  return '<div class="item-card '+d.border+' reveal">'
+    +'<div class="ic-vendor">'+d.vendor+'</div>'
+    +'<div class="ic-title">'+d.title+'</div>'
+    +'<div class="ic-body">'+d.body+'</div>'
+    +'<div class="ic-action">'+d.action+'</div>'
+    +'<div class="ic-footer"><div class="ic-tags">'+tags+'</div>'
+    +'<div class="ic-val">'+d.val+'</div></div>'
+    +'</div>';
+}
+document.getElementById('changed-body').innerHTML = BRIEF.changed.map(itemCard).join('');
+document.getElementById('changed-count').textContent = BRIEF.changed.length + ' updates';
+document.getElementById('decisions-body').innerHTML = BRIEF.decisions.map(itemCard).join('');
+document.getElementById('decisions-count').textContent = BRIEF.decisions.length + ' open';
+
+(function(){
+  var header='<div class="rt-header">'
+    +'<div class="rt-hcell">Vendor</div>'
+    +'<div class="rt-hcell">Signal</div>'
+    +'<div class="rt-hcell">Score</div>'
+    +'<div class="rt-hcell">Delta</div>'
+    +'<div class="rt-hcell">Movement</div>'
+    +'</div>';
+  var rows=BRIEF.risks.map(function(r){
+    return '<div class="rt-row">'
+      +'<div class="rt-vendor">'+r.vendor+'</div>'
+      +'<div class="rt-note">'+r.note+'</div>'
+      +'<div><div class="rt-score '+r.scoreCls+'">'+r.score+'</div>'
+      +'<div class="rt-bar-wrap"><div class="rt-bar '+r.barCls+'" style="width:'+r.score+'%"></div></div></div>'
+      +'<div class="rt-delta '+r.deltaCls+'">'+r.delta+'</div>'
+      +'<div class="rt-note" style="font-size:8pt">prev: '+r.prev+' &rarr; now: '+r.score+'</div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('risk-body').innerHTML=header+rows;
+  var increasing=BRIEF.risks.filter(function(r){return r.delta.charAt(0)==='+';}).length;
+  document.getElementById('risk-count').textContent=increasing+' increasing';
+})();
+
+(function(){
+  var chunks=[];
+  for(var i=0;i<BRIEF.value.length;i+=3) chunks.push(BRIEF.value.slice(i,i+3));
+  document.getElementById('value-body').innerHTML=chunks.map(function(row,ri){
+    return '<div class="value-row reveal" style="transition-delay:'+(ri*0.12)+'s">'
+      +row.map(function(v){
+        return '<div class="value-card">'
+          +'<div class="vc-num '+v.cls+'">'+v.num+'</div>'
+          +'<div class="vc-lbl">'+v.lbl+'</div>'
+          +'<div class="vc-note">'+v.note+'</div>'
+          +'</div>';
+      }).join('')+'</div>';
+  }).join('');
+})();
+
+/* ══ SCROLL REVEAL (Brief) ══ */
+var observer=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); } });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+
+/* ══ DASHBOARD DATA ══ */
+var ENGAGEMENTS = [
+  {vendor:'NTT Data',domain:'nttdata.com',name:'AMS — Application Maintenance Services',pillar:'DA&O',value:'$22.8M',status:'amber',badge:'GSA Re-assignment In Progress',expiry:'Sep 2028',detail:'TCV $33M+ · Sep 2023–Sep 2028 · 180-day notice · L1/L2/L3 application maintenance across DET pillars. Budget owner: DA&O. Mission-critical — no disruption during GSA transition.'},
+  {vendor:'NTT Data',domain:'nttdata.com',name:'AD — Application Development (Restructured)',pillar:'DA&O',value:'$10.0M',status:'red',badge:'Expires Aug 2026 — 99 days',expiry:'Aug 2026',detail:'24 individual POs · Expires Aug 12, 2026 · 30-day notice · ~140 resources · Restructured Apr 2026. $9.0M savings realized. Renewal decision required before Aug 2026.'},
+  {vendor:'Cognizant',domain:'cognizant.com',name:'Workday ADAMS — Enterprise Systems',pillar:'SF on SF',value:'$2.43M',status:'green',badge:'Year 3 of 3',expiry:'Feb 2027',detail:'Year 3 of 3 · Expires Feb 14, 2027 · Per GSA notice · All SLAs meeting targets. Workday ADAMS L2 + L3 support scope. Renewal decision needed before FY28.'},
+  {vendor:'Cognizant',domain:'cognizant.com',name:'Workday ADAMS — Financials',pillar:'SF on SF',value:'$3.83M',status:'green',badge:'Year 2 of 2',expiry:'Feb 2027',detail:'Year 2 of 2 · Expires Feb 14, 2027 · Per GSA notice · L2 + L3 AMS support performing to scope. Renewal decision before FY28.'},
+  {vendor:'Workday',domain:'workday.com',name:'Enterprise License — HCM & Financials',pillar:'SF on SF',value:'$23.7M',status:'red',badge:'Renews Nov 2026 — Critical',expiry:'Nov 2026',detail:'Critical renewal Nov 30, 2026 · 90-day notice · Rate benchmarking in progress. Largest SF on SF spend item. Renewal strategy to Pillar Lead and Procurement by Q2 FY27.'},
+  {vendor:'Tech Mahindra',domain:'techmahindra.com',name:'Techforce — Service Desk & On-Site',pillar:'IT',value:'$6.5M',status:'amber',badge:'Expires Apr 2027',expiry:'Apr 2027',detail:'Service Desk $1.08M + On-Site Services $5.45M · Both expire Apr 30, 2027 · 90-day notice · 24x7 managed service · ~30K tickets/mo.'},
+  {vendor:'AWS',domain:'aws.amazon.com',name:'Cloud Infrastructure — EDP Committed Spend',pillar:'Engineering',value:'$17.2M',status:'green',badge:'Expires Mar 2027',expiry:'Mar 2027',detail:'Enterprise Discount Program (EDP) committed spend · Expires Mar 1, 2027 · 90-day notice · Usage within EDP envelope on track.'}
+];
+var PILLARS=[
+  {key:'sf-on-sf',short:'SF on SF',color:'#0D9488',risk:'amber',spend:'$22.2M'},
+  {key:'eng-dev',short:'Engineering',color:'#D97706',risk:'amber',spend:'$15.9M'},
+  {key:'it',short:'IT',color:'#2563EB',risk:'amber',spend:'$116.8M'},
+  {key:'da-ops',short:'DA&amp;O',color:'#059669',risk:'amber',spend:'$0 Coupa'},
+  {key:'data',short:'Data',color:'#0EA5E9',risk:'green',spend:'$11.9M'},
+  {key:'dig-mkt',short:'Dig Mktg',color:'#7C3AED',risk:'green',spend:'$4.7M'},
+  {key:'agentic',short:'Agentic',color:'#EC4899',risk:'green',spend:'$0'},
+  {key:'cdo',short:'CDO',color:'#64748B',risk:'amber',spend:'$6.3M'},
+  {key:'emerging',short:'Emerging',color:'#EA580C',risk:'green',spend:'$0'}
+];
+var BF='1idLxwmT7Sv6VAWJq9j';
+var LOGO_COLORS_E=['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB','#DC2626','#0891B2'];
+function eLogoColor(n){return LOGO_COLORS_E[(n||'').length%LOGO_COLORS_E.length];}
+function eInitials(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
+function eLogoFallback(img,name){
+  var el=document.createElement('div');
+  el.style.cssText='width:36px;height:36px;border-radius:7px;flex-shrink:0;background:'+eLogoColor(name)+';display:flex;align-items:center;justify-content:center;font-size:10pt;font-weight:800;color:#fff;font-family:Arial;';
+  el.textContent=eInitials(name);
+  img.parentNode.replaceChild(el,img);
+}
+var BADGE_CLASS={green:'b-green',amber:'b-amber',red:'b-red'};
+var SIGNAL_CLASS={green:'eng-signal-green',amber:'eng-signal-amber',red:'eng-signal-red'};
+var VAL_CLASS={green:'eng-val-green',amber:'eng-val-amber',red:'eng-val-red'};
+
+function buildPillarStrip(){
+  var el=document.getElementById('pillar-strip');
+  if(!el) return;
+  el.innerHTML=PILLARS.map(function(p){
+    var rl=p.risk==='green'?'Healthy':p.risk==='amber'?'Monitor':'Action';
+    return '<a href="page_pillar_detail.html?pillar='+p.key+'" class="p-pill" '
+      +'style="background:linear-gradient(160deg,'+p.color+' 0%,'+p.color+'cc 100%);">'
+      +'<div class="p-name">'+p.short+'</div>'
+      +'<div class="p-spend">'+p.spend+'</div>'
+      +'<span class="p-risk risk-'+p.risk+'">'+rl+'</span>'
+      +'</a>';
+  }).join('');
+}
+
+function buildEngGrid(){
+  var el=document.getElementById('eng-grid');
+  if(!el) return;
+  el.innerHTML=ENGAGEMENTS.map(function(e,i){
+    var sc=SIGNAL_CLASS[e.status]||'eng-signal-navy';
+    var bc=BADGE_CLASS[e.status]||'b-gray';
+    var vc=VAL_CLASS[e.status]||'eng-val-navy';
+    return '<div class="eng-card" onclick="openEngModal('+i+')">'
+      +'<div class="eng-signal '+sc+'"></div>'
+      +'<div class="eng-top">'
+        +'<img class="eng-logo" src="https://cdn.brandfetch.io/'+e.domain+'?c='+BF+'" onerror="eLogoFallback(this,\''+e.vendor+'\')" alt="'+e.vendor+'">'
+        +'<div class="eng-info"><div class="eng-vendor">'+e.vendor+'</div><div class="eng-name">'+e.name+'</div></div>'
+        +'<div class="eng-value"><div class="eng-val-num '+vc+'">'+e.value+'</div><div class="eng-val-lbl">annual value</div></div>'
+      +'</div>'
+      +'<div class="eng-badges">'
+        +'<span class="badge b-gray">'+e.pillar+'</span>'
+        +'<span class="badge '+bc+'">'+e.badge+'</span>'
+        +'<span class="badge b-gray">'+e.expiry+'</span>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+var SIG_COLORS={green:'var(--green)',amber:'var(--amber)',red:'var(--red)',navy:'var(--navy)'};
+function openEngModal(i){
+  var e=ENGAGEMENTS[i]; if(!e) return;
+  var bc=BADGE_CLASS[e.status]||'b-gray';
+  var vc=VAL_CLASS[e.status]||'eng-val-navy';
+  var sig=SIG_COLORS[e.status]||'var(--navy)';
+  document.getElementById('eng-modal-signal').style.background=sig;
+  document.getElementById('eng-modal-logo').src='https://cdn.brandfetch.io/'+e.domain+'?c='+BF;
+  document.getElementById('eng-modal-vendor').textContent=e.vendor;
+  document.getElementById('eng-modal-name').textContent=e.name;
+  var valEl=document.getElementById('eng-modal-val-num');
+  valEl.textContent=e.value; valEl.className='eng-modal-val-num '+vc;
+  document.getElementById('eng-modal-badges').innerHTML=
+    '<span class="badge b-gray">'+e.pillar+'</span>'
+    +'<span class="badge '+bc+'">'+e.badge+'</span>'
+    +'<span class="badge b-gray">Expires '+e.expiry+'</span>';
+  document.getElementById('eng-modal-detail').textContent=e.detail;
+  document.getElementById('eng-modal-meta').innerHTML=[['Value',e.value],['Expiry',e.expiry],['Pillar',e.pillar]].map(function(m){
+    return '<div class="eng-modal-meta-item">'
+      +'<div class="eng-modal-meta-val">'+m[1]+'</div>'
+      +'<div class="eng-modal-meta-lbl">'+m[0]+'</div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('eng-modal-backdrop').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeEngModal(){
+  document.getElementById('eng-modal-backdrop').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeEngModal(); });
+
+document.addEventListener('DOMContentLoaded',function(){
+  buildPillarStrip();
+  buildEngGrid();
+  // Re-run observer after dynamic content
+  document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+});
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openExecHelp(){
+  HelpModal.open({
+    title: 'Executive Snapshot',
+    what: 'The Executive Snapshot gives senior leadership a <strong>one-screen view of DET vendor portfolio health</strong> — spend, risk posture, renewal exposure, governance actions, and savings realized. Built for briefing cadences: QBR, SteerCo, and monthly CPO reviews.',
+    steps: [
+      '<strong>Start with the KPI strip</strong> — total vendor spend, savings realized, open escalations, and portfolio risk score are the four numbers that matter most at the executive level.',
+      '<strong>Review the pillar health grid</strong> — each pillar shows spend trend, vendor count, and risk status. Red pillars need executive attention; amber are being managed.',
+      '<strong>Click any pillar or vendor card</strong> to expand the engagement detail — shows contract status, recent activity, and the recommended executive action.',
+      '<strong>Use the engagement modals</strong> to review vendor scorecards, approve escalations, or push items into the governance queue with a single click.',
+      '<strong>Export the snapshot</strong> for distribution — the output is formatted for email attachment or slide embedding, filtered to show only what\'s relevant for the current review cadence.'
+    ],
+    tips: [
+      { icon: '&#x1F3AF;', title: 'This is the "so what" view', body: 'The Executive Snapshot is not a drill-down tool — it\'s designed to surface decisions, not data. If you need detail, use the pillar or vendor detail pages.' },
+      { icon: '&#x1F4CB;', title: 'Governance actions are live', body: 'Escalations and actions shown in the snapshot are live — approving or dismissing them here updates the Governance Queue in real time.' },
+      { icon: '&#x1F4C8;', title: 'Trends beat snapshots', body: 'The spend trend arrows show quarter-over-quarter direction. A stable high spend is less concerning than a spend that is accelerating without a corresponding project milestone.' },
+      { icon: '&#x1F512;', title: 'Confidential by default', body: 'This page is marked Confidential. The export function applies a watermark and strips cost detail below the pillar level.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

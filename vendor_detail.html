@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vendor 360 &mdash; VER Vendor Platform</title>
+<script src="assets/vendors.js" defer></script>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── VENDOR PORTAL LAYOUT ── */
+.vp-wrap{display:flex;min-height:100vh;}
+.vp-side{width:220px;background:var(--navy);flex-shrink:0;position:sticky;
+  top:0;height:100vh;overflow-y:auto;z-index:100;display:flex;flex-direction:column;}
+.vp-main{flex:1;padding:16px 20px;overflow-x:hidden;}
+
+/* ── SIDEBAR ── */
+.vp-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vp-logo-title{font-size:10.5pt;font-weight:800;color:#fff;line-height:1.2;}
+.vp-logo-sub{font-size:8pt;color:rgba(255,255,255,0.65);margin-top:2px;
+  letter-spacing:0.05em;text-transform:uppercase;}
+.vp-nav{padding:12px 0;flex:1;}
+.vp-nav-section{font-size:8pt;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.08em;color:rgba(255,255,255,0.60);padding:10px 18px 4px;}
+.vp-nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;
+  font-size:8.5pt;font-weight:600;color:rgba(255,255,255,0.85);
+  text-decoration:none;transition:all 0.15s;cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;}
+.vp-nav-item:hover,.vp-nav-item.active{background:rgba(255,255,255,0.10);color:#fff;}
+.vp-nav-item.active{border-left:3px solid var(--teal);}
+.vp-nav-icon{font-size:12pt;flex-shrink:0;}
+.vp-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0;}
+.vp-side-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);
+  font-size:8pt;color:rgba(255,255,255,0.55);margin-top:auto;}
+
+/* ── TOP BAR ── */
+.vp-dm-row{display:flex;justify-content:flex-end;margin-bottom:6px;}
+.vp-topbar{display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.vp-back{font-size:8pt;color:var(--teal);text-decoration:none;font-weight:600;
+  display:inline-flex;align-items:center;gap:4px;margin-bottom:3px;transition:color 0.15s;}
+.vp-back:hover{color:var(--teal2);}
+.vp-page-title{font-size:13pt;font-weight:900;color:var(--navy);}
+.vp-page-sub{font-size:9pt;color:var(--ink3);margin-top:1px;}
+.vp-topbar-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;padding-top:4px;}
+
+/* ── BUTTONS ── */
+.btn{font-size:8pt;padding:7px 16px;border-radius:7px;cursor:pointer;
+  border:none;font-weight:600;font-family:inherit;transition:all 0.15s;}
+.btn-teal{background:var(--teal);color:#fff;}
+.btn-teal:hover{background:var(--teal2);}
+.btn-ghost{background:transparent;color:var(--ink3);border:1px solid var(--border2);}
+.btn-ghost:hover{background:var(--gray2);}
+.btn-sm{font-size:7.5pt;padding:5px 12px;}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid var(--border2);background:var(--gray2);
+  color:var(--ink4);font-size:7.5pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── VENDOR IDENTITY STRIP ── */
+.v-identity-strip{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+  border-radius:10px;padding:16px 20px;margin-bottom:14px;}
+.v-id-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.v-avatar{width:50px;height:50px;border-radius:10px;
+  background:rgba(13,148,136,0.2);border:1px solid rgba(13,148,136,0.35);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:15pt;font-weight:900;color:#5EEAD4;letter-spacing:-0.02em;overflow:hidden;padding:0;}
+.v-avatar img{width:50px;height:50px;object-fit:contain;border-radius:10px;background:#fff;padding:3px;}
+.v-id-info{flex:1;min-width:0;}
+.v-name{font-size:15pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:6px;}
+.v-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px;}
+.v-sub{font-size:8.5pt;color:rgba(255,255,255,0.75);line-height:1.6;}
+
+/* Stage badges */
+.sbadge{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  padding:3px 9px;border-radius:10px;white-space:nowrap;}
+.sb-tier1{background:rgba(13,148,136,0.2);color:#5EEAD4;border:1px solid rgba(13,148,136,0.35);}
+.sb-tier2{background:rgba(30,58,95,0.5);color:#93C5FD;border:1px solid rgba(37,99,235,0.3);}
+.sb-tier3{background:rgba(107,114,128,0.2);color:#D1D5DB;border:1px solid rgba(107,114,128,0.3);}
+.sb-active{background:rgba(5,150,105,0.2);color:#6EE7B7;border:1px solid rgba(5,150,105,0.3);}
+.sb-cat{background:rgba(124,58,237,0.18);color:#C4B5FD;border:1px solid rgba(124,58,237,0.25);}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.kpi{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:10px 14px;border-top:2px solid var(--teal);}
+.kpi.red{border-top-color:var(--red);}
+.kpi.amber{border-top-color:var(--amber);}
+.kpi.green{border-top-color:var(--green);}
+.kpi-val{font-size:15pt;font-weight:900;color:#fff;line-height:1;margin-bottom:2px;}
+.kpi.red .kpi-val{color:#F87171;}
+.kpi.amber .kpi-val{color:#FBBF24;}
+.kpi.green .kpi-val{color:#34D399;}
+.kpi-lbl{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.75);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;}
+.kpi-note{font-size:8pt;color:rgba(255,255,255,0.60);}
+.src-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.src-badge{display:inline-flex;align-items:center;gap:4px;font-size:8pt;font-weight:700;
+  padding:2px 7px;border-radius:10px;white-space:nowrap;letter-spacing:0.04em;}
+.src-coupa{background:rgba(37,99,235,0.18);color:#93C5FD;border:1px solid rgba(37,99,235,0.3);}
+.src-qbr{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.25);}
+.src-manual{background:rgba(107,114,128,0.2);color:#D1D5DB;border:1px solid rgba(107,114,128,0.3);}
+.src-date{background:rgba(13,148,136,0.18);color:#5EEAD4;border:1px solid rgba(13,148,136,0.3);}
+.src-hi{background:rgba(5,150,105,0.2);color:#6EE7B7;border:1px solid rgba(5,150,105,0.3);}
+.src-med{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.25);}
+.src-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* ── PEER COMPARISON STRIP ── */
+.peer-section{margin-bottom:14px;}
+.peer-section-hdr{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;}
+.peer-section-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.1em;color:var(--ink4);}
+.peer-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.peer-card{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:10px 14px;cursor:pointer;transition:box-shadow 0.15s,border-color 0.15s;
+  text-decoration:none;display:block;}
+.peer-card:hover{box-shadow:0 4px 14px rgba(0,0,0,0.08);border-color:var(--teal);}
+.peer-top{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.peer-logo{width:28px;height:28px;border-radius:6px;background:var(--gray2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.peer-logo img{width:28px;height:28px;object-fit:contain;background:#fff;padding:2px;border-radius:5px;}
+.peer-name{font-size:8pt;font-weight:800;color:var(--ink);flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.peer-spend{font-size:11pt;font-weight:900;color:var(--navy);margin-bottom:5px;line-height:1;}
+.peer-meta{display:flex;gap:5px;flex-wrap:wrap;}
+.peer-badge{font-size:6.5pt;font-weight:700;padding:2px 7px;border-radius:8px;white-space:nowrap;}
+.pb-green{background:var(--green3);color:var(--green2);}
+.pb-amber{background:var(--amber3);color:var(--amber2);}
+.pb-red{background:var(--red3);color:var(--red2);}
+.pb-navy{background:var(--navy3);color:var(--navy2);}
+
+/* ── DOSSIER LAYOUT ── */
+.dossier-layout{display:grid;grid-template-columns:1fr 290px;gap:14px;align-items:start;}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.card:last-child{margin-bottom:0;}
+.card-hdr{padding:11px 16px 0;display:flex;align-items:center;gap:7px;}
+.card-icon{font-size:11pt;}
+.card-title{font-size:9pt;font-weight:800;color:var(--navy);flex:1;}
+.card-body{padding:10px 16px 13px;}
+.card-body-links{padding:4px 16px;}
+
+/* ── OVERVIEW ── */
+.desc-text{font-size:8.5pt;color:var(--ink3);line-height:1.65;margin-bottom:10px;}
+.overview-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+.notes-box{background:var(--gray);border:1px solid var(--border);border-radius:7px;
+  padding:8px 12px;font-size:8pt;color:var(--ink4);line-height:1.55;}
+.cap-row{display:flex;flex-wrap:wrap;gap:5px;}
+.cap-tag{font-size:7pt;font-weight:700;padding:2px 9px;border-radius:10px;
+  background:var(--navy3);color:var(--navy2);}
+.sec-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--teal);margin-bottom:5px;}
+
+
+/* ── RISK TILES ── */
+.risk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.risk-tile{background:var(--gray2);border-radius:8px;padding:10px 12px;
+  border-bottom:3px solid var(--border2);}
+.risk-tile.rt-green{border-bottom-color:var(--green);}
+.risk-tile.rt-amber{border-bottom-color:var(--amber);}
+.risk-tile.rt-red{border-bottom-color:var(--red);}
+.rt-score{font-size:16pt;font-weight:900;line-height:1;margin-bottom:2px;}
+.risk-tile.rt-green .rt-score{color:var(--green);}
+.risk-tile.rt-amber .rt-score{color:var(--amber);}
+.risk-tile.rt-red .rt-score{color:var(--red);}
+.rt-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.06em;color:var(--ink3);margin-bottom:1px;}
+.rt-dir{font-size:6.5pt;color:var(--ink4);}
+
+/* ── CONTRACT / KV GRID ── */
+.kv-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.kv-item{background:var(--gray2);border-radius:7px;padding:8px 12px;}
+.kv-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--ink4);margin-bottom:2px;}
+.kv-val{font-size:8pt;font-weight:700;color:var(--ink);}
+.kv-val a{color:var(--teal);text-decoration:none;}
+.kv-val a:hover{text-decoration:underline;}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:0;}
+.tl-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray3);position:relative;}
+.tl-item:last-child{border-bottom:none;}
+.tl-dot-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:12px;}
+.tl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:2px;}
+.tl-line{flex:1;width:1px;background:var(--gray3);margin-top:3px;}
+.tl-content{flex:1;min-width:0;}
+.tl-date{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--ink4);margin-bottom:2px;}
+.tl-text{font-size:8pt;color:var(--ink3);line-height:1.55;}
+
+/* ── ENGAGEMENT HEALTH ── */
+.health-dial{display:flex;align-items:center;justify-content:center;
+  flex-direction:column;padding:10px 0 8px;}
+.dial-ring{width:88px;height:88px;border-radius:50%;position:relative;
+  display:flex;align-items:center;justify-content:center;border:7px solid var(--gray3);}
+.dial-ring::before{content:'';position:absolute;inset:-7px;border-radius:50%;
+  border:7px solid transparent;border-top-color:var(--teal-dial, #0D9488);
+  transform:var(--dial-rotation, rotate(0deg));
+  transition:transform 1s cubic-bezier(0.22,1,0.36,1);}
+.dial-score{font-size:19pt;font-weight:900;color:var(--ink);line-height:1;}
+.dial-unit{font-size:7pt;color:var(--ink4);margin-top:2px;}
+.health-status{font-size:7.5pt;font-weight:700;text-align:center;
+  padding:3px 10px;border-radius:10px;margin-top:5px;}
+.health-desc{font-size:7.5pt;color:var(--ink4);text-align:center;
+  margin-top:6px;line-height:1.5;padding:0 4px;}
+
+/* ── ACTION ITEMS ── */
+.action-item{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid var(--gray3);}
+.action-item:last-child{border-bottom:none;}
+.ai-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.ai-body{flex:1;min-width:0;}
+.ai-title{font-size:8pt;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.ai-note{font-size:7.5pt;color:var(--ink4);line-height:1.45;}
+.ai-pri{font-size:6.5pt;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:auto;flex-shrink:0;}
+
+/* ── DECISION ITEMS ── */
+.dec-item{padding:8px 0;border-bottom:1px solid var(--gray3);}
+.dec-item:last-child{border-bottom:none;}
+.dec-title{font-size:8pt;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.dec-meta{font-size:7.5pt;color:var(--ink4);line-height:1.45;}
+
+/* ── QUICK LINKS ── */
+.qlink{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid var(--gray3);text-decoration:none;transition:background 0.12s;}
+.qlink:last-child{border-bottom:none;}
+.qlink:hover .ql-label{color:var(--teal);}
+.ql-icon{font-size:10pt;flex-shrink:0;}
+.ql-label{font-size:8pt;font-weight:700;color:var(--navy);flex:1;padding:0 9px;}
+.ql-arrow{font-size:9pt;color:var(--ink4);}
+
+/* ── NOT FOUND ── */
+.notfound{max-width:480px;margin:80px auto;text-align:center;padding:0 24px;}
+.nf-icon{font-size:36pt;margin-bottom:16px;}
+.nf-title{font-size:16pt;font-weight:900;color:var(--navy);margin-bottom:8px;}
+.nf-text{font-size:9pt;color:var(--ink4);margin-bottom:24px;line-height:1.6;}
+.nf-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;
+  border-radius:8px;background:var(--teal);color:#fff;font-size:9pt;
+  font-weight:700;text-decoration:none;transition:background 0.15s;}
+.nf-btn:hover{background:var(--teal2);}
+
+/* ── DARK MODE ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .vp-side{background:#060e1c;}
+[data-theme="dark"] .vp-main{background:var(--gray);}
+[data-theme="dark"] .vp-page-title{color:var(--ink);}
+[data-theme="dark"] .vp-back{color:#5EEAD4;}
+[data-theme="dark"] .v-identity-strip{background:linear-gradient(135deg,#060e1c 0%,#0a1628 100%);}
+[data-theme="dark"] .card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .card-title{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .kv-item{background:rgba(255,255,255,0.04);}
+[data-theme="dark"] .kv-label{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .kv-val{color:rgba(255,255,255,0.85);}
+[data-theme="dark"] .contact-item{background:rgba(255,255,255,0.04);}
+[data-theme="dark"] .ci-label{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .ci-val{color:rgba(255,255,255,0.85);}
+[data-theme="dark"] .desc-text{color:rgba(255,255,255,0.6);}
+[data-theme="dark"] .notes-box{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:rgba(255,255,255,0.45);}
+[data-theme="dark"] .cap-tag{background:rgba(13,148,136,0.12);color:#5EEAD4;border:1px solid rgba(13,148,136,0.2);}
+[data-theme="dark"] .risk-tile{background:rgba(255,255,255,0.04);}
+[data-theme="dark"] .rt-lbl{color:rgba(255,255,255,0.45);}
+[data-theme="dark"] .rt-dir{color:rgba(255,255,255,0.25);}
+[data-theme="dark"] .tl-item{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .tl-date{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .tl-text{color:rgba(255,255,255,0.6);}
+[data-theme="dark"] .tl-line{background:rgba(255,255,255,0.06);}
+[data-theme="dark"] .dial-ring{border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .dial-score{color:rgba(255,255,255,0.95);}
+[data-theme="dark"] .dial-unit{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .health-desc{color:rgba(255,255,255,0.4);}
+[data-theme="dark"] .action-item{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .dec-item{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .ai-title,.dec-title{color:rgba(255,255,255,0.85);}
+[data-theme="dark"] .ai-note,.dec-meta{color:rgba(255,255,255,0.4);}
+[data-theme="dark"] .qlink{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .ql-label{color:rgba(255,255,255,0.8);}
+[data-theme="dark"] .ql-arrow{color:rgba(255,255,255,0.3);}
+[data-theme="dark"] .peer-card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .peer-name{color:rgba(255,255,255,0.85);}
+[data-theme="dark"] .peer-spend{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .peer-section-lbl{color:rgba(255,255,255,0.3);}
+[data-theme="dark"] .vp-topbar{border-color:var(--border);}
+[data-theme="dark"] .btn-ghost{color:var(--ink3);border-color:var(--border2);}
+[data-theme="dark"] .btn-ghost:hover{background:var(--gray2);}
+.is-hidden{display:none!important;}
+
+/* ── SURVEY SCORED BADGE ── */
+.survey-scored-row{margin-top:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.survey-scored-badge{display:inline-flex;align-items:center;gap:5px;font-size:7.5pt;font-weight:700;
+  padding:4px 10px;border-radius:10px;background:rgba(124,58,237,0.18);
+  color:#C4B5FD;border:1px solid rgba(124,58,237,0.3);}
+.survey-scored-lbl{font-size:7.5pt;color:rgba(255,255,255,0.55);}
+.survey-score-avg{font-size:8pt;font-weight:900;color:#C4B5FD;margin-left:2px;}
+
+/* ── PRINT ── */
+@media print{
+  .vp-side,.vp-dm-row,.vp-back,.btn,.peer-section{display:none!important;}
+  .vp-wrap,.vp-main{display:block!important;}
+  .vp-main{padding:16px!important;}
+  .v-identity-strip{background:#0F1E3C!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .kpi-strip{grid-template-columns:repeat(4,1fr)!important;}
+  .dossier-layout{display:block!important;}
+  .dossier-col{width:100%!important;}
+  .card{break-inside:avoid;margin-bottom:12px;}
+  .overview-row{grid-template-columns:1fr 1fr!important;}
+  .kv-grid{grid-template-columns:repeat(3,1fr)!important;}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .vp-side{display:none;}
+  .vp-main{padding:14px 16px;}
+  .kpi-strip{grid-template-columns:repeat(2,1fr);}
+  .peer-strip{grid-template-columns:1fr 1fr;}
+  .dossier-layout{grid-template-columns:1fr;}
+  .kv-grid{grid-template-columns:1fr 1fr;}
+  .risk-grid{grid-template-columns:1fr 1fr 1fr;}
+  .overview-row{grid-template-columns:1fr;}
+
+}
+@media(max-width:600px){
+  .peer-strip{grid-template-columns:1fr;}
+  .kpi-strip{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body data-page="vendor-detail">
+
+<div class="vp-wrap">
+
+<!-- ── Sidebar ── -->
+<div class="vp-side">
+  <div class="vp-logo">
+    <div class="vp-logo-title">VER Vendor<br>Platform</div>
+    <div class="vp-logo-sub">DET &middot; FY27</div>
+  </div>
+  <nav class="vp-nav">
+    <div class="vp-nav-section">Platform</div>
+    <a href="vendor_home.html" class="vp-nav-item"><span class="vp-nav-icon">&#127968;</span>Portfolio Overview</a>
+    <a href="vendor_registry.html" class="vp-nav-item active"><span class="vp-nav-icon">&#128203;</span>Vendor Registry</a>
+    <a href="vendor_risk.html" class="vp-nav-item"><span class="vp-nav-icon">&#9888;&#65039;</span>Risk Dashboard</a>
+    <div class="vp-nav-section">Tools</div>
+    <a href="vendor_selector.html" class="vp-nav-item"><span class="vp-nav-icon">&#127919;</span>Vendor Selector</a>
+    <a href="spend_benchmarking.html" class="vp-nav-item"><span class="vp-nav-icon">&#128178;</span>Spend Benchmarking</a>
+    
+    
+    <a href="vendor_sow.html" class="vp-nav-item"><span class="vp-nav-icon">&#128196;</span>SOW Builder</a>
+    <a href="vendor_co.html" class="vp-nav-item"><span class="vp-nav-icon">&#128260;</span>Change Order</a>
+    <div class="vp-nav-divider"></div>
+    <a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a>
+  </nav>
+  <div class="vp-side-footer">VER Vendor Platform<br>Salesforce DET &middot; FY27</div>
+</div>
+
+<!-- ── Main ── -->
+<div class="vp-main">
+
+  <div class="vp-dm-row">
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button>
+  </div>
+
+  <!-- Not found -->
+  <div id="notfound-state" class="is-hidden">
+    <div class="notfound">
+      <div class="nf-icon">&#128269;</div>
+      <div class="nf-title">Vendor Not Found</div>
+      <div class="nf-text">No vendor matched the requested ID. The vendor may not exist in the VER registry, or the link may be incorrect.</div>
+      <a href="vendor_registry.html" class="nf-btn">&#8592; Back to Vendor Registry</a>
+    </div>
+  </div>
+
+  <!-- Dossier content -->
+  <div id="dossier-content" class="is-hidden">
+
+    <!-- Top bar -->
+    <div class="vp-topbar">
+      <div>
+        <a href="vendor_registry.html" class="vp-back">&#8592; Vendor Registry</a>
+        <div class="vp-page-title" id="v-name-title">Vendor 360 Dossier</div>
+        <div class="vp-page-sub" id="v-page-sub">Loading vendor data&hellip;</div>
+      </div>
+      <div class="vp-topbar-actions">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="openVendorDetailHelp()">&#63; How to Read</button>
+        <button type="button" class="btn btn-teal btn-sm is-hidden" id="scenario-btn" onclick="_goScenario()">&#128208; Model Scenario</button>
+        <button type="button" class="btn btn-teal btn-sm is-hidden" id="sow-btn" onclick="_goSOW()">&#128196; Generate SOW</button>
+        <button type="button" class="btn btn-teal btn-sm is-hidden" id="co-btn" onclick="_goChangeOrder()">&#128260; Change Order</button>
+        <button type="button" class="btn btn-ghost btn-sm is-hidden" id="survey-btn" onclick="_goSurvey()">&#128203; Send Survey</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="csv-btn" onclick="_exportCSV()">&#8681; Export CSV</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="window.print()">&#128438; Print PDF</button>
+      </div>
+    </div>
+
+    <!-- Vendor identity strip -->
+    <div class="v-identity-strip">
+      <div class="v-id-top">
+        <div class="v-avatar" id="v-avatar"></div>
+        <div class="v-id-info">
+          <div class="v-name" id="v-name"></div>
+          <div class="v-badges" id="v-badges"></div>
+          <div class="v-sub" id="v-sub"></div>
+          <div class="survey-scored-row is-hidden" id="survey-scored-row">
+            <span class="survey-scored-badge">&#9733; Stakeholder Scored</span>
+            <span class="survey-scored-lbl" id="survey-scored-lbl"></span>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-strip">
+        <div class="kpi" id="kpi-spend">
+          <div class="kpi-lbl">Annual Spend</div>
+          <div class="kpi-val" id="kv-spend">—</div>
+          <div class="kpi-note" id="kv-spend-note">Coupa actuals</div>
+          <div class="src-row">
+            <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+            <span class="src-badge src-hi"><span class="src-dot"></span>High</span>
+            <span class="src-badge src-date" id="src-date-spend"></span>
+          </div>
+        </div>
+        <div class="kpi" id="kpi-sla">
+          <div class="kpi-lbl">SLA Score</div>
+          <div class="kpi-val" id="kv-sla">—</div>
+          <div class="kpi-note" id="kv-sla-note">QBR cycle</div>
+          <div class="src-row">
+            <span class="src-badge src-qbr"><span class="src-dot"></span>QBR</span>
+            <span class="src-badge src-hi"><span class="src-dot"></span>High</span>
+            <span class="src-badge src-date" id="src-date-sla"></span>
+          </div>
+        </div>
+        <div class="kpi" id="kpi-risk">
+          <div class="kpi-lbl">Risk Score</div>
+          <div class="kpi-val" id="kv-risk">—</div>
+          <div class="kpi-note" id="kv-risk-note">Composite score</div>
+          <div class="src-row">
+            <span class="src-badge src-manual"><span class="src-dot"></span>VER</span>
+            <span class="src-badge src-med"><span class="src-dot"></span>Medium</span>
+            <span class="src-badge src-date" id="src-date-risk"></span>
+          </div>
+        </div>
+        <div class="kpi" id="kpi-renewal">
+          <div class="kpi-lbl">Renewal Date</div>
+          <div class="kpi-val" id="kv-renewal">—</div>
+          <div class="kpi-note" id="kv-renewal-note">Days remaining</div>
+          <div class="src-row">
+            <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+            <span class="src-badge src-hi"><span class="src-dot"></span>High</span>
+            <span class="src-badge src-date" id="src-date-renewal"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Peer comparison strip -->
+    <div class="peer-section" id="peer-section">
+      <div class="peer-section-hdr">
+        <span class="peer-section-lbl">Portfolio Peers &mdash; <span id="peer-cat-label"></span></span>
+      </div>
+      <div class="peer-strip" id="peer-strip"></div>
+    </div>
+
+    <!-- 2-col dossier layout -->
+    <div class="dossier-layout">
+
+      <!-- Left column -->
+      <div class="dossier-left">
+
+        <!-- Overview -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-icon">&#128203;</span>
+            <span class="card-title">Overview</span>
+          </div>
+          <div class="card-body">
+            <div class="desc-text" id="v-desc"></div>
+            <div class="overview-row">
+              <div>
+                <div class="sec-lbl">Advisory Notes</div>
+                <div class="notes-box" id="v-notes"></div>
+              </div>
+              <div>
+                <div class="sec-lbl">Capabilities</div>
+                <div class="cap-row" id="v-caps"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk breakdown -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-icon">&#9888;</span>
+            <span class="card-title">Risk Breakdown</span>
+          </div>
+          <div class="card-body">
+            <div class="risk-grid" id="risk-breakdown"></div>
+          </div>
+        </div>
+
+        <!-- Contract snapshot -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-icon">&#128196;</span>
+            <span class="card-title">Contract Snapshot</span>
+          </div>
+          <div class="card-body">
+            <div class="kv-grid" id="contract-grid"></div>
+          </div>
+        </div>
+
+        <!-- Advisory timeline -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-icon">&#128336;</span>
+            <span class="card-title">VER Advisory Timeline</span>
+          </div>
+          <div class="card-body">
+            <div class="timeline" id="advisory-timeline"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right column -->
+      <div class="dossier-right">
+
+        <!-- Engagement health -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-icon">&#128200;</span>
+            <span class="card-title">Engagement Health</span>
+          </div>
+          <div class="card-body">
+            <div class="health-dial">
+              <div class="dial-ring" id="health-dial">
+                <div>
+                  <div class="dial-score" id="health-score">—</div>
+                  <div class="dial-unit">/ 100</div>
+                </div>
+              </div>
+              <div class="health-status" id="health-status-badge"></div>
+              <div class="health-desc" id="health-desc"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Open actions -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-icon">&#9889;</span>
+            <span class="card-title">Open Actions</span>
+          </div>
+          <div class="card-body">
+            <div id="open-actions"></div>
+          </div>
+        </div>
+
+        <!-- Related decisions -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-icon">&#9878;</span>
+            <span class="card-title">Related Decisions</span>
+          </div>
+          <div class="card-body">
+            <div id="related-decisions"></div>
+          </div>
+        </div>
+
+        <!-- Quick links -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-icon">&#128279;</span>
+            <span class="card-title">Quick Links</span>
+          </div>
+          <div class="card-body card-body-links">
+            <a class="qlink" id="tco-link" href="../page_tco.html">
+              <span class="ql-icon">&#128178;</span>
+              <span class="ql-label">TCO Calculator</span>
+              <span class="ql-arrow">&#8594;</span>
+            </a>
+            <a class="qlink" href="page_renewal.html">
+              <span class="ql-icon">&#128197;</span>
+              <span class="ql-label">Renewal Horizon</span>
+              <span class="ql-arrow">&#8594;</span>
+            </a>
+
+            <a class="qlink" href="page_governance.html">
+              <span class="ql-icon">&#128101;</span>
+              <span class="ql-label">Governance Queue</span>
+              <span class="ql-arrow">&#8594;</span>
+            </a>
+            <a class="qlink" href="page_exec.html">
+              <span class="ql-icon">&#128196;</span>
+              <span class="ql-label">Executive Intelligence</span>
+              <span class="ql-arrow">&#8594;</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end #dossier-content -->
+</div><!-- end .vp-main -->
+</div><!-- end .vp-wrap -->
+
+<script>
+// ── Brandfetch logo ────────────────────────────────────────────────
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+function vlogoErr(img){
+  img.style.display='none';
+  var fb=img.nextElementSibling;
+  if(fb) fb.style.display='flex';
+}
+function vlogoOk(img){
+  var fb=img.nextElementSibling;
+  if(fb) fb.style.display='none';
+}
+function vendorLogo(domain, name, size){
+  size = size || 50;
+  var ini = (name||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+  var pal = ['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB'];
+  var lc  = pal[(name||'').length % pal.length];
+  var sz  = size+'px';
+  var bs  = 'width:'+sz+';height:'+sz+';border-radius:'+(size<=32?'6':'10')+'px;flex-shrink:0;';
+  var fs  = Math.round(size*0.3)+'pt';
+  var fallback = '<div style="'+bs+'background:'+lc+';display:flex;align-items:center;'+
+    'justify-content:center;font-size:'+fs+';font-weight:900;color:#fff;font-family:Arial;">'+ini+'</div>';
+  if(!domain) return fallback;
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'"'+
+    ' alt="'+name.replace(/"/g,'')+'"'+
+    ' style="'+bs+'object-fit:contain;background:#fff;padding:2px;"'+
+    ' onerror="vlogoErr(this)" onload="vlogoOk(this)">'+
+    '<div style="'+bs+'background:'+lc+';display:none;align-items:center;'+
+    'justify-content:center;font-size:'+fs+';font-weight:900;color:#fff;font-family:Arial;">'+ini+'</div>';
+}
+
+// ── Dark mode ──────────────────────────────────────────────────────
+(function(){
+  var saved = localStorage.getItem('ver-theme');
+  if(saved === 'dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    var btn = document.getElementById('dm-btn');
+    if(btn) btn.textContent = '☀ Light Mode';
+  }
+})();
+function _dmToggle(){
+  var cur = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ver-theme', next);
+  document.getElementById('dm-btn').textContent = next === 'dark' ? '☀ Light Mode' : '☽ Dark Mode';
+}
+function _goScenario(){
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id') || params.get('ID');
+  window.location.href = 'page_scenario.html' + (id ? '?id=' + encodeURIComponent(id) : '');
+}
+
+function _getVendor(){
+  var vendors = window.VER_VENDORS || [];
+  var id = (new URLSearchParams(window.location.search)).get('id') || (new URLSearchParams(window.location.search)).get('ID');
+  return vendors.find(function(x){ return x.id === id; }) || null;
+}
+
+function _goSOW(){
+  var v = _getVendor();
+  if(!v) return;
+  var p = new URLSearchParams();
+  p.set('supplier',       v.name);
+  p.set('supplier_addr',  v.supplier_address || '');
+  p.set('supplier_notice',v.supplier_notice  || '');
+  p.set('supplier_rep',   v.supplier_rep_name || '');
+  window.location.href = 'vendor_sow.html?' + p.toString();
+}
+
+function _goChangeOrder(){
+  var v = _getVendor();
+  if(!v) return;
+  // Match vendor to Coupa spend data by name
+  var coupa = (window.VER_COUPA && window.VER_COUPA.vendors) ? window.VER_COUPA.vendors : [];
+  var spend = coupa.find(function(c){ return c.n && c.n.toLowerCase() === v.name.toLowerCase(); });
+  var p = new URLSearchParams();
+  p.set('supplier',      v.name);
+  p.set('supplier_addr', v.supplier_address || '');
+  if(spend && spend.fy27) p.set('orig_cost', '$' + (spend.fy27 * 1e6).toLocaleString('en-US', {maximumFractionDigits:0}));
+  window.location.href = 'vendor_co.html?' + p.toString();
+}
+
+function _goSurvey(){
+  var v = _getVendor();
+  if(!v) return;
+  var url = 'page_survey.html?id='+encodeURIComponent(v.id)+'&name='+encodeURIComponent(v.name);
+  // Copy to clipboard and open in new tab
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(window.location.origin + window.location.pathname.replace(/[^/]+$/, '') + url)
+      .catch(function(){});
+  }
+  window.open(url, '_blank');
+}
+
+function _renderSurveyBadge(vendorId){
+  var approved = JSON.parse(localStorage.getItem('ver_survey_approved') || '{}');
+  var data = approved[vendorId];
+  if(!data) return;
+  var row = document.getElementById('survey-scored-row');
+  var lbl = document.getElementById('survey-scored-lbl');
+  if(!row || !lbl) return;
+  var d = new Date(data.lastApproved);
+  var dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  var avg = ((data.avgScores && data.avgScores.overall) || 0).toFixed(1);
+  var n = data.respondentCount || 0;
+  lbl.textContent = 'Last scored ' + dateStr + ' · ' + n + ' respondent' + (n !== 1 ? 's' : '') + ' · Avg ' + avg + '/10';
+  row.classList.remove('is-hidden');
+}
+
+// ── Utilities ─────────────────────────────────────────────────────
+function daysFromNow(dateStr){
+  if(!dateStr) return null;
+  var d = new Date(dateStr);
+  var now = new Date();
+  return Math.round((d - now) / 86400000);
+}
+function fmtDate(dateStr){
+  if(!dateStr) return 'N/A';
+  var d = new Date(dateStr);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function riskClass(score){
+  if(score >= 60) return {kpi:'red'};
+  if(score >= 30) return {kpi:'amber'};
+  return {kpi:'green'};
+}
+function slaClass(score){
+  if(score >= 95) return 'green';
+  if(score >= 80) return 'amber';
+  return 'red';
+}
+function parseSpend(s){
+  if(!s || s==='N/A' || s==='$0') return 0;
+  var n = parseFloat((s+'').replace(/[^0-9.]/g,''));
+  if((s+'').toUpperCase().indexOf('M') > -1) n *= 1e6;
+  else if((s+'').toUpperCase().indexOf('K') > -1) n *= 1e3;
+  return isNaN(n) ? 0 : n;
+}
+
+// ── Portal CSV parser (minimal, header-keyed) ──────────────────────
+function parsePortalCSV(text) {
+  var lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+  if (lines.length < 2) return [];
+  var headers = lines[0].split(',').map(function(h){ return h.replace(/^"|"$/g,'').trim(); });
+  var result = [];
+  for (var i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    var cols = lines[i].match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || lines[i].split(',');
+    var obj = {};
+    headers.forEach(function(h, j){ obj[h] = (cols[j]||'').replace(/^"|"$/g,'').trim(); });
+    result.push(obj);
+  }
+  return result;
+}
+
+function portalRowToVendor(row, idx) {
+  var name = (row['Legal Company Name'] || row['DBA / Trading Name'] || ('Portal Vendor '+(idx+1))).trim();
+  var website = (row['Company Website']||'').replace(/^https?:\/\//,'').replace(/\/.*$/,'').toLowerCase();
+  var caps = (row['Capabilities']||'').split(/[|,;]/).map(function(c){ return c.trim(); }).filter(Boolean);
+  var cat = row['Vendor Category'] || 'Professional Services';
+  var catNorm = cat.toLowerCase();
+  if (catNorm.includes('software')||catNorm.includes('saas')) cat = 'Software / SaaS';
+  else if (catNorm.includes('contingent')||catNorm.includes('staffing')||catNorm.includes('workforce')) cat = 'Contingent Workforce';
+  else if (catNorm.includes('hardware')||catNorm.includes('infrastructure')) cat = 'Hardware & Infrastructure';
+  else if (catNorm.includes('cloud')||catNorm.includes('managed')) cat = 'Cloud & Managed Services';
+  else cat = 'Professional Services';
+  return {
+    id: (row['Reference Number'] || ('PORTAL-' + idx)),
+    name: name, category: cat, tier: 3, status: 'Active',
+    region: row['Regions Covered'] || 'AMER',
+    annual_spend: '$0',
+    rate_ranges: row['Rate Ranges'] || '',
+    renewal_date: '—', description: row['Company Description'] || '',
+    sla_score: 90, concentration_risk: 25, financial_risk: 20,
+    delivery_risk: 20, compliance_risk: 15, risk_score: 25,
+    capabilities: caps, domain: website,
+    supplier_address: row['Headquarters Location'] || '',
+    notes: 'Portal submission · Contact: '+(row['Contact Name']||'')+' ('+(row['Contact Email']||'')+')',
+    primary_contact: row['Contact Name'] || 'Portal Submission',
+    _portal: true
+  };
+}
+
+// ── Main render ────────────────────────────────────────────────────
+window.addEventListener('load', async function(){
+  var params = new URLSearchParams(window.location.search);
+  var vendorId = params.get('id') || params.get('ID');
+  var vendors = window.VER_VENDORS || [];
+  var v = vendors.find(function(x){ return x.id === vendorId; });
+
+  // If not in static data, check portal CSV
+  if (!v && vendorId) {
+    try {
+      var resp = await fetch('portal_vendors.csv');
+      if (resp.ok) {
+        var rows = parsePortalCSV(await resp.text());
+        rows = rows.filter(function(r){ var s=(r['Status']||'').trim().toLowerCase(); return !s||s==='approved'; });
+        var portalVendors = rows.map(portalRowToVendor);
+        v = portalVendors.find(function(x){ return x.id === vendorId; });
+      }
+    } catch(e) { console.warn('Portal CSV fetch failed:', e); }
+  }
+
+  if(!v){
+    document.getElementById('notfound-state').classList.remove('is-hidden');
+    document.title = 'Vendor Not Found — VER Vendor Platform';
+    return;
+  }
+
+  document.getElementById('dossier-content').classList.remove('is-hidden');
+  document.getElementById('scenario-btn').classList.remove('is-hidden');
+  document.getElementById('sow-btn').classList.remove('is-hidden');
+  document.getElementById('co-btn').classList.remove('is-hidden');
+  document.getElementById('survey-btn').classList.remove('is-hidden');
+  _renderSurveyBadge(vendorId);
+  document.title = v.name + ' · Vendor 360 — VER Vendor Platform';
+
+  // ── Last-refreshed date badges ────────────────────────────────
+  var now = new Date();
+  var refreshLbl = now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  ['spend','sla','risk','renewal'].forEach(function(k){
+    var el = document.getElementById('src-date-'+k);
+    if(el) el.textContent = refreshLbl;
+  });
+
+  // ── Identity ──────────────────────────────────────────────────
+  document.getElementById('v-avatar').innerHTML = vendorLogo(v.domain, v.name, 50);
+  document.getElementById('v-name').textContent = v.name;
+  document.getElementById('v-name-title').textContent = v.name;
+  document.getElementById('v-page-sub').textContent = v.id + ' · ' + v.category + ' · Active Dossier';
+
+  var tierCls = v.tier === 1 ? 'sb-tier1' : v.tier === 2 ? 'sb-tier2' : 'sb-tier3';
+  document.getElementById('v-badges').innerHTML =
+    '<span class="sbadge '+tierCls+'">Tier '+v.tier+'</span>'+
+    '<span class="sbadge sb-active">'+v.status+'</span>'+
+    '<span class="sbadge sb-cat">'+v.category+'</span>';
+
+  var days = daysFromNow(v.renewal_date);
+  var renewStr = days !== null ? (days < 0 ? 'Renewal overdue' : days < 180 ? days + ' days to renewal' : fmtDate(v.renewal_date)) : 'No renewal date';
+  document.getElementById('v-sub').innerHTML =
+    '<strong style="color:rgba(255,255,255,0.75)">'+v.id+'</strong> &middot; '+
+    (v.region || 'Unknown Region') + ' &middot; ' + renewStr;
+
+  // ── KPI strip ─────────────────────────────────────────────────
+  if (v._portal) {
+    document.getElementById('kv-spend').textContent = 'N/A';
+    document.getElementById('kv-spend-note').textContent = 'Portal vendor · no Coupa data';
+  } else {
+    var spendVal = v.annual_spend && v.annual_spend !== '$0' ? v.annual_spend : 'N/A';
+    document.getElementById('kv-spend').textContent = spendVal;
+    var totalSpend = vendors.reduce(function(sum,p){ return sum + parseSpend(p.annual_spend); }, 0);
+    var vSpend = parseSpend(v.annual_spend);
+    if(totalSpend > 0 && vSpend > 0){
+      var pct = (vSpend / totalSpend * 100).toFixed(1);
+      document.getElementById('kv-spend-note').textContent = pct + '% of portfolio · Coupa';
+    }
+  }
+
+  var sla = v.sla_score;
+  document.getElementById('kv-sla').textContent = sla;
+  document.getElementById('kpi-sla').classList.add(slaClass(sla));
+  document.getElementById('kv-sla-note').textContent = sla >= 95 ? 'Above target (95%)' : sla >= 80 ? 'Watch — below target' : 'Critical — SLA breach';
+
+  var risk = v.risk_score;
+  document.getElementById('kv-risk').textContent = risk;
+  document.getElementById('kpi-risk').classList.add(riskClass(risk).kpi);
+  document.getElementById('kv-risk-note').textContent = risk >= 60 ? 'High — active monitoring' : risk >= 30 ? 'Moderate — watch list' : 'Low risk';
+
+  var rDays = daysFromNow(v.renewal_date);
+  document.getElementById('kv-renewal').textContent = rDays !== null ? fmtDate(v.renewal_date) : 'N/A';
+  if(rDays !== null){
+    document.getElementById('kpi-renewal').classList.add(rDays < 180 ? 'amber' : 'green');
+    document.getElementById('kv-renewal-note').textContent = rDays < 0 ? 'Overdue' : rDays < 180 ? rDays + ' days remaining' : rDays + ' days out';
+  }
+
+  // ── Peer comparison strip ─────────────────────────────────────
+  document.getElementById('peer-cat-label').textContent = v.category;
+  var peers = vendors.filter(function(p){ return p.category === v.category && p.id !== v.id; });
+  peers.sort(function(a,b){ return parseSpend(b.annual_spend) - parseSpend(a.annual_spend); });
+  peers = peers.slice(0, 3);
+
+  if(peers.length === 0){
+    document.getElementById('peer-section').classList.add('is-hidden');
+  } else {
+    document.getElementById('peer-strip').innerHTML = peers.map(function(p){
+      var rCls = p.risk_score >= 60 ? 'pb-red' : p.risk_score >= 30 ? 'pb-amber' : 'pb-green';
+      var sCls = p.sla_score >= 95 ? 'pb-green' : p.sla_score >= 80 ? 'pb-amber' : 'pb-red';
+      var pSpend = p.annual_spend && p.annual_spend !== '$0' ? p.annual_spend : 'N/A';
+      return '<a class="peer-card" href="vendor_detail.html?id='+encodeURIComponent(p.id)+'">'+
+        '<div class="peer-top">'+
+          '<div class="peer-logo">'+vendorLogo(p.domain, p.name, 28)+'</div>'+
+          '<div class="peer-name">'+p.name+'</div>'+
+        '</div>'+
+        '<div class="peer-spend">'+pSpend+'</div>'+
+        '<div class="peer-meta">'+
+          '<span class="peer-badge pb-navy">Tier '+p.tier+'</span>'+
+          '<span class="peer-badge '+rCls+'">Risk '+p.risk_score+'</span>'+
+          '<span class="peer-badge '+sCls+'">SLA '+p.sla_score+'%</span>'+
+        '</div>'+
+      '</a>';
+    }).join('');
+  }
+
+  // ── Overview ─────────────────────────────────────────────────
+  document.getElementById('v-desc').textContent = v.description || 'No description available.';
+  document.getElementById('v-notes').textContent = v.notes || 'No advisory notes on file.';
+  document.getElementById('v-caps').innerHTML = (v.capabilities || []).map(function(c){
+    return '<span class="cap-tag">'+c+'</span>';
+  }).join('') || '<span class="cap-tag">Unclassified</span>';
+
+  // ── Risk tiles (3×2 grid) ─────────────────────────────────────
+  var rMetrics = [
+    {lbl:'SLA Attainment', val:v.sla_score,         invert:false, dir:'Higher is better'},
+    {lbl:'Overall Risk',   val:v.risk_score,         invert:true,  dir:'Lower is better'},
+    {lbl:'Concentration',  val:v.concentration_risk, invert:true,  dir:'Lower is better'},
+    {lbl:'Financial',      val:v.financial_risk,     invert:true,  dir:'Lower is better'},
+    {lbl:'Delivery',       val:v.delivery_risk,      invert:true,  dir:'Lower is better'},
+    {lbl:'Compliance',     val:v.compliance_risk,    invert:true,  dir:'Lower is better'}
+  ];
+  document.getElementById('risk-breakdown').innerHTML = rMetrics.map(function(m){
+    var s = m.val || 0;
+    var cls = m.invert ? (s >= 60 ? 'rt-red' : s >= 30 ? 'rt-amber' : 'rt-green')
+                       : (s >= 95 ? 'rt-green' : s >= 80 ? 'rt-amber' : 'rt-red');
+    return '<div class="risk-tile '+cls+'">'+
+      '<div class="rt-score">'+s+'</div>'+
+      '<div class="rt-lbl">'+m.lbl+'</div>'+
+      '<div class="rt-dir">'+m.dir+'</div>'+
+    '</div>';
+  }).join('');
+
+  // ── Contract snapshot ─────────────────────────────────────────
+  var domainHref = v.domain ? '<a href="https://'+v.domain+'" target="_blank" rel="noopener">'+v.domain+'</a>' : 'N/A';
+  document.getElementById('contract-grid').innerHTML =
+    kvi('Vendor ID',     v.id) +
+    kvi('Category',      v.category) +
+    kvi('Tier',          'Tier '+v.tier) +
+    kvi('Region',        v.region || 'N/A') +
+    kvi('Status',        v.status || 'N/A') +
+    kvi('Renewal Date',  fmtDate(v.renewal_date)) +
+    kvi('Notice Period', v.supplier_notice || 'N/A') +
+    kvi('Website',       domainHref) +
+    kvi('Headquarters',  v.supplier_address || 'N/A');
+
+  // ── Advisory timeline ─────────────────────────────────────────
+  var timeline = buildTimeline(v);
+  document.getElementById('advisory-timeline').innerHTML = timeline.map(function(t, i){
+    return '<div class="tl-item">'+
+      '<div class="tl-dot-col">'+
+        '<div class="tl-dot" style="background:'+t.color+'"></div>'+
+        (i < timeline.length-1 ? '<div class="tl-line"></div>' : '')+
+      '</div>'+
+      '<div class="tl-content">'+
+        '<div class="tl-date">'+t.date+'</div>'+
+        '<div class="tl-text">'+t.text+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  // ── Engagement health ─────────────────────────────────────────
+  var hs = v.sla_score || 0;
+  document.getElementById('health-score').textContent = hs;
+  var hStatus, hColor, hDesc;
+  if(hs >= 95){ hStatus='Healthy'; hColor='#059669'; hDesc='SLA targets met. Delivery consistent. No active governance actions required.'; }
+  else if(hs >= 80){ hStatus='Watch'; hColor='#D97706'; hDesc='One or more SLA metrics below target. VER monitoring engagement health closely.'; }
+  else { hStatus='At Risk'; hColor='#DC2626'; hDesc='SLA breach detected. Active VER governance advisory initiated. Remediation plan required.'; }
+  var dial = document.getElementById('health-dial');
+  dial.style.setProperty('--teal-dial', hColor);
+  dial.style.setProperty('--dial-rotation', 'rotate('+(Math.round((hs/100)*270)-135)+'deg)');
+  dial.style.borderTopColor = hColor;
+  document.getElementById('health-status-badge').textContent = hStatus;
+  document.getElementById('health-status-badge').style.cssText = 'background:'+hColor+'22;color:'+hColor+';border:1px solid '+hColor+'55;';
+  document.getElementById('health-desc').textContent = hDesc;
+
+  // ── Open actions ──────────────────────────────────────────────
+  document.getElementById('open-actions').innerHTML = buildActions(v).map(function(a){
+    return '<div class="action-item">'+
+      '<div class="ai-dot" style="background:'+a.color+'"></div>'+
+      '<div class="ai-body"><div class="ai-title">'+a.title+'</div><div class="ai-note">'+a.note+'</div></div>'+
+      '<span class="ai-pri" style="background:'+a.color+'22;color:'+a.color+';border:1px solid '+a.color+'44">'+a.pri+'</span>'+
+    '</div>';
+  }).join('');
+
+  // ── Related decisions ─────────────────────────────────────────
+  document.getElementById('related-decisions').innerHTML = buildDecisions(v).map(function(d){
+    return '<div class="dec-item"><div class="dec-title">'+d.title+'</div><div class="dec-meta">'+d.meta+'</div></div>';
+  }).join('');
+});
+
+// ── Helpers ────────────────────────────────────────────────────────
+function kvi(label, val){
+  return '<div class="kv-item"><div class="kv-label">'+label+'</div><div class="kv-val">'+val+'</div></div>';
+}
+
+function buildTimeline(v){
+  var events = [];
+  var risk=v.risk_score||0, delivery=v.delivery_risk||0, sla=v.sla_score||0;
+  var days=daysFromNow(v.renewal_date);
+  if(risk>50) events.push({date:'Jun 2026',color:'#DC2626',text:'VER initiated active governance monitoring. Risk score elevated to '+risk+'/100. Remediation plan requested.'});
+  else if(risk>30) events.push({date:'Jun 2026',color:'#D97706',text:'VER placed vendor on watch list. Risk score '+risk+'/100. Quarterly check-in scheduled.'});
+  else events.push({date:'Jun 2026',color:'#059669',text:'VER advisory review completed. Vendor in good standing. Risk score '+risk+'/100.'});
+  if(delivery>40) events.push({date:'May 2026',color:'#D97706',text:'Delivery performance review triggered. Delivery risk at '+delivery+'/100. Escalation path documented.'});
+  else events.push({date:'Apr 2026',color:'#0D9488',text:'Delivery review completed. Performance within acceptable thresholds. Delivery risk: '+delivery+'/100.'});
+  if(sla<90) events.push({date:'Mar 2026',color:'#DC2626',text:'SLA attainment below target at '+sla+'%. VER issued formal performance notice. Response plan due within 30 days.'});
+  else if(days!==null&&days<180) events.push({date:'Mar 2026',color:'#D97706',text:'Early renewal planning initiated. Contract expires '+fmtDate(v.renewal_date)+'. Benchmark refresh in progress.'});
+  else events.push({date:'Jan 2026',color:'#059669',text:'Annual vendor profile updated in VER registry. All fields validated against Coupa and QBR data.'});
+  return events;
+}
+
+function buildActions(v){
+  var risk=v.risk_score||0, sla=v.sla_score||0, days=daysFromNow(v.renewal_date);
+  var actions=[];
+  if(risk>50||sla<85) actions.push({title:'Governance Escalation Required',note:'Risk score or SLA breach triggers formal VER governance review. Vendor must submit remediation plan.',color:'#DC2626',pri:'Critical'});
+  if(risk>30||sla<95) actions.push({title:'QBR Scorecard Review',note:'Schedule next QBR cycle to re-assess SLA attainment and delivery metrics.',color:'#D97706',pri:'High'});
+  if(days!==null&&days<180&&days>=0) actions.push({title:'Renewal Planning — Benchmark Required',note:'Contract expires in '+days+' days. Rate benchmark and commercial strategy needed before negotiation.',color:'#D97706',pri:'High'});
+  if(actions.length===0) actions.push({title:'No Open Actions',note:'Vendor is performing within all thresholds. Next review at scheduled QBR.',color:'#059669',pri:'OK'});
+  return actions;
+}
+
+function buildDecisions(v){
+  var days=daysFromNow(v.renewal_date), risk=v.risk_score||0, decisions=[];
+  if(days!==null&&days>=0&&days<365) decisions.push({title:v.name+' Renewal — Decision Required',meta:'Due: '+fmtDate(v.renewal_date)+' &middot; Owner: Procurement &middot; Status: Open'});
+  if(risk>50) decisions.push({title:'Governance Action — Performance Remediation',meta:'Triggered by risk score '+risk+'/100 &middot; Owner: VER Director &middot; Status: Pending'});
+  if(decisions.length===0) decisions.push({title:'No Open Decisions',meta:'All decisions for this vendor are resolved or not yet triggered.'});
+  return decisions;
+}
+
+// ── CSV export ─────────────────────────────────────────────────────
+function _exportCSV(){
+  var vendors = window.VER_VENDORS || [];
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id') || params.get('ID');
+  var v = vendors.find(function(x){ return String(x.id)===String(id); });
+  if(!v) return;
+
+  var date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var rows = [
+    ['VER Vendor 360 Dossier — '+v.name,'','','Generated: '+date],
+    [],
+    ['VENDOR SUMMARY'],
+    ['Field','Value'],
+    ['Vendor Name', v.name],
+    ['Vendor ID', v.id],
+    ['Category', v.category],
+    ['Tier', 'Tier '+v.tier],
+    ['Region', v.region||'N/A'],
+    ['Status', v.status||'N/A'],
+    ['Annual Spend', v.annual_spend||'N/A'],
+    ['Renewal Date', fmtDate(v.renewal_date)],
+    ['Notice Period', v.supplier_notice||'N/A'],
+    ['Website', v.domain||'N/A'],
+    ['Headquarters', v.supplier_address||'N/A'],
+    [],
+    ['RISK PROFILE'],
+    ['Metric','Score'],
+    ['Overall Risk Score', v.risk_score||'N/A'],
+    ['SLA Score', v.sla_score||'N/A'],
+    ['Concentration Risk', v.concentration_risk||'N/A'],
+    ['Financial Risk', v.financial_risk||'N/A'],
+    ['Delivery Risk', v.delivery_risk||'N/A'],
+    ['Compliance Risk', v.compliance_risk||'N/A'],
+    [],
+    ['NOTES'],
+    ['"'+(v.advisory_notes||'No advisory notes recorded.')+'"'],
+    [],
+    ['Source: VER Vendor Platform · Salesforce DET']
+  ];
+
+  var csv = rows.map(function(r){
+    return r.map(function(cell){
+      var s = String(cell===null||cell===undefined?'':cell);
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s;
+    }).join(',');
+  }).join('\n');
+
+  var b = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'VER_Dossier_'+(v.name||'Vendor').replace(/\s+/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openVendorDetailHelp(){
+  HelpModal.open({
+    title: 'Vendor 360 Dossier',
+    what: 'The Vendor 360 Dossier is the <strong>complete intelligence profile for a single vendor</strong> — combining contract data, performance scores, governance history, market signals, portal submissions, and VER advisory into one place. Everything you need to know about a vendor relationship is here.',
+    steps: [
+      '<strong>Read the header band</strong> — vendor tier, overall health score, contract value, and days to next renewal are your orientation anchors.',
+      '<strong>Navigate the tabs</strong> — Overview, Contracts, Performance, Governance, Market Signals, and Portal. Each tab surfaces a different dimension of the relationship.',
+      '<strong>Review the contract timeline</strong> in the Contracts tab — all active and historical contracts with key dates, values, and status.',
+      '<strong>Check the performance trend</strong> in the Performance tab — scorecard history across quarters with dimension-level detail and VER commentary.',
+      '<strong>Review governance events</strong> in the Governance tab — CQBR history, escalations, and action item outcomes form the relationship audit trail.'
+    ],
+    tips: [
+      { icon: '&#x1F4CA;', title: 'The Overview tab is your briefing', body: 'The Overview tab is designed to give you a full picture in 60 seconds — read it before any vendor meeting, negotiation, or escalation conversation.' },
+      { icon: '&#x1F4C5;', title: 'Contract timeline is the negotiation map', body: 'The contract timeline shows every renewal window, every prior negotiation outcome, and every rate change. This is your leverage map.' },
+      { icon: '&#x26A0;', title: 'Market signals can change everything', body: 'A vendor in financial distress or acquisition talks changes your renewal strategy fundamentally. Check Market Signals before every major contract touch.' },
+      { icon: '&#x1F517;', title: 'Action from this page', body: 'You can launch TCO modeling, Rate Benchmark comparison, Survey submission, and SOW review directly from this page without losing context.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

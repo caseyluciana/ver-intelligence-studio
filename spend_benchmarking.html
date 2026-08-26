@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Spend Benchmarking · VER Vendor Platform</title>
+<style>
+:root{
+  --font-sans:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --text-xs:11px;--text-sm:12px;--text-base:14px;--text-md:15px;--text-lg:18px;
+  --surface-raised:#0F1E3C;--surface-overlay:#1E3A5F;
+  --surface-light:#F9FAFB;--surface-card:#FFFFFF;--surface-subtle:#F3F4F6;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+  --text-primary:#111827;--text-secondary:#1F2937;--text-muted:#6B7280;
+}
+[data-theme="dark"]{
+  --surface-light:#080F1E;--surface-card:#0F1E3C;--surface-subtle:#162942;
+  --text-primary:rgba(255,255,255,0.92);--text-secondary:rgba(255,255,255,0.75);--text-muted:rgba(255,255,255,0.40);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --gray:#080F1E;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-sans);background:var(--surface-light);color:var(--text-secondary);font-size:var(--text-base);}
+
+/* ── LAYOUT ── */
+.vp-wrap{display:flex;min-height:100vh;}
+.vp-side{width:220px;background:var(--surface-raised);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;}
+.vp-main{flex:1;padding:0;overflow-x:hidden;display:flex;flex-direction:column;}
+
+/* ── SIDEBAR ── */
+.vp-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vp-logo-title{font-size:var(--text-md);font-weight:800;color:#fff;line-height:1.2;}
+.vp-logo-sub{font-size:var(--text-xs);color:rgba(255,255,255,0.45);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+.vp-nav{padding:12px 0;}
+.vp-nav-section{font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);padding:10px 18px 4px;}
+.vp-nav-item{display:flex;align-items:center;gap:9px;padding:7px 18px;font-size:8.5pt;font-weight:600;color:rgba(255,255,255,0.85);text-decoration:none;transition:all 0.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.vp-nav-item:hover,.vp-nav-item.active{background:rgba(255,255,255,0.10);color:#fff;}
+.vp-nav-item.active{border-left:3px solid var(--teal);}
+.vp-nav-icon{font-size:12pt;flex-shrink:0;}
+.vp-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0;}
+.vp-side-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);font-size:var(--text-xs);color:rgba(255,255,255,0.35);}
+
+/* ── TOP BAR ── */
+.vp-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);}
+.vp-page-title{font-size:15pt;font-weight:900;color:var(--navy);}
+[data-theme="dark"] .vp-page-title{color:var(--ink);}
+.vp-page-sub{font-size:var(--text-sm);color:var(--text-muted);margin-top:2px;}
+
+/* ── TOOLBAR ── */
+.bench-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 20px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.bench-toolbar select,.bench-toolbar input{padding:7px 12px;border:1px solid var(--border2);border-radius:6px;font-size:var(--text-sm);font-family:inherit;color:var(--ink2);background:var(--white);outline:none;transition:border-color 0.15s;}
+.bench-toolbar input{min-width:180px;}
+.bench-toolbar select:focus,.bench-toolbar input:focus{border-color:var(--teal);}
+.export-btn{padding:7px 14px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:var(--text-sm);font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.export-btn:hover{background:var(--navy2);}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--gray2);color:var(--ink4);font-size:var(--text-xs);font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+
+/* ── KPI STRIP ── */
+.bench-kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:16px 20px;background:var(--gray);border-bottom:1px solid var(--border);}
+.kpi-card{background:var(--white);border-radius:8px;padding:14px 16px;border:1px solid var(--border);}
+.kpi-val{font-size:17pt;font-weight:900;color:var(--navy);line-height:1;}
+[data-theme="dark"] .kpi-val{color:var(--ink);}
+.kpi-label{font-size:var(--text-xs);color:var(--text-muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;}
+.kpi-sub{font-size:var(--text-xs);color:var(--text-muted);margin-top:2px;}
+
+/* ── BODY SPLIT ── */
+.bench-body{display:flex;flex:1;overflow:hidden;}
+.bench-left{flex:1;overflow-y:auto;padding:20px;}
+.bench-right{width:420px;flex-shrink:0;border-left:1px solid var(--border);overflow-y:auto;background:var(--gray);}
+
+/* ── TABS ── */
+.view-tabs{display:flex;gap:2px;margin-bottom:16px;background:var(--gray2);border-radius:8px;padding:3px;width:fit-content;}
+.vtab{padding:6px 16px;border-radius:6px;font-size:var(--text-sm);font-weight:600;cursor:pointer;border:none;font-family:inherit;background:transparent;color:var(--ink3);transition:all 0.15s;}
+.vtab.active{background:var(--white);color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+
+/* ── RATE TABLE ── */
+.rate-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);}
+.rate-table th{background:var(--navy);color:#fff;padding:8px 10px;text-align:left;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.rate-table td{padding:8px 10px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.rate-table tr:hover td{background:var(--gray);cursor:pointer;}
+.rate-table tr.sel-row td{background:var(--teal3);}
+.rb-track{height:6px;background:var(--gray2);border-radius:3px;overflow:hidden;max-width:80px;}
+.rb-fill{height:100%;border-radius:3px;}
+
+/* ── SOURCE BADGES ── */
+.src-badge{font-size:var(--text-xs);padding:2px 8px;border-radius:10px;font-weight:600;}
+.src-ver{background:var(--navy3);color:var(--navy);}
+.src-aws{background:#FFF7ED;color:#92400E;}
+.src-isg{background:#F0FDF4;color:#065F46;}
+.src-gartner{background:#EEF2FF;color:#3730A3;}
+.src-big4{background:#FDF4FF;color:#6B21A8;}
+.src-mkt{background:var(--gray2);color:var(--ink4);}
+
+/* ── DETAIL PANEL ── */
+.detail-panel{padding:20px;}
+.dp-empty{padding:40px 20px;text-align:center;color:var(--text-muted);}
+.dp-empty-icon{font-size:32px;margin-bottom:10px;}
+.dp-role{font-size:13pt;font-weight:800;color:var(--navy);margin-bottom:2px;}
+[data-theme="dark"] .dp-role{color:var(--ink);}
+.dp-meta{font-size:var(--text-sm);color:var(--text-muted);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.dp-sec{font-size:var(--text-xs);font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;margin:14px 0 8px;}
+[data-theme="dark"] .dp-sec{color:var(--ink);}
+.rr-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;}
+.rr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.rr-region{font-size:var(--text-sm);font-weight:700;color:var(--ink2);}
+.rr-rate{font-size:var(--text-base);font-weight:800;}
+.rr-track{height:8px;background:var(--gray2);border-radius:4px;overflow:hidden;margin-bottom:4px;}
+.rr-fill{height:100%;border-radius:4px;transition:width 0.4s;}
+.rr-foot{display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--text-muted);}
+.sav-box{background:var(--green3);border:1px solid var(--green);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.sav-title{font-size:var(--text-sm);font-weight:700;color:var(--green2);margin-bottom:3px;}
+.sav-val{font-size:var(--text-md);font-weight:900;color:var(--green2);}
+.sav-note{font-size:var(--text-xs);color:var(--ink4);margin-top:3px;}
+.ins-card{border-left:4px solid;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:10px;background:var(--white);}
+.ins-good{border-color:var(--green);}
+.ins-watch{border-color:var(--amber);}
+.ins-title{font-size:var(--text-sm);font-weight:700;color:var(--ink2);margin-bottom:3px;}
+.ins-body{font-size:var(--text-sm);color:var(--ink4);line-height:1.55;}
+.ins-val{font-size:13pt;font-weight:900;color:var(--navy);margin-top:6px;}
+
+/* ── CATEGORY GRID ── */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.cat-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all 0.2s;}
+.cat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08);border-color:var(--teal);}
+.cat-icon{font-size:22pt;margin-bottom:6px;}
+.cat-name{font-size:var(--text-base);font-weight:700;color:var(--navy);margin-bottom:3px;}
+[data-theme="dark"] .cat-name{color:var(--ink);}
+.cat-count{font-size:var(--text-sm);color:var(--text-muted);margin-bottom:10px;}
+.cat-stat{display:flex;justify-content:space-between;font-size:var(--text-sm);margin-bottom:4px;}
+.cat-bar-track{height:6px;background:var(--gray2);border-radius:3px;overflow:hidden;}
+.cat-bar-fill{height:100%;border-radius:3px;}
+
+/* ── MODAL ── */
+.modal-bg{opacity:0;pointer-events:none;position:fixed;inset:0;background:rgba(0,0,0,0.52);z-index:500;display:flex;align-items:center;justify-content:center;padding:32px 20px;overflow-y:auto;transition:opacity .2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border-radius:14px;max-width:680px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.28);transform:translateY(24px) scale(0.97);transition:transform .25s cubic-bezier(.16,1,.3,1);overflow:hidden;display:flex;flex-direction:column;}
+.modal-bg.open .modal{transform:translateY(0) scale(1);}
+.modal-signal{height:4px;flex-shrink:0;}
+.modal-hd{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 14px;border-bottom:1px solid var(--border);}
+.modal-title{font-size:13pt;font-weight:900;color:var(--navy);line-height:1.2;}
+[data-theme="dark"] .modal-title{color:var(--ink);}
+.modal-cat{font-size:var(--text-sm);color:var(--text-muted);margin-top:3px;}
+.modal-close{background:var(--gray2);border:none;font-size:var(--text-md);cursor:pointer;color:var(--ink4);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .13s;flex-shrink:0;}
+.modal-close:hover{background:var(--red3);color:var(--red);}
+.print-btn{padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:var(--text-xs);font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;white-space:nowrap;}
+.print-btn:hover{background:var(--navy2);}
+.modal-hd-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.modal-body{padding:20px 24px;overflow-y:auto;max-height:calc(100vh - 200px);}
+.m2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.m-tile{background:var(--gray);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.m-tile-label{font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:5px;}
+.m-tile-val{font-size:15pt;font-weight:900;color:var(--navy);}
+[data-theme="dark"] .m-tile-val{color:var(--ink);}
+.m-tile-note{font-size:var(--text-xs);color:var(--text-muted);margin-top:3px;}
+.m-tile.highlight{background:var(--teal3);border-color:rgba(13,148,136,.3);}
+.m-tile.highlight .m-tile-val{color:var(--teal2);}
+.m-tile.savings{background:var(--green3);border-color:rgba(5,150,105,.3);}
+.m-tile.savings .m-tile-val{color:var(--green2);}
+.m-section{margin-bottom:16px;}
+.m-section-title{font-size:var(--text-sm);font-weight:800;color:var(--navy);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+[data-theme="dark"] .m-section-title{color:var(--ink);}
+.m-list{list-style:none;}
+.m-list li{font-size:var(--text-sm);color:var(--ink3);padding:4px 0 4px 16px;position:relative;border-bottom:1px solid var(--gray2);}
+.m-list li:last-child{border-bottom:none;}
+.m-list li::before{content:'&#8594;';position:absolute;left:0;color:var(--teal);font-weight:700;}
+.m-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.m-tag{font-size:var(--text-xs);font-weight:700;padding:2px 9px;border-radius:8px;background:var(--navy3);color:var(--navy2);}
+.reg-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);}
+.reg-table th{background:var(--gray2);color:var(--ink3);padding:6px 10px;text-align:left;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;border-bottom:1px solid var(--border);}
+.reg-table td{padding:7px 10px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.reg-table tr:last-child td{border-bottom:none;}
+
+/* ── INSIGHTS ── */
+.insight-lbl{font-size:var(--text-base);font-weight:800;color:var(--navy);margin-bottom:12px;}
+[data-theme="dark"] .insight-lbl{color:var(--ink);}
+
+@media print{
+  .vp-side,.bench-toolbar,.vp-topbar,.bench-kpi,.bench-body,.modal-close,.print-btn{display:none!important;}
+  .vp-wrap,.vp-main{display:block!important;}
+  .modal-bg{position:static!important;background:none!important;padding:0!important;display:block!important;opacity:1!important;pointer-events:none!important;}
+  .modal{box-shadow:none!important;border-radius:0!important;max-width:100%!important;transform:none!important;}
+  .modal-body{max-height:none!important;overflow:visible!important;}
+}
+</style>
+</head>
+<body>
+<div id="modal-root"></div>
+<div class="vp-wrap">
+
+<!-- ── SIDEBAR ── -->
+<div class="vp-side">
+  <div class="vp-logo">
+    <div class="vp-logo-title">VER Vendor<br>Platform</div>
+    <div class="vp-logo-sub">DET &middot; FY27</div>
+  </div>
+  <nav class="vp-nav">
+    <div class="vp-nav-section">Platform</div>
+    <a href="vendor_home.html" class="vp-nav-item"><span class="vp-nav-icon">&#127968;</span>Portfolio Overview</a>
+    <a href="vendor_registry.html" class="vp-nav-item"><span class="vp-nav-icon">&#128203;</span>Vendor Registry</a>
+    <a href="vendor_risk.html" class="vp-nav-item"><span class="vp-nav-icon">&#9888;&#65039;</span>Risk Dashboard</a>
+    <div class="vp-nav-section">Tools</div>
+    <a href="vendor_selector.html" class="vp-nav-item"><span class="vp-nav-icon">&#127919;</span>Vendor Selector</a>
+    <a href="spend_benchmarking.html" class="vp-nav-item active"><span class="vp-nav-icon">&#128178;</span>Spend Benchmarking</a>
+    
+    <a href="vendor_intake.html" class="vp-nav-item"><span class="vp-nav-icon">&#128229;</span>Intake Requests</a>
+    <a href="vendor_sow.html" class="vp-nav-item"><span class="vp-nav-icon">&#128196;</span>SOW Builder</a>
+    <a href="vendor_co.html" class="vp-nav-item"><span class="vp-nav-icon">&#128260;</span>Change Order</a>
+    <div class="vp-nav-divider"></div>
+    <a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a>
+  </nav>
+  <div class="vp-side-footer">VER Vendor Platform<br>Salesforce DET &middot; FY27</div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="vp-main">
+  <div class="vp-topbar">
+    <div>
+      <div class="vp-page-title">Spend Benchmarking</div>
+      <div class="vp-page-sub">Rate intelligence across categories &amp; regions &middot; VER Rate Card &middot; AWS Published Rates &middot; ISG &middot; Gartner &middot; Big4 Benchmarks &middot; 767 records &middot; FY27</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button type="button" class="dm-toggle" onclick="openSpendBenchHelp()">&#63; How to Use</button>
+      <button type="button" class="dm-toggle" id="theme-toggle-btn" onclick="toggleTheme()">&#9789; Dark</button>
+      <button type="button" class="export-btn" onclick="exportCSV()">&#8681; Export CSV</button>
+    </div>
+  </div>
+
+  <div class="bench-toolbar">
+    <input type="text" id="search-input" placeholder="&#128269; Search roles, categories..." oninput="applyFilters()">
+    <select id="cat-filter" title="Category filter" onchange="applyFilters()">
+      <option value="all">All Categories</option>
+      <option value="AI/ML &amp; Data">AI/ML &amp; Data</option>
+      <option value="Cloud &amp; Engineering">Cloud &amp; Engineering</option>
+      <option value="Contingent Workforce">Contingent Workforce</option>
+      <option value="ERP &amp; Workday">ERP &amp; Workday</option>
+      <option value="Managed Services">Managed Services</option>
+      <option value="Professional Services">Professional Services</option>
+      <option value="Project Management">Project Management</option>
+      <option value="Software Engineering">Software Engineering</option>
+      <option value="Strategic Consulting">Strategic Consulting</option>
+    </select>
+    <select id="reg-filter" title="Region filter" onchange="applyFilters()">
+      <option value="all">All Regions</option>
+      <option value="AMER">AMER (Onshore US)</option>
+      <option value="APAC">APAC (India Offshore)</option>
+      <option value="LATAM">LATAM (Nearshore)</option>
+      <option value="EMEA">EMEA (Europe)</option>
+    </select>
+    <select id="src-filter" title="Source filter" onchange="applyFilters()">
+      <option value="all">All Sources</option>
+      <option value="Insight Global Rate Card">Insight Global Rate Card</option>
+      <option value="benchmark">Market Benchmarks (ISG, Gartner, AWS, Big4)</option>
+    </select>
+    <span id="result-count" style="font-size:var(--text-xs);color:var(--text-muted);"></span>
+  </div>
+
+  <div class="bench-kpi" id="kpi-strip"></div>
+
+  <div class="bench-body">
+    <div class="bench-left">
+      <div class="view-tabs">
+        <button type="button" class="vtab active" id="tab-table" onclick="setView('table')">Rate Table</button>
+        <button type="button" class="vtab" id="tab-category" onclick="setView('category')">By Category</button>
+        <button type="button" class="vtab" id="tab-insights" onclick="setView('insights')">VER Insights</button>
+      </div>
+      <div id="view-table">
+        <table class="rate-table">
+          <thead><tr>
+            <th>Role</th><th>Level</th><th>Category</th><th>Region</th>
+            <th>Rate Range ($/hr)</th><th>Midpoint</th><th>Source</th>
+          </tr></thead>
+          <tbody id="rate-tbody"></tbody>
+        </table>
+        <div id="tfoot" style="padding:10px 0;font-size:var(--text-sm);color:var(--text-muted);text-align:center;"></div>
+      </div>
+      <div id="view-category" style="display:none;"><div class="cat-grid" id="cat-grid"></div></div>
+      <div id="view-insights" style="display:none;"><div id="ins-content"></div></div>
+    </div>
+    <div class="bench-right">
+      <div id="det-panel">
+        <div class="dp-empty">
+          <div class="dp-empty-icon">&#128202;</div>
+          <div style="font-size:var(--text-base);font-weight:600;color:var(--ink3);margin-bottom:6px;">Select a rate record</div>
+          <div style="font-size:var(--text-sm);color:var(--text-muted);line-height:1.6;">Click any row in the table to see the regional breakdown, offshore savings opportunity, and VER rate advisory. Or click Full Rate Analysis for the detailed modal.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// RATE_DATA injected below by build step
+</script>
+<script src="assets/rate_data.js"></script>
+<script>
+var CAT_ICONS={'AI/ML & Data':'&#129302;','Cloud & Engineering':'&#9729;&#65039;',
+  'Contingent Workforce':'&#128101;','ERP & Workday':'&#9881;&#65039;',
+  'Managed Services':'&#128269;','Professional Services':'&#129516;',
+  'Project Management':'&#128203;','Software Engineering':'&#128187;',
+  'Strategic Consulting':'&#127919;'};
+
+var filteredData=[],selectedIdx=null,currentView='table';
+function rnd(n){return Math.round(n);}
+
+function rateColor(pct){
+  if(pct<0.35) return 'var(--green)';
+  if(pct<0.65) return 'var(--teal)';
+  if(pct<0.85) return 'var(--amber)';
+  return 'var(--red)';
+}
+function srcCls(s){
+  if(!s) return 'src-mkt';
+  if(s==='Insight Global Rate Card') return 'src-ver';
+  if(s.includes('AWS')) return 'src-aws';
+  if(s.includes('ISG')) return 'src-isg';
+  if(s.includes('Gartner')) return 'src-gartner';
+  if(s.includes('Big4')) return 'src-big4';
+  return 'src-mkt';
+}
+function srcLbl(s){
+  if(!s) return 'Global';
+  if(s==='Insight Global Rate Card') return 'IG Rate Card';
+  if(s==='AWS Published Rate') return 'AWS';
+  if(s==='ISG Benchmark') return 'ISG';
+  if(s==='ISG/Everest Benchmark') return 'ISG / Everest';
+  if(s==='Gartner Benchmark') return 'Gartner';
+  if(s==='Gartner/ISG Benchmark') return 'Gartner / ISG';
+  if(s==='Gartner/Big4 Benchmark') return 'Gartner / Big4';
+  if(s==='Big4 Benchmark') return 'Big4';
+  return s;
+}
+
+function applyFilters(){
+  var s=document.getElementById('search-input').value.toLowerCase();
+  var cat=document.getElementById('cat-filter').value;
+  var reg=document.getElementById('reg-filter').value;
+  var src=document.getElementById('src-filter').value;
+  filteredData=RATE_DATA.filter(function(r){
+    var ms=!s||r.role.toLowerCase().includes(s)||r.category.toLowerCase().includes(s);
+    var mc=cat==='all'||r.category===cat;
+    var mr=reg==='all'||r.region===reg||r.region==='Global';
+    var mv=src==='all'
+      ||(src==='Insight Global Rate Card'&&r.source==='Insight Global Rate Card')
+      ||(src==='benchmark'&&r.source!=='Insight Global Rate Card');
+    return ms&&mc&&mr&&mv;
+  });
+  document.getElementById('result-count').textContent=filteredData.length+' records';
+  renderKPI(); renderTable(); renderCategory(); renderInsights();
+}
+
+function renderKPI(){
+  var n=filteredData.length;
+  if(!n){document.getElementById('kpi-strip').innerHTML='';return;}
+  var mids=filteredData.map(function(r){return r.rate_mid;});
+  var avg=Math.round(mids.reduce(function(a,b){return a+b;},0)/n);
+  var lo=Math.round(Math.min.apply(null,mids));
+  var hi=Math.round(Math.max.apply(null,mids));
+  var cats=new Set(filteredData.map(function(r){return r.category;})).size;
+  var regs=new Set(filteredData.map(function(r){return r.region;})).size;
+  document.getElementById('kpi-strip').innerHTML=
+    kpiCard('$'+avg+'/hr','Avg Midpoint','across '+n+' records')
+   +kpiCard(n,'Rate Records',cats+' categories')
+   +kpiCard(regs,'Regions','in current view')
+   +kpiCard('$'+lo,'Floor Rate','/hr minimum midpoint')
+   +kpiCard('$'+hi,'Ceiling Rate','/hr maximum midpoint');
+}
+function kpiCard(val,label,sub){
+  return '<div class="kpi-card"><div class="kpi-val">'+val+'</div>'
+    +'<div class="kpi-label">'+label+'</div>'
+    +'<div class="kpi-sub">'+sub+'</div></div>';
+}
+
+function renderTable(){
+  var max=filteredData.length?Math.max.apply(null,filteredData.map(function(r){return r.rate_mid;})):1;
+  var html=filteredData.map(function(r,i){
+    var pct=max>0?r.rate_mid/max:0;
+    var bc=rateColor(pct);
+    var sel=selectedIdx===i?' class="sel-row"':'';
+    return '<tr'+sel+' data-idx="'+i+'" onclick="selectRow('+i+')">'
+      +'<td style="font-weight:600;color:var(--ink2)">'+r.role+'</td>'
+      +'<td style="font-size:var(--text-xs);color:var(--ink4)">'+r.level+'</td>'
+      +'<td style="font-size:var(--text-xs)">'+(CAT_ICONS[r.category]||'')+' '+r.category+'</td>'
+      +'<td style="font-size:var(--text-xs)">'+r.region+'</td>'
+      +'<td><div style="display:flex;align-items:center;gap:6px;">'
+        +'<div class="rb-track"><div class="rb-fill" style="width:'+Math.round(pct*100)+'%;background:'+bc+'"></div></div>'
+        +'<span style="font-size:var(--text-xs);color:var(--ink3);font-weight:600;">$'+rnd(r.rate_lo)+' &ndash; $'+rnd(r.rate_hi)+'</span>'
+        +'</div></td>'
+      +'<td><strong style="color:'+bc+'">$'+rnd(r.rate_mid)+'</strong></td>'
+      +'<td><span class="src-badge '+srcCls(r.source)+'">'+srcLbl(r.source)+'</span></td>'
+      +'</tr>';
+  }).join('');
+  document.getElementById('rate-tbody').innerHTML=html||
+    '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--ink4)">No rates match the current filters.</td></tr>';
+  document.getElementById('tfoot').textContent=filteredData.length+' rate records shown';
+}
+
+function renderCategory(){
+  var bycat={};
+  filteredData.forEach(function(r){if(!bycat[r.category])bycat[r.category]=[];bycat[r.category].push(r);});
+  var maxAvg=0,catList=[];
+  Object.keys(bycat).forEach(function(c){
+    var mids=bycat[c].map(function(r){return r.rate_mid;});
+    var avg=Math.round(mids.reduce(function(a,b){return a+b;},0)/mids.length);
+    var lo=Math.round(Math.min.apply(null,mids));
+    var hi=Math.round(Math.max.apply(null,mids));
+    if(avg>maxAvg)maxAvg=avg;
+    catList.push({cat:c,avg:avg,lo:lo,hi:hi,
+      roles:new Set(bycat[c].map(function(r){return r.role;})).size,count:bycat[c].length});
+  });
+  var html=catList.sort(function(a,b){return b.avg-a.avg;}).map(function(item){
+    var pct=maxAvg>0?item.avg/maxAvg:0;
+    var bc=rateColor(pct);
+    return '<div class="cat-card" onclick="filterCat(\''+item.cat.replace(/&/g,'%26').replace(/'/g,"\\'")+'\')">'
+      +'<div class="cat-icon">'+(CAT_ICONS[item.cat]||'&#128202;')+'</div>'
+      +'<div class="cat-name">'+item.cat+'</div>'
+      +'<div class="cat-count">'+item.roles+' roles &middot; '+item.count+' records</div>'
+      +'<div class="cat-stat"><span style="color:var(--ink4)">Range</span><span style="font-weight:700">$'+item.lo+' &ndash; $'+item.hi+'/hr</span></div>'
+      +'<div class="cat-stat"><span style="color:var(--ink4)">Avg Midpoint</span><span style="font-weight:700;color:'+bc+'">$'+item.avg+'/hr</span></div>'
+      +'<div class="cat-bar-track" style="margin-top:8px;"><div class="cat-bar-fill" style="width:'+Math.round(pct*100)+'%;background:'+bc+'"></div></div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('cat-grid').innerHTML=html||'<div style="color:var(--ink4);padding:20px">No categories in current filter.</div>';
+}
+function filterCat(cat){
+  document.getElementById('cat-filter').value=cat;
+  setView('table');applyFilters();
+}
+
+function renderInsights(){
+  var n=filteredData.length;
+  if(!n){document.getElementById('ins-content').innerHTML='<div style="color:var(--ink4);padding:20px">Apply filters to generate insights.</div>';return;}
+  var mids=filteredData.map(function(r){return r.rate_mid;});
+  var avg=Math.round(mids.reduce(function(a,b){return a+b;},0)/n);
+  var byReg={};
+  filteredData.forEach(function(r){if(!byReg[r.region])byReg[r.region]=[];byReg[r.region].push(r.rate_mid);});
+  var bycat={};
+  filteredData.forEach(function(r){if(!bycat[r.category])bycat[r.category]=[];bycat[r.category].push(r.rate_mid);});
+  var catAvgs=Object.keys(bycat).map(function(c){
+    return{cat:c,avg:Math.round(bycat[c].reduce(function(a,b){return a+b;},0)/bycat[c].length)};
+  }).sort(function(a,b){return b.avg-a.avg;});
+  var verR=filteredData.filter(function(r){return r.source==='Insight Global Rate Card';});
+  var mktR=filteredData.filter(function(r){return r.source!=='Insight Global Rate Card';});
+  var awsR=filteredData.filter(function(r){return r.source&&r.source.includes('AWS');});
+  var amerArr=byReg['AMER'],apacArr=byReg['APAC'];
+  var amerAvg=amerArr?Math.round(amerArr.reduce(function(a,b){return a+b;},0)/amerArr.length):null;
+  var apacAvg=apacArr?Math.round(apacArr.reduce(function(a,b){return a+b;},0)/apacArr.length):null;
+  var html='<div class="insight-lbl">VER Rate Intelligence Summary</div>';
+  html+=insCard('ins-good','Portfolio Avg Midpoint','Average across '+n+' rate records in current view. Use as baseline when evaluating new SOW rates.','$'+avg+'/hr');
+  if(catAvgs.length)html+=insCard('ins-watch','Highest Cost Category',catAvgs[0].cat+' commands the highest avg rate at $'+catAvgs[0].avg+'/hr. Engagements here warrant closest rate scrutiny.','$'+catAvgs[0].avg+'/hr avg');
+  if(amerAvg&&apacAvg){
+    var pctS=Math.round(((amerAvg-apacAvg)/amerAvg)*100);
+    html+=insCard('ins-good','AMER vs APAC Differential','APAC (India offshore) averages '+pctS+'% below AMER onshore for comparable roles. VER uses this spread to benchmark offshore delivery value.',pctS+'% savings potential');
+  }
+  if(awsR.length)html+=insCard('ins-good','AWS Published Rate Anchor',awsR.length+' rates anchored to the AWS published rate schedule &mdash; the most reliable ceiling for cloud/engineering roles. Compiled by VER from AWS public pricing. VER recommends rates above the AWS schedule require written approval.',awsR.length+' anchored rates');
+  if(verR.length&&mktR.length){
+    var vAvg=Math.round(verR.reduce(function(s,r){return s+r.rate_mid;},0)/verR.length);
+    var mAvg=Math.round(mktR.reduce(function(s,r){return s+r.rate_mid;},0)/mktR.length);
+    var diff=vAvg-mAvg;
+    var srcNames=[awsR.length?'AWS':'',filteredData.filter(function(r){return r.source&&r.source.includes('ISG');}).length?'ISG':'',filteredData.filter(function(r){return r.source&&r.source.includes('Gartner');}).length?'Gartner':'',filteredData.filter(function(r){return r.source&&r.source.includes('Big4');}).length?'Big4':''].filter(Boolean).join(', ')||'global benchmarks';
+    html+=insCard(diff>10?'ins-watch':'ins-good','Insight Global Rate Card vs Global Benchmarks','Insight Global negotiated rates avg $'+vAvg+'/hr vs global benchmark avg $'+mAvg+'/hr (sources: '+srcNames+', compiled by VER). '+(diff>10?'Rates above benchmark &mdash; review recommended.':diff<-10?'Below benchmark &mdash; strong negotiation position.':'Tracking at benchmark. Solid baseline.'),(diff>=0?'+':'')+diff+'/hr vs benchmark');
+  }
+  var wdR=filteredData.filter(function(r){return r.category==='ERP & Workday'&&r.region==='AMER';});
+  if(wdR.length){
+    var wdAvg=Math.round(wdR.reduce(function(s,r){return s+r.rate_mid;},0)/wdR.length);
+    html+=insCard('ins-watch','Workday Specialist Premium','Workday-certified consultants command 20&ndash;35% above general SI rates. AMER avg $'+wdAvg+'/hr. VER benchmarks Cognizant ADAMS rates against this range at each renewal.','$'+wdAvg+'/hr AMER avg');
+  }
+  html+='<div class="insight-lbl" style="margin-top:20px;">Regional Rate Comparison</div>'
+    +'<table class="rate-table"><thead><tr><th>Region</th><th>Avg Low</th><th>Avg Mid</th><th>Avg High</th><th>Records</th></tr></thead><tbody>';
+  ['AMER','APAC','LATAM','EMEA'].forEach(function(reg){
+    var rr=filteredData.filter(function(r){return r.region===reg||r.region==='Global';});
+    if(!rr.length)return;
+    var lo=Math.round(rr.reduce(function(s,r){return s+r.rate_lo;},0)/rr.length);
+    var mid=Math.round(rr.reduce(function(s,r){return s+r.rate_mid;},0)/rr.length);
+    var hi=Math.round(rr.reduce(function(s,r){return s+r.rate_hi;},0)/rr.length);
+    html+='<tr><td>'+reg+'</td><td>$'+lo+'</td><td><strong>$'+mid+'</strong></td><td>$'+hi+'</td><td>'+rr.length+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('ins-content').innerHTML=html;
+}
+function insCard(cls,title,body,val){
+  return '<div class="ins-card '+cls+'"><div class="ins-title">'+title+'</div><div class="ins-body">'+body+'</div><div class="ins-val">'+val+'</div></div>';
+}
+
+function selectRow(idx){
+  selectedIdx=idx;
+  document.querySelectorAll('.rate-table tbody tr').forEach(function(tr){
+    tr.classList.remove('sel-row');
+    if(Number(tr.getAttribute('data-idx'))===idx)tr.classList.add('sel-row');
+  });
+  renderDetail();
+  openModal(filteredData[idx].id);
+}
+function renderDetail(){
+  var r=filteredData[selectedIdx];
+  if(!r)return;
+  var related=RATE_DATA.filter(function(d){return d.role===r.role;});
+  var byReg={};
+  related.forEach(function(d){if(!byReg[d.region])byReg[d.region]=[];byReg[d.region].push(d);});
+  var maxMid=Math.max.apply(null,related.map(function(d){return d.rate_mid;}));
+  var regHtml=['AMER','APAC','LATAM','EMEA','Global'].map(function(reg){
+    var rr=byReg[reg];
+    if(!rr||!rr.length)return '';
+    var best=rr.reduce(function(a,b){return a.rate_mid>b.rate_mid?a:b;});
+    var pct=maxMid>0?best.rate_mid/maxMid:0;
+    var bc=rateColor(pct);
+    return '<div class="rr-card"><div class="rr-top">'
+      +'<span class="rr-region">'+reg+'</span>'
+      +'<span class="rr-rate" style="color:'+bc+'">$'+rnd(best.rate_lo)+' &ndash; $'+rnd(best.rate_hi)+'/hr</span>'
+      +'</div><div class="rr-track"><div class="rr-fill" style="width:'+Math.round(pct*100)+'%;background:'+bc+'"></div></div>'
+      +'<div class="rr-foot"><span>Midpoint $'+rnd(best.rate_mid)+'</span>'
+        +'<span class="src-badge '+srcCls(best.source)+'">'+srcLbl(best.source)+'</span>'
+      +'</div></div>';
+  }).join('');
+  var amerMid=byReg['AMER']?Math.round(byReg['AMER'].reduce(function(s,d){return s+d.rate_mid;},0)/byReg['AMER'].length):null;
+  var apacMid=byReg['APAC']?Math.round(byReg['APAC'].reduce(function(s,d){return s+d.rate_mid;},0)/byReg['APAC'].length):null;
+  var savHtml='';
+  if(amerMid&&apacMid){
+    var sav=amerMid-apacMid;
+    var pctSv=Math.round((sav/amerMid)*100);
+    savHtml='<div class="dp-sec">Offshore Savings Opportunity</div>'
+      +'<div class="sav-box"><div class="sav-title">AMER to APAC shift</div>'
+        +'<div class="sav-val">$'+sav+'/hr &middot; '+pctSv+'% reduction</div>'
+        +'<div class="sav-note">AMER $'+rnd(amerMid)+'/hr vs APAC $'+rnd(apacMid)+'/hr midpoint per resource</div>'
+      +'</div>';
+  }
+  var adv=getAdvisory(r);
+  var sidx=selectedIdx;
+  document.getElementById('det-panel').innerHTML=
+    '<div class="detail-panel">'
+    +'<div class="dp-role">'+r.role+'</div>'
+    +'<div class="dp-meta">'+(CAT_ICONS[r.category]||'')+' '+r.category+' &middot; '+r.level+'</div>'
+    +'<div class="dp-sec">Regional Breakdown</div>'+regHtml
+    +savHtml
+    +'<div class="dp-sec">VER Rate Advisory</div>'
+    +'<div class="ins-card '+adv.cls+'"><div class="ins-title">'+adv.title+'</div><div class="ins-body">'+adv.body+'</div></div>'
+    +'<div style="margin-top:16px;">'
+      +'<button onclick="openModal(filteredData['+sidx+'].id)" style="width:100%;padding:9px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:var(--text-sm);font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;" onmouseover="this.style.background=\'var(--navy2)\'" onmouseout="this.style.background=\'var(--navy)\'">&#128202; Full Rate Analysis</button>'
+    +'</div></div>';
+}
+function getAdvisory(r){
+  var c=r.category;
+  if(c==='ERP & Workday')return{cls:'ins-watch',title:'Workday Premium Market',body:'Workday-certified consultants command 20&ndash;35% above general SI rates. Benchmark Cognizant ADAMS rates against this range at each renewal. Rates above the high band require written VER justification.'};
+  if(c==='Strategic Consulting')return{cls:'ins-watch',title:'Fixed Fee Preferred',body:'VER recommends fixed-fee SOWs for consulting engagements to avoid T&amp;M exposure. Partner-level rates should be benchmarked against published Big 4 ranges (Deloitte, PwC, EY, KPMG).'};
+  if(c==='Cloud & Engineering')return{cls:'ins-good',title:'AWS Rate Anchor Available',body:'AWS published rates provide a reliable ceiling for this role. VER recommends rates above the AWS schedule require written approval. APAC rates typically 55&ndash;65% below AMER for India-delivered cloud work.'};
+  if(c==='AI/ML & Data')return{cls:'ins-watch',title:'High Demand &mdash; Rates Moving Quickly',body:'AI/ML and data engineering rates are increasing faster than other categories. VER recommends quarterly rate reviews. Validate benchmark data before any renewal.'};
+  if(c==='Contingent Workforce')return{cls:'ins-good',title:'Insight Global Rate Card Governs',body:'CW rates governed by the Insight Global Rate Card negotiated by VER (2026). Bill rates above the high band are a signal to engage VER — in most cases rates at this level have room to negotiate down before SOW signature.'};
+  return{cls:'ins-good',title:'Global Benchmark Reference',body:'Rate sourced from '+srcLbl(r.source)+' — compiled by VER from global market data. VER uses this as a reference point in vendor negotiations. Validate annually against current benchmark surveys.'};
+}
+
+function openModal(id){
+  var r=RATE_DATA.find(function(x){return x.id===id;});
+  if(!r)return;
+  var related=RATE_DATA.filter(function(d){return d.role===r.role;});
+  var byReg={};
+  related.forEach(function(d){if(!byReg[d.region])byReg[d.region]=[];byReg[d.region].push(d);});
+  var amerMid=byReg['AMER']?Math.round(byReg['AMER'].reduce(function(s,d){return s+d.rate_mid;},0)/byReg['AMER'].length):null;
+  var apacMid=byReg['APAC']?Math.round(byReg['APAC'].reduce(function(s,d){return s+d.rate_mid;},0)/byReg['APAC'].length):null;
+  var signalColor=r.category==='ERP & Workday'?'var(--amber)':r.category==='AI/ML & Data'?'var(--purple)':r.source==='Insight Global Rate Card'?'var(--teal)':'var(--navy)';
+  var regRows=['AMER','APAC','LATAM','EMEA','Global'].map(function(reg){
+    var rr=byReg[reg];
+    if(!rr||!rr.length)return '';
+    var best=rr.reduce(function(a,b){return a.rate_mid>b.rate_mid?a:b;});
+    return '<tr><td>'+reg+'</td><td>$'+rnd(best.rate_lo)+'</td><td><strong>$'+rnd(best.rate_mid)+'</strong></td><td>$'+rnd(best.rate_hi)+'</td>'
+      +'<td><span class="src-badge '+srcCls(best.source)+'">'+srcLbl(best.source)+'</span></td></tr>';
+  }).join('');
+  var savHtml='';
+  if(amerMid&&apacMid){
+    var sav=amerMid-apacMid;
+    var pctSv=Math.round((sav/amerMid)*100);
+    savHtml='<div style="margin-bottom:16px;">'
+      +'<div class="m-tile savings"><div class="m-tile-label">Offshore Savings Opportunity</div>'
+        +'<div class="m-tile-val">$'+rnd(sav)+'/hr &middot; '+pctSv+'% reduction</div>'
+        +'<div class="m-tile-note">AMER $'+rnd(amerMid)+'/hr vs APAC $'+rnd(apacMid)+'/hr midpoint per resource</div>'
+      +'</div></div>';
+  }
+  var adv=getAdvisory(r);
+  var html='<div class="modal-bg open" id="modal-overlay" onclick="closeModalIfBg(event)">'
+    +'<div class="modal">'
+    +'<div class="modal-signal" style="background:'+signalColor+'"></div>'
+    +'<div class="modal-hd">'
+      +'<div><div class="modal-title">'+r.role+'</div>'
+        +'<div class="modal-cat">'+(CAT_ICONS[r.category]||'')+' '+r.category+' &middot; '+r.level+'</div>'
+      +'</div>'
+      +'<div class="modal-hd-actions">'
+        +'<button class="print-btn" onclick="window.print()">&#128438; Print PDF</button>'
+        +'<button class="modal-close" onclick="closeModal()">&#215;</button>'
+      +'</div>'
+    +'</div>'
+    +'<div class="modal-body">'
+    +'<div class="m2col">'
+      +'<div class="m-tile"><div class="m-tile-label">Rate Range</div>'
+        +'<div class="m-tile-val">$'+rnd(r.rate_lo)+' &ndash; $'+rnd(r.rate_hi)+'</div>'
+        +'<div class="m-tile-note">$/hr &middot; '+r.source+'</div></div>'
+      +'<div class="m-tile highlight"><div class="m-tile-label">Midpoint</div>'
+        +'<div class="m-tile-val">$'+rnd(r.rate_mid)+'/hr</div>'
+        +'<div class="m-tile-note">VER reference rate</div></div>'
+      +(amerMid?'<div class="m-tile"><div class="m-tile-label">AMER Onshore Avg</div>'
+        +'<div class="m-tile-val">$'+rnd(amerMid)+'/hr</div>'
+        +'<div class="m-tile-note">Midpoint across AMER records</div></div>':'')
+      +(apacMid?'<div class="m-tile"><div class="m-tile-label">APAC Offshore Avg</div>'
+        +'<div class="m-tile-val" style="color:var(--green);">$'+rnd(apacMid)+'/hr</div>'
+        +'<div class="m-tile-note">India delivery midpoint</div></div>':'')
+    +'</div>'
+    +savHtml
+    +'<div class="m-section"><div class="m-section-title">Regional Rate Breakdown</div>'
+      +'<table class="reg-table"><thead><tr><th>Region</th><th>Low</th><th>Mid</th><th>High</th><th>Source</th></tr></thead>'
+      +'<tbody>'+regRows+'</tbody></table>'
+    +'</div>'
+    +'<div class="m-section"><div class="m-section-title">VER Rate Advisory</div>'
+      +'<div class="ins-card '+adv.cls+'" style="margin:0;">'
+        +'<div class="ins-title">'+adv.title+'</div>'
+        +'<div class="ins-body">'+adv.body+'</div>'
+      +'</div>'
+    +'</div>'
+    +'</div></div></div>';
+  document.getElementById('modal-root').innerHTML=html;
+}
+function closeModal(){document.getElementById('modal-root').innerHTML='';}
+function closeModalIfBg(e){if(e.target.id==='modal-overlay')closeModal();}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
+function setView(v){
+  currentView=v;
+  ['table','category','insights'].forEach(function(n){
+    document.getElementById('view-'+n).style.display=n===v?'':'none';
+    document.getElementById('tab-'+n).classList.toggle('active',n===v);
+  });
+}
+
+function exportCSV(){
+  var h=['role','level','category','region','rate_lo','rate_hi','rate_mid','source'];
+  var rows=[h.join(',')];
+  filteredData.forEach(function(r){
+    rows.push(h.map(function(k){var v=String(r[k]||'');return v.includes(',')? '"'+v+'"':v;}).join(','));
+  });
+  var b=new Blob([rows.join('\n')],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='VER_Spend_Benchmark_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+}
+
+(function(){
+  var saved=localStorage.getItem('ver-theme');
+  var prefersDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  var theme=saved||(prefersDark?'dark':'light');
+  document.documentElement.setAttribute('data-theme',theme);
+  updateToggle(theme);
+})();
+function toggleTheme(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('ver-theme',next);updateToggle(next);
+}
+function updateToggle(theme){
+  var btn=document.getElementById('theme-toggle-btn');
+  if(!btn)return;
+  btn.innerHTML=theme==='dark'?'&#9790; Light':'&#9789; Dark';
+}
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(e){
+  if(!localStorage.getItem('ver-theme')){var t=e.matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);updateToggle(t);}
+});
+
+(function(){
+  var isAppsScript=window.location.href.indexOf('script.google.com')>-1||window.location.href.indexOf('googleusercontent.com')>-1;
+  if(!isAppsScript)return;
+  function rewriteLinks(){document.querySelectorAll('a[href]').forEach(function(a){var href=a.getAttribute('href');if(!href||href.startsWith('http')||href.startsWith('#')||href.startsWith('mailto')||!href.match(/\.html/))return;var page=href.replace(/\.html.*$/,'').replace(/^.*\//,'');var qs=href.indexOf('?')>-1?href.slice(href.indexOf('?')+1):'';var base=window.location.href.split('?')[0];a.setAttribute('href',base+'?page='+page+(qs?'&'+qs:''));});}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',rewriteLinks);}else{rewriteLinks();}
+  new MutationObserver(rewriteLinks).observe(document.body,{childList:true,subtree:true});
+})();
+
+document.addEventListener('DOMContentLoaded',function(){applyFilters();});
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openSpendBenchHelp(){
+  HelpModal.open({
+    title: 'Spend Benchmarking',
+    what: 'Spend Benchmarking compares <strong>DET vendor spend against external market benchmarks and internal historical baselines</strong> — showing where DET is paying above market, where it has leverage, and where spend density is out of line with the complexity of the work being delivered.',
+    steps: [
+      '<strong>Select the spend category</strong> to benchmark — Software, CW, Cloud, Services, or All. Each category has a distinct benchmark methodology.',
+      '<strong>Set the comparison baseline</strong> — benchmark against peer companies (anonymized), DET prior year, or VER internal norms. Each gives a different perspective.',
+      '<strong>Review the spend density chart</strong> — spend per FTE, per project, or per output unit compared to benchmark. Above-benchmark density is the savings signal.',
+      '<strong>Check the rate comparison table</strong> — for each vendor category, the table shows DET\'s average rate vs. market P25, P50, and P75. Rates above P75 are highlighted.',
+      '<strong>Export the benchmark report</strong> for use in negotiation preparation, sourcing strategy, or QBR materials.'
+    ],
+    tips: [
+      { icon: '&#x1F4CA;', title: 'Density is the real metric', body: 'Absolute spend numbers tell you scale. Spend density (spend per unit of output) tells you efficiency. Focus on density benchmarks for savings conversations.' },
+      { icon: '&#x1F3AF;', title: 'P75 is your negotiation anchor', body: 'If DET rates are above P75 in a category, the benchmark data is your opening position in any negotiation. It is hard for a vendor to argue against market data.' },
+      { icon: '&#x1F4C5;', title: 'Benchmarks have vintage dates', body: 'Benchmark data (ISG, Gartner, AWS, Big4) is compiled by VER from publicly available and negotiated sources. Always check the data vintage before using benchmarks in an external-facing negotiation.' },
+      { icon: '&#x1F517;', title: 'Links to Rate Benchmarks', body: 'For role-level rate benchmarking on CW engagements, use the Rate Benchmarks tool — it has 767 individual data points vs. the category-level view here.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

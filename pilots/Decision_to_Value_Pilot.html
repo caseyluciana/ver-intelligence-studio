@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Decision to Value · VER Intelligence Hub</title>
+<script src="../assets/vendors.js" defer></script>
+<script src="../assets/coupa_spend.js" defer></script>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --blue:#2563EB;--blue2:#1D4ED8;--blue3:#EFF6FF;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+[data-theme="dark"]{
+  --gray:#080F1E;--gray2:#111F35;--gray3:#1A2D47;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --white:#0F1E3C;--ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --red3:rgba(220,38,38,0.15);--red2:#FCA5A5;
+  --amber3:rgba(217,119,6,0.15);--amber2:#FCD34D;
+  --green3:rgba(5,150,105,0.15);--green2:#6EE7B7;
+  --blue3:rgba(37,99,235,0.15);--blue2:#93C5FD;
+  --purple3:rgba(124,58,237,0.15);--purple2:#C4B5FD;
+  --teal3:rgba(13,148,136,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);color:var(--ink2);}
+[data-theme="dark"] .card,[data-theme="dark"] .dtv-card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .exec-brief{background:linear-gradient(135deg,#0F1E3C,#1A0F2E);}
+[data-theme="dark"] .card-title{color:var(--ink);}
+[data-theme="dark"] input,[data-theme="dark"] textarea{background:var(--gray2);color:var(--ink);border-color:var(--border2);}
+[data-theme="dark"] select:not(.vselect-select){background:var(--gray2);color:var(--ink);border-color:var(--border2);}
+[data-theme="dark"] table{background:var(--white);}
+[data-theme="dark"] td{color:var(--ink2);border-bottom-color:var(--border);}
+[data-theme="dark"] .stage-badge,[data-theme="dark"] .type-badge{background:rgba(255,255,255,0.08)!important;color:var(--ink2)!important;}
+[data-theme="dark"] .kpi-card{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .kpi-val{color:var(--ink);}
+[data-theme="dark"] th{color:var(--ink4);border-bottom-color:var(--border);}
+[data-theme="dark"] td{color:var(--ink2);border-bottom-color:var(--border);}
+[data-theme="dark"] tr:hover td{background:var(--gray2);}
+[data-theme="dark"] select:not(.vselect-select){background:var(--gray2);color:var(--ink);border-color:var(--border2);}
+[data-theme="dark"] .btn-sec{background:var(--gray2);color:var(--ink);border-color:var(--border2);}
+[data-theme="dark"] .btn-danger{background:var(--gray2);color:#FCA5A5;border-color:rgba(220,38,38,0.25);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;-webkit-font-smoothing:antialiased;}
+
+/* ── TOP BAR ─────────────────────────────────────────── */
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;
+  background:rgba(10,18,38,0.96);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.07);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8pt;color:rgba(255,255,255,0.45);text-decoration:none;font-weight:600;
+  display:flex;align-items:center;gap:5px;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.1);}
+.htb-brand{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.02em;}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-tag{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.25);padding:3px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:4px;}
+.top-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:6px;
+  border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);
+  color:rgba(255,255,255,0.5);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.top-btn:hover{background:rgba(220,38,38,0.15);border-color:rgba(220,38,38,0.4);color:#FCA5A5;}
+
+/* ── HERO ─────────────────────────────────────────────── */
+.hero{background:linear-gradient(150deg,#0D1830 0%,#112B1A 40%,#0D1428 100%);
+  padding:22px 0 18px;position:relative;overflow:hidden;}
+.hero-glow-1{position:absolute;top:-60px;right:-80px;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(13,148,136,0.1),transparent 65%);pointer-events:none;
+  animation:glowPulse 6s ease-in-out infinite;}
+.hero-glow-2{position:absolute;bottom:-80px;left:5%;width:400px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(5,150,105,0.08),transparent 65%);pointer-events:none;}
+@keyframes glowPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(1.05);}}
+.hero-wrap{max-width:1280px;margin:0 auto;padding:0 52px;position:relative;}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.hero-eyebrow-text{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;
+  color:rgba(255,255,255,0.45);}
+.hero-eyebrow-dot{width:4px;height:4px;border-radius:50%;background:rgba(13,148,136,0.9);}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.05;margin-bottom:6px;
+  letter-spacing:-0.02em;}
+.hero-title span{color:#5EEAD4;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.6);line-height:1.6;max-width:580px;margin-bottom:14px;}
+.hero-data-source{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;
+  font-size:7pt;color:rgba(255,255,255,0.45);font-weight:600;letter-spacing:0.05em;margin-bottom:20px;}
+.hero-data-source-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;
+  box-shadow:0 0 6px #22C55E;animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.hero-kpis{display:flex;gap:14px;flex-wrap:wrap;}
+.hkpi{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:15px 18px;min-width:145px;position:relative;overflow:hidden;
+  transition:border-color 0.2s,background 0.2s;}
+.hkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0.7;}
+.hkpi.c-teal::before{background:linear-gradient(90deg,#0D9488,transparent);}
+.hkpi.c-green::before{background:linear-gradient(90deg,#059669,transparent);}
+.hkpi.c-amber::before{background:linear-gradient(90deg,#D97706,transparent);}
+.hkpi.c-red::before{background:linear-gradient(90deg,#DC2626,transparent);}
+.hkpi:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.16);}
+.hkpi-val{font-size:20pt;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.02em;}
+.hkpi.c-teal .hkpi-val{color:#5EEAD4;}
+.hkpi.c-green .hkpi-val{color:#6EE7B7;}
+.hkpi.c-amber .hkpi-val{color:#FCD34D;}
+.hkpi.c-red .hkpi-val{color:#FCA5A5;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.45);margin-top:5px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.3);margin-top:3px;line-height:1.4;}
+
+/* ── EXEC BRIEF ───────────────────────────────────────── */
+.exec-brief{background:linear-gradient(135deg,#0F1E3C 0%,#1A0F2E 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);padding:28px 0;}
+.exec-brief-wrap{max-width:1280px;margin:0 auto;padding:0 52px;}
+.eb-label{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.3);margin-bottom:16px;}
+.eb-insights{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.eb-insight{padding:16px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.03);}
+.eb-insight.critical{border-left:3px solid #9B2C32;background:rgba(155,44,50,0.05);}
+.eb-insight.warning{border-left:3px solid #D97706;background:rgba(217,119,6,0.06);}
+.eb-insight.info{border-left:3px solid #7C3AED;background:rgba(124,58,237,0.06);}
+.ebi-headline{font-size:9.5pt;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;}
+.ebi-number{font-size:22pt;font-weight:900;color:rgba(255,255,255,0.12);float:right;
+  line-height:1;margin-left:8px;margin-top:-2px;font-variant-numeric:tabular-nums;}
+.ebi-body{font-size:8pt;color:rgba(255,255,255,0.45);line-height:1.6;}
+
+/* ── PAGE BODY ────────────────────────────────────────── */
+.page-wrap{max-width:1280px;margin:0 auto;padding:32px 52px 72px;}
+
+.sec-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--ink4);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── TWO-COLUMN MAIN GRID ─────────────────────────────── */
+.main-grid{display:grid;grid-template-columns:400px 1fr;gap:22px;margin-bottom:32px;}
+
+/* ── CARD ─────────────────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px 24px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.04);}
+.card-title{font-size:10.5pt;font-weight:800;color:var(--ink);margin-bottom:16px;}
+
+/* ── FORM ─────────────────────────────────────────────── */
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.field-full{grid-column:1/-1;}
+label{display:block;font-size:7.5pt;font-weight:800;color:var(--ink4);text-transform:uppercase;
+  letter-spacing:0.06em;margin-bottom:5px;}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;
+  font:inherit;font-size:8.5pt;background:var(--white);color:var(--ink);transition:border-color 0.15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);
+  box-shadow:0 0 0 3px rgba(13,148,136,0.1);}
+textarea{min-height:64px;resize:vertical;}
+.field-note{font-size:7pt;color:var(--teal2);margin-top:5px;font-weight:600;
+  padding:4px 8px;background:var(--teal3);border-radius:4px;border:1px solid rgba(13,148,136,0.15);}
+
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 15px;border-radius:7px;
+  font:inherit;font-size:8pt;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all 0.15s;}
+.btn-primary{background:var(--teal);color:#fff;border-color:var(--teal2);}
+.btn-primary:hover{background:var(--teal2);}
+.btn-secondary{background:var(--white);color:var(--ink3);border-color:var(--border2);}
+.btn-secondary:hover{background:var(--gray2);border-color:var(--border);}
+.btn-danger{background:var(--white);color:var(--red);border-color:#FECACA;}
+.btn-danger:hover{background:var(--red3);}
+
+/* ── PIPELINE ─────────────────────────────────────────── */
+.pipeline-col{display:flex;flex-direction:column;gap:10px;}
+.stage-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
+  border-left-width:4px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.stage-card.s-identified{border-left-color:#9CA3AF;}
+.stage-card.s-decided{border-left-color:var(--amber);}
+.stage-card.s-approved{border-left-color:var(--purple);}
+.stage-card.s-executed{border-left-color:var(--blue);}
+.stage-card.s-realized{border-left-color:var(--green);}
+.sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sc-name{font-size:9pt;font-weight:800;color:var(--ink);}
+.sc-badge{font-size:7pt;font-weight:800;padding:3px 9px;border-radius:99px;}
+.s-identified .sc-badge{background:var(--gray2);color:var(--ink4);}
+.s-decided .sc-badge{background:var(--amber3);color:var(--amber2);}
+.s-approved .sc-badge{background:var(--purple3);color:var(--purple2);}
+.s-executed .sc-badge{background:var(--blue3);color:var(--blue2);}
+.s-realized .sc-badge{background:var(--green3);color:var(--green2);}
+.sc-stats{display:flex;gap:22px;}
+.sc-stat{font-size:7.5pt;color:var(--ink4);line-height:1.3;}
+.sc-stat strong{display:block;font-size:11pt;font-weight:900;line-height:1.1;color:var(--ink2);}
+.s-realized .sc-stat strong{color:var(--green2);}
+
+/* ── TABLE ────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:8.5pt;}
+th{padding:9px 11px;border-bottom:2px solid var(--border);text-align:left;font-size:7pt;
+  font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;}
+td{padding:9px 11px;border-bottom:1px solid var(--gray2);color:var(--ink3);vertical-align:middle;}
+tr:hover td{background:var(--gray);}
+.late-date{color:var(--red);font-weight:700;}
+td select{padding:5px 7px;font-size:8pt;border-radius:5px;border:1px solid var(--border2);}
+.tbl-action{font-size:8.5pt;font-weight:700;color:var(--ink2);}
+.empty-row td{text-align:center;color:var(--ink4);padding:28px;font-style:italic;}
+.btn-sm{padding:5px 10px;font-size:7.5pt;border-radius:5px;border:1px solid rgba(5,150,105,0.3);
+  background:var(--green3);color:var(--green2);font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;}
+.btn-sm:hover{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-sm-del{padding:5px 10px;font-size:7.5pt;border-radius:5px;border:1px solid #FECACA;
+  background:var(--white);color:var(--red);font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;margin-left:5px;}
+.btn-sm-del:hover{background:var(--red3);}
+
+/* ── DATA NOTE ────────────────────────────────────────── */
+.data-note{margin-top:28px;padding:14px 18px;background:var(--white);border:1px solid var(--border);
+  border-radius:10px;display:flex;align-items:flex-start;gap:12px;}
+.dn-icon{font-size:11pt;flex-shrink:0;opacity:0.6;}
+.dn-text{font-size:7.5pt;color:var(--ink4);line-height:1.6;}
+.dn-text strong{color:var(--ink3);}
+
+/* ── VIEWING MODE BANNER ── */
+.viewing-banner{display:flex;align-items:center;gap:10px;padding:9px 16px;margin-bottom:20px;
+  background:var(--teal3);border:1px solid rgba(13,148,136,0.25);border-radius:9px;
+  font-size:7.5pt;font-weight:600;color:var(--teal2);}
+.viewing-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+
+/* ── CLICKABLE TABLE ROWS ── */
+tbody tr.clickable-row{cursor:pointer;}
+tbody tr.clickable-row:hover td{background:var(--teal3);}
+.click-hint{font-size:10px;color:var(--teal2);font-style:italic;margin-top:6px;}
+
+/* ── ANIMATIONS ───────────────────────────────────────── */
+.fade-up{opacity:0;transform:translateY(18px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:1000px){
+  .hero-wrap,.exec-brief-wrap,.page-wrap{padding:0 20px;}
+  .page-wrap{padding-top:24px;}
+  .eb-insights{grid-template-columns:1fr;}
+  .main-grid{grid-template-columns:1fr;}
+  .hero-title{font-size:17pt;}
+}
+@media print{
+  .hub-top-bar,.top-btn,.actions,.btn{display:none!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body{background:#fff!important;}
+  .exec-brief{background:#f8f9fa!important;}
+  .hero{background:#0D1830!important;}
+  .fade-up{opacity:1!important;transform:none!important;}
+  .page-wrap{padding-bottom:0!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="../index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">VER Intelligence Hub</span>
+  </div>
+  <div class="htb-right">
+    <div class="htb-tag">DET Confidential</div>
+    <button type="button" class="top-btn" id="dm-btn" onclick="toggleDark()">☾ Dark</button>
+    <button type="button" class="top-btn" onclick="openDTVHelp()">? How to Use</button>
+    <button type="button" class="top-btn" onclick="window.print()">&#9113; Print</button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-wrap">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      <span class="hero-eyebrow-text">VER Intelligence Hub &middot; Decision-to-Value</span>
+    </div>
+    <h1 class="hero-title">Did our decisions create <span>real value?</span></h1>
+    <p class="hero-sub">Track every approved opportunity from identification through commercial execution, budget impact, and verified value realization. Close the gap between what was approved and what was actually delivered.</p>
+    <div class="hero-data-source">
+      <div class="hero-data-source-dot"></div>
+      Source: VER Intelligence Hub &middot; localStorage ver_decision_value_v2 &middot; Live portfolio
+    </div>
+    <div class="hero-kpis" id="hero-kpis"></div>
+  </div>
+</section>
+
+<!-- ── EXEC BRIEF ── -->
+<section class="exec-brief">
+  <div class="exec-brief-wrap">
+    <div class="eb-label">What leadership needs to know about value realization</div>
+    <div class="eb-insights">
+      <div class="eb-insight critical">
+        <div class="ebi-number">1</div>
+        <div class="ebi-headline">Execution is where value disappears</div>
+        <div class="ebi-body">Value realization rarely fails at the decision stage — it fails at execution. The gap between "Approved" and "Realized" is where most savings evaporate. Every approved decision needs an owner, a target date, and a validation method before the approval meeting ends.</div>
+      </div>
+      <div class="eb-insight warning">
+        <div class="ebi-number">2</div>
+        <div class="ebi-headline">Cost avoidance is the most overclaimed category</div>
+        <div class="ebi-body">Cost avoidance is the most commonly overclaimed value type. Without a validated baseline spend and a documented alternative, cost avoidance entries should remain in "Identified" until evidence is attached.</div>
+      </div>
+      <div class="eb-insight info">
+        <div class="ebi-number">3</div>
+        <div class="ebi-headline">Realization rate is the most honest KPI</div>
+        <div class="ebi-body">The realization rate KPI is the most honest signal of procurement effectiveness. A portfolio with high expected value and low realization rate signals a decision-making culture that approves without executing.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LEGEND STRIP ─────────────────────────────────────── -->
+<style>
+.legend-strip{max-width:1280px;margin:0 auto 0;padding:0 52px;}
+.legend-bar{display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:10px 16px;margin-bottom:16px;}
+[data-theme="dark"] .legend-bar{background:rgba(255,255,255,0.04);border-color:var(--border);}
+.legend-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--ink4);flex-shrink:0;margin-right:4px;}
+.legend-items{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--ink3);}
+[data-theme="dark"] .legend-item{color:var(--ink4);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-divider{width:1px;height:14px;background:var(--border);flex-shrink:0;}
+@media(max-width:900px){.legend-strip{padding:0 20px;}}
+</style>
+<div class="legend-strip">
+  <div class="legend-bar">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><div class="legend-dot" style="background:#9CA3AF"></div>Identified</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>Decided</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div>Approved</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div>Executed</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#059669"></div>Realized</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div>Past Target</div>
+      <div class="legend-divider"></div>
+      <div class="legend-item" style="font-size:10px;color:var(--ink4);">Realization Rate = Realized &divide; Expected &times; 100 &nbsp;&middot;&nbsp; Healthy &gt;60%</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PAGE BODY ── -->
+<div class="page-wrap">
+  <!-- VIEWING MODE BANNER -->
+  <div class="viewing-banner">
+    <div class="viewing-banner-dot"></div>
+    <span>Viewing mode &mdash; adjustments affect the calculator only and are not saved.</span>
+  </div>
+
+  <p class="sec-label">Value Decision Pipeline Overview</p>
+
+  <div class="main-grid fade-up">
+
+    <!-- LEFT: FORM CARD -->
+    <div class="card">
+      <div class="card-title">Explore a value decision</div>
+      <div class="fields">
+
+        <div class="field-full">
+          <label for="f-vendor-sel">Vendor</label>
+          <select id="f-vendor-sel"></select>
+          <div class="field-note" id="f-baseline-note" style="display:none;"></div>
+        </div>
+
+        <div class="field-full">
+          <label for="f-name">Action / Opportunity Name</label>
+          <input type="text" id="f-name" placeholder="e.g. Renegotiate Workday pricing tier">
+        </div>
+
+        <div class="field-full">
+          <label for="f-owner">Owner</label>
+          <input type="text" id="f-owner" value="Budget Owner">
+        </div>
+
+        <div>
+          <label for="f-expected">Expected Value ($M)</label>
+          <input type="number" id="f-expected" min="0" step="0.01" value="0">
+        </div>
+
+        <div>
+          <label for="f-realized">Realized Value ($M)</label>
+          <input type="number" id="f-realized" min="0" step="0.01" value="0">
+        </div>
+
+        <div>
+          <label for="f-stage">Stage</label>
+          <select id="f-stage">
+            <option value="Identified">Identified</option>
+            <option value="Decided">Decided</option>
+            <option value="Approved">Approved</option>
+            <option value="Executed">Executed</option>
+            <option value="Realized">Realized</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="f-type">Value Type</label>
+          <select id="f-type">
+            <option value="Cost reduction">Cost reduction</option>
+            <option value="Cost avoidance">Cost avoidance</option>
+            <option value="Capacity release">Capacity release</option>
+            <option value="Risk avoidance">Risk avoidance</option>
+            <option value="Revenue enablement">Revenue enablement</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="f-decision">Decision Date</label>
+          <input type="date" id="f-decision">
+        </div>
+
+        <div>
+          <label for="f-target">Target Realization Date</label>
+          <input type="date" id="f-target">
+        </div>
+
+        <div class="field-full">
+          <label for="f-evidence">Evidence / Notes</label>
+          <textarea id="f-evidence" placeholder="Baseline source, methodology, approving stakeholder, contract reference..."></textarea>
+        </div>
+
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" id="btn-export">&#8659; Export CSV</button>
+        <button type="button" class="btn btn-secondary" onclick="window.print()">&#9113; Print</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: PIPELINE KANBAN -->
+    <div class="pipeline-col" id="pipeline-col"></div>
+
+  </div>
+
+  <!-- RECORDS TABLE -->
+  <p class="sec-label">Value Realization Records</p>
+
+  <div class="card fade-up">
+    <div class="click-hint" style="margin-bottom:8px;">Click any row to load that record into the form above for exploration.</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>Vendor</th>
+            <th>Owner</th>
+            <th>Stage</th>
+            <th>Value Type</th>
+            <th>Expected ($M)</th>
+            <th>Realized ($M)</th>
+            <th>Target Date</th>
+            <th>Evidence</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="records-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DATA NOTE -->
+  <div class="data-note fade-up">
+    <div class="dn-icon">&#8505;</div>
+    <div class="dn-text">
+      <strong>Data source:</strong> All records are stored in browser localStorage under key <code>ver_decision_value_v2</code>.
+      Vendor baseline spend values are sourced from Coupa DEV (salesforce-compass-dev.coupahost.com) FY27 actuals.
+      Stage updates and realized value entries are applied immediately on change.
+      <strong>This tool is decision-support — not a financial system of record.</strong>
+      For questions contact the VER team.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DOM helpers ────────────────────────────────────────
+function el(tag, cls, text){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(text !== undefined) e.textContent = text;
+  return e;
+}
+function clearEl(node){
+  while(node.firstChild) node.removeChild(node.firstChild);
+}
+
+// ── Animation helpers ──────────────────────────────────
+function animateCount(elNode, target, prefix, suffix, decimals, duration){
+  var start = 0, startTime = null;
+  function step(ts){
+    if(!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    elNode.textContent = prefix + (start + (target - start) * eased).toFixed(decimals) + suffix;
+    if(progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function initScrollReveal(){
+  if(!('IntersectionObserver' in window)) return;
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, {threshold: 0.08});
+  document.querySelectorAll('.fade-up').forEach(function(elem){ obs.observe(elem); });
+}
+
+// ── Storage ────────────────────────────────────────────
+var LS_KEY = 'ver_decision_value_v2';
+var TODAY_STR = new Date().toISOString().slice(0, 10);
+
+function loadRecords(){
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch(e){ return []; }
+}
+function saveRecords(recs){
+  localStorage.setItem(LS_KEY, JSON.stringify(recs));
+}
+
+// ── Vendor selector ────────────────────────────────────
+function populateVendorSelect(){
+  var sel = document.getElementById('f-vendor-sel');
+  clearEl(sel);
+
+  var blank = document.createElement('option');
+  blank.value = '';
+  blank.textContent = '— Select a vendor —';
+  sel.appendChild(blank);
+
+  var vendors = [];
+  if(window.VER_VENDORS && Array.isArray(window.VER_VENDORS)){
+    vendors = window.VER_VENDORS.slice();
+  }
+  vendors.sort(function(a, b){ return a.name.localeCompare(b.name); });
+
+  vendors.forEach(function(v){
+    var opt = document.createElement('option');
+    opt.value = v.name;
+    opt.textContent = v.name;
+    sel.appendChild(opt);
+  });
+
+  sel.addEventListener('change', function(){
+    var noteEl = document.getElementById('f-baseline-note');
+    var name = sel.value;
+    if(!name){
+      noteEl.style.display = 'none';
+      return;
+    }
+    var coupaVendors = (window.VER_COUPA && Array.isArray(window.VER_COUPA.vendors))
+      ? window.VER_COUPA.vendors : [];
+    var match = null;
+    for(var i = 0; i < coupaVendors.length; i++){
+      if(coupaVendors[i].n === name){ match = coupaVendors[i]; break; }
+    }
+    if(match && match.fy27){
+      noteEl.textContent = 'FY27 Baseline: $' + match.fy27.toFixed(2) + 'M';
+      noteEl.style.display = 'block';
+    } else {
+      noteEl.style.display = 'none';
+    }
+  });
+}
+
+// ── Hero KPIs ──────────────────────────────────────────
+var kpiBuilt = false;
+var KPI_DEFS = [
+  { id:'kpi-exp',  label:'Pipeline Value',   prefix:'$', suffix:'M', decimals:2, cls:'c-teal',  note:'Total expected value across all records' },
+  { id:'kpi-real', label:'Realized Value',   prefix:'$', suffix:'M', decimals:2, cls:'c-green', note:'Sum of confirmed realized values' },
+  { id:'kpi-rate', label:'Realization Rate', prefix:'',  suffix:'%', decimals:1, cls:'c-amber', note:'Realized ÷ Expected × 100' },
+  { id:'kpi-late', label:'Past Target',      prefix:'',  suffix:'',  decimals:0, cls:'c-red',   note:'Approved+ stage, target date passed' }
+];
+
+function renderHeroKPIs(recs){
+  var container = document.getElementById('hero-kpis');
+  var totalExpected = 0, totalRealized = 0, pastTarget = 0;
+  recs.forEach(function(r){
+    totalExpected += (parseFloat(r.expected) || 0);
+    totalRealized += (parseFloat(r.realized) || 0);
+    if(r.target && r.target < TODAY_STR && r.stage !== 'Realized') pastTarget++;
+  });
+  var rate = totalExpected > 0 ? (totalRealized / totalExpected * 100) : 0;
+  var vals = [totalExpected, totalRealized, rate, pastTarget];
+
+  if(!kpiBuilt){
+    clearEl(container);
+    KPI_DEFS.forEach(function(k){
+      var card = el('div', 'hkpi ' + k.cls);
+      var valEl = el('div', 'hkpi-val', k.prefix + '0' + k.suffix);
+      valEl.id = k.id;
+      card.appendChild(valEl);
+      card.appendChild(el('div', 'hkpi-lbl', k.label));
+      card.appendChild(el('div', 'hkpi-note', k.note));
+      container.appendChild(card);
+    });
+    kpiBuilt = true;
+  }
+
+  KPI_DEFS.forEach(function(k, i){
+    var node = document.getElementById(k.id);
+    if(node) animateCount(node, vals[i], k.prefix, k.suffix, k.decimals, 900);
+  });
+}
+
+// ── Pipeline kanban ────────────────────────────────────
+var STAGES = ['Identified', 'Decided', 'Approved', 'Executed', 'Realized'];
+var STAGE_CLS = {
+  Identified: 's-identified',
+  Decided:    's-decided',
+  Approved:   's-approved',
+  Executed:   's-executed',
+  Realized:   's-realized'
+};
+
+function renderPipeline(recs){
+  var col = document.getElementById('pipeline-col');
+  clearEl(col);
+  STAGES.forEach(function(stage){
+    var group = recs.filter(function(r){ return r.stage === stage; });
+    var exp  = group.reduce(function(acc, r){ return acc + (parseFloat(r.expected) || 0); }, 0);
+    var real = group.reduce(function(acc, r){ return acc + (parseFloat(r.realized) || 0); }, 0);
+
+    var card = el('div', 'stage-card ' + (STAGE_CLS[stage] || ''));
+
+    var top = el('div', 'sc-top');
+    top.appendChild(el('div', 'sc-name', stage));
+    top.appendChild(el('span', 'sc-badge', group.length + (group.length === 1 ? ' record' : ' records')));
+    card.appendChild(top);
+
+    var stats = el('div', 'sc-stats');
+
+    var sExp = el('div', 'sc-stat');
+    sExp.appendChild(el('strong', null, '$' + exp.toFixed(2) + 'M'));
+    sExp.appendChild(document.createTextNode(' Expected'));
+    stats.appendChild(sExp);
+
+    var sReal = el('div', 'sc-stat');
+    sReal.appendChild(el('strong', null, '$' + real.toFixed(2) + 'M'));
+    sReal.appendChild(document.createTextNode(' Realized'));
+    stats.appendChild(sReal);
+
+    card.appendChild(stats);
+    col.appendChild(card);
+  });
+}
+
+// ── Load record into form ──────────────────────────────
+function loadRecordIntoForm(r){
+  var sel = document.getElementById('f-vendor-sel');
+  // Try to match vendor name in select options
+  var found = false;
+  for(var i = 0; i < sel.options.length; i++){
+    if(sel.options[i].value === r.vendor){ sel.selectedIndex = i; found = true; break; }
+  }
+  if(!found){ sel.value = ''; }
+
+  // Trigger baseline note
+  sel.dispatchEvent(new Event('change'));
+
+  document.getElementById('f-name').value      = r.name || '';
+  document.getElementById('f-owner').value     = r.owner || 'Budget Owner';
+  document.getElementById('f-expected').value  = (parseFloat(r.expected) || 0).toFixed(2);
+  document.getElementById('f-realized').value  = (parseFloat(r.realized) || 0).toFixed(2);
+  document.getElementById('f-stage').value     = r.stage || 'Identified';
+  document.getElementById('f-type').value      = r.type || 'Cost reduction';
+  document.getElementById('f-decision').value  = r.decision || '';
+  document.getElementById('f-target').value    = r.target || '';
+  document.getElementById('f-evidence').value  = r.evidence || '';
+
+  // Scroll to form
+  var formEl = document.querySelector('.main-grid');
+  if(formEl) formEl.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── Table render ───────────────────────────────────────
+function renderTable(recs){
+  var tbody = document.getElementById('records-tbody');
+  clearEl(tbody);
+
+  if(!recs.length){
+    var erow = document.createElement('tr');
+    erow.className = 'empty-row';
+    var etd = document.createElement('td');
+    etd.colSpan = 10;
+    etd.textContent = 'No records yet. The VER team portal will push records here automatically.';
+    erow.appendChild(etd);
+    tbody.appendChild(erow);
+    return;
+  }
+
+  recs.forEach(function(r){
+    var tr = document.createElement('tr');
+    tr.className = 'clickable-row';
+    tr.title = 'Click to load into form for exploration';
+
+    // Action
+    var tdAction = document.createElement('td');
+    var actionDiv = el('div', 'tbl-action', r.name || '—');
+    actionDiv.title = r.name || '';
+    actionDiv.style.maxWidth = '170px';
+    actionDiv.style.overflow = 'hidden';
+    actionDiv.style.textOverflow = 'ellipsis';
+    actionDiv.style.whiteSpace = 'nowrap';
+    tdAction.appendChild(actionDiv);
+    tr.appendChild(tdAction);
+
+    // Vendor
+    tr.appendChild(el('td', null, r.vendor || '—'));
+
+    // Owner
+    tr.appendChild(el('td', null, r.owner || '—'));
+
+    // Stage (read-only badge)
+    var tdStage = document.createElement('td');
+    var stageSpan = document.createElement('span');
+    var stageCls = STAGE_CLS[r.stage] || '';
+    // Map stage class to a simple badge style
+    var stageStyleMap = {
+      's-identified': 'background:var(--gray2);color:var(--ink4)',
+      's-decided':    'background:var(--amber3);color:var(--amber2)',
+      's-approved':   'background:var(--purple3);color:var(--purple2)',
+      's-executed':   'background:var(--blue3);color:var(--blue2)',
+      's-realized':   'background:var(--green3);color:var(--green2)'
+    };
+    stageSpan.style.cssText = 'display:inline-block;padding:3px 9px;border-radius:99px;font-size:7pt;font-weight:800;' + (stageStyleMap[stageCls] || '');
+    stageSpan.textContent = r.stage || '—';
+    tdStage.appendChild(stageSpan);
+    tr.appendChild(tdStage);
+
+    // Value type
+    tr.appendChild(el('td', null, r.type || '—'));
+
+    // Expected
+    tr.appendChild(el('td', null, '$' + (parseFloat(r.expected) || 0).toFixed(2) + 'M'));
+
+    // Realized
+    tr.appendChild(el('td', null, '$' + (parseFloat(r.realized) || 0).toFixed(2) + 'M'));
+
+    // Target date
+    var tdTarget = document.createElement('td');
+    if(r.target){
+      var isLate = (r.target < TODAY_STR && r.stage !== 'Realized');
+      var dateSpan = document.createElement('span');
+      if(isLate) dateSpan.className = 'late-date';
+      dateSpan.textContent = r.target + (isLate ? ' ⚠' : '');
+      tdTarget.appendChild(dateSpan);
+    } else {
+      tdTarget.textContent = '—';
+    }
+    tr.appendChild(tdTarget);
+
+    // Evidence
+    var evTd = document.createElement('td');
+    evTd.style.maxWidth = '150px';
+    evTd.style.overflow = 'hidden';
+    evTd.style.textOverflow = 'ellipsis';
+    evTd.style.whiteSpace = 'nowrap';
+    evTd.title = r.evidence || '';
+    evTd.textContent = r.evidence || '—';
+    tr.appendChild(evTd);
+
+    // View action
+    var tdAct = document.createElement('td');
+    tdAct.style.whiteSpace = 'nowrap';
+    var viewBtn = el('button', 'btn-sm', 'Load');
+    (function(rec){
+      viewBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        loadRecordIntoForm(rec);
+      });
+    })(r);
+    tdAct.appendChild(viewBtn);
+    tr.appendChild(tdAct);
+
+    // Row click
+    (function(rec){
+      tr.addEventListener('click', function(){ loadRecordIntoForm(rec); });
+    })(r);
+
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Master render ──────────────────────────────────────
+function renderAll(){
+  var recs = loadRecords();
+  renderHeroKPIs(recs);
+  renderPipeline(recs);
+  renderTable(recs);
+}
+
+// ── Fetch live Coupa spend and update baseline note ────
+function fetchCoupaSpend(vendorName){
+  fetch('/api/coupa/invoices?status=Approved&limit=50')
+    .then(function(res){
+      if(!res.ok) throw new Error('not ok');
+      return res.json();
+    })
+    .then(function(data){
+      if(!Array.isArray(data)) return;
+      var nameLower = (vendorName || '').toLowerCase();
+      var total = 0;
+      data.forEach(function(inv){
+        var supplier = (inv.supplier || inv.vendor || inv.name || '').toLowerCase();
+        if(supplier === nameLower || supplier.indexOf(nameLower) >= 0 || nameLower.indexOf(supplier) >= 0){
+          total += parseFloat(inv.amount || inv.total || 0) || 0;
+        }
+      });
+      if(total > 0){
+        var inM = total > 1000 ? total / 1000000 : total;
+        var noteEl = document.getElementById('f-baseline-note');
+        if(noteEl && noteEl.style.display !== 'none'){
+          noteEl.textContent = 'FY27 Baseline (live): $' + inM.toFixed(2) + 'M';
+        } else if(noteEl) {
+          noteEl.textContent = 'FY27 Baseline (live): $' + inM.toFixed(2) + 'M';
+          noteEl.style.display = 'block';
+        }
+      }
+    })
+    .catch(function(){
+      // Silently fall back to static data already shown
+    });
+}
+
+// ── Export CSV ─────────────────────────────────────────
+function exportCSV(){
+  var recs = loadRecords();
+  if(!recs.length){ alert('No records to export.'); return; }
+  var headers = ['ID','Name','Vendor','Owner','Stage','Value_Type','Expected_M','Realized_M',
+                 'Decision_Date','Target_Date','Evidence','Updated'];
+  function csvEsc(v){ return String(v || ''); }
+  var lines = [headers];
+  recs.forEach(function(r){
+    lines.push([
+      r.id, csvEsc(r.name), csvEsc(r.vendor), csvEsc(r.owner), csvEsc(r.stage),
+      csvEsc(r.type), (parseFloat(r.expected)||0).toFixed(2), (parseFloat(r.realized)||0).toFixed(2),
+      r.decision || '', r.target || '', csvEsc(r.evidence || ''), r.updated || ''
+    ]);
+  });
+  var csv = lines.map(function(row){
+    return row.map(function(c){ return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',');
+  }).join('\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv'}));
+  a.download = 'decision-to-value-' + TODAY_STR + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── Seed default data ──────────────────────────────────
+function seedDefaultData(){
+  if(localStorage.getItem(LS_KEY)) return; // never overwrite existing data
+
+  // 10 vendor/initiative records — spread across pipeline stages
+  // Vendors chosen for upcoming renewals (within 12 months of 2026-07-30) or high spend
+  var seed = [
+    {
+      id: 1700000001000,
+      name: 'Renegotiate Workday pricing tier',
+      vendor: 'Workday',
+      owner: 'Casey Candelaria',
+      expected: 2.37,
+      realized: 0,
+      stage: 'Approved',
+      type: 'Cost reduction',
+      decision: '2026-06-15',
+      target: '2026-11-01',
+      evidence: 'Renewal due Nov 2026. Highest spend vendor $23.7M. Benchmark shows 10% reduction opportunity.',
+      updated: '2026-07-01T10:00:00.000Z'
+    },
+    {
+      id: 1700000002000,
+      name: 'IBM application services scope reduction',
+      vendor: 'IBM',
+      owner: 'Casey Candelaria',
+      expected: 1.43,
+      realized: 0,
+      stage: 'Decided',
+      type: 'Cost reduction',
+      decision: '2026-06-20',
+      target: '2026-09-30',
+      evidence: 'Renewal Aug 2026. Active review with Procurement. Enterprise app and data services overlap identified.',
+      updated: '2026-07-02T10:00:00.000Z'
+    },
+    {
+      id: 1700000003000,
+      name: 'Microsoft 365 seat consolidation',
+      vendor: 'Microsoft',
+      owner: 'Budget Owner',
+      expected: 0.18,
+      realized: 0.18,
+      stage: 'Realized',
+      type: 'Cost reduction',
+      decision: '2026-05-01',
+      target: '2026-06-30',
+      evidence: 'M365 renewal Jun 2026. Seat audit reduced unused licenses. $180K confirmed in Coupa actuals.',
+      updated: '2026-07-10T10:00:00.000Z'
+    },
+    {
+      id: 1700000004000,
+      name: 'Deloitte scope consolidation — HR and Tax',
+      vendor: 'Deloitte',
+      owner: 'Casey Candelaria',
+      expected: 0.91,
+      realized: 0,
+      stage: 'Identified',
+      type: 'Cost avoidance',
+      decision: '2026-07-01',
+      target: '2027-01-31',
+      evidence: 'Renewal Dec 2026. Overlap between HR Consulting and Payroll Advisory scopes. Validate before renewal.',
+      updated: '2026-07-05T10:00:00.000Z'
+    },
+    {
+      id: 1700000005000,
+      name: 'BCG advisory engagement exit',
+      vendor: 'BCG',
+      owner: 'Casey Candelaria',
+      expected: 1.2,
+      realized: 0,
+      stage: 'Approved',
+      type: 'Cost reduction',
+      decision: '2026-06-10',
+      target: '2026-09-30',
+      evidence: 'Renewal Jun 2026. Delivery risk high (score 70). VER Director engaged. Business case for exit approved.',
+      updated: '2026-07-08T10:00:00.000Z'
+    },
+    {
+      id: 1700000006000,
+      name: 'NTT Data PO consolidation — reduce active POs',
+      vendor: 'NTT Data',
+      owner: 'Budget Owner',
+      expected: 1.14,
+      realized: 0,
+      stage: 'Executed',
+      type: 'Cost reduction',
+      decision: '2026-04-15',
+      target: '2026-08-31',
+      evidence: '24 active POs. Target consolidation to 18 POs. AD restructure complete Apr 2026. Tracking in Fieldglass.',
+      updated: '2026-07-15T10:00:00.000Z'
+    },
+    {
+      id: 1700000007000,
+      name: 'AWS EDP renegotiation — commit adjustment',
+      vendor: 'AWS',
+      owner: 'Budget Owner',
+      expected: 0.86,
+      realized: 0,
+      stage: 'Identified',
+      type: 'Cost avoidance',
+      decision: '2026-07-10',
+      target: '2027-03-01',
+      evidence: 'EDP renewal Mar 2027. Usage within committed spend envelope. Early renegotiation window opens Q4 FY27.',
+      updated: '2026-07-10T10:00:00.000Z'
+    },
+    {
+      id: 1700000008000,
+      name: 'Snowflake usage optimization — query cost reduction',
+      vendor: 'Snowflake',
+      owner: 'Budget Owner',
+      expected: 0.22,
+      realized: 0.22,
+      stage: 'Realized',
+      type: 'Cost reduction',
+      decision: '2026-05-15',
+      target: '2026-08-15',
+      evidence: 'Query optimization initiative reduced compute costs by ~20%. Validated in FY27 Coupa actuals.',
+      updated: '2026-07-20T10:00:00.000Z'
+    },
+    {
+      id: 1700000009000,
+      name: 'Figma license hygiene before renewal',
+      vendor: 'Figma',
+      owner: 'Budget Owner',
+      expected: 0.48,
+      realized: 0,
+      stage: 'Decided',
+      type: 'Cost reduction',
+      decision: '2026-07-05',
+      target: '2027-01-31',
+      evidence: 'Renewal Jan 2027. Seat count review required. $3.2M baseline — reduce unused seats before new term.',
+      updated: '2026-07-05T10:00:00.000Z'
+    },
+    {
+      id: 1700000010000,
+      name: 'Tech Mahindra SLA penalty recovery',
+      vendor: 'Tech Mahindra',
+      owner: 'Casey Candelaria',
+      expected: 0.65,
+      realized: 0,
+      stage: 'Approved',
+      type: 'Risk avoidance',
+      decision: '2026-06-25',
+      target: '2026-10-31',
+      evidence: '3 SLA metrics below target. Contract penalty clauses confirmed. Credits negotiation in progress.',
+      updated: '2026-07-12T10:00:00.000Z'
+    }
+  ];
+
+  saveRecords(seed);
+}
+
+// ── Wire buttons ───────────────────────────────────────
+document.getElementById('btn-export').addEventListener('click', exportCSV);
+
+// ── Storage event — auto-inject from portal ────────────
+window.addEventListener('storage', function(e){
+  if(e.key === LS_KEY){
+    kpiBuilt = false;
+    renderAll();
+  }
+});
+
+// ── Init (defer-safe) ──────────────────────────────────
+function init(){
+  // Seed default data on first load (no-op if data already exists)
+  seedDefaultData();
+
+  populateVendorSelect();
+
+  // Wire vendor change to also try live Coupa
+  var vendorSel = document.getElementById('f-vendor-sel');
+  var origChange = vendorSel.onchange;
+  vendorSel.addEventListener('change', function(){
+    var name = vendorSel.value;
+    if(name) fetchCoupaSpend(name);
+  });
+
+  renderAll();
+  initScrollReveal();
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(init, 150);
+  });
+} else {
+  setTimeout(init, 150);
+}
+</script>
+<script>
+(function(){var t=localStorage.getItem('ver-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+function toggleDark(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('ver-theme',next);
+  var btn=document.getElementById('dm-btn');
+  if(btn)btn.textContent=next==='dark'?'☾ Light':'☽ Dark';
+}
+</script>
+<script src="../assets/help-modal.js"></script>
+<script>
+function openDTVHelp(){
+  HelpModal.open({
+    title: 'Decision to Value',
+    what: 'Decision to Value answers: "Did the approved decision actually create real value?" It tracks vendor-related decisions through a 5-stage pipeline — from identification through realized savings — and calculates the realization rate: the percentage of projected savings that has been confirmed in actuals. Use it to hold decisions accountable after approval.',
+    steps: [
+      '<strong>Add a decision</strong> — enter the vendor name, decision type, projected value, and target date. The FY27 Coupa baseline auto-populates when the vendor is matched.',
+      '<strong>Track pipeline stage</strong> — each decision moves through: Identified → Decided → Approved → Executed → Realized. Update the stage as the decision progresses.',
+      '<strong>Enter realized value</strong> once execution is confirmed. This unlocks the realization rate calculation.',
+      '<strong>Read the KPI bar</strong> — Pipeline Value, Realized Value, Realization Rate, and Past Target count give you an instant portfolio health check.',
+      '<strong>Review the Exec Brief</strong> for the key insight: are decisions translating to savings, which are stalled, and what needs escalation.'
+    ],
+    glossary: [
+      {term:'Pipeline Value', color:'#3B82F6', def:'Total projected savings across all active decisions in the tracker, regardless of current stage. Represents the total potential value being pursued.'},
+      {term:'Realized Value', color:'#10B981', def:'Confirmed savings from decisions that have reached the Realized stage. This is actual, verified value — not projected.'},
+      {term:'Realization Rate', color:'#8B5CF6', def:'Realized Value ÷ Pipeline Value × 100. A healthy realization rate is above 60%. Below 40% indicates decisions are stalling before execution or savings are not being captured.'},
+      {term:'Stage: Identified', color:'#94A3B8', def:'The opportunity has been spotted but no formal decision has been made. No commitment yet.'},
+      {term:'Stage: Decided', color:'#60A5FA', def:'A decision has been made internally (e.g., to renegotiate, consolidate, or exit) but approval has not yet been granted.'},
+      {term:'Stage: Approved', color:'#A78BFA', def:'The decision has received formal sign-off (stakeholder, VP, or procurement approval). Ready to execute.'},
+      {term:'Stage: Executed', color:'#F59E0B', def:'The action has been taken — contract signed, vendor notified, change in effect. Savings not yet confirmed in actuals.'},
+      {term:'Stage: Realized', color:'#10B981', def:'Savings have been confirmed in Coupa actuals or financial reporting. This is the only stage where value counts toward the Realization Rate.'},
+      {term:'Past Target', color:'#EF4444', def:'A decision whose target date has passed without reaching the Realized stage. Flags stalled decisions that need escalation or re-scoping.'},
+      {term:'Decision Type', color:null, def:'The category of action: Rate Renegotiation, Contract Consolidation, Vendor Exit, Scope Reduction, New Sourcing, or Process Automation.'},
+      {term:'FY27 Coupa Baseline', color:null, def:'The actual FY27 spend for the vendor pulled from Coupa DEV (242 vendors, $295.47M portfolio). Auto-populated as context when adding a decision.'}
+    ],
+    footNote: 'FY27 · Salesforce DET · Confidential'
+  });
+}
+</script>
+</body>
+</html>

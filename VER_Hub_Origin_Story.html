@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Why I Built It — VER Intelligence Hub</title>
+<style>
+
+/* ── Design tokens ── */
+:root{
+  --teal:#0D9488;--teal-dim:#0F766E;--teal-bright:#14B8A6;
+  --green:#059669;--amber:#D97706;--red:#DC2626;
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+[data-theme="dark"]{
+  --bg:#060D1A;
+  --bg-bar:rgba(6,13,26,0.82);
+  --ink:rgba(255,255,255,0.93);
+  --ink-dim:rgba(255,255,255,0.56);
+  --ink-muted:rgba(255,255,255,0.30);
+  --border:rgba(255,255,255,0.06);
+  --border-soft:rgba(255,255,255,0.10);
+  --grid:rgba(255,255,255,0.018);
+  --card:rgba(255,255,255,0.04);
+  --card-hover:rgba(255,255,255,0.07);
+  --teal-glow:rgba(13,148,136,0.18);
+  --teal-border:rgba(13,148,136,0.35);
+  --kpi-green:#34D399;--kpi-amber:#FBBF24;--kpi-blue:#93C5FD;
+  --dot-color:#34D399;
+}
+
+/* ── Reset ── */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+
+/* ── Ambient glows ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 82% 0%,   rgba(13,148,136,0.16) 0%,transparent 52%),
+    radial-gradient(ellipse at 0%  100%, rgba(124,58,237,0.09) 0%,transparent 48%),
+    radial-gradient(ellipse at 28% 55%,  rgba(13,148,136,0.05) 0%,transparent 42%);
+}
+/* ── Grid overlay ── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:72px 72px;
+}
+
+/* ── Scan line ── */
+.scan{
+  position:fixed;left:0;right:0;height:200px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(13,148,136,0.03) 50%,transparent 100%);
+  animation:scan 10s linear infinite;will-change:transform;
+}
+@keyframes scan{from{transform:translateY(-200px)}to{transform:translateY(110vh)}}
+
+/* ── Top bar ── */
+.top-bar{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:52px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-bar);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+}
+.tb-left{display:flex;align-items:center;gap:16px;}
+.tb-brand{font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink);}
+.tb-status{
+  display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;
+  background:rgba(13,148,136,0.12);border:1px solid rgba(13,148,136,0.22);
+}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--dot-color);animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.tb-status-lbl{font-size:9px;font-weight:700;color:var(--dot-color);letter-spacing:0.12em;text-transform:uppercase;}
+.tb-right{font-size:10px;color:var(--ink-muted);letter-spacing:0.06em;}
+
+/* ── Page shell ── */
+.page{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:0 40px 120px;}
+
+/* ── HERO ── */
+.hero-section{padding:96px 0 80px;text-align:center;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:12px;
+  font-size:10px;font-weight:700;color:var(--teal);
+  text-transform:uppercase;letter-spacing:0.22em;margin-bottom:28px;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{
+  content:'';display:inline-block;width:28px;height:1px;background:var(--teal);opacity:0.45;
+}
+.hero-title{
+  font-size:clamp(38px,6vw,68px);font-weight:900;line-height:1.06;
+  letter-spacing:-0.035em;color:var(--ink);margin-bottom:16px;
+}
+.hero-title em{color:var(--teal);font-style:normal;text-shadow:0 0 70px rgba(13,148,136,0.42);}
+.hero-sub{
+  font-size:clamp(15px,1.4vw,17px);color:var(--ink-dim);line-height:1.7;
+  max-width:620px;margin:0 auto 48px;font-weight:400;
+}
+.hero-meta{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 20px;
+  font-size:10px;color:var(--ink-muted);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+}
+.hero-sep{opacity:0.3;}
+
+/* ── Divider ── */
+.divider{height:1px;background:linear-gradient(to right,transparent,var(--border-soft),transparent);margin:16px 0;}
+
+/* ── Chapter ── */
+.chapter{padding:72px 0 0;}
+.chapter-eyebrow{
+  font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.22em;
+  margin-bottom:16px;display:flex;align-items:center;gap:10px;
+}
+.chapter-eyebrow::before{content:'';display:inline-block;width:18px;height:1px;background:var(--teal);}
+.chapter-title{
+  font-size:clamp(22px,3vw,34px);font-weight:800;letter-spacing:-0.022em;
+  color:var(--ink);margin-bottom:22px;line-height:1.22;
+}
+.chapter-body{font-size:15px;color:var(--ink-dim);line-height:1.82;margin-bottom:18px;}
+.chapter-body strong{color:var(--ink);font-weight:600;}
+
+/* ── Pull quote ── */
+.pull-quote{
+  border-left:2px solid var(--teal);
+  padding:18px 28px;margin:36px 0;
+  background:rgba(13,148,136,0.06);border-radius:0 10px 10px 0;
+}
+.pull-quote p{
+  font-size:17px;font-style:italic;color:rgba(255,255,255,0.78);
+  line-height:1.72;font-weight:400;
+}
+
+/* ── Stat row ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:40px 0;}
+.stat-card{
+  background:var(--card);border:1px solid var(--border-soft);border-radius:10px;
+  padding:20px 14px;text-align:center;
+}
+.stat-val{font-size:26px;font-weight:900;line-height:1;margin-bottom:6px;letter-spacing:-0.03em;}
+.stat-val.teal{color:var(--teal);}
+.stat-val.green{color:var(--kpi-green);}
+.stat-val.amber{color:var(--kpi-amber);}
+.stat-val.blue{color:var(--kpi-blue);}
+.stat-lbl{font-size:9px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.10em;line-height:1.4;}
+
+/* ── Module grid ── */
+.module-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:36px 0;}
+.module-card{
+  background:var(--card);border:1px solid var(--border-soft);border-radius:12px;
+  padding:24px;transition:background 0.2s,border-color 0.2s;
+  position:relative;overflow:hidden;
+}
+.module-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--teal),transparent);
+  opacity:0;transition:opacity 0.2s;
+}
+.module-card:hover{background:var(--card-hover);border-color:rgba(13,148,136,0.28);}
+.module-card:hover::after{opacity:1;}
+.module-icon{font-size:22px;margin-bottom:14px;display:block;}
+.module-label{
+  font-size:9px;font-weight:700;color:var(--teal);
+  text-transform:uppercase;letter-spacing:0.18em;margin-bottom:6px;
+}
+.module-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.3;}
+.module-desc{font-size:13px;color:var(--ink-dim);line-height:1.65;}
+.module-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.module-tag{
+  font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;
+  background:rgba(13,148,136,0.10);border:1px solid rgba(13,148,136,0.22);
+  color:rgba(20,184,166,0.88);text-transform:uppercase;
+}
+
+/* ── Audience row ── */
+.audience-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:34px 0;}
+.audience-card{
+  background:var(--card);border:1px solid var(--border-soft);border-radius:10px;
+  padding:22px 18px;text-align:center;
+}
+.audience-icon{font-size:26px;margin-bottom:12px;}
+.audience-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+.audience-desc{font-size:12px;color:var(--ink-dim);line-height:1.6;}
+
+/* ── Impact band ── */
+.impact-band{
+  background:linear-gradient(135deg,rgba(13,148,136,0.10) 0%,rgba(13,148,136,0.04) 100%);
+  border:1px solid var(--teal-border);border-radius:14px;
+  padding:36px 40px;margin:40px 0;
+}
+.impact-band-title{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:14px;}
+.impact-band p{font-size:15px;color:var(--ink-dim);line-height:1.78;}
+.impact-band p + p{margin-top:14px;}
+.impact-band strong{color:var(--ink);font-weight:600;}
+
+/* ── Ask section ── */
+.ask-box{
+  background:var(--card);border:1px solid var(--border-soft);border-radius:14px;
+  padding:40px;margin:36px 0;
+}
+.ask-title{font-size:22px;font-weight:800;color:var(--ink);margin-bottom:14px;}
+.ask-body{font-size:14px;color:var(--ink-dim);line-height:1.75;margin-bottom:28px;}
+.ask-items{display:flex;flex-direction:column;gap:14px;}
+.ask-item{display:flex;align-items:flex-start;gap:16px;}
+.ask-bullet{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  background:rgba(13,148,136,0.14);border:1px solid var(--teal-border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:var(--teal);margin-top:1px;
+}
+.ask-item-body{font-size:14px;color:var(--ink-dim);line-height:1.65;}
+.ask-item-body strong{color:var(--ink);font-weight:600;}
+
+/* ── Footer ── */
+.page-footer{
+  border-top:1px solid var(--border);padding-top:24px;margin-top:80px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  font-size:10px;color:var(--ink-muted);
+}
+
+/* ── Print ── */
+@media print{
+  .scan{display:none;}
+  body::before,body::after{display:none;}
+  .top-bar{position:static;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .module-card,.stat-card,.audience-card,.ask-box,.impact-band,.pull-quote{
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+}
+
+/* ── Responsive ── */
+@media(max-width:680px){
+  .module-grid,.audience-row{grid-template-columns:1fr;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .top-bar,.page{padding-left:20px;padding-right:20px;}
+  .ask-box{padding:28px 22px;}
+  .impact-band{padding:26px 24px;}
+}
+
+</style>
+</head>
+<body>
+
+<div class="scan"></div>
+
+<!-- ── TOP BAR ── -->
+<header class="top-bar">
+  <div class="tb-left">
+    <span class="tb-brand">VER Intelligence Hub</span>
+    <div class="tb-status">
+      <div class="tb-dot"></div>
+      <span class="tb-status-lbl">Live</span>
+    </div>
+  </div>
+  <span class="tb-right">Salesforce DET · FY27</span>
+</header>
+
+<div class="page">
+
+  <!-- ── HERO ── -->
+  <section class="hero-section">
+    <div class="hero-eyebrow">Origin Story &amp; Vision</div>
+    <h1 class="hero-title">
+      The information existed.<br>
+      The need existed.<br>
+      The connective tissue <em>didn't</em>.
+    </h1>
+    <p class="hero-sub">
+      How one person built a platform that changed how Salesforce DET sees, manages, and acts on third-party spend — without a single line of engineering support, without a budget, and without being asked.
+    </p>
+    <div class="hero-meta">
+      <span>Casey Luciana Candelaria-Logan</span>
+      <span class="hero-sep">·</span>
+      <span>Director, Vendor Engagement &amp; Reliability</span>
+      <span class="hero-sep">·</span>
+      <span>Salesforce DET · FY27</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── THE PROBLEM ── -->
+  <section class="chapter">
+    <div class="chapter-eyebrow">The Problem</div>
+    <h2 class="chapter-title">We were managing $295M of third-party spend without a clear picture of any of it.</h2>
+
+    <p class="chapter-body">
+      Every quarter, I spent hours hunting across spreadsheets, shared drives, email threads, and disconnected reports just to answer questions that should have instant answers: What does our renewal calendar look like? Which contracts are at risk? Where is our third-party spend actually going? How are our key vendors tracking against SLA? What does the next 12 months look like for the portfolio?
+    </p>
+    <p class="chapter-body">
+      The answers existed — but they were scattered, stale, and completely invisible to the people who needed to act on them. There was no single source of truth. No live view. No platform that connected vendor performance to spend to risk to strategy in one place.
+    </p>
+
+    <div class="pull-quote">
+      <p>"I had to look in a thousand places to find information that should live in one place. The intelligence was never available, never surfaced, never actionable in real time. So I built it — not because I was asked to, but because it needed to exist."</p>
+    </div>
+
+    <p class="chapter-body">
+      Senior leaders were making decisions about multi-million-dollar engagements without the context they deserved. Stakeholders were submitting vendor requests with no visibility into cost, risk, or alternatives. Contracts were being renewed by default because no one had bandwidth to surface the right signals in time.
+    </p>
+    <p class="chapter-body">
+      <strong>That is the gap the VER Intelligence Hub was built to close.</strong> Not a spreadsheet update. Not a better deck. A platform — designed to make third-party spend intelligence visible, accessible, and actionable at every level of the organization.
+    </p>
+  </section>
+
+  <!-- ── STATS ── -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-val teal">$295M</div>
+      <div class="stat-lbl">Third-Party Spend Mapped</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val green">$10.2M</div>
+      <div class="stat-lbl">FY27 Savings Realized</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val amber">20+</div>
+      <div class="stat-lbl">Intelligence Modules Built</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val blue">0</div>
+      <div class="stat-lbl">Engineering Resources Required</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── WHAT WAS BUILT ── -->
+  <section class="chapter">
+    <div class="chapter-eyebrow">What Was Built</div>
+    <h2 class="chapter-title">A full-stack intelligence platform. No engineering. No budget. No waiting.</h2>
+
+    <p class="chapter-body">
+      The VER Intelligence Hub is not a dashboard. It is a <strong>portfolio command center</strong> — a suite of interconnected tools that give leadership, stakeholders, and the VER team a live, actionable view of every dimension of DET's third-party spend. Built in pure HTML, CSS, and JavaScript, it deploys as a single shareable link and runs entirely in the browser. Every page is printable. Every view is interactive.
+    </p>
+    <p class="chapter-body">
+      And every module was designed to answer a real question that previously had no good answer.
+    </p>
+
+    <div class="module-grid">
+
+      <div class="module-card">
+        <span class="module-icon">🏛️</span>
+        <div class="module-label">Core Platform</div>
+        <div class="module-title">VER Intelligence Hub</div>
+        <div class="module-desc">The command center for all of DET's third-party spend intelligence. Executive snapshot, renewal horizon, governance queue, pillar health, spend analysis, rate benchmarks, savings tracking — one always-current view, accessible to any stakeholder or leader on demand.</div>
+        <div class="module-tags">
+          <span class="module-tag">Executive</span>
+          <span class="module-tag">Multi-Module</span>
+          <span class="module-tag">Live</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <span class="module-icon">🏢</span>
+        <div class="module-label">Vendor Intelligence</div>
+        <div class="module-title">Vendor Platform &amp; 360 Dossiers</div>
+        <div class="module-desc">Deep-dive profiles for every key third-party partner. Spend history, SLA performance, contract status, risk signals, renewal timelines, and strategic notes — all in one place. No more hunting across source systems to get a complete picture of any vendor relationship before a negotiation or a decision.</div>
+        <div class="module-tags">
+          <span class="module-tag">360 View</span>
+          <span class="module-tag">SLA Tracking</span>
+          <span class="module-tag">Risk</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <span class="module-icon">🚪</span>
+        <div class="module-label">Intake &amp; Requests</div>
+        <div class="module-title">Supplier Portal</div>
+        <div class="module-desc">A structured intake system for stakeholder-driven third-party spend requests — replacing ad-hoc emails and Slack threads with a consistent, trackable process. Stakeholders submit through the portal; VER triages, evaluates, and responds with intelligence, guidance, and action.</div>
+        <div class="module-tags">
+          <span class="module-tag">Stakeholder-Facing</span>
+          <span class="module-tag">Intake</span>
+          <span class="module-tag">Workflow</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <span class="module-icon">📊</span>
+        <div class="module-label">Reporting &amp; QBR</div>
+        <div class="module-title">CQBR Generator &amp; Library</div>
+        <div class="module-desc">Automated quarterly business review generation for any third-party vendor. Pulls spend, SLA, savings, and performance data to produce a complete, executive-ready QBR in minutes — not hours. The library archives all historical QBRs for trend analysis, audit readiness, and long-term vendor accountability.</div>
+        <div class="module-tags">
+          <span class="module-tag">Automation</span>
+          <span class="module-tag">QBR</span>
+          <span class="module-tag">Reporting</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <span class="module-icon">🧮</span>
+        <div class="module-label">Financial Intelligence</div>
+        <div class="module-title">TCO Calculator</div>
+        <div class="module-desc">A standalone total cost of ownership tool that surfaces the hidden costs of any third-party engagement — contracted fees, overage exposure, audit liability, AI integration costs, and more. Produces a two-page PDF assessment with advisory findings, risk flags, and a strategic action roadmap.</div>
+        <div class="module-tags">
+          <span class="module-tag">Standalone</span>
+          <span class="module-tag">PDF Export</span>
+          <span class="module-tag">Advisory</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <span class="module-icon">👥</span>
+        <div class="module-label">Team Operations</div>
+        <div class="module-title">Team Portal</div>
+        <div class="module-desc">A dedicated workspace built for the VER team itself — daily briefings, intake review, assignment tracking, team charter, demand planning, and governance tools. Built to support a small, high-impact team operating across a large, complex third-party spend portfolio without dropping signals.</div>
+        <div class="module-tags">
+          <span class="module-tag">Internal</span>
+          <span class="module-tag">Ops</span>
+          <span class="module-tag">Daily Briefing</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── FOR WHOM ── -->
+  <section class="chapter">
+    <div class="chapter-eyebrow">Who It Serves</div>
+    <h2 class="chapter-title">Built for everyone who needed it — and never had it.</h2>
+
+    <p class="chapter-body">
+      Every module was designed around a real audience with a real unmet need. The platform doesn't require training. It doesn't require access requests. It requires nothing more than a link.
+    </p>
+
+    <div class="audience-row">
+      <div class="audience-card">
+        <div class="audience-icon">📋</div>
+        <div class="audience-title">Senior Leadership</div>
+        <div class="audience-desc">SVP, EVP, and President-level executives who need a live, defensible view of DET's third-party spend exposure, savings performance, and strategic direction — on demand, not on a quarterly slide deck cycle.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🤝</div>
+        <div class="audience-title">Business Stakeholders</div>
+        <div class="audience-desc">The teams that depend on third-party vendors to operate — who needed a structured way to request support, understand cost and risk implications, and get timely intelligence rather than slow, manual responses.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">⚡</div>
+        <div class="audience-title">The VER Team</div>
+        <div class="audience-desc">A small team managing an enormous portfolio. The Hub gives them the tools to operate at scale — surfacing the right signals, prioritizing the right actions, and communicating with the right stakeholders at the right time.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── WHY THIS IS DIFFERENT ── -->
+  <section class="chapter">
+    <div class="chapter-eyebrow">Why This Is Different</div>
+    <h2 class="chapter-title">This isn't a project. It's a new way of operating.</h2>
+
+    <div class="impact-band">
+      <div class="impact-band-title">Speed + Quality at Executive Standard</div>
+      <p>
+        Platforms like this — interactive, multi-module, executive-grade, data-driven, printable, stakeholder-facing — typically take months of engineering time, a dedicated BI team, and a formal product roadmap to produce. The VER Intelligence Hub was designed, built, iterated, and delivered by one person. No budget. No engineering dependency. No months of lead time.
+      </p>
+      <p>
+        What makes it significant isn't just the speed. It's that it's <strong>already in use</strong>. It's already answering questions that previously had no answer. It's already surfacing third-party spend intelligence that previously sat buried in spreadsheets. It's already changing how this organization talks about vendor strategy, renewal risk, and financial exposure.
+      </p>
+      <p>
+        And the platform is built to grow. Every module is designed to be extended. Every page is built to accept new data. The foundation is solid — the roadmap is clear — and the impact is already real.
+      </p>
+    </div>
+
+    <div class="pull-quote">
+      <p>"The connective tissue that was always missing — now it exists. The question is whether we formalize it, scale it, and make it the standard for how this organization manages third-party spend intelligence."</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── THE ASK ── -->
+  <section class="chapter">
+    <div class="chapter-eyebrow">The Path Forward</div>
+    <h2 class="chapter-title">One ask. A clear path. Real momentum.</h2>
+
+    <p class="chapter-body">
+      The VER Intelligence Hub has proven its value. The intelligence is real. The adoption is real. The impact is real. The next step is formalizing what's already working — and scaling it to the organizations that need it most.
+    </p>
+
+    <div class="ask-box">
+      <div class="ask-title">Formal Adoption Across Organizations</div>
+      <div class="ask-body">
+        This platform was built on conviction — that the right intelligence, surfaced at the right time, changes decisions. The ask is to formalize it: give it the visibility, the mandate, and the organizational reach it needs to become the standard for third-party spend intelligence at Salesforce DET and beyond.
+      </div>
+      <div class="ask-items">
+        <div class="ask-item">
+          <div class="ask-bullet">1</div>
+          <div class="ask-item-body"><strong>Recognize it as an official DET capability.</strong> Not a side project or a personal initiative — a strategic asset with a named owner, an active roadmap, and leadership backing that signals its permanence to the organization.</div>
+        </div>
+        <div class="ask-item">
+          <div class="ask-bullet">2</div>
+          <div class="ask-item-body"><strong>Expand access across partner organizations.</strong> Other procurement, finance, and vendor management teams who manage third-party spend need the same quality of intelligence. The platform is already built — it scales with access, not engineering effort.</div>
+        </div>
+        <div class="ask-item">
+          <div class="ask-bullet">3</div>
+          <div class="ask-item-body"><strong>Explore packaging for broader Salesforce use.</strong> With senior leaders already expressing interest in adoption beyond DET, this platform represents a replicable model for any organization managing complex third-party spend. That conversation is worth having.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <div class="page-footer">
+    <span>VER Intelligence Hub · Origin Story · FY27 · DET Leadership Confidential</span>
+    <span>Casey Luciana Candelaria-Logan · Director, Vendor Engagement &amp; Reliability</span>
+  </div>
+
+</div><!-- /.page -->
+
+</body>
+</html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vendor Survey · VER Team Portal</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-border:rgba(244,63,94,0.30);--bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14);--mag-border:rgba(192,38,211,0.28);
+  --rose-gold:#E8A598;--violet:#A855F7;--violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12);--vio-border:rgba(168,85,247,0.28);
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.034);--bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 80% 0%,rgba(244,63,94,0.14) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(192,38,211,0.18) 0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(168,85,247,0.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(168,85,247,0.014) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(244,63,94,0.018) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── Shell ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sb-gem{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(244,63,94,0.38);}
+.sb-logo-title{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.42);}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);animation:pulse 2.5s ease-in-out infinite;}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-section{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);padding:12px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+.sb-user{margin:0 12px 8px;padding:9px 13px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:18px;line-height:1;}
+.sb-user-name{font-size:11px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:8.5px;color:rgba(255,255,255,0.52);}
+.sb-footer{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;font-size:8.5px;color:rgba(255,255,255,0.42);line-height:1.7;}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── Page Hero ── */
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:28px 36px 26px;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,#120610 0%,#1A0828 40%,#0E0620 100%);
+  border:1px solid rgba(168,85,247,0.18);animation:rise 0.5s var(--ease) 0.05s both;}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 90% 10%,rgba(244,63,94,0.20) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(168,85,247,0.16) 0%,transparent 46%);}
+.hero-inner{position:relative;z-index:1;}
+.hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;
+  color:rgba(255,255,255,0.50);margin-bottom:10px;}
+.hero-eyebrow span{color:var(--bloom-bright);}
+.hero-title{font-size:clamp(22px,2.4vw,32px);font-weight:900;letter-spacing:-0.025em;
+  margin-bottom:8px;
+  background:linear-gradient(92deg,var(--bloom-bright) 0%,var(--violet-bright) 55%,var(--magenta-bright) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.58);line-height:1.6;max-width:560px;}
+
+/* ── Note banner ── */
+.note-banner{background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.20);
+  border-radius:10px;padding:12px 16px;margin-bottom:20px;
+  display:flex;align-items:flex-start;gap:10px;animation:rise 0.4s var(--ease) 0.12s both;}
+.note-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.note-text{font-size:11px;color:var(--ink-dim);line-height:1.6;}
+.note-text strong{color:var(--violet-bright);}
+
+/* ── Form layout ── */
+.survey-wrap{max-width:700px;width:100%;margin:0 auto;animation:rise 0.5s var(--ease) 0.18s both;}
+.section-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.form-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:12px;
+  padding:20px 22px;margin-bottom:16px;}
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.field-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;
+  color:var(--ink-muted);margin-bottom:7px;}
+.field-label .req{color:var(--bloom-bright);}
+.field-input{width:100%;padding:9px 12px;border-radius:8px;
+  border:1.5px solid var(--border-soft);background:rgba(255,255,255,0.04);
+  color:var(--ink);font-family:var(--font);font-size:12.5px;
+  transition:border-color 0.15s,background 0.15s;}
+.field-input:focus{outline:none;border-color:rgba(168,85,247,0.50);background:rgba(168,85,247,0.06);}
+.field-input::placeholder{color:var(--ink-muted);}
+select.field-input{cursor:pointer;}
+select.field-input option{background:#1C1030;color:var(--ink);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:600px){.field-row{grid-template-columns:1fr;}}
+.auto-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;
+  background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.26);
+  font-size:9px;font-weight:700;color:var(--violet-bright);margin-top:4px;}
+
+/* ── Vendor picker ── */
+.vendor-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;}
+.vendor-logo-wrap{width:44px;height:44px;border-radius:8px;overflow:hidden;flex-shrink:0;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border-soft);}
+.vendor-logo-wrap img{width:100%;height:100%;object-fit:contain;padding:3px;}
+.vendor-logo-wrap.is-hidden{display:none;}
+
+/* ── Score dimensions ── */
+.dim-block{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;margin-bottom:10px;}
+.dim-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:12px;}
+.dim-label{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:3px;}
+.dim-desc{font-size:10px;color:var(--ink-muted);line-height:1.5;}
+.dim-score-display{font-size:24px;font-weight:900;flex-shrink:0;width:40px;text-align:center;
+  line-height:1;color:var(--violet-bright);transition:color 0.2s;}
+.dim-score-display.s1,.dim-score-display.s2,.dim-score-display.s3{color:var(--bloom-bright);}
+.dim-score-display.s4,.dim-score-display.s5,.dim-score-display.s6{color:var(--magenta-bright);}
+.dim-score-display.s7,.dim-score-display.s8{color:var(--amber);}
+.dim-score-display.s9,.dim-score-display.s10{color:var(--violet-bright);}
+.slider-wrap{margin-bottom:6px;}
+input[type="range"]{width:100%;-webkit-appearance:none;appearance:none;
+  height:4px;border-radius:4px;cursor:pointer;outline:none;
+  background:linear-gradient(90deg,var(--violet) 50%,rgba(255,255,255,0.10) 50%);}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--violet-bright);border:2px solid var(--bg);cursor:pointer;
+  box-shadow:0 0 10px rgba(168,85,247,0.50);transition:transform 0.15s;}
+input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
+  background:var(--violet-bright);border:2px solid var(--bg);cursor:pointer;}
+.slider-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--ink-muted);margin-bottom:10px;}
+.comment-toggle{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;
+  font-family:var(--font);font-size:10px;font-weight:700;color:var(--violet-bright);
+  padding:3px 0;transition:color 0.12s;}
+.comment-toggle:hover{color:var(--violet);}
+.comment-toggle svg{transition:transform 0.2s;}
+.comment-toggle.open svg{transform:rotate(45deg);}
+.comment-area{display:none;margin-top:8px;}
+.comment-area.open{display:block;}
+.comment-area textarea{width:100%;padding:8px 10px;border-radius:7px;
+  border:1.5px solid var(--border-soft);background:rgba(255,255,255,0.03);
+  color:var(--ink);font-family:var(--font);font-size:11.5px;resize:vertical;min-height:60px;}
+.comment-area textarea:focus{outline:none;border-color:rgba(168,85,247,0.40);}
+.comment-area textarea::placeholder{color:var(--ink-muted);}
+
+/* ── Radio group ── */
+.radio-group{display:flex;flex-direction:column;gap:6px;}
+.radio-option{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border-radius:9px;
+  border:1.5px solid var(--border-soft);background:rgba(255,255,255,0.02);cursor:pointer;
+  transition:background 0.15s,border-color 0.15s;}
+.radio-option:hover{background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.24);}
+.radio-option.selected{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.30);}
+.radio-option input{margin-top:2px;accent-color:var(--violet);cursor:pointer;flex-shrink:0;}
+.radio-label{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.radio-meta{font-size:10px;color:var(--ink-muted);line-height:1.45;}
+
+/* ── Submit ── */
+.submit-btn{display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:14px 24px;border-radius:10px;border:none;cursor:pointer;
+  font-family:var(--font);font-size:14px;font-weight:800;letter-spacing:0.02em;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 60%,var(--violet) 100%);
+  color:#fff;box-shadow:0 4px 24px rgba(244,63,94,0.30);
+  transition:opacity 0.15s,transform 0.15s,box-shadow 0.15s;margin-top:20px;}
+.submit-btn:hover{opacity:0.90;transform:translateY(-1px);box-shadow:0 6px 32px rgba(244,63,94,0.40);}
+.submit-btn:active{transform:translateY(0);}
+.validation-msg{display:none;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.30);
+  border-radius:8px;padding:9px 14px;font-size:11px;color:var(--bloom-bright);margin-top:10px;}
+.validation-msg.visible{display:block;}
+
+/* ── Confirm screen ── */
+.confirm-screen{display:none;text-align:center;padding:48px 32px;}
+.confirm-screen.visible{display:block;}
+.confirm-icon{font-size:48px;margin-bottom:16px;}
+.confirm-title{font-size:24px;font-weight:900;letter-spacing:-0.02em;margin-bottom:8px;
+  background:linear-gradient(92deg,var(--violet-bright),var(--magenta-bright));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.confirm-sub{font-size:13px;color:var(--ink-dim);line-height:1.6;margin-bottom:24px;}
+.confirm-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn-outline{padding:9px 20px;border-radius:99px;border:1.5px solid var(--vio-border);
+  background:transparent;color:var(--violet-bright);font-family:var(--font);
+  font-size:11px;font-weight:700;cursor:pointer;transition:background 0.15s;}
+.btn-outline:hover{background:rgba(168,85,247,0.12);}
+
+/* ── User picker overlay ── */
+.up-overlay{position:fixed;inset:0;z-index:500;background:rgba(7,4,17,0.96);
+  backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center;padding:24px;}
+.up-overlay.hidden{display:none;}
+.up-panel{width:100%;max-width:500px;animation:slideUp 0.4s var(--ease) both;text-align:center;}
+.up-gem{width:48px;height:48px;border-radius:14px;margin:0 auto 18px;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 0 36px rgba(244,63,94,0.40);}
+.up-title{font-size:22px;font-weight:900;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom),var(--magenta),var(--violet));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.up-sub{font-size:12px;color:var(--ink-muted);margin-bottom:24px;}
+.up-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.up-tile{padding:14px 10px;border-radius:10px;cursor:pointer;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  transition:background 0.15s,border-color 0.15s,transform 0.15s;font-family:var(--font);}
+.up-tile:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);transform:translateY(-2px);}
+.up-tile-emoji{font-size:22px;margin-bottom:6px;display:block;}
+.up-tile-name{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:1px;}
+.up-tile-role{font-size:8.5px;color:var(--ink-muted);}
+
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode::before{background:radial-gradient(ellipse at 80% 0%,rgba(192,38,211,0.12) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.10) 0%,transparent 50%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title{color:#1A0818;}
+body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .hero{background:linear-gradient(135deg,#FDE8EE 0%,#FCDDE7 38%,#FEE8F0 68%,#FFF0F4 100%);border:1px solid #F5C6D3;}
+body.light-mode .form-card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .dim-block{background:#FFF0F4;border-color:#F5C6D3;}
+body.light-mode .field-input{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode select.field-input option{background:#FFF8FA;color:#1A0818;}
+body.light-mode .comment-area textarea{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode .radio-option{background:#FFF0F4;border-color:#F5C6D3;}
+body.light-mode .radio-label{color:#1A0818;}
+body.light-mode .radio-meta{color:#7A4055;}
+body.light-mode .radio-option.selected{background:rgba(109,40,217,0.08);border-color:rgba(109,40,217,0.24);}
+body.light-mode .note-banner{background:rgba(109,40,217,0.06);border-color:rgba(109,40,217,0.18);}
+body.light-mode .note-text{color:#3D1028;}
+body.light-mode .validation-msg{background:rgba(192,20,60,0.08);border-color:rgba(192,20,60,0.24);}
+body.light-mode input[type="range"]{background:linear-gradient(90deg,var(--violet-bright) 50%,rgba(26,8,24,0.12) 50%);}
+body.light-mode input[type="range"]::-webkit-slider-thumb{background:var(--violet-bright);}
+body.light-mode .section-label{color:#7A4055;}
+body.light-mode .section-label::after{background:#F5C6D3;}
+body.light-mode .scan{opacity:0.12;}
+
+/* ── Responsive ── */
+@media(max-width:640px){.sidebar{display:none;}}
+</style>
+</head>
+<body data-portal="true">
+<script>
+(function(){
+  var t=localStorage.getItem('ver-portal-theme');
+  if(t==='mid')document.body.classList.add('mid-mode');
+  else if(t==='light')document.body.classList.add('light-mode');
+})();
+</script>
+
+<div class="scan" aria-hidden="true"></div>
+
+<!-- User picker overlay -->
+<div class="up-overlay hidden" id="up-overlay">
+  <div class="up-panel">
+    <div class="up-gem">&#128100;</div>
+    <div class="up-title">Who are you?</div>
+    <div class="up-sub">Your name will auto-fill the respondent field.</div>
+    <div class="up-grid" id="up-grid"></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="window.location.href='team_portal.html'">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-user" id="sb-user-chip">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html"      class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"     class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"         class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"      class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"   class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"    class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"    class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html"  class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html" class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html" class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"         class="sb-item active"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Vendor Survey</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button class="tb-btn" onclick="document.getElementById('up-overlay').classList.toggle('hidden')">&#128100; Switch User</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div class="hero-eyebrow">VER Team Portal &middot; <span>Tools</span></div>
+          <div class="hero-title">Vendor Performance Survey</div>
+          <div class="hero-sub">Submit your assessment of a vendor across five performance dimensions. Your responses feed directly into Survey Review and inform renewal decisions, CQBRs, and vendor scorecards.</div>
+        </div>
+      </div>
+
+      <!-- Note banner -->
+      <div class="note-banner">
+        <span class="note-icon">&#128274;</span>
+        <div class="note-text">
+          <strong>Internal team tool.</strong> Responses are submitted under your name and routed to Survey Review for approval before scores update vendor records. Be specific — qualitative comments carry more weight than scores alone.
+        </div>
+      </div>
+
+      <!-- Survey form -->
+      <div class="survey-wrap">
+        <form id="surveyForm" autocomplete="off" novalidate>
+
+          <!-- Section 1: Respondent -->
+          <div class="section-label">Section 1 — About You</div>
+          <div class="form-card">
+            <div class="field-row">
+              <div class="field">
+                <div class="field-label">Your name <span class="req">*</span></div>
+                <input type="text" id="respondentName" class="field-input" placeholder="Your name" required>
+                <div class="auto-chip" id="auto-chip" style="display:none;">&#9889; Auto-filled from profile</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Your team / pillar <span class="req">*</span></div>
+                <input type="text" id="respondentTeam" class="field-input" placeholder="e.g. Cloud Engineering" required>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label">Your relationship to this vendor <span class="req">*</span></div>
+              <select id="respondentRelationship" class="field-input" required>
+                <option value="">Select your role…</option>
+                <option value="Delivery Lead">Delivery Lead</option>
+                <option value="Program Manager">Program Manager</option>
+                <option value="Business Owner">Business Owner</option>
+                <option value="Vendor Manager">Vendor Manager</option>
+                <option value="Technical Lead">Technical Lead</option>
+                <option value="Finance Analyst">Finance Analyst</option>
+                <option value="Procurement">Procurement</option>
+                <option value="Executive Sponsor">Executive Sponsor</option>
+                <option value="VER Analyst">VER Analyst</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Section 2: Vendor + Scores -->
+          <div class="section-label">Section 2 — Vendor &amp; Scores</div>
+          <div class="form-card">
+
+            <!-- Vendor picker -->
+            <div class="field">
+              <div class="field-label">Vendor <span class="req">*</span></div>
+              <div class="vendor-row">
+                <select id="vendorPickerSelect" class="field-input" required>
+                  <option value="">Select vendor…</option>
+                </select>
+                <div class="vendor-logo-wrap is-hidden" id="vendorLogoWrap">
+                  <img id="vendorLogoImg" src="" alt="" width="40" height="40">
+                </div>
+              </div>
+            </div>
+
+            <!-- SLA & Delivery -->
+            <div class="dim-block">
+              <div class="dim-header">
+                <div>
+                  <div class="dim-label">SLA &amp; Delivery Quality</div>
+                  <div class="dim-desc">Are SLAs consistently met? Is delivery quality reliable and predictable?</div>
+                </div>
+                <div class="dim-score-display s5" id="slaVal">5</div>
+              </div>
+              <div class="slider-wrap">
+                <input type="range" id="slaSld" min="1" max="10" value="5" data-dim="sla" aria-label="SLA &amp; Delivery score">
+              </div>
+              <div class="slider-labels"><span>1 — Poor</span><span>10 — Excellent</span></div>
+              <button type="button" class="comment-toggle" data-target="slaComment">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 1v10M1 6h10" id="slaTogglePath"/></svg>
+                &nbsp;Add comment
+              </button>
+              <div class="comment-area" id="slaComment">
+                <textarea id="slaCommentText" rows="2" placeholder="Optional comment on SLA performance…"></textarea>
+              </div>
+            </div>
+
+            <!-- Relationship -->
+            <div class="dim-block">
+              <div class="dim-header">
+                <div>
+                  <div class="dim-label">Relationship &amp; Communication</div>
+                  <div class="dim-desc">How effective is the vendor's communication, responsiveness, and escalation handling?</div>
+                </div>
+                <div class="dim-score-display s5" id="relVal">5</div>
+              </div>
+              <div class="slider-wrap">
+                <input type="range" id="relSld" min="1" max="10" value="5" data-dim="relationship" aria-label="Relationship score">
+              </div>
+              <div class="slider-labels"><span>1 — Poor</span><span>10 — Excellent</span></div>
+              <button type="button" class="comment-toggle" data-target="relComment">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 1v10M1 6h10" id="relTogglePath"/></svg>
+                &nbsp;Add comment
+              </button>
+              <div class="comment-area" id="relComment">
+                <textarea id="relCommentText" rows="2" placeholder="Optional comment on relationship…"></textarea>
+              </div>
+            </div>
+
+            <!-- Financial -->
+            <div class="dim-block">
+              <div class="dim-header">
+                <div>
+                  <div class="dim-label">Financial &amp; Commercial</div>
+                  <div class="dim-desc">Are pricing, invoicing, and contract terms transparent and fair?</div>
+                </div>
+                <div class="dim-score-display s5" id="finVal">5</div>
+              </div>
+              <div class="slider-wrap">
+                <input type="range" id="finSld" min="1" max="10" value="5" data-dim="financial" aria-label="Financial score">
+              </div>
+              <div class="slider-labels"><span>1 — Poor</span><span>10 — Excellent</span></div>
+              <button type="button" class="comment-toggle" data-target="finComment">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 1v10M1 6h10" id="finTogglePath"/></svg>
+                &nbsp;Add comment
+              </button>
+              <div class="comment-area" id="finComment">
+                <textarea id="finCommentText" rows="2" placeholder="Optional comment on financial terms…"></textarea>
+              </div>
+            </div>
+
+            <!-- Compliance -->
+            <div class="dim-block">
+              <div class="dim-header">
+                <div>
+                  <div class="dim-label">Compliance &amp; Risk</div>
+                  <div class="dim-desc">Does the vendor meet security, regulatory, and contractual compliance requirements?</div>
+                </div>
+                <div class="dim-score-display s5" id="compVal">5</div>
+              </div>
+              <div class="slider-wrap">
+                <input type="range" id="compSld" min="1" max="10" value="5" data-dim="compliance" aria-label="Compliance score">
+              </div>
+              <div class="slider-labels"><span>1 — Poor</span><span>10 — Excellent</span></div>
+              <button type="button" class="comment-toggle" data-target="compComment">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 1v10M1 6h10" id="compTogglePath"/></svg>
+                &nbsp;Add comment
+              </button>
+              <div class="comment-area" id="compComment">
+                <textarea id="compCommentText" rows="2" placeholder="Optional comment on compliance…"></textarea>
+              </div>
+            </div>
+
+            <!-- Strategic -->
+            <div class="dim-block">
+              <div class="dim-header">
+                <div>
+                  <div class="dim-label">Strategic Value</div>
+                  <div class="dim-desc">Does this vendor contribute strategic value beyond the transactional scope of work?</div>
+                </div>
+                <div class="dim-score-display s5" id="stratVal">5</div>
+              </div>
+              <div class="slider-wrap">
+                <input type="range" id="stratSld" min="1" max="10" value="5" data-dim="strategic" aria-label="Strategic value score">
+              </div>
+              <div class="slider-labels"><span>1 — Poor</span><span>10 — Excellent</span></div>
+              <button type="button" class="comment-toggle" data-target="stratComment">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 1v10M1 6h10" id="stratTogglePath"/></svg>
+                &nbsp;Add comment
+              </button>
+              <div class="comment-area" id="stratComment">
+                <textarea id="stratCommentText" rows="2" placeholder="Optional comment on strategic alignment…"></textarea>
+              </div>
+            </div>
+
+          </div><!-- /section 2 -->
+
+          <!-- Section 3: Overall -->
+          <div class="section-label">Section 3 — Overall Assessment</div>
+          <div class="form-card">
+            <div class="field">
+              <div class="field-label">Overall recommendation <span class="req">*</span></div>
+              <div class="radio-group" id="recommendationGroup">
+                <label class="radio-option" data-val="continue">
+                  <input type="radio" name="recommendation" value="continue">
+                  <div>
+                    <div class="radio-label">Continue / Renew</div>
+                    <div class="radio-meta">Strong performance — recommend continuing or renewing without conditions</div>
+                  </div>
+                </label>
+                <label class="radio-option" data-val="continue_conditions">
+                  <input type="radio" name="recommendation" value="continue_conditions">
+                  <div>
+                    <div class="radio-label">Continue / Renew with Conditions</div>
+                    <div class="radio-meta">Acceptable performance — continue with specific improvement conditions</div>
+                  </div>
+                </label>
+                <label class="radio-option" data-val="escalate">
+                  <input type="radio" name="recommendation" value="escalate">
+                  <div>
+                    <div class="radio-label">Escalate for Review</div>
+                    <div class="radio-meta">Concerns noted — a formal VER review is warranted before continuing</div>
+                  </div>
+                </label>
+                <label class="radio-option" data-val="do_not_continue">
+                  <input type="radio" name="recommendation" value="do_not_continue">
+                  <div>
+                    <div class="radio-label">Do Not Continue / Renew</div>
+                    <div class="radio-meta">Significant issues — recommend ending this engagement</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="field" style="margin-top:16px;">
+              <div class="field-label">Additional context <span style="font-size:8px;opacity:0.6;font-weight:500;text-transform:none;letter-spacing:0;">(optional)</span></div>
+              <textarea id="overallComments" class="field-input" rows="4" placeholder="Any additional context, specific incidents, or recommendations for the VER team?"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">Submit Assessment &#8594;</button>
+          <div class="validation-msg" id="validationMsg"></div>
+
+        </form>
+
+        <!-- Confirm screen -->
+        <div class="confirm-screen" id="confirmScreen">
+          <div class="confirm-icon">&#10003;</div>
+          <div class="confirm-title">Assessment Submitted</div>
+          <div class="confirm-sub" id="confirmSub">Your feedback has been saved and is pending review in Survey Review.<br>The VER team will review and approve scores before they update vendor records.</div>
+          <div class="confirm-actions">
+            <button class="btn-outline" id="submitAnotherBtn">Submit Another</button>
+            <button class="tb-btn" onclick="window.location.href='portal_survey_review.html'" style="border-radius:99px;padding:9px 20px;">View Survey Review &#8594;</button>
+          </div>
+        </div>
+
+      </div><!-- /survey-wrap -->
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script src="assets/data.js"></script>
+<script src="assets/vendors.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* ── Theme ── */
+  var THEME_KEY = 'ver-portal-theme';
+  var themeBtn = document.getElementById('theme-toggle-btn');
+  function _getTheme(){
+    if(document.body.classList.contains('light-mode')) return 'light';
+    if(document.body.classList.contains('mid-mode'))   return 'mid';
+    return 'dark';
+  }
+  window._toggleTheme = function(){
+    var cur = _getTheme();
+    document.body.classList.remove('mid-mode','light-mode');
+    var next = cur==='dark'?'mid':cur==='mid'?'light':'dark';
+    if(next==='mid')   document.body.classList.add('mid-mode');
+    if(next==='light') document.body.classList.add('light-mode');
+    localStorage.setItem(THEME_KEY, next);
+    themeBtn.textContent = next==='dark'?'☀ Light':next==='mid'?'☀ Light':'☾ Dark';
+    if(next==='light') themeBtn.textContent='☾ Dark';
+    else if(next==='mid') themeBtn.textContent='☀ Light';
+    else themeBtn.textContent='☀ Mid';
+  };
+  (function syncThemeBtn(){
+    var t=_getTheme();
+    if(t==='dark')  themeBtn.textContent='☀ Mid';
+    else if(t==='mid') themeBtn.textContent='☀ Light';
+    else            themeBtn.textContent='☾ Dark';
+  })();
+
+  /* ── Team members ── */
+  var TEAM = [
+    {name:'Casey',  role:'Director',        emoji:'👑', team:'VER', rel:'VER Analyst'},
+    {name:'Debs',   role:'Manager',         emoji:'🌟', team:'VER', rel:'Vendor Manager'},
+    {name:'Erin',   role:'Senior Manager',  emoji:'⭐', team:'VER', rel:'Vendor Manager'},
+    {name:'Mahesh', role:'Senior Manager',  emoji:'💫', team:'VER', rel:'VER Analyst'},
+    {name:'Aditya', role:'Senior Manager',  emoji:'✨', team:'VER', rel:'VER Analyst'},
+    {name:'Justin', role:'Senior Analyst',  emoji:'🌠', team:'VER', rel:'VER Analyst'},
+    {name:'Guest',  role:'VER Team',        emoji:'👤', team:'VER', rel:'VER Analyst'},
+  ];
+  var LS_USER = 'ver-team-user';
+
+  function loadUser(){
+    try{ return JSON.parse(localStorage.getItem(LS_USER)||'null'); }catch(e){ return null; }
+  }
+  function saveUser(u){ localStorage.setItem(LS_USER, JSON.stringify(u)); }
+
+  function applyUser(u){
+    document.getElementById('sb-user-emoji').innerHTML   = u.emoji;
+    document.getElementById('sb-user-name').textContent  = u.name;
+    document.getElementById('sb-user-role').textContent  = u.role;
+    // Auto-fill respondent fields
+    var nameField = document.getElementById('respondentName');
+    var teamField = document.getElementById('respondentTeam');
+    var relField  = document.getElementById('respondentRelationship');
+    if(nameField && !nameField.value){ nameField.value = u.name; }
+    if(teamField && !teamField.value){ teamField.value = u.team || 'VER'; }
+    if(relField  && !relField.value && u.rel){
+      for(var i=0;i<relField.options.length;i++){
+        if(relField.options[i].value===u.rel){relField.selectedIndex=i;break;}
+      }
+    }
+    var chip = document.getElementById('auto-chip');
+    if(chip && u.name !== 'Guest') chip.style.display='inline-flex';
+  }
+
+  // Build user picker grid
+  var grid = document.getElementById('up-grid');
+  TEAM.forEach(function(u){
+    var tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'up-tile';
+    tile.innerHTML = '<span class="up-tile-emoji">'+u.emoji+'</span><div class="up-tile-name">'+u.name+'</div><div class="up-tile-role">'+u.role+'</div>';
+    tile.addEventListener('click', function(){
+      saveUser(u);
+      applyUser(u);
+      document.getElementById('up-overlay').classList.add('hidden');
+    });
+    grid.appendChild(tile);
+  });
+
+  // Load or prompt
+  var currentUser = loadUser();
+  if(!currentUser){
+    document.getElementById('up-overlay').classList.remove('hidden');
+  } else {
+    applyUser(currentUser);
+  }
+
+  /* ── Vendor picker ── */
+  var VENDOR_DOMAINS = {
+    'Infosys':'infosys.com','Cognizant':'cognizant.com','TCS':'tcs.com',
+    'HCLTech':'hcltech.com','NTT Data':'nttdata.com','Tech Mahindra':'techmahindra.com',
+    'Wipro':'wipro.com','IBM':'ibm.com','Accenture':'accenture.com','Deloitte':'deloitte.com',
+    'AWS':'aws.amazon.com','Microsoft':'microsoft.com','Workday':'workday.com',
+    'ServiceNow':'servicenow.com','BCG':'bcg.com','McKinsey & Company':'mckinsey.com',
+    'PwC':'pwc.com','Capgemini':'capgemini.com','Kyndryl':'kyndryl.com'
+  };
+  var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+  var selectedVendorId   = '';
+  var selectedVendorName = '';
+
+  var pickerSel  = document.getElementById('vendorPickerSelect');
+  var logoWrap   = document.getElementById('vendorLogoWrap');
+  var logoImg    = document.getElementById('vendorLogoImg');
+
+  // Check for URL params (optional deep-link)
+  var params = new URLSearchParams(window.location.search);
+  var urlId   = params.get('id')   || '';
+  var urlName = params.get('name') || '';
+
+  var vendors = ((window.VER_VENDORS||[]).slice().sort(function(a,b){
+    return a.name.localeCompare(b.name);
+  }));
+
+  vendors.forEach(function(v){
+    var opt = document.createElement('option');
+    opt.value = v.id;
+    opt.textContent = v.name + (v.category?' · '+v.category:'');
+    if(v.id === urlId) opt.selected = true;
+    pickerSel.appendChild(opt);
+  });
+
+  // If no vendors loaded via data.js, fall back to domain map keys
+  if(vendors.length === 0){
+    Object.keys(VENDOR_DOMAINS).sort().forEach(function(n,i){
+      var opt = document.createElement('option');
+      opt.value = 'V-'+i;
+      opt.textContent = n;
+      pickerSel.appendChild(opt);
+    });
+  }
+
+  function showLogo(name){
+    var domain = VENDOR_DOMAINS[name];
+    if(!domain){ logoWrap.classList.add('is-hidden'); return; }
+    logoImg.alt   = name;
+    logoImg.onerror = function(){ logoWrap.classList.add('is-hidden'); };
+    logoImg.onload  = function(){ logoWrap.classList.remove('is-hidden'); };
+    logoImg.src = 'https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT;
+  }
+
+  if(urlId && urlName){
+    selectedVendorId   = urlId;
+    selectedVendorName = urlName;
+    showLogo(urlName);
+  }
+
+  pickerSel.addEventListener('change', function(){
+    var v = vendors.find(function(x){ return x.id === pickerSel.value; });
+    if(v){
+      selectedVendorId   = v.id;
+      selectedVendorName = v.name;
+      showLogo(v.name);
+    } else {
+      // Fallback for static list
+      var optText = pickerSel.options[pickerSel.selectedIndex]&&pickerSel.options[pickerSel.selectedIndex].text.split(' · ')[0];
+      selectedVendorId   = pickerSel.value;
+      selectedVendorName = optText || '';
+      showLogo(selectedVendorName);
+    }
+  });
+
+  /* ── Sliders ── */
+  var sliders = [
+    {sld:'slaSld',  val:'slaVal'},
+    {sld:'relSld',  val:'relVal'},
+    {sld:'finSld',  val:'finVal'},
+    {sld:'compSld', val:'compVal'},
+    {sld:'stratSld',val:'stratVal'},
+  ];
+
+  function scoreClass(n){
+    n=+n;
+    if(n<=3) return 's'+n+' s-crit';
+    if(n<=6) return 's'+n+' s-warn';
+    return 's'+n+' s-good';
+  }
+
+  function updateSlider(sld, disp){
+    var pct = ((sld.value - sld.min)/(sld.max - sld.min))*100;
+    var base = document.body.classList.contains('light-mode')?'rgba(26,8,24,0.12)':'rgba(255,255,255,0.10)';
+    var col  = document.body.classList.contains('light-mode')?'#6D28D9':'#A855F7';
+    sld.style.background = 'linear-gradient(90deg,'+col+' 0%,'+col+' '+pct+'%,'+base+' '+pct+'%,'+base+' 100%)';
+    disp.textContent = sld.value;
+    disp.className   = 'dim-score-display s'+sld.value;
+  }
+
+  sliders.forEach(function(m){
+    var s = document.getElementById(m.sld);
+    var d = document.getElementById(m.val);
+    updateSlider(s,d);
+    s.addEventListener('input', function(){ updateSlider(s,d); });
+  });
+
+  /* ── Comment toggles ── */
+  document.querySelectorAll('.comment-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var tgt = document.getElementById(btn.getAttribute('data-target'));
+      var open = tgt.classList.contains('open');
+      tgt.classList.toggle('open', !open);
+      btn.classList.toggle('open', !open);
+    });
+  });
+
+  /* ── Radio styling ── */
+  document.querySelectorAll('.radio-option input[type="radio"]').forEach(function(r){
+    r.addEventListener('change', function(){
+      document.querySelectorAll('.radio-option').forEach(function(o){
+        o.classList.toggle('selected', o.querySelector('input[type="radio"]').checked);
+      });
+    });
+  });
+
+  /* ── Submit ── */
+  document.getElementById('surveyForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var msg = document.getElementById('validationMsg');
+    msg.classList.remove('visible');
+
+    // Validate vendor
+    if(!selectedVendorId || !selectedVendorName){
+      msg.textContent = 'Please select a vendor before submitting.';
+      msg.classList.add('visible');
+      pickerSel.focus();
+      return;
+    }
+
+    // Validate respondent name
+    var nameVal = document.getElementById('respondentName').value.trim();
+    if(!nameVal){
+      msg.textContent = 'Please enter your name.';
+      msg.classList.add('visible');
+      document.getElementById('respondentName').focus();
+      return;
+    }
+
+    // Validate relationship
+    var relVal = document.getElementById('respondentRelationship').value;
+    if(!relVal){
+      msg.textContent = 'Please select your relationship to this vendor.';
+      msg.classList.add('visible');
+      document.getElementById('respondentRelationship').focus();
+      return;
+    }
+
+    // Validate at least 3 sliders moved
+    var sldIds = ['slaSld','relSld','finSld','compSld','stratSld'];
+    var moved  = sldIds.filter(function(id){ return +document.getElementById(id).value !== 5; });
+    if(moved.length < 3){
+      msg.textContent = 'Please rate at least 3 of the 5 dimensions by moving the sliders from their default position.';
+      msg.classList.add('visible');
+      return;
+    }
+
+    // Validate recommendation
+    var rec = document.querySelector('input[name="recommendation"]:checked');
+    if(!rec){
+      msg.textContent = 'Please select an overall recommendation.';
+      msg.classList.add('visible');
+      return;
+    }
+
+    // Build response
+    var response = {
+      id: (crypto&&crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2),
+      vendorId:    selectedVendorId,
+      vendorName:  selectedVendorName,
+      submittedAt: new Date().toISOString(),
+      status:      'pending',
+      source:      'portal',
+      respondent: {
+        name:         nameVal,
+        team:         document.getElementById('respondentTeam').value.trim() || 'VER',
+        relationship: relVal,
+      },
+      scores: {
+        sla:          +document.getElementById('slaSld').value,
+        relationship: +document.getElementById('relSld').value,
+        financial:    +document.getElementById('finSld').value,
+        compliance:   +document.getElementById('compSld').value,
+        strategic:    +document.getElementById('stratSld').value,
+      },
+      comments: {
+        sla:          document.getElementById('slaCommentText').value.trim(),
+        relationship: document.getElementById('relCommentText').value.trim(),
+        financial:    document.getElementById('finCommentText').value.trim(),
+        compliance:   document.getElementById('compCommentText').value.trim(),
+        strategic:    document.getElementById('stratCommentText').value.trim(),
+        overall:      document.getElementById('overallComments').value.trim(),
+      },
+      recommendation: rec.value,
+    };
+
+    // Write to shared localStorage key
+    try{
+      var existing = JSON.parse(localStorage.getItem('ver_survey_responses')||'[]');
+      existing.push(response);
+      localStorage.setItem('ver_survey_responses', JSON.stringify(existing));
+    } catch(err){
+      console.warn('VER Survey: localStorage write failed', err);
+    }
+
+    // Show confirm
+    document.getElementById('surveyForm').style.display = 'none';
+    document.getElementById('confirmSub').textContent =
+      'Your assessment of '+selectedVendorName+' has been saved and is pending review. The VER team will review and approve scores before they update vendor records.';
+    document.getElementById('confirmScreen').classList.add('visible');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+
+  document.getElementById('submitAnotherBtn').addEventListener('click', function(){
+    window.location.reload();
+  });
+
+})();
+</script>
+</body>
+</html>

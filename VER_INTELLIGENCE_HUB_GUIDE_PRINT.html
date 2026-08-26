@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VER Intelligence Hub — Build Guide & Maintenance Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:#0D9488; --navy:#0F1E3C; --ink:#111827; --muted:#6B7280;
+    --border:#E5E7EB; --surface:#F9FAFB; --code-bg:#F3F4F6;
+    --font:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);color:var(--ink);background:#fff;font-size:13px;line-height:1.65;}
+
+  /* Cover page */
+  .cover{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;
+    background:linear-gradient(150deg,#060D1A 0%,#0F1E3C 50%,#0a1628 100%);
+    padding:64px 72px;position:relative;overflow:hidden;
+    page-break-after:always;
+  }
+  .cover::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 85% 15%,rgba(13,148,136,0.28) 0%,transparent 55%),
+      radial-gradient(ellipse at 10% 90%,rgba(37,99,235,0.18) 0%,transparent 50%);
+    pointer-events:none;
+  }
+  .cover::after{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);
+    background-size:52px 52px;
+  }
+  .cover-inner{position:relative;z-index:1;}
+  .cover-eyebrow{font-size:10px;font-weight:800;color:rgba(13,148,136,0.9);text-transform:uppercase;letter-spacing:0.22em;margin-bottom:18px;}
+  .cover-title{font-size:42px;font-weight:900;color:#fff;line-height:1.08;letter-spacing:-0.03em;margin-bottom:12px;}
+  .cover-title span{color:#0D9488;}
+  .cover-sub{font-size:15px;color:rgba(255,255,255,0.60);margin-bottom:48px;font-weight:400;}
+  .cover-meta{display:flex;gap:32px;flex-wrap:wrap;}
+  .cover-meta-item{border-top:2px solid rgba(13,148,136,0.5);padding-top:10px;min-width:140px;}
+  .cover-meta-label{font-size:9px;font-weight:800;color:rgba(255,255,255,0.40);text-transform:uppercase;letter-spacing:0.16em;margin-bottom:4px;}
+  .cover-meta-val{font-size:12px;font-weight:600;color:rgba(255,255,255,0.85);}
+  .cover-logo{position:absolute;top:64px;right:72px;z-index:1;
+    font-size:11px;font-weight:800;color:rgba(13,148,136,0.7);letter-spacing:0.14em;text-transform:uppercase;}
+
+  /* Body layout */
+  .body-wrap{max-width:900px;margin:0 auto;padding:52px 64px;}
+
+  /* TOC page */
+  .toc-page{page-break-after:always;padding-bottom:40px;}
+  .toc-title{font-size:11px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.18em;margin-bottom:24px;padding-bottom:10px;border-bottom:2px solid var(--teal);}
+  .toc-list{list-style:none;}
+  .toc-list li{display:flex;align-items:baseline;gap:0;padding:6px 0;border-bottom:1px solid var(--border);}
+  .toc-list li:last-child{border-bottom:none;}
+  .toc-num{font-size:11px;font-weight:700;color:var(--teal);min-width:28px;}
+  .toc-link{font-size:13px;font-weight:500;color:var(--ink);text-decoration:none;flex:1;}
+  .toc-link:hover{color:var(--teal);}
+  .toc-dots{flex:1;border-bottom:1px dotted #D1D5DB;margin:0 8px;height:1em;}
+  .toc-sub{padding-left:28px;}
+  .toc-sub .toc-num{color:var(--muted);font-weight:500;}
+  .toc-sub .toc-link{font-size:12px;color:var(--muted);}
+
+  /* Sections */
+  .section{margin-bottom:52px;}
+  .section-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:10px;border-bottom:2px solid var(--border);page-break-after:avoid;}
+  .section-num{font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.16em;background:rgba(13,148,136,0.08);padding:4px 10px;border-radius:99px;white-space:nowrap;}
+  .section-title{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-0.02em;}
+
+  h3{font-size:15px;font-weight:700;color:var(--navy);margin:28px 0 10px;page-break-after:avoid;}
+  h4{font-size:13px;font-weight:700;color:var(--ink);margin:20px 0 8px;page-break-after:avoid;}
+  p{margin-bottom:12px;color:#374151;}
+  ul,ol{margin:10px 0 14px 20px;}
+  li{margin-bottom:5px;color:#374151;}
+  strong{font-weight:700;color:var(--ink);}
+  em{font-style:italic;}
+
+  /* Blockquote / meta box */
+  .meta-box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:8px;padding:16px 20px;margin-bottom:28px;}
+  .meta-box p{margin:0;font-size:12px;color:var(--muted);}
+  .meta-box strong{color:var(--ink);}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;margin:14px 0 22px;font-size:11.5px;page-break-inside:avoid;}
+  thead tr{background:var(--navy);}
+  thead th{padding:9px 12px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#fff;}
+  tbody tr:nth-child(even){background:var(--surface);}
+  tbody tr:hover{background:rgba(13,148,136,0.04);}
+  td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5;}
+  td:first-child{font-family:var(--mono);font-size:10.5px;color:#1D4ED8;white-space:nowrap;}
+  td code{font-family:var(--mono);font-size:10px;background:var(--code-bg);padding:1px 5px;border-radius:3px;}
+
+  /* Code blocks */
+  pre{background:var(--navy);border-radius:8px;padding:16px 20px;margin:12px 0 20px;overflow-x:auto;page-break-inside:avoid;}
+  pre code{font-family:var(--mono);font-size:11px;color:#fff !important;line-height:1.65;white-space:pre;background:transparent !important;}
+  code{font-family:var(--mono);font-size:11.5px;background:var(--code-bg);padding:2px 6px;border-radius:4px;color:#1D4ED8;}
+
+  /* Callout boxes */
+  .callout{border-radius:8px;padding:14px 18px;margin:16px 0;border-left:4px solid;}
+  .callout-warn{background:#FFFBEB;border-color:#D97706;}
+  .callout-warn strong{color:#92400E;}
+  .callout-info{background:#EFF6FF;border-color:#2563EB;}
+  .callout-info strong{color:#1E40AF;}
+  .callout p{margin:0;font-size:12px;}
+
+  /* Checklist */
+  .checklist{list-style:none;margin-left:0;}
+  .checklist li{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
+  .checklist li:last-child{border-bottom:none;}
+  .check-box{width:14px;height:14px;border:2px solid var(--border);border-radius:3px;flex-shrink:0;display:inline-block;margin-top:2px;}
+
+  /* Tag/badge */
+  .tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:0.08em;}
+  .tag-note{background:rgba(13,148,136,0.10);color:var(--teal);}
+  .tag-warn{background:rgba(217,119,6,0.12);color:#92400E;}
+  .tag-key{background:rgba(37,99,235,0.10);color:#1D4ED8;}
+
+  /* Page header/footer for print */
+  @page{size:A4;margin:16mm 16mm 20mm;}
+  @media print{
+    body{font-size:12px;}
+    .cover{min-height:100vh;page-break-after:always;}
+    .section{page-break-inside:avoid;}
+    pre{page-break-inside:avoid;}
+    table{page-break-inside:avoid;}
+    h3,h4{page-break-after:avoid;}
+    .no-print{display:none!important;}
+    a{color:inherit;text-decoration:none;}
+  }
+
+  /* Print button */
+  .print-btn{
+    position:fixed;top:20px;right:20px;z-index:100;
+    padding:10px 20px;background:var(--teal);color:#fff;border:none;border-radius:8px;
+    font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;
+    box-shadow:0 4px 12px rgba(13,148,136,0.35);transition:background 0.15s;
+  }
+  .print-btn:hover{background:#0F766E;}
+  @media print{.print-btn{display:none;}}
+
+  hr{border:none;border-top:1px solid var(--border);margin:32px 0;}
+  .page-break{page-break-before:always;}
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">&#128438; Save as PDF</button>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="cover-logo">VER Intelligence Hub</div>
+  <div class="cover-inner">
+    <div class="cover-eyebrow">Technical Documentation</div>
+    <div class="cover-title">Build Guide &amp;<br><span>Maintenance Reference</span></div>
+    <div class="cover-sub">VER Intelligence Hub &mdash; Complete developer and maintainer reference for all 67 pages, tools, and systems.</div>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Owner</div>
+        <div class="cover-meta-val">Casey Luciana Candelaria-Logan</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Team</div>
+        <div class="cover-meta-val">VER · Salesforce DET</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Last Updated</div>
+        <div class="cover-meta-val">July 2026</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Version</div>
+        <div class="cover-meta-val">FY27 · v1.0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="body-wrap">
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc-page">
+  <div class="toc-title">Table of Contents</div>
+  <ul class="toc-list">
+    <li><span class="toc-num">1</span><span class="toc-link">Project Overview</span></li>
+    <li><span class="toc-num">2</span><span class="toc-link">Architecture</span></li>
+    <li><span class="toc-num">3</span><span class="toc-link">Theme System</span></li>
+    <li><span class="toc-num">4</span><span class="toc-link">Navigation &amp; Routing</span></li>
+    <li><span class="toc-num">5</span><span class="toc-link">Page Index</span></li>
+    <li class="toc-sub"><span class="toc-num">5.1</span><span class="toc-link">Intelligence Hub Pages (29 pages)</span></li>
+    <li class="toc-sub"><span class="toc-num">5.2</span><span class="toc-link">Team Portal (13 pages)</span></li>
+    <li class="toc-sub"><span class="toc-num">5.3</span><span class="toc-link">Vendor Platform (9 pages)</span></li>
+    <li class="toc-sub"><span class="toc-num">5.4</span><span class="toc-link">Supplier Portal (3 pages)</span></li>
+    <li class="toc-sub"><span class="toc-num">5.5</span><span class="toc-link">Standalone Tools (5 pages)</span></li>
+    <li class="toc-sub"><span class="toc-num">5.6</span><span class="toc-link">Resources (8 pages)</span></li>
+    <li><span class="toc-num">6</span><span class="toc-link">Key Tools Reference</span></li>
+    <li class="toc-sub"><span class="toc-num">6.1</span><span class="toc-link">TCO Calculator</span></li>
+    <li class="toc-sub"><span class="toc-num">6.2</span><span class="toc-link">CQBR Generator</span></li>
+    <li class="toc-sub"><span class="toc-num">6.3</span><span class="toc-link">Cinematic Generator v2</span></li>
+    <li class="toc-sub"><span class="toc-num">6.4</span><span class="toc-link">Chief of Staff Module</span></li>
+    <li><span class="toc-num">7</span><span class="toc-link">Data Layer</span></li>
+    <li><span class="toc-num">8</span><span class="toc-link">Common Patterns</span></li>
+    <li><span class="toc-num">9</span><span class="toc-link">Light / Dark / Mid Theme Overrides</span></li>
+    <li><span class="toc-num">10</span><span class="toc-link">Known Quirks &amp; Gotchas</span></li>
+    <li><span class="toc-num">11</span><span class="toc-link">Google Apps Script Deployment</span></li>
+    <li><span class="toc-num">12</span><span class="toc-link">Maintenance Checklist</span></li>
+  </ul>
+</div>
+
+<!-- SECTION 1 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 1</span>
+    <h2 class="section-title">Project Overview</h2>
+  </div>
+  <div class="meta-box">
+    <p><strong>Owner:</strong> Casey Luciana Candelaria-Logan, VER Team (Salesforce DET) &nbsp;&middot;&nbsp; <strong>Stack:</strong> Pure static HTML/CSS/JS — no build step, no framework &nbsp;&middot;&nbsp; <strong>Deployment:</strong> Google Apps Script or any static file host</p>
+  </div>
+  <p>The <strong>VER Intelligence Hub</strong> is a multi-page static web application built for the Salesforce DET Vendor Engagement &amp; Reliability (VER) team. It serves as an FY27 command center for vendor intelligence, renewals, governance, TCO analysis, and team operations.</p>
+  <h3>Audience Tiers</h3>
+  <ul>
+    <li><strong>VER Team</strong> — team portal, trackers, CQBR generator, chief of staff</li>
+    <li><strong>Internal Stakeholders</strong> — intel hub pages, exec snapshot, renewal horizon</li>
+    <li><strong>Suppliers / Vendors</strong> — supplier portal (<code>portal_*.html</code> pages)</li>
+    <li><strong>Other Tools</strong> — standalone tools (TCO calculator, CQBR Generator v2)</li>
+  </ul>
+  <div class="callout callout-warn">
+    <p><strong>Important:</strong> VER serves stakeholders — surfacing intelligence, routing decisions, and delivering analysis so the business can act with confidence. VER does <strong>not</strong> process Change Orders (CO). Remove any CO Review, CO Generator, or CO metrics references if found on any page.</p>
+  </div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 2</span>
+    <h2 class="section-title">Architecture</h2>
+  </div>
+  <pre><code>CW Rate Benchmarks/
+├── index.html                    # Hub home / landing
+├── page_*.html                   # Hub intel pages
+├── portal_*.html                 # Supplier/team portal pages
+├── vendor_*.html                 # Vendor platform pages
+├── team_portal.html              # VER internal team hub
+├── *_tracker.html                # Team tracker pages
+├── chief_of_staff.html           # Standalone CoS tool (NOT in portal nav)
+├── tco_standalone.html           # Standalone TCO (for external teams)
+├── spend_benchmarking.html       # Spend benchmarking (vendor platform)
+├── assets/
+│   ├── data.js                   # Shared data layer
+│   ├── styles.css                # Global styles (hub pages)
+│   ├── app.js                    # Global app logic (hub pages)
+│   └── help-modal.js             # Shared help modal utility
+└── VER_INTELLIGENCE_HUB_GUIDE.md # Source of this document</code></pre>
+  <h3>Key Architectural Rules</h3>
+  <ul>
+    <li>Every page is fully <strong>self-contained</strong> — all CSS and JS is inline within each HTML file</li>
+    <li>The <code>assets/</code> folder is only used by main hub pages (<code>page_*.html</code>, <code>index.html</code>)</li>
+    <li>Portal, vendor, and tracker pages carry their own inline styles</li>
+    <li>No external JS frameworks — plain <strong>ES5 JavaScript</strong> throughout for broad compatibility</li>
+    <li>Google Fonts (Inter) loaded via CDN; all other assets are inline or from trusted CDNs</li>
+  </ul>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 3</span>
+    <h2 class="section-title">Theme System</h2>
+  </div>
+  <p>There are <strong>two separate theme systems</strong> depending on which page group you're editing.</p>
+  <h3>Hub Pages (<code>page_*.html</code>, <code>index.html</code>)</h3>
+  <p>Uses <code>data-theme</code> attribute on <code>&lt;html&gt;</code>:</p>
+  <pre><code>document.documentElement.setAttribute('data-theme', 'dark' | 'light');
+localStorage.setItem('ver-theme', theme);
+// CSS switches via [data-theme="dark"] { ... } blocks</code></pre>
+  <h3>Portal &amp; Team Pages (<code>portal_*.html</code>, <code>team_portal.html</code>, <code>*_tracker.html</code>)</h3>
+  <p>Uses CSS classes on <code>&lt;body&gt;</code>:</p>
+  <pre><code>document.body.classList.add('light-mode');   // light
+document.body.classList.add('mid-mode');     // mid (default)
+// neither class = dark mode
+localStorage.setItem('ver-portal-theme', 'light' | 'mid' | 'dark');</code></pre>
+  <h4>Three Portal Modes</h4>
+  <table>
+    <thead><tr><th>Mode</th><th>Body Class</th><th>Background</th></tr></thead>
+    <tbody>
+      <tr><td>Dark</td><td><em>(none)</em></td><td><code>#070411</code></td></tr>
+      <tr><td>Mid</td><td><code>mid-mode</code></td><td><code>#0E0B22</code></td></tr>
+      <tr><td>Light</td><td><code>light-mode</code></td><td><code>#FFF0F4</code></td></tr>
+    </tbody>
+  </table>
+  <div class="callout callout-warn">
+    <p><strong>Critical:</strong> When adding light-mode color fixes, always override semantic color variables in the <code>body.light-mode</code> block — not just individual classes. This fixes every element using <code>var(--amber)</code>, <code>var(--green)</code> etc. at once.</p>
+  </div>
+  <pre><code>body.light-mode {
+  --green: #059669;   /* replaces neon #34D399 */
+  --amber: #B45309;   /* replaces neon #FBBF24 */
+  --red:   #DC2626;   /* replaces bright #F43F5E */
+}</code></pre>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 4</span>
+    <h2 class="section-title">Navigation &amp; Routing</h2>
+  </div>
+  <h3>Hub Navigation</h3>
+  <p>Hub pages use <code>data-nav</code> attributes and are wired in <code>assets/app.js</code>. The sidebar uses <code>&lt;a href="page_name.html"&gt;</code> relative links.</p>
+  <h3>Google Apps Script Link Rewriting</h3>
+  <p>When deployed on Apps Script, all <code>href="page_name.html"</code> links are automatically rewritten to <code>?page=page_name</code> by the IIFE at the bottom of each file. <strong>Do not remove this IIFE from any page</strong> — it is harmless when running locally.</p>
+  <pre><code>(function(){
+  var isAppsScript = window.location.href.indexOf('script.google.com') > -1
+    || window.location.href.indexOf('googleusercontent.com') > -1;
+  if(!isAppsScript) return;
+  function rewriteLinks(){
+    document.querySelectorAll('a[href]').forEach(function(a){
+      var href = a.getAttribute('href');
+      if(!href||href.startsWith('http')||href.startsWith('#')||!href.match(/\.html/)) return;
+      var page = href.replace(/\.html.*$/,'').replace(/^.*\//,'');
+      a.setAttribute('href', window.location.href.split('?')[0]+'?page='+page);
+    });
+  }
+  document.readyState==='loading'
+    ? document.addEventListener('DOMContentLoaded',rewriteLinks)
+    : rewriteLinks();
+  new MutationObserver(rewriteLinks).observe(document.body,{childList:true,subtree:true});
+})();</code></pre>
+  <h3>Back Bars</h3>
+  <p>Hub pages have a <code>.back-bar</code> at the top linking back to <code>index.html</code>. Standalone tools have this removed — see <code>tco_standalone.html</code> for the pattern.</p>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section page-break">
+  <div class="section-header">
+    <span class="section-num">Section 5</span>
+    <h2 class="section-title">Page Index</h2>
+  </div>
+
+  <div class="callout callout-info"><p><strong>How pages are grouped:</strong> Hub pages live under <code>index.html</code> nav. Team Portal pages are internal-only and live under <code>team_portal.html</code>. Standalone tools have no back-link to any hub. Resources are published outputs not tied to any nav.</p></div>
+
+  <h3>5.1 Intelligence Hub Pages</h3>
+  <p>All pages linked from <code>index.html</code> nav. All use the hub theme (<code>data-theme</code> on <code>&lt;html&gt;</code>) and include a <code>.back-bar</code> linking back to the hub.</p>
+  <table>
+    <thead><tr><th>File</th><th>Title</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>index.html</td><td>VER Intelligence Hub</td><td>Home / operating hub overview</td></tr>
+      <tr><td>page_exec.html</td><td>Executive Intelligence</td><td>C-level snapshot with engagement modals</td></tr>
+      <tr><td>page_renewal.html</td><td>Renewal Calendar</td><td>Contract renewal horizon with filter behavior</td></tr>
+      <tr><td>page_governance.html</td><td>Governance Posture</td><td>Governance queue with modal detail</td></tr>
+      <tr><td>page_tco.html</td><td>TCO Calculator</td><td>Full TCO calculator — hub-connected, accepts query params from dashboard</td></tr>
+      <tr><td>page_tco_dashboard.html</td><td>TCO Dashboard</td><td>Portfolio TCO breakdown across pillars</td></tr>
+      <tr><td>page_rate_benchmarks.html</td><td>Rate &amp; Benchmark Intelligence</td><td>Rate card and benchmark analysis</td></tr>
+      <tr><td>page_scorecards.html</td><td>Vendor Performance Scorecards</td><td>Scorecard dashboards</td></tr>
+      <tr><td>page_cqbr.html</td><td>CQBR Library</td><td>Repository of all generated CQBRs</td></tr>
+      <tr><td>page_cqbr_generator.html</td><td>CQBR Generator</td><td>CQBR generation tool (hub version)</td></tr>
+      <tr><td>page_category_intel.html</td><td>Category Intelligence</td><td>Spend by category</td></tr>
+      <tr><td>page_cw_intel.html</td><td>CW Intelligence</td><td>Contingent workforce spend tracking</td></tr>
+      <tr><td>page_consumption.html</td><td>Consumption Monitor</td><td>Service consumption analytics</td></tr>
+      <tr><td>page_digest.html</td><td>Monthly Digest</td><td>Intelligence briefing archive</td></tr>
+      <tr><td>page_decision.html</td><td>Decision Support Center</td><td>Decision-making analytics</td></tr>
+      <tr><td>page_decision_ledger.html</td><td>Decision Ledger</td><td>Log of procurement decisions</td></tr>
+      <tr><td>page_forecast.html</td><td>Cost Optimization &amp; Demand Planning</td><td>Forecasting and HC planning</td></tr>
+      <tr><td>page_market.html</td><td>Market Intelligence</td><td>Market trends and competitive analysis</td></tr>
+      <tr><td>page_spend_analysis.html</td><td>AI-Assisted Spend Analysis</td><td>AI-powered spend analysis</td></tr>
+      <tr><td>page_ma.html</td><td>M&amp;A Vendor Transition</td><td>Merger &amp; acquisition vendor tracking</td></tr>
+      <tr><td>page_mft.html</td><td>MFT Forecasted Spend</td><td>Managed File Transfer spend forecast</td></tr>
+      <tr><td>page_sow.html</td><td>SOW &amp; PO Expiry Tracker</td><td>Statement of Work expiry tracking</td></tr>
+      <tr><td>page_ai_cost.html</td><td>AI Cost Monitor</td><td>AI spending and cost analysis</td></tr>
+      <tr><td>page_action_queue.html</td><td>Action Queue</td><td>Task queue and workflow management</td></tr>
+      <tr><td>page_pillar.html</td><td>Pillar Portfolio Intelligence</td><td>Strategic pillar portfolio view</td></tr>
+      <tr><td>page_pillar_detail.html</td><td>Pillar Intelligence Detail</td><td>Detailed pillar-level analytics</td></tr>
+      <tr><td>page_pillar_alerts.html</td><td>Pillar Action Alerts</td><td>Pillar-specific alerts</td></tr>
+      <tr><td>page_pillar_pl.html</td><td>Spend &amp; Savings Intelligence</td><td>Pillar P&amp;L analysis</td></tr>
+      <tr><td>page_scenario.html</td><td>Scenario Planner</td><td>What-if scenario modeling</td></tr>
+      <tr><td>page_roadmap.html</td><td>Strategic Roadmap</td><td>VER team roadmap and initiatives</td></tr>
+      <tr><td>page_guide.html</td><td>VER-Ready Manager Guide</td><td>Manager enablement documentation</td></tr>
+      <tr><td>page_team.html</td><td>Our Team</td><td>VER team profiles and charter</td></tr>
+      <tr><td>page_coming.html</td><td>Coming Soon</td><td>Placeholder for in-development pages</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 Team Portal</h3>
+  <p>Internal-only pages accessible from <code>team_portal.html</code>. Use <code>body.light-mode</code> / <code>body.mid-mode</code> theme system. Not linked from <code>index.html</code>. The Chief of Staff daily briefing is <strong>embedded inside</strong> <code>team_portal.html</code> as a modal — the separate standalone <code>chief_of_staff.html</code> is a distinct personal tool listed in 5.5.</p>
+  <table>
+    <thead><tr><th>File</th><th>Title</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>team_portal.html</td><td>VER Team Portal</td><td>Main internal hub — hero with Chibi rabbit, Chief of Staff briefing, daily queue, sidebar nav to all team tools</td></tr>
+      <tr><td>assignments.html</td><td>Assign Work</td><td>Task distribution and work queue</td></tr>
+      <tr><td>portal_intake_review.html</td><td>Intake Review</td><td>Internal review of submitted stakeholder intakes</td></tr>
+      <tr><td>portal_survey_review.html</td><td>Survey Response Review</td><td>Internal analysis of vendor survey responses</td></tr>
+      <tr><td>portal_vendor_registry.html</td><td>Vendor Registry</td><td>Internal vendor registration management</td></tr>
+      <tr><td>portal_rate_benchmarks.html</td><td>Rate Benchmarks</td><td>Internal rate submission and benchmark review</td></tr>
+      <tr><td>portal_vendor_risk.html</td><td>Vendor Risk</td><td>Risk assessment heat map and detail panel</td></tr>
+      <tr><td>portal_cqbr_generator.html</td><td>CQBR Generator</td><td>CQBR generation tool in team portal context</td></tr>
+      <tr><td>portal_vendor_selector.html</td><td>Vendor Selector</td><td>Multi-vendor comparison and selection</td></tr>
+      <tr><td>portal_survey.html</td><td>Vendor Survey</td><td>Vendor performance survey tool</td></tr>
+      <tr><td>response_tracker.html</td><td>Response Time Tracker</td><td>Vendor response SLA tracking</td></tr>
+      <tr><td>risk_tracker.html</td><td>Risk Assessment Tracker</td><td>Risk scoring with band distribution</td></tr>
+      <tr><td>savings_tracker.html</td><td>Savings Tracker</td><td>Cost savings attribution and targets</td></tr>
+      <!-- Chief of Staff briefing is embedded inside team_portal.html — see chief_of_staff.html in 5.5 Standalone Tools for the separate personal CoS tool -->
+    </tbody>
+  </table>
+
+  <h3>5.3 Vendor Platform</h3>
+  <p>Vendor-facing and internal vendor management pages. Includes <code>spend_benchmarking.html</code> which lives in this platform context.</p>
+  <table>
+    <thead><tr><th>File</th><th>Title</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>vendor_home.html</td><td>Portfolio Overview</td><td>Vendor portfolio dashboard</td></tr>
+      <tr><td>vendor_detail.html</td><td>Vendor Detail</td><td>Individual vendor profile + analytics</td></tr>
+      <tr><td>vendor_registry.html</td><td>Vendor Registry</td><td>Master vendor database</td></tr>
+      <tr><td>vendor_risk.html</td><td>Vendor Risk Assessment</td><td>Risk dashboard</td></tr>
+      <tr><td>vendor_selector.html</td><td>Vendor Selector</td><td>Multi-vendor comparison</td></tr>
+      <tr><td>vendor_sow.html</td><td>Vendor SOW &amp; PO Tracker</td><td>SOW and PO management</td></tr>
+      <tr><td>vendor_intake.html</td><td>Vendor Intake Form</td><td>New vendor onboarding form</td></tr>
+      <tr><td>vendor_co.html</td><td>Vendor Change Orders</td><td>Change order management</td></tr>
+      <tr><td>spend_benchmarking.html</td><td>Spend Benchmarking</td><td>Benchmarking analysis — part of vendor platform, not a standalone tool</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.4 Supplier Portal</h3>
+  <p>External-facing supplier-submitted pages only. Three pages total.</p>
+  <table>
+    <thead><tr><th>File</th><th>Title</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>portal_home.html</td><td>Supplier Portal Home</td><td>Main supplier landing page and intake entry point</td></tr>
+      <tr><td>portal_register.html</td><td>Supplier Registration</td><td>New supplier registration form</td></tr>
+      <tr><td>portal_confirm.html</td><td>Submission Received</td><td>Post-submission confirmation page</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.5 Standalone Tools</h3>
+  <p>Self-contained tools with no back-link to any hub or platform. Safe to share externally or embed in other contexts.</p>
+  <table>
+    <thead><tr><th>File</th><th>Title</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>tco_standalone.html</td><td>TCO Calculator</td><td>Standalone TCO tool for external teams — no hub nav, no DET/VER branding, all inputs start at $0</td></tr>
+      <tr><td>page_cinematic_generator_v2.html</td><td>Cinematic Generator v2</td><td>Standalone meeting &amp; presentation builder — NOT in hub nav</td></tr>
+      <tr><td>page_survey.html</td><td>Vendor Performance Survey</td><td>Standalone survey instrument — not linked from index.html</td></tr>
+      <tr><td>page_survey_review.html</td><td>Survey Response Review</td><td>Standalone internal survey review — not linked from index.html</td></tr>
+      <tr><td>chief_of_staff.html</td><td>Chief of Staff</td><td>Standalone personal CoS dashboard — separate from the CoS briefing modal embedded in team_portal.html</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.6 Resources</h3>
+  <p>Published outputs, narrative documents, and the Vision Series. Not tied to hub navigation.</p>
+  <table>
+    <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>page_vision_series.html</td><td>Vision Series library — in-hub archive of episode links</td></tr>
+      <tr><td>VER_Vision_Series_E1_WhoIsVER_v2.html</td><td>Vision Series Episode 1 — standalone published page</td></tr>
+      <tr><td>Cognizant_QBR_FY26Q4_Cinematic_v2.html</td><td>Full-screen exec presentation — Cognizant QBR</td></tr>
+      <tr><td>VER_Hub_Build_Story.html</td><td>Development narrative (standalone)</td></tr>
+      <tr><td>VER_Manager_Guide.html</td><td>Standalone manager enablement guide</td></tr>
+      <tr><td>VER_Monthly_Digest_May2026.html</td><td>Archived monthly digest — May 2026</td></tr>
+      <tr><td>VER_Strategic_Roadmap.html</td><td>Standalone strategy document</td></tr>
+      <tr><td>VER_Team_Charter_Standalone.html</td><td>Standalone team charter</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 6 -->
+<div class="section page-break">
+  <div class="section-header">
+    <span class="section-num">Section 6</span>
+    <h2 class="section-title">Key Tools Reference</h2>
+  </div>
+
+  <h3>6.1 TCO Calculator</h3>
+  <p><strong>Files:</strong> <code>page_tco.html</code> (hub version) &middot; <code>tco_standalone.html</code> (standalone — no hub nav, no DET/VER references, all inputs start at $0)</p>
+  <p><strong>Engagement types:</strong> Software/SaaS &middot; SOW Engagement &middot; Cloud &amp; Infrastructure &middot; Professional Services &middot; Contingent Workforce &middot; Mobility &amp; Telecom</p>
+  <p><strong>Modes:</strong> Decision Support (all inputs start at $0, benchmark insights active) | Audit &amp; Review (enter actual costs for variance analysis)</p>
+  <h4>Core Functions</h4>
+  <ul>
+    <li><code>buildCategories()</code> — renders all input sliders for the selected engagement type</li>
+    <li><code>getCatTotal(catId)</code> — calculates a category total (handles hrs/FTE/% special units)</li>
+    <li><code>get3YrTotal()</code> — returns year-by-year array and total TCO across the full contract term (1–5 yrs or sub-year months for SOW)</li>
+    <li><code>updateTermUI()</code> — updates term button highlights, <code>ts-period</code> label, <code>donut-center-lbl</code>, and shows/hides year KPI columns (Year 1–5) based on selected term</li>
+    <li><code>formatTermLabel()</code> — returns human-readable term string e.g. "3-year", "6-month"</li>
+    <li><code>updateVERTip()</code> — fires benchmark insight tip for the active engagement type; all 6 types have tips with smart input-value triggers</li>
+    <li><code>getHiddenCostPct()</code> — calculates % of total TCO hidden beyond contracted value</li>
+    <li><code>openAssessModal()</code> — generates the full TCO assessment report modal</li>
+    <li><code>exportPDF()</code> — print-to-PDF via <code>window.print()</code> with <code>.printing</code> body class</li>
+    <li><code>exportCSVSummary()</code> / <code>exportCSVFull()</code> — CSV download via Blob URL</li>
+  </ul>
+  <h4>Dynamic Term Labels</h4>
+  <p>The running total strip (<code>#ts-period</code>), donut center label (<code>#donut-center-lbl</code>), and year KPI columns all update live when the term changes. Year 4 and Year 5 columns are hidden by default and revealed when a 4- or 5-year term is selected. Sub-year SOW terms (3 Mo, 6 Mo etc.) show a single period column labelled in months.</p>
+  <h4>Internal Rate Constants</h4>
+  <pre><code>var INTERNAL_RATE = 200; // $ per hour for FTE/hours inputs
+var HELPDESK_COST = 25;  // $ per support ticket</code></pre>
+  <h4>URL Pre-population</h4>
+  <p>Hub links pass <code>?vendor=NAME&amp;type=TYPE&amp;spend=VALUE&amp;mult=MULT</code> query params. The <code>loadFromURL()</code> function reads these and pre-fills inputs.</p>
+
+  <h3>6.2 CQBR Generator</h3>
+  <p><strong>Files:</strong> <code>page_cqbr_generator.html</code> (hub) &middot; <code>portal_cqbr_generator.html</code> (team portal)</p>
+  <p>Generates Cognizant Quarterly Business Review documents from structured input. Produces a formatted report covering performance, spend, risks, and actions.</p>
+  <div class="callout callout-warn">
+    <p><strong>Critical — Script tag inside template literal:</strong> The <code>_toggleTheme</code> function and its init IIFE must be in a <strong>separate <code>&lt;script&gt;</code> block</strong> after the main one. If inside the main script block, the HTML parser terminates on any <code>&lt;/script&gt;</code> found in a template literal string, causing raw JS to render as visible text at the bottom of the page.</p>
+  </div>
+  <pre><code>&lt;/script&gt;  &lt;!-- close main script first --&gt;
+&lt;script&gt;
+function _toggleTheme(){ ... }
+(function(){ /* theme restore IIFE */ })();
+&lt;/script&gt;</code></pre>
+
+  <h3>6.3 Cinematic Generator v2</h3>
+  <p><strong>File:</strong> <code>page_cinematic_generator_v2.html</code> — Standalone tool, <strong>NOT wired to hub nav</strong>.</p>
+  <p>Generates cinematic full-screen animated HTML presentations for any meeting type: MBR, QBR, Team, Offsite, Exec. Output is a self-contained standalone HTML file. Separate from the CQBR Generator — this is for general meetings, not Cognizant-specific QBRs.</p>
+
+  <h3>6.4 Chief of Staff Module</h3>
+  <p>There are <strong>two separate implementations</strong> that must not be confused:</p>
+  <ol>
+    <li><strong>Built-in daily briefing</strong> — embedded inside <code>team_portal.html</code> as an overlay modal, triggered via <code>openCoS()</code>. Auto-shows once per day on login. Data lives in <code>COS_DATA</code> within the file. Accessible from the team portal hero bar only.</li>
+    <li><strong>Standalone CoS</strong> (<code>chief_of_staff.html</code>) — separate personal executive assistant dashboard. <strong>NOT in the portal sidebar nav.</strong> Accessed directly via URL. Has its own independent data model.</li>
+  </ol>
+  <div class="callout callout-info">
+    <p><strong>Never merge these two.</strong> The embedded briefing is a lightweight daily digest for the team. The standalone CoS is a full personal tool. They are intentionally separate.</p>
+  </div>
+</div>
+
+<!-- SECTION 7 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 7</span>
+    <h2 class="section-title">Data Layer</h2>
+  </div>
+  <h3>Shared Data (<code>assets/data.js</code>)</h3>
+  <p>Used by hub pages only. Contains vendor data, pillar data, renewal timelines, and governance records.</p>
+  <h3>Inline Data (Portal / Team / Tracker Pages)</h3>
+  <p>Most portal and team pages carry their own data inline as JS objects within <code>&lt;script&gt;</code> tags — keeping each page self-contained for deployment.</p>
+  <h3>Vendor Logo CDN (Brandfetch)</h3>
+  <pre><code>var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+// Usage:
+'https://cdn.brandfetch.io/' + domain + '?c=' + BF_CLIENT</code></pre>
+  <div class="callout callout-warn">
+    <p><strong>onerror fallback — use DOM createElement, not innerHTML=:</strong> Inline onerror handlers with complex HTML strings break due to quote escaping. Always use <code>document.createElement()</code> in the onerror attribute.</p>
+  </div>
+  <pre><code>onerror="this.style.display='none';
+  var s=document.createElement('div');
+  s.style.cssText='width:32px;height:32px;...';
+  s.textContent='A';
+  this.parentNode.insertBefore(s,this);"</code></pre>
+  <h3>VENDOR_DOMAINS Map</h3>
+  <p>Each portal page that shows logos maintains a <code>VENDOR_DOMAINS</code> object:</p>
+  <pre><code>var VENDOR_DOMAINS = {
+  'Cognizant': 'cognizant.com',
+  'IBM': 'ibm.com',
+  // ...
+};</code></pre>
+</div>
+
+<!-- SECTION 8 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 8</span>
+    <h2 class="section-title">Common Patterns</h2>
+  </div>
+  <h3>KPI Strip</h3>
+  <p>Most pages open with a <code>.kpi-strip</code> or <code>.total-strip</code> showing key metrics. Values are updated by JS after page load.</p>
+  <h3>Modal System</h3>
+  <pre><code>function openModal(id) {
+  var bd = document.getElementById(id);
+  bd.style.opacity = '1';
+  bd.style.pointerEvents = 'all';
+  bd.querySelector('.modal-box').style.transform = 'translateY(0) scale(1)';
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) { /* reverse of above */ }</code></pre>
+  <h3>Help Modal Utility (<code>assets/help-modal.js</code>)</h3>
+  <pre><code>HelpModal.open({
+  title: 'Page Name',
+  what: 'What this page does...',
+  steps: ['Step 1...', 'Step 2...'],
+  tips: [{ icon: '📊', title: 'Tip title', body: 'Tip body' }],
+  footNote: 'FY27 · VER Intelligence Hub · Confidential'
+});</code></pre>
+  <div class="callout callout-info">
+    <p><strong>Note:</strong> Standalone and portal pages that do not load <code>assets/help-modal.js</code> must not call <code>HelpModal.open()</code>.</p>
+  </div>
+  <h3>Sticky Header Heights</h3>
+  <ul>
+    <li>Top bar: <strong>52px</strong> — use <code>top: 52px</code> for sticky elements below it</li>
+    <li>Running total strip (TCO): also <strong>52px</strong> — use <code>top: 104px</code> when both are present</li>
+  </ul>
+  <h3><code>position:sticky</code> Scoping Rule</h3>
+  <p>Sticky only works relative to the nearest scrolling ancestor. A sticky element inside a flex child with <code>overflow:hidden</code> will not stick to the viewport. Ensure the containing div has <code>overflow-y:auto</code>.</p>
+</div>
+
+<!-- SECTION 9 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 9</span>
+    <h2 class="section-title">Light / Dark / Mid Theme Overrides</h2>
+  </div>
+  <h3>Step 1 — Override semantic variables at root level</h3>
+  <pre><code>body.light-mode {
+  --green: #059669;    /* replaces neon #34D399 */
+  --amber: #B45309;    /* replaces neon #FBBF24 */
+  --red:   #DC2626;    /* replaces bright #F43F5E */
+}</code></pre>
+  <h3>Step 2 — Override component classes</h3>
+  <pre><code>/* Status pills */
+body.light-mode .sp-green { background:rgba(5,150,105,0.14); color:#059669; border-color:rgba(5,150,105,0.35); }
+body.light-mode .sp-amber { background:rgba(180,83,9,0.12);  color:#B45309; border-color:rgba(180,83,9,0.30); }
+body.light-mode .sp-red   { background:rgba(192,20,60,0.12); color:#C0143C; border-color:rgba(192,20,60,0.30); }
+
+/* Bar tracks */
+body.light-mode .hbar-track { background: rgba(26,8,24,0.18) !important; }</code></pre>
+  <h3>Step 3 — Canvas/SVG charts — detect at draw time</h3>
+  <pre><code>var isLight = document.body.classList.contains('light-mode');
+var gridColor  = isLight ? 'rgba(26,8,24,0.15)' : 'rgba(255,255,255,0.15)';
+var labelColor = isLight ? 'rgba(26,8,24,0.70)' : 'rgba(255,255,255,0.55)';</code></pre>
+</div>
+
+<!-- SECTION 10 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 10</span>
+    <h2 class="section-title">Known Quirks &amp; Gotchas</h2>
+  </div>
+  <h3>Script Tag Inside Template Literal</h3>
+  <p><strong>Problem:</strong> The HTML parser terminates a <code>&lt;script&gt;</code> block when it encounters <code>&lt;/script&gt;</code> — even inside a JS string or template literal.<br>
+  <strong>Solution:</strong> Close the main script block before any function that produces <code>&lt;/script&gt;</code> in a string, then open a new <code>&lt;script&gt;</code> block for those functions.</p>
+
+  <h3>Emoji Splitting</h3>
+  <p><strong>Problem:</strong> <code>'🐹🐻'.split('')</code> produces question marks — multi-codepoint emoji split at the UTF-16 code unit level, not grapheme clusters.<br>
+  <strong>Solution:</strong> Store emoji collections as arrays, not strings:</p>
+  <pre><code>// Wrong — splits at UTF-16 boundaries, produces broken chars
+var emojis = '🐹🐻'.split('');
+
+// Correct — each emoji is already a discrete element
+var emojis = ['🐹', '🐻'];</code></pre>
+
+  <h3>onerror HTML Injection</h3>
+  <p><strong>Problem:</strong> <code>onerror="this.parentNode.innerHTML='&lt;div&gt;...'"</code> breaks when the HTML string contains <code>"</code> — the browser parses it as closing the attribute.<br>
+  <strong>Solution:</strong> Always use <code>document.createElement()</code> in onerror handlers (see Section 7).</p>
+
+  <h3>Panel Height Bleeding</h3>
+  <p>When a detail panel should match the viewport height (not page height), use:</p>
+  <pre><code>.detail-panel {
+  height: calc(100vh - 104px); /* 52px topbar + 52px toolbar */
+  position: sticky;
+  top: 0;
+  align-self: flex-start;     /* NOT align-self: stretch */
+}</code></pre>
+  <p><code>align-self: stretch</code> extends the panel to full page height, producing a white box below content in light mode.</p>
+</div>
+
+<!-- SECTION 11 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 11</span>
+    <h2 class="section-title">Google Apps Script Deployment</h2>
+  </div>
+  <p>All pages include an IIFE that detects Apps Script hosting and rewrites <code>.html</code> links to <code>?page=</code> query parameters. <strong>Do not remove this IIFE from any page.</strong></p>
+  <pre><code>(function(){
+  var isAppsScript = window.location.href.indexOf('script.google.com') > -1
+    || window.location.href.indexOf('googleusercontent.com') > -1;
+  if(!isAppsScript) return;
+  function rewriteLinks(){
+    document.querySelectorAll('a[href]').forEach(function(a){
+      var href = a.getAttribute('href');
+      if(!href||href.startsWith('http')||href.startsWith('#')||!href.match(/\.html/)) return;
+      var page = href.replace(/\.html.*$/,'').replace(/^.*\//,'');
+      var base = window.location.href.split('?')[0];
+      a.setAttribute('href', base+'?page='+page);
+    });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',rewriteLinks);
+  } else { rewriteLinks(); }
+  new MutationObserver(rewriteLinks).observe(document.body,{childList:true,subtree:true});
+})();</code></pre>
+  <p>For the Apps Script host file, each <code>?page=NAME</code> request resolves to <code>NAME.html</code> and its content is served.</p>
+</div>
+
+<!-- SECTION 12 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">Section 12</span>
+    <h2 class="section-title">Maintenance Checklist</h2>
+  </div>
+
+  <h3>Adding a New Hub Page</h3>
+  <ul class="checklist">
+    <li><span class="check-box"></span>Create <code>page_newname.html</code> based on an existing page as a template</li>
+    <li><span class="check-box"></span>Add the <code>← VER Intelligence Hub</code> back bar at the top</li>
+    <li><span class="check-box"></span>Include the Apps Script link rewriter IIFE at the bottom of the <code>&lt;script&gt;</code> block</li>
+    <li><span class="check-box"></span>Add a nav link in <code>index.html</code> sidebar</li>
+    <li><span class="check-box"></span>Add entry to this guide's page index</li>
+  </ul>
+
+  <h3>Adding a New Portal Page</h3>
+  <ul class="checklist">
+    <li><span class="check-box"></span>Create <code>portal_newname.html</code></li>
+    <li><span class="check-box"></span>Include the three-mode theme system (<code>_toggleTheme</code> + restore IIFE)</li>
+    <li><span class="check-box"></span>Add light-mode overrides for all status pills, bar tracks, and color variables</li>
+    <li><span class="check-box"></span>Include the Apps Script link rewriter IIFE</li>
+    <li><span class="check-box"></span>Add sidebar link in <code>team_portal.html</code> if it is a team tool</li>
+    <li><span class="check-box"></span>Add entry to this guide's page index</li>
+  </ul>
+
+  <h3>Fixing Light-Mode Colors</h3>
+  <ol>
+    <li>Check if the broken color uses a CSS variable (<code>var(--amber)</code> etc.)</li>
+    <li>If yes → add the variable override to the <code>body.light-mode { }</code> block</li>
+    <li>If no → add a specific <code>body.light-mode .classname { }</code> override</li>
+  </ol>
+
+  <h3>Updating Vendor Data</h3>
+  <ul>
+    <li><strong>Hub vendor data:</strong> edit <code>assets/data.js</code></li>
+    <li><strong>Portal vendor data:</strong> search for <code>VENDOR_DOMAINS</code> and <code>VENDORS</code> arrays within each portal page</li>
+    <li><strong>Preferred Tier 1 AMER vendors:</strong> Accenture, Cognizant, IBM, Infosys, TCS, Wipro, HCL, Capgemini, NTT Data, DXC, Deloitte, PwC, EY, KPMG, BCG, McKinsey</li>
+  </ul>
+
+  <h3>Adding a Team Member</h3>
+  <p>Edit the <code>TEAM_MEMBERS</code> array in <code>team_portal.html</code>:</p>
+  <pre><code>{ id: 'newid', name: 'Full Name', role: 'VER Role', emoji: '👤', color: '#HEX', director: false }</code></pre>
+
+  <h3>Deploying the Standalone TCO Calculator</h3>
+  <p>Use <code>tco_standalone.html</code> — all hub nav, back links, and DET/VER references are removed. Safe to share with external teams or host in a Forge space. Key differences from <code>page_tco.html</code>:</p>
+  <ul>
+    <li>All inputs start at $0 — no pre-populated benchmark defaults</li>
+    <li>All 6 engagement types have benchmark insight tips (Cloud &amp; Infrastructure, Professional Services, Contingent Workforce, Mobility &amp; Telecom each have 4 smart-trigger tips)</li>
+    <li>Term labels, donut centre, and year KPI columns (Year 1–5) update dynamically with term selection</li>
+    <li>Full calculation engine, AI augmentation panel, CSV/PDF export, and assessment report all work independently</li>
+    <li>No <code>Portfolio TCO</code> dashboard link and no hub footer branding</li>
+  </ul>
+
+  <hr>
+  <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:32px;">VER Intelligence Hub &middot; Build Guide &amp; Maintenance Reference &middot; FY27 &middot; Casey Luciana Candelaria-Logan &middot; Last Updated July 2026<br>Update this document whenever a new page is added, a key behavior changes, or a non-obvious pattern is established.</p>
+</div>
+
+</div><!-- end body-wrap -->
+</body>
+</html>

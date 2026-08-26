@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pillar Intelligence &middot; VER Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --orange:#EA580C;--orange3:#FFF7ED;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F8FAFC;--gray2:#F1F5F9;--gray3:#E2E8F0;
+  --border:#E2E8F0;--border2:#CBD5E1;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;-webkit-font-smoothing:antialiased;}
+
+/* TOP BAR */
+.hub-top-bar{position:sticky;top:0;z-index:200;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98),rgba(10,22,40,0.98));
+  border-bottom:1px solid rgba(255,255,255,0.07);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.hub-top-bar-inner{max-width:1280px;margin:0 auto;padding:10px 32px;
+  display:flex;align-items:center;justify-content:space-between;}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;}
+.htb-back:hover{color:var(--teal);}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:.04em;}
+.htb-right{display:flex;align-items:center;gap:10px;}
+.htb-meta{font-size:7.5pt;color:rgba(255,255,255,0.3);}
+.top-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;
+  border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.55);font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
+.top-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+
+/* PILLAR NAV STRIP */
+.pillar-nav-wrap{background:rgba(10,18,36,0.96);border-bottom:1px solid rgba(255,255,255,0.06);
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none;}
+.pillar-nav-inner{max-width:1280px;margin:0 auto;padding:0 32px;}
+.pillar-nav-wrap::-webkit-scrollbar{display:none;}
+.pillar-nav{display:inline-flex;gap:4px;padding:8px 0;}
+.pnav-item{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;
+  font-size:8pt;font-weight:600;color:rgba(255,255,255,0.45);text-decoration:none;
+  border:1px solid transparent;transition:all .15s;white-space:nowrap;}
+.pnav-item:hover{color:rgba(255,255,255,0.80);background:rgba(255,255,255,0.06);}
+.pnav-item.active{background:rgba(255,255,255,0.10);border-color:rgba(255,255,255,0.18);color:#fff;}
+
+/* PAGE */
+.page-wrap{max-width:1280px;margin:0 auto;padding:24px 32px 64px;}
+
+/* COVER BAND */
+.v2-cover{border-radius:16px;padding:30px 36px 26px;color:#fff;margin-bottom:22px;
+  position:relative;overflow:hidden;}
+.v2-cover::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 85% 15%,rgba(255,255,255,0.07) 0%,transparent 55%);pointer-events:none;}
+.cover-eyebrow{font-size:7.5pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);margin-bottom:8px;}
+.cover-name{font-size:24pt;font-weight:900;line-height:1.05;letter-spacing:-.02em;margin-bottom:4px;}
+.cover-sub{font-size:9pt;color:rgba(255,255,255,.50);margin-bottom:26px;}
+.cover-kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;position:relative;z-index:1;}
+.ckpi{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:12px 14px;transition:background .15s;}
+.ckpi.savings-win{background:rgba(5,150,105,.25);border-color:rgba(16,185,129,.4);}
+.ckpi-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:rgba(255,255,255,.45);margin-bottom:5px;}
+.ckpi-val{font-size:15pt;font-weight:900;color:#fff;line-height:1;}
+.ckpi.savings-win .ckpi-val{color:#6EE7B7;}
+.ckpi-note{font-size:7.5pt;color:rgba(255,255,255,.40);margin-top:4px;line-height:1.4;}
+.risk-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:8pt;font-weight:700;}
+.risk-pill .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.rp-green{background:rgba(16,185,129,.25);color:#6EE7B7;}
+.rp-green .dot{background:#34D399;}
+.rp-amber{background:rgba(251,191,36,.22);color:#FCD34D;}
+.rp-amber .dot{background:#FCD34D;}
+.rp-red{background:rgba(239,68,68,.25);color:#FCA5A5;}
+.rp-red .dot{background:#F87171;}
+
+/* P&L ROW */
+.pl-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.pl-card{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:relative;overflow:hidden;}
+.pl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.pl-card.spend::before{background:var(--navy);}
+.pl-card.forecast::before{background:var(--amber);}
+.pl-card.savings::before{background:var(--green);}
+.pl-card.exposure::before{background:var(--blue);}
+.pl-lbl{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink4);margin-bottom:8px;}
+.pl-val{font-size:26pt;font-weight:900;line-height:1;color:var(--ink);}
+.pl-card.savings .pl-val{color:var(--green2);}
+.pl-card.exposure .pl-val{color:var(--navy);}
+.pl-card.forecast .pl-val{color:var(--amber2);}
+.pl-note{font-size:8pt;color:var(--ink4);margin-top:7px;line-height:1.5;}
+
+/* SPEND PROGRESS BAR */
+.spend-bar-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:18px 22px;margin-bottom:22px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.spend-bar-track{height:14px;background:var(--gray2);border-radius:7px;overflow:hidden;
+  display:flex;margin:10px 0 8px;}
+.spend-bar-seg{height:100%;transition:width .6s ease;}
+.spend-bar-legend{display:flex;gap:18px;flex-wrap:wrap;}
+.sbl-item{display:flex;align-items:center;gap:6px;font-size:8pt;}
+.sbl-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
+/* MAIN GRID — 2×2, rows auto-equalize per row */
+.main-grid{display:grid;grid-template-columns:1fr 340px;grid-template-rows:auto auto;gap:18px;margin-bottom:22px;align-items:stretch;}
+.main-grid>.v2-card{display:flex;flex-direction:column;margin-bottom:0;}
+
+/* CARDS */
+.v2-card{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:16px;}
+.v2-card:last-child{margin-bottom:0;}
+.card-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:2px;}
+.card-sub{font-size:8pt;color:var(--ink4);margin-bottom:14px;}
+
+/* SPEND VS PLAN BOX */
+.svp-arrow{font-size:32pt;font-weight:900;line-height:1;margin-bottom:4px;}
+.svp-label{font-size:11pt;font-weight:800;margin-bottom:10px;}
+.svp-note{font-size:8.5pt;color:var(--ink3);line-height:1.65;}
+
+/* RENEWAL */
+.renewal-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.rm-item .lbl{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:3px;}
+.rm-item .val{font-size:9pt;font-weight:700;color:var(--ink2);}
+
+/* VENDOR GRID */
+.vendor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.vendor-card{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;cursor:pointer;position:relative;overflow:hidden;transition:all .18s;}
+.vendor-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;}
+.vendor-card.green::before{background:var(--green);}
+.vendor-card.amber::before{background:var(--amber);}
+.vendor-card.red::before{background:var(--red);}
+.vendor-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.10);border-color:var(--border2);}
+.vendor-card:hover::after{content:'View Details \2192';position:absolute;bottom:10px;right:12px;
+  font-size:7.5pt;font-weight:700;color:var(--teal);}
+.vendor-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.vendor-name{font-size:9.5pt;font-weight:800;color:var(--ink);}
+.vendor-meta{font-size:7.5pt;color:var(--ink4);margin-top:1px;}
+.vendor-spend{font-size:14pt;font-weight:900;color:var(--navy);}
+.vendor-pct{font-size:7.5pt;color:var(--ink4);}
+.v-pill{display:inline-flex;align-items:center;gap:4px;font-size:7pt;font-weight:700;
+  padding:2px 9px;border-radius:10px;margin-top:6px;}
+.vp-g{background:var(--green3);color:var(--green2);}
+.vp-a{background:var(--amber3);color:var(--amber2);}
+.vp-r{background:var(--red3);color:var(--red2);}
+
+/* ACTION TABLE */
+.action-table{width:100%;border-collapse:collapse;}
+.action-table thead tr{background:var(--navy);}
+.action-table th{padding:9px 14px;text-align:left;color:rgba(255,255,255,.8);
+  font-size:7.5pt;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.action-table th:first-child{border-radius:10px 0 0 0;}
+.action-table th:last-child{border-radius:0 10px 0 0;}
+.action-table td{padding:11px 14px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.action-table tr:last-child td{border-bottom:none;}
+.action-table tr:hover td{background:var(--gray);}
+.ai-text{font-size:9pt;font-weight:600;color:var(--ink2);}
+.ai-owner{font-size:8pt;color:var(--ink4);margin-top:2px;}
+.status-pill{display:inline-flex;align-items:center;gap:4px;font-size:7.5pt;font-weight:700;
+  padding:3px 10px;border-radius:10px;white-space:nowrap;}
+.sp-g{background:var(--green3);color:var(--green2);}
+.sp-a{background:var(--amber3);color:var(--amber2);}
+.sp-r{background:var(--red3);color:var(--red2);}
+
+/* ADVISORY BOX */
+.advisory-box{background:linear-gradient(135deg,#080F1E,#0F1E3C);border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;padding:24px 28px;margin-bottom:22px;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.adv-eyebrow{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+  color:rgba(255,255,255,.35);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.adv-eyebrow::before{content:'';width:24px;height:1px;background:var(--teal);}
+.adv-body{font-size:9.5pt;color:rgba(255,255,255,.80);line-height:1.82;}
+
+/* VER ASKS */
+.ask-item{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;
+  background:var(--gray);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;}
+.ask-num{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:8.5pt;font-weight:800;flex-shrink:0;}
+.ask-text{font-size:9pt;color:var(--ink2);line-height:1.65;padding-top:2px;}
+
+/* SECTION DIVIDER */
+.v2-section{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--ink4);margin:28px 0 14px;display:flex;align-items:center;gap:10px;}
+.v2-section::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* CQBR */
+.cqbr-tile{background:linear-gradient(135deg,var(--teal3),var(--white));
+  border:1px solid rgba(13,148,136,.3);border-radius:12px;padding:18px 22px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;}
+.cqbr-btn{padding:10px 22px;background:var(--navy);color:#fff;border-radius:8px;
+  text-decoration:none;font-size:9pt;font-weight:700;white-space:nowrap;transition:background .15s;}
+.cqbr-btn:hover{background:var(--teal2);}
+
+/* DATA NOTES */
+.data-notes{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:16px 20px;font-size:8.5pt;color:var(--ink4);line-height:1.75;}
+
+/* VENDOR MODAL */
+#vendor-modal{display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(5,10,20,.65);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+#vendor-modal.open{display:flex;}
+.vm-box{background:#fff;border-radius:16px;width:min(560px,92vw);max-height:88vh;
+  overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.35);}
+.vm-head{padding:24px 26px 20px;color:#fff;flex-shrink:0;position:relative;}
+.vm-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.15);border:none;
+  color:#fff;width:28px;height:28px;border-radius:50%;font-size:14pt;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;line-height:1;transition:background .15s;}
+.vm-close:hover{background:rgba(255,255,255,.3);}
+.vm-logo-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.vm-vendor-name{font-size:16pt;font-weight:900;}
+.vm-vendor-cats{font-size:8.5pt;color:rgba(255,255,255,.55);margin-top:2px;}
+.vm-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.vm-kpi{background:rgba(255,255,255,.12);border-radius:8px;padding:10px 12px;}
+.vm-kpi-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+  color:rgba(255,255,255,.45);margin-bottom:4px;}
+.vm-kpi-val{font-size:13pt;font-weight:900;color:#fff;}
+.vm-body{padding:22px 26px;overflow-y:auto;flex:1;}
+.vm-section-lbl{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--ink4);margin:18px 0 8px;}
+.vm-section-lbl:first-child{margin-top:0;}
+.vm-note-box{background:var(--gray);border-radius:8px;padding:14px 16px;
+  font-size:9pt;color:var(--ink2);line-height:1.70;border-left:3px solid var(--border2);}
+.vm-items{display:flex;flex-direction:column;gap:8px;}
+.vm-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
+  background:var(--gray);border-radius:8px;font-size:8.5pt;}
+.vm-item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+
+/* DARK MODE */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--teal3:rgba(13,148,136,.15);--green3:rgba(5,150,105,.15);
+  --amber3:rgba(217,119,6,.15);--red3:rgba(220,38,38,.15);--blue3:rgba(37,99,235,.15);
+}
+[data-theme="dark"] body{background:var(--gray);}
+[data-theme="dark"] .v2-card,.pl-card,[data-theme="dark"] .pl-card,[data-theme="dark"] .vendor-card,
+[data-theme="dark"] .spend-bar-wrap,[data-theme="dark"] .data-notes{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .ask-item{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .action-table tr:hover td{background:var(--gray3);}
+[data-theme="dark"] #vendor-modal .vm-box{background:#0F1E3C;}
+[data-theme="dark"] .vm-note-box,[data-theme="dark"] .vm-item{background:var(--gray3);}
+[data-theme="dark"] .top-btn{border-color:rgba(255,255,255,.15);}
+[data-theme="dark"] .top-btn.dm{background:rgba(13,148,136,.18);border-color:rgba(13,148,136,.4);color:#0D9488;}
+
+@media print{
+  .hub-top-bar,.pillar-nav-wrap{display:none!important;}
+  .page-wrap{padding:12px;}
+  .v2-cover{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+
+/* ── COST TO OPERATE ── */
+#cto-overlay{display:none;position:fixed;inset:0;background:rgba(5,10,20,.55);
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:300;}
+#cto-overlay.open{display:block;}
+#cto-drawer{position:fixed;top:0;right:0;bottom:0;width:440px;background:var(--white);
+  z-index:400;box-shadow:-8px 0 40px rgba(0,0,0,.22);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;}
+#cto-drawer.open{transform:translateX(0);}
+.cto-dhead{padding:20px 22px 18px;background:linear-gradient(135deg,var(--navy),#1E3A5F);
+  color:#fff;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;}
+.cto-deyebrow{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:rgba(255,255,255,.45);margin-bottom:4px;}
+.cto-dtitle{font-size:14pt;font-weight:900;color:#fff;}
+.cto-xbtn{background:rgba(255,255,255,.12);border:none;color:#fff;width:30px;height:30px;
+  border-radius:50%;font-size:14pt;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;line-height:1;transition:background .15s;flex-shrink:0;font-family:inherit;}
+.cto-xbtn:hover{background:rgba(255,255,255,.28);}
+#cto-dbody{flex:1;overflow-y:auto;padding:20px 22px 32px;}
+.cto-sec{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.cto-sec:last-of-type{border-bottom:none;margin-bottom:0;}
+.cto-sec-lbl{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--ink4);margin-bottom:10px;}
+.cto-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+.cto-row2:last-child{margin-bottom:0;}
+.cto-field{display:flex;flex-direction:column;gap:4px;}
+.cto-field label{font-size:7.5pt;font-weight:700;color:var(--ink3);}
+.cto-field input[type="number"]{border:1px solid var(--border2);border-radius:6px;
+  padding:7px 10px;font-size:9pt;font-family:inherit;color:var(--ink);background:var(--white);
+  transition:border-color .15s;width:100%;}
+.cto-field input[type="number"]:focus{outline:none;border-color:var(--teal);
+  box-shadow:0 0 0 3px rgba(13,148,136,.12);}
+.cto-calc-btn{display:block;width:100%;margin-top:22px;
+  background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;border:none;
+  border-radius:8px;padding:13px;font-size:10pt;font-weight:800;cursor:pointer;
+  font-family:inherit;transition:opacity .15s;}
+.cto-calc-btn:hover{opacity:.87;}
+.cto-hist-lbl{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--ink4);margin:24px 0 10px;padding-top:20px;border-top:2px solid var(--border);}
+.cto-hist-item{background:var(--gray);border:1px solid var(--border);border-radius:8px;
+  padding:11px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
+.cto-hist-item:hover{border-color:var(--teal);}
+.cto-hist-name{font-size:8.5pt;font-weight:700;color:var(--ink2);margin-bottom:3px;}
+.cto-hist-meta{font-size:7.5pt;color:var(--ink4);line-height:1.5;}
+.cto-hist-cost{font-size:11pt;font-weight:900;color:var(--navy);}
+/* Results modal */
+#cto-modal{display:none;position:fixed;inset:0;z-index:600;
+  background:rgba(5,10,20,.65);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;}
+#cto-modal.open{display:flex;}
+.cto-mbox{background:var(--white);border-radius:16px;width:min(600px,94vw);max-height:90vh;
+  overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.35);}
+.cto-mhead{padding:20px 22px 18px;background:linear-gradient(135deg,var(--teal2),var(--navy));
+  color:#fff;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;}
+.cto-meyebrow{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:rgba(255,255,255,.45);margin-bottom:4px;}
+.cto-mpillar{font-size:12pt;font-weight:800;color:#fff;}
+.cto-mbody{padding:20px 22px;overflow-y:auto;flex:1;}
+.cto-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.cto-kpi-tile{background:var(--gray2);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;border-top-width:3px;border-top-style:solid;}
+.cto-kpi-lbl{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink4);margin-bottom:6px;}
+.cto-kpi-val{font-size:17pt;font-weight:900;line-height:1;margin-bottom:3px;}
+.cto-kpi-note{font-size:7.5pt;color:var(--ink4);}
+.cto-breakdown{background:var(--gray);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;}
+.cto-bk-title{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.10em;
+  color:var(--ink4);margin-bottom:10px;}
+.cto-bk-row{display:flex;justify-content:space-between;padding:6px 0;
+  border-bottom:1px solid var(--border);font-size:8.5pt;color:var(--ink3);}
+.cto-bk-row:last-child{border-bottom:none;}
+.cto-bk-total{font-weight:800;font-size:9.5pt!important;color:var(--ink)!important;
+  border-top:2px solid var(--border2)!important;border-bottom:none!important;
+  padding-top:10px!important;margin-top:4px;}
+.cto-mfoot{padding:14px 22px;border-top:1px solid var(--border);
+  display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;}
+.cto-btn{padding:9px 18px;border-radius:8px;font-size:8.5pt;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;}
+.cto-btn:hover{opacity:.85;}
+.cto-btn-sec{background:var(--white);color:var(--ink3);border:1px solid var(--border2);}
+.cto-btn-save{background:var(--navy);color:#fff;border:none;}
+.cto-btn-apply{background:var(--teal);color:#fff;border:none;}
+/* Summary card injected into page */
+.cto-summary-card{background:linear-gradient(135deg,var(--teal3),var(--white));
+  border:1px solid rgba(13,148,136,.28);border-radius:12px;padding:20px 22px;margin-bottom:22px;}
+.cto-sum-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.cto-sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.cto-sum-tile{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.cto-sum-lbl{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--ink4);margin-bottom:6px;}
+.cto-sum-val{font-size:13pt;font-weight:900;color:var(--teal2);line-height:1;}
+.cto-sum-note{font-size:7.5pt;color:var(--ink4);margin-top:3px;}
+/* Dark mode support */
+[data-theme="dark"] #cto-drawer,[data-theme="dark"] .cto-mbox{background:var(--gray2);}
+[data-theme="dark"] .cto-field input[type="number"]{background:var(--gray3);border-color:var(--border);color:var(--ink);}
+[data-theme="dark"] .cto-hist-item,[data-theme="dark"] .cto-kpi-tile,[data-theme="dark"] .cto-breakdown{background:var(--gray3);border-color:var(--border);}
+[data-theme="dark"] .cto-summary-card{border-color:rgba(13,148,136,.4);}
+[data-theme="dark"] .cto-sum-tile{background:var(--gray3);border-color:var(--border);}
+[data-theme="dark"] .cto-btn-sec{background:var(--gray3);border-color:var(--border2);color:var(--ink2);}
+
+/* ── TAB STRIP ── */
+.tab-strip-wrap{background:rgba(10,18,36,0.97);border-bottom:2px solid rgba(255,255,255,.07);}
+.tab-strip-inner{max-width:1280px;margin:0 auto;padding:0 32px;display:flex;gap:2px;}
+.tab-btn{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;
+  font-size:8.5pt;font-weight:700;color:rgba(255,255,255,.45);background:none;border:none;
+  border-bottom:3px solid transparent;cursor:pointer;font-family:inherit;
+  transition:all .18s;white-space:nowrap;margin-bottom:-2px;}
+.tab-btn:hover{color:rgba(255,255,255,.80);}
+.tab-btn.active{color:#fff;border-bottom-color:var(--teal);}
+.tab-btn .tab-badge{display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.1);
+  font-size:7pt;font-weight:800;color:rgba(255,255,255,.5);}
+.tab-btn.active .tab-badge{background:rgba(13,148,136,.3);color:var(--teal);}
+
+/* ── CTO TAB LAYOUT ── */
+.cto-tab-wrap{max-width:1280px;margin:0 auto;padding:24px 32px 64px;}
+.cto-tab-top{display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:22px;gap:16px;flex-wrap:wrap;}
+.cto-tab-heading{font-size:18pt;font-weight:900;color:var(--ink);line-height:1.1;}
+.cto-tab-sub{font-size:9pt;color:var(--ink4);margin-top:4px;}
+.cto-adjust-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;
+  background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;border:none;
+  border-radius:8px;font-size:9pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:opacity .15s;white-space:nowrap;}
+.cto-adjust-btn:hover{opacity:.87;}
+.cto-estimate-banner{background:linear-gradient(135deg,rgba(13,148,136,.08),rgba(37,99,235,.06));
+  border:1px solid rgba(13,148,136,.25);border-radius:12px;padding:16px 20px;
+  margin-bottom:22px;display:flex;align-items:center;gap:14px;}
+.cto-est-icon{font-size:20pt;flex-shrink:0;}
+.cto-est-body{flex:1;}
+.cto-est-title{font-size:9.5pt;font-weight:800;color:var(--teal2);margin-bottom:3px;}
+.cto-est-note{font-size:8.5pt;color:var(--ink3);line-height:1.65;}
+/* KPI row on CTO tab */
+.cto-tab-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.cto-tab-kpi{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.cto-tab-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.cto-tab-kpi.c-teal::before{background:var(--teal);}
+.cto-tab-kpi.c-navy::before{background:var(--navy);}
+.cto-tab-kpi.c-green::before{background:var(--green);}
+.cto-tab-kpi.c-amber::before{background:var(--amber);}
+.cto-tab-kpi.c-red::before{background:var(--red);}
+.cto-tab-kpi-lbl{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--ink4);margin-bottom:8px;}
+.cto-tab-kpi-val{font-size:24pt;font-weight:900;line-height:1;margin-bottom:4px;}
+.cto-tab-kpi.c-teal .cto-tab-kpi-val{color:var(--teal2);}
+.cto-tab-kpi.c-navy .cto-tab-kpi-val{color:var(--navy);}
+.cto-tab-kpi.c-green .cto-tab-kpi-val{color:var(--green2);}
+.cto-tab-kpi.c-amber .cto-tab-kpi-val{color:var(--amber2);}
+.cto-tab-kpi.c-red .cto-tab-kpi-val{color:var(--red2);}
+.cto-tab-kpi-note{font-size:8pt;color:var(--ink4);}
+/* Charts row */
+.cto-charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:22px;}
+.cto-chart-card{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.cto-chart-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:2px;}
+.cto-chart-sub{font-size:8pt;color:var(--ink4);margin-bottom:14px;}
+/* Scenario comparison strip */
+.cto-scenarios-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.cto-scen-card{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:relative;}
+.cto-scen-card.active-scen{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.12);}
+.cto-scen-badge{position:absolute;top:12px;right:12px;font-size:7pt;font-weight:700;
+  padding:2px 8px;border-radius:10px;background:var(--teal3);color:var(--teal2);}
+.cto-scen-num{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink4);margin-bottom:6px;}
+.cto-scen-cost{font-size:18pt;font-weight:900;color:var(--navy);line-height:1;margin-bottom:6px;}
+.cto-scen-meta{font-size:8pt;color:var(--ink4);line-height:1.55;}
+.cto-scen-load-btn{display:block;width:100%;margin-top:10px;padding:7px;border-radius:6px;
+  background:var(--gray2);border:1px solid var(--border2);color:var(--ink3);
+  font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
+.cto-scen-load-btn:hover{background:var(--teal3);border-color:var(--teal);color:var(--teal2);}
+/* Benchmark gauge card */
+.cto-gauge-wrap{position:relative;text-align:center;padding:8px 0 0;}
+/* Waterfall bar */
+.wf-bar-wrap{display:flex;align-items:flex-end;gap:8px;height:180px;padding:0 4px;}
+.wf-bar-col{display:flex;flex-direction:column;align-items:center;flex:1;}
+.wf-bar{width:100%;border-radius:6px 6px 0 0;position:relative;min-height:4px;transition:height .4s;}
+.wf-bar-lbl{font-size:6.5pt;color:var(--ink4);margin-top:5px;text-align:center;line-height:1.3;}
+.wf-bar-val{font-size:7.5pt;font-weight:700;color:var(--ink3);margin-bottom:3px;}
+/* Empty state for CTO tab */
+.cto-empty{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:48px 32px;text-align:center;margin-bottom:22px;}
+.cto-empty-icon{font-size:36pt;margin-bottom:12px;}
+.cto-empty-title{font-size:13pt;font-weight:800;color:var(--ink);margin-bottom:8px;}
+.cto-empty-note{font-size:9pt;color:var(--ink4);line-height:1.7;max-width:480px;margin:0 auto 20px;}
+/* Dark mode */
+[data-theme="dark"] .cto-tab-kpi,[data-theme="dark"] .cto-chart-card,
+[data-theme="dark"] .cto-scen-card,[data-theme="dark"] .cto-empty{
+  background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .cto-estimate-banner{border-color:rgba(13,148,136,.3);}
+[data-theme="dark"] .cto-scen-load-btn{background:var(--gray3);border-color:var(--border2);color:var(--ink2);}
+
+/* ── HIDDEN COST RADAR ── */
+.hcr-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+.hcr-card{background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.hcr-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.hcr-card.hcr-attrition::before{background:#EF4444;}
+.hcr-card.hcr-vendor::before{background:#F59E0B;}
+.hcr-card.hcr-quality::before{background:#8B5CF6;}
+.hcr-card.hcr-compliance::before{background:#3B82F6;}
+.hcr-card.hcr-license::before{background:#10B981;}
+.hcr-icon{font-size:18pt;margin-bottom:8px;}
+.hcr-lbl{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink4);margin-bottom:6px;}
+.hcr-val{font-size:16pt;font-weight:900;line-height:1;margin-bottom:4px;}
+.hcr-note{font-size:7.5pt;color:var(--ink4);line-height:1.5;}
+.hcr-source{font-size:7pt;color:var(--ink4);margin-top:6px;font-style:italic;}
+
+/* ── EXEC NARRATIVE ── */
+.exec-narrative{background:linear-gradient(135deg,#080F1E,#0F1E3C);border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;padding:26px 30px;margin-bottom:22px;}
+.en-eyebrow{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+  color:rgba(255,255,255,.35);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.en-eyebrow::before{content:'';width:24px;height:1px;background:var(--teal);}
+.en-body{font-size:10.5pt;color:rgba(255,255,255,.85);line-height:1.9;font-weight:400;}
+.en-highlight{color:#6EE7B7;font-weight:700;}
+.en-warn{color:#FCD34D;font-weight:700;}
+
+/* ── OPPORTUNITY LIST ── */
+.opp-list{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+.opp-item{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;display:flex;align-items:flex-start;gap:14px;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.opp-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:9pt;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;}
+.opp-body{flex:1;}
+.opp-title{font-size:9.5pt;font-weight:800;color:var(--ink);margin-bottom:3px;}
+.opp-detail{font-size:8.5pt;color:var(--ink3);line-height:1.6;}
+.opp-value{text-align:right;flex-shrink:0;}
+.opp-amt{font-size:13pt;font-weight:900;line-height:1;}
+.opp-tag{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:3px;}
+
+/* ── BENCHMARK TABLE ── */
+.bench-table{width:100%;border-collapse:collapse;background:var(--white);
+  border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:22px;}
+.bench-table thead tr{background:var(--navy);}
+.bench-table th{padding:10px 16px;text-align:left;color:rgba(255,255,255,.8);
+  font-size:7.5pt;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.bench-table th:first-child{border-radius:12px 0 0 0;}
+.bench-table th:last-child{border-radius:0 12px 0 0;}
+.bench-table td{padding:12px 16px;border-bottom:1px solid var(--gray2);font-size:8.5pt;vertical-align:middle;}
+.bench-table tr:last-child td{border-bottom:none;}
+.bench-table tr:hover td{background:var(--gray);}
+.bench-this{font-weight:800;color:var(--navy);}
+.bench-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:8px;
+  font-size:7.5pt;font-weight:700;white-space:nowrap;}
+.bench-g{background:var(--green3);color:var(--green2);}
+.bench-a{background:var(--amber3);color:var(--amber2);}
+.bench-r{background:var(--red3);color:var(--red2);}
+
+/* ── DRAWER SECTION DIVIDER ── */
+.cto-sec-divider{margin:18px -22px 18px;padding:10px 22px;
+  background:linear-gradient(135deg,rgba(220,38,38,.06),rgba(251,191,36,.06));
+  border-top:1px solid rgba(220,38,38,.15);border-bottom:1px solid rgba(220,38,38,.15);}
+.cto-sec-divider-lbl{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  color:#DC2626;display:flex;align-items:center;gap:8px;}
+.cto-sec-divider-note{font-size:7.5pt;color:var(--ink4);margin-top:3px;line-height:1.5;}
+
+/* ── TOTAL COST BADGE (in drawer) ── */
+.cto-live-total{background:linear-gradient(135deg,var(--teal),var(--teal2));
+  border-radius:10px;padding:14px 18px;margin:16px 0;display:flex;
+  align-items:center;justify-content:space-between;}
+.clt-lbl{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.65);}
+.clt-val{font-size:16pt;font-weight:900;color:#fff;line-height:1;}
+.clt-sub{font-size:7.5pt;color:rgba(255,255,255,.55);margin-top:2px;}
+.clt-right{text-align:right;}
+
+/* Dark mode additions */
+[data-theme="dark"] .hcr-card,.bench-table tr:hover [data-theme="dark"] td{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .opp-item{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .bench-table{background:var(--gray2);}
+[data-theme="dark"] .bench-table tr:hover td{background:var(--gray3);}
+</style>
+</head>
+<body>
+
+<div class="hub-top-bar">
+  <div class="hub-top-bar-inner">
+    <div class="htb-left">
+      <a href="page_pillar.html" class="htb-back">&#8592; Portfolio Intelligence</a>
+      <div class="htb-divider"></div>
+      <span class="htb-brand" id="pd-title-bar">Pillar Intelligence</span>
+    </div>
+    <div class="htb-right">
+      <button type="button" class="top-btn" onclick="openPillarDetailHelp()">&#63; How to Read</button>
+      <button type="button" class="top-btn" onclick="openCTODrawer()">&#128200; Cost to Operate</button>
+      <button type="button" class="top-btn" onclick="window.print()">&#128438; Print / PDF</button>
+      <span class="htb-meta">FY27 &middot; Salesforce DET &middot; Confidential</span>
+      <button type="button" class="top-btn dm" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button>
+    </div>
+  </div>
+</div>
+
+<div class="pillar-nav-wrap">
+  <div class="pillar-nav-inner">
+    <div class="pillar-nav" id="pillar-nav"></div>
+  </div>
+</div>
+
+<div class="tab-strip-wrap">
+  <div class="tab-strip-inner">
+    <button type="button" class="tab-btn active" id="tab-btn-intel" onclick="switchTab('intel')">
+      &#128202; Intelligence
+    </button>
+    <button type="button" class="tab-btn" id="tab-btn-cto" onclick="switchTab('cto')">
+      &#128200; Cost to Operate
+      <span class="tab-badge" id="cto-tab-badge">&#9889;</span>
+    </button>
+  </div>
+</div>
+
+<div id="tab-intel">
+  <div class="page-wrap">
+    <div id="pd-content"><div style="text-align:center;padding:60px;color:var(--ink4);">Loading&hellip;</div></div>
+  </div>
+</div>
+
+<div id="tab-cto" style="display:none;">
+  <div class="cto-tab-wrap" id="cto-tab-content">
+    <div style="text-align:center;padding:60px;color:var(--ink4);">Loading&hellip;</div>
+  </div>
+</div>
+
+<!-- COST TO OPERATE OVERLAY + DRAWER -->
+<div id="cto-overlay" onclick="closeCTODrawer()"></div>
+<div id="cto-drawer" role="dialog" aria-modal="true" aria-label="Cost to Operate Calculator">
+  <div class="cto-dhead">
+    <div>
+      <div class="cto-deyebrow">VER Intelligence Hub</div>
+      <div class="cto-dtitle">&#128200; Cost to Operate</div>
+      <div id="cto-pillar-label" style="font-size:8.5pt;color:rgba(255,255,255,.45);margin-top:4px;"></div>
+    </div>
+    <button type="button" class="cto-xbtn" onclick="closeCTODrawer()" aria-label="Close">&#215;</button>
+  </div>
+  <div id="cto-dbody">
+
+    <!-- ═══════ VISIBLE COSTS ═══════ -->
+    <div class="cto-sec" style="padding-bottom:8px;border-bottom:none;margin-bottom:4px;">
+      <div style="font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--teal2);margin-bottom:14px;">● Visible Cost Inputs</div>
+    </div>
+
+    <!-- HEADCOUNT -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">👥 Headcount</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-fte-count">FTE Count</label><input type="number" id="cto-fte-count" min="0" placeholder="e.g. 12" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-fte-rate">Avg Loaded Rate ($/yr)</label><input type="number" id="cto-fte-rate" min="0" placeholder="e.g. 185000" oninput="ctoLiveUpdate()"></div>
+      </div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-cw-count">CW Count</label><input type="number" id="cto-cw-count" min="0" placeholder="e.g. 8" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-cw-rate">Avg Bill Rate ($/hr)</label><input type="number" id="cto-cw-rate" min="0" placeholder="e.g. 95" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- TOOLS & SYSTEMS -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">💾 Tools &amp; Systems</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-tools-annual">SaaS / Tooling ($)</label><input type="number" id="cto-tools-annual" min="0" placeholder="e.g. 240000" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-infra-annual">Infrastructure / Cloud ($)</label><input type="number" id="cto-infra-annual" min="0" placeholder="e.g. 120000" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- OVERHEAD & FACILITIES -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">🏢 Overhead &amp; Facilities</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-overhead-pct">Corp Overhead Allocation (%)</label><input type="number" id="cto-overhead-pct" min="0" max="100" placeholder="e.g. 20" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-facilities">Facilities / Space ($)</label><input type="number" id="cto-facilities" min="0" placeholder="e.g. 50000" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- GOVERNANCE & REPORTING -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">⏱ Governance, Reporting &amp; Meetings</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-gov-hours">Hours / Year</label><input type="number" id="cto-gov-hours" min="0" placeholder="e.g. 500" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-gov-rate">Blended Hourly Rate ($)</label><input type="number" id="cto-gov-rate" min="0" placeholder="e.g. 120" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- TRAINING & DEVELOPMENT -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">🎓 Training &amp; Development</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-training">Annual Training Budget ($)</label><input type="number" id="cto-training" min="0" placeholder="e.g. 30000" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-misc">Other / Miscellaneous ($)</label><input type="number" id="cto-misc" min="0" placeholder="e.g. 15000" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- HIDDEN COST SECTION DIVIDER -->
+    <div class="cto-sec-divider">
+      <div class="cto-sec-divider-lbl">⚠ Hidden / Shadow Cost Layer</div>
+      <div class="cto-sec-divider-note">These costs are real — they just rarely appear in a budget line item. Enter actuals or leave blank to use VER proxy estimates.</div>
+    </div>
+
+    <!-- ATTRITION & CHURN -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">🔄 Attrition &amp; Churn Cost</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-cw-turnover">CW Annual Turnover (%)</label><input type="number" id="cto-cw-turnover" min="0" max="100" placeholder="e.g. 35" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-cw-ramp">Avg CW Ramp Time (weeks)</label><input type="number" id="cto-cw-ramp" min="0" placeholder="e.g. 6" oninput="ctoLiveUpdate()"></div>
+      </div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-fte-turnover">FTE Annual Turnover (%)</label><input type="number" id="cto-fte-turnover" min="0" max="100" placeholder="e.g. 12" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-fte-replacement">FTE Replacement Cost (% of salary)</label><input type="number" id="cto-fte-replacement" min="0" placeholder="e.g. 50" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- VENDOR MANAGEMENT OVERHEAD -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">🤝 Vendor Management Overhead</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-vm-hrs-per-vendor">Hrs / Vendor / Month</label><input type="number" id="cto-vm-hrs-per-vendor" min="0" placeholder="e.g. 8" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-vm-rate">VM Team Rate ($/hr)</label><input type="number" id="cto-vm-rate" min="0" placeholder="e.g. 110" oninput="ctoLiveUpdate()"></div>
+      </div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-escalation-hrs">Escalation &amp; Dispute Hrs / yr</label><input type="number" id="cto-escalation-hrs" min="0" placeholder="e.g. 80" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-onboarding-cost">Vendor Onboarding Cost / yr ($)</label><input type="number" id="cto-onboarding-cost" min="0" placeholder="e.g. 25000" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- QUALITY & REWORK -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">🔁 Quality &amp; Rework</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-rework-pct">Est. Rework Rate (% of HC cost)</label><input type="number" id="cto-rework-pct" min="0" max="100" placeholder="e.g. 8" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-defect-cost">Defect / Incident Cost / yr ($)</label><input type="number" id="cto-defect-cost" min="0" placeholder="e.g. 40000" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE & LEGAL -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">⚖ Compliance &amp; Legal</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-audit-cost">Security &amp; Compliance Audit ($)</label><input type="number" id="cto-audit-cost" min="0" placeholder="e.g. 60000" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-legal-hrs">Legal / Contract Review Hrs / yr</label><input type="number" id="cto-legal-hrs" min="0" placeholder="e.g. 120" oninput="ctoLiveUpdate()"></div>
+      </div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-legal-rate">Legal Rate ($/hr)</label><input type="number" id="cto-legal-rate" min="0" placeholder="e.g. 350" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-compliance-tools">Compliance Tools ($)</label><input type="number" id="cto-compliance-tools" min="0" placeholder="e.g. 20000" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- LICENSE WASTE -->
+    <div class="cto-sec">
+      <div class="cto-sec-lbl">📦 License Portfolio &amp; Utilization</div>
+      <div class="cto-row2">
+        <div class="cto-field"><label for="cto-license-total">Total License Spend ($)</label><input type="number" id="cto-license-total" min="0" placeholder="e.g. 500000" oninput="ctoLiveUpdate()"></div>
+        <div class="cto-field"><label for="cto-license-util">Avg Utilization Rate (%)</label><input type="number" id="cto-license-util" min="0" max="100" placeholder="e.g. 72" oninput="ctoLiveUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- LIVE TOTAL -->
+    <div class="cto-live-total" id="cto-live-total">
+      <div><div class="clt-lbl">Running Total</div><div class="clt-sub">Visible + hidden layers</div></div>
+      <div class="clt-right"><div class="clt-val" id="cto-live-val">—</div></div>
+    </div>
+
+    <button type="button" class="cto-calc-btn" onclick="runCTOCalc()">▼ Calculate &amp; View Full Analysis</button>
+
+    <!-- SCENARIO HISTORY -->
+    <div id="cto-hist-wrap" style="display:none;">
+      <div class="cto-hist-lbl">🕐 Last 10 Scenarios</div>
+      <div id="cto-hist-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COST TO OPERATE RESULTS MODAL -->
+<div id="cto-modal">
+  <div class="cto-mbox">
+    <div class="cto-mhead">
+      <div>
+        <div class="cto-meyebrow">Cost to Operate — Results</div>
+        <div class="cto-mpillar" id="cto-modal-pillar"></div>
+      </div>
+      <button type="button" class="cto-xbtn" onclick="closeCTOModal()" aria-label="Close">&#215;</button>
+    </div>
+    <div class="cto-mbody">
+      <div class="cto-kpi-grid" id="cto-kpi-grid"></div>
+      <div class="cto-breakdown" id="cto-breakdown"></div>
+    </div>
+    <div class="cto-mfoot">
+      <button type="button" class="cto-btn cto-btn-sec" onclick="closeCTOModal()">Close</button>
+      <button type="button" class="cto-btn cto-btn-save" onclick="saveCTOScenario()">&#128190; Save Scenario</button>
+      <button type="button" class="cto-btn cto-btn-apply" onclick="applyCTOToPage()">&#10003; Apply to Page</button>
+    </div>
+  </div>
+</div>
+
+<div id="vendor-modal">
+  <div class="vm-box">
+    <div class="vm-head" id="vm-head">
+      <button type="button" class="vm-close" onclick="closeVendorModal()">&#215;</button>
+      <div class="vm-logo-row">
+        <div id="vm-logo"></div>
+        <div>
+          <div class="vm-vendor-name" id="vm-name"></div>
+          <div class="vm-vendor-cats" id="vm-cats"></div>
+        </div>
+      </div>
+      <div class="vm-kpi-row" id="vm-kpis"></div>
+    </div>
+    <div class="vm-body" id="vm-body"></div>
+  </div>
+</div>
+
+<script>
+var VENDOR_DOMAINS = {"NTT Data":"nttdata.com","NTT Data (AMS)":"nttdata.com","Accenture":"accenture.com","Cognizant":"cognizant.com","Deloitte":"deloitte.com","Workday":"workday.com","IBM":"ibm.com","Google":"google.com","JLL":"jll.com","Computacenter":"computacenter.com","BCG":"bcg.com","Capgemini":"capgemini.com","Infosys":"infosys.com","TechM":"techmahindra.com","Insight Direct":"insight.com","Fractal Analytics":"fractal.ai","Demandbase":"demandbase.com","Akamai":"akamai.com","Brightcove":"brightcove.com","Nucleusteq":"nucleusteq.com","DNA":"","iTech":"itech-us.com","Xebia":"xebia.com","StaffUp":"","Thinkvibes":"","Oktana":"oktana.io"};
+var BF_CLIENT='1idLxwmT7Sv6VAWJq9j';
+function vlogoErr(img){img.style.display='none';var fb=img.nextElementSibling;if(fb)fb.style.display='flex';}
+function vlogoOk(img){var fb=img.nextElementSibling;if(fb)fb.style.display='none';}
+function vendorLogo(domain,name,size,extra){
+  size=size||36;extra=extra||'';
+  var ini=(name||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+  var pal=['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB'];
+  var lc=pal[(name||'').length%pal.length];
+  var bs='width:'+size+'px;height:'+size+'px;border-radius:8px;flex-shrink:0;';
+  var fb='<div style="'+bs+'background:'+lc+';display:none;align-items:center;justify-content:center;font-size:'+Math.round(size*.33)+'pt;font-weight:800;color:#fff;font-family:Arial;'+extra+'">'+ini+'</div>';
+  if(!domain)return'<div style="'+bs+'background:'+lc+';display:flex;align-items:center;justify-content:center;font-size:'+Math.round(size*.33)+'pt;font-weight:800;color:#fff;font-family:Arial;'+extra+'">'+ini+'</div>';
+  return'<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'" alt="'+name.replace(/[<>"]/g,'')+'" onerror="vlogoErr(this)" onload="vlogoOk(this)" style="'+bs+'object-fit:contain;background:#fff;padding:2px;'+extra+'">'+fb;
+}
+
+var PILLARS = {"sf-on-sf":{"name":"Salesforce on Salesforce Technology","short":"SF on SF","lead":"SF on SF Pillar Lead","color":"#0D9488","emoji":"⚡","sow_value":22.21,"mft_approved":2.1,"mft_total":8.4,"mft_items":116,"savings":1.236,"savings_pipeline":"$3-5M Workday rate benchmarking in progress","risk":"amber","risk_note":"Workday ELP renewal Nov 2026 — critical action required","renewal_note":"Workday Enterprise License — Nov 30, 2026 · 90-day notice","days_to_renewal":210,"governance":"amber","q_distribution":[24,10,27,39],"ver_notes":"Coupa FY27 spend: $22.21M across 116 POs. NTT Data is the dominant vendor at $7.82M. Workday ELP renewal Nov 30, 2026 ($23.7M) is the critical watchpoint — 90-day notice means decision required by September 2026. VER recommends rate benchmarking and renewal strategy with Procurement no later than Q2 FY27.","key_vendors":[{"name":"NTT Data","fy27":7.82,"pos":22,"cats":"CWF","status":"green","domain":"nttdata.com"},{"name":"Accenture","fy27":3.89,"pos":11,"cats":"CWF","status":"green","domain":"accenture.com"},{"name":"Cognizant","fy27":2.63,"pos":3,"cats":"CWF","status":"green","domain":"cognizant.com"},{"name":"Thinkvibes","fy27":1.11,"pos":2,"cats":"CWF","status":"green","domain":"thinkvibes.com"},{"name":"Oktana","fy27":1.03,"pos":9,"cats":"CWF","status":"green","domain":"oktana.io"},{"name":"Workday","fy27":23.7,"pos":1,"cats":"Software","status":"amber","domain":"workday.com"}],"advisory_position":"The Salesforce on Salesforce Technology pillar carries the highest single-vendor renewal risk in the DET portfolio — the Workday ELP ($23.7M, Nov 2026) requires a decision by September 2026 given the 90-day notice requirement. VER is actively benchmarking Workday implementation rates against market and recommends initiating renewal negotiations no later than Q2 FY27. VER realized $1.236M in savings this period through the termination of the Cognizant engagement specific to this pillar. NTT Data is the dominant services vendor at $7.82M — VER is monitoring rate competitiveness. Rate benchmarking pipeline of $3-5M is in scope for FY27.","spend_vs_plan":"above","spend_vs_plan_note":"SOW spend $22.21M running above MFT forecast of $8.4M. Delta driven by Workday ELP structure outside standard PO flow.","vendor_notes":{"Workday":"Amber — ELP renewal Nov 30, 2026. 90-day notice means decision window opens Sep 1. $23.7M at risk. VER rate benchmarking initiated.","Cognizant":"Green — active engagement across 3 POs. Monitor attrition given Q4 FY26 CQBR findings."},"open_items":[{"item":"Workday ELP renewal strategy","owner":"VER + SF on SF Lead","due":"Aug 2026","status":"amber"},{"item":"NTT Data rate benchmarking","owner":"VER","due":"Q2 FY27","status":"amber"},{"item":"Cognizant attrition continuity plan review","owner":"VER","due":"Q2 FY27","status":"green"}],"ver_asks":["Confirm Workday ELP renewal intent and budget approval authority before Aug 1, 2026","Advise VER of any planned scope changes with NTT Data before next SOW cycle","Share Cognizant delivery feedback for Q1 FY27 CQBR preparation"],"cqbr_ref":null},"eng-dev":{"name":"Engineering Development & Delivery","short":"Eng Dev & Delivery","lead":"Engineering Pillar Lead","color":"#D97706","emoji":"🔧","sow_value":15.87,"mft_approved":3.8,"mft_total":22.4,"mft_items":36,"savings":0,"savings_pipeline":"Cognizant PD savings target in scope FY27","risk":"green","risk_note":"Cognizant amber — attrition, L3 data gap, Cursor AI validation outstanding","renewal_note":"Cognizant FY27 engagement · Active SOWs · Q1 QBR remediation in progress","days_to_renewal":180,"governance":"green","q_distribution":[20,12,10,58],"ver_notes":"Coupa FY27 spend: $15.87M across 72 POs (Enterprise Engineering + Eng Delivery combined). Deloitte is the largest vendor at $7.34M. Note: NTT AD ($10.0M annual, funded by DA&O) and AWS EDP ($17.2M committed) are governed by master agreements not reflected in this Coupa snapshot.","key_vendors":[{"name":"Deloitte","fy27":7.34,"pos":7,"cats":"CWF","status":"green","domain":"deloitte.com"},{"name":"DNA","fy27":1.48,"pos":2,"cats":"CWF","status":"green","domain":"dnainfo.com"},{"name":"Accenture","fy27":1.05,"pos":5,"cats":"CWF","status":"green","domain":"accenture.com"},{"name":"iTech","fy27":0.84,"pos":1,"cats":"CWF","status":"green","domain":"itech.com"},{"name":"NTT Data","fy27":0.16,"pos":2,"cats":"CWF","status":"green","domain":"nttdata.com"},{"name":"Cognizant","fy27":0.4,"pos":4,"cats":"CWF","status":"amber","domain":"cognizant.com"}],"advisory_position":"The Engineering Development & Delivery pillar is a critical advisory pillar for VER. Deloitte leads pillar spend at $7.34M across 7 POs. The NTT Data AD master agreement ($10.0M annual) is funded by DA&O and governed under a master agreement — the $9.0M realized savings from the AD restructure is attributed to DA&O as the budget owner. Cognizant is the amber-status vendor to watch — attrition and transparency concerns were noted in the Q4 FY26 CQBR.","spend_vs_plan":"on-plan","spend_vs_plan_note":"SOW spend $15.87M tracking to plan. NTT AD restructure complete — $9.0M savings realized Apr 2026.","vendor_notes":{"Cognizant":"Amber — Q4 FY26 CQBR identified attrition (10% ES & Partner), L3 data gap, and unvalidated Cursor AI claims. Remediation plans due Q1 FY27.","NTT Data":"Green — AD restructure complete and savings realized. Renewal Aug 12, 2026 on 30-day notice — VER engagement active."},"open_items":[{"item":"Cognizant Q1 FY27 continuity plans","owner":"Cognizant","due":"End Q1 FY27","status":"amber"},{"item":"Cognizant L3 utilization data","owner":"Cognizant","due":"Q1 FY27 QBR","status":"amber"},{"item":"Cognizant Cursor AI production validation","owner":"Cognizant + VER","due":"Q1 FY27 QBR","status":"amber"},{"item":"Cognizant PD savings target","owner":"VER","due":"Q2 FY27","status":"green"}],"ver_asks":["Confirm NTT Data AD renewal decision — 30-day notice means action required by mid-July 2026","Review Cognizant Q4 FY26 CQBR and share stakeholder feedback with VER before Q1 QBR","Flag any planned headcount changes to Cognizant delivery team immediately"],"cqbr_ref":null},"it":{"name":"IT","short":"IT","lead":"IT Pillar Lead","color":"#2563EB","emoji":"💻","sow_value":116.76,"mft_approved":1.2,"mft_total":18.6,"mft_items":542,"savings":0,"savings_pipeline":"Service Desk SLA renegotiation in scope","risk":"green","risk_note":"Tech Mahindra Techforce — 3 SLA metrics below target","renewal_note":"Tech Mahindra Techforce · Apr 30, 2027 · 90-day notice · $6.5M","days_to_renewal":361,"governance":"amber","q_distribution":[11,23,16,50],"ver_notes":"Coupa FY27 spend: $116.76M across 542 POs (Technology Services + Asset Management combined). IBM, Google, JLL and Insight Direct are the largest vendors.","key_vendors":[{"name":"IBM","fy27":13.63,"pos":4,"cats":"Software","status":"green","domain":"ibm.com"},{"name":"Google","fy27":13.41,"pos":1,"cats":"Software","status":"green","domain":"google.com"},{"name":"JLL","fy27":10.85,"pos":4,"cats":"Hardware","status":"green","domain":"jll.com"},{"name":"Insight Direct","fy27":10.36,"pos":39,"cats":"CWF/HW/SW","status":"green","domain":"insight.com"},{"name":"Computacenter","fy27":6.5,"pos":89,"cats":"CWF/HW","status":"green","domain":"computacenter.com"},{"name":"TechM","fy27":1.69,"pos":7,"cats":"CWF","status":"amber","domain":"techmahindra.com"}],"advisory_position":"The IT pillar is the largest spend pillar in the DET portfolio at $116.76M across 542 POs. IBM ($13.63M), Google ($13.41M), and JLL ($10.85M) are the top three vendors by spend. Tech Mahindra (Techforce) is the amber-status vendor — three SLA metrics below target as of last review. Service Desk SLA renegotiation is in scope for FY27.","spend_vs_plan":"on-plan","spend_vs_plan_note":"SOW spend $116.76M across 542 POs — largest pillar by volume. MFT forecast $18.6M reflects approved incremental scope.","vendor_notes":{"TechM":"Amber — Tech Mahindra Techforce showing 3 SLA metrics below target. Service Desk L1 response time and first-call resolution both flagged. VER monitoring.","IBM":"Green — stable engagement. Rate review recommended before any scope expansion.","Google":"Green — GCP consumption tracking to plan. Watch for overages in Q4."},"open_items":[{"item":"Tech Mahindra SLA remediation plan","owner":"Tech Mahindra + VER","due":"Q2 FY27","status":"amber"},{"item":"Service Desk SLA renegotiation","owner":"VER + IT Lead","due":"Q3 FY27","status":"amber"},{"item":"IBM rate card benchmarking","owner":"VER","due":"Q3 FY27","status":"green"},{"item":"Top 5 vendor rate review","owner":"VER","due":"Before any scope expansion","status":"green"}],"ver_asks":["Provide Tech Mahindra SLA performance data from last 3 months for VER review","Notify VER before approving any scope expansion with IBM, Google, or JLL","Share planned IT infrastructure roadmap for FY28 so VER can begin vendor advisory"],"cqbr_ref":null},"da-ops":{"name":"Delivery Assurance & Operations","short":"DA & Ops","lead":"DA&O Pillar Lead","color":"#059669","emoji":"🎯","sow_value":0,"mft_approved":0.8,"mft_total":4.2,"mft_items":17,"savings":9.0,"savings_pipeline":"GSA re-assignment cost avoidance in progress · Cognizant PD pipeline monitored","risk":"amber","risk_note":"GSA re-assignment of NTT AMS in progress — transition risk","renewal_note":"NTT Data AMS · Sep 1, 2028 · 180-day notice · $22.8M annual","days_to_renewal":850,"governance":"amber","q_distribution":[10,15,15,60],"ver_notes":"No Coupa FY27 PO data maps to this pillar. NTT AMS ($22.8M annual) is governed under a master agreement (Sep 2028 expiry). VER monitors this pillar directly through the NTT AMS engagement. GSA re-assignment in progress.","key_vendors":[{"name":"NTT Data (AMS)","fy27":22.8,"pos":1,"cats":"Professional Services","status":"amber","domain":"nttdata.com"}],"advisory_position":"Delivery Assurance & Operations is VER's strongest savings story in FY27. The NTT Data AD master agreement ($22.8M annual) delivered $9.0M in realized savings in April 2026 — the single largest advisory win in the DET portfolio this fiscal year. The GSA re-assignment of NTT AMS is the active risk item. The NTT AD renewal (Aug 12, 2026, 30-day notice) requires immediate engagement.","spend_vs_plan":"on-plan","spend_vs_plan_note":"No Coupa PO spend in FY27 — NTT AMS master agreement operates outside standard PO structure. MFT forecast $4.2M reflects ancillary scope.","vendor_notes":{"NTT Data (AMS)":"Amber — GSA re-assignment in progress. Transition risk is VER’s primary monitoring focus. $22.8M annual engagement."},"open_items":[{"item":"NTT Data AD renewal — 30-day notice · Aug 12, 2026","owner":"VER + DA&O Lead","due":"Jul 2026","status":"red"},{"item":"GSA re-assignment transition plan","owner":"VER + DA&O Lead","due":"Q3 FY27","status":"amber"},{"item":"NTT AMS performance baseline documentation","owner":"VER","due":"Q2 FY27","status":"green"},{"item":"Cognizant PD savings confirmation","owner":"VER","due":"Q2 FY27","status":"green"}],"ver_asks":["Share GSA re-assignment timeline and any vendor communication received from NTT","Advise VER of any service disruption or delivery concerns with NTT AMS immediately","Confirm Cognizant PD savings realization details for FY27 reporting"],"cqbr_ref":null},"data":{"name":"Data Solutions","short":"Data Solutions","lead":"Data Pillar Lead","color":"#0F1E3C","emoji":"📊","sow_value":11.85,"mft_approved":0.5,"mft_total":11.4,"mft_items":97,"savings":0,"savings_pipeline":"Snowflake consumption optimization in scope","risk":"amber","risk_note":"Q1/Q3 renewal overlap — coordinated Procurement engagement required","renewal_note":"Multiple data platform renewals Q1 and Q3 FY27","days_to_renewal":60,"governance":"green","q_distribution":[39,28,7,26],"ver_notes":"Coupa FY27 spend: $11.85M across 97 POs. Diverse vendor base — 33 vendors tracked. Deloitte, Nucleusteq, and Fractal Analytics lead by spend. Q1 and Q3 renewal concentration requires coordinated Procurement planning. Informatica under M&A review.","key_vendors":[{"name":"Deloitte","fy27":1.58,"pos":7,"cats":"CWF","status":"green","domain":"deloitte.com"},{"name":"Nucleusteq","fy27":1.37,"pos":10,"cats":"CWF","status":"green","domain":"nucleusteq.com"},{"name":"Fractal Analytics","fy27":1.17,"pos":2,"cats":"CWF","status":"green","domain":"fractal.ai"},{"name":"Demandbase","fy27":1.12,"pos":3,"cats":"Software","status":"green","domain":"demandbase.com"},{"name":"Capgemini","fy27":0.89,"pos":2,"cats":"CWF","status":"green","domain":"capgemini.com"},{"name":"Informatica","fy27":0.11,"pos":2,"cats":"Software","status":"amber","domain":"informatica.com"}],"advisory_position":"The Data Solutions pillar has the most complex renewal landscape in FY27 — multiple data platform renewals are clustered in Q1 and Q3, creating a coordinated Procurement engagement requirement. Snowflake consumption optimization is in the savings pipeline. Informatica carries amber status due to M&A exposure.","spend_vs_plan":"on-plan","spend_vs_plan_note":"SOW spend $11.85M across 97 POs. Diverse vendor mix — no single vendor above $1.58M. Q1 and Q3 renewal cluster requires coordinated Procurement engagement.","vendor_notes":{"Informatica":"Amber — M&A exposure. Salesforce acquisition implications for pricing and contract continuity are being monitored by VER.","Demandbase":"Green — watch consumption levels against contracted capacity. Overages in Q3 flagged."},"open_items":[{"item":"Q1 FY27 data platform renewals","owner":"VER + Data Lead + Procurement","due":"Q1 FY27","status":"red"},{"item":"Informatica M&A impact assessment","owner":"VER","due":"Q2 FY27","status":"amber"},{"item":"Snowflake consumption optimization","owner":"VER + Data Lead","due":"Q3 FY27","status":"amber"},{"item":"Q3 FY27 data platform renewals","owner":"VER + Data Lead + Procurement","due":"Q3 FY27","status":"green"}],"ver_asks":["Engage Procurement now on Q1 renewal cluster — VER needs 60 days minimum for advisory","Share any Informatica communications regarding pricing or contract changes immediately","Provide Snowflake consumption actuals vs contracted capacity for optimization analysis"],"cqbr_ref":null},"dig-mkt":{"name":"Digital Marketing Technology","short":"Dig Mkt Tech","lead":"Digital Marketing Pillar Lead","color":"#7C3AED","emoji":"📣","sow_value":4.7,"mft_approved":0.6,"mft_total":9.8,"mft_items":50,"savings":0,"savings_pipeline":"Rate card review scheduled Q3 FY27","risk":"green","risk_note":"No active escalations — standard advisory cadence","renewal_note":"Multiple SaaS renewals Q4 FY27","days_to_renewal":200,"governance":"green","q_distribution":[14,17,22,47],"ver_notes":"Coupa FY27 spend: $4.70M across 50 POs. StaffUp dominates at $2.85M (CWF). Q4 concentration (47%) means bulk of renewals land late in FY27.","key_vendors":[{"name":"StaffUp","fy27":2.85,"pos":21,"cats":"CWF","status":"green","domain":""},{"name":"Akamai","fy27":0.35,"pos":1,"cats":"Telecom","status":"green","domain":"akamai.com"},{"name":"Brightcove","fy27":0.22,"pos":1,"cats":"Software","status":"green","domain":"brightcove.com"},{"name":"NTT Data","fy27":0.1,"pos":1,"cats":"CWF","status":"green","domain":"nttdata.com"}],"advisory_position":"Digital Marketing Technology is a lean pillar at $4.70M, with StaffUp representing 61% of pillar spend ($2.85M across 21 POs). VER’s rate card review is scheduled for Q3 FY27. No active escalations.","spend_vs_plan":"below","spend_vs_plan_note":"SOW spend $4.70M below MFT forecast of $9.8M. Delta may reflect deferred digital marketing initiatives. VER recommends confirming forecast accuracy.","vendor_notes":{"StaffUp":"Green — dominant vendor at 61% of pillar spend. Rate card review in scope Q3 FY27.","Akamai":"Green — CDN stable. Watch for contract auto-renewal provisions."},"open_items":[{"item":"StaffUp rate card review vs VER benchmark","owner":"VER","due":"Q3 FY27","status":"green"},{"item":"Forecast accuracy review — $5.1M gap vs MFT","owner":"VER + Dig Mkt Lead","due":"Q2 FY27","status":"amber"},{"item":"SaaS renewal calendar Q4 FY27","owner":"VER + Dig Mkt Lead","due":"Q4 FY27","status":"green"}],"ver_asks":["Confirm whether $9.8M MFT forecast reflects planned spend or requires revision","Share StaffUp utilization data — VER needs actuals for rate card benchmarking","Provide Q4 SaaS renewal list to VER by end of Q3 so advisory can begin"],"cqbr_ref":null},"agentic":{"name":"Agentic Transformation","short":"Agentic","lead":"Agentic Pillar Lead","color":"#7C3AED","emoji":"🤖","sow_value":0,"mft_approved":0.2,"mft_total":3.8,"mft_items":0,"savings":0,"savings_pipeline":"Establishing governance baseline FY27","risk":"green","risk_note":"Emerging pillar — no Coupa PO spend yet recorded","renewal_note":"AI/ML platform engagements — Q3 FY27","days_to_renewal":180,"governance":"green","q_distribution":[10,20,50,20],"ver_notes":"No Coupa FY27 PO data recorded for this pillar yet. VER is working with the Pillar Lead to establish vendor governance baseline.","key_vendors":[],"advisory_position":"The Agentic Transformation pillar is an emerging function with no Coupa PO spend recorded in FY27. MFT forecast of $3.8M signals planned investment. VER’s role is to establish governance before spend scales — SOW structures, vendor qualification criteria, and rate governance frameworks should be in place before any material AI/ML vendor engagement begins.","spend_vs_plan":"below","spend_vs_plan_note":"No Coupa PO spend recorded yet. MFT forecast $3.8M reflects planned AI/ML platform investment.","vendor_notes":{},"open_items":[{"item":"VER governance framework for AI/ML engagements","owner":"VER","due":"Q2 FY27","status":"amber"},{"item":"Vendor qualification criteria — AI/ML","owner":"VER + Agentic Lead","due":"Q2 FY27","status":"amber"},{"item":"SOW template for POC engagements","owner":"VER","due":"Q2 FY27","status":"green"}],"ver_asks":["Do not commit to any AI/ML vendor engagement before VER governance framework is in place","Share current vendor shortlist for any planned AI/ML platform evaluation","Engage VER at the earliest stage of any third-party AI engagement"],"cqbr_ref":null},"cdo":{"name":"Office of the CDO","short":"Office of CDO","lead":"CDO Office Lead","color":"#0F1E3C","emoji":"🏛️","sow_value":6.28,"mft_approved":0.1,"mft_total":2.6,"mft_items":7,"savings":0,"savings_pipeline":"Advisory rate benchmarking in scope","risk":"green","risk_note":"No active escalations — standard monitoring","renewal_note":"BCG strategic advisory — Q2 FY27 concentration","days_to_renewal":120,"governance":"green","q_distribution":[11,89,0,0],"ver_notes":"Coupa FY27 spend: $6.28M across 8 POs. BCG dominates at $5.97M — strategic advisory engagement. Q2 concentration (89%) means near-term renewal activity.","key_vendors":[{"name":"BCG","fy27":5.97,"pos":2,"cats":"CWF","status":"green","domain":"bcg.com"},{"name":"DNA","fy27":0.16,"pos":1,"cats":"CWF","status":"green","domain":""},{"name":"Pluralsight","fy27":0.03,"pos":1,"cats":"Software","status":"green","domain":"pluralsight.com"}],"advisory_position":"The Office of the CDO has a highly concentrated spend profile — BCG accounts for $5.97M of $6.28M total (95% concentration). This warrants VER advisory attention at each BCG scope expansion. Strategic consulting rates should be benchmarked against Big 4 ranges. VER recommends fixed-fee SOW structures for all future CDO advisory engagements.","spend_vs_plan":"above","spend_vs_plan_note":"SOW spend $6.28M above MFT forecast of $2.6M. BCG concentration ($5.97M / 95%) is highest single-vendor concentration in DET portfolio.","vendor_notes":{"BCG":"Green — delivery quality high. Concentration risk is the primary VER concern. Any scope expansion requires VER pre-approval."},"open_items":[{"item":"BCG advisory rate benchmarking vs Big 4","owner":"VER","due":"Q2 FY27","status":"amber"},{"item":"CDO spend vs forecast reconciliation","owner":"VER + CDO Lead","due":"Q2 FY27","status":"amber"},{"item":"Fixed-fee SOW framework for advisory engagements","owner":"VER","due":"Q3 FY27","status":"green"}],"ver_asks":["Route all BCG scope expansion requests through VER before approval","Share BCG engagement scope and deliverable list for rate benchmarking analysis","Confirm whether $6.28M spend vs $2.6M MFT is expected or requires forecast revision"],"cqbr_ref":null},"emerging":{"name":"Emerging Technology","short":"Emerging Tech","lead":"Emerging Tech Pillar Lead","color":"#EA580C","emoji":"🚀","sow_value":0,"mft_approved":0.1,"mft_total":2.4,"mft_items":0,"savings":0,"savings_pipeline":"POC governance framework in development","risk":"green","risk_note":"Emerging pillar — no Coupa PO spend yet recorded","renewal_note":"Technology evaluation and POC engagements — Q2/Q3","days_to_renewal":150,"governance":"green","q_distribution":[10,40,35,15],"ver_notes":"No Coupa FY27 PO data recorded for this pillar yet. VER monitoring ensures POC vendors transition to formal SOW/PO process before production deployment.","key_vendors":[],"advisory_position":"Emerging Technology is a pre-spend pillar — no Coupa PO activity recorded in FY27. MFT forecast of $2.4M reflects planned POC spend. VER’s priority is governance infrastructure: ensuring all POC engagements are properly SOW-governed and vendors are registered in the DET Supplier Portal before any recurring spend is committed.","spend_vs_plan":"below","spend_vs_plan_note":"No Coupa PO spend recorded. MFT forecast $2.4M reflects planned POC investment.","vendor_notes":{},"open_items":[{"item":"POC governance framework development","owner":"VER","due":"Q2 FY27","status":"amber"},{"item":"Supplier Portal registration for POC vendors","owner":"VER + Emerging Lead","due":"Before any POC spend","status":"green"},{"item":"Rate structure for evaluation engagements","owner":"VER","due":"Q2 FY27","status":"green"}],"ver_asks":["Engage VER before any POC vendor is selected — governance must precede spend","Register all technology evaluation vendors in DET Supplier Portal before engagement","Share technology evaluation roadmap for FY27-FY28 so VER can prepare advisory framework"],"cqbr_ref":null}};
+
+/* ── CURRENT PILLAR REF (set during render) ── */
+var _currentPillar = null;
+
+/* ── HELPERS ── */
+function riskPillHtml(risk, size) {
+  var cls = risk==='green'?'rp-green':risk==='amber'?'rp-amber':'rp-red';
+  var label = risk==='green'?'On Track':risk==='amber'?'Watch':'Action Required';
+  var sz = size||'8pt';
+  return '<span class="risk-pill '+cls+'" style="font-size:'+sz+';">'
+    +'<span class="dot"></span>'+label+'</span>';
+}
+function statusPill(s, label) {
+  var cls = s==='green'?'sp-g':s==='amber'?'sp-a':'sp-r';
+  var icon = s==='green'?'&#10003;':'&#9888;';
+  return '<span class="status-pill '+cls+'">'+icon+' '+(label||s)+'</span>';
+}
+function fmtM(v){
+  if(!v||v<=0) return '--';
+  if(v>=1000) return '$'+(v/1000).toFixed(1)+'B';
+  if(v>=1)    return '$'+v.toFixed(v>=10?1:2)+'M';
+  return '$'+Math.round(v*1000)+'K';
+}
+
+/* ── RENDER PILLAR ── */
+function renderPillar(key) {
+  var p = PILLARS[key];
+  if (!p) {
+    document.getElementById('pd-content').innerHTML =
+      '<div style="padding:40px;color:var(--ink4);">Pillar not found.</div>';
+    return;
+  }
+  _currentPillar = p;
+
+  var barEl = document.getElementById('pd-title-bar');
+  if (barEl) barEl.textContent = p.emoji + ' ' + (p.short||p.name);
+
+  var renewCol = p.days_to_renewal<90?'var(--red)':p.days_to_renewal<180?'var(--amber)':'var(--green)';
+  var planCol  = p.spend_vs_plan==='above'?'var(--amber)':p.spend_vs_plan==='below'?'var(--blue)':'var(--green)';
+  var planIcon = p.spend_vs_plan==='above'?'&#9650;':p.spend_vs_plan==='below'?'&#9660;':'&#10003;';
+  var planLbl  = p.spend_vs_plan==='above'?'Above Forecast':p.spend_vs_plan==='below'?'Below Forecast':'On Plan';
+  var planBg   = p.spend_vs_plan==='above'?'var(--amber3)':p.spend_vs_plan==='below'?'var(--blue3)':'var(--green3)';
+  var netExposure = Math.max(0, p.mft_total - p.savings);
+
+  var html = '';
+
+  /* COVER */
+  html += '<div class="v2-cover" style="background:linear-gradient(140deg,'+p.color+' 0%,#05091A 100%);">'
+    +'<div class="cover-eyebrow">FY27 &middot; DET Vendor Intelligence &middot; '+p.lead+'</div>'
+    +'<div class="cover-name">'+p.emoji+' '+p.name+'</div>'
+    +'<div class="cover-sub">Spend &amp; Savings P&amp;L &middot; VER Advisory &middot; Confidential</div>'
+    +'<div class="cover-kpi-strip">';
+
+  /* KPI 1: SOW Spend */
+  html += '<div class="ckpi"><div class="ckpi-lbl">SOW & PO Spend</div>'
+    +'<div class="ckpi-val">'+fmtM(p.sow_value)+'</div>'
+    +'<div class="ckpi-note">'+(p.mft_items>0?p.mft_items+' active POs':'No Coupa POs')+'</div></div>';
+
+  /* KPI 2: MFT Forecast */
+  html += '<div class="ckpi"><div class="ckpi-lbl">MFT Forecast</div>'
+    +'<div class="ckpi-val">'+fmtM(p.mft_total)+'</div>'
+    +'<div class="ckpi-note">'+fmtM(p.mft_approved)+' approved</div></div>';
+
+  /* KPI 3: Savings — green accent if realized */
+  html += '<div class="ckpi'+(p.savings>0?' savings-win':'')+'"><div class="ckpi-lbl">Savings Realized</div>'
+    +'<div class="ckpi-val">'+fmtM(p.savings)+'</div>'
+    +'<div class="ckpi-note">'+(p.savings>0?'Advisory win confirmed FY27':p.savings_pipeline||'In pipeline')+'</div></div>';
+
+  /* KPI 4: Days to Renewal */
+  html += '<div class="ckpi"><div class="ckpi-lbl">Days to Renewal</div>'
+    +'<div class="ckpi-val" style="color:'+(p.days_to_renewal<90?'#FCA5A5':p.days_to_renewal<180?'#FCD34D':'#6EE7B7')+';">'
+    +p.days_to_renewal+'d</div>'
+    +'<div class="ckpi-note">'+(p.days_to_renewal<90?'Critical window':'On track')+'</div></div>';
+
+  /* KPI 5: Risk Status — pill, not text */
+  html += '<div class="ckpi"><div class="ckpi-lbl">Risk Status</div>'
+    +'<div style="margin-top:4px;">'+riskPillHtml(p.risk,'9pt')+'</div>'
+    +'<div class="ckpi-note">Gov: '+riskPillHtml(p.governance,'7.5pt')+'</div></div>';
+
+  html += '</div></div>'; /* end cover */
+
+  /* P&L ROW */
+  html += '<div class="pl-row">'
+    +'<div class="pl-card spend">'
+      +'<div class="pl-lbl">SOW & PO Spend</div>'
+      +'<div class="pl-val">'+fmtM(p.sow_value)+'</div>'
+      +'<div class="pl-note">'+(p.mft_items>0?p.mft_items+' purchase orders':'No Coupa POs recorded')+'</div>'
+    +'</div>'
+    +'<div class="pl-card forecast">'
+      +'<div class="pl-lbl">MFT Forecast</div>'
+      +'<div class="pl-val">'+fmtM(p.mft_total)+'</div>'
+      +'<div class="pl-note">'+fmtM(p.mft_approved)+' approved &middot; full-year view</div>'
+    +'</div>'
+    +'<div class="pl-card savings">'
+      +'<div class="pl-lbl">&#10003; Savings Realized</div>'
+      +'<div class="pl-val">'+fmtM(p.savings)+'</div>'
+      +'<div class="pl-note">'+(p.savings>0?'Advisory savings confirmed FY27':p.savings_pipeline||'Pipeline in progress')+'</div>'
+    +'</div>'
+    +'<div class="pl-card exposure">'
+      +'<div class="pl-lbl">Net Exposure</div>'
+      +'<div class="pl-val">'+fmtM(netExposure)+'</div>'
+      +'<div class="pl-note">MFT forecast minus realized savings</div>'
+    +'</div>'
+  +'</div>';
+
+  /* SPEND PROGRESS BAR */
+  var barTotal = Math.max(p.sow_value, p.mft_total, 1);
+  var spendPct  = Math.round((p.sow_value/barTotal)*100);
+  var forecastPct = Math.round((p.mft_total/barTotal)*100);
+  var savingsPct  = p.savings>0?Math.round((p.savings/barTotal)*100):0;
+  html += '<div class="spend-bar-wrap">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'
+      +'<div style="font-size:9pt;font-weight:700;color:var(--ink);">Spend Composition</div>'
+      +'<span class="status-pill" style="background:'+planBg+';color:'+planCol+';">'
+        +planIcon+' '+planLbl+'</span>'
+    +'</div>'
+    +'<div class="spend-bar-track">'
+      +(p.sow_value>0?'<div class="spend-bar-seg" style="width:'+spendPct+'%;background:var(--navy);"></div>':'')
+      +(p.mft_total>0?'<div class="spend-bar-seg" style="width:'+forecastPct+'%;background:var(--amber);opacity:0.65;"></div>':'')
+      +(p.savings>0?'<div class="spend-bar-seg" style="width:'+savingsPct+'%;background:var(--green);"></div>':'')
+    +'</div>'
+    +'<div class="spend-bar-legend">'
+      +(p.sow_value>0?'<div class="sbl-item"><div class="sbl-dot" style="background:var(--navy);"></div>SOW & PO Spend <strong>'+fmtM(p.sow_value)+'</strong></div>':'')
+      +(p.mft_total>0?'<div class="sbl-item"><div class="sbl-dot" style="background:var(--amber);opacity:.7;"></div>MFT Forecast <strong>'+fmtM(p.mft_total)+'</strong></div>':'')
+      +(p.savings>0?'<div class="sbl-item"><div class="sbl-dot" style="background:var(--green);"></div>Savings Realized <strong>'+fmtM(p.savings)+'</strong></div>':'')
+    +'</div>'
+    +'<div style="margin-top:10px;font-size:8.5pt;color:var(--ink3);line-height:1.6;">'+(p.spend_vs_plan_note||'')+'</div>'
+  +'</div>';
+
+  /* MAIN GRID — 4 direct children → 2×2 auto-equalized rows */
+  html += '<div class="main-grid">';
+
+  /* ROW 1 LEFT: Renewal Horizon */
+  var rParts = (p.renewal_note||'').split(' · ');
+  var renewUrgency = p.days_to_renewal<90?'Critical — action required now'
+    :p.days_to_renewal<180?'VER watching — engage soon':'On track — standard monitoring';
+  var renewAction = p.days_to_renewal<90
+    ?'VER recommends immediate pillar lead engagement and renewal strategy confirmation.'
+    :p.days_to_renewal<180
+    ?'VER has initiated renewal advisory. Rate benchmarking in scope before commitment.'
+    :'VER monitoring. Advisory engagement will begin 180 days before renewal window.';
+
+  html += '<div class="v2-card">'
+    +'<div class="card-title">Renewal Horizon</div>'
+    +'<div class="card-sub">Next critical contract renewal</div>'
+    +'<div id="renewal-timeline" style="position:relative;height:56px;background:var(--gray2);border-radius:8px;overflow:hidden;margin-bottom:16px;"></div>'
+    +'<div class="renewal-meta" style="margin-bottom:16px;">'
+      +'<div class="rm-item"><div class="lbl">Contract</div><div class="val">'+(rParts[0]||'See advisory')+'</div></div>'
+      +'<div class="rm-item"><div class="lbl">Notice Required</div><div class="val">'+(rParts[1]||'—')+'</div></div>'
+      +'<div class="rm-item"><div class="lbl">Spend at Risk</div><div class="val" style="color:'+renewCol+';">'+(rParts[2]||rParts[3]||'See advisory')+'</div></div>'
+      +'<div class="rm-item"><div class="lbl">VER Status</div><div class="val">'+riskPillHtml(p.days_to_renewal<90?'red':p.days_to_renewal<180?'amber':'green','8pt')+'</div></div>'
+    +'</div>'
+    +'<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;">'
+      +'<div style="padding:14px 16px;border-radius:8px;border-left:3px solid '+renewCol
+        +';background:var(--gray);">'
+        +'<div style="font-size:8.5pt;font-weight:800;color:'+renewCol+';margin-bottom:4px;">'+renewUrgency+'</div>'
+        +'<div style="font-size:8.5pt;color:var(--ink3);line-height:1.65;">'+renewAction+'</div>'
+      +'</div>'
+    +'</div>'
+  +'</div>';
+
+  /* ROW 1 RIGHT: Donut chart */
+  html += '<div class="v2-card">'
+    +'<div class="card-title">Spend Composition</div>'
+    +'<div class="card-sub">SOW vs MFT vs Savings</div>'
+    +'<canvas id="chart-donut" width="280" height="210" style="display:block;margin:0 auto;cursor:pointer;"></canvas>'
+    +'<div id="donut-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;justify-content:center;font-size:8pt;"></div>'
+  +'</div>';
+
+  /* ROW 2 LEFT: Savings Intelligence */
+  html += '<div class="v2-card" style="background:linear-gradient(135deg,var(--green3) 0%,var(--white) 60%);">'
+    +'<div class="card-title" style="color:var(--green2);">Savings Intelligence</div>'
+    +'<div class="card-sub">Realized &amp; pipeline</div>'
+    +'<div style="display:flex;gap:20px;align-items:flex-start;flex:1;">'
+      +'<div style="flex:1;">'
+        +'<div style="font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:4px;">Realized FY27</div>'
+        +'<div style="font-size:28pt;font-weight:900;line-height:1;color:'+(p.savings>0?'var(--green2)':'var(--ink4)')+';margin-bottom:4px;">'
+          +fmtM(p.savings)+'</div>'
+        +'<div style="font-size:8pt;color:var(--ink4);">'+(p.savings>0?'Advisory savings confirmed':'No savings this period')+'</div>'
+      +'</div>'
+      +'<div style="flex:1;padding-left:16px;border-left:1px solid var(--border);">'
+        +'<div style="font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:6px;">Pipeline</div>'
+        +'<div style="font-size:10pt;font-weight:700;color:var(--navy);line-height:1.45;">'+(p.savings_pipeline||'Under VER review')+'</div>'
+      +'</div>'
+    +'</div>'
+  +'</div>';
+
+  /* ROW 2 RIGHT: Bar chart */
+  html += '<div class="v2-card">'
+    +'<div class="card-title">Quarterly Distribution</div>'
+    +'<div class="card-sub">FY27 spend concentration</div>'
+    +'<canvas id="chart-bars" width="280" height="160" style="display:block;margin:0 auto;cursor:pointer;"></canvas>'
+    +'<div id="bar-tooltip" style="display:none;position:fixed;background:rgba(15,30,60,.95);color:#fff;padding:8px 12px;border-radius:8px;font-size:8.5pt;z-index:500;pointer-events:none;"></div>'
+  +'</div>';
+
+  html += '</div>'; /* end main-grid */
+
+  /* VENDOR INTELLIGENCE */
+  var kv = p.key_vendors||[];
+  var vNotes = p.vendor_notes||{};
+  var vTotal = p.sow_value>0?p.sow_value:1;
+
+  html += '<div class="v2-section">Vendor Intelligence</div>';
+  html += '<div class="vendor-grid">';
+  if (!kv.length) {
+    html += '<div style="grid-column:span 2;padding:20px;color:var(--ink4);font-size:9pt;">No key vendor data recorded for this pillar yet.</div>';
+  } else {
+    kv.forEach(function(v, idx) {
+      var fy = parseFloat(v.fy27)||0;
+      var pct = Math.round((fy/vTotal)*100);
+      var note = vNotes[v.name]||'';
+      var logo = v.domain
+        ?'<img src="https://cdn.brandfetch.io/'+v.domain+'?c=1idLxwmT7Sv6VAWJq9j"'
+          +' style="width:38px;height:38px;border-radius:8px;object-fit:contain;border:1px solid var(--border);background:#fff;padding:2px;flex-shrink:0;"'
+          +' onerror="this.style.display=\'none\'">'
+        :'<div style="width:38px;height:38px;border-radius:8px;background:var(--navy);color:#fff;'
+          +'display:flex;align-items:center;justify-content:center;font-size:12pt;font-weight:800;flex-shrink:0;">'+v.name.charAt(0)+'</div>';
+      var pillCls = v.status==='amber'?'vp-a':v.status==='red'?'vp-r':'vp-g';
+      var pillTxt = v.status==='green'?'&#10003; Active':v.status==='amber'?'&#9888; Watch':'&#9888; Action';
+      html += '<div class="vendor-card '+v.status+'" onclick="openVendorModal(\''+key+'\','+idx+')" role="button" tabindex="0">'
+        +'<div class="vendor-top">'
+          +logo
+          +'<div style="flex:1;min-width:0;">'
+            +'<div class="vendor-name">'+v.name+'</div>'
+            +'<div class="vendor-meta">'+v.pos+' POs &middot; '+v.cats+'</div>'
+          +'</div>'
+          +'<div style="text-align:right;flex-shrink:0;">'
+            +'<div class="vendor-spend">'+fmtM(fy)+'</div>'
+            +'<div class="vendor-pct">'+pct+'% of pillar</div>'
+          +'</div>'
+        +'</div>'
+        +'<span class="v-pill '+pillCls+'">'+pillTxt+'</span>'
+      +'</div>';
+    });
+  }
+  html += '</div>';
+
+  /* ACTION REGISTER + ADVISORY (left col stacked) · VER ASKS (right col full height) */
+  var items = p.open_items||[];
+  var asks = p.ver_asks||[];
+  html += '<div class="v2-section" style="margin-top:28px;">Action Register &amp; Advisory</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin-bottom:22px;">';
+
+  /* Left column: action register on top, advisory below */
+  html += '<div style="display:flex;flex-direction:column;gap:16px;">';
+
+  /* Action register */
+  html += '<div style="border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05);">';
+  if (!items.length) {
+    html += '<div style="padding:20px;color:var(--ink4);">No open items.</div>';
+  } else {
+    html += '<table class="action-table"><thead><tr>'
+      +'<th style="width:50%;padding-left:20px;">Item</th>'
+      +'<th>Owner</th><th>Due</th><th>Status</th>'
+      +'</tr></thead><tbody>';
+    items.forEach(function(it) {
+      var sp = it.status==='red'?'sp-r':it.status==='amber'?'sp-a':'sp-g';
+      var icon = it.status==='green'?'&#10003; In Progress':'&#9888; '+(it.status==='red'?'Action':'Watch');
+      html += '<tr><td style="padding-left:20px;">'
+        +'<div class="ai-text">'+it.item+'</div>'
+        +'</td>'
+        +'<td><div class="ai-owner">'+it.owner+'</div></td>'
+        +'<td style="font-size:8.5pt;color:var(--ink3);white-space:nowrap;">'+it.due+'</td>'
+        +'<td><span class="status-pill '+sp+'">'+icon+'</span></td>'
+        +'</tr>';
+    });
+    html += '</tbody></table>';
+  }
+  html += '</div>';
+
+  /* Advisory — below action register, same left column */
+  html += '<div class="advisory-box" style="margin-bottom:0;flex:1;">'
+    +'<div class="adv-eyebrow">VER Advisory Position</div>'
+    +'<div class="adv-body">'+(p.advisory_position||p.ver_notes||'Advisory position pending.')+'</div>'
+  +'</div>';
+
+  html += '</div>'; /* end left column */
+
+  /* Right column: What VER Needs — spans full height naturally */
+  html += '<div class="v2-card" style="margin-bottom:0;">'
+    +'<div class="card-title">What VER Needs</div>'
+    +'<div class="card-sub">From '+p.short+' by next review</div>';
+  if (asks.length) {
+    asks.forEach(function(ask, i) {
+      html += '<div class="ask-item"><div class="ask-num">'+(i+1)+'</div>'
+        +'<div class="ask-text">'+ask+'</div></div>';
+    });
+  } else {
+    html += '<div style="color:var(--ink4);">No specific asks at this time.</div>';
+  }
+  html += '</div>';
+
+  html += '</div>'; /* end two-column row */
+
+  /* CQBR */
+  if (p.cqbr_ref) {
+    html += '<div class="cqbr-tile">'
+      +'<div><div style="font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--teal2);margin-bottom:4px;">Latest Cinematic QBR</div>'
+        +'<div style="font-size:12pt;font-weight:800;color:var(--navy);">'+p.cqbr_ref.vendor+' &mdash; '+p.cqbr_ref.period+'</div>'
+        +'<div style="font-size:8pt;color:var(--ink4);margin-top:2px;">On-demand intelligence &middot; No meeting required</div>'
+      +'</div>'
+      +'<a href="'+p.cqbr_ref.file+'" target="_blank" class="cqbr-btn">&#9654; Watch CQBR</a>'
+    +'</div>';
+  }
+
+  /* DATA NOTES */
+  html += '<div class="data-notes"><strong style="color:var(--navy);">Coupa Data Notes</strong> &mdash; '+p.ver_notes+'</div>';
+
+  document.getElementById('pd-content').innerHTML = html;
+
+  setTimeout(function(){
+    drawDonut(p);
+    drawBars(p);
+    drawRenewalTimeline(p);
+  }, 60);
+}
+
+/* ── VENDOR MODAL ── */
+function openVendorModal(pillarKey, vendorIdx) {
+  var p = PILLARS[pillarKey];
+  if (!p) return;
+  var v = p.key_vendors[vendorIdx];
+  if (!v) return;
+
+  var fy = parseFloat(v.fy27)||0;
+  var vTotal = p.sow_value>0?p.sow_value:1;
+  var pct = Math.round((fy/vTotal)*100);
+  var note = (p.vendor_notes||{})[v.name]||'';
+
+  /* Modal head color */
+  var hColor = v.status==='amber'?'linear-gradient(135deg,#78350F,#D97706)'
+    :v.status==='red'?'linear-gradient(135deg,#7F1D1D,#DC2626)'
+    :'linear-gradient(135deg,#065F46,#059669)';
+  document.getElementById('vm-head').style.background = hColor;
+
+  /* Logo */
+  document.getElementById('vm-logo').innerHTML = vendorLogo(v.domain||'', v.name, 48, 'border-radius:10px;border:2px solid rgba(255,255,255,.3);');
+
+  /* Name / cats */
+  document.getElementById('vm-name').textContent = v.name;
+  document.getElementById('vm-cats').textContent = v.pos+' POs · '+v.cats+' · '+p.short;
+
+  /* KPIs */
+  document.getElementById('vm-kpis').innerHTML =
+    '<div class="vm-kpi"><div class="vm-kpi-lbl">FY27 Spend</div><div class="vm-kpi-val">'+fmtM(fy)+'</div></div>'
+    +'<div class="vm-kpi"><div class="vm-kpi-lbl">Pillar Share</div><div class="vm-kpi-val">'+pct+'%</div></div>'
+    +'<div class="vm-kpi"><div class="vm-kpi-lbl">Status</div><div class="vm-kpi-val" style="font-size:10pt;margin-top:4px;">'+riskPillHtml(v.status,'9pt')+'</div></div>';
+
+  /* Body */
+  var bodyHtml = '';
+
+  /* Advisory note — strip leading "Color — " prefix from raw data strings */
+  var cleanNote = note.replace(/^(Green|Amber|Red)\s*[—–-]+\s*/i, '');
+  if (cleanNote) {
+    bodyHtml += '<div class="vm-section-lbl">VER Advisory Note</div>'
+      +'<div class="vm-note-box">'+cleanNote+'</div>';
+  }
+
+  /* Vendor-related open items */
+  var relItems = (p.open_items||[]).filter(function(it){
+    return it.item.toLowerCase().indexOf(v.name.toLowerCase().split(' ')[0])>=0
+      || it.owner.toLowerCase().indexOf(v.name.toLowerCase().split(' ')[0])>=0;
+  });
+  if (relItems.length) {
+    bodyHtml += '<div class="vm-section-lbl">Related Action Items</div><div class="vm-items">';
+    relItems.forEach(function(it){
+      var dc = it.status==='red'?'var(--red)':it.status==='amber'?'var(--amber)':'var(--green)';
+      bodyHtml += '<div class="vm-item">'
+        +'<div class="vm-item-dot" style="background:'+dc+';"></div>'
+        +'<div style="flex:1;">'
+          +'<div style="font-size:9pt;font-weight:600;color:var(--ink2);">'+it.item+'</div>'
+          +'<div style="font-size:8pt;color:var(--ink4);margin-top:2px;">'+it.owner+' &middot; Due: '+it.due+'</div>'
+        +'</div>'
+        +statusPill(it.status, it.status==='red'?'Action':it.status==='amber'?'Watch':'In Progress')
+      +'</div>';
+    });
+    bodyHtml += '</div>';
+  }
+
+  /* VER asks mentioning this vendor */
+  var relAsks = (p.ver_asks||[]).filter(function(a){
+    return a.toLowerCase().indexOf(v.name.toLowerCase().split(' ')[0])>=0;
+  });
+  if (relAsks.length) {
+    bodyHtml += '<div class="vm-section-lbl">VER Ask — '+p.short+' Pillar Lead</div>';
+    relAsks.forEach(function(a, i){
+      bodyHtml += '<div class="vm-item">'
+        +'<div class="vm-item-dot" style="background:var(--navy);"></div>'
+        +'<div style="font-size:9pt;color:var(--ink2);">'+a+'</div>'
+      +'</div>';
+    });
+  }
+
+  if (!note && !relItems.length && !relAsks.length) {
+    bodyHtml = '<div style="color:var(--ink4);font-size:9pt;padding:8px 0;">No additional advisory notes on file for this vendor at this time.</div>';
+  }
+
+  document.getElementById('vm-body').innerHTML = bodyHtml;
+
+  var modal = document.getElementById('vendor-modal');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVendorModal() {
+  document.getElementById('vendor-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('vendor-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeVendorModal();
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeVendorModal(); });
+
+/* ── CHARTS (verbatim from v1) ── */
+function drawDonut(p) {
+  var canvas=document.getElementById('chart-donut');
+  if(!canvas) return;
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=Math.min(W,H)/2-18,thick=44;
+  function hexRgba(hex,a){var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return'rgba('+r+','+g+','+b+','+a+')';}
+  function lighten(hex,a){var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return'rgb('+Math.round(r+(255-r)*a)+','+Math.round(g+(255-g)*a)+','+Math.round(b+(255-b)*a)+')';}
+  var bc=p.color||'#0F1E3C';
+  var segs=[];
+  if(p.sow_value>0) segs.push({label:'SOW & PO Spend',val:p.sow_value,color:bc,colorLight:hexRgba(bc,.85)});
+  if(p.mft_total>0) segs.push({label:'MFT Forecast',val:p.mft_total,color:lighten(bc,.55),colorLight:lighten(bc,.70)});
+  if(p.savings>0) segs.push({label:'Savings Realized',val:p.savings,color:'#10B981',colorLight:'#34D399'});
+  if(!segs.length) segs.push({label:'No spend recorded',val:1,color:'#E2E8F0',colorLight:'#F1F5F9'});
+  var total=segs.reduce(function(s,x){return s+x.val;},0),angle=-Math.PI/2,GAP=.025;
+  ctx.clearRect(0,0,W,H);
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.arc(cx,cy,R-thick,Math.PI*2,0,true);ctx.closePath();ctx.fillStyle='#F1F5F9';ctx.fill();
+  segs.forEach(function(seg){
+    var sweep=(seg.val/total)*Math.PI*2,sa=angle+GAP/2,ss=sweep-GAP;if(ss<0)ss=sweep;
+    var ma=sa+ss/2,grad=ctx.createLinearGradient(cx+(R-thick/2)*Math.cos(ma-Math.PI/4),cy+(R-thick/2)*Math.sin(ma-Math.PI/4),cx+(R-thick/2)*Math.cos(ma+Math.PI/4),cy+(R-thick/2)*Math.sin(ma+Math.PI/4));
+    grad.addColorStop(0,seg.color);grad.addColorStop(1,seg.colorLight);
+    ctx.beginPath();ctx.arc(cx,cy,R,sa,sa+ss);ctx.arc(cx,cy,R-thick,sa+ss,sa,true);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,R+1,sa,sa+ss);ctx.arc(cx,cy,R-thick-1,sa+ss,sa,true);ctx.closePath();ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=1;ctx.stroke();
+    seg._startAngle=angle;seg._sweep=sweep;angle+=sweep;
+  });
+  var ig=ctx.createRadialGradient(cx,cy,R-thick-2,cx,cy,R-thick+8);ig.addColorStop(0,'rgba(0,0,0,.08)');ig.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath();ctx.arc(cx,cy,R-thick+8,0,Math.PI*2);ctx.arc(cx,cy,R-thick-2,Math.PI*2,0,true);ctx.closePath();ctx.fillStyle=ig;ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,R-thick-2,0,Math.PI*2);ctx.fillStyle='#FFFFFF';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,R-thick-2,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,.06)';ctx.lineWidth=1;ctx.stroke();
+  var cv=p.sow_value>0?p.sow_value:p.mft_total,cl=p.sow_value>0?'SOW Spend':'MFT Forecast';
+  ctx.fillStyle='#0F1E3C';ctx.font='bold 14pt Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(fmtM(cv),cx,cy-9);ctx.font='8pt Arial';ctx.fillStyle='#64748B';ctx.fillText(cl,cx,cy+11);
+  var leg=document.getElementById('donut-legend');
+  if(leg) leg.innerHTML=segs.map(function(s){if(s.label==='No spend recorded')return'';return'<span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:50%;background:'+s.color+';display:inline-block;"></span><span style="color:var(--ink3);">'+s.label+' <strong>'+fmtM(s.val)+'</strong></span></span>';}).join('');
+  var tt=document.getElementById('donut-tooltip');if(!tt){tt=document.createElement('div');tt.id='donut-tooltip';tt.style.cssText='display:none;position:fixed;background:rgba(15,30,60,.95);color:#fff;padding:8px 12px;border-radius:8px;font-size:8.5pt;z-index:500;pointer-events:none;line-height:1.5;';document.body.appendChild(tt);}
+  canvas.onmousemove=function(e){var rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left-cx,my=e.clientY-rect.top-cy,dist=Math.sqrt(mx*mx+my*my);if(dist<R-thick||dist>R){tt.style.display='none';return;}var a=Math.atan2(my,mx);if(a<-Math.PI/2)a+=Math.PI*2;var found=null;segs.forEach(function(s){var sa=s._startAngle<-Math.PI/2?s._startAngle+Math.PI*2:s._startAngle,ea=sa+s._sweep,aa=a<-Math.PI/2?a+Math.PI*2:a;if(aa>=sa&&aa<=ea)found=s;});if(found){tt.style.display='block';tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';tt.innerHTML='<strong>'+found.label+'</strong><br>'+fmtM(found.val)+' &nbsp;('+Math.round((found.val/total)*100)+'%)';}else tt.style.display='none';};
+  canvas.onmouseleave=function(){tt.style.display='none';};
+}
+
+function drawBars(p) {
+  var canvas=document.getElementById('chart-bars');if(!canvas)return;
+  var ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+  var qd=p.q_distribution||[25,25,25,25],maxQ=Math.max.apply(null,qd);
+  var labels=['Q1 FY27','Q2 FY27','Q3 FY27','Q4 FY27'],barW=44,gap=18,totalW=qd.length*(barW+gap)-gap,startX=(W-totalW)/2,maxH=H-50,tooltip=document.getElementById('bar-tooltip');
+  ctx.clearRect(0,0,W,H);
+  qd.forEach(function(val,i){var bh=maxQ>0?(val/maxQ)*maxH:0,x=startX+i*(barW+gap),y=H-30-bh,grad=ctx.createLinearGradient(x,y,x,y+bh);grad.addColorStop(0,p.color);grad.addColorStop(1,p.color+'88');ctx.fillStyle=grad;ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,barW,bh,4):ctx.rect(x,y,barW,bh);ctx.fill();ctx.fillStyle='#374151';ctx.font='bold 9pt Arial';ctx.textAlign='center';ctx.fillText(val+'%',x+barW/2,y-6);ctx.fillStyle='#94A3B8';ctx.font='8pt Arial';ctx.fillText(labels[i],x+barW/2,H-12);});
+  canvas.addEventListener('mousemove',function(e){var rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left,found=-1;qd.forEach(function(val,i){var x=startX+i*(barW+gap);if(mx>=x&&mx<=x+barW)found=i;});if(found>=0){tooltip.style.display='block';tooltip.style.left=(e.clientX+12)+'px';tooltip.style.top=(e.clientY-8)+'px';var es=p.sow_value>0?fmtM(p.sow_value*qd[found]/100):'--';tooltip.innerHTML='<strong>'+labels[found]+'</strong><br>Distribution: '+qd[found]+'%<br>'+(p.sow_value>0?'Est. spend: '+es:'');}else tooltip.style.display='none';});
+  canvas.addEventListener('mouseleave',function(){tooltip.style.display='none';});
+}
+
+function drawRenewalTimeline(p) {
+  var el=document.getElementById('renewal-timeline');if(!el)return;
+  var days=p.days_to_renewal,maxDays=730,pct=Math.min(100,Math.max(2,(days/maxDays)*100));
+  var col=days<90?'var(--red)':days<180?'var(--amber)':'var(--green)';
+  el.innerHTML='<div style="position:absolute;inset:0;background:var(--gray2);"></div>'
+    +'<div style="position:absolute;left:0;top:0;bottom:0;width:'+pct+'%;background:'+col+';opacity:.18;transition:width .6s;"></div>'
+    +'<div style="position:absolute;left:'+pct+'%;top:10px;bottom:10px;width:3px;background:'+col+';border-radius:2px;transform:translateX(-50%);"></div>'
+    +'<div style="position:absolute;left:'+pct+'%;top:50%;transform:translate(-50%,-50%);"><div style="width:14px;height:14px;border-radius:50%;background:'+col+';box-shadow:0 0 0 3px white,0 0 0 5px '+col+';"></div></div>'
+    +'<div style="position:absolute;left:'+Math.min(pct,78)+'%;top:50%;transform:translateY(-50%) translateX(12px);">'
+      +'<div style="font-size:8pt;font-weight:700;color:var(--ink2);">'+days+'d until renewal</div>'
+      +'<div style="font-size:7.5pt;color:var(--ink4);">'+p.renewal_note+'</div>'
+    +'</div>'
+    +'<div style="position:absolute;left:0;bottom:4px;font-size:7pt;color:var(--ink4);padding-left:6px;">Today</div>'
+    +'<div style="position:absolute;left:'+((90/maxDays)*100)+'%;bottom:4px;font-size:7pt;color:var(--red);transform:translateX(-50%);">90d</div>'
+    +'<div style="position:absolute;left:'+((180/maxDays)*100)+'%;bottom:4px;font-size:7pt;color:var(--amber);transform:translateX(-50%);">180d</div>'
+    +'<div style="position:absolute;left:'+((365/maxDays)*100)+'%;bottom:4px;font-size:7pt;color:var(--ink4);transform:translateX(-50%);">1yr</div>'
+    +'<div style="position:absolute;right:6px;bottom:4px;font-size:7pt;color:var(--ink4);">2yr</div>';
+}
+
+/* ── COST TO OPERATE ── */
+var _ctoResult = null;
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function openCTODrawer() {
+  /* Ensure CTO tab is visible first */
+  if (_activeTab !== 'cto') switchTab('cto');
+  var p = _currentPillar;
+  var lbl = document.getElementById('cto-pillar-label');
+  if (lbl && p) lbl.textContent = p.emoji + ' ' + p.name;
+  document.getElementById('cto-overlay').classList.add('open');
+  document.getElementById('cto-drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _renderCTOHistory();
+}
+
+function closeCTODrawer() {
+  document.getElementById('cto-overlay').classList.remove('open');
+  document.getElementById('cto-drawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function openCTOModal() {
+  document.getElementById('cto-modal').classList.add('open');
+}
+
+function closeCTOModal() {
+  document.getElementById('cto-modal').classList.remove('open');
+}
+
+document.getElementById('cto-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeCTOModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { closeCTOModal(); closeCTODrawer(); }
+});
+
+function _n(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+function _ctoCompute() {
+  var p = _currentPillar;
+  var vendorCount = p ? (p.key_vendors||[]).length : 3;
+
+  /* ── VISIBLE COSTS ── */
+  var fteCost    = _n('cto-fte-count') * _n('cto-fte-rate');
+  var cwCost     = _n('cto-cw-count')  * _n('cto-cw-rate') * 2080;
+  var toolsCost  = _n('cto-tools-annual');
+  var infraCost  = _n('cto-infra-annual');
+  var govCost    = _n('cto-gov-hours') * _n('cto-gov-rate');
+  var trainCost  = _n('cto-training');
+  var miscCost   = _n('cto-misc');
+  var facilCost  = _n('cto-facilities');
+  var hcSubtotal     = fteCost + cwCost;
+  var directSubtotal = toolsCost + infraCost + govCost + trainCost + miscCost + facilCost;
+  var overheadAmt    = (hcSubtotal + directSubtotal) * (_n('cto-overhead-pct') / 100);
+  var visibleTotal   = hcSubtotal + directSubtotal + overheadAmt;
+
+  /* ── HIDDEN / SHADOW COSTS ── */
+  /* Attrition */
+  var cwTurnover    = _n('cto-cw-turnover') || 30;        /* % — proxy 30% if blank */
+  var cwRamp        = _n('cto-cw-ramp') || 6;             /* weeks */
+  var fteTurnover   = _n('cto-fte-turnover') || 12;       /* % */
+  var fteReplace    = _n('cto-fte-replacement') || 50;    /* % of salary */
+  var attrCW        = _n('cto-cw-count') * (cwTurnover/100) * _n('cto-cw-rate') * 2080 * (cwRamp/52);
+  var attrFTE       = _n('cto-fte-count') * (fteTurnover/100) * _n('cto-fte-rate') * (fteReplace/100);
+  var attritionTotal = attrCW + attrFTE;
+
+  /* Vendor Management */
+  var vmHrs         = _n('cto-vm-hrs-per-vendor') || 8;   /* hrs/vendor/month proxy */
+  var vmRate        = _n('cto-vm-rate') || 110;
+  var escalHrs      = _n('cto-escalation-hrs') || (vendorCount * 15);
+  var onboardCost   = _n('cto-onboarding-cost') || 0;
+  var vmCost        = vendorCount * vmHrs * 12 * vmRate + escalHrs * vmRate + onboardCost;
+
+  /* Quality & Rework */
+  var reworkPct     = _n('cto-rework-pct') || 0;
+  var defectCost    = _n('cto-defect-cost') || 0;
+  var reworkCost    = hcSubtotal * (reworkPct/100) + defectCost;
+
+  /* Compliance & Legal */
+  var auditCost     = _n('cto-audit-cost') || 0;
+  var legalCost     = _n('cto-legal-hrs') * (_n('cto-legal-rate') || 350);
+  var compToolsCost = _n('cto-compliance-tools') || 0;
+  var complianceCost = auditCost + legalCost + compToolsCost;
+
+  /* License Waste */
+  var licenseTotal  = _n('cto-license-total') || 0;
+  var licenseUtil   = _n('cto-license-util') || 0;
+  var licenseWaste  = licenseUtil > 0 ? licenseTotal * (1 - licenseUtil/100) : 0;
+
+  var hiddenTotal   = attritionTotal + vmCost + reworkCost + complianceCost + licenseWaste;
+  var grandTotal    = visibleTotal + hiddenTotal;
+
+  /* ── DERIVED METRICS ── */
+  var managedSpend  = p ? p.sow_value : 0;
+  var hcCount       = _n('cto-fte-count') + _n('cto-cw-count');
+  var costPerM      = managedSpend > 0 ? grandTotal / managedSpend : 0;
+  var hcEfficiency  = hcCount > 0 ? grandTotal / hcCount : 0;
+  var pctOfSpend    = managedSpend > 0 ? (grandTotal / (managedSpend * 1e6)) * 100 : 0;
+  var hiddenPct     = visibleTotal > 0 ? (hiddenTotal / visibleTotal) * 100 : 0;
+  var pillarKey     = p ? Object.keys(PILLARS).find(function(k){return PILLARS[k]===p;})||'' : '';
+
+  return {
+    pillar: p ? (p.emoji + ' ' + p.name) : 'Pillar',
+    pillarKey: pillarKey,
+    ts: new Date().toLocaleString(),
+    vendorCount: vendorCount,
+    inputs: {
+      fteCount: _n('cto-fte-count'), fteRate: _n('cto-fte-rate'),
+      cwCount: _n('cto-cw-count'), cwRate: _n('cto-cw-rate'),
+      toolsAnnual: toolsCost, infraAnnual: infraCost,
+      overheadPct: _n('cto-overhead-pct'), facilities: facilCost,
+      govHours: _n('cto-gov-hours'), govRate: _n('cto-gov-rate'),
+      training: trainCost, misc: miscCost,
+      cwTurnover: _n('cto-cw-turnover'), cwRamp: _n('cto-cw-ramp'),
+      fteTurnover: _n('cto-fte-turnover'), fteReplacement: _n('cto-fte-replacement'),
+      vmHrsPerVendor: _n('cto-vm-hrs-per-vendor'), vmRate: _n('cto-vm-rate'),
+      escalationHrs: _n('cto-escalation-hrs'), onboardingCost: _n('cto-onboarding-cost'),
+      reworkPct: _n('cto-rework-pct'), defectCost: _n('cto-defect-cost'),
+      auditCost: _n('cto-audit-cost'), legalHrs: _n('cto-legal-hrs'),
+      legalRate: _n('cto-legal-rate'), complianceTools: _n('cto-compliance-tools'),
+      licenseTotal: _n('cto-license-total'), licenseUtil: _n('cto-license-util')
+    },
+    fteCost: fteCost, cwCost: cwCost, hcSubtotal: hcSubtotal,
+    toolsCost: toolsCost, infraCost: infraCost, govCost: govCost,
+    trainCost: trainCost, miscCost: miscCost, facilCost: facilCost,
+    directSubtotal: directSubtotal, overheadAmt: overheadAmt, visibleTotal: visibleTotal,
+    attrCW: attrCW, attrFTE: attrFTE, attritionTotal: attritionTotal,
+    vmCost: vmCost, reworkCost: reworkCost, complianceCost: complianceCost,
+    licenseWaste: licenseWaste, hiddenTotal: hiddenTotal,
+    grandTotal: grandTotal,
+    managedSpend: managedSpend, hcCount: hcCount,
+    costPerM: costPerM, hcEfficiency: hcEfficiency,
+    pctOfSpend: pctOfSpend, hiddenPct: hiddenPct
+  };
+}
+
+function ctoLiveUpdate() {
+  var r = _ctoCompute();
+  var el = document.getElementById('cto-live-val');
+  if (el) el.textContent = r.grandTotal > 0 ? _fmtDollar(r.grandTotal) : '—';
+}
+
+function runCTOCalc() {
+  _ctoResult = _ctoCompute();
+  _renderCTOModal(_ctoResult);
+  openCTOModal();
+  var badge = document.getElementById('cto-tab-badge');
+  if (badge) badge.textContent = '⚡';
+}
+
+function _fmtDollar(v) {
+  if (!v || v <= 0) return '$0';
+  if (v >= 1e9) return '$' + (v/1e9).toFixed(1) + 'B';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(v >= 10e6 ? 1 : 2) + 'M';
+  if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K';
+  return '$' + Math.round(v).toLocaleString();
+}
+
+function _renderCTOModal(r) {
+  /* pillar label — textContent, no escaping needed */
+  document.getElementById('cto-modal-pillar').textContent = r.pillar;
+
+  /* KPI tiles — all values are number-formatted strings from _fmtDollar */
+  var kpiColors = ['var(--teal)', 'var(--navy)', 'var(--green)', 'var(--amber)'];
+  var kpis = [
+    { lbl: 'Total Operate Cost',   val: _fmtDollar(r.grandTotal||r.total),
+      note: 'Annual fully-loaded', color: kpiColors[0] },
+    { lbl: 'Cost per $M Managed',
+      val: r.managedSpend > 0 ? _fmtDollar(r.costPerM * 1e6) : '--',
+      note: r.managedSpend > 0 ? 'per $1M pillar spend' : 'No managed spend', color: kpiColors[1] },
+    { lbl: 'Cost per HC',
+      val: r.hcCount > 0 ? _fmtDollar(r.hcEfficiency) : '--',
+      note: r.hcCount > 0 ? 'FTE + CW (' + r.hcCount + ' total)' : 'No headcount entered', color: kpiColors[2] },
+    { lbl: '% of Managed Spend',
+      val: r.managedSpend > 0 ? r.pctOfSpend.toFixed(1) + '%' : '--',
+      note: r.managedSpend > 0 ? 'Operate cost as share of SOW' : 'No managed spend', color: kpiColors[3] }
+  ];
+
+  var kpiEl = document.getElementById('cto-kpi-grid');
+  kpiEl.innerHTML = '';
+  kpis.forEach(function(k) {
+    var tile = document.createElement('div');
+    tile.className = 'cto-kpi-tile';
+    tile.style.borderTopColor = k.color;
+    var lbl = document.createElement('div'); lbl.className = 'cto-kpi-lbl'; lbl.textContent = k.lbl;
+    var val = document.createElement('div'); val.className = 'cto-kpi-val'; val.style.color = k.color; val.textContent = k.val;
+    var note = document.createElement('div'); note.className = 'cto-kpi-note'; note.textContent = k.note;
+    tile.appendChild(lbl); tile.appendChild(val); tile.appendChild(note);
+    kpiEl.appendChild(tile);
+  });
+
+  /* Breakdown table — label strings are hardcoded; values are _fmtDollar numbers */
+  var inp = r.inputs;
+  var rows = [
+    { lbl: 'FTE Headcount (' + inp.fteCount + ' @ $' + Math.round(inp.fteRate/1e3) + 'K/yr)', val: r.fteCost },
+    { lbl: 'CW Headcount (' + inp.cwCount + ' @ $' + inp.cwRate + '/hr × 2,080 hrs)', val: r.cwCost },
+    { lbl: 'Headcount Subtotal', val: r.hcSubtotal, bold: true },
+    { lbl: 'Tools & Systems', val: inp.toolsAnnual },
+    { lbl: 'Infrastructure / Cloud', val: inp.infraAnnual },
+    { lbl: 'Governance & Reporting (' + inp.govHours + ' hrs × $' + inp.govRate + ')', val: inp.govHours * inp.govRate },
+    { lbl: 'Training & Development', val: inp.training },
+    { lbl: 'Facilities', val: inp.facilities },
+    { lbl: 'Other / Misc', val: inp.misc },
+    { lbl: 'Direct Cost Subtotal', val: r.directSubtotal, bold: true },
+    { lbl: 'Overhead Allocation (' + inp.overheadPct + '%)', val: r.overheadAmt },
+    { lbl: 'TOTAL Annual Cost to Operate', val: r.grandTotal||r.total, total: true }
+  ];
+
+  var bkEl = document.getElementById('cto-breakdown');
+  bkEl.innerHTML = '';
+  var titleEl = document.createElement('div'); titleEl.className = 'cto-bk-title'; titleEl.textContent = 'Cost Breakdown';
+  bkEl.appendChild(titleEl);
+  rows.forEach(function(row) {
+    var rowEl = document.createElement('div');
+    rowEl.className = 'cto-bk-row' + (row.total ? ' cto-bk-total' : '');
+    var lSpan = document.createElement('span');
+    if (row.bold || row.total) { lSpan.style.fontWeight = '700'; lSpan.style.color = 'var(--ink2)'; }
+    lSpan.textContent = row.lbl;
+    var vSpan = document.createElement('span');
+    if (row.bold || row.total) vSpan.style.fontWeight = '700';
+    vSpan.textContent = row.val > 0 ? _fmtDollar(row.val) : '--';
+    rowEl.appendChild(lSpan);
+    rowEl.appendChild(vSpan);
+    bkEl.appendChild(rowEl);
+  });
+}
+
+function saveCTOScenario() {
+  if (!_ctoResult) return;
+  var key = 'cto-history-' + (_ctoResult.pillarKey || 'all');
+  var hist = [];
+  try { hist = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+  hist.unshift({
+    ts: _ctoResult.ts, pillar: _ctoResult.pillar,
+    total: _ctoResult.grandTotal,
+    visibleTotal: _ctoResult.visibleTotal,
+    hiddenTotal: _ctoResult.hiddenTotal,
+    hiddenPct: _ctoResult.hiddenPct,
+    costPerM: _ctoResult.costPerM,
+    hcEfficiency: _ctoResult.hcEfficiency,
+    pctOfSpend: _ctoResult.pctOfSpend,
+    inputs: _ctoResult.inputs
+  });
+  if (hist.length > 10) hist = hist.slice(0, 10);
+  try { localStorage.setItem(key, JSON.stringify(hist)); } catch(e) {}
+  closeCTOModal();
+  _renderCTOHistory();
+  if (_activeTab === 'cto') { renderCTOTab(); return; }
+  var wrap = document.getElementById('cto-hist-wrap');
+  if (wrap) { wrap.style.display = 'block'; wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+}
+
+function _renderCTOHistory() {
+  if (!_currentPillar) return;
+  var pillarKey = Object.keys(PILLARS).find(function(k){ return PILLARS[k] === _currentPillar; }) || 'all';
+  var hist = [];
+  try { hist = JSON.parse(localStorage.getItem('cto-history-' + pillarKey)) || []; } catch(e) {}
+  var wrap = document.getElementById('cto-hist-wrap');
+  var list = document.getElementById('cto-hist-list');
+  if (!hist.length) { if (wrap) wrap.style.display = 'none'; return; }
+  if (wrap) wrap.style.display = 'block';
+  if (!list) return;
+  list.innerHTML = '';
+  hist.forEach(function(h, i) {
+    var item = document.createElement('div');
+    item.className = 'cto-hist-item';
+    item.addEventListener('click', function(){ _loadCTOHistory(i); });
+
+    var topRow = document.createElement('div');
+    topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;';
+    var costEl = document.createElement('div'); costEl.className = 'cto-hist-cost'; costEl.textContent = _fmtDollar(h.total);
+    var tsEl   = document.createElement('div'); tsEl.style.cssText = 'font-size:7pt;color:var(--ink4);'; tsEl.textContent = h.ts;
+    topRow.appendChild(costEl); topRow.appendChild(tsEl);
+
+    var metaEl = document.createElement('div'); metaEl.className = 'cto-hist-meta';
+    var parts = [];
+    if (h.inputs.fteCount)  parts.push(h.inputs.fteCount + ' FTE');
+    if (h.inputs.cwCount)   parts.push(h.inputs.cwCount + ' CW');
+    if (h.inputs.toolsAnnual) parts.push('Tools ' + _fmtDollar(h.inputs.toolsAnnual));
+    if (h.inputs.overheadPct) parts.push(h.inputs.overheadPct + '% overhead');
+    metaEl.textContent = parts.join(' · ');
+
+    item.appendChild(topRow); item.appendChild(metaEl);
+    list.appendChild(item);
+  });
+}
+
+function _loadCTOHistory(idx) {
+  if (!_currentPillar) return;
+  var pillarKey = Object.keys(PILLARS).find(function(k){ return PILLARS[k] === _currentPillar; }) || 'all';
+  var hist = [];
+  try { hist = JSON.parse(localStorage.getItem('cto-history-' + pillarKey)) || []; } catch(e) {}
+  var h = hist[idx];
+  if (!h) return;
+  var inp = h.inputs;
+  var fields = {
+    'cto-fte-count': inp.fteCount, 'cto-fte-rate': inp.fteRate,
+    'cto-cw-count': inp.cwCount, 'cto-cw-rate': inp.cwRate,
+    'cto-tools-annual': inp.toolsAnnual, 'cto-infra-annual': inp.infraAnnual,
+    'cto-overhead-pct': inp.overheadPct, 'cto-facilities': inp.facilities,
+    'cto-gov-hours': inp.govHours, 'cto-gov-rate': inp.govRate,
+    'cto-training': inp.training, 'cto-misc': inp.misc,
+    'cto-cw-turnover': inp.cwTurnover, 'cto-cw-ramp': inp.cwRamp,
+    'cto-fte-turnover': inp.fteTurnover, 'cto-fte-replacement': inp.fteReplacement,
+    'cto-vm-hrs-per-vendor': inp.vmHrsPerVendor, 'cto-vm-rate': inp.vmRate,
+    'cto-escalation-hrs': inp.escalationHrs, 'cto-onboarding-cost': inp.onboardingCost,
+    'cto-rework-pct': inp.reworkPct, 'cto-defect-cost': inp.defectCost,
+    'cto-audit-cost': inp.auditCost, 'cto-legal-hrs': inp.legalHrs,
+    'cto-legal-rate': inp.legalRate, 'cto-compliance-tools': inp.complianceTools,
+    'cto-license-total': inp.licenseTotal, 'cto-license-util': inp.licenseUtil
+  };
+  Object.keys(fields).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = fields[id] || '';
+  });
+  ctoLiveUpdate();
+}
+
+function applyCTOToPage() {
+  if (!_ctoResult) return;
+  closeCTOModal();
+  /* If on CTO tab, re-render it with new result */
+  if (_activeTab === 'cto') { renderCTOTab(); return; }
+  /* Otherwise inject summary card into Intelligence tab */
+
+  /* Remove any existing injected card */
+  var existing = document.getElementById('cto-summary-inject');
+  if (existing) existing.remove();
+
+  var r = _ctoResult;
+  var card = document.createElement('div');
+  card.id = 'cto-summary-inject';
+  card.className = 'cto-summary-card';
+
+  /* Head row */
+  var head = document.createElement('div'); head.className = 'cto-sum-head';
+  var headLeft = document.createElement('div');
+  var eyebrow = document.createElement('div');
+  eyebrow.style.cssText = 'font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--teal2);margin-bottom:3px;';
+  eyebrow.textContent = 'Cost to Operate — Active Scenario';
+  var titleDiv = document.createElement('div');
+  titleDiv.style.cssText = 'font-size:11pt;font-weight:800;color:var(--navy);';
+  titleDiv.textContent = r.pillar;
+  var noteDiv = document.createElement('div');
+  noteDiv.style.cssText = 'font-size:7.5pt;color:var(--ink4);margin-top:2px;';
+  noteDiv.textContent = 'Calculated ' + r.ts + ' · Session only — save scenario to persist';
+  headLeft.appendChild(eyebrow); headLeft.appendChild(titleDiv); headLeft.appendChild(noteDiv);
+  var editBtn = document.createElement('button');
+  editBtn.type = 'button'; editBtn.className = 'cto-btn cto-btn-sec';
+  editBtn.style.cssText = 'white-space:nowrap;margin-top:4px;';
+  editBtn.textContent = '✎ Edit';
+  editBtn.addEventListener('click', openCTODrawer);
+  head.appendChild(headLeft); head.appendChild(editBtn);
+  card.appendChild(head);
+
+  /* KPI grid */
+  var grid = document.createElement('div'); grid.className = 'cto-sum-grid';
+  var sumTiles = [
+    { lbl: 'Total Operate Cost',   val: _fmtDollar(r.grandTotal||r.total),   note: 'Annual fully-loaded' },
+    { lbl: 'Cost per $M Managed',  val: r.managedSpend > 0 ? _fmtDollar(r.costPerM * 1e6) : '--',  note: 'vs ' + (r.managedSpend > 0 ? fmtM(r.managedSpend) : '--') + ' pillar spend' },
+    { lbl: 'HC Efficiency',        val: r.hcCount > 0 ? _fmtDollar(r.hcEfficiency) : '--',          note: 'Cost per headcount (' + r.hcCount + ')' },
+    { lbl: '% of Managed Spend',   val: r.managedSpend > 0 ? r.pctOfSpend.toFixed(1) + '%' : '--',  note: 'Operate cost share' }
+  ];
+  sumTiles.forEach(function(t) {
+    var tile = document.createElement('div'); tile.className = 'cto-sum-tile';
+    var tLbl = document.createElement('div'); tLbl.className = 'cto-sum-lbl'; tLbl.textContent = t.lbl;
+    var tVal = document.createElement('div'); tVal.className = 'cto-sum-val'; tVal.textContent = t.val;
+    var tNote = document.createElement('div'); tNote.className = 'cto-sum-note'; tNote.textContent = t.note;
+    tile.appendChild(tLbl); tile.appendChild(tVal); tile.appendChild(tNote);
+    grid.appendChild(tile);
+  });
+  card.appendChild(grid);
+
+  /* Insert after cover band (first child of pd-content) */
+  var content = document.getElementById('pd-content');
+  if (content && content.firstChild) {
+    content.insertBefore(card, content.firstChild.nextSibling);
+  } else if (content) {
+    content.appendChild(card);
+  }
+}
+
+/* ── TAB SWITCHING ── */
+var _activeTab = 'intel';
+
+function switchTab(tab) {
+  _activeTab = tab;
+  document.getElementById('tab-intel').style.display = tab === 'intel' ? '' : 'none';
+  document.getElementById('tab-cto').style.display   = tab === 'cto'   ? '' : 'none';
+  document.getElementById('tab-btn-intel').classList.toggle('active', tab === 'intel');
+  document.getElementById('tab-btn-cto').classList.toggle('active',   tab === 'cto');
+  if (tab === 'cto') renderCTOTab();
+}
+
+/* ── CTO TAB RENDER ── */
+function _pillarKey() {
+  return Object.keys(PILLARS).find(function(k){ return PILLARS[k] === _currentPillar; }) || 'all';
+}
+
+function _ctoHistory() {
+  try { return JSON.parse(localStorage.getItem('cto-history-' + _pillarKey())) || []; } catch(e) { return []; }
+}
+
+function renderCTOTab() {
+  var wrap = document.getElementById('cto-tab-content');
+  if (!wrap || !_currentPillar) return;
+  var p = _currentPillar;
+  var hist = _ctoHistory();
+  var r = _ctoResult;
+
+  /* Badge update */
+  var badge = document.getElementById('cto-tab-badge');
+  if (badge) badge.textContent = hist.length > 0 ? hist.length : '⚡';
+
+  /* Proxy compute when no real calc */
+  var display = r;
+  if (!r) {
+    var vendorCount = (p.key_vendors||[]).length || 3;
+    var govProxy   = Math.round((p.mft_items||0) * 0.5 + vendorCount * 40);
+    var govCostP   = govProxy * 115;
+    var toolsP     = 85000;
+    var vmP        = vendorCount * 8 * 12 * 110;
+    var attrP      = 0;
+    var hiddenP    = vmP;
+    var visP       = toolsP + govCostP;
+    var ohP        = visP * 0.2;
+    var totalP     = visP + ohP + hiddenP;
+    display = {
+      pillar: p.emoji + ' ' + p.name, pillarKey: '', ts: null, vendorCount: vendorCount,
+      isProxy: true,
+      fteCost:0, cwCost:0, hcSubtotal:0, toolsCost:toolsP, infraCost:0,
+      govCost:govCostP, trainCost:0, miscCost:0, facilCost:0,
+      directSubtotal:toolsP+govCostP, overheadAmt:ohP, visibleTotal:visP+ohP,
+      attrCW:0, attrFTE:0, attritionTotal:attrP,
+      vmCost:vmP, reworkCost:0, complianceCost:0, licenseWaste:0, hiddenTotal:hiddenP,
+      grandTotal:totalP, inputs:{},
+      managedSpend:p.sow_value, hcCount:0,
+      costPerM: p.sow_value>0 ? totalP/p.sow_value : 0,
+      hcEfficiency:0,
+      pctOfSpend: p.sow_value>0 ? (totalP/(p.sow_value*1e6))*100 : 0,
+      hiddenPct: visP>0 ? (hiddenP/(visP+ohP))*100 : 0
+    };
+  }
+
+  /* ─── HELPERS ─── */
+  function mk(tag, cls, txt) {
+    var el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (txt !== undefined) el.textContent = txt;
+    return el;
+  }
+  function secLabel(txt) {
+    var d = mk('div','v2-section'); d.textContent = txt; return d;
+  }
+
+  /* Clear and build */
+  wrap.innerHTML = '';
+
+  /* ── TOP HEADING ROW ── */
+  var topDiv = mk('div','cto-tab-top');
+  var headDiv = mk('div');
+  var h1 = mk('div','cto-tab-heading', p.emoji + ' Cost to Operate');
+  var sub = mk('div','cto-tab-sub', p.name + ' · FY27 · VER Intelligence Hub');
+  headDiv.appendChild(h1); headDiv.appendChild(sub);
+  var adjBtn = mk('button','cto-adjust-btn');
+  adjBtn.type='button'; adjBtn.textContent = display.isProxy ? '⚙ Open Full Calculator' : '⚙ Adjust Scenario';
+  adjBtn.addEventListener('click', openCTODrawer);
+  topDiv.appendChild(headDiv); topDiv.appendChild(adjBtn);
+  wrap.appendChild(topDiv);
+
+  /* ── ESTIMATE BANNER ── */
+  var banner = mk('div','cto-estimate-banner');
+  var bIcon = mk('div','cto-est-icon'); bIcon.textContent = display.isProxy ? '💡' : '✅';
+  var bBody = mk('div','cto-est-body');
+  var bTitle = mk('div','cto-est-title');
+  bTitle.textContent = display.isProxy
+    ? 'VER Proxy Estimates — open the calculator to enter actuals'
+    : 'Showing your calculated scenario · ' + display.ts;
+  var bNote = mk('div','cto-est-note');
+  bNote.textContent = display.isProxy
+    ? 'Estimates are derived from pillar data (' + p.mft_items + ' POs, ' + display.vendorCount + ' key vendors) using standard burden assumptions. Hidden cost layer uses industry proxy rates. Enter actuals for a precise view.'
+    : 'Grand total includes ' + _fmtDollar(display.visibleTotal) + ' in visible costs and ' + _fmtDollar(display.hiddenTotal) + ' in shadow costs. Save this scenario to compare against future runs.';
+  bBody.appendChild(bTitle); bBody.appendChild(bNote);
+  banner.appendChild(bIcon); banner.appendChild(bBody);
+  wrap.appendChild(banner);
+
+  /* ── 6-KPI ROW ── */
+  var kpiGrid = mk('div');
+  kpiGrid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;';
+  var kpis6 = [
+    { cls:'c-teal',  lbl:'Total Annual Cost to Operate', val:_fmtDollar(display.grandTotal),
+      note: display.isProxy ? 'Proxy estimate — enter actuals' : 'Visible + hidden layers' },
+    { cls:'c-navy',  lbl:'Visible Cost Subtotal', val:_fmtDollar(display.visibleTotal),
+      note:'HC + tools + gov + overhead' },
+    { cls:'c-red',   lbl:'Hidden / Shadow Costs', val:_fmtDollar(display.hiddenTotal),
+      note:display.hiddenPct.toFixed(1)+'% of visible cost base' },
+    { cls:'c-navy',  lbl:'Cost per $M Managed',
+      val: display.managedSpend>0 ? _fmtDollar(display.costPerM*1e6) : '--',
+      note: display.managedSpend>0 ? 'vs '+fmtM(display.managedSpend)+' pillar spend' : 'No Coupa spend on file' },
+    { cls:'c-green', lbl:'HC Efficiency',
+      val: display.hcCount>0 ? _fmtDollar(display.hcEfficiency) : (display.isProxy ? '--' : '--'),
+      note: display.hcCount>0 ? 'Total cost per person ('+display.hcCount+')' : 'Enter HC in calculator' },
+    { cls:'c-amber', lbl:'% of Managed Spend',
+      val: display.managedSpend>0 ? display.pctOfSpend.toFixed(1)+'%' : '--',
+      note: display.managedSpend>0 ? 'Benchmark range: 8–14%' : 'No managed spend' }
+  ];
+  kpis6.forEach(function(k) {
+    var tile = mk('div','cto-tab-kpi '+k.cls);
+    var lbl  = mk('div','cto-tab-kpi-lbl',k.lbl);
+    var val  = mk('div','cto-tab-kpi-val',k.val);
+    var note = mk('div','cto-tab-kpi-note',k.note);
+    tile.appendChild(lbl); tile.appendChild(val); tile.appendChild(note);
+    kpiGrid.appendChild(tile);
+  });
+  wrap.appendChild(kpiGrid);
+
+  /* ── 3-CHART ROW ── */
+  var chartsRow = mk('div','cto-charts-row');
+  function chartCard(id, title, sub2) {
+    var card = mk('div','cto-chart-card');
+    card.appendChild(mk('div','cto-chart-title',title));
+    card.appendChild(mk('div','cto-chart-sub',sub2));
+    var canvas = document.createElement('canvas');
+    canvas.id=id; canvas.width=320; canvas.height=200;
+    canvas.style.cssText='display:block;width:100%;';
+    card.appendChild(canvas);
+    return card;
+  }
+  chartsRow.appendChild(chartCard('cto-chart-waterfall','Cost Waterfall','Visible → hidden buckets build to total'));
+  chartsRow.appendChild(chartCard('cto-chart-donut','Cost Composition','Spend share by category'));
+  chartsRow.appendChild(chartCard('cto-chart-gauge','Efficiency vs Benchmark','% of managed spend · industry bands'));
+  wrap.appendChild(chartsRow);
+
+  /* ── HIDDEN COST RADAR ── */
+  wrap.appendChild(secLabel('Hidden Cost Radar — What\'s Not in Your Budget'));
+  var hcrGrid = mk('div','hcr-grid');
+  var hcrItems = [
+    { cls:'hcr-attrition', icon:'🔄', lbl:'Attrition & Ramp',
+      val: _fmtDollar(display.attritionTotal || (display.vendorCount * 8000)),
+      note: display.inputs && display.inputs.cwTurnover
+        ? display.inputs.cwTurnover+'% CW turnover · '+display.inputs.cwRamp+'-wk ramp'
+        : 'Proxy: 30% CW turnover / 6-wk ramp',
+      src: display.attritionTotal > 0 ? 'Your inputs' : 'VER proxy estimate' },
+    { cls:'hcr-vendor', icon:'🤝', lbl:'Vendor Mgmt Overhead',
+      val: _fmtDollar(display.vmCost),
+      note: display.vendorCount + ' vendors × ' + (display.inputs && display.inputs.vmHrsPerVendor || 8) + ' hrs/mo × $' + (display.inputs && display.inputs.vmRate || 110) + '/hr',
+      src: (display.inputs && display.inputs.vmHrsPerVendor) ? 'Your inputs' : 'VER proxy estimate' },
+    { cls:'hcr-quality', icon:'🔁', lbl:'Quality & Rework',
+      val: _fmtDollar(display.reworkCost || (display.hcSubtotal * 0.05)),
+      note: display.inputs && display.inputs.reworkPct
+        ? display.inputs.reworkPct+'% rework rate on HC base'
+        : 'Proxy: 5% rework rate applied to HC',
+      src: display.reworkCost > 0 ? 'Your inputs' : 'VER proxy estimate' },
+    { cls:'hcr-compliance', icon:'⚖', lbl:'Compliance & Legal',
+      val: _fmtDollar(display.complianceCost || 45000),
+      note: 'Audit + legal review + compliance tools',
+      src: display.complianceCost > 0 ? 'Your inputs' : 'VER proxy estimate' },
+    { cls:'hcr-license', icon:'📦', lbl:'License Waste',
+      val: display.licenseWaste > 0 ? _fmtDollar(display.licenseWaste) : '--',
+      note: display.inputs && display.inputs.licenseTotal
+        ? _fmtDollar(display.inputs.licenseTotal)+' portfolio · '+(display.inputs.licenseUtil||0)+'% utilization'
+        : 'Enter license spend + utilization to calculate',
+      src: display.licenseWaste > 0 ? 'Your inputs' : 'Enter license data above' }
+  ];
+  hcrItems.forEach(function(item) {
+    var card = mk('div','hcr-card '+item.cls);
+    card.appendChild(mk('div','hcr-icon',item.icon));
+    card.appendChild(mk('div','hcr-lbl',item.lbl));
+    var vEl = mk('div','hcr-val',item.val);
+    var col = item.cls==='hcr-attrition'?'#EF4444':item.cls==='hcr-vendor'?'#F59E0B':item.cls==='hcr-quality'?'#8B5CF6':item.cls==='hcr-compliance'?'#3B82F6':'#10B981';
+    vEl.style.color = col;
+    card.appendChild(vEl);
+    card.appendChild(mk('div','hcr-note',item.note));
+    card.appendChild(mk('div','hcr-source',item.src));
+    hcrGrid.appendChild(card);
+  });
+  wrap.appendChild(hcrGrid);
+
+  /* ── EXEC NARRATIVE ── */
+  wrap.appendChild(secLabel('Executive Intelligence — Narrative'));
+  var narrative = mk('div','exec-narrative');
+  var eyebrow = mk('div','en-eyebrow','VER Cost Intelligence');
+  narrative.appendChild(eyebrow);
+  var bodyDiv = mk('div','en-body');
+
+  /* Build narrative dynamically */
+  var parts = [];
+  var dominantBucket = 'operating costs';
+  var buckets = [
+    {lbl:'headcount',val:display.hcSubtotal},{lbl:'tools and infrastructure',val:display.toolsCost+display.infraCost},
+    {lbl:'governance overhead',val:display.govCost},{lbl:'vendor management',val:display.vmCost},
+    {lbl:'attrition and churn',val:display.attritionTotal}
+  ].filter(function(b){return b.val>0;});
+  if(buckets.length) {
+    buckets.sort(function(a,b){return b.val-a.val;});
+    dominantBucket = buckets[0].lbl;
+  }
+
+  parts.push('The ' + p.name + ' pillar carries a total annual cost to operate of ' +
+    _fmtDollar(display.grandTotal) + ', with ' + dominantBucket +
+    ' representing the dominant cost driver at ' +
+    (display.grandTotal>0?Math.round((buckets[0]?buckets[0].val:0)/display.grandTotal*100):0) + '% of the total cost base.');
+
+  if (display.hiddenPct > 15) {
+    parts.push('Shadow costs — attrition, vendor management overhead, quality rework, and compliance — represent ' +
+      display.hiddenPct.toFixed(0) + '% of the visible cost base (' + _fmtDollar(display.hiddenTotal) +
+      '), a figure that rarely appears in budget line items but directly reduces team productivity and capacity.');
+  } else if (display.hiddenTotal > 0) {
+    parts.push('Hidden cost layers (attrition, vendor overhead, quality) add ' + _fmtDollar(display.hiddenTotal) +
+      ' (' + display.hiddenPct.toFixed(0) + '% of visible costs) — manageable, but worth tracking as pillar complexity grows.');
+  }
+
+  if (display.managedSpend > 0) {
+    if (display.pctOfSpend > 14) {
+      parts.push('At ' + display.pctOfSpend.toFixed(1) + '% of managed spend, this pillar is running above the industry benchmark range of 8–14% and warrants a cost structure review in the next planning cycle.');
+    } else if (display.pctOfSpend < 8 && display.pctOfSpend > 0) {
+      parts.push('At ' + display.pctOfSpend.toFixed(1) + '% of managed spend, this pillar is operating efficiently — below the 8% lean benchmark, suggesting strong operational leverage relative to the spend base it manages.');
+    } else if (display.pctOfSpend >= 8) {
+      parts.push('At ' + display.pctOfSpend.toFixed(1) + '% of managed spend, this pillar is operating within the industry benchmark range of 8–14%, with VER monitoring for drift.');
+    }
+  }
+
+  if (display.licenseWaste > 10000) {
+    parts.push('License utilization at ' + (display.inputs.licenseUtil||0) + '% on a ' + _fmtDollar(display.inputs.licenseTotal||0) +
+      ' portfolio represents ' + _fmtDollar(display.licenseWaste) + ' in potentially recoverable waste — the highest near-term cost reduction opportunity.');
+  }
+
+  bodyDiv.textContent = parts.join(' ');
+  narrative.appendChild(bodyDiv);
+  wrap.appendChild(narrative);
+
+  /* ── COST REDUCTION OPPORTUNITIES ── */
+  wrap.appendChild(secLabel('Cost Reduction Opportunities — Ranked by Impact'));
+  var opps = [];
+
+  if (display.licenseWaste > 10000)
+    opps.push({ rank:1, color:'#10B981', title:'License Rationalization', amt:display.licenseWaste,
+      detail:'Portfolio at '+(display.inputs&&display.inputs.licenseUtil||0)+'% utilization. A rationalization program targeting 85% utilization could recover '+_fmtDollar(display.licenseWaste)+' annually.', tag:'Quick Win' });
+  if (display.attritionTotal > 20000)
+    opps.push({ rank:opps.length+1, color:'#EF4444', title:'Attrition Reduction Program',
+      amt: display.attritionTotal * 0.4,
+      detail:'CW turnover cost of '+_fmtDollar(display.attritionTotal)+'/yr. A 10-point turnover reduction (extended contracts, structured feedback loops) could save ~40% of this cost.',
+      tag:'Strategic' });
+  if (display.vmCost > 50000)
+    opps.push({ rank:opps.length+1, color:'#F59E0B', title:'Vendor Consolidation',
+      amt: display.vmCost * 0.25,
+      detail:'Managing '+display.vendorCount+' vendors at '+_fmtDollar(display.vmCost)+'/yr. A 20% reduction in active vendor relationships could yield '+_fmtDollar(display.vmCost*0.25)+' in management overhead.',
+      tag:'Strategic' });
+  if (display.reworkCost > 15000)
+    opps.push({ rank:opps.length+1, color:'#8B5CF6', title:'Quality Investment',
+      amt: display.reworkCost * 0.5,
+      detail:_fmtDollar(display.reworkCost)+' in annual rework costs. Investing in upstream QA practices (definition of done, structured acceptance criteria) typically recovers 40–60% of rework cost.',
+      tag:'Operational' });
+  if (display.managedSpend > 0)
+    opps.push({ rank:opps.length+1, color:'#0D9488', title:'VER Rate Benchmarking Program',
+      amt: display.managedSpend * 1e6 * 0.03,
+      detail:'VER\'s active rate benchmarking program targets 3–8% savings on managed spend. Applied to '+fmtM(display.managedSpend)+', the savings pipeline is '+_fmtDollar(display.managedSpend*1e6*0.03)+' at the low end.',
+      tag:'Pipeline' });
+  opps.push({ rank:opps.length+1, color:'#2563EB', title:'Governance Efficiency Review',
+    amt: display.govCost * 0.2,
+    detail: _fmtDollar(display.govCost)+' in governance and reporting costs. AI-assisted reporting, consolidated review cadences, and structured agendas can reduce meeting overhead by 15–25%.',
+    tag:'Operational' });
+
+  opps.sort(function(a,b){return b.amt-a.amt;});
+  opps.forEach(function(o,i){o.rank=i+1;});
+
+  var oppList = mk('div','opp-list');
+  opps.forEach(function(o) {
+    var item = mk('div','opp-item');
+    var rankEl = mk('div','opp-rank'); rankEl.textContent=o.rank; rankEl.style.background=o.color;
+    var body  = mk('div','opp-body');
+    body.appendChild(mk('div','opp-title',o.title));
+    body.appendChild(mk('div','opp-detail',o.detail));
+    var valDiv = mk('div','opp-value');
+    var amtEl  = mk('div','opp-amt',_fmtDollar(o.amt)); amtEl.style.color=o.color;
+    var tagEl  = mk('div','opp-tag',o.tag); tagEl.style.color=o.color;
+    valDiv.appendChild(amtEl); valDiv.appendChild(tagEl);
+    item.appendChild(rankEl); item.appendChild(body); item.appendChild(valDiv);
+    oppList.appendChild(item);
+  });
+  wrap.appendChild(oppList);
+
+  /* ── BENCHMARK TABLE ── */
+  wrap.appendChild(secLabel('Benchmark Comparison — This Pillar vs Industry'));
+  var benchRows = [
+    { metric:'Total Operate Cost as % of Managed Spend',
+      mine: display.managedSpend>0 ? display.pctOfSpend.toFixed(1)+'%' : '--',
+      mineRaw: display.pctOfSpend,
+      lean:'< 8%', avg:'8–12%', complex:'12–18%',
+      status: display.managedSpend>0 ? (display.pctOfSpend<8?'g':display.pctOfSpend<14?'a':'r') : 'n' },
+    { metric:'Cost per $1M Managed Spend',
+      mine: display.managedSpend>0 ? _fmtDollar(display.costPerM*1e6) : '--',
+      mineRaw: display.managedSpend>0 ? display.costPerM*1e6 : 0,
+      lean:'< $80K', avg:'$80K–$150K', complex:'> $150K',
+      status: display.managedSpend>0 ? (display.costPerM*1e6<80000?'g':display.costPerM*1e6<150000?'a':'r') : 'n' },
+    { metric:'Hidden Cost as % of Visible Cost',
+      mine: display.hiddenPct.toFixed(1)+'%', mineRaw: display.hiddenPct,
+      lean:'< 10%', avg:'10–20%', complex:'> 20%',
+      status: display.hiddenPct<10?'g':display.hiddenPct<20?'a':'r' },
+    { metric:'Attrition Cost as % of HC Spend',
+      mine: display.hcSubtotal>0 ? (display.attritionTotal/display.hcSubtotal*100).toFixed(1)+'%' : '--',
+      mineRaw: display.hcSubtotal>0 ? display.attritionTotal/display.hcSubtotal*100 : 0,
+      lean:'< 8%', avg:'8–18%', complex:'> 18%',
+      status: display.hcSubtotal>0 ? (display.attritionTotal/display.hcSubtotal*100<8?'g':display.attritionTotal/display.hcSubtotal*100<18?'a':'r') : 'n' },
+    { metric:'Vendor Mgmt Overhead as % of Total',
+      mine: display.grandTotal>0 ? (display.vmCost/display.grandTotal*100).toFixed(1)+'%' : '--',
+      mineRaw: display.grandTotal>0 ? display.vmCost/display.grandTotal*100 : 0,
+      lean:'< 5%', avg:'5–12%', complex:'> 12%',
+      status: display.grandTotal>0 ? (display.vmCost/display.grandTotal*100<5?'g':display.vmCost/display.grandTotal*100<12?'a':'r') : 'n' }
+  ];
+  var tbl = document.createElement('table'); tbl.className='bench-table';
+  var thead = document.createElement('thead');
+  var hrow  = document.createElement('tr');
+  ['Metric','This Pillar','Lean','Industry Avg','High-Complexity'].forEach(function(h) {
+    var th = document.createElement('th'); th.textContent=h; hrow.appendChild(th);
+  });
+  thead.appendChild(hrow); tbl.appendChild(thead);
+  var tbody = document.createElement('tbody');
+  benchRows.forEach(function(row) {
+    var tr = document.createElement('tr');
+    var td0=document.createElement('td'); td0.textContent=row.metric; tr.appendChild(td0);
+    var td1=document.createElement('td');
+    var statusPillEl = document.createElement('span');
+    if(row.status==='n') {
+      td1.textContent = row.mine;
+    } else {
+      var pCls = row.status==='g'?'bench-pill bench-g':row.status==='a'?'bench-pill bench-a':'bench-pill bench-r';
+      statusPillEl.className = pCls;
+      statusPillEl.textContent = (row.status==='g'?'✓ ':row.status==='a'?'⚠ ':'⚠ ') + row.mine;
+      td1.appendChild(statusPillEl);
+    }
+    tr.appendChild(td1);
+    [row.lean,row.avg,row.complex].forEach(function(v){
+      var td=document.createElement('td'); td.style.color='var(--ink4)'; td.textContent=v; tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+  wrap.appendChild(tbl);
+
+  /* ── SCENARIO COMPARISON ── */
+  if (hist.length > 0) {
+    wrap.appendChild(secLabel('Scenario Comparison — Last ' + Math.min(hist.length,3)));
+    var scenRow = mk('div','cto-scenarios-row');
+    hist.slice(0,3).forEach(function(h,i) {
+      var card = mk('div','cto-scen-card'+(i===0?' active-scen':''));
+      if(i===0){var b2=mk('div','cto-scen-badge','Latest');card.appendChild(b2);}
+      card.appendChild(mk('div','cto-scen-num','Scenario '+(i+1)+' · '+h.ts));
+      var costEl=mk('div','cto-scen-cost',_fmtDollar(h.total));card.appendChild(costEl);
+      var mp=[];
+      if(h.inputs.fteCount) mp.push(h.inputs.fteCount+' FTE');
+      if(h.inputs.cwCount)  mp.push(h.inputs.cwCount+' CW');
+      if(h.inputs.toolsAnnual) mp.push('Tools '+_fmtDollar(h.inputs.toolsAnnual));
+      var metaEl=mk('div','cto-scen-meta',mp.join(' · ')||'No HC entered'); card.appendChild(metaEl);
+      /* Hidden cost line */
+      var hiddenPctStr = h.hiddenPct ? h.hiddenPct.toFixed(0)+'% hidden costs' : '';
+      if(hiddenPctStr){var hEl=mk('div','cto-scen-meta');hEl.style.cssText='color:var(--red);margin-top:3px;font-size:7.5pt;';hEl.textContent=hiddenPctStr;card.appendChild(hEl);}
+      var loadBtn=mk('button','cto-scen-load-btn','↺ Load This Scenario');
+      loadBtn.type='button';
+      (function(idx){loadBtn.addEventListener('click',function(){_loadCTOHistory(idx);openCTODrawer();});})(i);
+      card.appendChild(loadBtn);
+      scenRow.appendChild(card);
+    });
+    wrap.appendChild(scenRow);
+  }
+
+  /* ── DRAW CHARTS ── */
+  setTimeout(function(){
+    _drawCTOWaterfall(
+      display.fteCost, display.cwCost, display.toolsCost+display.infraCost,
+      display.govCost+display.trainCost+display.miscCost+display.facilCost,
+      display.overheadAmt, display.attritionTotal, display.vmCost,
+      display.reworkCost+display.complianceCost+display.licenseWaste,
+      display.grandTotal, p.color
+    );
+    _drawCTODonut(
+      display.fteCost, display.cwCost, display.toolsCost+display.infraCost,
+      display.govCost+display.facilCost+display.trainCost+display.miscCost,
+      display.overheadAmt, display.attritionTotal, display.vmCost,
+      display.reworkCost+display.complianceCost+display.licenseWaste, p.color
+    );
+    _drawCTOGauge(display.pctOfSpend, display.managedSpend > 0);
+  }, 60);
+}
+
+/* ── CHART: WATERFALL ── */
+function _drawCTOWaterfall(fte, cw, tools, gov, overhead, attrition, vmCost, otherHidden, total, pColor) {
+  var canvas = document.getElementById('cto-chart-waterfall');
+  if (!canvas) return;
+  var W = canvas.offsetWidth || canvas.width;
+  canvas.width = W; canvas.height = 200;
+  var ctx = canvas.getContext('2d'), H = 200;
+  ctx.clearRect(0, 0, W, H);
+
+  var buckets = [
+    { lbl:'FTE',       val:fte,         color:pColor||'#0F1E3C' },
+    { lbl:'CW',        val:cw,          color:'#0D9488' },
+    { lbl:'Tools',     val:tools,       color:'#7C3AED' },
+    { lbl:'Gov/Ops',   val:gov,         color:'#D97706' },
+    { lbl:'Overhead',  val:overhead,    color:'#6B7280' },
+    { lbl:'Attrition', val:attrition,   color:'#EF4444' },
+    { lbl:'Vendor Mgmt',val:vmCost,     color:'#F59E0B' },
+    { lbl:'Other Hidden',val:otherHidden,color:'#8B5CF6'},
+    { lbl:'TOTAL',     val:total,       color:'#059669', isTotal:true }
+  ].filter(function(b){ return b.val > 0 || b.isTotal; });
+
+  var maxVal = Math.max(total, 1);
+  var padL=6, padR=6, padT=22, padB=40;
+  var chartH = H - padT - padB;
+  var colW = Math.floor((W - padL - padR) / buckets.length);
+  var barW = Math.max(8, Math.floor(colW * 0.65));
+  var barOff = Math.floor((colW - barW) / 2);
+
+  buckets.forEach(function(b, i) {
+    var bh = b.val > 0 ? Math.max(4, (b.val/maxVal)*chartH) : 4;
+    var x = padL + i*colW + barOff, y = padT + chartH - bh;
+    var grad = ctx.createLinearGradient(x,y,x,y+bh);
+    grad.addColorStop(0, b.color); grad.addColorStop(1, b.color+'88');
+    ctx.fillStyle = grad;
+    if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x,y,barW,bh,[4,4,0,0]); ctx.fill(); }
+    else ctx.fillRect(x,y,barW,bh);
+    ctx.fillStyle='#374151'; ctx.font='bold 6.5pt Arial'; ctx.textAlign='center';
+    var vs = b.val > 0 ? _fmtDollar(b.val) : '--';
+    ctx.fillText(vs, x+barW/2, y-4);
+    ctx.fillStyle='#94A3B8'; ctx.font='6pt Arial';
+    var ll = b.lbl.split(' ');
+    ll.forEach(function(w,li){ ctx.fillText(w, x+barW/2, H-padB+11+li*9); });
+  });
+
+  ctx.strokeStyle='rgba(148,163,184,.3)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+  buckets.forEach(function(b,i){
+    if(i>=buckets.length-1)return;
+    var bh=b.val>0?Math.max(4,(b.val/maxVal)*chartH):4;
+    var x1=padL+i*colW+barOff+barW, x2=padL+(i+1)*colW+barOff;
+    var y1=padT+chartH-bh;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y1); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+}
+
+/* ── CHART: DONUT (cost composition) ── */
+function _drawCTODonut(fte, cw, tools, gov, overhead, attrition, vmCost, otherHidden, pColor) {
+  var canvas = document.getElementById('cto-chart-donut');
+  if (!canvas) return;
+  var W = canvas.offsetWidth || canvas.width;
+  canvas.width = W; canvas.height = 200;
+  var ctx = canvas.getContext('2d'), H = 200;
+  var cx=W/2, cy=H/2-8, R=Math.min(W,H)/2-20, thick=34;
+  ctx.clearRect(0,0,W,H);
+
+  var segs = [
+    {lbl:'FTE',         val:fte,         color:pColor||'#0F1E3C'},
+    {lbl:'CW',          val:cw,          color:'#0D9488'},
+    {lbl:'Tools',       val:tools,       color:'#7C3AED'},
+    {lbl:'Gov/Ops',     val:gov,         color:'#D97706'},
+    {lbl:'Overhead',    val:overhead,    color:'#6B7280'},
+    {lbl:'Attrition',   val:attrition,   color:'#EF4444'},
+    {lbl:'Vendor Mgmt', val:vmCost,      color:'#F59E0B'},
+    {lbl:'Other Hidden',val:otherHidden, color:'#8B5CF6'}
+  ].filter(function(s){return s.val>0;});
+
+  if(!segs.length){
+    ctx.fillStyle='#E2E8F0';
+    ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.arc(cx,cy,R-thick,Math.PI*2,0,true);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#94A3B8';ctx.font='8pt Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('Enter inputs',cx,cy);return;
+  }
+
+  var total=segs.reduce(function(s,x){return s+x.val;},0),angle=-Math.PI/2,GAP=0.018;
+  segs.forEach(function(seg){
+    var sweep=(seg.val/total)*Math.PI*2,sa=angle+GAP/2,ss=sweep-GAP;if(ss<0)ss=sweep;
+    ctx.beginPath();ctx.arc(cx,cy,R,sa,sa+ss);ctx.arc(cx,cy,R-thick,sa+ss,sa,true);ctx.closePath();
+    ctx.fillStyle=seg.color;ctx.fill();
+    seg._sa=angle;seg._sw=sweep;angle+=sweep;
+  });
+  ctx.beginPath();ctx.arc(cx,cy,R-thick-2,0,Math.PI*2);ctx.fillStyle='#FFFFFF';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,R-thick-2,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,.05)';ctx.lineWidth=1;ctx.stroke();
+
+  var biggest=segs.reduce(function(a,b){return a.val>b.val?a:b;});
+  ctx.fillStyle='#0F1E3C';ctx.font='bold 8pt Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(biggest.lbl,cx,cy-7);
+  ctx.font='7.5pt Arial';ctx.fillStyle='#64748B';
+  ctx.fillText(Math.round((biggest.val/total)*100)+'%',cx,cy+8);
+
+  var visTotal=fte+cw+tools+gov+overhead, hidTotal=attrition+vmCost+otherHidden;
+  ctx.fillStyle='#374151';ctx.font='bold 7pt Arial';ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillText('Visible: '+Math.round(visTotal/total*100)+'%',cx,H-32);
+  ctx.fillStyle='#EF4444';ctx.font='bold 7pt Arial';
+  ctx.fillText('Hidden: '+Math.round(hidTotal/total*100)+'%',cx,H-20);
+
+  var tt2=document.getElementById('cto-donut-tt');
+  if(!tt2){tt2=document.createElement('div');tt2.id='cto-donut-tt';tt2.style.cssText='display:none;position:fixed;background:rgba(15,30,60,.95);color:#fff;padding:8px 12px;border-radius:8px;font-size:8.5pt;z-index:700;pointer-events:none;line-height:1.5;';document.body.appendChild(tt2);}
+  canvas.onmousemove=function(e){
+    var rect=canvas.getBoundingClientRect(),scaleX=canvas.width/rect.width;
+    var mx=(e.clientX-rect.left)*scaleX-cx,my=(e.clientY-rect.top)*scaleX-cy,dist=Math.sqrt(mx*mx+my*my);
+    if(dist<R-thick||dist>R){tt2.style.display='none';return;}
+    var a=Math.atan2(my,mx);if(a<-Math.PI/2)a+=Math.PI*2;
+    var found=null;segs.forEach(function(s){var sa=s._sa<-Math.PI/2?s._sa+Math.PI*2:s._sa,ea=sa+s._sw,aa=a<-Math.PI/2?a+Math.PI*2:a;if(aa>=sa&&aa<=ea)found=s;});
+    if(found){tt2.style.display='block';tt2.style.left=(e.clientX+14)+'px';tt2.style.top=(e.clientY-10)+'px';tt2.textContent=found.lbl+': '+_fmtDollar(found.val)+' ('+Math.round((found.val/total)*100)+'%)';}else tt2.style.display='none';
+  };
+  canvas.onmouseleave=function(){tt2.style.display='none';};
+}
+
+/* ── CHART: GAUGE (% of managed spend vs benchmark) ── */
+function _drawCTOGauge(pctOfSpend, hasSpend) {
+  var canvas = document.getElementById('cto-chart-gauge');
+  if (!canvas) return;
+  var W = canvas.offsetWidth || canvas.width;
+  canvas.width = W; canvas.height = 200;
+  var ctx = canvas.getContext('2d');
+  var H = 200, cx = W/2, cy = H - 42, R = Math.min(cx, cy+20) - 14;
+  ctx.clearRect(0, 0, W, H);
+
+  /* Benchmark zones — semicircle: 0–8% green, 8–14% amber, 14–25% red */
+  var zones = [
+    { from: 0,  to: 8,  color: '#10B981' },
+    { from: 8,  to: 14, color: '#F59E0B' },
+    { from: 14, to: 25, color: '#EF4444' }
+  ];
+  var maxPct = 25;
+  zones.forEach(function(z) {
+    var aStart = Math.PI + (z.from/maxPct)*Math.PI;
+    var aEnd   = Math.PI + (z.to/maxPct)*Math.PI;
+    ctx.beginPath(); ctx.arc(cx, cy, R, aStart, aEnd); ctx.arc(cx, cy, R-28, aEnd, aStart, true); ctx.closePath();
+    ctx.fillStyle = z.color + '33'; ctx.fill();
+    ctx.strokeStyle = z.color + '55'; ctx.lineWidth = 1; ctx.stroke();
+  });
+
+  /* Track outline */
+  ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI, 0); ctx.arc(cx, cy, R-28, 0, Math.PI, true); ctx.closePath();
+  ctx.strokeStyle = 'rgba(0,0,0,.06)'; ctx.lineWidth = 1; ctx.stroke();
+
+  /* Needle */
+  var needleAngle, displayPct;
+  if (!hasSpend || pctOfSpend === 0) {
+    needleAngle = Math.PI; displayPct = null;
+  } else {
+    var clamped = Math.min(pctOfSpend, maxPct);
+    needleAngle = Math.PI + (clamped / maxPct) * Math.PI;
+    displayPct = pctOfSpend;
+  }
+  var nLen = R - 14;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(needleAngle);
+  ctx.strokeStyle = '#0F1E3C'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(nLen, 0); ctx.stroke();
+  ctx.restore();
+
+  /* Hub dot */
+  ctx.beginPath(); ctx.arc(cx, cy, 7, 0, Math.PI*2);
+  ctx.fillStyle = '#0F1E3C'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2);
+  ctx.fillStyle = '#fff'; ctx.fill();
+
+  /* Tick labels */
+  [0, 8, 14, 25].forEach(function(pct) {
+    var a = Math.PI + (pct/maxPct)*Math.PI;
+    var tx = cx + (R+10)*Math.cos(a), ty = cy + (R+10)*Math.sin(a);
+    ctx.fillStyle = '#94A3B8'; ctx.font = '7pt Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(pct+'%', tx, ty);
+  });
+
+  /* Centre value */
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (displayPct !== null) {
+    var col = displayPct < 8 ? '#059669' : displayPct < 14 ? '#D97706' : '#DC2626';
+    ctx.fillStyle = col; ctx.font = 'bold 15pt Arial';
+    ctx.fillText(displayPct.toFixed(1)+'%', cx, cy - 22);
+    ctx.fillStyle = '#64748B'; ctx.font = '7.5pt Arial';
+    ctx.fillText(displayPct < 8 ? 'Efficient' : displayPct < 14 ? 'Within Range' : 'Review Cost Base', cx, cy - 8);
+  } else {
+    ctx.fillStyle = '#94A3B8'; ctx.font = '8pt Arial';
+    ctx.fillText(hasSpend ? 'Enter inputs' : 'No spend data', cx, cy - 14);
+  }
+
+  /* Benchmark legend */
+  ctx.font = '7pt Arial'; ctx.textAlign='center';
+  var zones2 = [{c:'#10B981',t:'< 8%  Efficient'},{c:'#F59E0B',t:'8–14%  Range'},{c:'#EF4444',t:'> 14%  High'}];
+  var legW = Math.floor((W-20)/3), legY2 = H-16;
+  zones2.forEach(function(z,i){
+    ctx.fillStyle = z.c; ctx.fillRect(10+i*legW, legY2-7, 8, 8);
+    ctx.fillStyle='#94A3B8'; ctx.textAlign='left'; ctx.fillText(z.t, 22+i*legW, legY2);
+  });
+}
+
+/* ── INIT ── */
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var key = params.get('pillar') || 'sf-on-sf';
+  renderPillar(key);
+
+  /* Build pillar nav */
+  var nav = document.getElementById('pillar-nav');
+  if (nav) {
+    nav.innerHTML = Object.keys(PILLARS).map(function(k) {
+      var pp = PILLARS[k];
+      return '<a href="?pillar='+k+'" class="pnav-item'+(k===key?' active':'')+'">'
+        +pp.emoji+' '+pp.short+'</a>';
+    }).join('');
+  }
+})();
+
+function _dmToggle(){
+  var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+}
+(function(){
+  var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
+})();
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openPillarDetailHelp(){
+  HelpModal.open({
+    title: 'Pillar Intelligence Detail',
+    what: 'The Pillar Detail view gives you a <strong>deep dive into a single DET engineering pillar</strong> — every vendor, every contract, spend trend, governance status, and savings opportunity within that pillar\'s scope. It is the working view for pillar leaders and VER pillar owners.',
+    steps: [
+      '<strong>Review the pillar KPI strip</strong> — total spend, vendor count, savings identified, open actions, and risk score are the five numbers that define the pillar\'s health.',
+      '<strong>Scan the vendor card grid</strong> — each card shows a vendor\'s contract value, status, tier, and any active flags. Red border = needs action.',
+      '<strong>Click any vendor card</strong> to open the Vendor 360 dossier — full contract history, performance data, and governance timeline.',
+      '<strong>Review the spend trend chart</strong> — quarter-over-quarter spend for the pillar shows whether the cost base is growing, stable, or declining.',
+      '<strong>Work the action panel</strong> — open governance items, upcoming renewals, and flagged risks for this pillar are listed with recommended next steps.'
+    ],
+    tips: [
+      { icon: '&#x1F4B0;', title: 'Vendor count ≠ complexity', body: 'Some pillars have 5 vendors and extreme complexity; others have 20 and low risk. The governance and risk scores reflect true complexity, not headcount.' },
+      { icon: '&#x1F4C5;', title: 'Renewal timeline is your planning horizon', body: 'The renewal section shows every contract expiry for the next 18 months. This is your planning horizon for sourcing and budget decisions.' },
+      { icon: '&#x26A0;', title: 'Tier 1 vendors get quarterly reviews', body: 'Every Tier 1 vendor in this pillar requires a CQBR. The status of those reviews is tracked on the vendor card.' },
+      { icon: '&#x1F517;', title: 'Cross-links to all VER tools', body: 'Each vendor card links to TCO, Rate Benchmarks, Governance, and Renewal tools pre-filtered for that vendor.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Survey Response Review · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Back bar ── */
+.back-bar{
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  padding:0 24px;height:44px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.back-left{display:flex;align-items:center;gap:14px;}
+.back-link{font-size:8pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:700;
+  display:flex;align-items:center;gap:5px;transition:color 0.15s;}
+.back-link:hover{color:var(--teal);}
+.back-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.back-brand{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:0.04em;}
+.back-right{display:flex;align-items:center;gap:10px;}
+.back-meta{font-size:7.5pt;color:rgba(255,255,255,0.30);}
+.theme-toggle{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);cursor:pointer;
+  font-family:inherit;font-size:7.5pt;font-weight:700;color:rgba(255,255,255,0.65);transition:all 0.15s;}
+.theme-toggle:hover{background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .theme-toggle{background:rgba(13,148,136,0.20);border-color:rgba(13,148,136,0.40);color:var(--teal);}
+
+/* ── Page stage ── */
+.page-stage{background:linear-gradient(145deg,#0D2137 0%,#0F1E3C 40%,#091220 100%);
+  position:relative;overflow:hidden;padding:28px 28px 22px;}
+.page-stage::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 80% 20%,rgba(13,148,136,0.18) 0%,transparent 55%),
+    radial-gradient(ellipse at 10% 90%,rgba(124,58,237,0.10) 0%,transparent 50%);
+  pointer-events:none;}
+.page-stage::after{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(13,148,136,0.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(13,148,136,0.022) 1px,transparent 1px);
+  background-size:52px 52px;pointer-events:none;}
+.stage-inner{max-width:1280px;margin:0 auto;position:relative;z-index:1;}
+.stage-accent{width:36px;height:3px;background:var(--teal);border-radius:99px;margin-bottom:10px;}
+.stage-eyebrow{font-size:7pt;font-weight:700;color:var(--teal);text-transform:uppercase;
+  letter-spacing:0.18em;margin-bottom:6px;}
+.stage-title{font-size:22pt;font-weight:900;color:rgba(255,255,255,0.92);
+  letter-spacing:-0.01em;line-height:1.2;margin-bottom:5px;}
+.stage-sub{font-size:9pt;color:rgba(255,255,255,0.50);max-width:600px;line-height:1.6;}
+
+/* ── KPI strip ── */
+.kpi-strip{
+  background:linear-gradient(135deg,#0F1E3C,#1a2f50);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:0 28px;position:sticky;top:44px;z-index:40;}
+.ks-inner{max-width:1280px;margin:0 auto;width:100%;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
+.kpi-tile{padding:11px 16px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:2px;}
+.kpi-tile:last-child{border-right:none;}
+.kpi-tile-val{font-size:15pt;font-weight:900;color:rgba(255,255,255,0.92);line-height:1;}
+.kpi-tile-val.amber{color:#FBBF24;}
+.kpi-tile-val.green{color:#34D399;}
+.kpi-tile-val.teal{color:#5EEAD4;}
+.kpi-tile-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:rgba(255,255,255,0.35);}
+
+/* ── Main body ── */
+.hub-main{max-width:1280px;margin:0 auto;padding:18px 28px 40px;}
+
+/* ── Filter bar ── */
+.filter-bar{background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.filter-label{font-size:7.5pt;font-weight:700;color:var(--ink4);white-space:nowrap;}
+.pill-group{display:flex;gap:4px;flex-wrap:wrap;}
+.pill{padding:5px 13px;border-radius:20px;font-size:8pt;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--border2);background:transparent;color:var(--ink4);
+  font-family:inherit;transition:all 0.12s;white-space:nowrap;}
+.pill.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.pill:hover:not(.active){background:var(--gray2);}
+.filter-sep{width:1px;height:22px;background:var(--border);flex-shrink:0;}
+.search-input{font-size:8pt;padding:6px 10px 6px 30px;border:1.5px solid var(--border2);
+  border-radius:7px;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%236B7280' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
+  color:var(--ink2);font-family:inherit;min-width:180px;}
+.search-input:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.sort-select{font-size:8pt;padding:6px 10px;border:1.5px solid var(--border2);border-radius:7px;
+  background:var(--white);color:var(--ink2);font-family:inherit;cursor:pointer;}
+.sort-select:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.filter-count{font-size:7.5pt;color:var(--ink4);margin-left:auto;}
+
+/* ── Response cards ── */
+.response-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+
+.resp-card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  transition:box-shadow 0.15s;}
+.resp-card:hover{box-shadow:0 4px 18px rgba(0,0,0,0.07);}
+.resp-card.approved-card{background:#F0FDF9;border-color:#A7F3D0;}
+.resp-card.dismissed-card{background:#F9FAFB;border-color:var(--border);opacity:0.7;}
+
+/* Card header */
+.resp-card-hdr{display:flex;align-items:flex-start;gap:12px;padding:12px 14px 10px;flex-wrap:wrap;}
+.resp-vendor-name{font-size:11pt;font-weight:900;color:var(--teal);line-height:1.1;}
+.resp-meta-col{flex:1;min-width:0;}
+.resp-date{font-size:7.5pt;color:var(--ink4);margin-top:2px;}
+.resp-respondent{font-size:8pt;color:var(--ink3);margin-top:3px;}
+.resp-hdr-right{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;margin-left:auto;}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:6.5pt;font-weight:700;
+  padding:3px 8px;border-radius:9px;white-space:nowrap;}
+.b-pending{background:var(--amber3);color:var(--amber2);}
+.b-approved{background:var(--green3);color:var(--green2);}
+.b-dismissed{background:var(--gray2);color:var(--ink4);}
+.b-relationship{background:var(--navy3);color:var(--navy2);}
+.b-renew{background:var(--green3);color:var(--green2);}
+.b-renew-cond{background:var(--amber3);color:var(--amber2);}
+.b-review{background:#FEF3C7;color:#92400E;}
+.b-dnr{background:var(--red3);color:var(--red2);}
+
+/* Score grid */
+.resp-scores{display:flex;align-items:center;gap:6px;padding:8px 14px;
+  background:var(--gray);border-top:1px solid var(--border);flex-wrap:wrap;}
+.score-dim{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.score-dim-lbl{font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);}
+.score-badge{width:34px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:10pt;font-weight:900;}
+.score-badge.s-green{background:var(--green3);color:var(--green2);}
+.score-badge.s-amber{background:var(--amber3);color:var(--amber2);}
+.score-badge.s-red{background:var(--red3);color:var(--red2);}
+.score-sep{width:1px;height:30px;background:var(--border);margin:0 3px;}
+.score-avg-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.score-avg-lbl{font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--teal);}
+.score-avg-badge{width:38px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:11pt;font-weight:900;}
+
+/* Comments toggle */
+.resp-comments-wrap{border-top:1px solid var(--border);}
+.comments-toggle{display:flex;align-items:center;gap:5px;width:100%;padding:8px 14px;
+  background:none;border:none;cursor:pointer;font-family:inherit;font-size:8pt;
+  font-weight:700;color:var(--teal);text-align:left;transition:background 0.12s;}
+.comments-toggle:hover{background:var(--teal3);}
+.comments-body{display:none;padding:10px 14px 12px;border-top:1px solid var(--border);}
+.comments-body.open{display:block;}
+.comment-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:8px;}
+.comment-item{background:var(--gray);border-radius:7px;padding:8px 10px;}
+.comment-dim-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--teal);margin-bottom:3px;}
+.comment-text{font-size:8pt;color:var(--ink3);line-height:1.5;}
+.comment-overall{background:var(--navy3);border:1px solid #BFDBFE;border-radius:7px;padding:8px 10px;}
+.comment-overall .comment-dim-lbl{color:var(--navy2);}
+.comment-overall .comment-text{color:var(--navy);}
+
+/* Recommendation + actions */
+.resp-footer{display:flex;align-items:center;gap:10px;padding:8px 14px;
+  border-top:1px solid var(--border);flex-wrap:wrap;}
+.rec-label{font-size:7.5pt;font-weight:700;color:var(--ink4);margin-right:2px;}
+.resp-actions{display:flex;gap:7px;margin-left:auto;}
+.btn-approve{padding:6px 16px;border-radius:7px;font-family:inherit;font-size:8pt;font-weight:700;
+  cursor:pointer;border:none;background:var(--teal);color:#fff;transition:all 0.15s;}
+.btn-approve:hover{background:var(--teal2);}
+.btn-dismiss{padding:6px 14px;border-radius:7px;font-family:inherit;font-size:8pt;font-weight:700;
+  cursor:pointer;background:transparent;border:1.5px solid var(--red);color:var(--red);transition:all 0.15s;}
+.btn-dismiss:hover{background:var(--red3);}
+
+/* Inline feedback flash */
+.resp-flash{display:none;padding:7px 14px;font-size:8pt;font-weight:700;background:var(--green3);
+  color:var(--green2);border-top:1px solid #A7F3D0;align-items:center;gap:6px;}
+.resp-flash.show{display:flex;}
+.resp-flash.dismiss-flash{background:var(--gray2);color:var(--ink4);border-color:var(--border);}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:52px 20px;color:var(--ink4);}
+.empty-icon{font-size:40pt;margin-bottom:14px;}
+.empty-title{font-size:12pt;font-weight:800;color:var(--ink3);margin-bottom:6px;}
+.empty-sub{font-size:9pt;color:var(--ink4);max-width:420px;margin:0 auto;line-height:1.6;}
+
+/* ── Section header ── */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--teal);}
+.section-title{font-size:10.5pt;font-weight:900;color:var(--navy);display:flex;align-items:center;gap:7px;}
+.section-sub{font-size:7.5pt;color:var(--ink4);margin-top:2px;}
+
+/* ── Aggregates table ── */
+.agg-table-wrap{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:auto;}
+.agg-table{width:100%;border-collapse:collapse;font-size:8pt;}
+.agg-table th{padding:8px 12px;font-size:6.5pt;font-weight:800;text-transform:uppercase;
+  letter-spacing:0.08em;color:rgba(255,255,255,0.75);background:var(--navy2);text-align:left;
+  white-space:nowrap;}
+.agg-table th:not(:first-child){text-align:center;}
+.agg-table td{padding:8px 12px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.agg-table td:not(:first-child){text-align:center;}
+.agg-table tr:last-child td{border-bottom:none;}
+.agg-table tr:hover td{background:var(--gray);}
+.agg-vendor-name{font-weight:800;color:var(--ink);font-size:8.5pt;}
+.agg-vendor-id{font-size:7pt;color:var(--ink4);margin-top:1px;}
+.agg-score{font-size:9pt;font-weight:900;padding:3px 6px;border-radius:5px;}
+.agg-score.s-green{background:var(--green3);color:var(--green2);}
+.agg-score.s-amber{background:var(--amber3);color:var(--amber2);}
+.agg-score.s-red{background:var(--red3);color:var(--red2);}
+.agg-link{font-size:7.5pt;font-weight:700;color:var(--teal);text-decoration:none;
+  padding:3px 9px;border-radius:5px;border:1px solid rgba(13,148,136,0.3);
+  background:rgba(13,148,136,0.06);transition:all 0.12s;}
+.agg-link:hover{background:rgba(13,148,136,0.15);}
+.agg-date{font-size:7.5pt;color:var(--ink4);}
+.agg-empty{padding:28px;text-align:center;color:var(--ink4);font-style:italic;font-size:8.5pt;}
+
+/* ── Dark mode ── */
+[data-theme="dark"] body{background:#080F1E;color:rgba(255,255,255,0.82);}
+[data-theme="dark"] .filter-bar{background:#0F1E3C;border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .filter-label{color:rgba(255,255,255,0.40);}
+[data-theme="dark"] .pill{border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);}
+[data-theme="dark"] .pill:hover:not(.active){background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.8);}
+[data-theme="dark"] .pill.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+[data-theme="dark"] .search-input,[data-theme="dark"] .sort-select{background:#162642;border-color:rgba(255,255,255,0.12);color:rgba(255,255,255,0.80);}
+[data-theme="dark"] .filter-count{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .resp-card{background:#0F1E3C;border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .resp-card.approved-card{background:rgba(5,150,105,0.08);border-color:rgba(5,150,105,0.25);}
+[data-theme="dark"] .resp-card.dismissed-card{background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .resp-scores{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .resp-footer,[data-theme="dark"] .resp-comments-wrap,[data-theme="dark"] .comments-body{border-color:rgba(255,255,255,0.07);}
+[data-theme="dark"] .comments-toggle{color:#5EEAD4;}
+[data-theme="dark"] .comments-toggle:hover{background:rgba(13,148,136,0.10);}
+[data-theme="dark"] .comment-item{background:rgba(255,255,255,0.04);}
+[data-theme="dark"] .comment-text{color:rgba(255,255,255,0.65);}
+[data-theme="dark"] .comment-overall{background:rgba(15,30,60,0.5);border-color:rgba(37,99,235,0.2);}
+[data-theme="dark"] .comment-overall .comment-text{color:rgba(255,255,255,0.7);}
+[data-theme="dark"] .resp-vendor-name{color:#5EEAD4;}
+[data-theme="dark"] .resp-date,[data-theme="dark"] .resp-respondent{color:rgba(255,255,255,0.45);}
+[data-theme="dark"] .rec-label{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .section-hdr{border-bottom-color:var(--teal);}
+[data-theme="dark"] .section-title{color:#fff;}
+[data-theme="dark"] .agg-table-wrap{background:#0F1E3C;border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .agg-table td{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .agg-table tr:hover td{background:rgba(255,255,255,0.04);}
+[data-theme="dark"] .agg-vendor-name{color:rgba(255,255,255,0.88);}
+[data-theme="dark"] .agg-date{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .score-sep{background:rgba(255,255,255,0.10);}
+[data-theme="dark"] .empty-title{color:rgba(255,255,255,0.75);}
+[data-theme="dark"] .b-dismissed{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.40);}
+[data-theme="dark"] .btn-dismiss{border-color:#F87171;color:#F87171;}
+[data-theme="dark"] .btn-dismiss:hover{background:rgba(220,38,38,0.12);}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .ks-inner{grid-template-columns:1fr 1fr;}
+  .kpi-tile:nth-child(2){border-right:none;}
+  .hub-main{padding:14px 16px 32px;}
+  .back-bar{padding:0 14px;}
+  .filter-bar{gap:8px;}
+  .resp-hdr-right{margin-left:0;margin-top:6px;width:100%;}
+  .resp-actions{margin-left:0;margin-top:6px;width:100%;}
+  .resp-actions .btn-approve,.resp-actions .btn-dismiss{flex:1;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Back bar ── -->
+<header class="back-bar">
+  <div class="back-left">
+    <a href="../test/index.html" class="back-link">&#8592; VER Intelligence Hub</a>
+    <div class="back-divider"></div>
+    <span class="back-brand">Vendor Governance</span>
+  </div>
+  <div class="back-right">
+    <button class="theme-toggle" onclick="openSurveyReviewHelp()">&#63; How to Read</button>
+    <span class="back-meta">Team Access &middot; FY27 &middot; Confidential</span>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">&#9790; Dark</button>
+  </div>
+</header>
+
+<!-- ── Page stage ── -->
+<div class="page-stage">
+  <div class="stage-inner">
+    <div class="stage-accent"></div>
+    <div class="stage-eyebrow">VER Intelligence Hub &middot; Vendor Governance</div>
+    <div class="stage-title">Survey Response Review</div>
+    <div class="stage-sub">Review stakeholder feedback before approving score updates to vendor dossiers</div>
+  </div>
+</div>
+
+<!-- ── KPI strip ── -->
+<div class="kpi-strip">
+  <div class="ks-inner" id="kpiStrip">
+    <div class="kpi-tile">
+      <div class="kpi-tile-val amber" id="kpiPending">—</div>
+      <div class="kpi-tile-lbl">Pending Responses</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-tile-val green" id="kpiApprovedMonth">—</div>
+      <div class="kpi-tile-lbl">Approved This Month</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-tile-val teal" id="kpiVendorsScored">—</div>
+      <div class="kpi-tile-lbl">Vendors Scored</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-tile-val" id="kpiAvgScore">—</div>
+      <div class="kpi-tile-lbl">Avg Response Score</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main content ── -->
+<main class="hub-main">
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <span class="filter-label">Status:</span>
+    <div class="pill-group" id="statusPills">
+      <button class="pill active" data-status="all">All</button>
+      <button class="pill" data-status="pending">Pending</button>
+      <button class="pill" data-status="approved">Approved</button>
+      <button class="pill" data-status="dismissed">Dismissed</button>
+    </div>
+    <div class="filter-sep"></div>
+    <input type="text" class="search-input" id="vendorSearch" placeholder="Search vendor…" autocomplete="off">
+    <div class="filter-sep"></div>
+    <span class="filter-label">Sort:</span>
+    <select class="sort-select" id="sortSelect">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="vendor">Vendor name</option>
+    </select>
+    <span class="filter-count" id="filterCount"></span>
+  </div>
+
+  <!-- Response list -->
+  <div class="response-list" id="responseList"></div>
+
+  <!-- Aggregates section -->
+  <div class="section-hdr">
+    <div>
+      <div class="section-title">&#9646; Approved Score Aggregates</div>
+      <div class="section-sub">Cumulative averages across all approved responses per vendor</div>
+    </div>
+  </div>
+  <div class="agg-table-wrap">
+    <table class="agg-table" id="aggTable">
+      <thead>
+        <tr>
+          <th>Vendor</th>
+          <th>Respondents</th>
+          <th>Avg SLA</th>
+          <th>Avg Financial</th>
+          <th>Avg Compliance</th>
+          <th>Avg Relationship</th>
+          <th>Avg Strategic</th>
+          <th>Overall Avg</th>
+          <th>Last Approved</th>
+          <th>Dossier</th>
+        </tr>
+      </thead>
+      <tbody id="aggTableBody">
+        <tr><td colspan="10" class="agg-empty">No approved responses yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+/* ── Theme ── */
+(function(){
+  const saved = localStorage.getItem('ver-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeBtn(saved);
+})();
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ver-theme', next);
+  updateThemeBtn(next);
+}
+function updateThemeBtn(t){
+  const btn = document.getElementById('themeToggleBtn');
+  if(!btn) return;
+  btn.textContent = t === 'dark' ? '☀ Light' : '☾ Dark';
+}
+
+/* ── Data helpers ── */
+const LS_RESPONSES = 'ver_survey_responses';
+const LS_APPROVED  = 'ver_survey_approved';
+
+function getResponses(){ return JSON.parse(localStorage.getItem(LS_RESPONSES)||'[]'); }
+function saveResponses(data){ localStorage.setItem(LS_RESPONSES, JSON.stringify(data)); }
+function getApproved(){ return JSON.parse(localStorage.getItem(LS_APPROVED)||'{}'); }
+function saveApproved(data){ localStorage.setItem(LS_APPROVED, JSON.stringify(data)); }
+
+/* Seed demo data if nothing in storage */
+function seedDemoIfEmpty(){
+  const existing = getResponses();
+  if(existing.length > 0) return;
+  const now = new Date();
+  const demo = [
+    {
+      id:'resp-001',vendorId:'V001',vendorName:'Infosys',
+      submittedAt: new Date(now - 86400000*2).toISOString(),
+      status:'pending',
+      respondent:{name:'Sarah Chen',team:'Cloud Engineering',relationship:'Delivery Lead'},
+      scores:{sla:8,relationship:7,financial:6,compliance:9,strategic:7},
+      comments:{
+        sla:'Consistently meets SLA targets with 99.1% uptime. Minor incident response delays.',
+        relationship:'Strong engagement at director level. Quarterly business reviews well structured.',
+        financial:'Rates competitive but invoicing has had discrepancies twice this quarter.',
+        compliance:'Fully SOC2 compliant. Security posture is strong. MSA terms up to date.',
+        strategic:'Roadmap alignment good. Active in AI/ML capability building.',
+        overall:'Solid partner. Minor financial process issues to address before renewal.'
+      },
+      recommendation:'continue'
+    },
+    {
+      id:'resp-002',vendorId:'V001',vendorName:'Infosys',
+      submittedAt: new Date(now - 86400000*5).toISOString(),
+      status:'approved',
+      respondent:{name:'Marcus Webb',team:'Application Delivery',relationship:'Program Manager'},
+      scores:{sla:7,relationship:8,financial:7,compliance:8,strategic:6},
+      comments:{
+        sla:'Good performance. One P2 breach in Q2 but resolved within 4 hours.',
+        relationship:'Responsive team. Account manager proactive about escalations.',
+        financial:'Rates are fair. Would benefit from volume discount renegotiation.',
+        compliance:'No issues noted. All certifications current.',
+        strategic:'Not yet leveraged for strategic initiatives beyond BAU.',
+        overall:'Good operational partner. Consider strategic elevation for FY27.'
+      },
+      recommendation:'continue'
+    },
+    {
+      id:'resp-003',vendorId:'V004',vendorName:'Cognizant',
+      submittedAt: new Date(now - 86400000*1).toISOString(),
+      status:'pending',
+      respondent:{name:'Priya Nair',team:'Procurement',relationship:'Vendor Manager'},
+      scores:{sla:5,relationship:6,financial:4,compliance:7,strategic:5},
+      comments:{
+        sla:'SLA performance is borderline. Three consecutive months below 97% threshold.',
+        relationship:'Relationship is transactional. Limited executive engagement.',
+        financial:'Costs have crept 11% above benchmark. T&M overruns on last two projects.',
+        compliance:'Compliant but late on annual security questionnaire.',
+        strategic:'No strategic value demonstrated beyond headcount supply.',
+        overall:'Recommend renegotiation or competitive RFP before renewal decision.'
+      },
+      recommendation:'continue_conditions'
+    },
+    {
+      id:'resp-004',vendorId:'V007',vendorName:'HCLTech',
+      submittedAt: new Date(now - 86400000*10).toISOString(),
+      status:'dismissed',
+      respondent:{name:'James Ortega',team:'Infrastructure',relationship:'Technical Lead'},
+      scores:{sla:3,relationship:4,financial:3,compliance:5,strategic:2},
+      comments:{
+        sla:'Chronic SLA failures in Q1 and Q2. Four P1 breaches unresolved within SLA.',
+        relationship:'Poor responsiveness at all levels. Multiple escalations unresolved.',
+        financial:'Significantly above market. No flexibility shown in negotiations.',
+        compliance:'MSA terms expired. Security certification lapsed.',
+        strategic:'No strategic value. Recommend do not renew.',
+        overall:'This vendor relationship is not working. Recommend replacement.'
+      },
+      recommendation:'do_not_continue'
+    },
+    {
+      id:'resp-005',vendorId:'V002',vendorName:'TCS',
+      submittedAt: new Date(now - 86400000*3).toISOString(),
+      status:'pending',
+      respondent:{name:'Lisa Thornton',team:'Finance Systems',relationship:'Business Owner'},
+      scores:{sla:9,relationship:8,financial:8,compliance:9,strategic:8},
+      comments:{
+        sla:'Outstanding. No SLA breaches in 18 months.',
+        relationship:'Executive sponsor engaged. Innovation days productive.',
+        financial:'Rates well-negotiated. Invoice accuracy 100% last two quarters.',
+        compliance:'Best-in-class compliance posture. GDPR, SOC2, ISO27001 all current.',
+        strategic:'Co-innovation in AI for finance automation is delivering tangible ROI.',
+        overall:'Premier strategic partner. Full renewal recommended with scope expansion.'
+      },
+      recommendation:'continue'
+    }
+  ];
+  saveResponses(demo);
+  // Pre-seed the approved aggregate for the approved response
+  recalcAggregate('V001');
+}
+
+/* ── State ── */
+let state = { status:'all', search:'', sort:'newest' };
+
+/* ── Init ── */
+seedDemoIfEmpty();
+// Repair: ensure any vendor with approved responses has an aggregate entry
+(function repairAggregates(){
+  const approved = getResponses().filter(r => r.status === 'approved');
+  const agg = getApproved();
+  const missing = [...new Set(approved.map(r => r.vendorId))].filter(id => !agg[id]);
+  missing.forEach(id => recalcAggregate(id));
+})();
+renderAll();
+
+/* ── Event wiring ── */
+document.getElementById('statusPills').addEventListener('click', e => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  document.querySelectorAll('#statusPills .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  state.status = btn.dataset.status;
+  renderResponseList();
+  updateFilterCount();
+});
+document.getElementById('vendorSearch').addEventListener('input', e => {
+  state.search = e.target.value.trim().toLowerCase();
+  renderResponseList();
+  updateFilterCount();
+});
+document.getElementById('sortSelect').addEventListener('change', e => {
+  state.sort = e.target.value;
+  renderResponseList();
+});
+
+/* ── Render all ── */
+function renderAll(){
+  renderKPIs();
+  renderResponseList();
+  renderAggregates();
+  updateFilterCount();
+}
+
+/* ── KPI strip ── */
+function renderKPIs(){
+  const responses = getResponses();
+  const pending  = responses.filter(r => r.status === 'pending').length;
+  const thisMonth = responses.filter(r => {
+    if(r.status !== 'approved') return false;
+    const d = new Date(r.submittedAt);
+    const n = new Date();
+    return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+  }).length;
+  const vendorsScored = new Set(
+    responses.filter(r => r.status === 'approved').map(r => r.vendorId)
+  ).size;
+  const allScores = responses.map(r => calcAvg(r.scores));
+  const avgScore = allScores.length
+    ? (allScores.reduce((a,b) => a+b, 0) / allScores.length).toFixed(1) : '—';
+
+  document.getElementById('kpiPending').textContent = pending;
+  document.getElementById('kpiApprovedMonth').textContent = thisMonth;
+  document.getElementById('kpiVendorsScored').textContent = vendorsScored;
+  const avgEl = document.getElementById('kpiAvgScore');
+  avgEl.textContent = avgScore;
+  const n = parseFloat(avgScore);
+  avgEl.className = 'kpi-tile-val ' + (isNaN(n) ? '' : n >= 7 ? 'green' : n >= 4 ? 'amber' : 'red');
+}
+
+/* ── Response list ── */
+function getFilteredResponses(){
+  let list = getResponses();
+  if(state.status !== 'all') list = list.filter(r => r.status === state.status);
+  if(state.search) list = list.filter(r => r.vendorName.toLowerCase().includes(state.search));
+  if(state.sort === 'newest') list.sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+  else if(state.sort === 'oldest') list.sort((a,b) => new Date(a.submittedAt) - new Date(b.submittedAt));
+  else if(state.sort === 'vendor') list.sort((a,b) => a.vendorName.localeCompare(b.vendorName));
+  return list;
+}
+
+function renderResponseList(){
+  const list = getFilteredResponses();
+  const container = document.getElementById('responseList');
+  if(list.length === 0){
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">No responses found</div>
+        <div class="empty-sub">No responses yet. Share a survey link from a vendor dossier to collect stakeholder feedback.</div>
+      </div>`;
+    return;
+  }
+  container.innerHTML = list.map(r => buildCardHTML(r)).join('');
+}
+
+function updateFilterCount(){
+  const list = getFilteredResponses();
+  const total = getResponses().length;
+  const el = document.getElementById('filterCount');
+  el.textContent = list.length === total ? `${total} response${total !== 1 ? 's' : ''}` : `${list.length} of ${total}`;
+}
+
+/* ── Card HTML builder ── */
+function calcAvg(scores){
+  const vals = Object.values(scores).filter(v => typeof v === 'number');
+  return vals.length ? +(vals.reduce((a,b) => a+b,0) / vals.length).toFixed(1) : 0;
+}
+function scoreClass(n){ return n >= 7 ? 's-green' : n >= 4 ? 's-amber' : 's-red'; }
+function recBadgeClass(r){
+  if(r === 'continue') return 'b-renew';
+  if(r === 'continue_conditions') return 'b-renew-cond';
+  if(r === 'escalate') return 'b-review';
+  if(r === 'do_not_continue') return 'b-dnr';
+  return 'b-dismissed';
+}
+function recLabel(r){
+  if(r === 'continue') return 'Continue / Renew';
+  if(r === 'continue_conditions') return 'Continue / Renew with Conditions';
+  if(r === 'escalate') return 'Escalate for Review';
+  if(r === 'do_not_continue') return 'Do Not Continue / Renew';
+  return r || 'No recommendation';
+}
+function fmtDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function buildCardHTML(r){
+  const avg = calcAvg(r.scores);
+  const dims = [
+    {key:'sla',lbl:'SLA'},
+    {key:'relationship',lbl:'Relationship'},
+    {key:'financial',lbl:'Financial'},
+    {key:'compliance',lbl:'Compliance'},
+    {key:'strategic',lbl:'Strategic'}
+  ];
+  const statusBadge = r.status === 'pending'
+    ? '<span class="badge b-pending">&#9679; Pending</span>'
+    : r.status === 'approved'
+      ? '<span class="badge b-approved">&#10003; Approved</span>'
+      : '<span class="badge b-dismissed">&#8212; Dismissed</span>';
+
+  const cardClass = r.status === 'approved' ? 'approved-card' : r.status === 'dismissed' ? 'dismissed-card' : '';
+  const actions = r.status === 'pending' ? `
+    <div class="resp-actions">
+      <button class="btn-approve" onclick="approveResponse('${r.id}')">&#10003; Approve</button>
+      <button class="btn-dismiss" onclick="dismissResponse('${r.id}')">&#10007; Dismiss</button>
+    </div>` : '';
+
+  const scoreGrid = dims.map(d => `
+    <div class="score-dim">
+      <div class="score-badge ${scoreClass(r.scores[d.key])}">${r.scores[d.key]}</div>
+      <div class="score-dim-lbl">${d.lbl}</div>
+    </div>`).join('');
+
+  const commentsGrid = dims.map(d => {
+    const txt = (r.comments && r.comments[d.key]) ? r.comments[d.key] : '—';
+    return `<div class="comment-item">
+      <div class="comment-dim-lbl">${d.lbl}</div>
+      <div class="comment-text">${escHtml(txt)}</div>
+    </div>`;
+  }).join('');
+  const overallComment = (r.comments && r.comments.overall) ? `
+    <div class="comment-overall">
+      <div class="comment-dim-lbl">Overall</div>
+      <div class="comment-text">${escHtml(r.comments.overall)}</div>
+    </div>` : '';
+
+  return `
+<div class="resp-card ${cardClass}" id="card-${r.id}">
+  <div class="resp-card-hdr">
+    <div class="resp-meta-col">
+      <div class="resp-vendor-name">${escHtml(r.vendorName)}</div>
+      <div class="resp-date">Submitted ${fmtDate(r.submittedAt)}</div>
+      <div class="resp-respondent">${escHtml(r.respondent.name)} &middot; ${escHtml(r.respondent.team)}</div>
+    </div>
+    <div class="resp-hdr-right">
+      <span class="badge b-relationship">${escHtml(r.respondent.relationship)}</span>
+      ${statusBadge}
+    </div>
+  </div>
+  <div class="resp-scores">
+    ${scoreGrid}
+    <div class="score-sep"></div>
+    <div class="score-avg-wrap">
+      <div class="score-avg-badge ${scoreClass(avg)}">${avg}</div>
+      <div class="score-avg-lbl">Avg</div>
+    </div>
+  </div>
+  <div class="resp-comments-wrap">
+    <button class="comments-toggle" onclick="toggleComments('${r.id}')">
+      <span id="comments-arrow-${r.id}">&#9654;</span> View comments
+    </button>
+    <div class="comments-body" id="comments-body-${r.id}">
+      <div class="comment-grid">${commentsGrid}</div>
+      ${overallComment}
+    </div>
+  </div>
+  <div class="resp-footer">
+    <span class="rec-label">Recommendation:</span>
+    <span class="badge ${recBadgeClass(r.recommendation)}">${recLabel(r.recommendation)}</span>
+    ${actions}
+  </div>
+  <div class="resp-flash" id="flash-${r.id}"></div>
+</div>`;
+}
+
+/* ── Comments toggle ── */
+function toggleComments(id){
+  const body = document.getElementById('comments-body-' + id);
+  const arrow = document.getElementById('comments-arrow-' + id);
+  if(!body) return;
+  const open = body.classList.toggle('open');
+  if(arrow) arrow.textContent = open ? '▾' : '▶';
+}
+
+/* ── Approve ── */
+function approveResponse(id){
+  const responses = getResponses();
+  const idx = responses.findIndex(r => r.id === id);
+  if(idx < 0) return;
+  responses[idx].status = 'approved';
+  saveResponses(responses);
+  recalcAggregate(responses[idx].vendorId);
+  // Update card in place
+  const card = document.getElementById('card-' + id);
+  if(card){
+    card.classList.add('approved-card');
+    card.classList.remove('dismissed-card');
+    // Hide action row
+    card.querySelectorAll('.resp-actions').forEach(el => el.remove());
+    // Flip status badge
+    card.querySelectorAll('.badge.b-pending').forEach(el => {
+      el.className = 'badge b-approved';
+      el.innerHTML = '&#10003; Approved';
+    });
+    // Flash
+    const flash = document.getElementById('flash-' + id);
+    if(flash){
+      flash.className = 'resp-flash show';
+      flash.innerHTML = '&#10003; Response approved — vendor score aggregate updated.';
+      setTimeout(() => flash.classList.remove('show'), 3500);
+    }
+  }
+  renderKPIs();
+  renderAggregates();
+  updateFilterCount();
+}
+
+/* ── Dismiss ── */
+function dismissResponse(id){
+  const responses = getResponses();
+  const idx = responses.findIndex(r => r.id === id);
+  if(idx < 0) return;
+  responses[idx].status = 'dismissed';
+  saveResponses(responses);
+  const card = document.getElementById('card-' + id);
+  if(card){
+    card.classList.add('dismissed-card');
+    card.classList.remove('approved-card');
+    card.querySelectorAll('.resp-actions').forEach(el => el.remove());
+    card.querySelectorAll('.badge.b-pending').forEach(el => {
+      el.className = 'badge b-dismissed';
+      el.innerHTML = '&#8212; Dismissed';
+    });
+    const flash = document.getElementById('flash-' + id);
+    if(flash){
+      flash.className = 'resp-flash dismiss-flash show';
+      flash.innerHTML = '&#8212; Response dismissed.';
+      setTimeout(() => flash.classList.remove('show'), 2500);
+    }
+  }
+  renderKPIs();
+  updateFilterCount();
+}
+
+/* ── Recalculate aggregate ── */
+function recalcAggregate(vendorId){
+  const responses = getResponses();
+  const approved = responses.filter(r => r.vendorId === vendorId && r.status === 'approved');
+  const agg = getApproved();
+  if(approved.length === 0){
+    delete agg[vendorId];
+    saveApproved(agg);
+    return;
+  }
+  const dims = ['sla','relationship','financial','compliance','strategic'];
+  const avgScores = {};
+  dims.forEach(d => {
+    const vals = approved.map(r => r.scores[d]).filter(v => typeof v === 'number');
+    avgScores[d] = vals.length ? +(vals.reduce((a,b) => a+b,0) / vals.length).toFixed(2) : 0;
+  });
+  const allVals = Object.values(avgScores);
+  avgScores.overall = allVals.length ? +(allVals.reduce((a,b) => a+b,0) / allVals.length).toFixed(2) : 0;
+
+  const recs = {continue:0, continue_conditions:0, escalate:0, do_not_continue:0};
+  approved.forEach(r => { if(r.recommendation && recs[r.recommendation] !== undefined) recs[r.recommendation]++; });
+
+  agg[vendorId] = {
+    vendorName: approved[0].vendorName,
+    lastApproved: approved.reduce((a,b) => a.submittedAt > b.submittedAt ? a : b).submittedAt,
+    respondentCount: approved.length,
+    avgScores,
+    recommendations: recs,
+    approvedResponseIds: approved.map(r => r.id)
+  };
+  saveApproved(agg);
+}
+
+/* ── Aggregates table ── */
+function renderAggregates(){
+  const agg = getApproved();
+  const tbody = document.getElementById('aggTableBody');
+  const vendors = Object.keys(agg);
+  if(vendors.length === 0){
+    tbody.innerHTML = '<tr><td colspan="10" class="agg-empty">No approved responses yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = vendors.map(vid => {
+    const v = agg[vid];
+    const s = v.avgScores;
+    return `<tr>
+      <td>
+        <div class="agg-vendor-name">${escHtml(v.vendorName)}</div>
+        <div class="agg-vendor-id">${escHtml(vid)}</div>
+      </td>
+      <td>${v.respondentCount}</td>
+      <td><span class="agg-score ${scoreClass(s.sla)}">${s.sla}</span></td>
+      <td><span class="agg-score ${scoreClass(s.financial)}">${s.financial}</span></td>
+      <td><span class="agg-score ${scoreClass(s.compliance)}">${s.compliance}</span></td>
+      <td><span class="agg-score ${scoreClass(s.relationship)}">${s.relationship}</span></td>
+      <td><span class="agg-score ${scoreClass(s.strategic)}">${s.strategic}</span></td>
+      <td><span class="agg-score ${scoreClass(s.overall)}">${s.overall}</span></td>
+      <td class="agg-date">${fmtDate(v.lastApproved)}</td>
+      <td><a href="vendor_detail.html?id=${encodeURIComponent(vid)}" class="agg-link">View &#8599;</a></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── HTML escape ── */
+function escHtml(str){
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openSurveyReviewHelp(){
+  HelpModal.open({
+    title: 'Survey Response Review',
+    what: 'The Survey Response Review gives VER team members and pillar leads a <strong>consolidated view of all vendor performance survey responses</strong> — aggregated scores, sentiment trends, qualitative themes, and flagged issues — ready to use in CQBR preparation and scorecard updates.',
+    steps: [
+      '<strong>Select the vendor and time period</strong> to pull the relevant response set. Default shows the most recent survey cycle.',
+      '<strong>Review the aggregated scores</strong> by dimension — the radar chart shows the average across all respondents, with individual response ranges shown as shading.',
+      '<strong>Read the qualitative themes</strong> — the tool groups free-text comments into recurring themes (e.g., "communication gaps", "delivery delays", "pricing concerns") for faster synthesis.',
+      '<strong>Check flagged responses</strong> — any respondent who activated the critical issue flag is surfaced separately with their comments prioritized.',
+      '<strong>Export the review summary</strong> directly into CQBR preparation materials or the vendor scorecard update workflow.'
+    ],
+    tips: [
+      { icon: '&#x1F4CA;', title: 'Range matters more than average', body: 'A 3.2 average with responses from 1 to 5 tells a different story than a consistent 3.2. Wide ranges indicate inconsistent vendor experience across teams.' },
+      { icon: '&#x1F4AC;', title: 'Qualitative themes are the signal', body: 'When 4 out of 7 respondents mention "slow escalation response", that is a pattern worth raising in the CQBR regardless of the numeric score.' },
+      { icon: '&#x26A0;', title: 'Flagged responses need same-week follow-up', body: 'Any critical flag from a survey response must be followed up by VER within the same week it is submitted.' },
+      { icon: '&#x1F512;', title: 'Individual responses are confidential', body: 'Do not share individual response details with the vendor. Share aggregate findings and themes only in CQBR sessions.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

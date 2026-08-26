@@ -1,0 +1,2622 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cost Optimization &amp; Demand Planning · VER Intelligence Hub</title>
+<script src="assets/vendors.js" defer></script>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Back bar (TCO-style) ── */
+.back-bar{background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  padding:0 24px;height:44px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.back-left{display:flex;align-items:center;gap:14px;}
+.back-link{font-size:8pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:700;
+  display:flex;align-items:center;gap:5px;transition:color 0.15s;}
+.back-link:hover{color:var(--teal);}
+.back-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.back-brand{font-size:8pt;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:0.04em;}
+.back-right{display:flex;align-items:center;gap:10px;}
+.back-meta{font-size:7.5pt;color:rgba(255,255,255,0.3);}
+.back-action{font-size:7.5pt;color:var(--teal);font-weight:700;text-decoration:none;
+  padding:4px 12px;border-radius:20px;background:rgba(13,148,136,0.15);
+  border:1px solid rgba(13,148,136,0.30);cursor:pointer;font-family:inherit;
+  transition:all 0.15s;}
+.back-action:hover{background:rgba(13,148,136,0.25);}
+.theme-toggle{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);cursor:pointer;
+  font-family:inherit;font-size:7.5pt;font-weight:700;color:rgba(255,255,255,0.65);
+  transition:all 0.15s;}
+.theme-toggle:hover{background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .theme-toggle{background:rgba(13,148,136,0.20);border-color:rgba(13,148,136,0.40);color:var(--teal);}
+
+/* ── Page stage (TCO-style) ── */
+.page-stage{background:linear-gradient(145deg,#0D2137 0%,#0F1E3C 40%,#091220 100%);
+  position:relative;overflow:hidden;padding:24px 28px 20px;}
+.page-stage::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 80% 20%,rgba(13,148,136,0.18) 0%,transparent 55%),
+    radial-gradient(ellipse at 10% 90%,rgba(124,58,237,0.10) 0%,transparent 50%);
+  pointer-events:none;}
+.page-stage::after{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(13,148,136,0.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(13,148,136,0.022) 1px,transparent 1px);
+  background-size:52px 52px;pointer-events:none;}
+.stage-inner{max-width:1400px;margin:0 auto;position:relative;z-index:1;}
+.stage-accent{width:36px;height:3px;background:var(--teal);border-radius:99px;margin-bottom:10px;}
+.stage-eyebrow{font-size:7pt;font-weight:700;color:var(--teal);text-transform:uppercase;
+  letter-spacing:0.18em;margin-bottom:6px;}
+.stage-title{font-size:22pt;font-weight:900;color:rgba(255,255,255,0.92);
+  letter-spacing:-0.01em;line-height:1.2;margin-bottom:5px;}
+.stage-sub{font-size:9pt;color:rgba(255,255,255,0.55);margin-bottom:18px;}
+
+/* ── Stage tab toggles ── */
+.stage-tabs{display:flex;gap:8px;}
+.stage-tab{padding:8px 18px;border-radius:99px;font-family:inherit;font-size:8.5pt;
+  font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.60);transition:all 0.15s;}
+.stage-tab:hover{background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.9);}
+.stage-tab.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+
+/* ── KPI strip (TCO total-strip style) ── */
+.kpi-strip{background:linear-gradient(135deg,#0F1E3C,#1a2f50);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:10px 28px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:44px;z-index:40;}
+.ks-inner{max-width:1400px;margin:0 auto;width:100%;
+  display:flex;align-items:center;justify-content:space-between;}
+.ks-left{display:flex;align-items:baseline;gap:12px;}
+.ks-label{font-size:7pt;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;}
+.ks-total{font-size:20pt;font-weight:900;color:rgba(255,255,255,0.92);line-height:1;}
+.ks-period{font-size:7.5pt;color:rgba(255,255,255,0.35);}
+.ks-kpis{display:flex;gap:28px;}
+.ks-kpi{text-align:center;}
+.ks-kpi-val{font-size:11pt;font-weight:900;color:rgba(255,255,255,0.92);line-height:1;}
+.ks-kpi-val.g{color:#34D399;}.ks-kpi-val.a{color:#FBBF24;}.ks-kpi-val.t{color:#5EEAD4;}
+.ks-kpi-lbl{font-size:6.5pt;color:rgba(255,255,255,0.35);margin-top:2px;}
+
+/* ── Hub main wrapper ── */
+.hub-main{max-width:1400px;margin:0 auto;padding:14px 28px;}
+
+.btn{font-size:8pt;padding:6px 14px;border-radius:7px;cursor:pointer;border:none;font-weight:600;font-family:inherit;transition:all 0.15s;}
+.btn-ghost{background:transparent;color:var(--ink3);border:1px solid var(--border2);}
+.btn-ghost:hover{background:var(--gray2);}
+.btn-sm{font-size:7.5pt;padding:4px 10px;}
+
+/* ── MAIN LAYOUT ── */
+.fc-layout{display:block;}
+
+/* ── INLINE TOGGLE BUTTONS (Horizon, Scenario) ── */
+.tab-row{display:flex;gap:4px;flex-wrap:wrap;}
+.tab-btn{padding:4px 11px;border-radius:5px;font-size:8pt;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--border2);background:transparent;color:var(--ink4);
+  font-family:inherit;transition:all 0.12s;white-space:nowrap;}
+.tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab-btn:hover:not(.active){background:var(--gray2);}
+[data-theme="dark"] .tab-btn{border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);}
+[data-theme="dark"] .tab-btn:hover:not(.active){background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.8);}
+[data-theme="dark"] .tab-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+
+/* ── CONFIG PANEL ── */
+.cfg{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.cfg-hdr{background:var(--navy);padding:9px 14px;display:flex;align-items:center;gap:8px;color:#fff;}
+.cfg-hdr-title{font-size:9pt;font-weight:800;color:#fff;}
+/* Horizontal 4-column body: Spend | Horizon+Risk | Levers (wide) | BVA */
+.cfg-body{display:grid;grid-template-columns:200px 190px 1fr 300px;align-items:start;}
+.cfg-col{padding:11px 13px;border-right:1px solid var(--border);}
+.cfg-col:last-child{border-right:none;}
+/* 3-column mini-grid for levers */
+.lev-mini-grid{display:grid;grid-template-columns:1fr 1fr 1fr;column-gap:10px;}
+/* BVA quarter input grid */
+.bva-input-grid{display:grid;grid-template-columns:26px 1fr 1fr;gap:4px;align-items:center;margin-bottom:8px;}
+.bva-input-hdr{font-size:6pt;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;text-align:center;}
+.bva-hdr-budget{color:var(--navy);}
+.bva-hdr-actual{color:var(--teal);}
+.bva-qlbl{cursor:help;line-height:1.2;}
+.bva-qspan{font-size:5.5pt;color:var(--ink4);}
+.bva-inp{font-size:7pt;padding:4px 5px;}
+.fy-badge{background:var(--navy3);border:1px solid #BFDBFE;border-radius:6px;padding:7px 9px;font-size:7.5pt;color:var(--navy2);}
+.cfg-sec-lbl{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--teal);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.cfg-field{margin-bottom:8px;}
+.cfg-field:last-child{margin-bottom:0;}
+.cfg-label{font-size:7.5pt;font-weight:700;color:var(--ink3);margin-bottom:3px;display:flex;justify-content:space-between;align-items:center;}
+.cfg-val{font-size:9pt;font-weight:900;color:var(--teal);}
+.cfg-select,.cfg-input{width:100%;font-size:8pt;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;background:var(--white);color:var(--ink2);font-family:inherit;-webkit-appearance:auto;appearance:auto;}
+.cfg-select:focus,.cfg-input:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.cfg-range{width:100%;accent-color:var(--teal);cursor:pointer;margin-top:3px;}
+.cfg-input-lbl{font-size:7pt;font-weight:700;color:var(--ink4);margin-bottom:2px;}
+.cfg-sec-lbl--gap{margin-top:12px;}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.card:last-child{margin-bottom:0;}
+.card-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.card-title{font-size:9pt;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px;}
+.card-sub{font-size:7.5pt;color:var(--ink4);margin-top:1px;}
+
+/* ── SVG CHARTS ── */
+svg.chart{width:100%;display:block;}
+.chart-label{font-size:7.5pt;fill:var(--ink4);}
+.chart-val{font-size:7.5pt;font-weight:700;fill:var(--ink2);}
+.chart-axis{stroke:var(--gray3);stroke-width:1;}
+
+/* ── LEVER TABLE ── */
+.lev-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray2);}
+.lev-row:last-child{border-bottom:none;}
+.lev-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.lev-name{font-size:7.5pt;font-weight:700;color:var(--ink2);flex:1;}
+.lev-pct{font-size:7pt;color:var(--ink4);width:28px;text-align:right;flex-shrink:0;}
+.lev-bar-wrap{width:60px;flex-shrink:0;}
+.lev-track{height:5px;background:var(--gray2);border-radius:3px;overflow:hidden;}
+.lev-fill{height:5px;border-radius:3px;transition:width 0.3s;}
+.lev-amt{font-size:8pt;font-weight:800;color:var(--green2);width:52px;text-align:right;flex-shrink:0;}
+
+/* ── RENEWAL / BVA ── */
+.ren-row{display:grid;grid-template-columns:1fr 70px 65px 60px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray2);}
+.ren-row:last-child{border-bottom:none;}
+.ren-name{font-size:7.5pt;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ren-sub{font-size:6.5pt;color:var(--ink4);}
+.ren-urg{font-size:6.5pt;font-weight:800;padding:2px 6px;border-radius:5px;white-space:nowrap;text-align:center;}
+.ren-urg.c{background:var(--red3);color:var(--red2);}
+.ren-urg.s{background:var(--amber3);color:var(--amber2);}
+.ren-urg.p{background:var(--green3);color:var(--green2);}
+
+.bva-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray2);}
+.bva-row:last-child{border-bottom:none;}
+.bva-cat{font-size:7.5pt;font-weight:700;width:115px;flex-shrink:0;color:var(--ink2);}
+.bva-bars{flex:1;}
+.bva-track{height:6px;background:var(--gray2);border-radius:3px;position:relative;margin-bottom:2px;}
+.bva-b{height:6px;background:var(--navy3);border:1px solid rgba(15,30,60,0.2);border-radius:3px;position:absolute;top:0;left:0;}
+.bva-a{height:6px;border-radius:3px;position:absolute;top:0;left:0;opacity:0.75;}
+.bva-a.ov{background:var(--red);}.bva-a.un{background:var(--green);}
+.bva-foot{display:flex;justify-content:space-between;font-size:6.5pt;color:var(--ink4);}
+.bva-var{font-size:7pt;font-weight:700;padding:1px 6px;border-radius:4px;white-space:nowrap;}
+.bva-var.ov{background:var(--red3);color:var(--red2);}.bva-var.un{background:var(--green3);color:var(--green2);}.bva-var.fl{background:var(--gray2);color:var(--ink4);}
+
+/* ── ACTION ITEMS ── */
+.act-row{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--gray2);}
+.act-row:last-child{border-bottom:none;}
+.act-pri{width:17px;height:17px;border-radius:3px;font-size:6.5pt;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.act-pri.p1{background:var(--red3);color:var(--red2);}.act-pri.p2{background:var(--amber3);color:var(--amber2);}.act-pri.p3{background:var(--green3);color:var(--green2);}
+.act-title{font-size:8pt;font-weight:700;color:var(--ink);}
+.act-desc{font-size:7pt;color:var(--ink4);margin-top:1px;line-height:1.45;}
+.act-impact{font-size:8.5pt;font-weight:900;color:var(--green2);white-space:nowrap;padding-top:1px;}
+
+/* ── DARK MODE ── */
+[data-theme="dark"] body{background:#080F1E;color:rgba(255,255,255,0.82);}
+[data-theme="dark"] .card,[data-theme="dark"] .cfg{background:#0F1E3C;border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .card-title{color:rgba(255,255,255,0.92);}
+[data-theme="dark"] .card-sub,[data-theme="dark"] .ren-sub,[data-theme="dark"] .act-desc,[data-theme="dark"] .bva-foot{color:rgba(255,255,255,0.35);}
+[data-theme="dark"] .cfg-label,[data-theme="dark"] .lev-name,[data-theme="dark"] .ren-name,.bva-cat{color:rgba(255,255,255,0.75);}
+[data-theme="dark"] .cfg-select,[data-theme="dark"] .cfg-input{background:#162642;border-color:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);}
+[data-theme="dark"] .lev-track,[data-theme="dark"] .bva-track{background:rgba(255,255,255,0.08);}
+[data-theme="dark"] .lev-row,[data-theme="dark"] .ren-row,[data-theme="dark"] .bva-row,[data-theme="dark"] .act-row{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .chart-label{fill:rgba(255,255,255,0.4);}
+[data-theme="dark"] .chart-val{fill:rgba(255,255,255,0.75);}
+[data-theme="dark"] .chart-axis{stroke:rgba(255,255,255,0.07);}
+[data-theme="dark"] .cfg-divider{background:rgba(255,255,255,0.06);}
+
+/* ── RESULTS TWO-COLUMN ── */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.res-grid-top{align-items:start;}
+.res-col{display:flex;flex-direction:column;gap:10px;}
+.res-col .card{margin-bottom:0;}
+.composition-inner{display:grid;grid-template-columns:1fr 150px;gap:12px;align-items:start;}
+.card-mb{margin-bottom:10px;}
+.wf-total-badge{font-size:11pt;font-weight:900;color:var(--green2);white-space:nowrap;}
+.bva-summary-badge{text-align:right;font-size:8pt;font-weight:700;flex-shrink:0;}
+.bva-section{margin-bottom:10px;}
+.df-cfg-mb{margin-bottom:12px;}
+.df-risk-flags-empty{font-size:7.5pt;color:var(--ink4);font-style:italic;}
+.df-role-actions{padding:6px 13px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;}
+.df-ratio-bar-wrap{margin-top:8px;}
+.uioli-lev-hdr{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);}
+.uioli-card{display:none;}
+
+/* ── PANEL HEADERS ── */
+.cost-panel-hdr{margin-bottom:12px;}
+.panel-actions{display:flex;gap:8px;}
+
+/* ── UIOLI CARD ── */
+.uioli-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.uioli-stat{background:var(--gray2);border-radius:8px;padding:10px 13px;border:1px solid var(--border);}
+.uioli-stat.urgent{background:var(--red3);border-color:#FECACA;}
+.uioli-stat.warn{background:var(--amber3);border-color:#FDE68A;}
+.uioli-stat.good{background:var(--green3);border-color:#A7F3D0;}
+.uioli-stat-lbl{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);margin-bottom:4px;}
+.uioli-stat.urgent .uioli-stat-lbl{color:var(--red2);}
+.uioli-stat.warn .uioli-stat-lbl{color:var(--amber2);}
+.uioli-stat.good .uioli-stat-lbl{color:var(--green2);}
+.uioli-stat-val{font-size:15pt;font-weight:900;color:var(--ink);line-height:1;}
+.uioli-stat.urgent .uioli-stat-val{color:var(--red2);}
+.uioli-stat.warn .uioli-stat-val{color:var(--amber2);}
+.uioli-stat.good .uioli-stat-val{color:var(--green2);}
+.uioli-stat-note{font-size:6.5pt;color:var(--ink4);margin-top:3px;}
+.uioli-levers{margin-bottom:10px;}
+.uioli-lever-row{display:grid;grid-template-columns:160px 80px 1fr 90px 100px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray2);}
+.uioli-lever-row:last-child{border-bottom:none;}
+.uioli-lever-name{font-size:7.5pt;font-weight:700;color:var(--ink2);}
+.uioli-lever-lead{font-size:6.5pt;color:var(--ink4);}
+.uioli-lever-bar-wrap{position:relative;height:8px;background:var(--gray2);border-radius:4px;overflow:visible;}
+.uioli-lever-bar{height:8px;border-radius:4px;position:absolute;left:0;top:0;transition:width 0.3s;}
+.uioli-lever-bar.capturable{background:var(--green);}
+.uioli-lever-bar.partial{background:var(--amber);}
+.uioli-lever-bar.deferred{background:var(--gray3);}
+.uioli-lever-amt{font-size:7.5pt;font-weight:800;text-align:right;}
+.uioli-lever-tag{font-size:6.5pt;font-weight:800;padding:2px 7px;border-radius:5px;text-align:center;white-space:nowrap;}
+.uioli-lever-tag.thisq{background:var(--green3);color:var(--green2);}
+.uioli-lever-tag.partial{background:var(--amber3);color:var(--amber2);}
+.uioli-lever-tag.nextq{background:var(--gray2);color:var(--ink4);}
+.uioli-reforecast{background:linear-gradient(135deg,#0F1E3C,#1a2f50);border-radius:8px;padding:12px 16px;color:#fff;}
+.uioli-reforecast-title{font-size:8pt;font-weight:800;color:rgba(255,255,255,0.9);margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+.uioli-reforecast-body{font-size:7.5pt;color:rgba(255,255,255,0.65);line-height:1.6;}
+.uioli-reforecast-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.uioli-action-chip{font-size:7pt;font-weight:700;padding:4px 11px;border-radius:5px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);}
+.uioli-action-chip.hot{background:rgba(13,148,136,0.3);border-color:rgba(13,148,136,0.5);color:#5eead4;}
+[data-theme="dark"] .uioli-stat{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .uioli-stat.urgent{background:rgba(220,38,38,0.12);border-color:rgba(220,38,38,0.25);}
+[data-theme="dark"] .uioli-stat.warn{background:rgba(217,119,6,0.12);border-color:rgba(217,119,6,0.25);}
+[data-theme="dark"] .uioli-stat.good{background:rgba(5,150,105,0.12);border-color:rgba(5,150,105,0.25);}
+[data-theme="dark"] .uioli-lever-row{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .uioli-lever-bar-wrap{background:rgba(255,255,255,0.08);}
+[data-theme="dark"] .uioli-lever-name{color:rgba(255,255,255,0.85);}
+
+/* ── DEMAND FORECAST ── */
+.df-section{margin-top:16px;}
+.df-section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--teal);}
+.df-section-title{font-size:10.5pt;font-weight:900;color:var(--navy);display:flex;align-items:center;gap:7px;}
+.df-section-sub{font-size:7.5pt;color:var(--ink4);margin-top:2px;}
+
+.df-cfg{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.df-cfg-hdr{background:var(--teal);padding:9px 14px;display:flex;align-items:center;gap:8px;}
+.df-cfg-title{font-size:9pt;font-weight:800;color:#fff;}
+.df-cfg-body{display:grid;grid-template-columns:200px 1fr 220px;align-items:start;}
+.df-cfg-col{padding:11px 13px;border-right:1px solid var(--border);}
+.df-cfg-col:last-child{border-right:none;}
+
+/* Role demand grid */
+.df-role-grid{width:100%;border-collapse:collapse;font-size:8pt;}
+.df-role-grid th{padding:5px 8px;font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.7);background:var(--navy2);text-align:center;}
+.df-role-grid th:first-child,.df-role-grid th:nth-child(2){text-align:left;}
+.df-role-grid td{padding:4px 6px;border-bottom:1px solid var(--gray2);text-align:center;vertical-align:middle;}
+.df-role-grid td:first-child,.df-role-grid td:nth-child(2){text-align:left;}
+.df-role-grid td:nth-child(2){max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.df-role-grid tr:last-child td{border-bottom:none;}
+.df-role-grid tr:hover td{background:var(--gray);}
+.df-role-name{font-size:7.5pt;font-weight:700;color:var(--ink2);white-space:nowrap;}
+.df-role-cat{font-size:6pt;color:var(--ink4);margin-top:1px;}
+.df-qinput{width:100%;font-size:8pt;text-align:center;padding:3px 4px;border:1.5px solid var(--border2);border-radius:5px;background:var(--white);color:var(--ink2);font-family:inherit;box-sizing:border-box;}
+.df-qinput:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.df-qinput.df-role-select{width:100%;text-align:left;min-width:160px;}
+.df-qinput.df-cat-select{width:100%;text-align:left;min-width:180px;}
+.df-row-total{font-size:8pt;font-weight:900;color:var(--teal2);text-align:center;padding:4px 6px;}
+
+/* Summary stats strip */
+.df-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
+.df-stat{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.df-stat-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink4);margin-bottom:4px;}
+.df-stat-val{font-size:14pt;font-weight:900;color:var(--navy);line-height:1;}
+.df-stat-val.g{color:var(--green);}.df-stat-val.a{color:var(--amber);}.df-stat-val.r{color:var(--red);}.df-stat-val.t{color:var(--teal);}
+.df-stat-note{font-size:6.5pt;color:var(--ink4);margin-top:3px;}
+
+/* Gap table */
+.df-gap-table{width:100%;border-collapse:collapse;font-size:8pt;}
+.df-gap-table th{padding:6px 10px;font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:rgba(255,255,255,0.7);background:var(--navy2);text-align:right;}
+.df-gap-table th:first-child,.df-gap-table th:nth-child(2){text-align:left;}
+.df-gap-table td{padding:7px 10px;border-bottom:1px solid var(--gray2);text-align:right;}
+.df-gap-table td:first-child,.df-gap-table td:nth-child(2){text-align:left;}
+.df-gap-table tr:last-child td{border-bottom:none;}
+.df-gap-badge{font-size:6.5pt;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap;}
+.df-gap-badge.surplus{background:var(--green3);color:var(--green2);}
+.df-gap-badge.gap{background:var(--red3);color:var(--red2);}
+.df-gap-badge.ok{background:var(--gray2);color:var(--ink4);}
+
+/* Quarter demand bar chart */
+.df-qbar-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px;}
+.df-qbar-col{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.df-qbar-lbl{font-size:6pt;font-weight:700;color:var(--ink4);text-align:center;}
+.df-qbar-track{width:100%;background:var(--gray2);border-radius:4px;overflow:hidden;}
+.df-qbar-fill{border-radius:4px;transition:height 0.3s;}
+.df-qbar-val{font-size:7pt;font-weight:800;color:var(--navy);}
+
+[data-theme="dark"] .df-cfg{background:#0F1E3C;border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .df-stat{background:#0F1E3C;border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .df-role-grid td{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .df-role-grid tr:hover td{background:rgba(255,255,255,0.04);}
+[data-theme="dark"] .df-qinput{background:#162642;border-color:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);}
+[data-theme="dark"] .df-gap-table td{border-color:rgba(255,255,255,0.06);}
+[data-theme="dark"] .df-section-title{color:rgba(255,255,255,0.9);}
+
+.df-cfg-col--no-pad{padding:0;}
+.df-grid-hdr-bar{padding:8px 13px 6px;border-bottom:1px solid var(--border);}
+.df-cfg-sec-lbl--flush{margin-bottom:0;}
+.df-grid-scroll{overflow-x:auto;padding:8px 4px;}
+.df-th-role{min-width:150px;text-align:left!important;}
+.df-th-cat{min-width:110px;max-width:130px;text-align:left!important;}
+.df-th-q{width:72px;}
+.df-th-range{font-size:5.5pt;font-weight:400;display:block;}
+.df-vendor-card{margin-top:10px;}
+.df-model-hint{font-size:6.5pt;color:var(--ink4);margin-top:4px;line-height:1.5;}
+.df-model-hint strong{font-weight:700;}
+.df-mixed-hidden{display:none;}
+
+/* ── 70/30 ratio gauge ── */
+.df-ratio-lbl{font-size:6.5pt;font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.df-ratio-track{background:var(--gray2);border-radius:4px;height:10px;position:relative;overflow:hidden;}
+.df-ratio-fte-fill{position:absolute;left:0;top:0;height:10px;background:var(--teal);opacity:0.75;border-radius:4px 0 0 4px;transition:width 0.3s;}
+.df-ratio-cw-fill{position:absolute;top:0;height:10px;opacity:0.85;border-radius:0 4px 4px 0;transition:width 0.3s,left 0.3s;}
+.df-ratio-marker{position:absolute;left:70%;top:0;height:10px;width:2px;background:rgba(0,0,0,0.3);}
+.df-ratio-labels{display:flex;justify-content:space-between;margin-top:3px;font-size:6pt;}
+.df-ratio-fte-lbl{color:var(--teal2);font-weight:700;}
+.df-ratio-mid-lbl{color:var(--ink4);}
+.df-ratio-cw-lbl{font-weight:700;}
+
+/* ── Vendor recommendation cards ── */
+.df-vendor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.df-vendor-item{background:var(--gray);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.df-vendor-item-hdr{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.df-vendor-item-meta{flex:1;min-width:0;}
+.df-vendor-item-name{font-size:8.5pt;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.df-vendor-item-region{font-size:6.5pt;color:var(--ink4);margin-top:1px;}
+.df-vendor-tier-badge{font-size:6.5pt;font-weight:800;padding:2px 6px;border-radius:5px;background:var(--navy3);white-space:nowrap;flex-shrink:0;}
+.df-vendor-caps{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:7px;}
+.df-vendor-cap-chip{font-size:6pt;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--teal3);color:var(--teal2);}
+.df-vendor-stats{display:flex;justify-content:space-between;font-size:6.5pt;color:var(--ink4);}
+[data-theme="dark"] .df-vendor-item{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .df-vendor-item-name{color:rgba(255,255,255,0.9);}
+[data-theme="dark"] .df-vendor-tier-badge{background:rgba(255,255,255,0.08);}
+
+/* ── PAGE TABS ── */
+.pg-panel{display:none;}
+.pg-panel.active{display:block;}
+
+@media print{
+  .back-bar,.page-stage,.kpi-strip,.btn,.back-action,.theme-toggle{display:none!important;}
+  .hub-main{padding:0!important;}
+  .fc-layout{display:block!important;}
+  .res-grid{display:block!important;}
+  .card{break-inside:avoid;margin-bottom:10px;}
+}
+
+/* ── AI Augmentation Panel ── */
+.ai-panel{
+  background:#fff;
+  border-radius:12px;
+  border:1px solid #E5E7EB;
+  border-left:3px solid #7C3AED;
+  padding:16px;margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.ai-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.ai-panel-title-row{display:flex;align-items:center;gap:8px;}
+.ai-panel-icon{font-size:16px;}
+.ai-panel-title{font-size:10px;font-weight:800;color:#7C3AED;
+  text-transform:uppercase;letter-spacing:0.10em;}
+.ai-panel-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:rgba(124,58,237,0.10);color:#6D28D9;
+  border:1px solid rgba(124,58,237,0.35);}
+.ai-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:10px;color:#6B7280;font-weight:600;}
+.ai-toggle-track{width:28px;height:16px;border-radius:8px;
+  background:#F3F4F6;border:1px solid #D1D5DB;
+  position:relative;transition:background 200ms ease;cursor:pointer;}
+.ai-toggle-track.on{background:rgba(124,58,237,0.55);border-color:rgba(124,58,237,0.70);}
+.ai-toggle-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;
+  border-radius:50%;background:#fff;transition:transform 200ms ease,opacity 200ms ease;opacity:0.5;}
+.ai-toggle-track.on .ai-toggle-thumb{transform:translateX(12px);opacity:1;}
+.ai-toggle-label{font-size:10px;}
+.ai-body{display:none;}
+.ai-body.ai-on{display:block;}
+.ai-desc{font-size:11px;color:#6B7280;line-height:1.6;
+  margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.ai-slider-row{margin-bottom:12px;}
+.ai-slider-lbl-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.ai-slider-lbl{font-size:11px;color:#374151;font-weight:600;}
+.ai-slider-val{font-size:11px;font-weight:900;color:#7C3AED;}
+.ai-range{width:100%;height:5px;border-radius:99px;
+  -webkit-appearance:none;appearance:none;
+  background:#E5E7EB;cursor:pointer;outline:none;}
+.ai-range::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:#7C3AED;cursor:pointer;box-shadow:0 0 0 3px rgba(124,58,237,0.25);}
+.ai-result-box{background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.22);
+  border-radius:8px;padding:12px 14px;margin-top:12px;}
+.ai-result-row{display:flex;align-items:center;justify-content:space-between;
+  padding:4px 0;border-bottom:1px solid #F3F4F6;}
+.ai-result-row:last-child{border-bottom:none;}
+.ai-result-lbl{font-size:11px;color:#6B7280;}
+.ai-result-val{font-size:11px;font-weight:900;}
+.ai-result-val.purple{color:#7C3AED;}
+.ai-result-val.green{color:#86EFAC;}
+.ai-assumption-note{font-size:10px;color:#9CA3AF;
+  font-style:italic;line-height:1.5;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<!-- Back bar -->
+<div class="back-bar">
+  <div class="back-left">
+    <a href="index.html" class="back-link">&#8592; VER Intelligence Hub</a>
+    <div class="back-divider"></div>
+    <span class="back-brand">Cost Optimization &amp; Demand Planning</span>
+  </div>
+  <div class="back-right">
+    <button type="button" class="back-action" onclick="openForecastHelp()" aria-label="How to use Forecast">&#63; How to Use</button>
+    <button type="button" class="back-action" id="btn-export" onclick="_pgExport()">&#8681; Export CSV</button>
+    <button type="button" class="back-action" onclick="window.print()">&#128438; Print PDF</button>
+    <span class="back-meta">FY27 &middot; Salesforce DET &middot; Confidential</span>
+    <button type="button" class="theme-toggle" id="dm-btn" onclick="_dmToggle()">&#9789; Dark</button>
+  </div>
+</div>
+
+<!-- Stage -->
+<div class="page-stage">
+  <div class="stage-inner">
+    <div class="stage-accent"></div>
+    <div class="stage-eyebrow">VER Intelligence Hub &middot; FY27 &middot; Salesforce DET</div>
+    <div class="stage-title">Cost Optimization &amp; Demand Planning</div>
+    <div class="stage-sub">Model spend optimization levers, scenario analysis, and workforce demand forecasting by role and quarter &middot; Results update live</div>
+    <div class="stage-tabs">
+      <button type="button" class="stage-tab active" id="pgtab-cost" onclick="_pgSwitch('cost')">&#128181; Cost Optimization</button>
+      <button type="button" class="stage-tab" id="pgtab-demand" onclick="_pgSwitch('demand')">&#128101; Demand Planning</button>
+    </div>
+  </div>
+</div>
+
+<!-- KPI strip -->
+<div class="kpi-strip">
+  <div class="ks-inner">
+    <div class="ks-left">
+      <div class="ks-label">Net Savings</div>
+      <div class="ks-total ks-kpi-val g" id="hk-net">—</div>
+      <div class="ks-period">after costs &amp; risk buffer</div>
+    </div>
+    <div class="ks-kpis">
+      <div class="ks-kpi">
+        <div class="ks-kpi-val" id="hk-spend">—</div>
+        <div class="ks-kpi-lbl">Current Spend</div>
+      </div>
+      <div class="ks-kpi">
+        <div class="ks-kpi-val t" id="hk-projected">—</div>
+        <div class="ks-kpi-lbl">Projected Spend</div>
+      </div>
+      <div class="ks-kpi">
+        <div class="ks-kpi-val g" id="hk-gross">—</div>
+        <div class="ks-kpi-lbl">Gross Savings</div>
+      </div>
+      <div class="ks-kpi">
+        <div class="ks-kpi-val a" id="hk-roi">—</div>
+        <div class="ks-kpi-lbl">ROI</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hub-main">
+
+  <!-- ══ PANEL: COST OPTIMIZATION ══ -->
+  <div class="pg-panel active" id="pg-cost">
+
+  <div class="df-section-hdr cost-panel-hdr">
+    <div>
+      <div class="df-section-title">&#128181; Cost Optimization</div>
+      <div class="df-section-sub">Model spend reduction levers, scenario analysis, and budget intelligence &mdash; results update live.</div>
+    </div>
+    <div class="panel-actions">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="_exportCSV()">&#8681; Export CSV</button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="window.print()">&#128438; Print PDF</button>
+    </div>
+  </div>
+
+  <div class="fc-layout">
+
+    <!-- ── CONFIG PANEL ── -->
+    <div class="cfg">
+      <div class="cfg-hdr">&#127919;&nbsp;<span class="cfg-hdr-title">Forecast Inputs</span></div>
+      <div class="cfg-body">
+
+        <!-- COL 1: Spend & Category -->
+        <div class="cfg-col">
+          <div class="cfg-sec-lbl">&#128181; Spend &amp; Category</div>
+          <div class="cfg-field">
+            <div class="cfg-label">Category</div>
+            <select class="cfg-select" id="cfg-cat" title="Spend category" onchange="_recalc()">
+              <option value="Professional Services">Professional Services</option>
+              <option value="Cloud & Managed Services">Cloud &amp; Managed Services</option>
+              <option value="Software / SaaS">Software / SaaS</option>
+              <option value="Contingent Workforce">Contingent Workforce</option>
+              <option value="Hardware & Infrastructure">Hardware &amp; Infrastructure</option>
+              <option value="Custom">Custom / Other</option>
+            </select>
+          </div>
+          <div class="cfg-field">
+            <div class="cfg-label">Annual Spend ($)</div>
+            <input type="number" class="cfg-input" id="cfg-spend" value="0" min="0" step="100000" title="Current annual spend in dollars" oninput="_recalc()">
+          </div>
+          <div class="cfg-field">
+            <div class="cfg-label">Growth Rate <span class="cfg-val" id="lbl-growth">4%</span></div>
+            <input type="range" class="cfg-range" id="cfg-growth" min="-10" max="20" step="1" value="4" title="Annual spend growth rate %" oninput="document.getElementById('lbl-growth').textContent=this.value+'%';_recalc()">
+          </div>
+        </div>
+
+        <!-- COL 2: Horizon, Scenario, Cost & Risk -->
+        <div class="cfg-col">
+          <div class="cfg-sec-lbl">&#128336; Horizon &amp; Scenario</div>
+          <div class="cfg-field">
+            <div class="cfg-label">Horizon</div>
+            <div class="tab-row">
+              <button type="button" class="tab-btn active" id="h-1" onclick="_setHorizon(1)">1 Yr</button>
+              <button type="button" class="tab-btn" id="h-2" onclick="_setHorizon(2)">2 Yr</button>
+              <button type="button" class="tab-btn" id="h-3" onclick="_setHorizon(3)">3 Yr</button>
+            </div>
+          </div>
+          <div class="cfg-field">
+            <div class="cfg-label">Scenario</div>
+            <div class="tab-row">
+              <button type="button" class="tab-btn active" id="sc-base" onclick="_setScenario('base')">Base</button>
+              <button type="button" class="tab-btn" id="sc-opt" onclick="_setScenario('optimistic')">Opt.</button>
+              <button type="button" class="tab-btn" id="sc-cons" onclick="_setScenario('conservative')">Cons.</button>
+            </div>
+          </div>
+          <div class="cfg-sec-lbl cfg-sec-lbl--gap">&#128209; Cost &amp; Risk</div>
+          <div class="cfg-field">
+            <div class="cfg-label">Impl. Cost ($)</div>
+            <input type="number" class="cfg-input" id="cfg-impl" value="0" min="0" step="10000" title="Implementation cost in dollars" oninput="_recalc()">
+          </div>
+          <div class="cfg-field">
+            <div class="cfg-label">Risk Contingency <span class="cfg-val" id="lbl-risk">5%</span></div>
+            <input type="range" class="cfg-range" id="cfg-risk" min="0" max="30" step="1" value="5" title="Risk contingency buffer %" oninput="document.getElementById('lbl-risk').textContent=this.value+'%';_recalc()">
+          </div>
+        </div>
+
+        <!-- COL 3: Savings Levers (3-up mini grid) -->
+        <div class="cfg-col">
+          <div class="cfg-sec-lbl">&#9889; Savings Levers</div>
+          <div class="lev-mini-grid">
+            <div class="cfg-field">
+              <div class="cfg-label">Rate Renegotiation <span class="cfg-val" id="lbl-rate">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-rate" min="0" max="30" step="1" value="0" title="Rate renegotiation % reduction" oninput="document.getElementById('lbl-rate').textContent=this.value+'%';_recalc()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Scope Rightsizing <span class="cfg-val" id="lbl-scope">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-scope" min="0" max="50" step="1" value="0" title="Scope rightsizing % reduction" oninput="document.getElementById('lbl-scope').textContent=this.value+'%';_recalc()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">License / Seat Opt. <span class="cfg-val" id="lbl-license">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-license" min="0" max="25" step="1" value="0" title="License / seat optimization %" oninput="document.getElementById('lbl-license').textContent=this.value+'%';_recalc()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Volume Consolidation <span class="cfg-val" id="lbl-vol">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-vol" min="0" max="20" step="1" value="0" title="Volume consolidation % discount" oninput="document.getElementById('lbl-vol').textContent=this.value+'%';_recalc()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Contract Term Disc. <span class="cfg-val" id="lbl-term">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-term" min="0" max="15" step="1" value="0" title="Contract term commitment discount %" oninput="document.getElementById('lbl-term').textContent=this.value+'%';_recalc()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Benchmark Arbitrage <span class="cfg-val" id="lbl-bench">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-bench" min="0" max="20" step="1" value="0" title="Benchmark arbitrage % reduction" oninput="document.getElementById('lbl-bench').textContent=this.value+'%';_recalc()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">SLA Credit Capture <span class="cfg-val" id="lbl-sla">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-sla" min="0" max="10" step="1" value="0" title="SLA credit capture % of spend" oninput="document.getElementById('lbl-sla').textContent=this.value+'%';_recalc()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Payment Term Disc. <span class="cfg-val" id="lbl-pay">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-pay" min="0" max="5" step="0.5" value="0" title="Payment term early-pay discount %" oninput="document.getElementById('lbl-pay').textContent=this.value+'%';_recalc()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Make vs Buy Offset <span class="cfg-val" id="lbl-mvb">0%</span></div>
+              <input type="range" class="cfg-range" id="lev-mvb" min="0" max="30" step="1" value="0" title="Make vs buy insource offset %" oninput="document.getElementById('lbl-mvb').textContent=this.value+'%';_recalc()">
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 4: Budget vs Actual -->
+        <div class="cfg-col">
+          <div class="cfg-sec-lbl">&#128184; Budget vs Actual &mdash; FY Feb–Jan</div>
+          <div class="bva-input-grid">
+            <div class="bva-input-hdr"></div>
+            <div class="bva-input-hdr bva-hdr-budget">Budget</div>
+            <div class="bva-input-hdr bva-hdr-actual">Actuals</div>
+
+            <div class="cfg-input-lbl bva-qlbl" title="Q1: Feb–Apr">Q1<br><span class="bva-qspan">Feb–Apr</span></div>
+            <input type="number" class="cfg-input bva-inp" id="cfg-bq1" value="0" min="0" step="50000" title="Q1 (Feb–Apr) approved budget" oninput="_recalc()">
+            <input type="number" class="cfg-input bva-inp" id="cfg-aq1" value="0" min="0" step="50000" title="Q1 (Feb–Apr) actuals" oninput="_recalc()">
+
+            <div class="cfg-input-lbl bva-qlbl" title="Q2: May–Jul">Q2<br><span class="bva-qspan">May–Jul</span></div>
+            <input type="number" class="cfg-input bva-inp" id="cfg-bq2" value="0" min="0" step="50000" title="Q2 (May–Jul) approved budget" oninput="_recalc()">
+            <input type="number" class="cfg-input bva-inp" id="cfg-aq2" value="0" min="0" step="50000" title="Q2 (May–Jul) actuals" oninput="_recalc()">
+
+            <div class="cfg-input-lbl bva-qlbl" title="Q3: Aug–Oct">Q3<br><span class="bva-qspan">Aug–Oct</span></div>
+            <input type="number" class="cfg-input bva-inp" id="cfg-bq3" value="0" min="0" step="50000" title="Q3 (Aug–Oct) approved budget" oninput="_recalc()">
+            <input type="number" class="cfg-input bva-inp" id="cfg-aq3" value="0" min="0" step="50000" title="Q3 (Aug–Oct) actuals" oninput="_recalc()">
+
+            <div class="cfg-input-lbl bva-qlbl" title="Q4: Nov–Jan">Q4<br><span class="bva-qspan">Nov–Jan</span></div>
+            <input type="number" class="cfg-input bva-inp" id="cfg-bq4" value="0" min="0" step="50000" title="Q4 (Nov–Jan) approved budget" oninput="_recalc()">
+            <input type="number" class="cfg-input bva-inp" id="cfg-aq4" value="0" min="0" step="50000" title="Q4 (Nov–Jan) actuals" oninput="_recalc()">
+          </div>
+          <div class="fy-badge" id="fy-position-badge">Calculating FY position…</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── RESULTS ── -->
+    <div id="results-col">
+
+      <!-- ROW 1: WATERFALL (left) + YEAR-BY-YEAR (right) -->
+      <div class="res-grid">
+        <div class="res-col">
+          <div class="card">
+            <div class="card-hdr">
+              <div>
+                <div class="card-title">&#128202; Savings Waterfall</div>
+                <div class="card-sub">Spend reduction by lever — current → projected</div>
+              </div>
+              <div id="wf-total-badge" class="wf-total-badge"></div>
+            </div>
+            <div id="waterfall-chart"></div>
+          </div>
+        </div>
+
+        <div class="res-col">
+          <div class="card">
+            <div class="card-hdr">
+              <div>
+                <div class="card-title">&#128197; Year-by-Year Projection</div>
+                <div class="card-sub" id="proj-sub">Base case with applied growth rate and savings compounding</div>
+              </div>
+            </div>
+            <div id="projection-chart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2: SAVINGS COMPOSITION (left) + PRIORITY ACTIONS (right) -->
+      <div class="res-grid res-grid-top">
+        <div class="res-col">
+          <div class="card">
+            <div class="card-hdr">
+              <div>
+                <div class="card-title">&#127922; Savings Composition</div>
+                <div class="card-sub">Contribution of each lever to total identified savings</div>
+              </div>
+            </div>
+            <div class="composition-inner">
+              <div id="lever-table"></div>
+              <div id="donut-chart"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="res-col">
+          <div class="card">
+            <div class="card-hdr">
+              <div>
+                <div class="card-title">&#9889; Priority Actions</div>
+                <div class="card-sub">Recommended next steps based on active levers</div>
+              </div>
+            </div>
+            <div id="actions-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3: UIOLI QUARTER-CLOSE INTELLIGENCE — full width -->
+      <div class="card uioli-card card-mb" id="uioli-card">
+        <div class="card-hdr">
+          <div>
+            <div class="card-title">&#9201; Quarter-Close &amp; Use-It-Or-Lose-It Intelligence</div>
+            <div class="card-sub" id="uioli-sub">Savings realizable this quarter vs. deferred — based on lever lead times and days to Q-close</div>
+          </div>
+          <div id="uioli-urgency-badge"></div>
+        </div>
+        <div id="uioli-content"></div>
+      </div>
+
+      <!-- ROW 4: BUDGET INTELLIGENCE — full width -->
+      <div class="card card-mb">
+        <div class="card-hdr">
+          <div>
+            <div class="card-title">&#128184; Budget Intelligence &mdash; Quarterly View</div>
+            <div class="card-sub">Smart spend reforecast · quarterly burn · use-it-or-lose-it detection</div>
+          </div>
+          <div id="bva-summary" class="bva-summary-badge"></div>
+        </div>
+        <div id="bva-chart" class="bva-section"></div>
+        <div id="bva-reforecast" class="bva-section"></div>
+        <div id="bva-table"></div>
+      </div>
+
+      <!-- AI Augmentation Panel -->
+      <div class="ai-panel" id="ai-panel-forecast">
+        <div class="ai-panel-head">
+          <div class="ai-panel-title-row">
+            <span class="ai-panel-icon">&#10024;</span>
+            <span class="ai-panel-title">AI Spend Variable</span>
+            <span class="ai-panel-badge">Beta</span>
+          </div>
+          <div class="ai-toggle" onclick="toggleAiForecast()" aria-label="Toggle AI Spend Variable">
+            <span id="ai-forecast-label" class="ai-toggle-label">Off</span>
+            <div class="ai-toggle-track" id="ai-forecast-track">
+              <div class="ai-toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ai-body" id="ai-forecast-body">
+          <div class="ai-desc">Layer in projected AI/agentic investment and the corresponding CW spend offset. Adjust adoption rate to see the net forecast impact.</div>
+          <div class="ai-slider-row">
+            <div class="ai-slider-lbl-row">
+              <span class="ai-slider-lbl">AI Adoption Rate</span>
+              <span class="ai-slider-val" id="ai-fc-adoption-val">30%</span>
+            </div>
+            <input type="range" class="ai-range" id="ai-fc-adoption" min="0" max="100" step="10" value="30" oninput="updateAiForecast()">
+          </div>
+          <div class="ai-slider-row">
+            <div class="ai-slider-lbl-row">
+              <span class="ai-slider-lbl">CW Offset (AI replaces tasks)</span>
+              <span class="ai-slider-val" id="ai-fc-offset-val">15%</span>
+            </div>
+            <input type="range" class="ai-range" id="ai-fc-offset" min="0" max="40" step="5" value="15" oninput="updateAiForecast()">
+          </div>
+          <div class="ai-result-box">
+            <div class="ai-result-row">
+              <span class="ai-result-lbl">AI Platform Investment (est.)</span>
+              <span class="ai-result-val purple" id="ai-fc-invest">—</span>
+            </div>
+            <div class="ai-result-row">
+              <span class="ai-result-lbl">CW Spend Reduction (est.)</span>
+              <span class="ai-result-val green" id="ai-fc-reduction">—</span>
+            </div>
+            <div class="ai-result-row">
+              <span class="ai-result-lbl">Net Forecast Impact</span>
+              <span class="ai-result-val green" id="ai-fc-net">—</span>
+            </div>
+          </div>
+          <div class="ai-assumption-note" id="ai-fc-note">Set sliders to model AI spend impact on the forecast.</div>
+        </div>
+      </div>
+
+    </div><!-- end results-col -->
+
+  </div><!-- end fc-layout -->
+  </div><!-- end pg-cost panel -->
+
+  <!-- ══ PANEL: DEMAND PLANNING ══ -->
+  <div class="pg-panel" id="pg-demand">
+    <div class="df-section">
+      <div class="df-section-hdr">
+        <div>
+          <div class="df-section-title">&#128101; Workforce Demand Forecast</div>
+          <div class="df-section-sub">Forecast headcount by role and quarter &mdash; surface coverage gaps, vendor fit, and cost-to-fill estimates.</div>
+        </div>
+        <div class="panel-actions">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="_exportDemandCSV()">&#8681; Export CSV</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="window.print()">&#128438; Print PDF</button>
+        </div>
+      </div>
+
+      <!-- Config panel -->
+      <div class="df-cfg df-cfg-mb">
+        <div class="df-cfg-hdr">&#9881;&#65039;&nbsp;<span class="df-cfg-title">Forecast Parameters</span></div>
+        <div class="df-cfg-body">
+
+          <!-- Col 1: FY & Rate assumptions -->
+          <div class="df-cfg-col">
+            <div class="cfg-sec-lbl">&#128197; Fiscal Year &amp; Region</div>
+            <div class="cfg-field">
+              <div class="cfg-label">Forecast FY</div>
+              <select class="cfg-select" id="df-fy" title="Forecast fiscal year" onchange="_recalcDemand()">
+                <option value="FY27">FY27 (Feb 2027 – Jan 2028)</option>
+                <option value="FY28">FY28 (Feb 2028 – Jan 2029)</option>
+                <option value="FY26" selected>FY26 (Feb 2026 – Jan 2027)</option>
+              </select>
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Primary Region</div>
+              <select class="cfg-select" id="df-region" title="Primary sourcing region" onchange="_dfRegionChange()">
+                <option value="AMER">AMER</option>
+                <option value="EMEA">EMEA</option>
+                <option value="APAC">APAC</option>
+                <option value="JAPAC">JAPAC</option>
+                <option value="LATAM">LATAM</option>
+                <option value="Global">Global (all regions)</option>
+              </select>
+              <div id="df-region-hint" class="df-model-hint"></div>
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Engagement Model</div>
+              <select class="cfg-select" id="df-model" title="Engagement model type" onchange="_dfModelChange()">
+                <option value="staff_aug">Staff Augmentation</option>
+                <option value="managed">Managed Services</option>
+                <option value="project">Project-Based</option>
+                <option value="mixed">Mixed</option>
+              </select>
+              <div id="df-model-hint" class="df-model-hint"></div>
+            </div>
+            <div class="cfg-field" id="df-mixed-row" style="display:none;">
+              <div class="cfg-label">CW Fraction of Gap <span class="cfg-val" id="lbl-df-cwfrac">50%</span></div>
+              <input type="range" class="cfg-range" id="df-cwfrac" min="0" max="100" step="5" value="50" title="What % of the vendor gap counts as CW headcount toward the 70/30 target" oninput="document.getElementById('lbl-df-cwfrac').textContent=this.value+'%';_recalcDemand()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Avg. Bill Rate ($/hr) <span class="cfg-val" id="lbl-df-rate">$145</span></div>
+              <input type="range" class="cfg-range" id="df-rate" min="10" max="350" step="5" value="145" title="Average blended bill rate per hour — auto-set by region, adjustable" oninput="document.getElementById('lbl-df-rate').textContent='$'+this.value;_recalcDemand()">
+              <div id="df-rate-hint" class="df-model-hint"></div>
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Hrs/Wk per FTE <span class="cfg-val" id="lbl-df-hrs">40</span></div>
+              <input type="range" class="cfg-range" id="df-hrs" min="20" max="50" step="5" value="40" title="Billable hours per week per resource" oninput="document.getElementById('lbl-df-hrs').textContent=this.value;_recalcDemand()">
+            </div>
+          </div>
+
+          <!-- Col 2: Role demand grid -->
+          <div class="df-cfg-col df-cfg-col--no-pad">
+            <div class="df-grid-hdr-bar">
+              <div class="cfg-sec-lbl df-cfg-sec-lbl--flush">&#128101; Headcount Demand by Role &amp; Quarter</div>
+            </div>
+            <div class="df-grid-scroll">
+              <table class="df-role-grid" id="df-role-table">
+                <thead>
+                  <tr>
+                    <th class="df-th-role">Role</th>
+                    <th class="df-th-cat">Category</th>
+                    <th class="df-th-q">Q1<span class="df-th-range">Feb–Apr</span></th>
+                    <th class="df-th-q">Q2<span class="df-th-range">May–Jul</span></th>
+                    <th class="df-th-q">Q3<span class="df-th-range">Aug–Oct</span></th>
+                    <th class="df-th-q">Q4<span class="df-th-range">Nov–Jan</span></th>
+                    <th class="df-th-q">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="df-role-tbody"></tbody>
+              </table>
+            </div>
+            <div class="df-role-actions">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="_dfAddRole()">+ Add Role</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="_dfResetRoles()">Reset</button>
+            </div>
+          </div>
+
+          <!-- Col 3: Supply / coverage -->
+          <div class="df-cfg-col">
+            <div class="cfg-sec-lbl">&#127968; Internal Capacity &amp; HC Target</div>
+            <div class="cfg-field">
+              <div class="cfg-label">Available FTEs (internal) <span class="cfg-val" id="lbl-df-fte">0</span></div>
+              <input type="range" class="cfg-range" id="df-fte" min="0" max="200" step="5" value="0" title="Available internal FTE capacity" oninput="document.getElementById('lbl-df-fte').textContent=this.value;_recalcDemand()">
+              <div id="df-fte-hint" style="font-size:6.5pt;color:var(--ink4);margin-top:3px;"></div>
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Internal Coverage Rate <span class="cfg-val" id="lbl-df-cov">70%</span></div>
+              <input type="range" class="cfg-range" id="df-cov" min="0" max="100" step="5" value="70" title="% of FTE capacity applicable to this work" oninput="document.getElementById('lbl-df-cov').textContent=this.value+'%';_recalcDemand()">
+            </div>
+            <div class="cfg-field">
+              <div class="cfg-label">Ramp Time (weeks) <span class="cfg-val" id="lbl-df-ramp">4</span></div>
+              <input type="range" class="cfg-range" id="df-ramp" min="1" max="12" step="1" value="4" title="Weeks to ramp a new resource to full productivity" oninput="document.getElementById('lbl-df-ramp').textContent=this.value;_recalcDemand()">
+            </div>
+            <div id="df-ratio-bar" class="df-ratio-bar-wrap"></div>
+            <div class="cfg-sec-lbl cfg-sec-lbl--gap">&#9888;&#65039; Risk Flags</div>
+            <div id="df-risk-flags" class="df-risk-flags-empty">Enter demand above to see risk flags.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Summary stats strip -->
+      <div class="df-stats">
+        <div class="df-stat">
+          <div class="df-stat-lbl">Total Demand (HC)</div>
+          <div class="df-stat-val t" id="df-s-demand">—</div>
+          <div class="df-stat-note" id="df-s-demand-note">Across all roles &amp; quarters</div>
+        </div>
+        <div class="df-stat">
+          <div class="df-stat-lbl">Vendor Gap (HC)</div>
+          <div class="df-stat-val r" id="df-s-gap">—</div>
+          <div class="df-stat-note" id="df-s-gap-note">After internal coverage</div>
+        </div>
+        <div class="df-stat">
+          <div class="df-stat-lbl">Est. Cost to Fill</div>
+          <div class="df-stat-val a" id="df-s-cost">—</div>
+          <div class="df-stat-note" id="df-s-cost-note">Vendor gap × rate × hrs</div>
+        </div>
+        <div class="df-stat">
+          <div class="df-stat-lbl">Peak Quarter</div>
+          <div class="df-stat-val" id="df-s-peak">—</div>
+          <div class="df-stat-note" id="df-s-peak-note">Highest demand period</div>
+        </div>
+        <div class="df-stat" id="df-s-ratio-card">
+          <div class="df-stat-lbl">FTE / CW Split</div>
+          <div class="df-stat-val" id="df-s-ratio">—</div>
+          <div class="df-stat-note" id="df-s-ratio-note">Target: 70% FTE · 30% CW</div>
+        </div>
+      </div>
+
+      <!-- Results grid -->
+      <div class="res-grid res-grid-top">
+
+        <!-- Left: Quarter-by-quarter demand chart -->
+        <div class="res-col">
+          <div class="card">
+            <div class="card-hdr">
+              <div>
+                <div class="card-title">&#128202; Quarterly Demand Profile</div>
+                <div class="card-sub">Total headcount demand vs. internal coverage by quarter</div>
+              </div>
+            </div>
+            <div id="df-qchart"></div>
+          </div>
+        </div>
+
+        <!-- Right: Role gap breakdown -->
+        <div class="res-col">
+          <div class="card">
+            <div class="card-hdr">
+              <div>
+                <div class="card-title">&#9888;&#65039; Coverage Gap by Role</div>
+                <div class="card-sub">Vendor sourcing requirement after internal offset</div>
+              </div>
+            </div>
+            <div id="df-gap-content"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Full-width: Vendor match recommendations -->
+      <div class="card df-vendor-card">
+        <div class="card-hdr">
+          <div>
+            <div class="card-title">&#127919; Recommended Vendors for Gap Roles</div>
+            <div class="card-sub" id="df-vendor-sub">Vendor matches based on capability, region, and gap severity</div>
+          </div>
+        </div>
+        <div id="df-vendor-recs"></div>
+      </div>
+
+    </div><!-- end df-section -->
+  </div><!-- end pg-demand panel -->
+
+</div><!-- end hub-main -->
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────
+var S = {
+  category: 'Professional Services',
+  spend: 10000000,
+  growth: 4,
+  horizon: 1,
+  scenario: 'base',
+  levers: {
+    rate: 0, scope: 0, license: 0, vol: 0,
+    term: 0, bench: 0, sla: 0, pay: 0, mvb: 0
+  },
+  implCost: 0,
+  riskPct: 5,
+  budget: 10000000,
+  actuals: 0
+};
+
+var LEVER_META = [
+  { key:'rate',   label:'Rate Renegotiation',       color:'#0D9488' },
+  { key:'scope',  label:'Scope Rightsizing',         color:'#059669' },
+  { key:'license',label:'License / Seat Opt.',       color:'#2563EB' },
+  { key:'vol',    label:'Volume Consolidation',      color:'#7C3AED' },
+  { key:'term',   label:'Contract Term Discount',    color:'#D97706' },
+  { key:'bench',  label:'Benchmark Arbitrage',       color:'#0F766E' },
+  { key:'sla',    label:'SLA Credit Capture',        color:'#DC2626' },
+  { key:'pay',    label:'Payment Term Discount',     color:'#065F46' },
+  { key:'mvb',    label:'Make vs Buy Offset',        color:'#5B21B6' }
+];
+
+var SCENARIO_MULT = { base: 1.0, optimistic: 1.30, conservative: 0.60 };
+
+// Minimum weeks needed before savings can be realized for each lever
+var LEVER_LEAD_WEEKS = {
+  rate:    { min: 6,  max: 10, label: '6–10 wk lead' },
+  scope:   { min: 2,  max: 4,  label: '2–4 wk lead'  },
+  license: { min: 3,  max: 5,  label: '3–5 wk lead'  },
+  vol:     { min: 4,  max: 8,  label: '4–8 wk lead'  },
+  term:    { min: 4,  max: 7,  label: '4–7 wk lead'  },
+  bench:   { min: 3,  max: 6,  label: '3–6 wk lead'  },
+  sla:     { min: 1,  max: 3,  label: '1–3 wk lead'  },
+  pay:     { min: 2,  max: 4,  label: '2–4 wk lead'  },
+  mvb:     { min: 8,  max: 14, label: '8–14 wk lead' }
+};
+var GROWTH_DEFAULT = { 'Professional Services':4,'Cloud & Managed Services':6,'Software / SaaS':5,'Contingent Workforce':-3,'Hardware & Infrastructure':2,'Custom / Other':3 };
+
+// ── Helpers ────────────────────────────────────────────────────────────
+function fmt(n){ if(Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(1)+'M'; if(Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K'; return '$'+Math.round(n); }
+function fmtPct(n){ return (n>=0?'+':'')+n.toFixed(1)+'%'; }
+function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
+function daysTo(ds){ return Math.round((new Date(ds)-new Date())/86400000); }
+function fmtDate(d){ return new Date(d).toLocaleDateString('en-US',{month:'short',year:'numeric'}); }
+function parseSpend(s){ if(!s||s==='$0'||s==='0'||s==='—'||s==='') return 0; var n=parseFloat(String(s).replace(/[$,]/g,'')); if(/m/i.test(s)) n*=1e6; if(/k/i.test(s)) n*=1e3; return isNaN(n)?0:n; }
+
+// ── Input reading ──────────────────────────────────────────────────────
+function _calcFYPosition(){
+  var today = new Date();
+  var year  = today.getFullYear();
+  var fyStart = new Date(year, 1, 1);
+  if(today < fyStart) fyStart = new Date(year - 1, 1, 1);
+  var msElapsed = today - fyStart;
+  var fyWeek = Math.max(1, Math.ceil(msElapsed / 604800000));
+  fyWeek = Math.min(fyWeek, 52);
+
+  var qNames   = ['Q1 · Feb–Apr', 'Q2 · May–Jul', 'Q3 · Aug–Oct', 'Q4 · Nov–Jan'];
+  var currentQ = fyWeek <= 13 ? 0 : fyWeek <= 26 ? 1 : fyWeek <= 39 ? 2 : 3;
+  var weekInQ  = ((fyWeek - 1) % 13) + 1;
+  var weeksLeft = 52 - fyWeek;
+
+  var badge = document.getElementById('fy-position-badge');
+  if(badge){
+    badge.innerHTML =
+      '<strong style="color:var(--navy2);font-size:8pt;">'+qNames[currentQ]+'</strong>'
+      +'<span style="color:var(--ink4);font-size:7pt;"> &nbsp;·&nbsp; FY Wk '+fyWeek+'/52'
+      +' &nbsp;·&nbsp; Qtr Wk '+weekInQ+'/13'
+      +' &nbsp;·&nbsp; '+weeksLeft+' wks remaining</span>';
+  }
+  return fyWeek;
+}
+
+function _readInputs(){
+  S.category = document.getElementById('cfg-cat').value;
+  S.spend     = parseFloat(document.getElementById('cfg-spend').value)||0;
+  S.growth    = parseFloat(document.getElementById('cfg-growth').value)||0;
+  S.implCost  = parseFloat(document.getElementById('cfg-impl').value)||0;
+  S.riskPct   = parseFloat(document.getElementById('cfg-risk').value)||0;
+  S.fyWeek    = _calcFYPosition();
+  S.qBudget   = [1,2,3,4].map(function(q){ return parseFloat(document.getElementById('cfg-bq'+q).value)||0; });
+  S.qActuals  = [1,2,3,4].map(function(q){ return parseFloat(document.getElementById('cfg-aq'+q).value)||0; });
+  S.budget    = S.qBudget.reduce(function(s,v){ return s+v; },0);
+  S.actuals   = S.qActuals.reduce(function(s,v){ return s+v; },0);
+  LEVER_META.forEach(function(m){
+    S.levers[m.key] = parseFloat(document.getElementById('lev-'+m.key).value)||0;
+  });
+}
+
+function _setHorizon(h){
+  S.horizon = h;
+  [1,2,3].forEach(function(n){ document.getElementById('h-'+n).classList.toggle('active',n===h); });
+  _recalc();
+}
+function _setScenario(sc){
+  S.scenario = sc;
+  ['base','opt','cons'].forEach(function(id,i){
+    document.getElementById('sc-'+id).classList.toggle('active',['base','optimistic','conservative'][i]===sc);
+  });
+  _recalc();
+}
+
+// ── Core calculation ───────────────────────────────────────────────────
+function _calc(){
+  var spend = S.spend || 0;
+  var mult  = SCENARIO_MULT[S.scenario] || 1;
+
+  // Apply levers sequentially (compounding)
+  var running = spend;
+  var leverAmts = {};
+  LEVER_META.forEach(function(m){
+    var pct = S.levers[m.key] / 100;
+    var saving = running * pct * mult;
+    leverAmts[m.key] = saving;
+    running -= saving;
+  });
+
+  var grossSavings   = spend - running;
+  var riskContingency = grossSavings * (S.riskPct / 100);
+  var netSavings     = grossSavings - S.implCost - riskContingency;
+  var projectedSpend = spend - grossSavings;
+  var roi            = S.implCost > 0 ? (netSavings / S.implCost * 100) : (netSavings > 0 ? Infinity : 0);
+
+  // Year-by-year
+  var growthRate = S.growth / 100;
+  var years = [];
+  for(var y=1; y<=S.horizon; y++){
+    var baseSpend = spend * Math.pow(1 + growthRate, y);
+    // grossSavings already has mult baked in — just apply year-over-year decay
+    var yearSavings = grossSavings * Math.pow(0.97, y-1);
+    var yearNet = yearSavings - (y===1 ? S.implCost : 0) - (yearSavings * S.riskPct/100);
+    var projectedSpendYear = baseSpend - yearSavings;
+    years.push({ year:y, base:baseSpend, savings:yearSavings, net:yearNet, projected:projectedSpendYear });
+  }
+
+  var totalNetMultiYear = years.reduce(function(s,y){ return s+y.net; },0);
+
+  // ── UIOLI Quarter-Close Intelligence ──────────────────────────────────
+  var fyWeek   = S.fyWeek || 1;
+  var currentQ = fyWeek <= 13 ? 0 : fyWeek <= 26 ? 1 : fyWeek <= 39 ? 2 : 3;
+  var weekInQ  = ((fyWeek - 1) % 13) + 1;
+  var weeksLeftInQ = 13 - weekInQ;
+
+  // FY-close date: last Friday of Jan following the Feb FY start
+  var today = new Date();
+  var fyStartYear = today.getMonth() < 1 ? today.getFullYear() - 1 : today.getFullYear();
+  var qEndDates = [
+    new Date(fyStartYear, 3, 30),   // Q1 ends Apr 30
+    new Date(fyStartYear, 6, 31),   // Q2 ends Jul 31
+    new Date(fyStartYear, 9, 31),   // Q3 ends Oct 31
+    new Date(fyStartYear + 1, 0, 31)// Q4 ends Jan 31
+  ];
+  var qCloseDate = qEndDates[currentQ];
+  var msToClose  = qCloseDate - today;
+  var daysToClose = Math.max(0, Math.ceil(msToClose / 86400000));
+
+  // Budget still uncommitted in current Q (UIOLI exposure)
+  var qBudgetCurrent  = (S.qBudget  || [0,0,0,0])[currentQ];
+  var qActualCurrent  = (S.qActuals || [0,0,0,0])[currentQ];
+  var qUncommitted    = Math.max(0, qBudgetCurrent - qActualCurrent);
+  var qPaceAtClose    = weekInQ > 0 ? (qActualCurrent / weekInQ) * 13 : 0;
+  var uioliExposure   = Math.max(0, qBudgetCurrent - qPaceAtClose);
+
+  // Per-lever: can it be actioned in time before Q-close?
+  var leverUIOLI = {};
+  LEVER_META.forEach(function(m){
+    var lead = LEVER_LEAD_WEEKS[m.key];
+    var capturable = weeksLeftInQ >= lead.min;
+    var partial    = !capturable && weeksLeftInQ >= Math.ceil(lead.min / 2);
+    var qSaving    = capturable ? leverAmts[m.key] / 4 : partial ? leverAmts[m.key] / 8 : 0;
+    leverUIOLI[m.key] = { capturable: capturable, partial: partial, qSaving: qSaving, lead: lead };
+  });
+
+  var thisQCapturableTotal = LEVER_META.reduce(function(s,m){ return s + leverUIOLI[m.key].qSaving; }, 0);
+  var deferredTotal = grossSavings / 4 - thisQCapturableTotal;  // annualized ÷4 vs what's actually catchable
+
+  return { spend, projectedSpend, grossSavings, netSavings, riskContingency, roi, leverAmts, years,
+           totalNetMultiYear, weeksLeftInQ, daysToClose, qCloseDate, currentQ, qUncommitted,
+           uioliExposure, leverUIOLI, thisQCapturableTotal, deferredTotal };
+}
+
+// ── Recalc entry point ─────────────────────────────────────────────────
+function _recalc(){
+  _readInputs();
+  var R = _calc();
+  _renderHero(R);
+  _renderWaterfall(R);
+  _renderProjection(R);
+  _renderLeverTable(R);
+  _renderDonut(R);
+  _renderBVA(R);
+  _renderUIIOLI(R);
+  _renderActions(R);
+  if(typeof _pgUpdateBadges === 'function') _pgUpdateBadges();
+}
+
+// ── Hero ───────────────────────────────────────────────────────────────
+function _renderHero(R){
+  var setText = function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+  setText('hk-spend',     fmt(R.spend));
+  setText('hk-projected', fmt(R.projectedSpend));
+  setText('hk-gross',     fmt(R.grossSavings));
+  setText('hk-net',       fmt(R.netSavings));
+  var roiEl = document.getElementById('hk-roi');
+  if(roiEl){
+    if(R.roi === Infinity) roiEl.textContent = '∞';
+    else if(R.roi === 0 && S.implCost === 0) roiEl.textContent = 'N/A';
+    else roiEl.textContent = Math.round(R.roi)+'%';
+  }
+  // Update KPI strip period note with active scenario
+  var periodEl = document.querySelector('.ks-period');
+  if(periodEl) periodEl.textContent = {base:'Base',optimistic:'Optimistic',conservative:'Conservative'}[S.scenario]+' scenario · '+S.horizon+'yr';
+}
+
+// ── Waterfall Chart (SVG) ─────────────────────────────────────────────
+function _renderWaterfall(R){
+  var active = LEVER_META.filter(function(m){ return R.leverAmts[m.key] > 0; });
+  if(!active.length || R.spend === 0){
+    document.getElementById('waterfall-chart').innerHTML = '<div style="padding:20px;text-align:center;font-size:8.5pt;color:var(--ink4);font-style:italic;">Adjust savings levers to see the waterfall.</div>';
+    document.getElementById('wf-total-badge').textContent = '';
+    return;
+  }
+
+  var W = 580, H = 160, pad = { l:60, r:20, t:10, b:30 };
+  var chartW = W - pad.l - pad.r;
+  var bars = [{ label:'Current', val:R.spend, color:'#0F1E3C', type:'base' }];
+  active.forEach(function(m){ bars.push({ label:m.label, val:R.leverAmts[m.key], color:m.color, type:'saving' }); });
+  if(R.implCost > 0) bars.push({ label:'Impl. Cost', val:-R.implCost, color:'#DC2626', type:'cost' });
+  if(R.riskContingency > 0) bars.push({ label:'Risk Buffer', val:-R.riskContingency, color:'#D97706', type:'cost' });
+  bars.push({ label:'Net Projected', val:R.spend - R.grossSavings, color:'#0D9488', type:'net' });
+
+  var maxVal = R.spend * 1.05;
+  var barW = Math.floor(chartW / bars.length) - 6;
+  var runningTop = R.spend;
+
+  document.getElementById('wf-total-badge').textContent = fmt(R.grossSavings) + ' gross savings';
+
+  var rects = '', labels = '', connectors = '';
+  var prevX2 = -1, prevY = -1;
+
+  bars.forEach(function(b, i){
+    var x = pad.l + i * (chartW / bars.length) + 3;
+    if(b.type === 'base'){
+      var barH = Math.round(b.val / maxVal * (H - pad.t - pad.b));
+      var y = H - pad.b - barH;
+      rects += '<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+barH+'" fill="'+b.color+'" rx="3"/>';
+      rects += '<text x="'+(x+barW/2)+'" y="'+(y-4)+'" text-anchor="middle" class="chart-val" style="font-size:6.5pt;font-weight:800;fill:var(--ink2)">'+fmt(b.val)+'</text>';
+      prevX2 = x+barW; prevY = y;
+    } else if(b.type === 'saving'){
+      var savH = Math.round(b.val / maxVal * (H - pad.t - pad.b));
+      var saveY = Math.round(runningTop / maxVal * (H - pad.t - pad.b));
+      saveY = H - pad.b - saveY;
+      rects += '<rect x="'+x+'" y="'+saveY+'" width="'+barW+'" height="'+savH+'" fill="'+b.color+'" opacity="0.85" rx="2"/>';
+      rects += '<text x="'+(x+barW/2)+'" y="'+(saveY-4)+'" text-anchor="middle" style="font-size:6pt;fill:'+b.color+';font-weight:800;">-'+fmt(b.val)+'</text>';
+      if(prevX2 > 0) connectors += '<line x1="'+prevX2+'" y1="'+prevY+'" x2="'+x+'" y2="'+saveY+'" stroke="var(--gray3)" stroke-width="1" stroke-dasharray="3,2"/>';
+      prevX2 = x+barW; prevY = saveY;
+      runningTop -= b.val;
+    } else if(b.type === 'cost'){
+      var costH = Math.round(Math.abs(b.val) / maxVal * (H - pad.t - pad.b));
+      var baseCostY = Math.round(runningTop / maxVal * (H - pad.t - pad.b));
+      baseCostY = H - pad.b - baseCostY;
+      rects += '<rect x="'+x+'" y="'+baseCostY+'" width="'+barW+'" height="'+Math.max(2,costH)+'" fill="'+b.color+'" opacity="0.7" rx="2"/>';
+      rects += '<text x="'+(x+barW/2)+'" y="'+(baseCostY-4)+'" text-anchor="middle" style="font-size:6pt;fill:'+b.color+';font-weight:800;">+'+fmt(Math.abs(b.val))+'</text>';
+      if(prevX2 > 0) connectors += '<line x1="'+prevX2+'" y1="'+prevY+'" x2="'+x+'" y2="'+baseCostY+'" stroke="var(--gray3)" stroke-width="1" stroke-dasharray="3,2"/>';
+      prevX2 = x+barW; prevY = baseCostY;
+      runningTop -= b.val;
+    } else {
+      var netH = Math.round(b.val / maxVal * (H - pad.t - pad.b));
+      var netY = H - pad.b - netH;
+      rects += '<rect x="'+x+'" y="'+netY+'" width="'+barW+'" height="'+netH+'" fill="'+b.color+'" rx="3"/>';
+      rects += '<text x="'+(x+barW/2)+'" y="'+(netY-4)+'" text-anchor="middle" class="chart-val" style="font-size:7pt;font-weight:900;fill:#0D9488;">'+fmt(b.val)+'</text>';
+      if(prevX2 > 0) connectors += '<line x1="'+prevX2+'" y1="'+prevY+'" x2="'+x+'" y2="'+netY+'" stroke="var(--gray3)" stroke-width="1" stroke-dasharray="3,2"/>';
+    }
+    // X-axis labels
+    var shortLabel = b.label.length > 10 ? b.label.slice(0,10)+'…' : b.label;
+    labels += '<text x="'+(x+barW/2)+'" y="'+(H-pad.b+12)+'" text-anchor="middle" class="chart-label" style="font-size:6pt;">'+shortLabel+'</text>';
+  });
+
+  var baseline = '<line x1="'+pad.l+'" y1="'+(H-pad.b)+'" x2="'+(W-pad.r)+'" y2="'+(H-pad.b)+'" class="chart-axis"/>';
+
+  // Y-axis ticks
+  var yTicks = '';
+  for(var t=0; t<=4; t++){
+    var tickVal = maxVal * t/4;
+    var tickY = H - pad.b - Math.round(tickVal/maxVal*(H-pad.t-pad.b));
+    yTicks += '<line x1="'+(pad.l-4)+'" y1="'+tickY+'" x2="'+pad.l+'" y2="'+tickY+'" class="chart-axis"/>';
+    yTicks += '<text x="'+(pad.l-6)+'" y="'+(tickY+3)+'" text-anchor="end" class="chart-label" style="font-size:6pt;">'+fmt(tickVal)+'</text>';
+  }
+  yTicks += '<line x1="'+pad.l+'" y1="'+pad.t+'" x2="'+pad.l+'" y2="'+(H-pad.b)+'" class="chart-axis"/>';
+
+  document.getElementById('waterfall-chart').innerHTML =
+    '<svg class="chart" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+
+    yTicks+baseline+connectors+rects+labels+'</svg>';
+}
+
+// ── Year-by-Year Projection (SVG) ────────────────────────────────────
+function _renderProjection(R){
+  if(R.spend === 0){ document.getElementById('projection-chart').innerHTML=''; return; }
+  var years = [{ year:0, base:R.spend, projected:R.spend, label:'Current' }].concat(R.years.map(function(y){
+    return { year:y.year, base:y.base, projected:y.projected, savings:y.net, label:'Year '+y.year };
+  }));
+
+  var W=580, H=130, pad={l:60,r:20,t:10,b:28};
+  var maxVal = Math.max.apply(null, years.map(function(y){ return Math.max(y.base,y.projected); })) * 1.08;
+  var slotW = (W-pad.l-pad.r) / years.length;
+  var bw = Math.floor(slotW * 0.35);
+
+  var bars='', lbls='', gridlines='';
+
+  for(var g=0;g<=4;g++){
+    var gv=maxVal*g/4, gy=H-pad.b-Math.round(gv/maxVal*(H-pad.t-pad.b));
+    gridlines+='<line x1="'+pad.l+'" y1="'+gy+'" x2="'+(W-pad.r)+'" y2="'+gy+'" stroke="var(--gray3)" stroke-width="1" stroke-dasharray="4,3"/>';
+    gridlines+='<text x="'+(pad.l-6)+'" y="'+(gy+3)+'" text-anchor="end" class="chart-label" style="font-size:6pt;">'+fmt(gv)+'</text>';
+  }
+
+  years.forEach(function(y,i){
+    var cx = pad.l + i*slotW + slotW/2;
+    var baseH = Math.round(y.base/maxVal*(H-pad.t-pad.b));
+    var baseY = H-pad.b-baseH;
+    var projH = Math.round(y.projected/maxVal*(H-pad.t-pad.b));
+    var projY = H-pad.b-projH;
+
+    bars += '<rect x="'+(cx-bw-2)+'" y="'+baseY+'" width="'+bw+'" height="'+baseH+'" fill="var(--navy2)" opacity="0.7" rx="2"/>';
+    bars += '<rect x="'+(cx+2)+'" y="'+projY+'" width="'+bw+'" height="'+projH+'" fill="var(--teal)" opacity="0.85" rx="2"/>';
+
+    if(y.savings > 0){
+      bars += '<text x="'+cx+'" y="'+(Math.min(baseY,projY)-5)+'" text-anchor="middle" style="font-size:6pt;fill:var(--green2);font-weight:800;">'+fmt(y.savings)+'</text>';
+    }
+    lbls += '<text x="'+cx+'" y="'+(H-pad.b+12)+'" text-anchor="middle" class="chart-label" style="font-size:6.5pt;">'+y.label+'</text>';
+  });
+
+  var legend = '<rect x="'+pad.l+'" y="'+(H-8)+'" width="8" height="8" fill="var(--navy2)" opacity="0.7" rx="1"/><text x="'+(pad.l+10)+'" y="'+(H-1)+'" class="chart-label" style="font-size:6.5pt;">Base (w/ growth)</text>'+
+    '<rect x="'+(pad.l+105)+'" y="'+(H-8)+'" width="8" height="8" fill="var(--teal)" opacity="0.85" rx="1"/><text x="'+(pad.l+115)+'" y="'+(H-1)+'" class="chart-label" style="font-size:6.5pt;">Projected (after savings)</text>';
+
+  var axis = '<line x1="'+pad.l+'" y1="'+pad.t+'" x2="'+pad.l+'" y2="'+(H-pad.b)+'" class="chart-axis"/>'+
+    '<line x1="'+pad.l+'" y1="'+(H-pad.b)+'" x2="'+(W-pad.r)+'" y2="'+(H-pad.b)+'" class="chart-axis"/>';
+
+  document.getElementById('projection-chart').innerHTML =
+    '<svg class="chart" viewBox="0 0 '+W+' '+(H+14)+'" xmlns="http://www.w3.org/2000/svg">'+gridlines+axis+bars+lbls+legend+'</svg>';
+
+  document.getElementById('proj-sub').textContent =
+    S.scenario.charAt(0).toUpperCase()+S.scenario.slice(1)+' scenario · '+S.growth+'% annual growth · '+S.horizon+'-year horizon'+(R.totalNetMultiYear>0?' · Total net savings: '+fmt(R.totalNetMultiYear):'');
+}
+
+// ── Lever Breakdown Table ─────────────────────────────────────────────
+function _renderLeverTable(R){
+  var active = LEVER_META.filter(function(m){ return R.leverAmts[m.key]>0; });
+  if(!active.length){
+    document.getElementById('lever-table').innerHTML='<div style="font-size:8pt;color:var(--ink4);font-style:italic;padding:8px 0;">No savings levers active yet.</div>';
+    return;
+  }
+  var total = active.reduce(function(s,m){ return s+R.leverAmts[m.key]; },0);
+  var html = active.map(function(m){
+    var amt = R.leverAmts[m.key];
+    var pct = total>0?(amt/total*100).toFixed(0):0;
+    var barW = total>0?Math.round(amt/total*100):0;
+    return '<div class="lev-row">'
+      +'<div class="lev-dot" style="background:'+m.color+'"></div>'
+      +'<div class="lev-name">'+m.label+'</div>'
+      +'<div class="lev-bar-wrap"><div class="lev-track"><div class="lev-fill" style="width:'+barW+'%;background:'+m.color+'"></div></div></div>'
+      +'<div class="lev-pct">'+pct+'%</div>'
+      +'<div class="lev-amt">'+fmt(amt)+'</div>'
+    +'</div>';
+  }).join('');
+  document.getElementById('lever-table').innerHTML = html;
+}
+
+// ── Donut Chart (SVG) ──────────────────────────────────────────────────
+function _renderDonut(R){
+  var active = LEVER_META.filter(function(m){ return R.leverAmts[m.key]>0; });
+  if(!active.length){ document.getElementById('donut-chart').innerHTML=''; return; }
+  var total = active.reduce(function(s,m){ return s+R.leverAmts[m.key]; },0);
+  if(total===0){ document.getElementById('donut-chart').innerHTML=''; return; }
+
+  var cx=80,cy=72,ro=62,ri=42;
+  var slices=''; var angle=-Math.PI/2;
+  active.forEach(function(m){
+    var share = R.leverAmts[m.key]/total;
+    var sweep = share * 2 * Math.PI;
+    var x1=cx+ro*Math.cos(angle), y1=cy+ro*Math.sin(angle);
+    var x2=cx+ro*Math.cos(angle+sweep), y2=cy+ro*Math.sin(angle+sweep);
+    var xi1=cx+ri*Math.cos(angle), yi1=cy+ri*Math.sin(angle);
+    var xi2=cx+ri*Math.cos(angle+sweep), yi2=cy+ri*Math.sin(angle+sweep);
+    var large=sweep>Math.PI?1:0;
+    slices+='<path d="M'+xi1+','+yi1+' L'+x1+','+y1+' A'+ro+','+ro+' 0 '+large+',1 '+x2+','+y2+' L'+xi2+','+yi2+' A'+ri+','+ri+' 0 '+large+',0 '+xi1+','+yi1+' Z" fill="'+m.color+'" opacity="0.88"/>';
+    angle+=sweep;
+  });
+  var centerLabel = '<text x="'+cx+'" y="'+(cy-5)+'" text-anchor="middle" style="font-size:7pt;fill:var(--ink4);">Total</text><text x="'+cx+'" y="'+(cy+9)+'" text-anchor="middle" style="font-size:8pt;font-weight:900;fill:var(--green2);">'+fmt(total)+'</text>';
+
+  document.getElementById('donut-chart').innerHTML =
+    '<svg viewBox="0 0 160 144" style="width:160px;display:block;margin:0 auto">'+slices+centerLabel+'</svg>';
+}
+
+// ── Budget Intelligence Engine ─────────────────────────────────────────
+function _renderBVA(R){
+  var fyWeek   = S.fyWeek || 26;
+  var qBudget  = S.qBudget  || [0,0,0,0];
+  var qActuals = S.qActuals || [0,0,0,0];
+  var totalBudget  = qBudget.reduce(function(s,v){ return s+v; },0);
+  var totalActuals = qActuals.reduce(function(s,v){ return s+v; },0);
+
+  // Which quarter are we in based on week of FY?
+  var currentQ = fyWeek <= 13 ? 0 : fyWeek <= 26 ? 1 : fyWeek <= 39 ? 2 : 3;
+  var weekInQ  = ((fyWeek - 1) % 13) + 1;  // 1–13 within quarter
+
+  // Pacing calculation
+  var fyPctElapsed = fyWeek / 52;
+  var pacedBudget  = totalBudget * fyPctElapsed;
+  var pacedVariance = totalActuals - pacedBudget;
+  var runRate      = fyWeek > 0 ? (totalActuals / fyWeek) * 52 : 0;
+  var projectedEOY = runRate;
+  var eoyVariance  = projectedEOY - totalBudget;
+  var remainingBudget = totalBudget - totalActuals;
+  var weeksRemaining  = 52 - fyWeek;
+  var weeklyBurnNeeded = weeksRemaining > 0 ? remainingBudget / weeksRemaining : 0;
+  var currentWeeklyBurn = fyWeek > 0 ? totalActuals / fyWeek : 0;
+  var burnDelta = weeklyBurnNeeded - currentWeeklyBurn;
+
+  // Quarter statuses
+  var qStatus = qBudget.map(function(b, i){
+    var a = qActuals[i];
+    var isComplete = i < currentQ;
+    var isCurrent  = i === currentQ;
+    var isUpcoming = i > currentQ;
+    var pct  = b > 0 ? a / b * 100 : 0;
+    var diff = a - b;
+    var qPace = isCurrent ? (a / weekInQ) * 13 : a;
+    var projOverUnder = isCurrent ? qPace - b : (isUpcoming ? 0 : diff);
+    var status, cls;
+    if(isUpcoming){ status='Upcoming'; cls='plan'; }
+    else if(isComplete){
+      status = Math.abs(diff) < b*0.02 ? 'On Budget' : diff > 0 ? 'Over' : 'Under';
+      cls    = Math.abs(diff) < b*0.02 ? 'ok' : diff > 0 ? 'ov' : 'un';
+    } else {
+      var atRisk = projOverUnder > b * 0.05;
+      var underRisk = projOverUnder < -(b * 0.08);
+      status = atRisk ? 'Overpace' : underRisk ? 'At Risk' : 'On Track';
+      cls    = atRisk ? 'ov' : underRisk ? 'warn' : 'ok';
+    }
+    return { b:b, a:a, i:i, isComplete:isComplete, isCurrent:isCurrent, isUpcoming:isUpcoming,
+             pct:pct, diff:diff, qPace:qPace, projOverUnder:projOverUnder, status:status, cls:cls };
+  });
+
+  // ── 1. Quarterly Burn Chart (SVG) ──────────────────────────────────
+  var W=540, H=115, pad={l:44,r:12,t:10,b:32};
+  var chartH = H - pad.t - pad.b;
+  var maxVal = Math.max.apply(null, qBudget.concat(qActuals).concat([1])) * 1.18;
+  var slotW  = (W-pad.l-pad.r)/4;
+  var bw     = Math.floor(slotW*0.27);
+  var bars='', gridlines='', lbls='';
+
+  // 3 gridlines — light, dashed
+  for(var g=0;g<=3;g++){
+    var gv=maxVal*g/3, gy=H-pad.b-Math.round(gv/maxVal*chartH);
+    gridlines+='<line x1="'+pad.l+'" y1="'+gy+'" x2="'+(W-pad.r)+'" y2="'+gy+'" stroke="var(--gray3)" stroke-width="0.75" stroke-dasharray="4,3"/>';
+    gridlines+='<text x="'+(pad.l-5)+'" y="'+(gy+3)+'" text-anchor="end" style="font-size:5.5pt;fill:var(--ink4);">'+fmt(gv)+'</text>';
+  }
+  var axis='<line x1="'+pad.l+'" y1="'+pad.t+'" x2="'+pad.l+'" y2="'+(H-pad.b)+'" stroke="var(--border2)" stroke-width="0.75"/>'
+    +'<line x1="'+pad.l+'" y1="'+(H-pad.b)+'" x2="'+(W-pad.r)+'" y2="'+(H-pad.b)+'" stroke="var(--border2)" stroke-width="0.75"/>';
+
+  var qRanges = ['Feb–Apr','May–Jul','Aug–Oct','Nov–Jan'];
+
+  qBudget.forEach(function(b, i){
+    var a   = qActuals[i];
+    var qs  = qStatus[i];
+    var cx  = pad.l + i*slotW + slotW/2;
+    var bh  = Math.max(2, Math.round(b/maxVal*chartH));
+    var by  = H-pad.b-bh;
+    var ah  = a > 0 ? Math.max(2, Math.round(a/maxVal*chartH)) : 0;
+    var ay  = H-pad.b-ah;
+    var aColor     = qs.cls==='ov'?'#DC2626':qs.cls==='warn'?'#D97706':qs.cls==='ok'?'#059669':'#9CA3AF';
+    var budgetColor= qs.isUpcoming ? '#D1D5DB' : qs.isCurrent ? '#0F1E3C' : '#1E3A5F';
+
+    // Active quarter column tint
+    if(qs.isCurrent){
+      bars+='<rect x="'+(cx-slotW/2+2)+'" y="'+pad.t+'" width="'+(slotW-4)+'" height="'+chartH+'" fill="#0D9488" opacity="0.04" rx="2"/>';
+    }
+
+    // Budget bar
+    bars+='<rect x="'+(cx-bw-2)+'" y="'+by+'" width="'+bw+'" height="'+bh+'" fill="'+budgetColor+'" opacity="0.85" rx="2"/>';
+
+    // Actuals bar
+    if(a > 0){
+      bars+='<rect x="'+(cx+2)+'" y="'+ay+'" width="'+bw+'" height="'+ah+'" fill="'+aColor+'" opacity="0.88" rx="2"/>';
+      // Variance label above — only if notable and there's enough vertical space
+      if(!qs.isUpcoming && Math.abs(qs.diff) > b*0.02){
+        var varY = Math.min(by, ay) - 5;
+        if(varY > pad.t + 4){
+          bars+='<text x="'+cx+'" y="'+varY+'" text-anchor="middle" style="font-size:5.5pt;fill:'+aColor+';font-weight:700;">'+(qs.diff>0?'+':'')+fmt(qs.diff)+'</text>';
+        }
+      }
+    }
+
+    // Current Q: pace projection as ghost bar
+    if(qs.isCurrent && qs.qPace > 0){
+      var ph = Math.max(2, Math.round(qs.qPace/maxVal*chartH));
+      var py = H-pad.b-ph;
+      bars+='<rect x="'+(cx+2)+'" y="'+py+'" width="'+bw+'" height="'+(H-pad.b-py)+'" fill="'+aColor+'" opacity="0.15" rx="2" stroke="'+aColor+'" stroke-width="0.75" stroke-dasharray="2,2"/>';
+    }
+
+    // X labels: Q# (teal if current), date range
+    var qColor = qs.isCurrent ? '#0D9488' : '#6B7280';
+    var qWeight= qs.isCurrent ? '800' : '600';
+    lbls+='<text x="'+cx+'" y="'+(H-pad.b+11)+'" text-anchor="middle" style="font-size:6.5pt;font-weight:'+qWeight+';fill:'+qColor+';">Q'+(i+1)+(qs.isCurrent?' ▸':'')+'</text>';
+    lbls+='<text x="'+cx+'" y="'+(H-pad.b+21)+'" text-anchor="middle" style="font-size:5pt;fill:#9CA3AF;">'+qRanges[i]+'</text>';
+  });
+
+  // Legend
+  var legY = H+3;
+  var legend=
+    '<rect x="'+pad.l+'" y="'+legY+'" width="6" height="6" fill="#1E3A5F" opacity="0.85" rx="1"/>'
+    +'<text x="'+(pad.l+9)+'" y="'+(legY+6)+'" style="font-size:5.5pt;fill:var(--ink4);">Budget</text>'
+    +'<rect x="'+(pad.l+50)+'" y="'+legY+'" width="6" height="6" fill="#059669" opacity="0.88" rx="1"/>'
+    +'<text x="'+(pad.l+59)+'" y="'+(legY+6)+'" style="font-size:5.5pt;fill:var(--ink4);">Actuals</text>'
+    +'<rect x="'+(pad.l+102)+'" y="'+legY+'" width="6" height="6" fill="#059669" opacity="0.15" rx="1" stroke="#059669" stroke-width="0.75"/>'
+    +'<text x="'+(pad.l+111)+'" y="'+(legY+6)+'" style="font-size:5.5pt;fill:var(--ink4);">Q Pace est.</text>';
+
+  document.getElementById('bva-chart').innerHTML=
+    '<svg class="chart" viewBox="0 0 '+W+' '+(H+14)+'" xmlns="http://www.w3.org/2000/svg">'+gridlines+axis+bars+lbls+legend+'</svg>';
+
+  // ── 2. Pace status (used in header summary and reforecast logic) ─────
+  var paceStatus, paceCls;
+  if(Math.abs(pacedVariance) < totalBudget*0.02){ paceStatus='On Pace'; paceCls='var(--teal)'; }
+  else if(pacedVariance > 0){ paceStatus='Overpacing'; paceCls='var(--red)'; }
+  else { paceStatus='Underpacing'; paceCls='var(--amber)'; }
+
+  // ── 3. Smart Spend Reforecast ─────────────────────────────────────
+  var rfItems = [];
+  var remainingWeeks = 52 - fyWeek;
+
+  // Underpacing: recommend strategic actions instead of panic spending
+  // Underspend risk
+  if(pacedVariance < -(totalBudget * 0.05)){
+    rfItems.push({ type:'warn', icon:'&#9888;',
+      title:'Underspend Risk &mdash; '+fmt(Math.abs(pacedVariance))+' behind pace',
+      body:'At current run rate you\'ll end the year '+fmt(Math.abs(eoyVariance))+' under budget. '
+        +'Rather than accelerating spend to avoid budget cuts: '
+        +'(1) reforecast Q'+(currentQ+1)+' budget to reflect actual need, '
+        +'(2) redirect surplus to deferred strategic initiatives, or '
+        +'(3) return to finance with a documented optimization rationale.'
+    });
+  }
+
+  // Overspend alert
+  if(pacedVariance > totalBudget * 0.05){
+    rfItems.push({ type:'risk', icon:'&#128308;',
+      title:'Overspend Alert &mdash; '+fmt(pacedVariance)+' ahead of pace',
+      body:'Projected EOY overspend of '+fmt(eoyVariance)+'. Review Q'+(currentQ+1)+' SOW pipeline, '
+        +'pause discretionary spend, and confirm whether remaining commitments are obligated or deferrable.'
+    });
+  }
+
+  // Weekly burn rate
+  if(weeksRemaining > 0 && remainingBudget > 0){
+    var burnPctStr = currentWeeklyBurn > 0 ? Math.round(burnDelta/currentWeeklyBurn*100)+'%' : null;
+    var burnBody = currentWeeklyBurn === 0
+      ? 'No actuals yet. Remaining '+fmt(remainingBudget)+' requires '+fmt(weeklyBurnNeeded)+'/wk over '+weeksRemaining+' weeks — a spend-it-or-lose-it signal. Recommend reforecast.'
+      : burnDelta > currentWeeklyBurn*0.2
+      ? 'Weekly spend needs to rise from '+fmt(currentWeeklyBurn)+' to '+fmt(weeklyBurnNeeded)+'/wk (+'+(burnPctStr||'significant')+') to exhaust remaining '+fmt(remainingBudget)+'. Spend-it-or-lose-it signal — recommend reforecast.'
+      : burnDelta < -(currentWeeklyBurn*0.1)
+      ? 'Only '+fmt(weeklyBurnNeeded)+'/wk needed vs your current '+fmt(currentWeeklyBurn)+'/wk burn. Tracking to return '+fmt(Math.abs(eoyVariance))+' to budget.'
+      : 'Burn rate of '+fmt(currentWeeklyBurn)+'/wk is on pace to deplete remaining '+fmt(remainingBudget)+' over '+weeksRemaining+' weeks.';
+    rfItems.push({ type:'info', icon:'&#128336;',
+      title:'Weekly Burn Rate &mdash; '+fmt(weeklyBurnNeeded)+'/wk needed',
+      body: burnBody
+    });
+  }
+
+  var rfHtml = rfItems.length
+    ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">'
+      + rfItems.map(function(item){
+          var bg = item.type==='risk'?'var(--red3)':item.type==='warn'?'var(--amber3)':'var(--navy3)';
+          var bd = item.type==='risk'?'#FECACA':item.type==='warn'?'#FDE68A':'#BFDBFE';
+          var lc = item.type==='risk'?'var(--red)':item.type==='warn'?'var(--amber)':'var(--navy)';
+          var tc = item.type==='risk'?'var(--red2)':item.type==='warn'?'var(--amber2)':'var(--navy2)';
+          return '<div style="background:'+bg+';border:1px solid '+bd+';border-left:3px solid '+lc+';border-radius:0 6px 6px 0;padding:7px 10px;">'
+            +'<div style="font-size:6.5pt;font-weight:800;color:'+tc+';margin-bottom:3px;">'+item.icon+' '+item.title+'</div>'
+            +'<div style="font-size:6.5pt;color:'+tc+';line-height:1.5;">'+item.body+'</div>'
+          +'</div>';
+        }).join('')
+      +'</div>'
+    : '';
+
+  document.getElementById('bva-reforecast').innerHTML = rfHtml;
+
+  // ── 4. Quarter Detail Table ───────────────────────────────────────
+  var tHtml = '<table style="width:100%;border-collapse:collapse;font-size:8pt;">'
+    +'<thead><tr style="background:var(--navy);">'
+    +'<th style="padding:7px 10px;text-align:left;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.7);">Quarter</th>'
+    +'<th style="padding:7px 10px;text-align:right;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.7);">Budget</th>'
+    +'<th style="padding:7px 10px;text-align:right;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.7);">Actuals</th>'
+    +'<th style="padding:7px 10px;text-align:right;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.7);">Variance</th>'
+    +'<th style="padding:7px 10px;text-align:right;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.7);">% Used</th>'
+    +'<th style="padding:7px 10px;text-align:center;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.7);">Reforecast</th>'
+    +'<th style="padding:7px 10px;text-align:left;font-size:7pt;font-weight:700;color:rgba(255,255,255,0.7);">Status</th>'
+    +'</tr></thead><tbody>';
+
+  var statusColors = { ov:'var(--red2)', warn:'var(--amber2)', ok:'var(--green2)', un:'var(--green2)', plan:'var(--ink4)' };
+  var statusBgs    = { ov:'var(--red3)', warn:'var(--amber3)', ok:'var(--green3)', un:'var(--green3)', plan:'var(--gray2)' };
+
+  qStatus.forEach(function(q){
+    var varColor = Math.abs(q.diff)<q.b*0.02?'var(--ink4)':q.diff>0?'var(--red2)':'var(--green2)';
+    var rfVal = q.isCurrent ? fmt(q.qPace) : q.isUpcoming ? fmt(q.b) : fmt(q.a);
+    var rfNote = q.isCurrent ? '(Q pace est.)' : q.isUpcoming ? '(budget)' : '(closed)';
+    tHtml += '<tr style="border-bottom:1px solid var(--gray2);">'
+      +'<td style="padding:8px 10px;font-weight:700;color:var(--ink)'+(q.isCurrent?' ;background:rgba(13,148,136,0.04)':'')+';"><span style="'+(q.isCurrent?'color:var(--teal)':'')+'">'
+        +(q.isCurrent?'&#9654; ':'')+'Q'+(q.i+1)+(q.isCurrent?' <span style="font-size:6.5pt;font-weight:700;background:var(--teal3);color:var(--teal);padding:1px 5px;border-radius:4px;">Active</span>':'')
+      +'</span></td>'
+      +'<td style="padding:8px 10px;text-align:right;font-weight:600;">'+fmt(q.b)+'</td>'
+      +'<td style="padding:8px 10px;text-align:right;font-weight:700;color:var(--navy);">'+(q.a>0?fmt(q.a):'—')+'</td>'
+      +'<td style="padding:8px 10px;text-align:right;font-weight:800;color:'+varColor+';">'+(q.isUpcoming?'—':(q.diff>0?'+':'')+fmt(q.diff))+'</td>'
+      +'<td style="padding:8px 10px;text-align:right;color:var(--ink4);">'+(q.isUpcoming?'—':Math.round(q.pct)+'%')+'</td>'
+      +'<td style="padding:8px 10px;text-align:right;font-size:7.5pt;font-weight:700;color:var(--teal);">'+rfVal+' <span style="font-size:6pt;color:var(--ink4);">'+rfNote+'</span></td>'
+      +'<td style="padding:8px 10px;"><span style="font-size:6.5pt;font-weight:800;padding:2px 8px;border-radius:8px;background:'+statusBgs[q.cls]+';color:'+statusColors[q.cls]+';">'+q.status+'</span></td>'
+    +'</tr>';
+  });
+
+  // Totals row
+  var totalVar = totalActuals - totalBudget;
+  var totalVarColor = Math.abs(totalVar)<totalBudget*0.02?'var(--ink4)':totalVar>0?'var(--red2)':'var(--green2)';
+  tHtml += '<tr style="background:var(--gray2);font-weight:800;">'
+    +'<td style="padding:8px 10px;font-weight:800;color:var(--ink);">Full Year</td>'
+    +'<td style="padding:8px 10px;text-align:right;font-weight:800;">'+fmt(totalBudget)+'</td>'
+    +'<td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--navy);">'+fmt(totalActuals)+'</td>'
+    +'<td style="padding:8px 10px;text-align:right;font-weight:800;color:'+totalVarColor+';">'+(totalVar>0?'+':'')+fmt(totalVar)+'</td>'
+    +'<td style="padding:8px 10px;text-align:right;color:var(--ink4);">'+Math.round(totalBudget>0?totalActuals/totalBudget*100:0)+'%</td>'
+    +'<td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--teal);">'+fmt(projectedEOY)+'</td>'
+    +'<td style="padding:8px 10px;"><span style="font-size:6.5pt;font-weight:800;padding:2px 8px;border-radius:8px;background:'+(Math.abs(eoyVariance)<totalBudget*0.03?'var(--green3)':eoyVariance>0?'var(--red3)':'var(--amber3)')+';color:'+(Math.abs(eoyVariance)<totalBudget*0.03?'var(--green2)':eoyVariance>0?'var(--red2)':'var(--amber2)')+';">EOY: '+fmt(projectedEOY)+'</span></td>'
+  +'</tr>';
+
+  tHtml += '</tbody></table>';
+  document.getElementById('bva-table').innerHTML = tHtml;
+
+  // Header summary
+  var summaryColor = pacedVariance > totalBudget*0.05 ? 'var(--red2)' : pacedVariance < -(totalBudget*0.05) ? 'var(--amber2)' : 'var(--green2)';
+  document.getElementById('bva-summary').innerHTML =
+    '<span style="color:'+summaryColor+';">'+paceStatus+'</span><br>'
+    +'<span style="font-size:7pt;color:var(--ink4);font-weight:400;">Wk '+fyWeek+' of 52 &middot; '+fmt(remainingBudget)+' remaining</span>';
+}
+
+// ── Priority Actions (dynamic based on levers) ────────────────────────
+// ── UIOLI Quarter-Close Intelligence ──────────────────────────────────
+function _renderUIIOLI(R){
+  var card = document.getElementById('uioli-card');
+  if(!card) return;
+
+  // Only show card if levers are active and spend is set
+  var hasLevers = LEVER_META.some(function(m){ return R.leverAmts[m.key] > 0; });
+  if(!hasLevers || R.spend === 0){ card.style.display='none'; return; }
+  card.style.display='block';
+
+  var qNames    = ['Q1 (Feb–Apr)','Q2 (May–Jul)','Q3 (Aug–Oct)','Q4 (Nov–Jan)'];
+  var qName     = qNames[R.currentQ];
+  var weeksLeft = R.weeksLeftInQ;
+  var days      = R.daysToClose;
+  var urgency   = days <= 14 ? 'urgent' : days <= 28 ? 'warn' : 'good';
+  var urgencyLabel = days <= 14 ? 'Critical' : days <= 28 ? 'Caution' : 'Planning';
+
+  // Urgency badge
+  var badgeColors = { urgent:'var(--red2)', warn:'var(--amber2)', good:'var(--green2)' };
+  var badgeBgs    = { urgent:'var(--red3)', warn:'var(--amber3)', good:'var(--green3)' };
+  document.getElementById('uioli-urgency-badge').innerHTML =
+    '<span style="font-size:7pt;font-weight:800;padding:3px 10px;border-radius:6px;'
+    +'background:'+badgeBgs[urgency]+';color:'+badgeColors[urgency]+';white-space:nowrap;">'
+    + (urgency==='urgent'?'🔴':urgency==='warn'?'🟡':'🟢') + ' ' + urgencyLabel
+    +' &nbsp;·&nbsp; '+days+'d to Q-close</span>';
+
+  // Sub-line
+  document.getElementById('uioli-sub').textContent =
+    qName+' closes in '+days+' days ('+weeksLeft+' wks) — '
+    +( R.thisQCapturableTotal > 0
+       ? fmt(R.thisQCapturableTotal)+' capturable this quarter vs '+fmt(Math.max(0,R.deferredTotal))+' deferred to Q+'+(R.currentQ < 3 ? (R.currentQ+2) : 1)
+       : 'no active levers have short enough lead time to capture savings before Q-close' );
+
+  // ── Summary stat tiles ────────────────────────────────────────────────
+  var uncommitted = R.qUncommitted;
+  var uioliRisk   = R.uioliExposure;
+  var statHtml =
+    '<div class="uioli-summary">'
+    // Tile 1: Days to Q-close
+    +'<div class="uioli-stat '+urgency+'">'
+      +'<div class="uioli-stat-lbl">Days to Q-Close</div>'
+      +'<div class="uioli-stat-val">'+days+'</div>'
+      +'<div class="uioli-stat-note">'+qName+' closes '+R.qCloseDate.toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</div>'
+    +'</div>'
+    // Tile 2: Weeks remaining in quarter
+    +'<div class="uioli-stat">'
+      +'<div class="uioli-stat-lbl">Weeks Left in Quarter</div>'
+      +'<div class="uioli-stat-val">'+weeksLeft+'</div>'
+      +'<div class="uioli-stat-note">of 13 in '+qName+'</div>'
+    +'</div>'
+    // Tile 3: This-Q capturable savings
+    +'<div class="uioli-stat '+(R.thisQCapturableTotal>0?'good':'warn')+'">'
+      +'<div class="uioli-stat-lbl">Capturable This Quarter</div>'
+      +'<div class="uioli-stat-val">'+fmt(R.thisQCapturableTotal)+'</div>'
+      +'<div class="uioli-stat-note">Based on lever lead times</div>'
+    +'</div>'
+    // Tile 4: UIOLI budget exposure
+    +'<div class="uioli-stat '+(uioliRisk>0?(urgency):'good')+'">'
+      +'<div class="uioli-stat-lbl">UIOLI Budget Exposure</div>'
+      +'<div class="uioli-stat-val">'+fmt(uioliRisk)+'</div>'
+      +'<div class="uioli-stat-note">Uncommitted budget at pace risk</div>'
+    +'</div>'
+    +'</div>';
+
+  // ── Per-lever table ───────────────────────────────────────────────────
+  var activeLevers = LEVER_META.filter(function(m){ return R.leverAmts[m.key] > 0; });
+  var maxAmt = Math.max.apply(null, activeLevers.map(function(m){ return R.leverAmts[m.key]; }));
+
+  var leverHtml = '<div class="uioli-levers">'
+    +'<div style="display:grid;grid-template-columns:160px 80px 1fr 90px 100px;gap:8px;padding:4px 0 6px;border-bottom:2px solid var(--border);">'
+      +'<div class="uioli-lev-hdr">Lever</div>'
+      +'<div class="uioli-lev-hdr">Lead Time</div>'
+      +'<div class="uioli-lev-hdr">Q-Capturable vs Annual</div>'
+      +'<div class="uioli-lev-hdr" style="text-align:right;">This-Q Est.</div>'
+      +'<div class="uioli-lev-hdr" style="text-align:center;">Status</div>'
+    +'</div>';
+
+  activeLevers.forEach(function(m){
+    var u = R.leverUIOLI[m.key];
+    var annualAmt = R.leverAmts[m.key];
+    var barPct = maxAmt > 0 ? Math.round(annualAmt/maxAmt*100) : 0;
+    var capPct  = annualAmt > 0 ? Math.round(u.qSaving/annualAmt*100) : 0;
+    var barClass = u.capturable ? 'capturable' : u.partial ? 'partial' : 'deferred';
+    var tag = u.capturable
+      ? '<span class="uioli-lever-tag thisq">⚡ This Q</span>'
+      : u.partial
+        ? '<span class="uioli-lever-tag partial">⚠ Partial</span>'
+        : '<span class="uioli-lever-tag nextq">⏭ Deferred</span>';
+    var amtColor = u.capturable ? 'var(--green2)' : u.partial ? 'var(--amber2)' : 'var(--ink4)';
+
+    leverHtml += '<div class="uioli-lever-row">'
+      +'<div class="uioli-lever-name">'+m.label+'</div>'
+      +'<div class="uioli-lever-lead">'+u.lead.label+'</div>'
+      +'<div class="uioli-lever-bar-wrap">'
+        // Annual bar (grey background)
+        +'<div class="uioli-lever-bar deferred" style="width:'+barPct+'%"></div>'
+        // Capturable bar (green/amber overlay)
+        +(u.qSaving>0?'<div class="uioli-lever-bar '+barClass+'" style="width:'+Math.round(barPct*capPct/100)+'%"></div>':'')
+      +'</div>'
+      +'<div class="uioli-lever-amt" style="color:'+amtColor+';">'+fmt(u.qSaving)+'</div>'
+      +tag
+    +'</div>';
+  });
+  leverHtml += '</div>';
+
+  // ── Reforecast recommendation ─────────────────────────────────────────
+  var recastActions = [];
+  if(R.thisQCapturableTotal > 0)
+    recastActions.push({ hot:true,  label:'⚡ Action '+fmt(R.thisQCapturableTotal)+' in capturable levers now' });
+  if(uioliRisk > uncommitted * 0.1)
+    recastActions.push({ hot:true,  label:'📋 Reforecast '+qName+' budget before close' });
+  if(R.deferredTotal > 0)
+    recastActions.push({ hot:false, label:'📅 Plan deferred levers in Q'+(R.currentQ<3?R.currentQ+2:1)+' SOW pipeline' });
+  recastActions.push({ hot:false, label:'📄 Document optimization rationale for Finance' });
+
+  var recommendation = '';
+  if(days <= 14){
+    recommendation = 'Quarter close is imminent. '+(R.thisQCapturableTotal > 0 ? 'You have '+fmt(R.thisQCapturableTotal)+' in savings that can still be executed before close — initiate negotiations this week. ' : '')
+      +(uioliRisk > 0 ? fmt(uioliRisk)+' in uncommitted budget is at risk of lapsing. Reforecast now or redirect to strategic initiatives before it converts to zero-value spend.' : '');
+  } else if(days <= 28){
+    recommendation = 'Approaching quarter close. '+(R.thisQCapturableTotal > 0 ? fmt(R.thisQCapturableTotal)+' in savings levers are still actionable this quarter — prioritize short lead-time levers (Scope Rightsizing, SLA Credits, Payment Terms). ' : '')
+      +'Review '+(qName)+' actuals vs budget and prepare a reforecast package for Finance before week '+(13 - weeksLeft + 10)+'.';
+  } else {
+    recommendation = 'You have '+weeksLeft+' weeks in '+qName+'. '+(R.thisQCapturableTotal>0 ? fmt(R.thisQCapturableTotal)+' in savings are achievable this quarter with early action on short lead-time levers. ' : '')
+      +'Longer lead-time levers (Rate Renegotiation, Volume Consolidation) should be initiated now to land in Q'+(R.currentQ<3?R.currentQ+2:1)+'.';
+  }
+
+  var rfHtml = '<div class="uioli-reforecast">'
+    +'<div class="uioli-reforecast-title">&#128204; Recommended Q-Close Actions</div>'
+    +'<div class="uioli-reforecast-body">'+recommendation+'</div>'
+    +'<div class="uioli-reforecast-actions">'
+    + recastActions.map(function(a){
+        return '<span class="uioli-action-chip'+(a.hot?' hot':'')+'">' + a.label + '</span>';
+      }).join('')
+    +'</div>'
+    +'</div>';
+
+  document.getElementById('uioli-content').innerHTML = statHtml + leverHtml + rfHtml;
+}
+
+function _renderActions(R){
+  var spend=S.spend;
+  var actions=[];
+
+  if(S.levers.rate>0)    actions.push({pri:'p1',title:'Rate Renegotiation',desc:'Target '+S.levers.rate+'% rate reduction. Pull benchmark data and initiate negotiation before next renewal cycle.',impact:fmt(R.leverAmts.rate)});
+  if(S.levers.scope>0)   actions.push({pri:'p1',title:'Scope Rightsizing',desc:'Identify '+S.levers.scope+'% of scope for removal or deferral. Review active SOWs for underutilized deliverables.',impact:fmt(R.leverAmts.scope)});
+  if(S.levers.license>0) actions.push({pri:'p2',title:'License Optimization',desc:'Audit active seats/licenses. Remove idle users and right-size tiers before renewal.',impact:fmt(R.leverAmts.license)});
+  if(S.levers.bench>0)   actions.push({pri:'p1',title:'Benchmark Arbitrage',desc:'Use market benchmarks to validate current rates. Apply findings to accelerate negotiation.',impact:fmt(R.leverAmts.bench)});
+  if(S.levers.vol>0)     actions.push({pri:'p2',title:'Volume Consolidation',desc:'Aggregate spend across business units for higher volume leverage with fewer strategic vendors.',impact:fmt(R.leverAmts.vol)});
+  if(S.levers.term>0)    actions.push({pri:'p2',title:'Contract Term Commitment',desc:'Offer multi-year commitment in exchange for '+S.levers.term+'% discount. Model lock-in risk vs savings.',impact:fmt(R.leverAmts.term)});
+  if(S.levers.sla>0)     actions.push({pri:'p2',title:'SLA Credit Enforcement',desc:'Audit SLA performance history. Formally invoice SLA credits for documented misses.',impact:fmt(R.leverAmts.sla)});
+  if(S.levers.pay>0)     actions.push({pri:'p3',title:'Payment Term Optimization',desc:'Negotiate early payment discounts or extended payment terms (30→60→90 days) to optimize cash flow.',impact:fmt(R.leverAmts.pay)});
+  if(S.levers.mvb>0)     actions.push({pri:'p3',title:'Make vs Buy Analysis',desc:'Evaluate partial insourcing for '+S.levers.mvb+'% of scope. Build business case with FTE cost comparison.',impact:fmt(R.leverAmts.mvb)});
+
+  if(!actions.length){
+    // Default recommendations when no levers are set — impact derived from actual spend input
+    var sp = spend || 0;
+    var catDefaults = {
+      'Professional Services':    [{pri:'p1',title:'Rate Renegotiation',desc:'Professional services rates are frequently above market. Pull benchmark data and initiate rate review at next engagement milestone.',impact:sp>0?fmt(sp*0.115)+' est. (8–15%)':'Est. 8–15%'},
+                                   {pri:'p1',title:'Scope Rightsizing',desc:'Review active SOWs for underutilized deliverables or overstaffed roles. Target 10–20% scope reduction.',impact:sp>0?fmt(sp*0.15)+' est. (10–20%)':'Est. 10–20%'},
+                                   {pri:'p2',title:'Benchmark Arbitrage',desc:'Compare blended bill rates against Gartner/ISG benchmarks to build negotiation leverage.',impact:sp>0?fmt(sp*0.085)+' est. (5–12%)':'Est. 5–12%'}],
+      'Cloud & Managed Services': [{pri:'p1',title:'License / Seat Optimization',desc:'Audit active instances, reserved capacity, and idle resources. Cloud waste typically runs 20–35% of spend.',impact:sp>0?fmt(sp*0.225)+' est. (15–30%)':'Est. 15–30%'},
+                                   {pri:'p1',title:'Rate Renegotiation',desc:'Enterprise cloud agreements are negotiable. Leverage committed use discounts and competitive bids.',impact:sp>0?fmt(sp*0.13)+' est. (8–18%)':'Est. 8–18%'},
+                                   {pri:'p2',title:'Volume Consolidation',desc:'Consolidate workloads to fewer providers to unlock higher volume tiers.',impact:sp>0?fmt(sp*0.075)+' est. (5–10%)':'Est. 5–10%'}],
+      'Software / SaaS':          [{pri:'p1',title:'License / Seat Optimization',desc:'Audit active vs assigned seats. SaaS utilization gaps average 30–40% of licensed capacity.',impact:sp>0?fmt(sp*0.275)+' est. (20–35%)':'Est. 20–35%'},
+                                   {pri:'p2',title:'Contract Term Discount',desc:'Offer multi-year commitment in exchange for 10–15% discount. Model lock-in risk.',impact:sp>0?fmt(sp*0.125)+' est. (10–15%)':'Est. 10–15%'},
+                                   {pri:'p2',title:'Rate Renegotiation',desc:'Use renewal timing and competitive alternatives as leverage for improved unit pricing.',impact:sp>0?fmt(sp*0.10)+' est. (8–12%)':'Est. 8–12%'}],
+      'Contingent Workforce':     [{pri:'p1',title:'Rate Renegotiation',desc:'Bill rate benchmarks vary widely. Pull staffing agency rate cards and renegotiate markups.',impact:sp>0?fmt(sp*0.085)+' est. (5–12%)':'Est. 5–12%'},
+                                   {pri:'p1',title:'Scope Rightsizing',desc:'Review active headcount against deliverable backlog. Reduce contractor tenure where FTE coverage is viable.',impact:sp>0?fmt(sp*0.175)+' est. (10–25%)':'Est. 10–25%'},
+                                   {pri:'p2',title:'Volume Consolidation',desc:'Consolidate to preferred supplier list to improve rate leverage and reduce agency markup variance.',impact:sp>0?fmt(sp*0.065)+' est. (5–8%)':'Est. 5–8%'}],
+      'Hardware & Infrastructure': [{pri:'p2',title:'Volume Consolidation',desc:'Aggregate hardware refresh cycles across teams to qualify for volume pricing tiers.',impact:sp>0?fmt(sp*0.115)+' est. (8–15%)':'Est. 8–15%'},
+                                    {pri:'p2',title:'Contract Term Discount',desc:'Commit to multi-year refresh cycles in exchange for lock-in pricing.',impact:sp>0?fmt(sp*0.075)+' est. (5–10%)':'Est. 5–10%'},
+                                    {pri:'p3',title:'Make vs Buy Analysis',desc:'Evaluate co-lo or cloud migration for on-prem workloads nearing refresh.',impact:sp>0?fmt(sp*0.15)+' est. (10–20%)':'Est. 10–20%'}]
+    };
+    var defaults = catDefaults[S.category] || catDefaults['Professional Services'];
+    actions = defaults;
+  }
+
+  var html = actions.slice(0,6).map(function(a){
+    return '<div class="act-row">'
+      +'<div class="act-pri '+a.pri+'">'+(a.pri==='p1'?1:a.pri==='p2'?2:3)+'</div>'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div style="display:flex;justify-content:space-between;gap:6px;align-items:flex-start;">'
+          +'<div class="act-title">'+a.title+'</div>'
+          +'<div class="act-impact">'+a.impact+'</div>'
+        +'</div>'
+        +'<div class="act-desc">'+a.desc+'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  document.getElementById('actions-content').innerHTML = html;
+}
+
+// ── Export CSV ────────────────────────────────────────────────────────
+function _exportCSV(){
+  _readInputs();
+  var R=_calc();
+  var rows=[
+    ['"VER Forecast & Cost Optimization Export"'],
+    ['"Generated","'+new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'"'],
+    [],
+    ['INPUTS'],
+    ['Category',S.category],['Annual Spend',S.spend],['Growth Rate %',S.growth],
+    ['Horizon (years)',S.horizon],['Scenario',S.scenario],
+    ['Budget',S.budget],['Actuals YTD',S.actuals],
+    ['Implementation Cost',S.implCost],['Risk Contingency %',S.riskPct],
+    [],
+    ['SAVINGS LEVERS'],
+    ['Lever','% Applied','Dollar Impact'],
+  ];
+  LEVER_META.forEach(function(m){
+    if(S.levers[m.key]>0) rows.push(['"'+m.label+'"',S.levers[m.key],Math.round(R.leverAmts[m.key])]);
+  });
+  rows.push([]);
+  rows.push(['RESULTS']);
+  rows.push(['Current Spend',R.spend,'Projected Spend',Math.round(R.projectedSpend)]);
+  rows.push(['Gross Savings',Math.round(R.grossSavings),'Net Savings',Math.round(R.netSavings)]);
+  rows.push(['Risk Contingency',Math.round(R.riskContingency),'ROI %',R.roi===Infinity?'N/A':Math.round(R.roi)]);
+  rows.push([]);
+  rows.push(['BUDGET vs ACTUAL — QUARTERLY']);
+  rows.push(['Quarter','Budget','Actuals','Variance','% Used','Status']);
+  (S.qBudget||[]).forEach(function(b,i){
+    var a=S.qActuals[i]||0, diff=a-b, pct=b>0?Math.round(a/b*100):0;
+    rows.push(['Q'+(i+1),b,a,diff,pct+'%',diff>b*0.05?'Over':diff<-(b*0.05)?'Under':'On Budget']);
+  });
+  rows.push(['Full Year',S.budget,S.actuals,S.actuals-S.budget,S.budget>0?Math.round(S.actuals/S.budget*100)+'%':'—','']);
+  rows.push([]);
+  rows.push(['YEAR-BY-YEAR PROJECTION']);
+  rows.push(['Year','Base Spend (w/ growth)','Projected Spend','Net Savings']);
+  R.years.forEach(function(y){ rows.push(['Year '+y.year,Math.round(y.base),Math.round(y.projected),Math.round(y.net)]); });
+
+  var csv=rows.map(function(r){ return r.join(','); }).join('\n');
+  var b=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download='VER_Forecast_Optimization_'+new Date().toISOString().split('T')[0]+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+// ── Page tab switcher ─────────────────────────────────────────────────
+var _pgActive = 'cost';
+
+function _pgSwitch(tab){
+  _pgActive = tab;
+  document.getElementById('pg-cost').classList.toggle('active', tab === 'cost');
+  document.getElementById('pg-demand').classList.toggle('active', tab === 'demand');
+  document.getElementById('pgtab-cost').classList.toggle('active', tab === 'cost');
+  document.getElementById('pgtab-demand').classList.toggle('active', tab === 'demand');
+  document.getElementById('btn-export').textContent = tab === 'cost' ? '⬇ Export CSV' : '⬇ Export Demand CSV';
+}
+
+function _pgExport(){
+  if(_pgActive === 'cost') _exportCSV();
+  else _exportDemandCSV();
+}
+
+function _pgUpdateBadges(){}
+
+// ── Dark mode ──────────────────────────────────────────────────────────
+function _dmToggle(){
+  var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ver-theme',t);}catch(e){}
+  document.getElementById('dm-btn').innerHTML=t==='dark'?'&#9790; Light':'&#9789; Dark';
+}
+(function(){
+  var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
+  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('dm-btn');
+  if(btn) btn.innerHTML=t==='dark'?'&#9790; Light':'&#9789; Dark';
+})();
+
+// ── Vendor logo (Brandfetch CDN with initials fallback) ────────────────
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+function vlogoErr(img){ img.style.display='none'; var fb=img.nextElementSibling; if(fb) fb.style.display='flex'; }
+function vlogoOk(img) { var fb=img.nextElementSibling; if(fb) fb.style.display='none'; }
+function vendorLogo(domain, name, size, extra){
+  size = size||36; extra = extra||'';
+  var ini = (name||'?').split(' ').map(function(w){ return w[0]||''; }).join('').slice(0,2).toUpperCase();
+  var pal = ['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB'];
+  var lc  = pal[(name||'').length % pal.length];
+  var bs  = 'width:'+size+'px;height:'+size+'px;border-radius:8px;flex-shrink:0;';
+  var fb  = '<div style="'+bs+'background:'+lc+';display:none;align-items:center;justify-content:center;'
+          + 'font-size:'+Math.round(size*0.33)+'pt;font-weight:800;color:#fff;font-family:Arial;'+extra+'">'+ini+'</div>';
+  if(!domain) return '<div style="'+bs+'background:'+lc+';display:flex;align-items:center;justify-content:center;'
+    +'font-size:'+Math.round(size*0.33)+'pt;font-weight:800;color:#fff;font-family:Arial;'+extra+'">'+ini+'</div>';
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'"'
+    +' alt="'+name.replace(/[<>"]/g,'')+'" onerror="vlogoErr(this)" onload="vlogoOk(this)"'
+    +' style="'+bs+'object-fit:contain;background:#fff;padding:2px;'+extra+'">'+fb;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// DEMAND FORECASTING ENGINE
+// ══════════════════════════════════════════════════════════════════════
+
+// Role catalogue — label maps to default category; used to auto-populate category on role select
+var DF_ROLE_CATALOGUE = [
+  { label:'Software Engineer',              cat:'Software Engineering' },
+  { label:'Senior Software Engineer',       cat:'Software Engineering' },
+  { label:'Lead Software Engineer',         cat:'Software Engineering' },
+  { label:'Principal Software Engineer',    cat:'Software Engineering' },
+  { label:'Staff Software Engineer',        cat:'Software Engineering' },
+  { label:'Solution Architect',             cat:'Enterprise Architecture' },
+  { label:'Enterprise Architect',           cat:'Enterprise Architecture' },
+  { label:'Technical Architect',            cat:'Enterprise Architecture' },
+  { label:'Cloud Architect',                cat:'Enterprise Architecture' },
+  { label:'Data Architect',                 cat:'Data Engineering' },
+  { label:'Scrum Master',                   cat:'Agile Delivery' },
+  { label:'Senior Scrum Master',            cat:'Agile Delivery' },
+  { label:'Product Owner',                  cat:'Agile Delivery' },
+  { label:'Senior Product Owner',           cat:'Agile Delivery' },
+  { label:'Delivery Manager',               cat:'Agile Delivery' },
+  { label:'Agile Coach',                    cat:'Agile Delivery' },
+  { label:'Business Analyst',               cat:'Agile Delivery' },
+  { label:'Senior Business Analyst',        cat:'Agile Delivery' },
+  { label:'Product Manager',                cat:'Agile Delivery' },
+  { label:'Project Manager',                cat:'Agile Delivery' },
+  { label:'Program Manager',                cat:'Agile Delivery' },
+  { label:'UI/UX Designer',                 cat:'Agile Delivery' },
+  { label:'Senior UI/UX Designer',          cat:'Agile Delivery' },
+  { label:'Information Architect',          cat:'Agile Delivery' },
+  { label:'DevOps Engineer',                cat:'DevOps' },
+  { label:'Senior DevOps Engineer',         cat:'DevOps' },
+  { label:'Site Reliability Engineer',      cat:'DevOps' },
+  { label:'Platform Engineer',              cat:'Platform Engineering' },
+  { label:'QA Engineer',                    cat:'QA & Testing' },
+  { label:'Senior QA Engineer',             cat:'QA & Testing' },
+  { label:'SDET',                           cat:'QA & Testing' },
+  { label:'Data Engineer',                  cat:'Data Engineering' },
+  { label:'Senior Data Engineer',           cat:'Data Engineering' },
+  { label:'Data Scientist',                 cat:'Data Engineering' },
+  { label:'Data Analyst',                   cat:'Analytics & BI' },
+  { label:'BI Developer',                   cat:'Analytics & BI' },
+  { label:'Cybersecurity Analyst',          cat:'Security' },
+  { label:'Security Engineer',              cat:'Security' },
+  { label:'ERP Consultant (Workday)',        cat:'ERP / Workday' },
+  { label:'Salesforce Developer',           cat:'Application Development' },
+  { label:'Application Developer',          cat:'Application Development' },
+  { label:'Full Stack Developer',           cat:'Application Development' },
+  { label:'Mobile Developer',               cat:'Application Development' },
+  { label:'Integration Developer',          cat:'Application Development' },
+  { label:'Managed Services Engineer',      cat:'Managed Services' },
+  { label:'General Consultant',             cat:'General Consulting' },
+  { label:'Strategy Consultant',            cat:'Consulting / Advisory' },
+];
+
+var DF_ROLES = [
+  { id:'r1', label:'Software Engineer',     cat:'Software Engineering',    q:[0,0,0,0] },
+  { id:'r2', label:'Solution Architect',    cat:'Enterprise Architecture', q:[0,0,0,0] },
+  { id:'r3', label:'Scrum Master',          cat:'Agile Delivery',          q:[0,0,0,0] },
+];
+
+var DF_ROLE_ID_SEQ = 100;
+
+var DF_ALL_CATS = [
+  'Software Engineering','Enterprise Architecture','Agile Delivery','DevOps',
+  'QA & Testing','Data Engineering','Application Development','Managed Services',
+  'Staff Augmentation','Platform Engineering','Consulting / Advisory','Security',
+  'Analytics & BI','Application Maintenance','ERP / Workday','General Consulting'
+];
+
+// ── Role table rendering ───────────────────────────────────────────────
+function _dfBuildRoleTable(){
+  var tbody = document.getElementById('df-role-tbody');
+  tbody.innerHTML = DF_ROLES.map(function(r){
+    var rowTotal = r.q.reduce(function(s,v){ return s+v; }, 0);
+    return '<tr data-rid="'+r.id+'">'
+      +'<td>'
+        +'<select class="df-qinput df-role-select" title="Select role" onchange="_dfRoleChange(\''+r.id+'\',this.value)">'
+        + DF_ROLE_CATALOGUE.map(function(rc){ return '<option value="'+rc.label+'"'+(rc.label===r.label?' selected':'')+'>'+rc.label+'</option>'; }).join('')
+        +'</select>'
+      +'</td>'
+      +'<td>'
+        +'<select class="df-qinput df-cat-select" title="Role category" onchange="_dfCatChange(\''+r.id+'\',this.value)">'
+        + DF_ALL_CATS.map(function(c){ return '<option value="'+c+'"'+(c===r.cat?' selected':'')+'>'+c+'</option>'; }).join('')
+        +'</select>'
+      +'</td>'
+      + r.q.map(function(v,qi){
+        return '<td><input type="number" class="df-qinput" min="0" max="99" step="1" value="'+v+'" title="Q'+(qi+1)+' headcount" oninput="_dfQChange(\''+r.id+'\','+qi+',this.value)"></td>';
+      }).join('')
+      +'<td class="df-row-total" id="df-rt-'+r.id+'">'+rowTotal+'</td>'
+      +'<td><button type="button" class="btn btn-ghost btn-sm" title="Remove role" onclick="_dfRemoveRole(\''+r.id+'\')">✕</button></td>'
+    +'</tr>';
+  }).join('');
+  _recalcDemand();
+}
+
+function _dfRoleChange(rid, label){
+  var r = DF_ROLES.find(function(x){ return x.id===rid; });
+  if(!r) return;
+  r.label = label;
+  // Auto-set category to the role's default
+  var rc = DF_ROLE_CATALOGUE.find(function(x){ return x.label===label; });
+  if(rc) r.cat = rc.cat;
+  _dfBuildRoleTable();
+}
+
+function _dfCatChange(rid, val){
+  var r = DF_ROLES.find(function(x){ return x.id===rid; });
+  if(r) r.cat = val;
+  _recalcDemand();
+}
+
+function _dfQChange(rid, qi, val){
+  var r = DF_ROLES.find(function(x){ return x.id===rid; });
+  if(!r) return;
+  r.q[qi] = Math.max(0, parseInt(val)||0);
+  document.getElementById('df-rt-'+rid).textContent = r.q.reduce(function(s,v){ return s+v; },0);
+  _recalcDemand();
+}
+
+function _dfRemoveRole(rid){
+  DF_ROLES = DF_ROLES.filter(function(r){ return r.id!==rid; });
+  _dfBuildRoleTable();
+}
+
+function _dfAddRole(){
+  var id  = 'r'+(++DF_ROLE_ID_SEQ);
+  var rc  = DF_ROLE_CATALOGUE[0];
+  DF_ROLES.push({ id:id, label:rc.label, cat:rc.cat, q:[0,0,0,0] });
+  _dfBuildRoleTable();
+  // Focus the new row's role dropdown
+  var tbody = document.getElementById('df-role-tbody');
+  var lastRow = tbody.lastElementChild;
+  if(lastRow){ var sel = lastRow.querySelector('select'); if(sel) sel.focus(); }
+}
+
+function _dfResetRoles(){
+  DF_ROLES = [
+    { id:'r1', label:'Software Engineer',  cat:'Software Engineering',    q:[0,0,0,0] },
+    { id:'r2', label:'Solution Architect', cat:'Enterprise Architecture', q:[0,0,0,0] },
+    { id:'r3', label:'Scrum Master',       cat:'Agile Delivery',          q:[0,0,0,0] },
+  ];
+  DF_ROLE_ID_SEQ = 100;
+  _dfBuildRoleTable();
+}
+
+// ── Engagement model CW weight ─────────────────────────────────────────
+// How much of the vendor gap counts as CW headcount toward the 70/30 target
+var MODEL_CW_WEIGHT = {
+  staff_aug: 1.00,  // every seat is a CW resource — full weight
+  project:   0.50,  // time-boxed, finite — half weight
+  managed:   0.00,  // outcomes-based delivery — not seated CW, excluded from ratio
+  mixed:     null   // user-defined via df-cwfrac slider
+};
+var MODEL_LABELS = {
+  staff_aug: 'Staff Augmentation',
+  project:   'Project-Based',
+  managed:   'Managed Services',
+  mixed:     'Mixed'
+};
+var MODEL_HINTS = {
+  staff_aug: '<strong>Full CW weight (1.0×)</strong> — every vendor seat counts against the 30% ceiling.',
+  project:   '<strong>Half CW weight (0.5×)</strong> — time-boxed engagements carry 50% CW ratio weight.',
+  managed:   '<strong>Excluded from 70/30 ratio</strong> — outcomes-based delivery; vendor headcount is not seated CW.',
+  mixed:     '<strong>User-defined CW fraction</strong> — set the slider below to define what % of the gap counts as CW.'
+};
+
+// Blended CW benchmark rates by region (midpoint of actual rate card data)
+// APAC = broad (India, Philippines, Malaysia, Vietnam) — lower cost markets
+// JAPAC = Japan-centric — significantly higher cost of living and labor vs. broader APAC
+var REGION_RATE_DEFAULTS = {
+  AMER:   { rate: 127, lo: 90,  hi: 150, label: 'AMER benchmark: $90–$150/hr (CW blended)'                          },
+  EMEA:   { rate: 70,  lo: 55,  hi: 85,  label: 'EMEA benchmark: $55–$85/hr (CW blended)'                           },
+  APAC:   { rate: 44,  lo: 30,  hi: 55,  label: 'APAC benchmark: $30–$55/hr · India / SEA / Philippines blended'    },
+  JAPAC:  { rate: 93,  lo: 75,  hi: 115, label: 'JAPAC benchmark: $75–$115/hr · Japan-centric; higher cost market'  },
+  LATAM:  { rate: 53,  lo: 40,  hi: 65,  label: 'LATAM benchmark: $40–$65/hr (CW blended)'                          },
+  Global: { rate: 90,  lo: 60,  hi: 110, label: 'Global blended: $60–$110/hr (all regions)'                         }
+};
+
+function _dfRegionChange(){
+  var region  = document.getElementById('df-region').value;
+  var def     = REGION_RATE_DEFAULTS[region] || REGION_RATE_DEFAULTS.AMER;
+  var slider  = document.getElementById('df-rate');
+  var lbl     = document.getElementById('lbl-df-rate');
+  var hint    = document.getElementById('df-rate-hint');
+  var rhint   = document.getElementById('df-region-hint');
+  slider.value = def.rate;
+  lbl.textContent = '$' + def.rate;
+  hint.innerHTML  = def.label;
+  rhint.innerHTML = 'Rate auto-set to regional benchmark midpoint &mdash; adjust if needed.';
+  _recalcDemand();
+}
+
+function _dfModelChange(){
+  var model = document.getElementById('df-model').value;
+  var mixedRow = document.getElementById('df-mixed-row');
+  var hint     = document.getElementById('df-model-hint');
+  mixedRow.style.display = model === 'mixed' ? '' : 'none';
+  hint.innerHTML = MODEL_HINTS[model] || '';
+  _recalcDemand();
+}
+
+// ── Core demand calc ───────────────────────────────────────────────────
+function _calcDemand(){
+  var rate     = parseFloat(document.getElementById('df-rate').value)    || 145;
+  var hrsWk    = parseFloat(document.getElementById('df-hrs').value)     || 40;
+  var fteCap   = parseFloat(document.getElementById('df-fte').value)     || 0;
+  var covPct   = parseFloat(document.getElementById('df-cov').value)     || 70;
+  var rampWks  = parseFloat(document.getElementById('df-ramp').value)    || 4;
+  var region   = document.getElementById('df-region').value              || 'AMER';
+  var model    = document.getElementById('df-model').value               || 'staff_aug';
+  var cwFracEl = document.getElementById('df-cwfrac');
+  var cwWeight = MODEL_CW_WEIGHT[model] !== null
+    ? MODEL_CW_WEIGHT[model]
+    : (parseFloat(cwFracEl ? cwFracEl.value : 50) / 100);
+
+  // Quarter totals
+  var qTotals = [0,0,0,0];
+  DF_ROLES.forEach(function(r){ r.q.forEach(function(v,i){ qTotals[i]+=v; }); });
+
+  var totalDemand = qTotals.reduce(function(s,v){ return s+v; }, 0);
+  var internalCap = fteCap * (covPct/100);
+  var totalGap    = Math.max(0, totalDemand - internalCap);
+
+  // Effective CW HC = gap weighted by engagement model
+  var effectiveCW = totalGap * cwWeight;
+
+  // Peak quarter
+  var peakQ = 0;
+  qTotals.forEach(function(v,i){ if(v>qTotals[peakQ]) peakQ=i; });
+
+  // Cost to fill
+  var costToFill = totalGap * 13 * hrsWk * rate;
+
+  // Per-role gap analysis
+  var roleGaps = DF_ROLES.map(function(r){
+    var roleDemand   = r.q.reduce(function(s,v){ return s+v; }, 0);
+    var roleShare    = totalDemand > 0 ? roleDemand / totalDemand : 0;
+    var roleInternal = internalCap * roleShare;
+    var roleGap      = Math.max(0, roleDemand - roleInternal);
+    var roleCost     = roleGap * 13 * hrsWk * rate;
+    var severity     = roleGap === 0 ? 'ok' : roleGap <= 2 ? 'low' : roleGap <= 5 ? 'med' : 'high';
+    return { id:r.id, label:r.label, cat:r.cat, demand:roleDemand, internal:Math.round(roleInternal*10)/10, gap:Math.round(roleGap*10)/10, cost:roleCost, severity:severity, q:r.q.slice() };
+  }).filter(function(r){ return r.demand > 0; });
+
+  // Risk flags
+  var risks = [];
+  if(qTotals[peakQ] > totalDemand * 0.45) risks.push({ type:'warn', msg:'Heavy peak concentration in Q'+(peakQ+1)+' ('+qTotals[peakQ]+' HC). Consider smoothing demand across quarters to reduce sourcing pressure.' });
+  if(rampWks >= 8 && totalGap > 3)        risks.push({ type:'risk', msg:'High ramp time ('+rampWks+' wks) with '+Math.round(totalGap)+' HC gap. Source '+Math.ceil(totalGap*1.2)+' candidates to account for ramp attrition.' });
+  if(totalGap > 10)                        risks.push({ type:'risk', msg:'Large vendor gap ('+Math.round(totalGap)+' HC) may require multiple vendors. Avoid single-source concentration risk.' });
+  if(fteCap > 0 && internalCap/totalDemand > 0.8 && totalDemand > 0) risks.push({ type:'ok', msg:'Internal coverage is strong ('+Math.round(internalCap/totalDemand*100)+'%). Vendor sourcing should be targeted and supplemental only.' });
+
+  // 70/30 ratio — uses effectiveCW, not raw totalGap
+  var cwPct  = totalDemand > 0 ? (effectiveCW / totalDemand * 100) : 0;
+  var ftePct = 100 - cwPct;
+  var cwTarget  = 30;
+  var cwCeiling = totalDemand * (cwTarget / 100);
+  var ratioStatus = totalDemand === 0 ? 'none' : cwPct <= cwTarget ? 'ok' : cwPct <= cwTarget + 10 ? 'warn' : 'breach';
+
+  var modelLabel = MODEL_LABELS[model] || model;
+  var weightNote = model === 'managed'   ? ' (Managed Services excluded from ratio — outcomes-based)'
+                 : model === 'project'   ? ' (Project-Based weighted at 50% — time-boxed)'
+                 : model === 'mixed'     ? ' (Mixed: '+(cwWeight*100).toFixed(0)+'% CW fraction applied)'
+                 :                        ' (Staff Aug — full CW weight)';
+
+  if(ratioStatus === 'breach')
+    risks.push({ type:'risk', msg:'CW share is '+Math.round(cwPct)+'% — exceeds the 70/30 target (ceiling = '+Math.round(cwCeiling)+' HC)'+weightNote+'. Increase internal FTE capacity or reduce CW scope.' });
+  else if(ratioStatus === 'warn')
+    risks.push({ type:'warn', msg:'CW share is '+Math.round(cwPct)+'% — approaching the 30% ceiling'+weightNote+'. Effective CW HC: '+Math.round(effectiveCW)+'; ceiling allows '+Math.round(cwCeiling)+'.' });
+  else if(ratioStatus === 'ok' && totalDemand > 0)
+    risks.push({ type:'ok', msg:'FTE/CW split '+Math.round(ftePct)+'% / '+Math.round(cwPct)+'% — within the 70/30 target'+weightNote+'.' });
+  else if(model === 'managed' && totalDemand > 0)
+    risks.push({ type:'ok', msg:'Managed Services model — vendor headcount ('+Math.round(totalGap)+' HC) is excluded from the 70/30 ratio. No CW compliance impact.' });
+
+  return { qTotals, totalDemand, internalCap, totalGap, effectiveCW, peakQ, costToFill, roleGaps, risks, rate, hrsWk, region, model, cwWeight, cwPct, ftePct, cwTarget, cwCeiling, ratioStatus };
+}
+
+// ── Recalc entry ───────────────────────────────────────────────────────
+function _recalcDemand(){
+  var D = _calcDemand();
+  _renderDemandStats(D);
+  _renderDemandQChart(D);
+  _renderDemandGapTable(D);
+  _renderDemandVendors(D);
+  _renderDemandRisks(D);
+  if(typeof _pgUpdateBadges === 'function') _pgUpdateBadges();
+}
+
+// ── Stats strip ───────────────────────────────────────────────────────
+var Q_NAMES = ['Q1 (Feb–Apr)','Q2 (May–Jul)','Q3 (Aug–Oct)','Q4 (Nov–Jan)'];
+
+function _renderDemandStats(D){
+  document.getElementById('df-s-demand').textContent = D.totalDemand || '—';
+  document.getElementById('df-s-demand-note').textContent = DF_ROLES.length+' role'+(DF_ROLES.length!==1?'s':'')+' across 4 quarters';
+
+  var gapEl = document.getElementById('df-s-gap');
+  gapEl.textContent = D.totalGap > 0 ? Math.round(D.totalGap) : '0';
+  gapEl.className = 'df-stat-val ' + (D.totalGap > 5 ? 'r' : D.totalGap > 0 ? 'a' : 'g');
+  document.getElementById('df-s-gap-note').textContent = D.internalCap > 0 ? Math.round(D.internalCap)+' HC covered internally' : 'No internal FTEs set';
+
+  document.getElementById('df-s-cost').textContent = D.totalGap > 0 ? fmt(D.costToFill) : '$0';
+  document.getElementById('df-s-cost-note').textContent = '$'+document.getElementById('df-rate').value+'/hr × '+document.getElementById('df-hrs').value+'hr/wk × 13wks';
+
+  var peakEl = document.getElementById('df-s-peak');
+  peakEl.textContent = D.totalDemand > 0 ? 'Q'+(D.peakQ+1) : '—';
+  peakEl.className   = 'df-stat-val t';
+  document.getElementById('df-s-peak-note').textContent = D.totalDemand > 0 ? D.qTotals[D.peakQ]+' HC · '+Q_NAMES[D.peakQ] : 'Enter demand above';
+
+  // FTE/CW ratio card
+  var ratioEl   = document.getElementById('df-s-ratio');
+  var ratioCard = document.getElementById('df-s-ratio-card');
+  var modelShort = { staff_aug:'Staff Aug', project:'Project', managed:'Managed Svcs', mixed:'Mixed' }[D.model] || D.model;
+  if(D.totalDemand === 0){
+    ratioEl.textContent = '—';
+    ratioEl.className   = 'df-stat-val';
+    ratioCard.style.borderColor = '';
+    document.getElementById('df-s-ratio-note').textContent = 'Target: 70% FTE · 30% CW';
+  } else if(D.model === 'managed'){
+    ratioEl.textContent = 'N/A';
+    ratioEl.className   = 'df-stat-val g';
+    ratioCard.style.borderColor = 'var(--teal)';
+    document.getElementById('df-s-ratio-note').textContent = '✓ Managed Svcs — excluded from ratio';
+  } else {
+    ratioEl.textContent = Math.round(D.ftePct)+'% / '+Math.round(D.cwPct)+'%';
+    ratioEl.className   = 'df-stat-val '+(D.ratioStatus==='ok'?'g':D.ratioStatus==='warn'?'a':'r');
+    ratioCard.style.borderColor = D.ratioStatus==='breach'?'var(--red)':D.ratioStatus==='warn'?'var(--amber)':'var(--teal)';
+    var ratioSuffix = D.model === 'project' ? ' · 0.5× wt' : D.model === 'mixed' ? ' · '+(D.cwWeight*100).toFixed(0)+'% CW frac' : '';
+    document.getElementById('df-s-ratio-note').textContent =
+      (D.ratioStatus==='ok'   ? '✓ Within 70/30 target' :
+       D.ratioStatus==='warn' ? '⚠ Approaching 30% ceiling' :
+                                '● Exceeds 30% ceiling')
+      + ' · ' + modelShort + ratioSuffix;
+  }
+
+  // FTE target hint under the slider
+  var hintEl = document.getElementById('df-fte-hint');
+  if(hintEl && D.totalDemand > 0){
+    var fte70 = Math.ceil(D.totalDemand * 0.70);
+    var modelNote = D.model === 'managed' ? ' (ratio excluded — Managed Svcs)' : D.model === 'project' ? ' (0.5× CW weight)' : '';
+    hintEl.textContent = '70% target = '+fte70+' FTE for '+D.totalDemand+' HC demand'+modelNote;
+    hintEl.style.color = (D.model === 'managed' || parseFloat(document.getElementById('df-fte').value) >= fte70) ? 'var(--teal2)' : 'var(--amber2)';
+  } else if(hintEl){
+    hintEl.textContent = '';
+  }
+
+  // Inline ratio gauge in config panel
+  var ratioBar = document.getElementById('df-ratio-bar');
+  if(ratioBar && D.totalDemand > 0){
+    var clr = D.model === 'managed' ? 'var(--teal)'
+            : D.ratioStatus==='ok'  ? 'var(--teal)'
+            : D.ratioStatus==='warn'? 'var(--amber)'
+            :                         'var(--red)';
+    var gaugeLabel = D.model === 'managed'
+      ? 'HC Ratio — Excluded (Managed Services)'
+      : D.model === 'project'
+      ? 'HC Ratio — FTE vs CW (0.5× weight)'
+      : D.model === 'mixed'
+      ? 'HC Ratio — FTE vs CW ('+(D.cwWeight*100).toFixed(0)+'% CW fraction)'
+      : 'HC Ratio — FTE vs CW';
+    var cwDisplay  = D.model === 'managed' ? 0 : Math.round(D.cwPct);
+    var fteDisplay = 100 - cwDisplay;
+    ratioBar.innerHTML =
+      '<div class="df-ratio-lbl">'+gaugeLabel+'</div>'
+      +'<div class="df-ratio-track">'
+        +'<div class="df-ratio-fte-fill" style="width:'+fteDisplay+'%;"></div>'
+        +'<div class="df-ratio-cw-fill" style="width:'+Math.min(100,cwDisplay)+'%;left:'+fteDisplay+'%;background:'+clr+';"></div>'
+        +'<div class="df-ratio-marker"></div>'
+      +'</div>'
+      +'<div class="df-ratio-labels">'
+        +'<span class="df-ratio-fte-lbl">FTE '+fteDisplay+'%</span>'
+        +'<span class="df-ratio-mid-lbl">70/30 target</span>'
+        +'<span class="df-ratio-cw-lbl" style="color:'+clr+';">'+(D.model==='managed'?'Excl.':'CW '+cwDisplay+'%')+'</span>'
+      +'</div>';
+  } else if(ratioBar){
+    ratioBar.innerHTML = '';
+  }
+}
+
+// ── Quarterly chart ────────────────────────────────────────────────────
+function _renderDemandQChart(D){
+  var el = document.getElementById('df-qchart');
+  if(D.totalDemand === 0){ el.innerHTML = '<div style="padding:20px;text-align:center;font-size:8.5pt;color:var(--ink4);font-style:italic;">Enter headcount demand in the table above.</div>'; return; }
+
+  var W=560, H=140, pad={l:36,r:12,t:10,b:32};
+  var chartH = H-pad.t-pad.b;
+  var internalPerQ = D.totalDemand > 0 ? D.qTotals.map(function(v){ return Math.min(v, D.internalCap * (v/D.totalDemand)); }) : [0,0,0,0];
+  var maxVal = Math.max.apply(null, D.qTotals.concat([1])) * 1.2;
+  var slotW  = (W-pad.l-pad.r)/4;
+  var bw     = Math.floor(slotW*0.55);
+
+  var bars='', gridlines='', lbls='', axis='';
+
+  for(var g=0;g<=4;g++){
+    var gv=maxVal*g/4, gy=H-pad.b-Math.round(gv/maxVal*chartH);
+    gridlines+='<line x1="'+pad.l+'" y1="'+gy+'" x2="'+(W-pad.r)+'" y2="'+gy+'" stroke="var(--gray3)" stroke-width="0.75" stroke-dasharray="4,3"/>';
+    if(g>0) gridlines+='<text x="'+(pad.l-4)+'" y="'+(gy+3)+'" text-anchor="end" style="font-size:6pt;fill:var(--ink4);">'+Math.round(gv)+'</text>';
+  }
+  axis='<line x1="'+pad.l+'" y1="'+pad.t+'" x2="'+pad.l+'" y2="'+(H-pad.b)+'" stroke="var(--border2)" stroke-width="0.75"/>'
+      +'<line x1="'+pad.l+'" y1="'+(H-pad.b)+'" x2="'+(W-pad.r)+'" y2="'+(H-pad.b)+'" stroke="var(--border2)" stroke-width="0.75"/>';
+
+  var qRanges = ['Feb–Apr','May–Jul','Aug–Oct','Nov–Jan'];
+  D.qTotals.forEach(function(total, i){
+    var cx   = pad.l + i*slotW + slotW/2;
+    var intl = internalPerQ[i];
+    var gap  = Math.max(0, total-intl);
+
+    var totalH = total>0 ? Math.max(2,Math.round(total/maxVal*chartH)) : 0;
+    var totalY = H-pad.b-totalH;
+
+    var intlH  = intl>0  ? Math.max(2,Math.round(intl/maxVal*chartH))  : 0;
+    var intlY  = H-pad.b-intlH;
+
+    // Full demand bar (gap portion on top in red, internal in teal)
+    if(total > 0){
+      if(gap > 0){
+        var gapH = Math.round(gap/maxVal*chartH);
+        bars+='<rect x="'+(cx-bw/2)+'" y="'+totalY+'" width="'+bw+'" height="'+Math.max(2,gapH)+'" fill="#DC2626" opacity="0.75" rx="2"/>';
+      }
+      if(intl > 0){
+        bars+='<rect x="'+(cx-bw/2)+'" y="'+intlY+'" width="'+bw+'" height="'+intlH+'" fill="var(--teal)" opacity="0.80" rx="2"/>';
+      }
+      bars+='<text x="'+cx+'" y="'+(totalY-4)+'" text-anchor="middle" style="font-size:7pt;fill:var(--ink2);font-weight:800;">'+total+'</text>';
+    }
+
+    var isCurrentQ = (i === (function(){ var fw=_calcFYPosition(); return fw<=13?0:fw<=26?1:fw<=39?2:3; })());
+    if(isCurrentQ) bars='<rect x="'+(cx-slotW/2+2)+'" y="'+pad.t+'" width="'+(slotW-4)+'" height="'+chartH+'" fill="#0D9488" opacity="0.04" rx="2"/>'+bars;
+
+    var qColor  = isCurrentQ ? '#0D9488' : '#6B7280';
+    var qWeight = isCurrentQ ? '800' : '600';
+    lbls+='<text x="'+cx+'" y="'+(H-pad.b+12)+'" text-anchor="middle" style="font-size:6.5pt;font-weight:'+qWeight+';fill:'+qColor+';">Q'+(i+1)+(isCurrentQ?' ▸':'')+'</text>';
+    lbls+='<text x="'+cx+'" y="'+(H-pad.b+21)+'" text-anchor="middle" style="font-size:5pt;fill:#9CA3AF;">'+qRanges[i]+'</text>';
+  });
+
+  var legY = H+3;
+  // 30% CW ceiling reference line — one line per quarter based on that quarter's total
+  var ceilingLines = '';
+  D.qTotals.forEach(function(total, i){
+    if(total === 0) return;
+    var cx      = pad.l + i*slotW + slotW/2;
+    var ceiling = total * 0.30;
+    var cy      = H - pad.b - Math.round(ceiling/maxVal*chartH);
+    ceilingLines +=
+      '<line x1="'+(cx-bw/2-2)+'" y1="'+cy+'" x2="'+(cx+bw/2+2)+'" y2="'+cy+'" stroke="#D97706" stroke-width="1.5" stroke-dasharray="4,2"/>'
+      +'<text x="'+(cx+bw/2+4)+'" y="'+(cy+3)+'" style="font-size:5.5pt;fill:#D97706;font-weight:800;">30%</text>';
+  });
+
+  var legend=
+    '<rect x="'+pad.l+'" y="'+legY+'" width="6" height="6" fill="var(--teal)" opacity="0.80" rx="1"/>'
+    +'<text x="'+(pad.l+9)+'" y="'+(legY+6)+'" style="font-size:5.5pt;fill:var(--ink4);">Internal Coverage</text>'
+    +'<rect x="'+(pad.l+90)+'" y="'+legY+'" width="6" height="6" fill="#DC2626" opacity="0.75" rx="1"/>'
+    +'<text x="'+(pad.l+99)+'" y="'+(legY+6)+'" style="font-size:5.5pt;fill:var(--ink4);">Vendor Gap</text>'
+    +'<line x1="'+(pad.l+160)+'" y1="'+(legY+3)+'" x2="'+(pad.l+172)+'" y2="'+(legY+3)+'" stroke="#D97706" stroke-width="1.5" stroke-dasharray="4,2"/>'
+    +'<text x="'+(pad.l+175)+'" y="'+(legY+6)+'" style="font-size:5.5pt;fill:#D97706;font-weight:700;">30% CW ceiling</text>';
+
+  el.innerHTML='<svg class="chart" viewBox="0 0 '+W+' '+(H+14)+'" xmlns="http://www.w3.org/2000/svg">'+gridlines+axis+bars+ceilingLines+lbls+legend+'</svg>';
+}
+
+// ── Gap table ──────────────────────────────────────────────────────────
+function _renderDemandGapTable(D){
+  var el = document.getElementById('df-gap-content');
+  if(!D.roleGaps.length){ el.innerHTML='<div style="font-size:7.5pt;color:var(--ink4);font-style:italic;padding:8px 0;">No demand entered yet.</div>'; return; }
+
+  var html = '<table class="df-gap-table"><thead><tr>'
+    +'<th>Role</th><th>Category</th><th>Demand</th><th>Internal</th><th>Gap (HC)</th><th>Est. Cost</th><th>Severity</th>'
+    +'</tr></thead><tbody>';
+
+  D.roleGaps.forEach(function(r){
+    var sevLabel = {ok:'Covered',low:'Low',med:'Medium',high:'High'}[r.severity];
+    var sevCls   = {ok:'ok',low:'ok',med:'gap',high:'gap'}[r.severity];
+    if(r.severity==='low') sevCls='surplus';
+    html += '<tr>'
+      +'<td style="font-weight:700;color:var(--ink);">'+r.label+'</td>'
+      +'<td style="font-size:7pt;color:var(--ink4);">'+r.cat+'</td>'
+      +'<td style="font-weight:700;color:var(--navy);">'+r.demand+'</td>'
+      +'<td style="color:var(--teal2);font-weight:600;">'+r.internal+'</td>'
+      +'<td style="font-weight:800;color:'+(r.gap>0?'var(--red2)':'var(--green2)')+';">'+r.gap+'</td>'
+      +'<td style="font-weight:700;color:var(--amber2);">'+(r.gap>0?fmt(r.cost):'—')+'</td>'
+      +'<td><span class="df-gap-badge '+sevCls+'">'+sevLabel+'</span></td>'
+    +'</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+// ── Vendor recommendations ─────────────────────────────────────────────
+function _renderDemandVendors(D){
+  var el = document.getElementById('df-vendor-recs');
+  var vendors = window.VER_VENDORS || [];
+  if(!vendors.length){ el.innerHTML='<div style="font-size:7.5pt;color:var(--ink4);font-style:italic;padding:8px 0;">Vendor data not loaded.</div>'; return; }
+
+  // Collect gap categories (only roles with actual gap)
+  var gapCats = {};
+  D.roleGaps.forEach(function(r){
+    if(r.gap > 0){
+      if(!gapCats[r.cat]) gapCats[r.cat] = 0;
+      gapCats[r.cat] += r.gap;
+    }
+  });
+
+  if(!Object.keys(gapCats).length){
+    el.innerHTML='<div style="font-size:7.5pt;color:var(--teal2);font-weight:600;padding:8px 0;">&#10003; Internal coverage meets all demand. No vendor sourcing required.</div>';
+    document.getElementById('df-vendor-sub').textContent='Internal coverage is sufficient for current demand.';
+    return;
+  }
+
+  var region = D.region;
+
+  // Score each vendor against gap categories
+  var scored = vendors.map(function(v){
+    if(!v.capabilities) return null;
+    // Region gate — JAPAC matches both JAPAC and APAC vendor regions
+    if(region && region !== 'Global' && v.region && v.region !== 'Global'){
+      var vRegs = v.region.split('|');
+      var regionMatch = vRegs.includes(region) || (region === 'JAPAC' && vRegs.includes('APAC'));
+      if(!regionMatch) return null;
+    }
+    var caps = v.capabilities;
+    var matchedGap = 0;
+    var matchedCats = [];
+    Object.keys(gapCats).forEach(function(cat){
+      if(caps.indexOf(cat) !== -1){
+        matchedGap += gapCats[cat];
+        matchedCats.push(cat);
+      }
+    });
+    if(matchedCats.length === 0) return null;
+
+    var coverPct = matchedCats.length / Object.keys(gapCats).length;
+    var risk = typeof v.risk_score === 'number' ? v.risk_score : 50;
+    var score = coverPct * 60 + (1 - risk/100) * 25 + (v.tier===1?15:v.tier===2?10:5);
+
+    return { name:v.name, tier:v.tier, region:v.region, domain:v.domain||null, matchedCats:matchedCats, coverPct:coverPct, score:score, sla:v.sla_score, risk:risk };
+  }).filter(Boolean).sort(function(a,b){ return b.score-a.score; }).slice(0,6);
+
+  if(!scored.length){
+    el.innerHTML='<div style="font-size:7.5pt;color:var(--ink4);font-style:italic;padding:8px 0;">No vendors match the gap categories in the selected region.</div>';
+    return;
+  }
+
+  document.getElementById('df-vendor-sub').textContent =
+    Object.keys(gapCats).length+' gap categor'+(Object.keys(gapCats).length!==1?'ies':'y')+' · '+scored.length+' vendor'+(scored.length!==1?'s':'')+' matched in '+region;
+
+  var html = '<div class="df-vendor-grid">';
+  scored.forEach(function(v){
+    var tierClr = v.tier===1?'var(--teal2)':v.tier===2?'var(--amber2)':'var(--ink4)';
+    var tierLbl = 'Tier '+(v.tier||'—');
+    var riskClr = v.risk<40?'var(--green2)':v.risk<65?'var(--amber2)':'var(--red2)';
+    html += '<div class="df-vendor-item">'
+      +'<div class="df-vendor-item-hdr">'
+        +vendorLogo(v.domain, v.name, 32)
+        +'<div class="df-vendor-item-meta">'
+          +'<div class="df-vendor-item-name">'+v.name+'</div>'
+          +'<div class="df-vendor-item-region">'+v.region+'</div>'
+        +'</div>'
+        +'<span class="df-vendor-tier-badge" style="color:'+tierClr+';">'+tierLbl+'</span>'
+      +'</div>'
+      +'<div class="df-vendor-caps">'
+        +v.matchedCats.map(function(c){ return '<span class="df-vendor-cap-chip">'+c+'</span>'; }).join('')
+      +'</div>'
+      +'<div class="df-vendor-stats">'
+        +'<span>Coverage: <strong style="color:var(--teal2);">'+Math.round(v.coverPct*100)+'%</strong></span>'
+        +'<span>Risk: <strong style="color:'+riskClr+';">'+v.risk+'</strong></span>'
+      +'</div>'
+    +'</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ── Risk flags ─────────────────────────────────────────────────────────
+function _renderDemandRisks(D){
+  var el = document.getElementById('df-risk-flags');
+  if(!D.risks.length){ el.innerHTML='<span style="font-style:italic;">No risk signals detected.</span>'; return; }
+  el.innerHTML = D.risks.map(function(r){
+    var clr = r.type==='risk'?'var(--red2)':r.type==='warn'?'var(--amber2)':'var(--green2)';
+    var icon= r.type==='risk'?'&#128308;':r.type==='warn'?'&#9888;':'&#10003;';
+    return '<div style="margin-bottom:6px;font-size:7pt;color:'+clr+';line-height:1.5;">'+icon+' '+r.msg+'</div>';
+  }).join('');
+}
+
+// ── Export demand CSV ──────────────────────────────────────────────────
+function _exportDemandCSV(){
+  var D = _calcDemand();
+  var fy = document.getElementById('df-fy').value;
+  var rows = [
+    ['"VER Workforce Demand Forecast Export"'],
+    ['"Generated","'+new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'"'],
+    ['"Fiscal Year","'+fy+'"'],
+    ['"Region","'+D.region+'"'],
+    [],
+    ['ROLE DEMAND'],
+    ['Role','Category','Q1 (Feb-Apr)','Q2 (May-Jul)','Q3 (Aug-Oct)','Q4 (Nov-Jan)','Total HC']
+  ];
+  DF_ROLES.forEach(function(r){
+    rows.push(['"'+r.label+'"','"'+r.cat+'"'].concat(r.q).concat([r.q.reduce(function(s,v){return s+v;},0)]));
+  });
+  rows.push(['','','Totals:'].concat(D.qTotals).concat([D.totalDemand]));
+  rows.push([]);
+  rows.push(['GAP ANALYSIS']);
+  rows.push(['Role','Category','Total Demand','Internal Coverage','Vendor Gap','Est. Cost to Fill','Severity']);
+  D.roleGaps.forEach(function(r){
+    rows.push(['"'+r.label+'"','"'+r.cat+'"',r.demand,r.internal,r.gap,Math.round(r.cost),r.severity]);
+  });
+  rows.push([]);
+  rows.push(['SUMMARY']);
+  rows.push(['Total Demand',D.totalDemand,'Internal Cap',Math.round(D.internalCap),'Vendor Gap',Math.round(D.totalGap),'Est. Cost to Fill',Math.round(D.costToFill)]);
+
+  var csv = rows.map(function(r){ return r.join(','); }).join('\n');
+  var b = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'VER_Demand_Forecast_'+fy+'_'+new Date().toISOString().split('T')[0]+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  // Set growth rate default based on category
+  var defGrowth = GROWTH_DEFAULT['Professional Services'];
+  document.getElementById('cfg-growth').value = defGrowth;
+  document.getElementById('lbl-growth').textContent = defGrowth+'%';
+  document.getElementById('cfg-cat').addEventListener('change', function(){
+    var g = GROWTH_DEFAULT[this.value] || 3;
+    document.getElementById('cfg-growth').value = g;
+    document.getElementById('lbl-growth').textContent = g+'%';
+  });
+  _recalc();
+  _dfBuildRoleTable();
+  _dfModelChange();
+  _dfRegionChange();
+});
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openForecastHelp(){
+  HelpModal.open({
+    title: 'Spend Forecast',
+    what: 'The Spend Forecast tool projects <strong>vendor spend across FY27 by quarter, category, and tier</strong>. It combines committed contract values, pipeline renewals, and demand planning inputs to give finance and procurement a forward view of DET vendor obligations.',
+    steps: [
+      '<strong>Review the base forecast</strong> — committed spend from active contracts is pre-loaded from Coupa and MFT data. This is your floor.',
+      '<strong>Layer in pipeline items</strong> — use the pipeline panel to add renewals, new engagements, or anticipated contract expansions. The forecast model will incorporate these with a probability weighting.',
+      '<strong>Adjust quarterly phasing</strong> — drag or edit quarter-by-quarter distribution for each engagement if spend does not fall evenly across the year.',
+      '<strong>Apply variance scenarios</strong> — toggle optimistic, base, and conservative assumptions to see the spend range. Conservative applies a 10% haircut to pipeline probability; optimistic adds a 15% upside.',
+      '<strong>Export to Finance</strong> — the forecast output aligns to the DET finance chart of accounts and can be exported as a CSV for budget template submission.'
+    ],
+    tips: [
+      { icon: '&#x1F4C8;', title: 'Committed vs. pipeline distinction matters', body: 'Committed spend is locked in your budget. Pipeline spend is probabilistic — finance plans to the base case, but CPO reviews the full range.' },
+      { icon: '&#x1F4C5;', title: 'Q4 is always heavy', body: 'DET historically skews 35-40% of annual vendor spend to Q4 due to renewal clustering and year-end project acceleration.' },
+      { icon: '&#x1F4B1;', title: 'FX adjustments for non-USD contracts', body: 'APAC and EMEA vendor contracts flagged as non-USD will show an FX sensitivity row in the forecast detail.' },
+      { icon: '&#x1F501;', title: 'Sync with Demand Planning', body: 'Changes to headcount demand from the HC Planning tool will automatically recalculate CW-related spend forecasts when the two tools are linked.' }
+    ],
+    ai: '<strong>AI Augmentation variable:</strong> The Forecast includes an AI/Agentic spend line that projects investment in AI platform licenses, agent infrastructure, and AI-augmented CW spend. This line grows as AI adoption assumptions increase — the variable is adjustable in the scenario panel.',
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+<script>
+function toggleAiForecast(){
+  var on = document.getElementById('ai-forecast-track').classList.toggle('on');
+  document.getElementById('ai-forecast-label').textContent = on ? 'On' : 'Off';
+  document.getElementById('ai-forecast-body').classList.toggle('ai-on', on);
+  if(on) updateAiForecast();
+}
+function updateAiForecast(){
+  var adoption = parseInt(document.getElementById('ai-fc-adoption').value) || 0;
+  var offset   = parseInt(document.getElementById('ai-fc-offset').value) || 0;
+  document.getElementById('ai-fc-adoption-val').textContent = adoption + '%';
+  document.getElementById('ai-fc-offset-val').textContent   = offset   + '%';
+  // Update slider fills
+  ['ai-fc-adoption','ai-fc-offset'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    var pct = (parseInt(el.value)/parseInt(el.max))*100;
+    el.style.background = 'linear-gradient(to right,#7C3AED 0%,#7C3AED '+pct+'%,rgba(255,255,255,0.10) '+pct+'%,rgba(255,255,255,0.10) 100%)';
+  });
+  // Estimate based on a baseline $10M CW annual spend placeholder — real data would come from forecast totals
+  var cwBase = 10000000;
+  var invest  = cwBase * (adoption/100) * 0.08;
+  var savings = cwBase * (offset/100) * (adoption/100);
+  var net     = savings - invest;
+  function fmtM(v){ return (v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+Math.round(v)); }
+  document.getElementById('ai-fc-invest').textContent    = '+' + fmtM(invest);
+  document.getElementById('ai-fc-reduction').textContent = '−' + fmtM(savings);
+  document.getElementById('ai-fc-net').textContent       = net >= 0 ? '−'+fmtM(net) : '+'+fmtM(Math.abs(net));
+  document.getElementById('ai-fc-note').textContent      = adoption+'% adoption, '+offset+'% CW task offset. Investment and savings estimates are illustrative — calibrate against your actual CW forecast total.';
+}
+</script>
+</body>
+</html>

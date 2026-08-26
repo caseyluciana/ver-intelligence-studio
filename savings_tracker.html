@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Savings Tracker · VER Team Portal</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-dim:#E11D48;--bloom-bright:#FB7185;
+  --bloom-border:rgba(244,63,94,0.30);--bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3;--magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14);--mag-border:rgba(192,38,211,0.28);
+  --rose-gold:#E8A598;--violet:#A855F7;--violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12);--vio-border:rgba(168,85,247,0.28);
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.034);--bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06);--border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 80% 0%,rgba(52,211,153,0.18) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(192,38,211,0.18) 0%,transparent 50%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(52,211,153,0.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(52,211,153,0.014) 1px,transparent 1px);
+  background-size:64px 64px;}
+.scan{position:fixed;left:0;right:0;height:220px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(52,211,153,0.022) 50%,transparent 100%);
+  animation:scan 12s linear infinite;will-change:transform;}
+@keyframes scan{from{transform:translateY(-220px)}to{transform:translateY(110vh)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── Shell ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sb-gem{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(244,63,94,0.38);}
+.sb-logo-title{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.42);}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);animation:pulse 2.5s ease-in-out infinite;}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-section{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.38);padding:12px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+.sb-user{margin:0 12px 8px;padding:9px 13px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:18px;line-height:1;}
+.sb-user-name{font-size:11px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:8.5px;color:rgba(255,255,255,0.52);}
+.sb-footer{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;font-size:8.5px;color:rgba(255,255,255,0.42);line-height:1.7;}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--green);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--green);font-weight:700;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.tb-btn:hover{background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.28);color:var(--green);}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(52,211,153,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(52,211,153,0.18);border-radius:99px;}
+
+/* ── Hero ── */
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:32px 40px 30px;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,#060C10 0%,#071A12 40%,#060E0C 100%);
+  border:1px solid rgba(52,211,153,0.14);animation:rise 0.5s var(--ease) 0.05s both;}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 90% 10%,rgba(52,211,153,0.22) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(192,38,211,0.18) 0%,transparent 46%);}
+.hero-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);margin-bottom:10px;}
+.hero-title{font-size:clamp(26px,2.8vw,38px);font-weight:900;letter-spacing:-0.025em;
+  margin-bottom:8px;
+  background:linear-gradient(92deg,var(--green) 0%,var(--violet) 55%,var(--magenta-bright) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.62);line-height:1.6;max-width:440px;}
+.hero-stat{text-align:center;flex-shrink:0;}
+.hero-stat-val{font-size:48px;font-weight:900;letter-spacing:-0.04em;
+  background:linear-gradient(135deg,var(--green),#6EE7B7);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;}
+.hero-stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;
+  color:rgba(255,255,255,0.52);margin-top:4px;}
+.hero-stat-target{font-size:11px;color:var(--green);font-weight:600;margin-top:3px;}
+
+/* ── KPI strip ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;animation:rise 0.5s var(--ease) 0.14s both;}
+.kpi-tile{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:12px;
+  padding:16px 18px;position:relative;overflow:hidden;}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0;}
+.kt-green::before  {background:linear-gradient(90deg,#059669,var(--green));}
+.kt-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.kt-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.kt-amber::before  {background:linear-gradient(90deg,#D97706,var(--amber));}
+.kt-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico{font-size:17px;}
+.kpi-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.kb-good{background:rgba(52,211,153,0.12);color:var(--green);}
+.kb-warn{background:rgba(251,191,36,0.12);color:var(--amber);}
+.kb-risk{background:rgba(244,63,94,0.12);color:var(--bloom-bright);}
+.kpi-val{font-size:28px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.kt-green .kpi-val{color:var(--green);}
+.kt-bloom .kpi-val{color:var(--bloom-bright);}
+.kt-violet .kpi-val{color:var(--violet-bright);}
+.kt-amber .kpi-val{color:var(--amber);}
+.kt-magenta .kpi-val{color:var(--magenta-bright);}
+.kpi-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;color:var(--ink-muted);margin-bottom:2px;}
+.kpi-sub{font-size:10px;color:var(--ink-muted);}
+
+/* ── Section head ── */
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.sec-title{font-size:13px;font-weight:800;color:var(--ink);}
+.sec-pill{font-size:8px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;
+  padding:2px 8px;border-radius:99px;
+  background:rgba(52,211,153,0.10);color:var(--green);border:1px solid rgba(52,211,153,0.25);}
+.mb20{margin-bottom:20px;}
+
+/* ── Card ── */
+.card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;padding:20px 22px;}
+
+/* ── Trend chart ── */
+.trend-wrap{display:flex;align-items:flex-end;gap:8px;height:130px;padding-bottom:28px;position:relative;}
+.trend-wrap::after{content:'';position:absolute;bottom:28px;left:0;right:0;height:1px;background:var(--border);}
+.trend-col{flex:1;display:flex;flex-direction:column-reverse;align-items:center;gap:0;position:relative;}
+.trend-fill{width:100%;max-width:44px;border-radius:5px 5px 0 0;height:0;transition:height 1.2s var(--ease);}
+.trend-meta{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;}
+.trend-lbl{font-size:9px;color:var(--ink-muted);display:block;}
+.trend-val-lbl{position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  font-size:9px;font-weight:700;color:var(--ink-dim);white-space:nowrap;}
+
+/* ── Horizontal bars ── */
+.hbar-list{display:flex;flex-direction:column;gap:10px;}
+.hbar-row{display:flex;align-items:center;gap:12px;}
+.hbar-label{font-size:11px;color:var(--ink-dim);width:160px;flex-shrink:0;}
+.hbar-track{flex:1;height:8px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;}
+.hbar-fill{height:100%;border-radius:99px;width:0;transition:width 1.3s var(--ease);}
+.hbf-green  {background:linear-gradient(90deg,#059669,var(--green));}
+.hbf-bloom  {background:linear-gradient(90deg,var(--bloom-dim),var(--bloom-bright));}
+.hbf-amber  {background:linear-gradient(90deg,#D97706,var(--amber));}
+.hbf-violet {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.hbf-magenta{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.hbar-val{font-size:11px;font-weight:700;color:var(--ink);width:56px;text-align:right;flex-shrink:0;}
+.hbar-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0;}
+
+/* ── Two col ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+
+/* ── Table ── */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink-muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.data-table td{font-size:11.5px;color:var(--ink-dim);padding:10px 12px;border-bottom:1px solid var(--border);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(52,211,153,0.04);color:var(--ink);}
+.td-name{color:var(--ink)!important;font-weight:600;}
+.status-pill{display:inline-block;font-size:8px;font-weight:700;letter-spacing:0.08em;
+  text-transform:uppercase;padding:2px 8px;border-radius:99px;}
+.sp-green {background:rgba(52,211,153,0.12); color:var(--green); border:1px solid rgba(52,211,153,0.25);}
+.sp-amber {background:rgba(251,191,36,0.12); color:var(--amber); border:1px solid rgba(251,191,36,0.25);}
+.sp-violet{background:rgba(168,85,247,0.12); color:var(--violet-bright); border:1px solid rgba(168,85,247,0.25);}
+.sp-bloom {background:rgba(244,63,94,0.12);  color:var(--bloom-bright); border:1px solid rgba(244,63,94,0.25);}
+.td-amt{font-weight:700;color:var(--green)!important;}
+.vlogo{width:18px;height:18px;object-fit:contain;border-radius:4px;margin-right:7px;vertical-align:middle;display:inline-block;}
+
+/* ── Big number highlight ── */
+.big-num-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.big-num-cell{text-align:center;padding:14px 10px;border-radius:10px;border:1px solid;}
+
+/* ── Footer ── */
+.portal-footer{margin-top:24px;padding:12px 16px;
+  background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.10);border-radius:10px;
+  display:flex;align-items:center;gap:10px;font-size:10px;color:var(--ink-muted);line-height:1.65;}
+.portal-footer strong{color:var(--ink-dim);}
+
+/* ── User picker ── */
+.up-overlay{position:fixed;inset:0;z-index:500;background:rgba(7,4,17,0.96);
+  backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center;padding:24px;}
+.up-overlay.hidden{display:none;}
+.up-panel{width:100%;max-width:500px;animation:slideUp 0.4s var(--ease) both;text-align:center;}
+.up-gem{width:48px;height:48px;border-radius:14px;margin:0 auto 18px;
+  background:linear-gradient(135deg,var(--bloom),var(--magenta));
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 0 36px rgba(244,63,94,0.40);}
+.up-title{font-size:22px;font-weight:900;margin-bottom:6px;
+  background:linear-gradient(92deg,var(--bloom),var(--magenta),var(--violet));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.up-sub{font-size:12px;color:var(--ink-muted);margin-bottom:24px;}
+.up-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.up-tile{padding:14px 10px;border-radius:10px;cursor:pointer;
+  background:var(--bg-surface);border:1px solid var(--border-soft);
+  transition:background 0.15s,border-color 0.15s,transform 0.15s;font-family:var(--font);}
+.up-tile:hover{background:rgba(244,63,94,0.10);border-color:var(--bloom-border);transform:translateY(-2px);}
+.up-tile-emoji{font-size:22px;margin-bottom:6px;display:block;}
+.up-tile-name{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:1px;}
+.up-tile-role{font-size:8.5px;color:var(--ink-muted);}
+
+@media(max-width:1100px){.kpi-strip{grid-template-columns:repeat(2,1fr);}.two-col{grid-template-columns:1fr;}}
+@media(max-width:640px){.sidebar{display:none;}.content{padding:16px 16px 40px;}}
+/* ── Theme Toggle ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+body.mid-mode{--bg:#151E2E;--bg-surface:rgba(255,255,255,0.03);--bg-hover:rgba(244,63,94,0.08);--ink:rgba(255,255,255,0.90);--ink-dim:rgba(255,255,255,0.68);--ink-muted:rgba(255,255,255,0.46);--ink-ghost:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.14);--bloom-border:rgba(244,63,94,0.28);--bloom-glow:rgba(244,63,94,0.12);--green:#34D399;--amber:#FBBF24;--red:#F87171;}
+body.mid-mode::before{background:radial-gradient(ellipse at 88% 0%,rgba(37,99,235,0.04) 0%,transparent 22%),radial-gradient(ellipse at 3% 98%,rgba(99,102,241,0.03) 0%,transparent 18%);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#1A2540 0%,#172035 60%,#141B2E 100%);border-right:1px solid rgba(255,255,255,0.10);}
+body.mid-mode .topbar{background:rgba(24,31,48,0.92);}
+/* mid-mode up-overlay / user picker */
+body.mid-mode .up-overlay{background:rgba(20,27,46,0.97);}
+body.mid-mode .up-tile{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.14);}
+body.mid-mode .up-tile:hover{background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.35);}
+body.mid-mode .up-tile-name{color:rgba(255,255,255,0.90);}
+body.mid-mode .up-tile-role{color:rgba(255,255,255,0.50);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;--green:#059669;--amber:#B45309;--red:#DC2626;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title,body.light-mode .sb-user-name{color:#1A0818;}
+body.light-mode .sb-user-role{color:#7A4055;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .tb-btn{background:#FFF0F4;border-color:#F5C6D3;color:#5A2038;}
+body.light-mode .tb-btn:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.32);color:#E11D48;}
+body.light-mode .tb-crumb a{color:#7A4055;}
+body.light-mode .tb-crumb-cur{color:#E11D48;}
+body.light-mode .hero{background:linear-gradient(135deg,#FDE8EE 0%,#FCDDE7 38%,#FEE8F0 68%,#FFF0F4 100%);border:1px solid #F5C6D3;}
+body.light-mode .kpi-card,body.light-mode .savings-card,body.light-mode .two-col>*{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .kpi-val,body.light-mode .savings-val{color:#E11D48;}
+body.light-mode .kpi-label,body.light-mode .savings-vendor{color:#1A0818;}
+body.light-mode .kpi-sub,body.light-mode .savings-meta,body.light-mode .ph-eyebrow{color:#7A4055;}
+body.light-mode .content{background:transparent;}
+body.light-mode .scan{opacity:0.12;}
+body.light-mode .hero-eyebrow{color:#7A4055;}
+body.light-mode .hero-sub{color:#3D1028;}
+body.light-mode .hero-stat-label{color:#7A4055;}
+body.light-mode .hero-stat-target{color:#059669;}
+body.light-mode .card{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .sec-title{color:#1A0818;}
+body.light-mode .kpi-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .kpi-val{color:#C0143C;}
+body.light-mode .kpi-label{color:#1A0818;}
+body.light-mode .kpi-sub{color:#7A4055;}
+body.light-mode .hbar-track{background:rgba(26,8,24,0.18);}
+body.light-mode .sp-green{background:rgba(5,150,105,0.14);color:#059669;border-color:rgba(5,150,105,0.35);}
+body.light-mode .sp-amber{background:rgba(180,83,9,0.12);color:#B45309;border-color:rgba(180,83,9,0.30);}
+body.light-mode .sp-bloom{background:rgba(192,20,60,0.12);color:#C0143C;border-color:rgba(192,20,60,0.30);}
+body.light-mode .sp-violet{background:rgba(109,40,217,0.10);color:#6D28D9;border-color:rgba(109,40,217,0.28);}
+body.light-mode .kb-good{background:rgba(5,150,105,0.14);color:#059669;}
+body.light-mode .kb-warn{background:rgba(180,83,9,0.12);color:#B45309;}
+body.light-mode .kb-risk{background:rgba(192,20,60,0.12);color:#C0143C;}
+body.light-mode .hbar-label{color:#3D1028;}
+body.light-mode .hbar-val{color:#1A0818;}
+body.light-mode .trend-lbl{color:#7A4055;}
+body.light-mode .trend-val-lbl{color:#3D1028;}
+body.light-mode .trend-wrap::after{background:#F5C6D3;}
+body.light-mode .data-table th{color:#7A4055;border-bottom-color:#F5C6D3;}
+body.light-mode .data-table td{color:#3D1028;border-bottom-color:#F5C6D3;}
+body.light-mode .data-table tr:hover td{background:rgba(52,211,153,0.04);color:#1A0818;}
+body.light-mode .td-name{color:#1A0818!important;}
+body.light-mode .td-amt{color:#059669!important;}
+body.light-mode .portal-footer{background:rgba(52,211,153,0.04);border-color:rgba(52,211,153,0.12);color:#7A4055;}
+body.light-mode .portal-footer strong{color:#3D1028;}
+body.light-mode .up-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode .up-overlay{background:rgba(255,240,244,0.97);backdrop-filter:blur(18px);}
+body.light-mode .up-title{-webkit-text-fill-color:initial;background:none;color:#C0143C;}
+body.light-mode .up-sub{color:#7A4055;}
+body.light-mode .up-tile-name{color:#1A0818;}
+body.light-mode .up-tile-role{color:#7A4055;}
+body.light-mode .up-tile:hover{background:rgba(244,63,94,0.10);border-color:rgba(244,63,94,0.35);}
+body.light-mode .up-tile-name{color:#1A0818;}
+body.light-mode .up-tile-role{color:#7A4055;}
+</style>
+</head>
+<body data-portal="true">
+
+<div class="scan" aria-hidden="true"></div>
+
+<!-- User picker -->
+<div class="up-overlay hidden" id="up-overlay">
+  <div class="up-panel">
+    <div class="up-gem">&#128100;</div>
+    <div class="up-title">Who are you?</div>
+    <div class="up-sub">Personalize your portal experience.</div>
+    <div class="up-grid" id="up-grid"></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="window.location.href='team_portal.html'">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-user" id="sb-user-chip">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Team VER</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html" class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+
+
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"   class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"       class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"    class="sb-item active"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"        class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"      class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html" class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html"    class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html" class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html"     class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"         class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html" class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+      <div class="sb-divider"></div>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Savings Tracker</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button type="button" class="tb-btn">&#63; How to Use</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div>
+            <div class="hero-eyebrow">VER Intelligence &middot; FinOps Impact for Stakeholders</div>
+            <div class="hero-title">Savings Tracker</div>
+            <div class="hero-sub">Track savings identified on behalf of stakeholders through rate validations, SOW reviews, SaaS rationalization, and spend optimization across all vendor categories.</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val">$4.7M</div>
+            <div class="hero-stat-label">Identified FY27</div>
+            <div class="hero-stat-target">&#9650; 31% above FY26 pace</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip">
+        <div class="kpi-tile kt-green">
+          <div class="kpi-top"><span class="kpi-ico">&#128176;</span><span class="kpi-badge kb-good">+31% vs FY26</span></div>
+          <div class="kpi-val" data-count="4.7" data-prefix="$" data-suffix="M">$0</div>
+          <div class="kpi-label">Savings Identified</div>
+          <div class="kpi-sub">Identified for stakeholders YTD</div>
+        </div>
+        <div class="kpi-tile kt-violet">
+          <div class="kpi-top"><span class="kpi-ico">&#128195;</span><span class="kpi-badge kb-good">142 actions</span></div>
+          <div class="kpi-val" data-count="38.2" data-prefix="$" data-suffix="M">$0</div>
+          <div class="kpi-label">SOW Value Reviewed</div>
+          <div class="kpi-sub">Total contract value analyzed</div>
+        </div>
+        <div class="kpi-tile kt-amber">
+          <div class="kpi-top"><span class="kpi-ico">&#9989;</span><span class="kpi-badge kb-good">+18 vs Q2</span></div>
+          <div class="kpi-val" data-count="142" data-integer="1">0</div>
+          <div class="kpi-label">Rate Validations</div>
+          <div class="kpi-sub">Rates reviewed &amp; validated YTD</div>
+        </div>
+        <div class="kpi-tile kt-magenta">
+          <div class="kpi-top"><span class="kpi-ico">&#128221;</span><span class="kpi-badge kb-warn">3 pending</span></div>
+          <div class="kpi-val" data-count="29" data-integer="1">0</div>
+          <div class="kpi-label">SaaS Rationalizations</div>
+          <div class="kpi-sub">Duplicate / redundant titles actioned FY27</div>
+        </div>
+      </div>
+
+      <!-- TREND + BY CATEGORY -->
+      <div class="two-col mb20">
+
+        <!-- Trend chart -->
+        <div class="card">
+          <div class="sec-head" style="margin-bottom:18px;">
+            <div class="sec-title">&#128200; Savings Trend</div>
+            <span class="sec-pill">Monthly ($K)</span>
+          </div>
+          <div style="position:relative;">
+            <div class="trend-wrap" id="trend-chart">
+              <div class="trend-col">
+                <div class="trend-fill" data-h="55" style="background:rgba(52,211,153,0.38);"></div>
+                <div class="trend-meta"><span class="trend-lbl">Feb</span></div>
+                <span class="trend-val-lbl">$440K</span>
+              </div>
+              <div class="trend-col">
+                <div class="trend-fill" data-h="66" style="background:rgba(52,211,153,0.48);"></div>
+                <div class="trend-meta"><span class="trend-lbl">Mar</span></div>
+                <span class="trend-val-lbl">$530K</span>
+              </div>
+              <div class="trend-col">
+                <div class="trend-fill" data-h="72" style="background:rgba(52,211,153,0.56);"></div>
+                <div class="trend-meta"><span class="trend-lbl">Apr</span></div>
+                <span class="trend-val-lbl">$580K</span>
+              </div>
+              <div class="trend-col">
+                <div class="trend-fill" data-h="88" style="background:rgba(52,211,153,0.68);"></div>
+                <div class="trend-meta"><span class="trend-lbl">May</span></div>
+                <span class="trend-val-lbl">$710K</span>
+              </div>
+              <div class="trend-col">
+                <div class="trend-fill" data-h="100" style="background:rgba(52,211,153,0.82);"></div>
+                <div class="trend-meta"><span class="trend-lbl">Jun</span></div>
+                <span class="trend-val-lbl">$810K</span>
+              </div>
+              <div class="trend-col">
+                <div class="trend-fill" data-h="82" style="background:var(--green);"></div>
+                <div class="trend-meta"><span class="trend-lbl">Jul</span></div>
+                <span class="trend-val-lbl">$660K</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--green);font-weight:700;margin-top:8px;">&#9650; $4.73M YTD &middot; Best month: June $810K</div>
+        </div>
+
+        <!-- By category -->
+        <div class="card">
+          <div class="sec-head" style="margin-bottom:16px;">
+            <div class="sec-title">&#128194; By Spend Category</div>
+            <span class="sec-pill">YTD $M</span>
+          </div>
+          <div class="hbar-list">
+            <div class="hbar-row">
+              <span class="hbar-label">Professional Services</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-green" data-w="100"></div></div>
+              <span class="hbar-val">$1.82M</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Software / SaaS</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-violet" data-w="76"></div></div>
+              <span class="hbar-val">$1.39M</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Contingent Labor</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-bloom" data-w="54"></div></div>
+              <span class="hbar-val">$0.98M</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Infrastructure / Cloud</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-amber" data-w="29"></div></div>
+              <span class="hbar-val">$0.53M</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
+            <div style="font-size:10px;color:var(--ink-muted);">Avg savings rate vs. reviewed contract value</div>
+            <div style="font-size:18px;font-weight:900;color:var(--green);margin-top:4px;">12.4%</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BY INITIATIVE + TARGET PACE -->
+      <div class="two-col mb20">
+
+        <!-- By initiative -->
+        <div class="card">
+          <div class="sec-head" style="margin-bottom:16px;">
+            <div class="sec-title">&#127919; By Initiative Type</div>
+            <span class="sec-pill">% of total</span>
+          </div>
+          <div class="hbar-list">
+            <div class="hbar-row">
+              <span class="hbar-label">Rate Negotiation</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-green" data-w="82"></div></div>
+              <span class="hbar-val">38%</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">SOW Right-Sizing</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-violet" data-w="55"></div></div>
+              <span class="hbar-val">26%</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Vendor Consolidation</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-magenta" data-w="37"></div></div>
+              <span class="hbar-val">17%</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">SaaS Rationalization</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-amber" data-w="32"></div></div>
+              <span class="hbar-val">15%</span>
+            </div>
+            <div class="hbar-row">
+              <span class="hbar-label">Benchmark Arbitrage</span>
+              <div class="hbar-track"><div class="hbar-fill hbf-bloom" data-w="9"></div></div>
+              <span class="hbar-val">4%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FY27 target pace -->
+        <div class="card">
+          <div class="sec-head" style="margin-bottom:14px;">
+            <div class="sec-title">&#127919; FY27 Target Pace</div>
+          </div>
+          <div style="margin-bottom:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+              <span style="font-size:11px;color:var(--ink-dim);">YTD Identified</span>
+              <span style="font-size:14px;font-weight:900;color:var(--green);">$4.73M</span>
+            </div>
+            <div style="height:12px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;">
+              <div class="hbar-fill hbf-green" data-w="67" style="height:100%;border-radius:99px;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:9px;color:var(--ink-muted);">
+              <span>$0</span><span>FY27 Goal: $7.0M</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="text-align:center;padding:12px 8px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.18);border-radius:9px;">
+              <div style="font-size:22px;font-weight:900;color:var(--green);">$7.0M</div>
+              <div style="font-size:8.5px;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink-muted);">FY27 Goal</div>
+            </div>
+            <div style="text-align:center;padding:12px 8px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.18);border-radius:9px;">
+              <div style="font-size:22px;font-weight:900;color:var(--violet-bright);">$2.27M</div>
+              <div style="font-size:8.5px;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink-muted);">Remaining</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;font-size:10px;color:var(--ink-muted);line-height:1.6;">
+            At current run rate, VER is projected to reach <strong style="color:var(--green);">$7.8M</strong> by year-end — 11% above goal.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RECENT WINS TABLE -->
+      <div class="sec-head">
+        <div class="sec-title">&#127942; Recent Wins</div>
+        <span class="sec-pill">Last 12</span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Engagement</th>
+              <th>Vendor</th>
+              <th>Category</th>
+              <th>Initiative</th>
+              <th>Savings</th>
+              <th>Status</th>
+              <th>Assign</th>
+            </tr>
+          </thead>
+          <tbody id="st-tbody">
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/accenture.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">FY27 Q3 Rate Reset</td><td><img class="vlogo" src="https://cdn.brandfetch.io/accenture.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Accenture</td><td>Prof. Services</td><td>Rate Negotiation</td><td class="td-amt">$412K</td><td><span class="status-pill sp-green">Realized</span></td></tr>
+            <tr><td class="td-name">SaaS Consolidation Wave 2</td><td>Multi-vendor</td><td>Software</td><td>Consolidation</td><td class="td-amt">$387K</td><td><span class="status-pill sp-green">Realized</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/coupa.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Coupa Contract Renewal</td><td><img class="vlogo" src="https://cdn.brandfetch.io/coupa.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Coupa</td><td>SaaS</td><td>Benchmark Arb.</td><td class="td-amt">$218K</td><td><span class="status-pill sp-green">Realized</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/infosys.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">SOW Right-Sizing — Pillar 4</td><td><img class="vlogo" src="https://cdn.brandfetch.io/infosys.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Infosys</td><td>Prof. Services</td><td>SOW Right-Sizing</td><td class="td-amt">$190K</td><td><span class="status-pill sp-green">Realized</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/deloitte.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Deloitte SOW Scope Reduction</td><td><img class="vlogo" src="https://cdn.brandfetch.io/deloitte.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Deloitte</td><td>Prof. Services</td><td>SOW Right-Sizing</td><td class="td-amt">$155K</td><td><span class="status-pill sp-green">Realized</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/informatica.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Informatica License Audit</td><td><img class="vlogo" src="https://cdn.brandfetch.io/informatica.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Informatica</td><td>Software</td><td>Rate Negotiation</td><td class="td-amt">$340K</td><td><span class="status-pill sp-violet">In Review</span></td></tr>
+            <tr><td class="td-name">CW Rate Benchmark — AMER</td><td>Multi-vendor</td><td>CW Labor</td><td>Rate Negotiation</td><td class="td-amt">$280K</td><td><span class="status-pill sp-violet">In Review</span></td></tr>
+            <tr><td class="td-name">Vendor Consolidation — Tier 3</td><td>Multi-vendor</td><td>Mixed</td><td>Consolidation</td><td class="td-amt">$175K</td><td><span class="status-pill sp-amber">Pending</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/slalom.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Salesforce SI Re-bid</td><td><img class="vlogo" src="https://cdn.brandfetch.io/slalom.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Slalom</td><td>Prof. Services</td><td>SOW Right-Sizing</td><td class="td-amt">$410K</td><td><span class="status-pill sp-amber">Pending</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/workday.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Workday HCM Optimization</td><td><img class="vlogo" src="https://cdn.brandfetch.io/workday.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Workday</td><td>SaaS</td><td>Rate Negotiation</td><td class="td-amt">$260K</td><td><span class="status-pill sp-amber">Pending</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/aws.amazon.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Cloud Infra Cost Takeout</td><td><img class="vlogo" src="https://cdn.brandfetch.io/aws.amazon.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">AWS</td><td>Infrastructure</td><td>Benchmark Arb.</td><td class="td-amt">$530K</td><td><span class="status-pill sp-bloom">Identified</span></td></tr>
+            <tr><td class="td-name"><img class="vlogo" src="https://cdn.brandfetch.io/wipro.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Professional Services Rebid</td><td><img class="vlogo" src="https://cdn.brandfetch.io/wipro.com?c=1idLxwmT7Sv6VAWJq9j" alt="" onerror="this.style.display='none'">Wipro</td><td>Prof. Services</td><td>Rate Negotiation</td><td class="td-amt">$312K</td><td><span class="status-pill sp-bloom">Identified</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="portal-footer" style="margin-top:20px;">
+        <span style="font-size:15px;">&#128274;</span>
+        <span><strong>Internal Use Only.</strong> VER Team Portal &middot; Salesforce DET &middot; FY27</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/assign.js"></script>
+<script>
+var TEAM_MEMBERS=[
+  {id:'casey',name:'Casey',role:'Director',emoji:'&#128081;',director:true},
+  {id:'debs',name:'Debs',role:'Manager',emoji:'&#127775;'},
+  {id:'erin',name:'Erin',role:'Senior Manager',emoji:'&#11088;'},
+  {id:'mahesh',name:'Mahesh',role:'Senior Manager',emoji:'&#128171;'},
+  {id:'aditya',name:'Aditya',role:'Senior Manager',emoji:'&#10024;'},
+  {id:'justin',name:'Justin',role:'Senior Analyst',emoji:'&#127776;'},
+  {id:'guest',name:'Guest',role:'VER Team',emoji:'&#128100;'}
+];
+function _loadUser(){
+  var saved=null;try{saved=JSON.parse(localStorage.getItem('ver-team-user'));}catch(e){}
+  if(saved&&saved.name){_applyUser(saved);return;}
+  _showPicker();
+}
+function _applyUser(u){
+  var e=document.getElementById('sb-user-emoji'),n=document.getElementById('sb-user-name'),r=document.getElementById('sb-user-role');
+  if(e)e.innerHTML=u.emoji;if(n)n.textContent=u.name;if(r)r.textContent=u.role;
+  document.getElementById('up-overlay').classList.add('hidden');
+  AssignEngine.initDirectorChip(u,_showPicker);
+  AssignEngine._refreshAllBadges();
+}
+function _showPicker(){
+  var g=document.getElementById('up-grid');
+  g.innerHTML=TEAM_MEMBERS.map(function(m){
+    return '<div class="up-tile" onclick="_pick(\''+m.id+'\')"><span class="up-tile-emoji">'+m.emoji+'<\/span><div class="up-tile-name">'+m.name+'<\/div><div class="up-tile-role">'+m.role+'<\/div><\/div>';
+  }).join('');
+  document.getElementById('up-overlay').classList.remove('hidden');
+}
+function _pick(id){
+  var m=TEAM_MEMBERS.find(function(x){return x.id===id;});
+  if(!m)return;
+  try{localStorage.setItem('ver-team-user',JSON.stringify(m));}catch(e){}
+  _applyUser(m);
+}
+function animateCounter(el){
+  var target=parseFloat(el.getAttribute('data-count'));
+  var isInt=el.getAttribute('data-integer')==='1';
+  var suffix=el.getAttribute('data-suffix')||'';
+  var prefix=el.getAttribute('data-prefix')||'';
+  var dur=1400,start=null;
+  var decimals=(target%1!==0&&!isInt)?1:0;
+  function step(ts){
+    if(!start)start=ts;
+    var p=Math.min((ts-start)/dur,1),e=1-Math.pow(1-p,3),v=target*e;
+    el.textContent=prefix+(isInt?Math.round(v).toLocaleString():v.toFixed(decimals))+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  setTimeout(function(){requestAnimationFrame(step);},500);
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('[data-count]').forEach(animateCounter);
+  setTimeout(function(){
+    document.querySelectorAll('[data-w]').forEach(function(el){el.style.width=el.getAttribute('data-w')+'%';});
+    document.querySelectorAll('.trend-fill[data-h]').forEach(function(el){el.style.height=el.getAttribute('data-h')+'px';});
+  },700);
+  var path=window.location.pathname.split('/').pop()||'';
+  document.querySelectorAll('.sb-item').forEach(function(a){
+    if((a.getAttribute('href')||'').split('/').pop()===path)a.classList.add('active');
+  });
+  _loadUser();
+
+  // Wire assignment buttons to each savings row
+  var rows = document.querySelectorAll('#st-tbody tr');
+  var rowDefs = [
+    { label:'FY27 Q3 Rate Reset',           vendor:'Accenture',   checkType:'finops' },
+    { label:'SaaS Consolidation Wave 2',     vendor:'Multi-vendor',checkType:'saas' },
+    { label:'Coupa Contract Renewal',        vendor:'Coupa',       checkType:'finops' },
+    { label:'SOW Right-Sizing — Pillar 4',   vendor:'Infosys',     checkType:'sow' },
+    { label:'Deloitte SOW Scope Reduction',  vendor:'Deloitte',    checkType:'sow' },
+    { label:'Informatica License Audit',     vendor:'Informatica', checkType:'rate' },
+    { label:'CW Rate Benchmark — AMER',      vendor:'Multi-vendor',checkType:'rate' },
+    { label:'Vendor Consolidation — Tier 3', vendor:'Multi-vendor',checkType:'saas' },
+    { label:'Salesforce SI Re-bid',          vendor:'Slalom',      checkType:'finops' },
+    { label:'Workday HCM Optimization',      vendor:'Workday',     checkType:'finops' },
+    { label:'Cloud Infra Cost Takeout',      vendor:'AWS',         checkType:'spend' },
+    { label:'Professional Services Rebid',   vendor:'Wipro',       checkType:'finops' }
+  ];
+  rows.forEach(function(tr, i) {
+    if (!rowDefs[i]) return;
+    AssignEngine.wireTable(null, [{ tr: tr, contextId: 'st-' + i, label: rowDefs[i].label, vendor: rowDefs[i].vendor, checkType: rowDefs[i].checkType }]);
+  });
+});
+
+function _toggleTheme(){var b=document.body;var cur=b.classList.contains('light-mode')?'light':b.classList.contains('mid-mode')?'mid':'dark';var next=cur==='dark'?'mid':cur==='mid'?'light':'dark';b.classList.remove('light-mode','mid-mode');if(next==='light')b.classList.add('light-mode');if(next==='mid')b.classList.add('mid-mode');var btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=next==='light'?'&#9790; Dark':next==='mid'?'&#9788; Light':'&#9788; Mid';try{localStorage.setItem('ver-portal-theme',next);}catch(e){}}
+(function(){try{var t=localStorage.getItem('ver-portal-theme');var btn=document.getElementById('theme-toggle-btn');if(t==='light'){document.body.classList.add('light-mode');if(btn)btn.innerHTML='&#9790; Dark';}else if(t==='mid'){document.body.classList.add('mid-mode');if(btn)btn.innerHTML='&#9788; Light';}}catch(e){}})();
+</script>
+</body>
+</html>

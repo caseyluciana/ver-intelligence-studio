@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Operating Yield · VER Team Portal</title>
+<script src="assets/vendors.js" defer></script>
+<script src="assets/coupa_spend.js" defer></script>
+<style>
+:root {
+  --bloom:#F43F5E; --bloom-dim:#E11D48; --bloom-bright:#FB7185;
+  --bloom-glow:rgba(244,63,94,0.16); --bloom-border:rgba(244,63,94,0.30);
+  --bloom-status:rgba(244,63,94,0.09);
+  --magenta:#C026D3; --magenta-bright:#E879F9;
+  --mag-glow:rgba(192,38,211,0.14); --mag-border:rgba(192,38,211,0.28);
+  --violet:#A855F7; --violet-bright:#C084FC;
+  --vio-glow:rgba(168,85,247,0.12); --vio-border:rgba(168,85,247,0.28);
+  --green:#34D399; --green-dim:rgba(52,211,153,0.12); --green-border:rgba(52,211,153,0.28);
+  --amber:#FBBF24; --amber-dim:rgba(251,191,36,0.12); --amber-border:rgba(251,191,36,0.28);
+  --red:#F43F5E; --red-dim:rgba(244,63,94,0.12); --red-border:rgba(244,63,94,0.28);
+  --bg:#070411; --bg-side:#130D26; --bg-surface:rgba(255,255,255,0.034);
+  --bg-hover:rgba(244,63,94,0.07);
+  --ink:rgba(255,255,255,0.96); --ink-dim:rgba(255,255,255,0.76);
+  --ink-muted:rgba(255,255,255,0.52); --ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.06); --border-soft:rgba(255,255,255,0.10);
+  --font:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);
+  font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.22) 0%,transparent 52%),
+    radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.18) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 48%,rgba(168,85,247,0.07) 0%,transparent 60%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(244,63,94,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,63,94,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+
+/* ── SIDEBAR ── */
+.shell{position:relative;z-index:2;display:flex;min-height:100vh;}
+.sidebar{width:234px;flex-shrink:0;
+  background:linear-gradient(180deg,#1C1030 0%,#150D28 60%,#110B22 100%);
+  border-right:1px solid rgba(244,63,94,0.12);
+  box-shadow:inset -1px 0 0 rgba(244,63,94,0.08),4px 0 24px rgba(0,0,0,0.3);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sb-gem{width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bloom) 0%,var(--magenta) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  box-shadow:0 0 24px rgba(244,63,94,0.42),0 0 8px rgba(192,38,211,0.28);}
+.sb-logo-title{font-size:13.5px;font-weight:900;color:var(--ink);letter-spacing:-0.01em;line-height:1.1;}
+.sb-logo-sub{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.55);margin-top:2px;}
+.sb-status{display:inline-flex;align-items:center;gap:5px;
+  background:var(--bloom-status);border:1px solid var(--bloom-border);
+  border-radius:99px;padding:3px 9px;font-size:8px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.10em;color:var(--bloom-bright);}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:var(--bloom-bright);
+  animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.sb-nav{flex:1;padding:10px 0;}
+.sb-section{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:rgba(255,255,255,0.42);padding:12px 20px 5px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 20px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:600;color:rgba(255,255,255,0.72);text-decoration:none;
+  border-left:3px solid transparent;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.sb-item:hover{background:var(--bg-hover);color:var(--ink);border-left-color:rgba(244,63,94,0.35);}
+.sb-item.active{background:var(--bloom-status);color:var(--ink);border-left-color:var(--bloom);}
+.sb-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:8px 0;}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;
+  font-size:9px;color:rgba(255,255,255,0.50);line-height:1.7;}
+.sb-user{margin:0 12px 10px;padding:10px 14px;border-radius:10px;
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.16);
+  display:flex;align-items:center;gap:9px;}
+.sb-user-emoji{font-size:20px;line-height:1;}
+.sb-user-name{font-size:11.5px;font-weight:800;color:var(--ink);}
+.sb-user-role{font-size:9px;color:rgba(255,255,255,0.55);}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
+  background:rgba(7,4,17,0.80);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.tb-crumb{display:flex;align-items:center;gap:8px;font-size:11px;}
+.tb-crumb a{color:var(--ink-dim);text-decoration:none;transition:color 0.15s;}
+.tb-crumb a:hover{color:var(--bloom-bright);}
+.tb-crumb-sep{color:var(--ink-muted);}
+.tb-crumb-cur{color:var(--bloom-bright);font-weight:700;}
+.tb-actions{display:flex;align-items:center;gap:8px;}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;white-space:nowrap;}
+.tb-btn:hover{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.tb-btn.primary{background:linear-gradient(90deg,var(--bloom-dim),var(--magenta));
+  border-color:transparent;color:#fff;box-shadow:0 0 16px rgba(244,63,94,0.24);}
+.tb-btn.primary:hover{opacity:0.88;}
+.content{flex:1;overflow-y:auto;padding:28px 32px 56px;
+  scrollbar-width:thin;scrollbar-color:rgba(244,63,94,0.2) transparent;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:rgba(244,63,94,0.18);border-radius:99px;}
+
+/* ── PAGE HEADER ── */
+.page-head{margin-bottom:22px;}
+.page-eyebrow{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.18em;
+  color:var(--bloom-bright);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.page-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--bloom);
+  animation:pulse 2.5s ease-in-out infinite;}
+.page-title{font-size:26px;font-weight:900;letter-spacing:-0.02em;
+  background:linear-gradient(92deg,var(--bloom) 0%,var(--magenta) 55%,var(--violet) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:inline-block;margin-bottom:5px;}
+.page-sub{font-size:12px;color:var(--ink-muted);line-height:1.55;}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+.kpi-tile{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:13px;
+  padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0;}
+.t-bloom::before  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.t-magenta::before{background:linear-gradient(90deg,var(--magenta),var(--magenta-bright));}
+.t-violet::before {background:linear-gradient(90deg,var(--violet),var(--violet-bright));}
+.t-green::before  {background:linear-gradient(90deg,var(--green),#6EE7B7);}
+.t-amber::before  {background:linear-gradient(90deg,var(--amber),#FDE68A);}
+.kpi-ico-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico{font-size:18px;}
+.kpi-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.kb-bloom  {background:rgba(244,63,94,0.14);color:var(--bloom-bright);}
+.kb-magenta{background:rgba(192,38,211,0.12);color:var(--magenta-bright);}
+.kb-violet {background:rgba(168,85,247,0.12);color:var(--violet-bright);}
+.kb-green  {background:rgba(52,211,153,0.12);color:#34D399;}
+.kb-amber  {background:rgba(251,191,36,0.12);color:#FBBF24;}
+.kpi-val{font-size:28px;font-weight:900;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.t-bloom   .kpi-val{color:var(--bloom-bright);}
+.t-magenta .kpi-val{color:var(--magenta-bright);}
+.t-violet  .kpi-val{color:var(--violet-bright);}
+.t-green   .kpi-val{color:#34D399;}
+.t-amber   .kpi-val{color:#FBBF24;}
+.kpi-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:var(--ink-muted);}
+
+/* ── CALLOUT ── */
+.callout{padding:13px 18px;border-radius:10px;margin-bottom:22px;
+  background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.18);
+  border-left:3px solid var(--violet);font-size:12px;color:var(--ink-dim);line-height:1.65;}
+.callout strong{color:var(--violet-bright);}
+
+/* ── TWO-COL LAYOUT ── */
+.yield-layout{display:grid;grid-template-columns:420px 1fr;gap:18px;margin-bottom:22px;align-items:start;}
+
+/* ── FORM CARD ── */
+.form-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:14px;overflow:hidden;}
+.form-card-head{padding:16px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;}
+.form-card-title{font-size:13px;font-weight:800;color:var(--ink);}
+.form-card-body{padding:18px 22px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-full{margin-bottom:12px;}
+.form-label{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink-muted);margin-bottom:5px;display:block;}
+.form-input{width:100%;padding:8px 12px;border-radius:8px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  color:var(--ink);font-family:var(--font);font-size:12.5px;outline:none;
+  transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--bloom-border);}
+.form-input::placeholder{color:var(--ink-muted);}
+select.form-input option{background:#1C1030;color:var(--ink);}
+select.form-input optgroup{background:#150D28;color:rgba(255,255,255,0.42);font-style:normal;font-weight:800;font-size:9px;}
+
+/* ── FACTOR INPUTS ── */
+.factor-grid{display:grid;gap:10px;margin-bottom:14px;}
+.factor-row{display:grid;grid-template-columns:1fr 72px;gap:10px;align-items:center;}
+.factor-row-label{font-size:11px;font-weight:600;color:var(--ink-dim);}
+.factor-note{font-size:9px;color:var(--ink-muted);display:block;margin-top:1px;}
+.factor-num{width:72px;padding:6px 10px;border-radius:7px;
+  background:rgba(255,255,255,0.06);border:1px solid var(--border-soft);
+  color:var(--ink);font-family:var(--font);font-size:13px;font-weight:700;
+  text-align:center;outline:none;transition:border-color 0.15s;}
+.factor-num:focus{border-color:var(--bloom-border);}
+.factor-num.inverse{border-color:rgba(244,63,94,0.22);}
+
+/* ── SCORE DISPLAY ── */
+.score-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:14px;overflow:hidden;}
+.score-card-head{padding:16px 22px;border-bottom:1px solid var(--border);}
+.score-card-title{font-size:13px;font-weight:800;color:var(--ink);}
+.score-card-body{padding:18px 22px;}
+.score-display{display:flex;align-items:flex-start;gap:16px;margin-bottom:18px;}
+.score-number{font-size:64px;font-weight:900;line-height:1;letter-spacing:-0.04em;color:var(--ink);}
+.score-number small{font-size:18px;color:var(--ink-muted);}
+.score-meta{display:flex;flex-direction:column;gap:8px;padding-top:10px;}
+.yield-badge{display:inline-block;border-radius:99px;padding:5px 14px;font-size:11px;font-weight:800;}
+.yield-badge--green{background:rgba(52,211,153,0.14);color:#34D399;border:1px solid rgba(52,211,153,0.28);}
+.yield-badge--amber{background:rgba(251,191,36,0.12);color:#FBBF24;border:1px solid rgba(251,191,36,0.26);}
+.yield-badge--red  {background:rgba(244,63,94,0.12);color:var(--bloom-bright);border:1px solid var(--bloom-border);}
+.score-label{font-size:11px;color:var(--ink-muted);}
+
+/* ── FACTOR BARS ── */
+.factor-bars-section{margin-bottom:16px;}
+.factor-bar-row{display:grid;grid-template-columns:160px 1fr 38px;gap:10px;align-items:center;margin-bottom:8px;}
+.factor-bar-label{font-size:11px;color:var(--ink-dim);font-weight:600;}
+.factor-track{height:8px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+.factor-fill{height:100%;border-radius:99px;transition:width 0.5s var(--ease);}
+.factor-fill--green{background:linear-gradient(90deg,#34D399,#6EE7B7);}
+.factor-fill--amber{background:linear-gradient(90deg,#FBBF24,#FDE68A);}
+.factor-fill--red  {background:linear-gradient(90deg,var(--bloom),var(--bloom-bright));}
+.factor-bar-val{font-size:11px;font-weight:700;color:var(--ink-dim);text-align:right;}
+
+/* ── FORMULA STRIP ── */
+.formula-strip{background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.16);
+  border-radius:9px;padding:10px 14px;font-size:10px;color:rgba(255,255,255,0.50);line-height:1.7;
+  margin-bottom:14px;}
+.formula-strip strong{color:var(--violet-bright);}
+
+/* ── EXEC INTERP ── */
+.exec-interp{background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.18);
+  border-radius:10px;padding:14px 16px;font-size:12px;color:var(--ink-dim);line-height:1.7;}
+.exec-interp b{color:var(--violet-bright);}
+
+/* ── ACTION BUTTONS ── */
+.action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:14px;
+  border-top:1px solid var(--border);}
+.act-btn{font-size:10.5px;font-weight:700;padding:7px 16px;border-radius:8px;
+  cursor:pointer;font-family:var(--font);border:1px solid;transition:all 0.15s;}
+.act-btn-primary{
+  background:linear-gradient(90deg,var(--bloom-dim),var(--magenta));
+  border-color:transparent;color:#fff;box-shadow:0 0 14px rgba(244,63,94,0.22);}
+.act-btn-primary:hover{opacity:0.88;}
+.act-btn-save{
+  background:linear-gradient(90deg,rgba(168,85,247,0.18),rgba(192,38,211,0.14));
+  border-color:rgba(168,85,247,0.32);color:var(--violet-bright);}
+.act-btn-save:hover{background:linear-gradient(90deg,rgba(168,85,247,0.28),rgba(192,38,211,0.22));}
+.act-btn-ghost{background:transparent;border-color:var(--border-soft);color:var(--ink-muted);}
+.act-btn-ghost:hover{background:var(--bg-surface);color:var(--ink);}
+.act-btn-danger{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.22);color:var(--bloom-bright);}
+.act-btn-danger:hover{background:rgba(244,63,94,0.14);}
+
+/* ── TABLE SECTION ── */
+.table-section{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:14px;overflow:hidden;}
+.table-head{padding:16px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.table-title{font-size:13px;font-weight:800;color:var(--ink);}
+.table-filters{display:flex;gap:6px;flex-wrap:wrap;}
+.tbl-filter{font-size:10px;padding:4px 12px;border-radius:99px;cursor:pointer;
+  border:1px solid var(--border-soft);background:var(--bg-surface);
+  color:var(--ink-muted);font-family:var(--font);font-weight:600;transition:all 0.15s;}
+.tbl-filter:hover{background:var(--bg-hover);color:var(--ink);}
+.tbl-filter.active{background:var(--bloom-status);border-color:var(--bloom-border);color:var(--bloom-bright);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th,td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;}
+th{font-size:9px;font-weight:800;color:var(--ink-muted);text-transform:uppercase;
+  letter-spacing:0.08em;background:rgba(255,255,255,0.025);white-space:nowrap;}
+td{color:var(--ink-dim);}
+tr:hover td{background:rgba(244,63,94,0.03);}
+.tbl-badge{border-radius:99px;padding:3px 9px;font-size:10px;font-weight:800;display:inline-block;}
+.tbl-badge--green{background:rgba(52,211,153,0.14);color:#34D399;}
+.tbl-badge--amber{background:rgba(251,191,36,0.12);color:#FBBF24;}
+.tbl-badge--red  {background:rgba(244,63,94,0.12);color:var(--bloom-bright);}
+.tbl-vendor{font-weight:700;color:var(--ink);}
+.tbl-actions{display:flex;gap:6px;align-items:center;}
+.tbl-act{font-size:9.5px;font-weight:700;padding:4px 10px;border-radius:6px;
+  cursor:pointer;font-family:var(--font);border:1px solid;transition:all 0.15s;}
+.tbl-act-edit{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.24);color:var(--violet-bright);}
+.tbl-act-edit:hover{background:rgba(168,85,247,0.20);}
+.tbl-act-del{background:rgba(244,63,94,0.08);border-color:rgba(244,63,94,0.20);color:var(--bloom-bright);}
+.tbl-act-del:hover{background:rgba(244,63,94,0.16);}
+.table-empty{text-align:center;padding:40px 20px;color:var(--ink-muted);}
+.table-empty-ico{font-size:28px;margin-bottom:10px;}
+.table-empty-txt{font-size:12px;}
+
+/* ── TOAST ── */
+.success-toast{display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  z-index:9999;border-radius:12px;padding:13px 22px;font-size:11px;font-weight:700;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);align-items:center;gap:10px;
+  background:linear-gradient(135deg,rgba(52,211,153,0.18),rgba(52,211,153,0.10));
+  border:1px solid rgba(52,211,153,0.32);color:#34D399;
+  backdrop-filter:blur(12px);}
+.toast-dismiss{background:rgba(255,255,255,0.10);border:none;color:rgba(255,255,255,0.60);
+  border-radius:6px;padding:2px 8px;cursor:pointer;font-size:13px;margin-left:6px;}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:background 0.15s,border-color 0.15s,color 0.15s;flex-shrink:0;}
+.theme-toggle-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);color:#C084FC;}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--ink-muted);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── ANIMATIONS ── */
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-head{animation:rise 0.45s var(--ease) 0.05s both;}
+.kpi-strip{animation:rise 0.45s var(--ease) 0.12s both;}
+.callout{animation:rise 0.45s var(--ease) 0.18s both;}
+.yield-layout{animation:rise 0.45s var(--ease) 0.22s both;}
+.table-section{animation:rise 0.45s var(--ease) 0.28s both;}
+
+/* ── THEME VARIANTS ── */
+body.mid-mode{--bg:#0E0B22;--bg-surface:rgba(255,255,255,0.048);--border:rgba(255,255,255,0.10);--border-soft:rgba(255,255,255,0.13);}
+body.mid-mode .sidebar{background:linear-gradient(180deg,#241848 0%,#1E1440 60%,#18102E 100%);border-right:1px solid rgba(244,63,94,0.13);}
+body.mid-mode .topbar{background:rgba(22,17,43,0.88);}
+body.light-mode{--bg:#FFF0F4;--bg-surface:#FFF8FA;--bg-hover:rgba(244,63,94,0.06);--ink:#1A0818;--ink-dim:#3D1028;--ink-muted:#7A4055;--ink-ghost:rgba(26,8,24,0.06);--border:#F5C6D3;--border-soft:#F5C6D3;--bloom-status:rgba(244,63,94,0.08);--bloom-border:rgba(244,63,94,0.30);--bloom-bright:#C0143C;--magenta-bright:#9A0DAF;--violet-bright:#6D28D9;}
+body.light-mode::before{background:radial-gradient(ellipse at 82% 0%,rgba(192,38,211,0.13) 0%,transparent 52%),radial-gradient(ellipse at 2% 90%,rgba(244,63,94,0.11) 0%,transparent 50%);}
+body.light-mode .sidebar{background:linear-gradient(180deg,#FDE8EE 0%,#FCDDE7 60%,#FDE8EE 100%);border-right:1px solid #F5C6D3;}
+body.light-mode .sb-logo-sub,body.light-mode .sb-section,body.light-mode .sb-footer{color:#B06080;}
+body.light-mode .sb-item{color:#5A2038;}
+body.light-mode .sb-item:hover{background:rgba(244,63,94,0.08);color:#1A0818;}
+body.light-mode .sb-item.active{background:rgba(244,63,94,0.12);color:#1A0818;border-left-color:var(--bloom);}
+body.light-mode .sb-logo-title{color:#1A0818;}
+body.light-mode .topbar{background:rgba(255,240,244,0.96);border-bottom-color:#F5C6D3;}
+body.light-mode .form-card,.light-mode .score-card,.light-mode .table-section{background:#FFF8FA;}
+body.light-mode .form-input,.light-mode .factor-num{background:#FFF0F4;border-color:#F5C6D3;color:#1A0818;}
+body.light-mode td{color:#3D1028;}
+body.light-mode th{color:#7A4055;background:rgba(26,8,24,0.03);}
+body.light-mode tr:hover td{background:rgba(244,63,94,0.03);}
+body.light-mode .kpi-tile{background:#FFF8FA;border-color:#F5C6D3;}
+body.light-mode select.form-input option{background:#FFF0F4;color:#1A0818;}
+
+@media(max-width:1200px){.kpi-strip{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:1050px){.yield-layout{grid-template-columns:1fr;}}
+@media(max-width:640px){.sidebar{display:none;}.content{padding:16px 16px 40px;}
+  .kpi-strip{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body data-portal="true">
+
+<!-- TOAST -->
+<div class="success-toast" id="toast">
+  <span id="toast-msg">Assessment saved.</span>
+  <button type="button" class="toast-dismiss" onclick="document.getElementById('toast').style.display='none'">&#215;</button>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">
+        <div class="sb-gem">&#128100;</div>
+        <div>
+          <div class="sb-logo-title">Team Portal</div>
+          <div class="sb-logo-sub">VER &middot; Internal</div>
+        </div>
+      </div>
+      <div class="sb-status"><span class="sb-dot"></span>Live &middot; FY27</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-user">
+        <span class="sb-user-emoji" id="sb-user-emoji">&#128100;</span>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Casey</div>
+          <div class="sb-user-role" id="sb-user-role">VER Team</div>
+        </div>
+      </div>
+
+      <div class="sb-section">Director</div>
+      <a href="assignments.html" class="sb-item"><span class="sb-icon">&#10133;</span>Assign Work</a>
+      <div class="sb-section">Intelligence</div>
+      <a href="response_tracker.html"       class="sb-item"><span class="sb-icon">&#9201;</span>Response Time</a>
+      <a href="risk_tracker.html"           class="sb-item"><span class="sb-icon">&#128737;</span>Risk Assessments</a>
+      <a href="savings_tracker.html"        class="sb-item"><span class="sb-icon">&#128176;</span>Savings Tracker</a>
+      <a href="portal_rate_benchmarks.html" class="sb-item"><span class="sb-icon">&#128180;</span>Rate Benchmarks</a>
+      <a href="portal_vendor_risk.html"     class="sb-item"><span class="sb-icon">&#9888;</span>Vendor Risk</a>
+      <div class="sb-section">Operations</div>
+      <a href="portal_intake_review.html"   class="sb-item"><span class="sb-icon">&#128229;</span>Intake Review</a>
+      <a href="portal_survey_review.html"   class="sb-item"><span class="sb-icon">&#128203;</span>Survey Review</a>
+      <a href="portal_vendor_registry.html" class="sb-item"><span class="sb-icon">&#128218;</span>Vendor Registry</a>
+      <div class="sb-section">Tools</div>
+      <a href="portal_cinematic_generator.html" class="sb-item"><span class="sb-icon">&#127909;</span>Cinematic Generator</a>
+      <a href="portal_vendor_selector.html" class="sb-item"><span class="sb-icon">&#127919;</span>Vendor Selector</a>
+      <a href="portal_survey.html"          class="sb-item"><span class="sb-icon">&#128196;</span>Vendor Survey</a>
+      <div class="sb-section">Assessments</div>
+      <a href="portal_exit_optionality.html" class="sb-item"><span class="sb-icon">&#128683;</span>Exit Optionality</a>
+      <a href="portal_decision_value.html"  class="sb-item"><span class="sb-icon">&#128200;</span>Decision to Value</a>
+      <a href="portal_operating_yield.html" class="sb-item active"><span class="sb-icon">&#9881;</span>Operating Yield</a>
+      <a href="team_portal.html" class="sb-item"><span class="sb-icon">&#127968;</span>Team Portal</a>
+      <a href="index.html"       class="sb-item"><span class="sb-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+    <div class="sb-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27 &middot; Confidential</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <a href="team_portal.html">Team Portal</a>
+        <span class="tb-crumb-sep">/</span>
+        <span class="tb-crumb-cur">Operating Yield</span>
+      </div>
+      <div class="tb-actions">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="_toggleTheme()">&#9788; Mid</button>
+        <button type="button" class="tb-btn" onclick="window.print()">&#128438; Print</button>
+        <button type="button" class="tb-btn primary" onclick="exportJSON()">&#8595; Export JSON</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-head">
+        <div class="page-eyebrow"><span class="page-eyebrow-dot"></span>VER INTELLIGENCE HUB &nbsp;&middot;&nbsp; ASSESSMENTS</div>
+        <div class="page-title">Operating Yield</div>
+        <div class="page-sub">Assess vendor delivery efficiency across the portfolio. Yield scores reflect what the business is actually receiving for the full economic cost of each engagement.</div>
+      </div>
+
+      <!-- KPI BAR -->
+      <div class="kpi-strip">
+        <div class="kpi-tile t-violet">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128200;</span><span class="kpi-badge kb-violet">total</span></div>
+          <div class="kpi-val" id="kpi-count">0</div>
+          <div class="kpi-label">Total Assessed</div>
+        </div>
+        <div class="kpi-tile t-magenta">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#11088;</span><span class="kpi-badge kb-magenta">composite</span></div>
+          <div class="kpi-val" id="kpi-avg">&#8212;</div>
+          <div class="kpi-label">Avg Yield Score</div>
+        </div>
+        <div class="kpi-tile t-green">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#9989;</span><span class="kpi-badge kb-green">&#8805;75</span></div>
+          <div class="kpi-val" id="kpi-high">0</div>
+          <div class="kpi-label">High Yield</div>
+        </div>
+        <div class="kpi-tile t-bloom">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#9888;</span><span class="kpi-badge kb-bloom">&lt;50</span></div>
+          <div class="kpi-val" id="kpi-low">0</div>
+          <div class="kpi-label">Low Yield</div>
+        </div>
+        <div class="kpi-tile t-amber">
+          <div class="kpi-ico-row"><span class="kpi-ico">&#128181;</span><span class="kpi-badge kb-amber">FY27</span></div>
+          <div class="kpi-val" id="kpi-spend">$0M</div>
+          <div class="kpi-label">Total Spend Assessed</div>
+        </div>
+      </div>
+
+      <!-- CALLOUT -->
+      <div class="callout">
+        <strong>What is Operating Yield?</strong> Operating Yield answers: what are we actually getting for the full economic cost of this engagement? Each assessment scores five weighted factors &mdash; utilization, output quality, reliability/SLA, friction (inverse), and risk exposure &mdash; to surface which vendor relationships deliver full value and which need renegotiation or exit.
+      </div>
+
+      <!-- MAIN LAYOUT: FORM + SCORE -->
+      <div class="sec-label">Yield Assessment Tool</div>
+      <div class="yield-layout">
+
+        <!-- FORM -->
+        <div class="form-card">
+          <div class="form-card-head">
+            <div class="form-card-title">Yield Assumptions</div>
+            <span style="font-size:9px;color:var(--ink-muted);">Fields auto-populate from VER vendor data</span>
+          </div>
+          <div class="form-card-body">
+
+            <div class="form-full">
+              <label class="form-label" for="sel-vendor">Vendor (from VER registry)</label>
+              <select class="form-input" id="sel-vendor">
+                <option value="">&#8212; Select a vendor &#8212;</option>
+              </select>
+            </div>
+
+            <div class="form-full">
+              <label class="form-label" for="inp-name">Engagement / Vendor Name</label>
+              <input class="form-input" id="inp-name" type="text" placeholder="e.g. NTT Data AMS, IBM Data Services">
+            </div>
+
+            <div class="form-row">
+              <div>
+                <label class="form-label" for="inp-spend">Annual Spend ($M)</label>
+                <input class="form-input" id="inp-spend" type="number" min="0" step="0.1" value="4.0">
+              </div>
+              <div>
+                <label class="form-label" for="inp-overhead">Internal Overhead ($M)</label>
+                <input class="form-input" id="inp-overhead" type="number" min="0" step="0.05" value="0.0">
+              </div>
+            </div>
+
+            <div style="margin-bottom:12px;">
+              <div style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;color:var(--ink-muted);margin-bottom:8px;">Yield Factors (0 &#8211; 100)</div>
+              <div class="formula-strip">
+                <strong>Formula:</strong> (Utilization &times; 0.20) + (Output Quality &times; 0.35) + (Reliability &times; 0.15) + (100 &#8722; Friction &times; 0.15) + (100 &#8722; Risk &times; 0.15)<br>
+                <strong>Inverse factors:</strong> Friction and Risk score high = bad; the formula subtracts them from 100 before weighting.
+              </div>
+              <div class="factor-grid">
+                <div class="factor-row">
+                  <div>
+                    <div class="factor-row-label">Utilization Rate</div>
+                    <span class="factor-note">% of contracted capacity actually consumed</span>
+                  </div>
+                  <input class="factor-num" id="f-util" type="number" min="0" max="100" value="78">
+                </div>
+                <div class="factor-row">
+                  <div>
+                    <div class="factor-row-label">Output Quality</div>
+                    <span class="factor-note">Outcome attainment &amp; deliverable acceptance rate</span>
+                  </div>
+                  <input class="factor-num" id="f-output" type="number" min="0" max="100" value="72">
+                </div>
+                <div class="factor-row">
+                  <div>
+                    <div class="factor-row-label">Reliability / SLA</div>
+                    <span class="factor-note">SLA compliance rate; from vendor sla_score</span>
+                  </div>
+                  <input class="factor-num" id="f-reliability" type="number" min="0" max="100" value="90">
+                </div>
+                <div class="factor-row">
+                  <div>
+                    <div class="factor-row-label">Friction Rate <span style="font-size:9px;color:var(--bloom-bright);">inverse</span></div>
+                    <span class="factor-note">Management burden &amp; escalation cost (high = bad)</span>
+                  </div>
+                  <input class="factor-num inverse" id="f-friction" type="number" min="0" max="100" value="30">
+                </div>
+                <div class="factor-row">
+                  <div>
+                    <div class="factor-row-label">Risk Exposure <span style="font-size:9px;color:var(--bloom-bright);">inverse</span></div>
+                    <span class="factor-note">Financial + compliance risk composite (high = bad)</span>
+                  </div>
+                  <input class="factor-num inverse" id="f-risk" type="number" min="0" max="100" value="25">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-full">
+              <label class="form-label" for="inp-notes">Notes / Evidence</label>
+              <textarea class="form-input" id="inp-notes" rows="3" placeholder="Business context, evidence source, or rationale for these factor scores..."></textarea>
+            </div>
+
+            <div class="action-row">
+              <button type="button" class="act-btn act-btn-primary" id="btn-calc">&#9654; Calculate Score</button>
+              <button type="button" class="act-btn act-btn-save" id="btn-save">&#128190; Save Assessment</button>
+              <button type="button" class="act-btn act-btn-ghost" id="btn-export-json">&#8595; Export JSON</button>
+              <button type="button" class="act-btn act-btn-ghost" onclick="window.print()">&#128438; Print</button>
+              <button type="button" class="act-btn act-btn-danger" id="btn-reset-form">&#8635; Reset Form</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCORE DISPLAY -->
+        <div class="score-card">
+          <div class="score-card-head">
+            <div class="score-card-title">Operating Yield Profile</div>
+          </div>
+          <div class="score-card-body">
+
+            <div class="score-display">
+              <div class="score-number"><span id="score-val">&#8212;</span><small>/100</small></div>
+              <div class="score-meta">
+                <span id="score-badge" class="yield-badge yield-badge--amber">Calculate to assess</span>
+                <span class="score-label">Yield score (0&#8211;100, weighted composite)</span>
+              </div>
+            </div>
+
+            <div class="factor-bars-section" id="factor-bars">
+              <!-- populated by JS -->
+            </div>
+
+            <div class="exec-interp" id="exec-interp">
+              Adjust the factor inputs and press <strong>Calculate Score</strong> to produce an executive interpretation and factor bar analysis.
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SAVED ASSESSMENTS TABLE -->
+      <div class="sec-label">Saved Yield Assessments</div>
+      <div class="table-section" id="table-section">
+        <div class="table-head">
+          <div class="table-title">Portfolio Assessments</div>
+          <div class="table-filters">
+            <button type="button" class="tbl-filter active" data-filter="all" onclick="_filterTable('all',this)">All</button>
+            <button type="button" class="tbl-filter" data-filter="high"   onclick="_filterTable('high',this)">High (&ge;75)</button>
+            <button type="button" class="tbl-filter" data-filter="mid"    onclick="_filterTable('mid',this)">Mid (50&#8211;74)</button>
+            <button type="button" class="tbl-filter" data-filter="low"    onclick="_filterTable('low',this)">Low (&lt;50)</button>
+          </div>
+        </div>
+        <div class="table-wrap" id="saved-table"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+(function(){
+'use strict';
+
+/* ══════════════════════════════════════════════════════
+   CONSTANTS
+   ══════════════════════════════════════════════════════ */
+var LS_KEY = 'ver_operating_yield_v2';
+var _editId = null; // id of record being edited, or null for new
+var _currentFilter = 'all';
+
+/* ══════════════════════════════════════════════════════
+   HELPERS — no innerHTML for dynamic data
+   ══════════════════════════════════════════════════════ */
+function mk(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function clearEl(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
+function numId(id) { return Number(document.getElementById(id).value) || 0; }
+function strId(id) { return document.getElementById(id).value; }
+function clamp(v) { return Math.min(100, Math.max(0, v)); }
+
+/* ══════════════════════════════════════════════════════
+   STORAGE
+   ══════════════════════════════════════════════════════ */
+function loadRows() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function saveRows(rows) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
+  catch(e) {}
+}
+
+/* ══════════════════════════════════════════════════════
+   SCORE LOGIC
+   ══════════════════════════════════════════════════════ */
+function calcScore(util, output, reliability, friction, risk) {
+  return Math.round(
+    clamp(util) * 0.20 +
+    clamp(output) * 0.35 +
+    clamp(reliability) * 0.15 +
+    (100 - clamp(friction)) * 0.15 +
+    (100 - clamp(risk)) * 0.15
+  );
+}
+function scoreColorClass(s) {
+  if (s >= 75) return 'green';
+  if (s >= 50) return 'amber';
+  return 'red';
+}
+function scoreBadgeText(s) {
+  if (s >= 75) return 'High Operating Yield';
+  if (s >= 50) return 'Yield Needs Attention';
+  return 'Low Operating Yield';
+}
+function factorColorClass(v) {
+  if (v >= 75) return 'factor-fill--green';
+  if (v >= 50) return 'factor-fill--amber';
+  return 'factor-fill--red';
+}
+
+/* ══════════════════════════════════════════════════════
+   VENDOR SELECTOR BUILD
+   ══════════════════════════════════════════════════════ */
+function buildVendorSelector() {
+  var sel = document.getElementById('sel-vendor');
+  var vendors = (window.VER_VENDORS || []).slice();
+
+  vendors.sort(function(a, b) {
+    var ta = a.tier || 99, tb = b.tier || 99;
+    if (ta !== tb) return ta - tb;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+
+  var groups = {};
+  vendors.forEach(function(v) {
+    var t = v.tier || 99;
+    if (!groups[t]) groups[t] = [];
+    groups[t].push(v);
+  });
+
+  var tierLabels = {1:'Tier 1 — Strategic', 2:'Tier 2 — Preferred', 3:'Tier 3 — Monitored'};
+  [1, 2, 3].forEach(function(t) {
+    var list = groups[t];
+    if (!list || !list.length) return;
+    var og = document.createElement('optgroup');
+    og.label = tierLabels[t] || ('Tier ' + t);
+    list.forEach(function(v) {
+      var opt = document.createElement('option');
+      opt.value = v.id;
+      opt.textContent = v.name;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+
+  Object.keys(groups).forEach(function(t) {
+    t = parseInt(t, 10);
+    if (t <= 3) return;
+    var list = groups[t];
+    if (!list || !list.length) return;
+    var og = document.createElement('optgroup');
+    og.label = 'Tier ' + t;
+    list.forEach(function(v) {
+      var opt = document.createElement('option');
+      opt.value = v.id;
+      opt.textContent = v.name;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+
+  sel.addEventListener('change', onVendorChange);
+}
+
+function onVendorChange() {
+  var sel = document.getElementById('sel-vendor');
+  var vendorId = sel.value;
+  if (!vendorId) return;
+
+  var vendors = window.VER_VENDORS || [];
+  var vendor = null;
+  for (var i = 0; i < vendors.length; i++) {
+    if (vendors[i].id === vendorId) { vendor = vendors[i]; break; }
+  }
+  if (!vendor) return;
+
+  // Pre-fill name
+  document.getElementById('inp-name').value = vendor.name;
+
+  // Pre-fill spend from Coupa or vendor record
+  var spend = 0;
+  var coupaVendors = (window.VER_COUPA && window.VER_COUPA.vendors) || [];
+  var vname = (vendor.name || '').toLowerCase();
+  for (var j = 0; j < coupaVendors.length; j++) {
+    var cn = (coupaVendors[j].n || '').toLowerCase();
+    if (cn === vname || vname.indexOf(cn) === 0 || cn.indexOf(vname) === 0) {
+      spend = coupaVendors[j].fy27 || 0;
+      break;
+    }
+  }
+  if (!spend && vendor.annual_spend) {
+    var parsed = parseFloat(String(vendor.annual_spend).replace(/[^0-9.]/g, ''));
+    if (!isNaN(parsed)) spend = parsed;
+  }
+  document.getElementById('inp-spend').value = spend ? spend.toFixed(2) : '0.00';
+
+  // Reliability from sla_score
+  if (vendor.sla_score !== undefined) {
+    document.getElementById('f-reliability').value = vendor.sla_score;
+  }
+
+  // Friction from delivery_risk (direct mapping — high delivery risk = high friction)
+  if (vendor.delivery_risk !== undefined) {
+    document.getElementById('f-friction').value = vendor.delivery_risk;
+  }
+
+  // Risk from avg financial_risk + compliance_risk
+  var avgRisk = ((vendor.financial_risk || 0) + (vendor.compliance_risk || 0)) / 2;
+  document.getElementById('f-risk').value = Math.round(avgRisk);
+}
+
+/* ══════════════════════════════════════════════════════
+   CALCULATE + RENDER PROFILE
+   ══════════════════════════════════════════════════════ */
+function calculate() {
+  var util        = clamp(numId('f-util'));
+  var output      = clamp(numId('f-output'));
+  var reliability = clamp(numId('f-reliability'));
+  var friction    = clamp(numId('f-friction'));
+  var risk        = clamp(numId('f-risk'));
+
+  var score = calcScore(util, output, reliability, friction, risk);
+  var cls   = scoreColorClass(score);
+
+  // Score number
+  document.getElementById('score-val').textContent = String(score);
+
+  // Badge
+  var badgeEl = document.getElementById('score-badge');
+  badgeEl.className = 'yield-badge yield-badge--' + cls;
+  badgeEl.textContent = scoreBadgeText(score);
+
+  // Factor bars
+  var factors = [
+    {label: 'Utilization Rate',    val: util,                          inverse: false},
+    {label: 'Output Quality',      val: output,                        inverse: false},
+    {label: 'Reliability / SLA',   val: reliability,                   inverse: false},
+    {label: 'Friction Rate',       val: friction,  effective: 100 - friction, inverse: true},
+    {label: 'Risk Exposure',       val: risk,      effective: 100 - risk,     inverse: true}
+  ];
+
+  var barsEl = document.getElementById('factor-bars');
+  clearEl(barsEl);
+
+  factors.forEach(function(f) {
+    var displayVal = f.inverse ? f.effective : f.val;
+    var barRow = mk('div', 'factor-bar-row');
+
+    // Label cell
+    var lblWrap = mk('div');
+    lblWrap.appendChild(mk('div', 'factor-bar-label', f.label));
+    if (f.inverse) {
+      var invNote = mk('span', null);
+      invNote.style.fontSize = '9px';
+      invNote.style.color = 'var(--bloom-bright)';
+      invNote.textContent = ' (inverse)';
+      lblWrap.querySelector('.factor-bar-label').appendChild(invNote);
+    }
+    barRow.appendChild(lblWrap);
+
+    // Track + fill
+    var track = mk('div', 'factor-track');
+    var fill  = mk('div', 'factor-fill ' + factorColorClass(displayVal));
+    fill.style.width = displayVal.toFixed(1) + '%';
+    track.appendChild(fill);
+    barRow.appendChild(track);
+
+    // Value
+    barRow.appendChild(mk('span', 'factor-bar-val', String(f.val)));
+
+    barsEl.appendChild(barRow);
+  });
+
+  // Executive interpretation — DOM only, no innerHTML
+  var weakest = factors.slice().sort(function(a, b) {
+    var ea = a.inverse ? a.effective : a.val;
+    var eb = b.inverse ? b.effective : b.val;
+    return ea - eb;
+  })[0];
+  var weakEffective = weakest.inverse ? weakest.effective : weakest.val;
+
+  var interp = document.getElementById('exec-interp');
+  clearEl(interp);
+
+  var prefix = mk('b', null, 'Executive interpretation: ');
+  interp.appendChild(prefix);
+  interp.appendChild(document.createTextNode(scoreBadgeText(score) + '. '));
+
+  interp.appendChild(document.createTextNode('Largest visible constraint is '));
+  interp.appendChild(mk('b', null, weakest.label));
+  interp.appendChild(document.createTextNode(' at ' + weakEffective.toFixed(0) + (weakest.inverse ? ' (effective yield contribution)' : '') + '. '));
+
+  var spend = numId('inp-spend');
+  if (util < 80 && spend > 0) {
+    var unused = spend * (1 - util / 100);
+    interp.appendChild(document.createTextNode('Approximately '));
+    interp.appendChild(mk('b', null, '$' + unused.toFixed(2) + 'M'));
+    interp.appendChild(document.createTextNode(' of vendor spend is associated with unused purchased capacity. '));
+  }
+
+  if (score < 50) {
+    interp.appendChild(document.createTextNode('This engagement is below the low-yield threshold — flag for renegotiation, scope reduction, or exit planning review. '));
+  } else if (score < 75) {
+    interp.appendChild(document.createTextNode('Address the weakest factor before the next renewal negotiation. '));
+  } else {
+    interp.appendChild(document.createTextNode('Engagement is delivering strong value. Include yield data in renewal narrative as leverage. '));
+  }
+
+  // Return record object for saving
+  var nameVal = document.getElementById('inp-name').value.trim();
+  if (!nameVal) {
+    // Fall back to selected vendor name
+    var sel = document.getElementById('sel-vendor');
+    if (sel.value) {
+      var opt = sel.options[sel.selectedIndex];
+      nameVal = opt ? opt.textContent : sel.value;
+    } else {
+      nameVal = 'Manual Entry';
+    }
+  }
+
+  return {
+    id:          _editId || ('YA-' + Date.now()),
+    vendor:      nameVal,
+    spend:       numId('inp-spend'),
+    overhead:    numId('inp-overhead'),
+    util:        util,
+    output:      output,
+    reliability: reliability,
+    friction:    friction,
+    risk:        risk,
+    score:       score,
+    notes:       document.getElementById('inp-notes').value.trim(),
+    assessed:    new Date().toISOString()
+  };
+}
+
+/* ══════════════════════════════════════════════════════
+   KPI BAR
+   ══════════════════════════════════════════════════════ */
+function updateKPIs(rows) {
+  var count = rows.length;
+  var high  = rows.filter(function(r){ return (r.score || 0) >= 75; }).length;
+  var low   = rows.filter(function(r){ return (r.score || 0) < 50; }).length;
+  var totalSpend = 0;
+  var totalScore = 0;
+  rows.forEach(function(r) {
+    totalSpend += (r.spend || 0);
+    totalScore += (r.score || 0);
+  });
+  var avg = count > 0 ? Math.round(totalScore / count) : null;
+
+  document.getElementById('kpi-count').textContent = String(count);
+  document.getElementById('kpi-avg').textContent   = avg !== null ? String(avg) : '—';
+  document.getElementById('kpi-high').textContent  = String(high);
+  document.getElementById('kpi-low').textContent   = String(low);
+  document.getElementById('kpi-spend').textContent = '$' + totalSpend.toFixed(1) + 'M';
+}
+
+/* ══════════════════════════════════════════════════════
+   RENDER TABLE
+   ══════════════════════════════════════════════════════ */
+function renderTable(rows) {
+  var container = document.getElementById('saved-table');
+  clearEl(container);
+
+  var filtered = rows;
+  if (_currentFilter === 'high') filtered = rows.filter(function(r){ return (r.score||0) >= 75; });
+  if (_currentFilter === 'mid')  filtered = rows.filter(function(r){ return (r.score||0) >= 50 && (r.score||0) < 75; });
+  if (_currentFilter === 'low')  filtered = rows.filter(function(r){ return (r.score||0) < 50; });
+
+  if (!filtered.length) {
+    var empty = mk('div', 'table-empty');
+    var ico   = mk('div', 'table-empty-ico');
+    ico.textContent = '📄';
+    var txt   = mk('div', 'table-empty-txt', rows.length > 0
+      ? 'No assessments match this filter.'
+      : 'No yield assessments saved yet. Fill out the form and press Save Assessment.');
+    empty.appendChild(ico);
+    empty.appendChild(txt);
+    container.appendChild(empty);
+    return;
+  }
+
+  var tbl    = mk('table');
+  var thead  = mk('thead');
+  var hRow   = mk('tr');
+  var headers = ['Vendor','Spend','Yield Score','Utilization','Output','Reliability','Friction','Risk','Notes','Actions'];
+  headers.forEach(function(h) { hRow.appendChild(mk('th', null, h)); });
+  thead.appendChild(hRow);
+  tbl.appendChild(thead);
+
+  var tbody = mk('tbody');
+  filtered.forEach(function(r) {
+    var tr = mk('tr');
+    tr.style.cursor = 'pointer';
+    tr.addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON') return;
+      loadIntoForm(r);
+    });
+
+    // Vendor
+    var tdV = mk('td');
+    tdV.appendChild(mk('span', 'tbl-vendor', r.vendor || '—'));
+    tr.appendChild(tdV);
+
+    // Spend
+    tr.appendChild(mk('td', null, '$' + Number(r.spend || 0).toFixed(1) + 'M'));
+
+    // Yield score badge
+    var tdScore = mk('td');
+    var sc      = r.score || 0;
+    var badge   = mk('span', 'tbl-badge tbl-badge--' + scoreColorClass(sc), String(sc));
+    tdScore.appendChild(badge);
+    tr.appendChild(tdScore);
+
+    // Factors
+    tr.appendChild(mk('td', null, (r.util || 0) + '%'));
+    tr.appendChild(mk('td', null, (r.output || 0) + '%'));
+    tr.appendChild(mk('td', null, (r.reliability || 0) + '%'));
+    tr.appendChild(mk('td', null, (r.friction || 0)));
+    tr.appendChild(mk('td', null, (r.risk || 0)));
+
+    // Notes (truncated)
+    var notesText = (r.notes || '—');
+    tr.appendChild(mk('td', null, notesText.length > 40 ? notesText.slice(0, 40) + '…' : notesText));
+
+    // Actions
+    var tdAct = mk('td');
+    var actWrap = mk('div', 'tbl-actions');
+
+    var editBtn = mk('button', 'tbl-act tbl-act-edit', 'Edit');
+    editBtn.type = 'button';
+    (function(rec) {
+      editBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        loadIntoForm(rec);
+      });
+    }(r));
+
+    var delBtn = mk('button', 'tbl-act tbl-act-del', 'Delete');
+    delBtn.type = 'button';
+    (function(recId) {
+      delBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!confirm('Delete this assessment? This cannot be undone.')) return;
+        var rows2 = loadRows();
+        rows2 = rows2.filter(function(x) { return x.id !== recId; });
+        saveRows(rows2);
+        renderTable(rows2);
+        updateKPIs(rows2);
+        showToast('Assessment deleted.');
+      });
+    }(r.id));
+
+    actWrap.appendChild(editBtn);
+    actWrap.appendChild(delBtn);
+    tdAct.appendChild(actWrap);
+    tr.appendChild(tdAct);
+
+    tbody.appendChild(tr);
+  });
+
+  tbl.appendChild(tbody);
+  container.appendChild(tbl);
+}
+
+/* ══════════════════════════════════════════════════════
+   LOAD RECORD INTO FORM
+   ══════════════════════════════════════════════════════ */
+function loadIntoForm(r) {
+  _editId = r.id;
+  document.getElementById('inp-name').value     = r.vendor || '';
+  document.getElementById('inp-spend').value    = r.spend || 0;
+  document.getElementById('inp-overhead').value = r.overhead || 0;
+  document.getElementById('f-util').value        = r.util || 0;
+  document.getElementById('f-output').value      = r.output || 0;
+  document.getElementById('f-reliability').value = r.reliability || 0;
+  document.getElementById('f-friction').value    = r.friction || 0;
+  document.getElementById('f-risk').value        = r.risk || 0;
+  document.getElementById('inp-notes').value     = r.notes || '';
+  // Reset vendor dropdown
+  document.getElementById('sel-vendor').value = '';
+  // Run calculate to refresh profile view
+  calculate();
+  // Scroll to form
+  document.querySelector('.yield-layout').scrollIntoView({behavior:'smooth', block:'start'});
+  showToast('Record loaded for editing. Adjust and press Save Assessment to update.');
+}
+
+/* ══════════════════════════════════════════════════════
+   FILTER
+   ══════════════════════════════════════════════════════ */
+function _filterTable(f, btn) {
+  _currentFilter = f;
+  document.querySelectorAll('.tbl-filter').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderTable(loadRows());
+}
+window._filterTable = _filterTable;
+
+/* ══════════════════════════════════════════════════════
+   EXPORT JSON
+   ══════════════════════════════════════════════════════ */
+function exportJSON() {
+  var rows = loadRows();
+  var data = JSON.stringify(rows, null, 2);
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([data], {type: 'application/json'}));
+  a.download = 'operating-yield-assessments.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+window.exportJSON = exportJSON;
+
+/* ══════════════════════════════════════════════════════
+   TOAST
+   ══════════════════════════════════════════════════════ */
+function showToast(msg) {
+  var t   = document.getElementById('toast');
+  var txt = document.getElementById('toast-msg');
+  txt.textContent = msg || 'Done.';
+  t.style.display = 'flex';
+  setTimeout(function() { t.style.display = 'none'; }, 5000);
+}
+
+/* ══════════════════════════════════════════════════════
+   SEED DATA
+   ══════════════════════════════════════════════════════ */
+function seedDefaultData() {
+  if (localStorage.getItem(LS_KEY)) return; // never overwrite existing data
+
+  var seed = [
+    {id:'YA-001', vendor:'Tech Mahindra',   spend:6.5,  overhead:0.5,  util:72, output:68, reliability:82, friction:68, risk:43, score:59,
+     notes:'Techforce Service Desk. 3 SLA metrics below target. Delivery risk elevated. Active VER monitoring.', assessed:'2026-06-15T10:00:00.000Z'},
+    {id:'YA-002', vendor:'IBM',             spend:14.3, overhead:1.2,  util:85, output:76, reliability:91, friction:38, risk:33, score:75,
+     notes:'Enterprise application and data services. Renewal Aug 2026 under active review.', assessed:'2026-06-20T10:00:00.000Z'},
+    {id:'YA-003', vendor:'Google Cloud',    spend:14.0, overhead:0.4,  util:91, output:88, reliability:99, friction:12, risk:10, score:91,
+     notes:'GCP and Workspace nominal. Gemini AI usage growing. High yield engagement.', assessed:'2026-06-22T10:00:00.000Z'},
+    {id:'YA-004', vendor:'BCG',             spend:6.0,  overhead:0.8,  util:65, output:60, reliability:78, friction:70, risk:45, score:52,
+     notes:'Strategic consulting. Delivery risk 70. VER Director engaged. Yield below threshold.', assessed:'2026-06-25T10:00:00.000Z'},
+    {id:'YA-005', vendor:'ServiceNow',      spend:0.9,  overhead:0.1,  util:88, output:85, reliability:96, friction:15, risk:15, score:88,
+     notes:'ITSM platform for DET operations workflows. SLA 96. Low risk. Strong yield.', assessed:'2026-07-01T10:00:00.000Z'},
+    {id:'YA-006', vendor:'Splunk',          spend:0.7,  overhead:0.08, util:82, output:80, reliability:95, friction:12, risk:13, score:86,
+     notes:'SIEM and log analytics. Cisco acquisition — monitor renewal terms. Current yield strong.', assessed:'2026-07-03T10:00:00.000Z'},
+    {id:'YA-007', vendor:'Atos',            spend:3.5,  overhead:0.4,  util:70, output:65, reliability:85, friction:35, risk:28, score:65,
+     notes:'IT services EMEA. Financial health under monitoring. Delivery risk 35. Yield requires attention.', assessed:'2026-07-05T10:00:00.000Z'},
+    {id:'YA-008', vendor:'DXC Technology',  spend:2.8,  overhead:0.3,  util:74, output:68, reliability:84, friction:35, risk:28, score:68,
+     notes:'IT services and solutions. Delivery risk 35. Compliance risk 25. Mid-range yield.', assessed:'2026-07-08T10:00:00.000Z'},
+    {id:'YA-009', vendor:'Snowflake',       spend:1.1,  overhead:0.05, util:90, output:88, reliability:96, friction:12, risk:13, score:91,
+     notes:'Cloud data warehouse. Query optimization completed. FY27 compute costs reduced ~20%.', assessed:'2026-07-10T10:00:00.000Z'},
+    {id:'YA-010', vendor:'Verizon Business',spend:2.4,  overhead:0.2,  util:80, output:74, reliability:88, friction:22, risk:21, score:77,
+     notes:'Enterprise network and connectivity. Delivery risk 22, financial risk 20. Stable yield.', assessed:'2026-07-12T10:00:00.000Z'}
+  ];
+
+  saveRows(seed);
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════ */
+function init() {
+  seedDefaultData();
+
+  buildVendorSelector();
+
+  var rows = loadRows();
+  renderTable(rows);
+  updateKPIs(rows);
+
+  // Wire Calculate
+  document.getElementById('btn-calc').addEventListener('click', function() {
+    calculate();
+  });
+
+  // Wire Save
+  document.getElementById('btn-save').addEventListener('click', function() {
+    var record  = calculate();
+    var rows2   = loadRows();
+
+    if (_editId) {
+      // Update existing record
+      var idx = -1;
+      for (var i = 0; i < rows2.length; i++) {
+        if (rows2[i].id === _editId) { idx = i; break; }
+      }
+      if (idx !== -1) {
+        rows2[idx] = record;
+      } else {
+        rows2.unshift(record);
+      }
+      _editId = null;
+      showToast('Assessment updated and saved.');
+    } else {
+      // New record
+      record.id = 'YA-' + Date.now();
+      rows2.unshift(record);
+      if (rows2.length > 50) rows2 = rows2.slice(0, 50);
+      showToast('Assessment saved to portfolio.');
+    }
+
+    saveRows(rows2);
+    renderTable(rows2);
+    updateKPIs(rows2);
+  });
+
+  // Wire Export JSON (form button)
+  document.getElementById('btn-export-json').addEventListener('click', exportJSON);
+
+  // Wire Reset Form
+  document.getElementById('btn-reset-form').addEventListener('click', function() {
+    _editId = null;
+    document.getElementById('sel-vendor').value   = '';
+    document.getElementById('inp-name').value     = '';
+    document.getElementById('inp-spend').value    = '4.0';
+    document.getElementById('inp-overhead').value = '0.0';
+    document.getElementById('f-util').value        = '78';
+    document.getElementById('f-output').value      = '72';
+    document.getElementById('f-reliability').value = '90';
+    document.getElementById('f-friction').value    = '30';
+    document.getElementById('f-risk').value        = '25';
+    document.getElementById('inp-notes').value     = '';
+    // Clear profile display
+    document.getElementById('score-val').textContent = '—';
+    var badgeEl = document.getElementById('score-badge');
+    badgeEl.className = 'yield-badge yield-badge--amber';
+    badgeEl.textContent = 'Calculate to assess';
+    clearEl(document.getElementById('factor-bars'));
+    var interp = document.getElementById('exec-interp');
+    clearEl(interp);
+    interp.appendChild(document.createTextNode('Adjust the factor inputs and press Calculate Score to produce an executive interpretation and factor bar analysis.'));
+    var b = mk('strong', null, 'Calculate Score');
+    // rebuild message cleanly
+    clearEl(interp);
+    interp.appendChild(document.createTextNode('Adjust the factor inputs and press '));
+    interp.appendChild(b);
+    interp.appendChild(document.createTextNode(' to produce an executive interpretation and factor bar analysis.'));
+  });
+
+  // Top-bar Export JSON
+  document.querySelector('.tb-btn.primary').addEventListener('click', exportJSON);
+
+  // Listen for storage events from hub page
+  window.addEventListener('storage', function(e) {
+    if (e.key === LS_KEY) {
+      var rows2 = loadRows();
+      renderTable(rows2);
+      updateKPIs(rows2);
+    }
+  });
+
+  // Initial calculate with default values
+  calculate();
+}
+
+// Wait for deferred scripts
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(init, 0);
+  });
+} else {
+  setTimeout(init, 0);
+}
+
+})();
+</script>
+<script>
+/* ── USER BLOCK ── */
+(function(){
+  try {
+    var u = JSON.parse(localStorage.getItem('ver-team-user') || 'null');
+    if (u) {
+      var e = document.getElementById('sb-user-emoji');
+      var n = document.getElementById('sb-user-name');
+      var r = document.getElementById('sb-user-role');
+      if (e) e.textContent = u.emoji || '👤';
+      if (n) n.textContent = u.name || 'Casey';
+      if (r) r.textContent = u.role || 'VER Team';
+    }
+  } catch(ex) {}
+})();
+
+/* ── THEME TOGGLE ── */
+function _toggleTheme() {
+  var b   = document.body;
+  var cur = b.classList.contains('light-mode') ? 'light' : b.classList.contains('mid-mode') ? 'mid' : 'dark';
+  var next = cur === 'dark' ? 'mid' : cur === 'mid' ? 'light' : 'dark';
+  b.classList.remove('light-mode', 'mid-mode');
+  if (next === 'light') b.classList.add('light-mode');
+  if (next === 'mid')   b.classList.add('mid-mode');
+  var btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = next === 'light' ? '☾ Mid' : next === 'mid' ? '☀ Light' : '☀ Mid';
+  try { localStorage.setItem('ver-portal-theme', next); } catch(e) {}
+}
+
+(function(){
+  try {
+    var t   = localStorage.getItem('ver-portal-theme');
+    var btn = document.getElementById('theme-toggle-btn');
+    if (t === 'light') {
+      document.body.classList.add('light-mode');
+      if (btn) btn.textContent = '☹ Dark';
+    } else if (t === 'mid') {
+      document.body.classList.add('mid-mode');
+      if (btn) btn.textContent = '☀ Light';
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vendor Performance Scorecards · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Hub top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.35);line-height:1.4;}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+.print-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.print-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+@media print{
+  .hub-top-bar,.controls-bar,.print-btn,.dm-toggle,.htb-meta{display:none!important;}
+  .hero{background:#0F1E3C!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{background:#fff!important;color:#111!important;}
+  .card,.modal{box-shadow:none!important;}
+  .wrap,.content-wrap,.container{max-width:100%!important;padding:12px!important;}
+}
+
+/* ── PAGE INNER WRAP ── */
+.page-inner{max-width:1280px;margin:0 auto;}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,#162442 60%,#0F2D40 100%);
+  padding:32px 0 28px;position:relative;overflow:hidden;}
+.hero-inner-wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+.hero::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(13,148,136,0.12),transparent);pointer-events:none;}
+.hero-eyebrow{font-size:7pt;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:8px;}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.15;margin-bottom:8px;}
+.hero-sub{font-size:9.5pt;color:rgba(255,255,255,0.65);max-width:560px;line-height:1.6;}
+.hero-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:24px;}
+.hkpi{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:14px 16px;}
+.hkpi-val{font-size:18pt;font-weight:900;color:#fff;line-height:1;}
+.hkpi-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+  color:rgba(255,255,255,0.5);margin-top:4px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.45);margin-top:3px;}
+.hkpi.green .hkpi-val{color:var(--green3);}
+.hkpi.amber .hkpi-val{color:var(--amber3);}
+.hkpi.red   .hkpi-val{color:#FCA5A5;}
+.hkpi.teal  .hkpi-val{color:#5EEAD4;}
+/* ── Source / confidence badges ── */
+.src-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.src-badge{display:inline-flex;align-items:center;gap:4px;font-size:6.5pt;font-weight:700;
+  padding:3px 8px;border-radius:10px;white-space:nowrap;letter-spacing:0.04em;}
+.src-coupa{background:rgba(37,99,235,0.18);color:#93C5FD;border:1px solid rgba(37,99,235,0.3);}
+.src-mft{background:rgba(124,58,237,0.18);color:#C4B5FD;border:1px solid rgba(124,58,237,0.3);}
+.src-benchmark{background:rgba(13,148,136,0.18);color:#5EEAD4;border:1px solid rgba(13,148,136,0.3);}
+.src-qbr{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.3);}
+.src-manual{background:rgba(107,114,128,0.2);color:#D1D5DB;border:1px solid rgba(107,114,128,0.3);}
+.conf-high{background:rgba(5,150,105,0.18);color:#6EE7B7;border:1px solid rgba(5,150,105,0.3);}
+.conf-medium{background:rgba(217,119,6,0.18);color:#FCD34D;border:1px solid rgba(217,119,6,0.3);}
+.conf-low{background:rgba(220,38,38,0.18);color:#FCA5A5;border:1px solid rgba(220,38,38,0.3);}
+.src-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* ── CONTROLS ── */
+.controls{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:48px;z-index:50;padding:0;}
+.controls-inner{max-width:1280px;margin:0 auto;padding:14px 48px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.search{font-size:8.5pt;padding:7px 12px 7px 32px;border:1px solid var(--border2);
+  border-radius:7px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%236B7280' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
+  color:var(--ink2);font-family:inherit;min-width:200px;}
+.search:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.fsel{font-size:8pt;padding:7px 10px;border:1px solid var(--border2);
+  border-radius:7px;background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;}
+.fsel:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.fbtn{font-size:8pt;padding:6px 14px;border-radius:7px;cursor:pointer;
+  border:1px solid var(--border2);background:#fff;font-family:inherit;transition:all 0.13s;font-weight:600;}
+.fbtn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.fbtn:hover:not(.active){background:var(--gray2);}
+.count-badge{font-size:8pt;color:var(--ink4);margin-left:auto;}
+.dm-btn{font-size:7.5pt;padding:5px 12px;border-radius:20px;border:1px solid var(--border2);
+  background:var(--gray2);color:var(--ink4);font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.13s;white-space:nowrap;}
+.dm-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── SORT BAR ── */
+.sort-bar{padding:0;}
+.sort-bar-inner{max-width:1280px;margin:0 auto;padding:10px 48px 0;display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.sort-lbl{font-size:7.5pt;color:var(--ink4);font-weight:600;margin-right:2px;}
+.srt-btn{font-size:7.5pt;padding:4px 12px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--border2);background:#fff;font-family:inherit;transition:all 0.12s;}
+.srt-btn.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+.srt-btn:hover:not(.active){background:var(--gray2);}
+
+/* ── GRID ── */
+.grid-wrap{padding:0;}
+.grid-inner{max-width:1280px;margin:0 auto;padding:16px 48px 32px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+
+/* ── SCORECARD CARD ── */
+.sc-card{background:#fff;border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;transition:box-shadow 0.15s,transform 0.15s;cursor:pointer;}
+.sc-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.1);transform:translateY(-2px);}
+.sc-card.risk-high{border-top:3px solid var(--red);}
+.sc-card.risk-medium{border-top:3px solid var(--amber);}
+.sc-card.risk-low{border-top:3px solid var(--green);}
+
+.sc-head{padding:14px 16px 12px;border-bottom:1px solid var(--gray2);display:flex;gap:10px;align-items:flex-start;}
+.sc-logo{width:38px;height:38px;border-radius:8px;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;font-size:11pt;font-weight:800;color:#fff;font-family:Arial;overflow:hidden;}
+.sc-logo img{width:38px;height:38px;object-fit:contain;border-radius:8px;background:#fff;}
+.sc-name{font-size:10pt;font-weight:800;color:var(--ink);line-height:1.2;margin-bottom:4px;}
+.sc-meta{font-size:7.5pt;color:var(--ink4);}
+.sc-badges{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:6.5pt;font-weight:700;
+  padding:2px 7px;border-radius:9px;white-space:nowrap;}
+.b-green{background:var(--green3);color:var(--green2);}
+.b-amber{background:var(--amber3);color:var(--amber2);}
+.b-red  {background:var(--red3);color:var(--red2);}
+.b-navy {background:var(--navy3);color:var(--navy2);}
+.b-teal {background:var(--teal3);color:var(--teal2);}
+.b-gray {background:var(--gray3);color:var(--ink3);}
+.b-purple{background:var(--purple3);color:var(--purple);}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
+/* ── OVERALL SCORE RING ── */
+.sc-score-wrap{padding:12px 16px 10px;display:flex;align-items:center;gap:16px;
+  border-bottom:1px solid var(--gray2);}
+.sc-ring{position:relative;width:60px;height:60px;flex-shrink:0;}
+.sc-ring svg{transform:rotate(-90deg);}
+.sc-ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:11pt;font-weight:900;}
+.sc-ring-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;
+  color:var(--ink4);margin-bottom:4px;}
+.sc-ring-desc{font-size:7.5pt;color:var(--ink3);line-height:1.5;}
+
+/* ── DIMENSION BARS ── */
+.sc-dims{padding:12px 16px 14px;}
+.sc-dim{margin-bottom:8px;}
+.sc-dim:last-child{margin-bottom:0;}
+.sc-dim-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.sc-dim-lbl{font-size:7.5pt;color:var(--ink3);font-weight:600;}
+.sc-dim-val{font-size:7.5pt;font-weight:800;}
+.sc-bar-track{background:var(--gray2);border-radius:4px;height:6px;}
+.sc-bar-fill{height:6px;border-radius:4px;transition:width 0.6s ease;}
+
+/* ── FOOTER ROW ── */
+.sc-foot{padding:10px 16px;background:var(--gray);border-top:1px solid var(--gray2);
+  display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.sc-spend{font-size:7.5pt;font-weight:700;color:var(--ink2);}
+.sc-renewal{font-size:7pt;color:var(--ink4);}
+
+/* ── EMPTY STATE ── */
+.empty{padding:60px 20px;text-align:center;color:var(--ink4);}
+.empty-icon{font-size:28pt;margin-bottom:8px;}
+.empty-title{font-size:11pt;font-weight:700;color:var(--ink3);margin-bottom:4px;}
+
+/* ── PAGINATION ── */
+.pag{display:flex;gap:6px;align-items:center;justify-content:center;padding:16px 0;}
+.pag-btn{font-size:8pt;padding:5px 12px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--border2);background:#fff;font-family:inherit;min-width:36px;text-align:center;transition:all 0.12s;}
+.pag-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.pag-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.pag-btn:hover:not(.active):not(:disabled){background:var(--gray2);}
+.pag-info{font-size:8pt;color:var(--ink4);margin:0 8px;}
+
+/* ── MODAL ── */
+.modal-bg{opacity:0;pointer-events:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-start;
+  justify-content:center;padding:40px 20px;overflow-y:auto;transition:opacity 0.2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:14px;max-width:700px;width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,0.22);transform:translateY(28px) scale(0.97);
+  transition:transform 0.25s ease;overflow:hidden;}
+.modal-bg.open .modal{transform:translateY(0) scale(1);}
+.modal-header{background:linear-gradient(135deg,var(--navy),#1E3A5F);padding:24px 28px 20px;display:flex;gap:14px;align-items:flex-start;}
+.modal-logo{width:48px;height:48px;border-radius:10px;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;font-size:14pt;font-weight:800;color:#fff;
+  font-family:Arial;background:rgba(255,255,255,0.15);}
+.modal-title{font-size:14pt;font-weight:900;color:#fff;line-height:1.2;margin-bottom:5px;}
+.modal-sub{font-size:8.5pt;color:rgba(255,255,255,0.6);}
+.modal-close{margin-left:auto;background:none;border:none;font-size:18pt;cursor:pointer;
+  color:rgba(255,255,255,0.6);flex-shrink:0;padding:0;line-height:1;}
+.modal-close:hover{color:#fff;}
+.modal-body{padding:24px 28px;}
+.m-section{margin-bottom:20px;}
+.m-section:last-child{margin-bottom:0;}
+.m-section-title{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--ink4);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.m-tile{background:var(--gray);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.m-tile-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
+  color:var(--ink4);margin-bottom:5px;}
+.m-tile-val{font-size:9pt;font-weight:700;color:var(--ink2);}
+.m-dim-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray2);}
+.m-dim-row:last-child{border-bottom:none;}
+.m-dim-lbl{font-size:8.5pt;color:var(--ink2);font-weight:600;width:140px;flex-shrink:0;}
+.m-dim-bar-wrap{flex:1;position:relative;}
+.m-dim-bar-track{background:var(--gray2);border-radius:5px;height:8px;position:relative;overflow:visible;}
+.m-dim-bar-fill{height:8px;border-radius:5px;}
+.m-dim-target-line{position:absolute;top:-3px;bottom:-3px;width:2px;background:#374151;border-radius:1px;z-index:2;}
+.m-dim-target-line::after{content:attr(data-label);position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+  font-size:6pt;font-weight:700;color:var(--ink4);white-space:nowrap;}
+.m-dim-score{font-size:8.5pt;font-weight:800;width:30px;text-align:right;flex-shrink:0;}
+.m-dim-gap{font-size:7pt;font-weight:700;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0;}
+.m-dim-gap.meets{background:var(--green3);color:var(--green2);}
+.m-dim-gap.gap{background:var(--red3);color:var(--red2);}
+[data-theme="dark"] .m-dim-gap.meets{background:rgba(5,150,105,0.20);color:#6EE7B7;}
+[data-theme="dark"] .m-dim-gap.gap{background:rgba(220,38,38,0.20);color:#FCA5A5;}
+.m-caps{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.m-cap{font-size:7pt;padding:3px 9px;border-radius:9px;background:var(--navy3);color:var(--navy2);font-weight:700;}
+.m-desc{font-size:8.5pt;color:var(--ink3);line-height:1.6;}
+.m-notes{font-size:8pt;color:var(--ink4);line-height:1.6;font-style:italic;}
+.m-contact-row{display:flex;align-items:center;gap:6px;font-size:8.5pt;color:var(--ink2);margin-bottom:6px;}
+
+/* ── DARK MODE ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --white:#0F1E3C;--border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);--purple3:rgba(124,58,237,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);}
+[data-theme="dark"] .controls,[data-theme="dark"] .modal{background:#0a1220;}
+[data-theme="dark"] .sc-card,[data-theme="dark"] .modal{background:var(--gray2);}
+[data-theme="dark"] .sc-head,[data-theme="dark"] .sc-foot{border-color:var(--border);}
+[data-theme="dark"] .sc-score-wrap,[data-theme="dark"] .sc-dims{border-color:var(--border);}
+[data-theme="dark"] .sc-foot{background:var(--gray3);}
+[data-theme="dark"] .sc-name,[data-theme="dark"] .modal-title{color:var(--ink);}
+[data-theme="dark"] .search,[data-theme="dark"] .fsel{background:var(--gray2);color:var(--ink2);border-color:var(--border2);}
+[data-theme="dark"] .fbtn,[data-theme="dark"] .srt-btn,.pag-btn{background:var(--gray2);border-color:var(--border2);}
+[data-theme="dark"] .m-tile{background:var(--gray3);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .hero-kpis{grid-template-columns:repeat(2,1fr);}
+  .controls-inner{padding:12px 16px;}
+  .grid-inner{padding:12px 16px 24px;}
+  .sort-bar-inner{padding:10px 16px 0;}
+  .hero-inner-wrap{padding:0 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">Vendor Performance Scorecards</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="print-btn" onclick="openScorecardsHelp()">&#63; How to Read</button>
+    <button type="button" class="print-btn" onclick="window.print()">&#128438; Download PDF</button>
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="toggleDark()">&#9789; Dark Mode</button>
+    <div class="htb-meta">DET Portfolio Intelligence &mdash; Powered by VER<br>FY27 &middot; Confidential</div>
+  </div>
+</nav>
+<div id="modal-root"></div>
+
+<div class="hero">
+  <div class="hero-inner-wrap">
+    <div class="hero-eyebrow">VER Intelligence Hub · FY27</div>
+    <div class="hero-title">Vendor Performance Scorecards</div>
+    <div class="hero-sub">360° health view across all 1,375 managed vendors — SLA performance, risk profile, spend, and renewal posture at a glance.</div>
+    <div class="hero-kpis" id="hero-kpis">
+      <div class="hkpi teal">
+        <div class="hkpi-val" id="kpi-total">—</div>
+        <div class="hkpi-lbl">Total Vendors</div>
+        <div class="hkpi-note">All tiers &amp; categories</div>
+        <div class="src-row">
+          <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High</span>
+          <span class="src-badge src-manual">Jun 22</span>
+        </div>
+      </div>
+      <div class="hkpi green">
+        <div class="hkpi-val" id="kpi-healthy">—</div>
+        <div class="hkpi-lbl">Healthy</div>
+        <div class="hkpi-note">Risk score ≤ 33</div>
+        <div class="src-row">
+          <span class="src-badge src-qbr"><span class="src-dot"></span>QBR</span>
+          <span class="src-badge src-benchmark"><span class="src-dot"></span>Benchmark</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High</span>
+        </div>
+      </div>
+      <div class="hkpi amber">
+        <div class="hkpi-val" id="kpi-watch">—</div>
+        <div class="hkpi-lbl">Watch</div>
+        <div class="hkpi-note">Risk score 34–66</div>
+        <div class="src-row">
+          <span class="src-badge src-qbr"><span class="src-dot"></span>QBR</span>
+          <span class="src-badge src-benchmark"><span class="src-dot"></span>Benchmark</span>
+          <span class="src-badge conf-medium"><span class="src-dot"></span>Medium</span>
+        </div>
+      </div>
+      <div class="hkpi red">
+        <div class="hkpi-val" id="kpi-critical">—</div>
+        <div class="hkpi-lbl">At Risk</div>
+        <div class="hkpi-note">Risk score ≥ 67</div>
+        <div class="src-row">
+          <span class="src-badge src-qbr"><span class="src-dot"></span>QBR</span>
+          <span class="src-badge conf-medium"><span class="src-dot"></span>Medium</span>
+          <span class="src-badge src-manual">Jun 22</span>
+        </div>
+      </div>
+      <div class="hkpi">
+        <div class="hkpi-val" id="kpi-renewing">—</div>
+        <div class="hkpi-lbl">Renewing ≤90d</div>
+        <div class="hkpi-note">Needs attention</div>
+        <div class="src-row">
+          <span class="src-badge src-coupa"><span class="src-dot"></span>Coupa</span>
+          <span class="src-badge conf-high"><span class="src-dot"></span>High</span>
+          <span class="src-badge src-manual">Jun 22</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="controls-inner">
+  <input class="search" id="sc-search" type="text" placeholder="Search vendors…" oninput="applyFilters()">
+  <select class="fsel" id="sc-cat" title="Category" onchange="applyFilters()">
+    <option value="">All Categories</option>
+    <option>Professional Services</option>
+    <option>Software / SaaS</option>
+    <option>Cloud &amp; Managed Services</option>
+    <option>Contingent Workforce</option>
+    <option>Hardware &amp; Infrastructure</option>
+  </select>
+  <select class="fsel" id="sc-tier" title="Tier" onchange="applyFilters()">
+    <option value="">All Tiers</option>
+    <option value="1">Tier 1 — Strategic</option>
+    <option value="2">Tier 2 — Established</option>
+    <option value="3">Tier 3 — Specialized</option>
+  </select>
+  <select class="fsel" id="sc-status" title="Status" onchange="applyFilters()">
+    <option value="">All Statuses</option>
+    <option>Active</option>
+    <option>Under Review</option>
+    <option>Escalation</option>
+  </select>
+  <select class="fsel" id="sc-region" title="Region" onchange="applyFilters()">
+    <option value="">All Regions</option>
+    <option>AMER</option><option>EMEA</option><option>APAC</option>
+    <option>LATAM</option><option>JAPAC</option><option>Global</option>
+  </select>
+  <select class="fsel" id="sc-risk" title="Risk Level" onchange="applyFilters()">
+    <option value="">All Risk Levels</option>
+    <option value="low">Healthy (≤33)</option>
+    <option value="medium">Watch (34–66)</option>
+    <option value="high">At Risk (≥67)</option>
+  </select>
+  <button type="button" class="fbtn" onclick="clearFilters()">✕ Clear</button>
+  <span class="count-badge" id="sc-count"></span>
+  <button type="button" class="dm-btn" id="dm-btn2" onclick="toggleDark()">☽ Dark Mode</button>
+  </div>
+</div>
+
+<div class="sort-bar">
+  <div class="sort-bar-inner">
+    <span class="sort-lbl">Sort:</span>
+    <button type="button" class="srt-btn active" id="srt-name"    onclick="setSort('name')">Name A–Z</button>
+    <button type="button" class="srt-btn"        id="srt-risk"    onclick="setSort('risk')">Risk ↑</button>
+    <button type="button" class="srt-btn"        id="srt-sla"     onclick="setSort('sla')">SLA ↓</button>
+    <button type="button" class="srt-btn"        id="srt-tier"    onclick="setSort('tier')">Tier</button>
+    <button type="button" class="srt-btn"        id="srt-renewal" onclick="setSort('renewal')">Renewal</button>
+    <button type="button" class="srt-btn"        id="srt-spend"   onclick="setSort('spend')">Spend</button>
+  </div>
+</div>
+
+<div class="grid-wrap">
+  <div class="grid-inner">
+    <div class="grid" id="sc-grid"></div>
+    <div id="sc-pag-bottom"></div>
+  </div>
+</div>
+
+<script src="assets/vendors.js"></script>
+<script>
+var ALL = [];
+var FILTERED = [];
+var SORT_KEY = 'name';
+var PAGE = 1;
+var PAGE_SIZE = 30;
+
+var LOGO_COLORS = ['#0F1E3C','#0D9488','#7C3AED','#D97706','#059669','#2563EB','#DC2626','#0891B2'];
+
+function logoColor(name) {
+  return LOGO_COLORS[(name || '').length % LOGO_COLORS.length];
+}
+
+function initials(name) {
+  return (name || '?').split(' ').map(function(w){ return w[0] || ''; }).join('').slice(0,2).toUpperCase();
+}
+
+var BF_CLIENT = '1idLxwmT7Sv6VAWJq9j';
+function _scLogoFallback(img, name, size) {
+  var s = size || 38;
+  var lc = logoColor(name);
+  var ini = initials(name);
+  var el = document.createElement('div');
+  el.style.cssText = 'width:'+s+'px;height:'+s+'px;border-radius:8px;flex-shrink:0;background:'+lc+';display:flex;align-items:center;justify-content:center;font-size:'+(s*0.3)+'pt;font-weight:800;color:#fff;font-family:Arial;';
+  el.textContent = ini;
+  img.parentNode.replaceChild(el, img);
+}
+function vendorLogo(domain, name, size) {
+  var s = size || 38;
+  var bs = 'width:'+s+'px;height:'+s+'px;border-radius:8px;flex-shrink:0;';
+  var lc = logoColor(name);
+  var ini = initials(name);
+  if (!domain) return '<div style="'+bs+'background:'+lc+';display:flex;align-items:center;justify-content:center;font-size:'+(s*0.3)+'pt;font-weight:800;color:#fff;font-family:Arial;">'+ini+'</div>';
+  var esc = name.replace(/"/g,'&quot;');
+  return '<img src="https://cdn.brandfetch.io/'+domain+'?c='+BF_CLIENT+'" style="'+bs+'object-fit:contain;background:#fff;" onerror="_scLogoFallback(this,&quot;'+esc+'&quot;,'+s+')" alt="'+esc+'"/>';
+}
+
+function riskBand(score) {
+  if (score <= 33) return { label:'Healthy', cls:'risk-low',  color:'var(--green)',  bg:'var(--green3)',  txtCls:'b-green' };
+  if (score <= 66) return { label:'Watch',   cls:'risk-medium',color:'var(--amber)',  bg:'var(--amber3)',  txtCls:'b-amber' };
+  return                  { label:'At Risk', cls:'risk-high', color:'var(--red)',    bg:'var(--red3)',    txtCls:'b-red'   };
+}
+
+function tierLabel(t) {
+  return t === 1 ? 'T1 Strategic' : t === 2 ? 'T2 Established' : 'T3 Specialized';
+}
+
+function tierBadgeCls(t) {
+  return t === 1 ? 'b-navy' : t === 2 ? 'b-teal' : 'b-gray';
+}
+
+function statusBadgeCls(s) {
+  return s === 'Active' ? 'b-green' : s === 'Under Review' ? 'b-amber' : s === 'Escalation' ? 'b-red' : 'b-gray';
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  var d = new Date(dateStr);
+  var now = new Date();
+  return Math.ceil((d - now) / 86400000);
+}
+
+function renewalUrgencyLabel(days) {
+  if (days === null) return '';
+  if (days < 0) return 'Expired';
+  if (days <= 30) return 'Urgent';
+  if (days <= 90) return 'Soon';
+  return '';
+}
+
+function barColor(score, invert) {
+  if (invert) {
+    if (score <= 33) return 'var(--green)';
+    if (score <= 66) return 'var(--amber)';
+    return 'var(--red)';
+  }
+  if (score >= 95) return 'var(--green)';
+  if (score >= 80) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function dimColor(score) {
+  if (score <= 33) return 'var(--green)';
+  if (score <= 66) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function spendNum(spend) {
+  if (!spend || spend === '$0' || spend === '—') return 0;
+  return parseFloat((spend + '').replace(/[^0-9.]/g, '')) || 0;
+}
+
+function ringPath(score) {
+  var R = 24, cx = 30, cy = 30;
+  var circ = 2 * Math.PI * R;
+  var pct = Math.max(0, Math.min(100, score)) / 100;
+  var dash = pct * circ;
+  return '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="var(--gray2)" stroke-width="5"/>' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="' + dimColor(100 - score) + '" stroke-width="5"' +
+    ' stroke-dasharray="' + dash.toFixed(1) + ' ' + circ.toFixed(1) + '" stroke-linecap="round"/>';
+}
+
+function renderCard(v) {
+  var rb = riskBand(v.risk_score);
+  var days = daysUntil(v.renewal_date);
+  var urgency = renewalUrgencyLabel(days);
+  var logoC = logoColor(v.name);
+  var ini = initials(v.name);
+  var daysLabel = days !== null ? (days < 0 ? 'Expired' : days + 'd') : '—';
+
+  var dimRows = [
+    { lbl:'SLA Performance', score: v.sla_score, invert: false },
+    { lbl:'Concentration Risk', score: v.concentration_risk, invert: true },
+    { lbl:'Financial Risk',     score: v.financial_risk,     invert: true },
+    { lbl:'Delivery Risk',      score: v.delivery_risk,      invert: true },
+    { lbl:'Compliance Risk',    score: v.compliance_risk,    invert: true },
+  ].map(function(d) {
+    var col = d.invert ? dimColor(d.score) : barColor(d.score, false);
+    return '<div class="sc-dim">' +
+      '<div class="sc-dim-row">' +
+        '<span class="sc-dim-lbl">' + d.lbl + '</span>' +
+        '<span class="sc-dim-val" style="color:' + col + '">' + d.score + '</span>' +
+      '</div>' +
+      '<div class="sc-bar-track"><div class="sc-bar-fill" style="width:' + d.score + '%;background:' + col + '"></div></div>' +
+    '</div>';
+  }).join('');
+
+  var badges = [
+    '<span class="badge ' + tierBadgeCls(v.tier) + '">' + tierLabel(v.tier) + '</span>',
+    '<span class="badge ' + statusBadgeCls(v.status) + '"><span class="dot" style="background:' +
+      (v.status === 'Active' ? 'var(--green)' : v.status === 'Under Review' ? 'var(--amber)' : 'var(--red)') +
+      '"></span>' + v.status + '</span>',
+    urgency ? '<span class="badge b-red">' + urgency + '</span>' : ''
+  ].join('');
+
+  return '<div class="sc-card ' + rb.cls + '" onclick="openModal(\'' + v.id + '\')">' +
+    '<div class="sc-head">' +
+      '<div class="sc-logo">' + vendorLogo(v.domain, v.name, 38) + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="sc-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + v.name + '</div>' +
+        '<div class="sc-meta">' + v.category + ' · ' + (v.region || '—') + '</div>' +
+        '<div class="sc-badges">' + badges + '</div>' +
+      '</div>' +
+      '<span class="badge ' + rb.txtCls + '" style="font-size:7.5pt;padding:4px 9px;flex-shrink:0">' + v.risk_score + '</span>' +
+    '</div>' +
+    '<div class="sc-score-wrap">' +
+      '<div class="sc-ring"><svg viewBox="0 0 60 60" width="60" height="60">' + ringPath(v.sla_score) + '</svg>' +
+        '<div class="sc-ring-val" style="color:' + barColor(v.sla_score, false) + '">' + v.sla_score + '</div>' +
+      '</div>' +
+      '<div>' +
+        '<div class="sc-ring-lbl">SLA Score</div>' +
+        '<div class="sc-ring-desc">' + rb.label + ' · Overall Risk <strong>' + v.risk_score + '</strong>/100</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="sc-dims">' + dimRows + '</div>' +
+    '<div class="sc-foot">' +
+      '<span class="sc-spend">' + (v.annual_spend && v.annual_spend !== '$0' ? v.annual_spend : 'Spend not disclosed') + '</span>' +
+      '<span class="sc-renewal">Renewal: ' + (v.renewal_date || '—') + ' <span style="color:' +
+        (days !== null && days <= 90 ? 'var(--red)' : 'var(--ink4)') + '">(' + daysLabel + ')</span></span>' +
+    '</div>' +
+  '</div>';
+}
+
+function openModal(id) {
+  var v = ALL.find(function(x){ return x.id === id; });
+  if (!v) return;
+  var rb = riskBand(v.risk_score);
+  var days = daysUntil(v.renewal_date);
+  var logoC = logoColor(v.name);
+  var ini = initials(v.name);
+  var caps = (v.capabilities || []).map(function(c){ return '<span class="m-cap">' + c + '</span>'; }).join('');
+
+  var dimRows = [
+    { lbl:'SLA Performance',    score: v.sla_score,          invert: false, target: 95, note: 'Target ≥ 95' },
+    { lbl:'Concentration Risk', score: v.concentration_risk, invert: true,  target: 25, note: 'Target ≤ 25' },
+    { lbl:'Financial Risk',     score: v.financial_risk,     invert: true,  target: 30, note: 'Target ≤ 30' },
+    { lbl:'Delivery Risk',      score: v.delivery_risk,      invert: true,  target: 25, note: 'Target ≤ 25' },
+    { lbl:'Compliance Risk',    score: v.compliance_risk,    invert: true,  target: 20, note: 'Target ≤ 20' },
+  ].map(function(d) {
+    var col = d.invert ? dimColor(d.score) : barColor(d.score, false);
+    var meets = d.invert ? d.score <= d.target : d.score >= d.target;
+    var gapAbs = Math.abs(d.score - d.target);
+    var gapLabel = meets ? '✓ Meets target' : 'Gap: ' + gapAbs + ' pts';
+    var gapClass = meets ? 'meets' : 'gap';
+    var targetPct = d.target + '%';
+    return '<div class="m-dim-row">' +
+      '<span class="m-dim-lbl">' + d.lbl + '</span>' +
+      '<div class="m-dim-bar-wrap">' +
+        '<div style="font-size:6pt;color:var(--ink4);margin-bottom:3px;">' + d.note + '</div>' +
+        '<div class="m-dim-bar-track">' +
+          '<div class="m-dim-bar-fill" style="width:' + d.score + '%;background:' + col + '"></div>' +
+          '<div class="m-dim-target-line" style="left:' + targetPct + '" data-label="T:' + d.target + '"></div>' +
+        '</div>' +
+      '</div>' +
+      '<span class="m-dim-score" style="color:' + col + '">' + d.score + '</span>' +
+      '<span class="m-dim-gap ' + gapClass + '">' + gapLabel + '</span>' +
+    '</div>';
+  }).join('');
+
+  var html = '<div class="modal-bg open" id="modal-overlay" onclick="overlayClick(event)">' +
+    '<div class="modal">' +
+      '<div class="modal-header">' +
+        '<div class="modal-logo" style="background:rgba(255,255,255,0.15);overflow:hidden">' + vendorLogo(v.domain, v.name, 48) + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="modal-title">' + v.name + '</div>' +
+          '<div class="modal-sub">' + v.category + ' · ' + (v.region || '—') + ' · ' + v.id + '</div>' +
+        '</div>' +
+        '<button onclick="printScorecard(\'' + v.id + '\')" style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;margin-right:8px;">&#128438; Print</button>' +
+        '<button class="modal-close" onclick="closeModal()">×</button>' +
+      '</div>' +
+      '<div class="modal-body">' +
+
+        '<div class="m-section">' +
+          '<div class="m-section-title">Performance Scorecard</div>' +
+          dimRows +
+          '<div style="margin-top:12px;padding:10px 12px;background:' + rb.bg +
+            ';border-radius:8px;display:flex;align-items:center;gap:10px">' +
+            '<span style="font-size:11pt;font-weight:900;color:' + rb.color + '">' + v.risk_score + '</span>' +
+            '<div><div style="font-size:8pt;font-weight:700;color:' + rb.color + '">' + rb.label + ' — Overall Risk Score</div>' +
+            '<div style="font-size:7.5pt;color:var(--ink4)">Weighted composite: concentration 30%, delivery 30%, financial 20%, compliance 20%</div></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="m-section">' +
+          '<div class="m-section-title">Vendor Profile</div>' +
+          '<div class="m-grid">' +
+            '<div class="m-tile"><div class="m-tile-lbl">Annual Spend</div><div class="m-tile-val">' +
+              (v.annual_spend && v.annual_spend !== '$0' ? v.annual_spend : 'Not disclosed') + '</div></div>' +
+            '<div class="m-tile"><div class="m-tile-lbl">Renewal Date</div><div class="m-tile-val">' +
+              (v.renewal_date || '—') + (days !== null ? '<span style="font-size:7pt;color:' +
+                (days <= 90 ? 'var(--red)' : 'var(--ink4)') + '"> (' + (days < 0 ? 'Expired' : days + ' days') + ')</span>' : '') + '</div></div>' +
+            '<div class="m-tile"><div class="m-tile-lbl">Tier</div><div class="m-tile-val">' + tierLabel(v.tier) + '</div></div>' +
+            '<div class="m-tile"><div class="m-tile-lbl">Status</div><div class="m-tile-val">' + v.status + '</div></div>' +
+            '<div class="m-tile"><div class="m-tile-lbl">Region</div><div class="m-tile-val">' + (v.region || '—') + '</div></div>' +
+            '<div class="m-tile"><div class="m-tile-lbl">Vendor ID</div><div class="m-tile-val">' + v.id + '</div></div>' +
+          '</div>' +
+        '</div>' +
+
+        (v.capabilities && v.capabilities.length ? '<div class="m-section"><div class="m-section-title">Capabilities</div><div class="m-caps">' + caps + '</div></div>' : '') +
+
+        (v.notes ? '<div class="m-section"><div class="m-section-title">VER Notes</div><div class="m-notes">' + v.notes + '</div></div>' : '') +
+
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  document.getElementById('modal-root').innerHTML = html;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-root').innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+function overlayClick(e) {
+  if (e.target.id === 'modal-overlay') closeModal();
+}
+
+function printScorecard(id) {
+  var v = ALL.find(function(x){ return x.id === id; });
+  if (!v) return;
+  var rb = riskBand(v.risk_score);
+  var days = daysUntil(v.renewal_date);
+
+  var dimRows = [
+    { lbl:'SLA Performance',    score: v.sla_score,          invert: false, target: 95, note: 'Target ≥ 95' },
+    { lbl:'Concentration Risk', score: v.concentration_risk, invert: true,  target: 25, note: 'Target ≤ 25' },
+    { lbl:'Financial Risk',     score: v.financial_risk,     invert: true,  target: 30, note: 'Target ≤ 30' },
+    { lbl:'Delivery Risk',      score: v.delivery_risk,      invert: true,  target: 25, note: 'Target ≤ 25' },
+    { lbl:'Compliance Risk',    score: v.compliance_risk,    invert: true,  target: 20, note: 'Target ≤ 20' },
+  ].map(function(d) {
+    var col = d.invert ? dimColor(d.score) : barColor(d.score, false);
+    var meets = d.invert ? d.score <= d.target : d.score >= d.target;
+    var gapAbs = Math.abs(d.score - d.target);
+    var gapLabel = meets ? '✓ Meets' : 'Gap: ' + gapAbs + ' pts';
+    var gapBg = meets ? '#D1FAE5' : '#FEE2E2';
+    var gapTxt = meets ? '#065F46' : '#7F1D1D';
+    return '<tr style="border-bottom:1px solid #E5E7EB;">' +
+      '<td style="padding:6px 8px;font-size:8pt;font-weight:600;color:#374151;width:140px">' + d.lbl + '</td>' +
+      '<td style="padding:6px 8px;font-size:7.5pt;color:#6B7280">' + d.note + '</td>' +
+      '<td style="padding:6px 8px;width:160px">' +
+        '<div style="background:#F3F4F6;border-radius:4px;height:8px;position:relative;">' +
+          '<div style="width:' + d.score + '%;background:' + col + ';height:8px;border-radius:4px;"></div>' +
+          '<div style="position:absolute;top:-2px;bottom:-2px;left:' + d.target + '%;width:2px;background:#374151;border-radius:1px;"></div>' +
+        '</div>' +
+      '</td>' +
+      '<td style="padding:6px 8px;font-size:8pt;font-weight:800;color:' + col + ';width:36px;text-align:right">' + d.score + '</td>' +
+      '<td style="padding:6px 8px">' +
+        '<span style="font-size:7pt;font-weight:700;padding:2px 7px;border-radius:8px;background:' + gapBg + ';color:' + gapTxt + '">' + gapLabel + '</span>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  var caps = (v.capabilities || []).map(function(c){
+    return '<span style="font-size:7pt;font-weight:700;padding:2px 9px;border-radius:9px;background:#EFF6FF;color:#1E3A5F;margin:2px;">' + c + '</span>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>Scorecard — ' + v.name + '</title>' +
+    '<style>' +
+      'body{font-family:Segoe UI,Arial,sans-serif;margin:0;padding:24px;background:#fff;color:#111827;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+      '@page{margin:16mm;}' +
+      '@media print{.no-print{display:none!important;}}' +
+      'table{border-collapse:collapse;width:100%;}' +
+    '<\/style><\/head><body>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+      '<div style="font-size:7pt;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#0D9488;">VER Intelligence Hub · FY27 · Vendor Scorecard</div>' +
+      '<div style="font-size:7pt;color:#6B7280;">Generated ' + new Date().toLocaleDateString() + '</div>' +
+    '</div>' +
+    '<div style="background:linear-gradient(135deg,#0F1E3C,#1E3A5F);border-radius:10px;padding:20px 24px;display:flex;gap:16px;align-items:center;margin-bottom:18px;">' +
+      '<div style="width:52px;height:52px;border-radius:10px;background:rgba(255,255,255,0.15);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14pt;font-weight:900;color:#fff;font-family:Arial;">' + initials(v.name) + '</div>' +
+      '<div>' +
+        '<div style="font-size:15pt;font-weight:900;color:#fff;line-height:1.2;">' + v.name + '</div>' +
+        '<div style="font-size:8.5pt;color:rgba(255,255,255,0.6);margin-top:3px;">' + v.category + ' · ' + (v.region || '—') + ' · ' + v.id + '</div>' +
+      '</div>' +
+      '<div style="margin-left:auto;text-align:right;">' +
+        '<div style="font-size:22pt;font-weight:900;color:' + rb.color.replace('var(--green)','#059669').replace('var(--amber)','#D97706').replace('var(--red)','#DC2626') + '">' + v.risk_score + '</div>' +
+        '<div style="font-size:7.5pt;font-weight:700;color:rgba(255,255,255,0.55);">' + rb.label + ' · Overall Risk</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;">' +
+      '<div style="border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;"><div style="font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#6B7280;margin-bottom:4px;">Annual Spend</div><div style="font-size:9pt;font-weight:700">' + (v.annual_spend && v.annual_spend !== '$0' ? v.annual_spend : 'Not disclosed') + '</div></div>' +
+      '<div style="border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;"><div style="font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#6B7280;margin-bottom:4px;">Renewal Date</div><div style="font-size:9pt;font-weight:700">' + (v.renewal_date || '—') + (days !== null ? ' (' + (days < 0 ? 'Expired' : days + 'd') + ')' : '') + '</div></div>' +
+      '<div style="border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;"><div style="font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#6B7280;margin-bottom:4px;">Tier</div><div style="font-size:9pt;font-weight:700">' + tierLabel(v.tier) + '</div></div>' +
+      '<div style="border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;"><div style="font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#6B7280;margin-bottom:4px;">Status</div><div style="font-size:9pt;font-weight:700">' + v.status + '</div></div>' +
+    '</div>' +
+    '<div style="font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Performance Dimensions</div>' +
+    '<table style="margin-bottom:18px;"><tbody>' + dimRows + '</tbody></table>' +
+    '<div style="padding:10px 14px;background:#F9FAFB;border-radius:8px;display:flex;align-items:center;gap:10px;margin-bottom:18px;">' +
+      '<span style="font-size:12pt;font-weight:900;color:' + rb.color.replace('var(--green)','#059669').replace('var(--amber)','#D97706').replace('var(--red)','#DC2626') + '">' + v.risk_score + '</span>' +
+      '<div style="font-size:7.5pt;color:#374151;">' +
+        '<div style="font-weight:700;">' + rb.label + ' — Weighted Risk Score</div>' +
+        '<div style="color:#6B7280">Concentration 30% · Delivery 30% · Financial 20% · Compliance 20%</div>' +
+      '</div>' +
+    '</div>' +
+    (caps ? '<div style="font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:8px;">Capabilities</div><div style="margin-bottom:16px">' + caps + '</div>' : '') +
+    (v.notes ? '<div style="font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:6px;">VER Notes</div><div style="font-size:8pt;color:#374151;font-style:italic;line-height:1.6;">' + v.notes + '</div>' : '') +
+    '<div class="no-print" style="text-align:center;margin-top:24px;">' +
+      '<button onclick="window.print()" style="padding:8px 24px;border-radius:8px;background:#0F1E3C;color:#fff;border:none;font-size:9pt;font-weight:700;cursor:pointer;font-family:inherit;">Print / Save as PDF</button>' +
+      '&nbsp;&nbsp;<button onclick="window.close()" style="padding:8px 24px;border-radius:8px;background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;font-size:9pt;font-weight:700;cursor:pointer;font-family:inherit;">Close</button>' +
+    '</div>' +
+    '<\/body><\/html>';
+
+  var win = window.open('', '_blank', 'width=820,height=700,menubar=no,toolbar=no,location=no');
+  if (!win) return;
+  win.document.write(html);
+  win.document.close();
+}
+
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
+
+function applyFilters() {
+  var q      = document.getElementById('sc-search').value.toLowerCase();
+  var cat    = document.getElementById('sc-cat').value;
+  var tier   = document.getElementById('sc-tier').value;
+  var status = document.getElementById('sc-status').value;
+  var region = document.getElementById('sc-region').value;
+  var risk   = document.getElementById('sc-risk').value;
+
+  FILTERED = ALL.filter(function(v) {
+    if (q && !v.name.toLowerCase().includes(q) && !v.category.toLowerCase().includes(q) &&
+        !(v.capabilities || []).join(' ').toLowerCase().includes(q)) return false;
+    if (cat    && v.category !== cat) return false;
+    if (tier   && v.tier != tier) return false;
+    if (status && v.status !== status) return false;
+    if (region && !v.region.includes(region)) return false;
+    if (risk === 'low'    && v.risk_score > 33) return false;
+    if (risk === 'medium' && (v.risk_score <= 33 || v.risk_score > 66)) return false;
+    if (risk === 'high'   && v.risk_score <= 66) return false;
+    return true;
+  });
+
+  sortFiltered();
+  PAGE = 1;
+  render();
+}
+
+function clearFilters() {
+  ['sc-search','sc-cat','sc-tier','sc-status','sc-region','sc-risk'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el.tagName === 'INPUT') el.value = ''; else el.value = '';
+  });
+  applyFilters();
+}
+
+function setSort(key) {
+  SORT_KEY = key;
+  ['name','risk','sla','tier','renewal','spend'].forEach(function(k) {
+    document.getElementById('srt-' + k).className = 'srt-btn' + (k === key ? ' active' : '');
+  });
+  sortFiltered();
+  PAGE = 1;
+  render();
+}
+
+function sortFiltered() {
+  FILTERED.sort(function(a, b) {
+    if (SORT_KEY === 'name')    return a.name.localeCompare(b.name);
+    if (SORT_KEY === 'risk')    return b.risk_score - a.risk_score;
+    if (SORT_KEY === 'sla')     return b.sla_score - a.sla_score;
+    if (SORT_KEY === 'tier')    return a.tier - b.tier;
+    if (SORT_KEY === 'renewal') return (a.renewal_date||'').localeCompare(b.renewal_date||'');
+    if (SORT_KEY === 'spend')   return spendNum(b.annual_spend) - spendNum(a.annual_spend);
+    return 0;
+  });
+}
+
+function goPage(p) {
+  var total = Math.ceil(FILTERED.length / PAGE_SIZE);
+  if (p < 1 || p > total) return;
+  PAGE = p;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderPag(containerId) {
+  var total = Math.ceil(FILTERED.length / PAGE_SIZE);
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (total <= 1) { el.innerHTML = ''; return; }
+
+  var pages = [];
+  for (var i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= PAGE - 2 && i <= PAGE + 2)) pages.push(i);
+    else if (pages[pages.length-1] !== '…') pages.push('…');
+  }
+
+  var start = Math.min((PAGE-1)*PAGE_SIZE+1, FILTERED.length);
+  var end   = Math.min(PAGE*PAGE_SIZE, FILTERED.length);
+
+  el.innerHTML = '<div class="pag">' +
+    '<button class="pag-btn" onclick="goPage(' + (PAGE-1) + ')" ' + (PAGE===1?'disabled':'') + '>← Prev</button>' +
+    pages.map(function(p) {
+      return p === '…'
+        ? '<span style="padding:0 4px;color:var(--ink4)">…</span>'
+        : '<button class="pag-btn' + (p===PAGE?' active':'') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+    }).join('') +
+    '<button class="pag-btn" onclick="goPage(' + (PAGE+1) + ')" ' + (PAGE===total?'disabled':'') + '>Next →</button>' +
+    '<span class="pag-info">Showing ' + start + '–' + end + ' of ' + FILTERED.length.toLocaleString() + '</span>' +
+  '</div>';
+}
+
+function render() {
+  var start = (PAGE - 1) * PAGE_SIZE;
+  var page  = FILTERED.slice(start, start + PAGE_SIZE);
+  var grid  = document.getElementById('sc-grid');
+
+  if (!page.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No vendors match your filters</div><div>Try clearing a filter or broadening your search.</div></div>';
+  } else {
+    grid.innerHTML = page.map(renderCard).join('');
+  }
+
+  document.getElementById('sc-count').textContent = FILTERED.length.toLocaleString() + ' vendors';
+  renderPag('sc-pag-bottom');
+}
+
+function updateHeroKPIs() {
+  var total    = ALL.length;
+  var healthy  = ALL.filter(function(v){ return v.risk_score <= 33; }).length;
+  var watch    = ALL.filter(function(v){ return v.risk_score > 33 && v.risk_score <= 66; }).length;
+  var critical = ALL.filter(function(v){ return v.risk_score > 66; }).length;
+  var renewing = ALL.filter(function(v){
+    var d = daysUntil(v.renewal_date);
+    return d !== null && d >= 0 && d <= 90;
+  }).length;
+  document.getElementById('kpi-total').textContent    = total.toLocaleString();
+  document.getElementById('kpi-healthy').textContent  = healthy.toLocaleString();
+  document.getElementById('kpi-watch').textContent    = watch.toLocaleString();
+  document.getElementById('kpi-critical').textContent = critical.toLocaleString();
+  document.getElementById('kpi-renewing').textContent = renewing.toLocaleString();
+}
+
+function toggleDark() {
+  var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem('ver-theme', t); } catch(e) {}
+  syncDarkBtns(t);
+}
+
+function syncDarkBtns(t) {
+  var lbl = t === 'dark' ? '☀ Light Mode' : '☽ Dark Mode';
+  var btn = document.getElementById('dm-btn');
+  if (btn) btn.textContent = lbl;
+  var btn2 = document.getElementById('dm-btn2');
+  if (btn2) btn2.textContent = lbl;
+}
+
+// ── INIT ──
+(function() {
+  var t; try { t = localStorage.getItem('ver-theme'); } catch(e) {}
+  if (!t) t = window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  syncDarkBtns(t);
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (!window.VER_VENDORS || !window.VER_VENDORS.length) {
+    document.getElementById('sc-grid').innerHTML =
+      '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">vendors.js not loaded</div>' +
+      '<div>Make sure assets/vendors.js is included before this page script.</div></div>';
+    return;
+  }
+  ALL = window.VER_VENDORS;
+  FILTERED = ALL.slice();
+  updateHeroKPIs();
+  sortFiltered();
+  render();
+});
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openScorecardsHelp(){
+  HelpModal.open({
+    title: 'Vendor Performance Scorecards',
+    what: 'Vendor Performance Scorecards give you a <strong>structured, dimension-level rating for every tracked vendor</strong> — delivery quality, commercial compliance, responsiveness, innovation, and strategic alignment. Scores drive tier assignments, renewal recommendations, and CQBR agendas.',
+    steps: [
+      '<strong>Find a vendor</strong> by searching or browsing the scorecard grid. Each card shows the overall score and dimension-level breakdown.',
+      '<strong>Read the dimension scores</strong> — Delivery (40%), Commercial (25%), Responsiveness (15%), Innovation (10%), Strategic Fit (10%). Weightings reflect DET priorities.',
+      '<strong>Review the score history</strong> — click a vendor card to see the full scorecard history by quarter. Trend direction matters as much as the current score.',
+      '<strong>Check VER notes</strong> — each scorecard includes qualitative VER commentary explaining what is driving the score and what the vendor needs to do to improve.',
+      '<strong>Use scores in renewal decisions</strong> — scorecard data is automatically surfaced in the Renewal Horizon and Decision Support Center for any vendor with an upcoming contract event.'
+    ],
+    tips: [
+      { icon: '&#x2B50;', title: 'Score below 3.0 = watchlist', body: 'Any vendor scoring below 3.0 overall is added to the VER watchlist — requiring a remediation plan and executive visibility.' },
+      { icon: '&#x1F4C5;', title: 'Scores update after every CQBR', body: 'Scorecards are updated within 5 business days of each CQBR. A stale scorecard (>90 days) means the CQBR cadence has slipped.' },
+      { icon: '&#x1F4CB;', title: 'Delivery score is most predictive', body: 'Across DET vendor history, Delivery score at renewal time is the strongest predictor of whether a renewal creates value. Prioritize it.' },
+      { icon: '&#x1F517;', title: 'Links to CQBR Library', body: 'Click the CQBR link on any scorecard to open the full review history for that vendor.' }
+    ],
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+</body>
+</html>

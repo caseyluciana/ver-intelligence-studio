@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VER Intelligence Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ── Design tokens ── */
+:root{
+  --teal:#0D9488;--teal-dim:#0F766E;--teal-bright:#14B8A6;
+  --green:#059669;--amber:#D97706;--red:#DC2626;
+  --font:'Inter',system-ui,-apple-system,Arial,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --transition:background-color 0.35s var(--ease),color 0.25s,border-color 0.25s,box-shadow 0.25s;
+}
+[data-theme="dark"]{
+  --bg:#060D1A;
+  --bg-bar:rgba(6,13,26,0.72);
+  --bg-nav:rgba(6,13,26,0.65);
+  --ink:rgba(255,255,255,0.93);
+  --ink-dim:rgba(255,255,255,0.42);
+  --ink-muted:rgba(255,255,255,0.22);
+  --ink-ghost:rgba(255,255,255,0.05);
+  --border:rgba(255,255,255,0.05);
+  --border-soft:rgba(255,255,255,0.08);
+  --grid:rgba(255,255,255,0.013);
+  --kpi-green:#34D399;--kpi-amber:#FBBF24;--kpi-blue:#93C5FD;--kpi-teal:#2DD4BF;
+  --teal-status:rgba(13,148,136,0.12);--teal-status-border:rgba(13,148,136,0.22);
+  --dot-color:#34D399;
+  --mn-color:rgba(255,255,255,0.30);--mn-sep:rgba(255,255,255,0.06);
+  --overlay-bg:rgba(0,0,0,0.70);
+  --scan-visible:1;
+  --ticker-bg:rgba(4,9,20,0.90);--ticker-border:rgba(13,148,136,0.18);
+  --ticker-ink:rgba(255,255,255,0.48);
+  --chrome-bar:rgba(8,14,26,0.98);
+}
+[data-theme="light"]{
+  --bg:#1E3A5F;
+  --bg-bar:rgba(15,30,60,0.80);
+  --bg-nav:rgba(15,30,60,0.75);
+  --ink:rgba(255,255,255,0.92);
+  --ink-dim:rgba(255,255,255,0.62);
+  --ink-muted:rgba(255,255,255,0.42);
+  --ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.08);
+  --border-soft:rgba(255,255,255,0.12);
+  --grid:rgba(255,255,255,0.018);
+  --kpi-green:#34D399;--kpi-amber:#FBBF24;--kpi-blue:#93C5FD;--kpi-teal:#2DD4BF;
+  --teal-status:rgba(13,148,136,0.18);--teal-status-border:rgba(13,148,136,0.35);
+  --dot-color:#34D399;
+  --mn-color:rgba(255,255,255,0.45);--mn-sep:rgba(255,255,255,0.10);
+  --overlay-bg:rgba(0,0,0,0.55);
+  --scan-visible:0;
+  --ticker-bg:rgba(10,22,50,0.88);--ticker-border:rgba(13,148,136,0.22);
+  --ticker-ink:rgba(255,255,255,0.52);
+  --chrome-bar:rgba(8,18,40,0.98);
+}
+
+/* ── Reset ── */
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  transition:var(--transition);
+}
+[data-theme="light"] body{
+  background:linear-gradient(160deg,#0A1428 0%,#0F1E3C 20%,#1A3258 45%,#2E5480 70%,#4A7AA0 100%);
+}
+
+/* ── Ambient background ── */
+[data-theme="dark"] body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 85% -5%,  rgba(13,148,136,0.22) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 50% at -5% 105%,  rgba(124,58,237,0.14) 0%,transparent 52%),
+    radial-gradient(ellipse 40% 40% at 50% 50%,   rgba(13,148,136,0.04) 0%,transparent 60%);
+}
+[data-theme="light"] body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 90% 0%,   rgba(13,148,136,0.12) 0%,transparent 50%),
+    radial-gradient(ellipse 50% 40% at 0% 100%,  rgba(99,102,241,0.08) 0%,transparent 45%);
+}
+
+/* ── Fine grid ── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+/* ── Particle canvas ── */
+#particle-canvas{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  opacity:1;
+}
+
+/* ── Scan line ── */
+.scan{
+  position:fixed;left:0;right:0;height:240px;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(13,148,136,0.025) 50%,transparent 100%);
+  animation:scan 12s linear infinite;
+  opacity:var(--scan-visible,1);transition:opacity 0.3s;will-change:transform;
+}
+@keyframes scan{from{transform:translateY(-240px)}to{transform:translateY(110vh)}}
+
+/* ── Teal hairline rule ── */
+.top-rule{
+  position:fixed;top:0;left:0;right:0;height:1px;z-index:500;
+  background:linear-gradient(90deg,transparent 0%,rgba(13,148,136,0.6) 30%,rgba(13,148,136,0.85) 50%,rgba(13,148,136,0.6) 70%,transparent 100%);
+}
+
+/* ── Page load bar ── */
+#load-bar{
+  position:fixed;top:22px;left:0;right:0;height:2px;z-index:601;
+  background:linear-gradient(90deg,var(--teal-dim),var(--teal),var(--teal-bright),var(--teal));
+  transform-origin:left center;transform:scaleX(0);
+  animation:lb-grow 0.95s cubic-bezier(0.1,0.8,0.2,1) 0.2s both,
+            lb-fade 0.5s ease 1.3s both;
+}
+@keyframes lb-grow{
+  from{transform:scaleX(0);}
+  80%{transform:scaleX(0.90);}
+  to{transform:scaleX(1);}
+}
+@keyframes lb-fade{from{opacity:1;}to{opacity:0;visibility:hidden;}}
+
+/* ── Shell ── */
+.shell{position:relative;z-index:3;height:100vh;display:grid;grid-template-rows:52px 26px 1fr 68px;}
+
+/* ── Top bar ── */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-bar);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  transition:var(--transition);
+}
+.tb-left{display:flex;align-items:center;gap:16px;}
+.tb-brand{font-size:11px;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink);}
+.tb-status{
+  display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;
+  background:var(--teal-status);border:1px solid var(--teal-status-border);
+}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--dot-color);animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.tb-status-lbl{font-size:9px;font-weight:700;color:var(--dot-color);letter-spacing:0.12em;text-transform:uppercase;}
+.tb-tag{
+  font-size:9px;color:var(--ink-muted);letter-spacing:0.08em;
+  padding:2px 8px;border-radius:4px;
+  border:1px solid var(--border);background:var(--ink-ghost);
+}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-toggle{
+  display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border-soft);background:var(--ink-ghost);
+  color:var(--ink-dim);font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--font);transition:var(--transition);white-space:nowrap;
+}
+.tb-toggle:hover{background:var(--teal-status);border-color:var(--teal-status-border);color:var(--teal);}
+.tb-toggle-icon{font-size:14px;line-height:1;}
+.tb-toggle-track{width:28px;height:16px;border-radius:8px;background:var(--border-soft);position:relative;transition:background 0.25s;flex-shrink:0;}
+.tb-toggle-thumb{position:absolute;top:2px;width:12px;height:12px;border-radius:50%;background:var(--ink-muted);transition:transform 0.25s var(--ease),background 0.25s;}
+[data-theme="dark"]  .tb-toggle-thumb{transform:translateX(2px);background:#34D399;}
+[data-theme="light"] .tb-toggle-thumb{transform:translateX(14px);background:var(--teal);}
+[data-theme="dark"]  .tb-toggle-track{background:rgba(52,211,153,0.2);}
+[data-theme="light"] .tb-toggle-track{background:rgba(13,148,136,0.2);}
+
+/* ── Intelligence Ticker ── */
+.ticker-strip{
+  display:flex;align-items:center;overflow:hidden;
+  background:var(--ticker-bg);
+  border-bottom:1px solid var(--ticker-border);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+}
+.ticker-live{
+  flex-shrink:0;display:flex;align-items:center;gap:6px;
+  font-size:8px;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--teal);padding:0 16px;height:100%;
+  border-right:1px solid var(--ticker-border);white-space:nowrap;
+}
+.ticker-live-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
+.ticker-outer{flex:1;overflow:hidden;height:100%;display:flex;align-items:center;}
+.ticker-track{
+  display:flex;align-items:center;white-space:nowrap;
+  animation:ticker 38s linear infinite;will-change:transform;
+}
+.ticker-track:hover{animation-play-state:paused;}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* split-flap ticker display */
+.ticker-outer{position:relative;}
+.ticker-flap-display{
+  display:flex;align-items:center;gap:10px;
+  padding:0 20px;font-size:10px;color:var(--ticker-ink);
+  white-space:nowrap;overflow:hidden;
+  opacity:1;transition:opacity 0.12s;
+}
+.ticker-flap-display.flap-out{opacity:0;}
+.ticker-flap-char{
+  display:inline-block;
+  transition:transform 0.06s ease-in, opacity 0.06s;
+}
+.ticker-flap-char.flipping{
+  transform:rotateX(90deg);opacity:0.2;
+}
+.ticker-item{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:10px;color:var(--ticker-ink);
+  padding:0 22px;cursor:default;transition:color 0.15s;
+}
+.ticker-item:hover{color:var(--ink);}
+.t-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.t-dot.green {background:#34D399;}
+.t-dot.amber {background:#FBBF24;}
+.t-dot.blue  {background:#93C5FD;}
+.t-dot.teal  {background:#2DD4BF;}
+.t-dot.purple{background:#A78BFA;}
+.ticker-pipe{color:var(--border-soft);padding:0 6px;font-size:10px;opacity:0.35;user-select:none;}
+
+/* split-flap word flip for title */
+.flap-word{
+  display:inline-block;
+  transform-origin:center center;
+  will-change:transform,opacity;
+}
+
+
+/* ── split-flap tile keyframe ── */
+@keyframes tile-flip {
+  0%   { transform: perspective(120px) rotateX(90deg); }
+  75%  { transform: perspective(120px) rotateX(-8deg); }
+  100% { transform: perspective(120px) rotateX(0deg);  }
+}
+.tf-char {
+  display: inline-block;
+  animation: tile-flip 0.15s ease-out both;
+  animation-play-state: paused;
+  -webkit-text-fill-color: rgba(45,212,191,0.95);
+  color: rgba(45,212,191,0.95);
+}
+.tf-char.landed {
+  -webkit-text-fill-color: rgba(255,255,255,0.93) !important;
+  color: rgba(255,255,255,0.93) !important;
+}
+
+/* ── Hero ── */
+.hero{display:flex;align-items:center;padding:0 48px;gap:88px;position:relative;}
+.hero-inner{display:flex;flex-direction:column;flex-shrink:0;width:740px;}
+
+.eyebrow{
+  display:flex;align-items:center;gap:10px;
+  font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.18em;
+  margin-bottom:20px;
+  opacity:0;animation:rise 0.7s var(--ease) 0.1s forwards;will-change:opacity,transform;
+}
+.eyebrow-line{width:24px;height:1px;background:var(--teal);flex-shrink:0;opacity:0.6;}
+[data-theme="light"] .eyebrow{color:#5EEAD4;}
+
+/* ── Title with gradient on "Third-party spend" ── */
+.title{
+  font-size:clamp(50px,5.6vw,84px);font-weight:900;line-height:0.96;letter-spacing:-0.045em;
+  color:var(--ink);margin-bottom:22px;white-space:nowrap;
+  opacity:0;animation:rise 0.8s var(--ease) 0.2s forwards;will-change:opacity,transform;
+}
+.title-main{
+  background:linear-gradient(95deg,rgba(255,255,255,0.96) 0%,rgba(255,255,255,0.66) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  display:block;
+}
+.title-accent{
+  color:var(--teal);display:block;
+  -webkit-text-fill-color:var(--teal);
+}
+[data-theme="dark"] .title-accent{text-shadow:0 0 100px rgba(13,148,136,0.5);}
+[data-theme="light"] .title-accent{text-shadow:0 0 80px rgba(13,148,136,0.4);}
+
+.tagline{
+  font-size:clamp(13px,1.15vw,15px);color:var(--ink-dim);line-height:1.7;
+  max-width:580px;margin-bottom:40px;font-weight:400;
+  opacity:0;animation:rise 0.8s var(--ease) 0.3s forwards;will-change:opacity,transform;
+}
+
+/* ── KPI row — divider style ── */
+.kpi-row{
+  display:flex;align-items:flex-start;
+  margin-bottom:48px;
+  opacity:0;animation:rise 0.8s var(--ease) 0.45s forwards;will-change:opacity,transform;
+}
+.kpi{display:flex;flex-direction:column;gap:8px;padding:0 24px 0 0;flex:1;min-width:0;}
+.kpi:first-child{padding-left:0;}
+.kpi-sep{width:1px;height:64px;margin-top:4px;background:var(--border-soft);flex-shrink:0;margin-right:24px;}
+.kpi-val{font-size:clamp(32px,3.4vw,48px);font-weight:900;line-height:1;letter-spacing:-0.03em;color:var(--ink);}
+.kpi.blue  .kpi-val{color:var(--kpi-blue);}
+.kpi.green .kpi-val{color:var(--kpi-green);}
+.kpi.amber .kpi-val{color:var(--kpi-amber);}
+.kpi.teal  .kpi-val{color:var(--kpi-teal);}
+.kpi-lbl{font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.12em;}
+.kpi-notes{display:flex;flex-direction:column;gap:1px;}
+.kpi-note{font-size:9px;color:var(--ink-muted);opacity:0.6;line-height:1.45;white-space:nowrap;}
+.kpi-delta{
+  display:inline-flex;align-items:center;gap:4px;margin-top:6px;
+  font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:99px;
+  opacity:0;animation:rise 0.6s var(--ease) 1.2s forwards;
+}
+.kpi-delta.up{background:rgba(52,211,153,0.10);color:#34D399;border:1px solid rgba(52,211,153,0.20);}
+.kpi-delta.stable{background:rgba(255,255,255,0.05);color:var(--ink-muted);border:1px solid var(--border-soft);}
+.kpi-delta-arrow{font-size:9px;line-height:1;}
+
+/* ── CTA row ── */
+.cta-row{
+  display:flex;align-items:center;gap:16px;
+  opacity:0;animation:rise 0.8s var(--ease) 0.6s forwards;will-change:opacity,transform;
+}
+.cta-primary{
+  display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:8px;
+  background:var(--teal);border:1px solid var(--teal);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:0.04em;
+  cursor:pointer;font-family:var(--font);white-space:nowrap;
+  transition:background 0.2s,box-shadow 0.2s,transform 0.2s;
+}
+.cta-primary:hover{background:var(--teal-dim);box-shadow:0 0 40px rgba(13,148,136,0.35);transform:translateY(-1px);}
+.cta-arrow{display:inline-block;transition:transform 0.2s var(--ease);}
+.cta-primary:hover .cta-arrow{transform:translateX(4px);}
+.cta-secondary{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:8px;
+  background:transparent;border:1px solid var(--border-soft);color:var(--ink-dim);
+  font-size:12px;font-weight:700;letter-spacing:0.04em;
+  cursor:pointer;font-family:var(--font);text-decoration:none;white-space:nowrap;
+  transition:background 0.2s,border-color 0.2s,color 0.2s;
+}
+.cta-secondary:hover{background:var(--ink-ghost);border-color:rgba(255,255,255,0.14);color:var(--ink);}
+.cta-arrow-dim{display:inline-block;transition:transform 0.2s var(--ease);}
+.cta-secondary:hover .cta-arrow-dim{transform:translateX(3px);}
+.cta-hint{font-size:10px;color:var(--ink-muted);letter-spacing:0.04em;white-space:nowrap;}
+.cta-intake{
+  display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:8px;
+  background:rgba(13,148,136,0.14);border:1px solid rgba(13,148,136,0.42);color:#14B8A6;
+  font-size:12px;font-weight:700;letter-spacing:0.04em;
+  cursor:pointer;font-family:var(--font);text-decoration:none;white-space:nowrap;
+  transition:background 0.2s,border-color 0.2s,color 0.2s,transform 0.2s;
+}
+.cta-intake:hover{background:rgba(13,148,136,0.26);border-color:rgba(13,148,136,0.70);color:#fff;transform:translateY(-1px);}
+.cta-intake .cta-arrow-dim{display:inline-block;transition:transform 0.2s var(--ease);color:inherit;}
+.cta-intake:hover .cta-arrow-dim{transform:translateX(3px);}
+
+/* ── Module nav ── */
+.module-nav{
+  display:flex;align-items:center;padding:0 48px;
+  border-top:1px solid var(--border);
+  background:var(--bg-nav);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  opacity:0;animation:rise 0.7s var(--ease) 0.75s forwards;transition:var(--transition);
+}
+.module-nav-inner{display:flex;align-items:center;max-width:1100px;width:100%;}
+.mn-group{
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  padding:0 20px;height:68px;border-bottom:2px solid transparent;
+  transition:border-color 0.15s;white-space:nowrap;
+}
+.mn-group:first-child{padding-left:0;}
+.mn-group:hover{border-bottom-color:var(--teal);}
+.mn-top{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--mn-color);transition:color 0.15s;
+}
+.mn-group:hover .mn-top{color:var(--teal);}
+.mn-chevron{font-size:7px;opacity:0.4;transition:transform 0.15s,opacity 0.15s;}
+.mn-group:hover .mn-chevron{opacity:1;transform:translateY(-1px);}
+.mn-sub{font-size:9px;color:var(--ink-muted);letter-spacing:0.03em;opacity:0.6;transition:opacity 0.15s,color 0.15s;}
+.mn-group:hover .mn-sub{opacity:1;color:var(--ink-dim);}
+.mn-sep{width:1px;height:20px;background:var(--mn-sep);flex-shrink:0;}
+.mn-spacer{flex:1;}
+
+/* ── Animations ── */
+@keyframes rise{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Page preview carousel ── */
+.preview-carousel{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:14px;
+  opacity:0;animation:rise 0.9s var(--ease) 0.5s forwards;
+  will-change:opacity,transform;padding-right:32px;
+}
+
+/* ── Browser chrome frame ── */
+.pc-chrome-wrap{
+  width:100%;max-width:580px;
+  position:relative;
+  /* leave room below for deck cards to peek */
+  padding-bottom:22px;
+}
+.pc-chrome-bar{
+  height:32px;
+  background:var(--chrome-bar);
+  border:1px solid rgba(255,255,255,0.12);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  border-radius:10px 10px 0 0;
+  display:flex;align-items:center;
+  padding:0 14px;gap:12px;flex-shrink:0;
+  position:relative;z-index:10;
+}
+.pc-chrome-dots{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.pc-chrome-dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.pc-chrome-dots span:nth-child(1){background:#FF5F57;}
+.pc-chrome-dots span:nth-child(2){background:#FFBD2E;}
+.pc-chrome-dots span:nth-child(3){background:#28CA41;}
+.pc-chrome-addr{
+  flex:1;text-align:center;
+  font-size:10px;color:rgba(255,255,255,0.30);
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:5px;padding:4px 16px;
+  letter-spacing:0.02em;font-family:var(--font);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  transition:color 0.25s;
+}
+
+/* ── Carousel window ── */
+.pc-window{
+  width:100%;aspect-ratio:16/10;
+  position:relative;overflow:visible;
+  background:transparent;
+}
+/* deck cards that peek behind the active slide */
+.pc-deck{
+  position:absolute;border-radius:14px;
+  border:1px solid rgba(255,255,255,0.10);
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  pointer-events:none;
+}
+.pc-deck-1{top:8px;left:10px;right:-10px;bottom:-12px;background:rgba(255,255,255,0.06);z-index:2;}
+.pc-deck-2{top:16px;left:18px;right:-18px;bottom:-22px;background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.06);z-index:1;}
+.pc-track{position:absolute;inset:0;}
+.pc-slide{
+  position:absolute;inset:0;overflow:hidden;
+  border-radius:0 0 12px 12px;
+  border:1px solid var(--border-soft);border-top:none;
+  background:var(--bg);
+  opacity:0;z-index:3;pointer-events:none;
+  transform:translateY(10px) scale(0.97);
+  transition:transform 0.52s cubic-bezier(0.16,1,0.3,1),opacity 0.42s ease;
+  will-change:transform,opacity;
+}
+.pc-slide.is-active{
+  opacity:1;z-index:5;pointer-events:auto;transform:translateY(0) scale(1);
+  box-shadow:0 20px 60px rgba(0,0,0,0.65),0 0 100px rgba(13,148,136,0.07);
+}
+.pc-slide.is-leaving{
+  opacity:0;z-index:6;pointer-events:none;
+  transform:translateY(-52%) translateX(6%) rotate(8deg) scale(0.82);
+  transition:transform 0.46s cubic-bezier(0.55,0,0.9,0.4),opacity 0.28s ease;
+}
+.pc-iframe{position:absolute;top:0;left:0;width:1440px;height:900px;transform-origin:top left;border:none;pointer-events:none;}
+.pc-prev,.pc-next{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.10);
+  color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s,color 0.15s,opacity 0.15s;
+  opacity:0;z-index:10;
+}
+.pc-prev{left:10px;}.pc-next{right:10px;}
+.pc-window:hover .pc-prev,.pc-window:hover .pc-next{opacity:1;}
+.pc-prev:hover,.pc-next:hover{background:rgba(13,148,136,0.35);color:#fff;}
+
+/* ── Carousel meta ── */
+.pc-meta{
+  width:100%;max-width:580px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 2px 0;
+}
+.pc-label-text{font-size:11px;font-weight:700;color:var(--ink);letter-spacing:0.02em;}
+.pc-sub{font-size:10px;color:var(--ink-muted);margin-top:2px;}
+.pc-dots{display:flex;gap:6px;align-items:center;}
+.pc-d{width:6px;height:6px;border-radius:50%;background:var(--border-soft);border:1px solid rgba(255,255,255,0.08);cursor:pointer;transition:background 0.2s,width 0.2s;}
+.pc-d.active{background:var(--teal);width:18px;border-radius:3px;}
+
+/* ── Responsive ── */
+@media(max-width:1100px){.preview-carousel{display:none;}}
+@media(max-width:860px){
+  .shell{height:auto;min-height:100vh;grid-template-rows:auto auto 1fr auto;}
+  .top-bar,.module-nav{padding:0 20px;}
+  .hero{padding:24px 20px;flex-direction:column;align-items:flex-start;gap:24px;}
+  .hero-inner{width:100%;}
+  .title{font-size:clamp(32px,8vw,58px);}
+  .kpi-row{flex-wrap:wrap;gap:24px;}
+  .kpi-sep{display:none;}
+}
+@media(max-width:600px){
+  .top-bar,.module-nav{padding:0 14px;}
+  .hero{padding:20px 14px;}
+  .title{font-size:clamp(28px,9vw,44px);}
+  .tb-brand{font-size:9px;}.tb-status{display:none;}
+}
+@media print{body{overflow:auto;}.mod-overlay{display:none;}}
+
+/* ── Module modal ── */
+:root{--bg-modal:#0B1628;--modal-ink:var(--ink);--modal-ink-dim:var(--ink-dim);--modal-ink-muted:var(--ink-muted);--modal-border:var(--border);--modal-border-soft:var(--border-soft);--modal-ghost:var(--ink-ghost);--modal-teal-status:var(--teal-status);--modal-teal-border:var(--teal-status-border);}
+[data-theme="light"]{--bg-modal:#FFFFFF;--modal-ink:#0C1A35;--modal-ink-dim:rgba(12,26,53,0.58);--modal-ink-muted:rgba(12,26,53,0.40);--modal-border:rgba(12,26,53,0.08);--modal-border-soft:rgba(12,26,53,0.12);--modal-ghost:rgba(12,26,53,0.04);--modal-teal-status:rgba(13,148,136,0.08);--modal-teal-border:rgba(13,148,136,0.25);}
+.mod-overlay{position:fixed;inset:0;z-index:300;background:var(--overlay-bg);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.mod-overlay.open{opacity:1;pointer-events:all;}
+.mod-panel{background:var(--bg-modal);border:1px solid var(--border-soft);border-radius:16px;box-shadow:0 32px 80px rgba(0,0,0,0.5);width:100%;max-width:580px;max-height:82vh;overflow-y:auto;transform:translateY(24px) scale(0.98);transition:transform 0.3s var(--ease),opacity 0.3s;opacity:0;will-change:opacity,transform;}
+[data-theme="light"] .mod-panel{box-shadow:0 24px 60px rgba(12,26,53,0.16);}
+.mod-overlay.open .mod-panel{transform:translateY(0) scale(1);opacity:1;}
+.mod-panel.wide{max-width:82vw;width:82vw;height:86vh;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;}
+.mod-header{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 28px 16px;border-bottom:1px solid var(--modal-border);position:sticky;top:0;background:var(--bg-modal);z-index:1;border-radius:16px 16px 0 0;flex-shrink:0;}
+.mod-header-accent{width:32px;height:3px;border-radius:2px;margin-bottom:10px;}
+.mod-header-name{font-size:18px;font-weight:900;color:var(--modal-ink);letter-spacing:-0.02em;margin-bottom:3px;}
+.mod-header-desc{font-size:11.5px;color:var(--modal-ink-dim);line-height:1.5;max-width:460px;}
+.mod-close{width:30px;height:30px;border-radius:50%;flex-shrink:0;margin-left:16px;margin-top:2px;background:var(--modal-ghost);border:1px solid var(--modal-border-soft);color:var(--modal-ink-muted);font-size:16px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.mod-close:hover{background:var(--modal-teal-status);border-color:var(--modal-teal-border);color:var(--modal-ink);}
+.mod-body{padding:18px 24px 24px;overflow-y:auto;flex:1;}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mod-card{display:block;padding:14px 16px;border-radius:10px;background:var(--modal-ghost);border:1px solid var(--modal-border-soft);text-decoration:none;cursor:pointer;transition:background 0.15s,border-color 0.15s,transform 0.15s;}
+.mod-card:hover{background:var(--modal-teal-status);border-color:var(--modal-teal-border);transform:translateY(-1px);}
+.mod-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.mod-card-name{font-size:12px;font-weight:800;color:var(--modal-ink);letter-spacing:0.01em;}
+.mod-card-arrow{font-size:12px;color:var(--teal);opacity:0;transition:opacity 0.15s,transform 0.15s;}
+.mod-card:hover .mod-card-arrow{opacity:1;transform:translateX(2px);}
+.mod-card-desc{font-size:10.5px;color:var(--modal-ink-dim);line-height:1.45;}
+.mod-badge{display:inline-block;margin-top:8px;font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:99px;}
+.mod-gateway{border-radius:12px;padding:22px 24px;background:linear-gradient(135deg,#060D1A 0%,#0F1E3C 60%,#0C2236 100%);border:1px solid rgba(255,255,255,0.08);border-left:3px solid #0D9488;margin-bottom:14px;}
+.mod-gateway-icon{font-size:26px;margin-bottom:10px;display:block;}
+.mod-gateway-title{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.02em;margin-bottom:7px;}
+.mod-gateway-desc{font-size:11.5px;color:rgba(255,255,255,0.62);line-height:1.55;margin-bottom:16px;}
+.mod-gateway-btn{display:inline-block;padding:9px 20px;border-radius:8px;background:#0D9488;color:#fff;font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:0.01em;text-decoration:none;cursor:pointer;border:none;transition:background 0.15s,transform 0.12s;margin-bottom:16px;}
+.mod-gateway-btn:hover{background:#0F766E;transform:translateY(-1px);}
+.mod-gateway-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.mod-gateway-chip{font-size:10px;font-weight:700;letter-spacing:0.01em;padding:4px 11px;border-radius:99px;background:rgba(13,148,136,0.18);color:#2DD4BF;border:1px solid rgba(13,148,136,0.32);}
+.mod-tool-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mod-all-wrap{display:flex;flex:1;overflow:hidden;height:100%;}
+.mod-all-sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--modal-border);padding:12px 0;overflow-y:auto;}
+.mod-all-tab{display:flex;align-items:center;gap:10px;padding:10px 18px;width:100%;background:none;border:none;cursor:pointer;font-family:var(--font);text-align:left;transition:background 0.12s;border-left:3px solid transparent;}
+.mod-all-tab:hover{background:var(--modal-teal-status);}
+.mod-all-tab.active{background:var(--modal-teal-status);border-left-color:var(--teal);}
+.mod-all-tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.mod-all-tab-name{font-size:12px;font-weight:700;color:var(--modal-ink);letter-spacing:0.01em;}
+.mod-all-tab-count{font-size:9px;color:var(--modal-ink-muted);margin-left:auto;}
+.mod-all-content{flex:1;overflow-y:auto;padding:20px 24px;}
+.mod-all-section{display:none;}
+.mod-all-section.active{display:block;}
+.mod-all-section-hdr{margin-bottom:16px;}
+.mod-all-section-name{font-size:17px;font-weight:900;color:var(--modal-ink);letter-spacing:-0.02em;margin-bottom:5px;}
+.mod-all-section-desc{font-size:12px;color:var(--modal-ink-dim);line-height:1.5;}
+.mod-all-list{display:flex;flex-direction:column;gap:6px;}
+.mod-all-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:10px;background:var(--modal-ghost);border:1px solid var(--modal-border-soft);text-decoration:none;cursor:pointer;transition:background 0.12s,border-color 0.12s;}
+.mod-all-row:hover{background:var(--modal-teal-status);border-color:var(--modal-teal-border);}
+.mod-all-row-left{display:flex;align-items:center;gap:14px;}
+.mod-all-row-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.mod-all-row-name{font-size:13px;font-weight:800;color:var(--modal-ink);margin-bottom:3px;}
+.mod-all-row-desc{font-size:11px;color:var(--modal-ink-dim);line-height:1.4;}
+.mod-all-row-right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:12px;}
+.mod-all-row-arrow{font-size:12px;color:var(--teal);opacity:0;transition:opacity 0.12s,transform 0.12s;}
+.mod-all-row:hover .mod-all-row-arrow{opacity:1;transform:translateX(2px);}
+.mod-all-row-badge{font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.mod-all-row-badge.soon{background:rgba(217,119,6,0.12);color:#FBBF24;border-color:rgba(217,119,6,0.25);}
+</style>
+</head>
+<body>
+
+<!-- Particle canvas -->
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<!-- Teal top hairline -->
+<div class="top-rule" aria-hidden="true"></div>
+
+<!-- Page load bar -->
+<div id="load-bar" aria-hidden="true"></div>
+
+<div class="scan" aria-hidden="true"></div>
+
+<div class="shell">
+
+  <!-- Top bar -->
+  <header class="top-bar">
+    <div class="tb-left">
+      <div class="tb-brand">VER Intelligence Hub</div>
+      <div class="tb-status">
+        <span class="tb-dot"></span>
+        <span class="tb-status-lbl">Active Advisory</span>
+      </div>
+      <div class="tb-tag">DET &middot; Internal</div>
+    </div>
+    <div class="tb-right">
+      <button type="button" class="tb-toggle" aria-label="How to navigate">&#63; How to Navigate</button>
+      <button type="button" class="tb-toggle" id="dm-btn" onclick="_dmToggle()" aria-label="Toggle theme">
+        <span class="tb-toggle-icon" id="dm-icon">&#9790;</span>
+        <span id="dm-label">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Intelligence Ticker (split-flap) -->
+  <div class="ticker-strip" role="status" aria-live="polite">
+    <div class="ticker-live">
+      <span class="ticker-live-dot"></span>
+      Live Intelligence
+    </div>
+    <div class="ticker-outer">
+      <div class="ticker-flap-display" id="ticker-flap">
+        <span class="t-dot amber" id="ticker-dot"></span>
+        <span id="ticker-text">14 renewals expiring within 60 days — 3 flagged high-risk</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <main class="hero">
+    <div class="hero-inner">
+
+      <div class="eyebrow">
+        Vendor Engagement &amp; Reliability &nbsp;&middot;&nbsp; DET Portfolio Intelligence
+      </div>
+
+      <h1 class="title">
+        <span class="title-main" id="flap-title">Third-party spend</span>
+        <span class="title-accent">intelligence.</span>
+      </h1>
+
+      <p class="tagline">
+        DET manages hundreds of third-party engagements across every spend category and every pillar. That intelligence lives here &mdash; organized, current, and built for the decisions leadership actually makes.
+      </p>
+
+      <div class="kpi-row">
+        <div class="kpi blue">
+          <div class="kpi-val" data-count="32" data-integer="1">0</div>
+          <div class="kpi-lbl">Platform Modules</div>
+          <div class="kpi-notes">
+            <div class="kpi-note">Across 5 disciplines</div>
+            <div class="kpi-note" style="opacity:0;" aria-hidden="true">&nbsp;</div>
+          </div>
+          <div class="kpi-delta up"><span class="kpi-delta-arrow">↑</span> Built Q2&ndash;Q3</div>
+        </div>
+        <div class="kpi-sep"></div>
+        <div class="kpi">
+          <div class="kpi-val" data-count="5" data-integer="1">0</div>
+          <div class="kpi-lbl">Risk Dimensions</div>
+          <div class="kpi-notes">
+            <div class="kpi-note">Delivery &middot; Financial &middot; Market</div>
+            <div class="kpi-note">Relationship &middot; Strategic</div>
+          </div>
+          <div class="kpi-delta up"><span class="kpi-delta-arrow">↑</span> Framework active</div>
+        </div>
+        <div class="kpi-sep"></div>
+        <div class="kpi green">
+          <div class="kpi-val" data-count="9" data-integer="1">0</div>
+          <div class="kpi-lbl">Pillars Served</div>
+          <div class="kpi-notes">
+            <div class="kpi-note">DET pillars under VER advisory</div>
+            <div class="kpi-note" style="opacity:0;" aria-hidden="true">&nbsp;</div>
+          </div>
+          <div class="kpi-delta up"><span class="kpi-delta-arrow">↑</span> Full DET coverage</div>
+        </div>
+        <div class="kpi-sep"></div>
+        <div class="kpi teal">
+          <div class="kpi-val" data-count="9" data-integer="1">0</div>
+          <div class="kpi-lbl">Spend Categories</div>
+          <div class="kpi-notes">
+            <div class="kpi-note">SaaS &middot; SOW &middot; Cloud &amp; Infra &middot; Project &middot; CWF</div>
+            <div class="kpi-note">ProServe &middot; Mobility &amp; Telecom &middot; AI &amp; Agentic &middot; Internal Initiatives</div>
+          </div>
+          <div class="kpi-delta up"><span class="kpi-delta-arrow">↑</span> Built Q2&ndash;Q3</div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <button type="button" class="cta-primary" onclick="openModal('all')">
+          All Modules <span class="cta-arrow">&rarr;</span>
+        </button>
+        <a href="vendor_intake.html" class="cta-intake">
+          Request VER Support <span class="cta-arrow-dim">&rarr;</span>
+        </a>
+        <span class="cta-hint">or select a discipline below</span>
+      </div>
+
+    </div>
+
+    <!-- Page preview carousel with browser chrome -->
+    <div class="preview-carousel" id="pc" aria-label="Page previews">
+      <div class="pc-chrome-wrap">
+        <div class="pc-chrome-bar">
+          <div class="pc-chrome-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="pc-chrome-addr" id="pc-chrome-addr">ver-hub &middot; Executive Intelligence</div>
+        </div>
+        <div class="pc-window">
+          <div class="pc-deck pc-deck-2"></div>
+          <div class="pc-deck pc-deck-1"></div>
+          <div class="pc-track" id="pc-track">
+            <div class="pc-slide" data-slide="exec">
+              <iframe class="pc-iframe" src="page_exec.html" title="Executive Intelligence" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+            </div>
+            <div class="pc-slide" data-slide="bench">
+              <iframe class="pc-iframe" src="page_rate_benchmarks.html" title="Rate &amp; Benchmark Intelligence" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+            </div>
+            <div class="pc-slide" data-slide="tco">
+              <iframe class="pc-iframe" src="page_tco.html" title="TCO Calculator" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+            </div>
+            <div class="pc-slide" data-slide="vendor">
+              <iframe class="pc-iframe" src="vendor_registry.html" title="Vendor Registry" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+            </div>
+            <div class="pc-slide" data-slide="renewal">
+              <iframe class="pc-iframe" src="page_renewal.html" title="Renewal Horizon" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+            </div>
+          </div>
+          <button class="pc-prev" id="pc-prev" aria-label="Previous">&#8249;</button>
+          <button class="pc-next" id="pc-next" aria-label="Next">&#8250;</button>
+        </div>
+      </div>
+      <div class="pc-meta">
+        <div>
+          <div class="pc-label-text" id="pc-label-text">Executive Intelligence</div>
+          <div class="pc-sub" id="pc-sub">SVP brief &middot; portfolio dashboard</div>
+        </div>
+        <div class="pc-dots" id="pc-dots"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Module nav -->
+  <nav class="module-nav" aria-label="Intelligence modules">
+    <div class="module-nav-inner">
+      <button type="button" class="mn-group" onclick="openModal('intelligence')">
+        <div class="mn-top">Intelligence <span class="mn-chevron">&#9652;</span></div>
+        <div class="mn-sub">Executive &middot; Market &middot; Pillar &middot; M&amp;A</div>
+      </button>
+      <div class="mn-sep"></div>
+      <button type="button" class="mn-group" onclick="openModal('finops')">
+        <div class="mn-top">FinOps <span class="mn-chevron">&#9652;</span></div>
+        <div class="mn-sub">Spend &middot; TCO &middot; Benchmarks &middot; Forecasting</div>
+      </button>
+      <div class="mn-sep"></div>
+      <button type="button" class="mn-group" onclick="openModal('vendor')">
+        <div class="mn-top">Vendor <span class="mn-chevron">&#9652;</span></div>
+        <div class="mn-sub">Registry &middot; Renewals &middot; Risk &middot; Scorecards</div>
+      </button>
+      <div class="mn-sep"></div>
+      <button type="button" class="mn-group" onclick="openModal('workforce')">
+        <div class="mn-top">Workforce &amp; Delivery <span class="mn-chevron">&#9652;</span></div>
+        <div class="mn-sub">Governance &middot; Workforce Intel &middot; Pillar Alerts</div>
+      </button>
+      <div class="mn-sep"></div>
+      <button type="button" class="mn-group" onclick="openModal('resources')">
+        <div class="mn-top">Resources <span class="mn-chevron">&#9652;</span></div>
+        <div class="mn-sub">CQBRs &middot; Digest &middot; Roadmap &middot; Team &middot; Guide</div>
+      </button>
+      <div class="mn-spacer"></div>
+    </div>
+  </nav>
+
+</div>
+
+<div class="mod-overlay" id="mod-overlay" onclick="_overlayClick(event)" role="dialog" aria-modal="true">
+  <div class="mod-panel" id="mod-panel">
+    <div class="mod-header" id="mod-header"></div>
+    <div class="mod-body"  id="mod-body"></div>
+  </div>
+</div>
+
+<script>
+/* ── Utility ── */
+function _setTrustedHTML(el, html){
+  while(el.firstChild){ el.removeChild(el.firstChild); }
+  var tmp = document.createElement('div');
+  tmp.insertAdjacentHTML('beforeend', html);
+  while(tmp.firstChild){ el.appendChild(tmp.firstChild); }
+}
+
+/* ── Module data ── */
+var GROUPS = {
+  intelligence: {
+    label: 'Intelligence', color: '#0D9488', icon: '📊',
+    desc: 'Portfolio-wide analytics and advisory signals for senior stakeholders.',
+    modules: [
+      { name:'Decision Horizon',       href:'page_command_center.html', icon:'⚙',   desc:'The active decisions the DET portfolio is waiting on — owners named, financial exposure quantified, grouped by fiscal quarter.' },
+      { name:'Executive Intelligence', href:'page_exec.html',           icon:'📈',  desc:'5-minute SVP brief + full portfolio dashboard — KPIs, decisions, risk movement, and engagement detail.' },
+      { name:'M&A Tracker',            href:'page_ma.html',             icon:'🔗',  desc:'Informatica portfolio transition tracking with vendor disposition and integration status.' },
+      { name:'Market Intelligence',    href:'page_market.html',         icon:'🌎',  desc:'Vendor health signals, M&A watch, and market positioning for active suppliers.' },
+      { name:'Pillar Intelligence',    href:'page_pillar.html',         icon:'🏛',  desc:'Spend, risk, and savings breakdown across all 9 DET engineering pillars.' }
+    ]
+  },
+  finops: {
+    label: 'FinOps & Spend', color: '#2563EB', icon: '💰',
+    desc: 'Full-spectrum spend intelligence — every category, every dollar, every lever.',
+    modules: [
+      { name:'AI Cost Monitor',               href:'page_ai_cost.html',         icon:'🤖', desc:'Track AI/ML vendor spend, token consumption trends, and cost-per-outcome across all AI tools.' },
+      { name:'Category Intelligence',         href:'page_category_intel.html',  icon:'🎺', desc:'Portfolio breakdown by vendor category — SaaS, CW, Infrastructure, Cloud, ProServe, and emerging.' },
+      { name:'Consumption Monitor',           href:'page_consumption.html',     icon:'🕘', desc:'License & utilization intelligence — seat waste analysis, pillar attribution, and capacity tracking.' },
+      { name:'Cost Optimization & Demand',    href:'page_forecast.html',        icon:'🔁', desc:'Cost optimization with savings levers, scenario modeling, budget intelligence, and workforce demand forecasting.' },
+      { name:'MFT Forecast',                  href:'page_mft.html',             icon:'📄', desc:'$93.4M approved pipeline across 351 forecasted items.' },
+      { name:'Rate & Benchmark Intelligence', href:'page_rate_benchmarks.html', icon:'💴', desc:'Market rate benchmarks across all categories + negotiation playbooks, by-category grids, and VER insights. 767-record dataset.' },
+      { name:'Scenario Modeling',             href:'page_scenario.html',        icon:'🛠', desc:'Model sourcing scenarios, benchmark alternatives, and stress-test commercial decisions.' },
+      { name:'SOW & PO Tracker',              href:'page_sow.html',             icon:'📄', desc:'2,397 Coupa POs tracked for expiry, value, and renewal risk across all pillars.' },
+      { name:'Spend Analysis',                href:'page_spend_analysis.html',  icon:'🔍', desc:'AI-assisted spend intelligence with concentration risk signals and savings opportunities.' },
+      { name:'TCO Calculator',                href:'page_tco.html',             icon:'🧮', desc:'Model total cost of ownership for any engagement — includes Portfolio Dashboard with pillar-level TCO breakdown.' }
+    ]
+  },
+  vendor: {
+    label: 'Vendor', color: '#7C3AED', icon: '🏲',
+    desc: 'End-to-end vendor lifecycle — registry, renewals, risk, performance, and self-service.',
+    modules: [
+      { name:'Intake Request',    href:'vendor_intake.html',   icon:'📤', desc:'Submit a request for VER support — new vendor assessment, SOW review, staff aug, change order, rate validation, or renewal.' },
+      { name:'Renewal Horizon',   href:'page_renewal.html',    icon:'📅', desc:'Upcoming contract renewals with urgency scoring, action items, and negotiation strategies.' },
+      { name:'Risk Intelligence', href:'vendor_risk.html',     icon:'⚠',  desc:'1,375 vendors scored across 5 dimensions — financial, operational, security, compliance, and strategic.' },
+      { name:'SOW Builder',       href:'vendor_sow.html',      icon:'📄', desc:'Draft, validate, and export vendor statements of work with scope structure and commercial guardrails.' },
+      { name:'Vendor Portal',     href:'vendor_home.html',     icon:'👊', desc:'Self-service hub for vendor registration, intake requests, and risk assessments.' },
+      { name:'Vendor Registry',   href:'vendor_registry.html', icon:'📚', desc:'1,375+ vendors with full 360 dossiers, portal submissions, and category intelligence.' },
+      { name:'Vendor Scorecards', href:'page_scorecards.html', icon:'⭐', desc:'Performance scorecards for all tracked vendors with dimension-level ratings and VER notes.' }
+    ]
+  },
+  workforce: {
+    label: 'Workforce & Delivery', color: '#D97706', icon: '👥',
+    desc: 'Contingent workforce intelligence, delivery cost optimization, and governance posture.',
+    modules: [
+      { name:'Governance',      href:'page_governance.html',    icon:'⚶',  desc:'VER release calendar, engagement status, policy posture, and program commitments.' },
+      { name:'Pillar Alerts',   href:'page_pillar_alerts.html', icon:'🚨', desc:'27 active alerts spanning renewal risk, governance flags, and commercial signals by pillar.' },
+      { name:'Workforce Intel', href:'page_cw_intel.html',      icon:'👥', desc:'Contingent workforce rate benchmarks, utilization trends, and pillar cost attribution.' }
+    ]
+  },
+  resources: {
+    label: 'Resources', color: '#7C3AED', icon: '📚',
+    desc: 'CQBRs, editorial series, monthly digest, team charter, and engagement guides.',
+    modules: [
+      { name:'CQBR Library',   href:'page_cqbr.html',          icon:'📄', desc:'All Collaborative Quarterly Business Reviews — every vendor, every quarter, searchable and filterable.' },
+      { name:'Monthly Digest', href:'page_digest.html',        icon:'📰', desc:"VER's monthly intelligence briefing — spend signals, market moves, and what's next." },
+      { name:'Roadmap',        href:'page_roadmap.html',       icon:'🗺', desc:'VER program roadmap — initiatives, milestones, and delivery commitments.' },
+      { name:'Team & Charter', href:'page_team.html',          icon:'👩', desc:'VER team capabilities, coverage model, and charter commitments.' },
+      { name:'VER Guide',      href:'page_guide.html',         icon:'📘', desc:'How to engage VER — services, SLAs, intake process, and escalation paths.' },
+      { name:'Vision Series',  href:'page_vision_series.html', icon:'🎥', desc:"Six-episode cinematic series on VER's mission, intelligence practice, and strategy." }
+    ]
+  }
+};
+
+/* ── Modal open/close ── */
+var _activeTab = 'intelligence';
+
+function openModal(key){
+  var overlay = document.getElementById('mod-overlay');
+  var panel   = document.getElementById('mod-panel');
+  var header  = document.getElementById('mod-header');
+  var body    = document.getElementById('mod-body');
+  if(key === 'all'){
+    panel.classList.add('wide');
+    _activeTab = 'intelligence';
+    _setTrustedHTML(header, _renderAllHeader());
+    _setTrustedHTML(body,   _renderAllBody());
+  } else {
+    var g = GROUPS[key];
+    if(!g) return;
+    panel.classList.remove('wide');
+    _setTrustedHTML(header, _renderGroupHeader(g));
+    _setTrustedHTML(body,   _renderGroupBody(g));
+  }
+  overlay.classList.add('open');
+  document.addEventListener('keydown', _escClose);
+}
+function closeModal(){
+  document.getElementById('mod-overlay').classList.remove('open');
+  document.removeEventListener('keydown', _escClose);
+}
+function _escClose(e){ if(e.key === 'Escape') closeModal(); }
+function _overlayClick(e){ if(e.target === document.getElementById('mod-overlay')) closeModal(); }
+function switchTab(key){
+  _activeTab = key;
+  document.querySelectorAll('.mod-all-tab').forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-key') === key); });
+  document.querySelectorAll('.mod-all-section').forEach(function(s){ s.classList.toggle('active', s.getAttribute('data-key') === key); });
+}
+
+function _renderGroupHeader(g){
+  return '<div><div class="mod-header-accent" style="background:'+g.color+'"></div>'
+       + '<div class="mod-header-name">'+g.label+'</div>'
+       + '<div class="mod-header-desc">'+g.desc+'</div></div>'
+       + '<button class="mod-close" onclick="closeModal()" aria-label="Close">&times;</button>';
+}
+function _renderGroupBody(g){
+  if(g.label === 'Vendor') return _renderVendorGateway(g);
+  var html = '<div class="mod-grid">';
+  var sorted = g.modules.slice().sort(function(a,b){ return a.name.localeCompare(b.name); });
+  sorted.forEach(function(m){
+    html += '<a href="'+m.href+'" class="mod-card">'
+          + '<div class="mod-card-top"><span class="mod-card-name">'+m.name+'</span><span class="mod-card-arrow">&#8594;</span></div>'
+          + '<div class="mod-card-desc">'+m.desc+'</div>'
+          + '<span class="mod-badge" style="background:rgba(13,148,136,0.15);color:#2DD4BF;border:1px solid rgba(13,148,136,0.25)">'+(m.soon?'Coming Soon':'Live')+'</span>'
+          + '</a>';
+  });
+  return html + '</div>';
+}
+function _renderVendorGateway(g){
+  var html = '<div class="mod-gateway">'
+    + '<span class="mod-gateway-icon">&#127826;</span>'
+    + '<div class="mod-gateway-title">VER Vendor Platform</div>'
+    + '<div class="mod-gateway-desc">End-to-end vendor lifecycle management — registry, risk intelligence, renewals, scorecards, and self-service tools.</div>'
+    + '<a href="vendor_home.html" class="mod-gateway-btn">Enter Vendor Platform &#8594;</a>'
+    + '<div class="mod-gateway-chips">'
+    + '<span class="mod-gateway-chip">&#128203; Registry &amp; Dossiers</span>'
+    + '<span class="mod-gateway-chip">&#9888; Risk Intelligence</span>'
+    + '<span class="mod-gateway-chip">&#128197; Renewals</span>'
+    + '<span class="mod-gateway-chip">&#11088; Scorecards</span>'
+    + '</div></div>'
+    + '<a href="vendor_intake.html" class="mod-card" style="margin-bottom:10px">'
+    + '<div class="mod-card-top"><span class="mod-card-name">&#128228; Intake Request</span><span class="mod-card-arrow">&#8594;</span></div>'
+    + '<div class="mod-card-desc">Submit a VER support request — new vendor, SOW, staff aug, change order, rate validation, or renewal.</div>'
+    + '<span class="mod-badge" style="background:rgba(13,148,136,0.15);color:#2DD4BF;border:1px solid rgba(13,148,136,0.25)">Live</span></a>'
+    + '<div class="mod-tool-pair">'
+    + '<a href="vendor_selector.html" class="mod-card">'
+    + '<div class="mod-card-top"><span class="mod-card-name">Vendor Selector</span><span class="mod-card-arrow">&#8594;</span></div>'
+    + '<div class="mod-card-desc">Match vendors to engagement requirements with rate card cost estimates.</div>'
+    + '<span class="mod-badge" style="background:rgba(13,148,136,0.15);color:#2DD4BF;border:1px solid rgba(13,148,136,0.25)">Live</span></a>'
+    + '<a href="spend_benchmarking.html" class="mod-card">'
+    + '<div class="mod-card-top"><span class="mod-card-name">Spend Benchmarking</span><span class="mod-card-arrow">&#8594;</span></div>'
+    + '<div class="mod-card-desc">Validate individual contractor and consultant rates against 767 market records.</div>'
+    + '<span class="mod-badge" style="background:rgba(13,148,136,0.15);color:#2DD4BF;border:1px solid rgba(13,148,136,0.25)">Live</span></a>'
+    + '</div>';
+  return html;
+}
+function _renderAllHeader(){
+  var total = Object.keys(GROUPS).reduce(function(n,k){ return n + GROUPS[k].modules.length; }, 0);
+  return '<div><div class="mod-header-accent" style="background:var(--teal)"></div>'
+       + '<div class="mod-header-name">VER Intelligence Hub</div>'
+       + '<div class="mod-header-desc">'+total+' modules across 5 disciplines &mdash; select a discipline on the left.</div></div>'
+       + '<button type="button" class="mod-close" onclick="closeModal()" aria-label="Close">&times;</button>';
+}
+function _renderAllBody(){
+  var sidebar = '<div class="mod-all-sidebar">';
+  Object.keys(GROUPS).forEach(function(key){
+    var g = GROUPS[key];
+    sidebar += '<button class="mod-all-tab'+(key===_activeTab?' active':'')+'" data-key="'+key+'" onclick="switchTab(\''+key+'\')">'
+             + '<span class="mod-all-tab-dot" style="background:'+g.color+'"></span>'
+             + '<span class="mod-all-tab-name">'+g.label+'</span>'
+             + '<span class="mod-all-tab-count">'+g.modules.length+'</span>'
+             + '</button>';
+  });
+  sidebar += '</div>';
+  var content = '<div class="mod-all-content">';
+  Object.keys(GROUPS).forEach(function(key){
+    var g = GROUPS[key];
+    var hex = g.color.replace('#','');
+    var r=parseInt(hex.slice(0,2),16), gr=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16);
+    var iconBg = 'rgba('+r+','+gr+','+b+',0.15)';
+    content += '<div class="mod-all-section'+(key===_activeTab?' active':'')+'" data-key="'+key+'">'
+             + '<div class="mod-all-section-hdr">'
+             + '<div class="mod-all-section-name" style="color:'+g.color+'">'+g.icon+'  '+g.label+'</div>'
+             + '<div class="mod-all-section-desc">'+g.desc+'</div>'
+             + '</div><div class="mod-all-list">';
+    if(key === 'vendor'){
+      content += _renderVendorGateway(g) + '</div></div>';
+    } else {
+      var sorted = g.modules.slice().sort(function(a,b){ return a.name.localeCompare(b.name); });
+      sorted.forEach(function(m){
+        content += '<a href="'+m.href+'" class="mod-all-row">'
+                 + '<div class="mod-all-row-left">'
+                 + '<div class="mod-all-row-icon" style="background:'+iconBg+';color:'+g.color+'">'+m.icon+'</div>'
+                 + '<div class="mod-all-row-info">'
+                 + '<div class="mod-all-row-name">'+m.name+'</div>'
+                 + '<div class="mod-all-row-desc">'+m.desc+'</div>'
+                 + '</div></div>'
+                 + '<div class="mod-all-row-right">'
+                 + (m.soon ? '<span class="mod-all-row-badge soon">Coming Soon</span>' : '<span class="mod-all-row-badge" style="background:rgba(13,148,136,0.15);color:#2DD4BF;border:1px solid rgba(13,148,136,0.25)">Live</span>')
+                 + '<span class="mod-all-row-arrow">&#8594;</span>'
+                 + '</div></a>';
+      });
+      content += '</div></div>';
+    }
+  });
+  content += '</div>';
+  return '<div class="mod-all-wrap">'+sidebar+content+'</div>';
+}
+
+/* ── Theme ── */
+(function(){
+  var saved = null;
+  try{ saved = localStorage.getItem('ver-theme'); }catch(e){}
+  var prefersDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  var t = saved || (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', t);
+  updateToggle(t);
+})();
+function _dmToggle(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try{ localStorage.setItem('ver-theme', next); }catch(e){}
+  updateToggle(next);
+}
+function updateToggle(t){
+  var icon  = document.getElementById('dm-icon');
+  var label = document.getElementById('dm-label');
+  if(icon)  icon.textContent = t === 'dark' ? '☾' : '☽';
+  if(label) label.textContent = t === 'dark' ? 'Dark' : 'Light';
+}
+
+/* ── KPI counters ── */
+function animateCounter(el){
+  var target = parseFloat(el.getAttribute('data-count'));
+  var isInt  = el.getAttribute('data-integer') === '1';
+  var dur = 1400, start = null;
+  function step(ts){
+    if(!start) start = ts;
+    var p = Math.min((ts - start) / dur, 1);
+    var e = 1 - Math.pow(1 - p, 3);
+    var v = target * e;
+    el.textContent = isInt ? Math.round(v).toLocaleString() : v.toFixed(1);
+    if(p < 1) requestAnimationFrame(step);
+  }
+  setTimeout(function(){ requestAnimationFrame(step); }, 600);
+}
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('[data-count]').forEach(animateCounter);
+});
+
+/* ── Particle canvas ── */
+(function(){
+  var canvas = document.getElementById('particle-canvas');
+  if(!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var W, H, nodes = [];
+  var N = 48, LINK = 125;
+  var C = '13,148,136';
+
+  function resize(){
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  function rnd(a, b){ return a + Math.random() * (b - a); }
+  function init(){
+    nodes = [];
+    for(var i = 0; i < N; i++){
+      nodes.push({ x:rnd(0,W), y:rnd(0,H), vx:rnd(-0.28,0.28), vy:rnd(-0.28,0.28), r:rnd(1.4,2.4) });
+    }
+  }
+  function frame(){
+    ctx.clearRect(0, 0, W, H);
+    for(var i = 0; i < N; i++){
+      for(var j = i+1; j < N; j++){
+        var dx = nodes[i].x - nodes[j].x;
+        var dy = nodes[i].y - nodes[j].y;
+        var d  = Math.sqrt(dx*dx + dy*dy);
+        if(d < LINK){
+          ctx.strokeStyle = 'rgba('+C+','+(((1-d/LINK)*0.07).toFixed(3))+')';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    for(var i = 0; i < N; i++){
+      ctx.fillStyle = 'rgba('+C+',0.18)';
+      ctx.beginPath();
+      ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, Math.PI*2);
+      ctx.fill();
+      nodes[i].x += nodes[i].vx;
+      nodes[i].y += nodes[i].vy;
+      if(nodes[i].x < 0 || nodes[i].x > W) nodes[i].vx *= -1;
+      if(nodes[i].y < 0 || nodes[i].y > H) nodes[i].vy *= -1;
+    }
+    requestAnimationFrame(frame);
+  }
+  window.addEventListener('resize', function(){ resize(); init(); });
+  resize(); init(); frame();
+})();
+
+/* ── Split-flap title (disabled — revisit) ── */
+(function(){ /* paused for now */ })();
+/* ── Split-flap ticker ── */
+(function(){
+  var ITEMS = [
+    { dot:'amber', text:'14 renewals expiring within 60 days — 3 flagged high-risk' },
+    { dot:'green', text:'Rate benchmarks current — 767 records across 9 spend categories' },
+    { dot:'blue',  text:'2,397 active POs tracked across all pillars' },
+    { dot:'teal',  text:'AI Cost Monitor: token efficiency benchmarks now available' },
+    { dot:'purple',text:'Vendor Registry: 1,375+ vendors with full 360 dossiers' },
+    { dot:'amber', text:'Governance queue: 12 items pending VER review this week' }
+  ];
+  var CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789·—#$%';
+  var cur = 0;
+
+  function flapText(el, newText){
+    var oldLen = el.textContent.length;
+    var newLen = newText.length;
+    var maxLen = Math.max(oldLen, newLen);
+    /* pad with spaces so length matches */
+    var padded = newText + Array(Math.max(0, maxLen - newLen) + 1).join(' ');
+
+    var spans = [];
+    var html = '';
+    for(var i = 0; i < maxLen; i++){
+      html += '<span class="flap-char">' + (padded[i] === ' ' ? '&nbsp;' : padded[i]) + '</span>';
+    }
+    el.innerHTML = html;
+    spans = el.querySelectorAll('.flap-char');
+
+    spans.forEach(function(span, i){
+      if(padded[i] === ' '){ span.innerHTML = '&nbsp;'; return; }
+      var iters = 0, max = 4 + Math.floor(Math.random()*5);
+      var d = i * 22;
+      setTimeout(function tick(){
+        if(iters < max){
+          span.textContent = CHARS[Math.floor(Math.random()*CHARS.length)];
+          span.classList.add('scrambling');
+          iters++;
+          setTimeout(tick, 50);
+        } else {
+          span.textContent = padded[i];
+          span.classList.remove('scrambling');
+        }
+      }, d);
+    });
+  }
+
+  function nextItem(){
+    cur = (cur + 1) % ITEMS.length;
+    var item = ITEMS[cur];
+    var dotEl = document.getElementById('ticker-dot');
+    var textEl = document.getElementById('ticker-text');
+    if(!dotEl || !textEl) return;
+    dotEl.className = 't-dot ' + item.dot;
+    flapText(textEl, item.text);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var textEl = document.getElementById('ticker-text');
+    if(textEl) flapText(textEl, ITEMS[0].text);
+    setInterval(nextItem, 4500);
+  });
+})();
+
+/* ── Carousel ── */
+(function(){
+  var SLIDES = [
+    { label:'Executive Intelligence',        sub:'SVP brief · portfolio dashboard',           href:'page_exec.html' },
+    { label:'Rate & Benchmark Intelligence', sub:'767-record dataset · negotiation playbooks', href:'page_rate_benchmarks.html' },
+    { label:'TCO Calculator',                sub:'Model total cost · portfolio dashboard',     href:'page_tco.html' },
+    { label:'Vendor Registry',               sub:'1,375+ vendors · 360 dossiers',             href:'vendor_registry.html' },
+    { label:'Renewal Horizon',               sub:'Urgency scoring · negotiation actions',     href:'page_renewal.html' }
+  ];
+  var IFRAME_W = 1440, IFRAME_H = 900;
+  var N = SLIDES.length;
+  var cur = 0, timer = null, INTERVAL = 4000, busy = false;
+  var track, dots, labelEl, subEl, addrEl, winEl;
+
+  function scaleIframes(){
+    if(!winEl) return;
+    var w = winEl.offsetWidth, h = winEl.offsetHeight;
+    var scale = Math.min(w / IFRAME_W, h / IFRAME_H);
+    winEl.querySelectorAll('.pc-iframe').forEach(function(f){
+      f.style.transform = 'scale(' + scale + ')';
+      f.style.width  = IFRAME_W + 'px';
+      f.style.height = IFRAME_H + 'px';
+    });
+  }
+  function allSlides(){ return Array.prototype.slice.call(track.querySelectorAll('.pc-slide')); }
+  function updateMeta(idx){
+    labelEl.textContent = SLIDES[idx].label;
+    subEl.textContent   = SLIDES[idx].sub;
+    if(addrEl) addrEl.textContent = 'ver-hub · ' + SLIDES[idx].label;
+    dots.querySelectorAll('.pc-d').forEach(function(d,i){ d.classList.toggle('active', i===idx); });
+  }
+  function buildDots(){
+    while(dots.firstChild){ dots.removeChild(dots.firstChild); }
+    SLIDES.forEach(function(s,i){
+      var d = document.createElement('div');
+      d.className = 'pc-d' + (i===0 ? ' active' : '');
+      d.title = s.label;
+      d.addEventListener('click', function(){ goTo(i, true); });
+      dots.appendChild(d);
+    });
+  }
+  function goTo(nextIdx, manual){
+    if(busy) return;
+    nextIdx = ((nextIdx % N) + N) % N;
+    if(nextIdx === cur) return;
+    busy = true;
+    var slides  = allSlides();
+    var leaving = slides[cur];
+    cur = nextIdx;
+    updateMeta(cur);
+    leaving.classList.remove('is-active');
+    leaving.classList.add('is-leaving');
+    slides[cur].classList.add('is-active');
+    var done = false;
+    function onEnd(){
+      if(done) return; done = true;
+      leaving.removeEventListener('transitionend', onEnd);
+      leaving.classList.remove('is-leaving');
+      busy = false;
+    }
+    leaving.addEventListener('transitionend', onEnd);
+    setTimeout(onEnd, 600);
+    if(manual){ clearInterval(timer); startAuto(); }
+  }
+  function startAuto(){
+    timer = setInterval(function(){ goTo(cur+1, false); }, INTERVAL);
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    track   = document.getElementById('pc-track');
+    dots    = document.getElementById('pc-dots');
+    labelEl = document.getElementById('pc-label-text');
+    subEl   = document.getElementById('pc-sub');
+    addrEl  = document.getElementById('pc-chrome-addr');
+    winEl   = document.querySelector('.pc-window');
+    if(!track) return;
+    allSlides()[0].classList.add('is-active');
+    scaleIframes();
+    window.addEventListener('resize', scaleIframes);
+    buildDots();
+    startAuto();
+    document.getElementById('pc-prev').addEventListener('click', function(){ goTo(cur-1, true); });
+    document.getElementById('pc-next').addEventListener('click', function(){ goTo(cur+1, true); });
+    winEl.style.cursor = 'pointer';
+    winEl.addEventListener('click', function(e){
+      if(e.target.closest('.pc-prev') || e.target.closest('.pc-next')) return;
+      window.location.href = SLIDES[cur].href;
+    });
+    winEl.addEventListener('mouseenter', function(){ clearInterval(timer); });
+    winEl.addEventListener('mouseleave', function(){ startAuto(); });
+  });
+})();
+</script>
+</body>
+</html>

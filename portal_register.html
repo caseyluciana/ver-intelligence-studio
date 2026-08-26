@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Supplier Registration &middot; DET Supplier Portal</title>
+<style>
+:root {
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple3:#F5F3FF;
+  --ink2:#374151;--ink3:#6B7280;--ink4:#9CA3AF;
+  --border:#E5E7EB;--border2:#D1D5DB;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--gray);color:var(--ink2);font-size:9.5pt;line-height:1.5;}
+
+/* ── Portal shell ── */
+.por-shell{max-width:860px;margin:0 auto;padding:0 20px 40px;}
+
+/* ── Top nav bar ── */
+.por-nav{background:var(--navy);padding:0 20px;display:flex;align-items:center;
+  justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+.por-nav-brand{display:flex;align-items:center;gap:10px;}
+.por-nav-logo{font-size:9pt;font-weight:900;color:#fff;letter-spacing:0.02em;}
+.por-nav-sub{font-size:7.5pt;color:rgba(255,255,255,0.50);margin-top:1px;}
+.por-nav-links{display:flex;gap:4px;}
+.por-nav-link{font-size:8pt;font-weight:600;color:rgba(255,255,255,0.70);
+  padding:6px 12px;border-radius:6px;text-decoration:none;transition:all 0.15s;}
+.por-nav-link:hover{background:rgba(255,255,255,0.12);color:#fff;}
+.por-nav-link.active{background:rgba(255,255,255,0.15);color:#fff;}
+
+/* ── Page hero ── */
+.por-hero{background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);
+  border-radius:0 0 14px 14px;padding:28px 32px;color:#fff;margin-bottom:24px;}
+.por-hero-title{font-size:16pt;font-weight:900;margin-bottom:6px;letter-spacing:-0.01em;}
+.por-hero-sub{font-size:9pt;color:rgba(255,255,255,0.65);line-height:1.6;max-width:600px;}
+
+/* ── Cards ── */
+.por-card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:18px 20px;margin-bottom:16px;}
+.por-card-title{font-size:9.5pt;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.por-card-sub{font-size:8pt;color:var(--ink4);margin-bottom:12px;}
+
+/* ── Form elements ── */
+.por-section{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:18px 20px;margin-bottom:16px;}
+.por-section-title{font-size:9.5pt;font-weight:800;color:var(--navy);
+  margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.por-section-sub{font-size:8pt;color:var(--ink4);margin-bottom:14px;}
+.por-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.por-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.por-field{display:flex;flex-direction:column;gap:4px;}
+.por-label{font-size:8pt;font-weight:700;color:var(--ink2);}
+.por-req{color:var(--red);margin-left:2px;}
+.por-input{font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);width:100%;
+  transition:border-color 0.15s;}
+.por-input:focus{outline:none;border-color:var(--teal);
+  box-shadow:0 0 0 2px rgba(13,148,136,0.12);}
+.por-input.invalid{border-color:var(--red);}
+.por-select{font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);width:100%;background:#fff;}
+.por-textarea{font-size:8.5pt;padding:8px 10px;border:1px solid var(--border2);
+  border-radius:6px;font-family:inherit;color:var(--ink2);width:100%;
+  resize:vertical;min-height:80px;}
+.cap-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.cap-chk{display:none;}
+.cap-lbl{font-size:7.5pt;padding:4px 12px;border-radius:14px;
+  border:1px solid var(--border2);background:var(--gray2);color:var(--ink3);
+  cursor:pointer;transition:all 0.15s;user-select:none;}
+.cap-chk:checked + .cap-lbl{background:var(--navy);color:#fff;border-color:var(--navy);}
+.rate-row{display:grid;grid-template-columns:180px 1fr 1fr;gap:10px;
+  align-items:center;margin-bottom:8px;font-size:8.5pt;}
+.rate-row-hdr{display:grid;grid-template-columns:180px 1fr 1fr;gap:10px;
+  font-size:7.5pt;font-weight:700;color:var(--ink4);text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:6px;}
+.por-submit{width:100%;padding:13px;background:var(--navy);color:#fff;
+  border:none;border-radius:8px;font-size:10pt;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.por-submit:hover{background:#1E3A5F;}
+.code-gate{background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);
+  border-radius:12px;padding:40px 36px;text-align:center;color:#fff;margin:20px 0;}
+.code-input{font-size:14pt;letter-spacing:0.15em;padding:12px 20px;
+  border-radius:8px;border:2px solid rgba(255,255,255,0.30);
+  background:rgba(255,255,255,0.10);color:#fff;font-family:monospace;
+  text-align:center;width:240px;text-transform:uppercase;outline:none;}
+.code-input:focus{border-color:var(--teal);background:rgba(255,255,255,0.18);}
+.code-btn{margin:14px auto 0;display:block;padding:10px 32px;
+  background:var(--teal);color:#fff;border:none;border-radius:8px;
+  font-size:9.5pt;font-weight:700;cursor:pointer;font-family:inherit;}
+.code-btn:hover{background:var(--teal2);}
+.code-error{color:#FCA5A5;font-size:8.5pt;margin-top:8px;display:none;}
+.callout{border-radius:8px;padding:10px 14px;margin-bottom:14px;
+  font-size:8.5pt;line-height:1.6;}
+.callout-info{background:var(--navy3);border-left:3px solid var(--navy);}
+.callout-warn{background:var(--amber3);border-left:3px solid var(--amber);}
+
+/* ── Footer ── */
+.por-footer{text-align:center;font-size:7.5pt;color:var(--ink4);
+  padding:20px 0 10px;border-top:1px solid var(--border);margin-top:24px;}
+
+@media print{.por-nav,.por-submit{display:none!important;}body{background:#fff!important;}}
+</style>
+</head>
+<body>
+<nav class="por-nav">
+  <div class="por-nav-brand">
+    <div>
+      <div class="por-nav-logo">DET Supplier Portal</div>
+      <div class="por-nav-sub">Salesforce DET &middot; Powered by VER</div>
+    </div>
+  </div>
+  <div class="por-nav-links">
+    <a href="portal_home.html" class="por-nav-link ">Home</a>
+    <a href="portal_register.html" class="por-nav-link active">Register</a>
+    <a href="mailto:ver-intake@salesforce.com" class="por-nav-link">Contact VER</a>
+  </div>
+</nav>
+<div class="por-shell">
+  <div class="por-hero">
+    <div class="por-hero-title">Supplier Registration</div>
+    <div class="por-hero-sub">Register your company for DET vendor advisory consideration. Access code required.</div>
+  </div>
+
+  <div id="code-gate">
+    <div class="code-gate">
+      <div style="font-size:36pt;margin-bottom:10px;">&#128274;</div>
+      <div style="font-size:13pt;font-weight:900;margin-bottom:8px;">Access Code Required</div>
+      <div style="font-size:9pt;color:rgba(255,255,255,0.65);margin-bottom:20px;max-width:400px;margin:0 auto 20px;">
+        Enter the access code provided by your DET contact or the VER team.</div>
+      <input type="text" id="code-input" class="code-input" placeholder="DET-VER-XXXX"
+        maxlength="12" onkeyup="this.value=this.value.toUpperCase();if(event.key==='Enter')checkCode()">
+      <button class="code-btn" onclick="checkCode()">Unlock Form &#8594;</button>
+      <div id="code-error" class="code-error">Incorrect access code. Please check with your DET contact.</div>
+    </div>
+  </div>
+
+  <div id="reg-form" style="display:none;">
+    <div class="callout callout-info" style="margin-bottom:16px;">
+      <strong>Complete all required fields</strong> (marked *). When you click
+      <strong>Generate &amp; Email Submission</strong>, a CSV will download.
+      Attach it to the email that opens and send to complete your registration.
+    </div>
+
+    <div class="por-section">
+      <div class="por-section-title">&#127968; Company Information</div>
+      <div class="por-section-sub">Tell us about your company</div>
+      <div class="por-grid" style="margin-bottom:12px;">
+        <div class="por-field"><label class="por-label" for="f-legal-name">Legal Company Name <span class="por-req">*</span></label>
+          <input type="text" id="f-legal-name" class="por-input" placeholder="e.g. Acme Technology Solutions LLC"></div>
+        <div class="por-field"><label class="por-label" for="f-dba">DBA / Trading Name</label>
+          <input type="text" id="f-dba" class="por-input" placeholder="If different from legal name"></div>
+      </div>
+      <div class="por-grid" style="margin-bottom:12px;">
+        <div class="por-field"><label class="por-label" for="f-website">Company Website <span class="por-req">*</span></label>
+          <input type="url" id="f-website" class="por-input" placeholder="https://www.yourcompany.com"></div>
+        <div class="por-field"><label class="por-label" for="f-hq">Headquarters Location <span class="por-req">*</span></label>
+          <input type="text" id="f-hq" class="por-input" placeholder="City, State / Country"></div>
+      </div>
+      <div class="por-grid-3" style="margin-bottom:12px;">
+        <div class="por-field"><label class="por-label" for="f-size">Company Size <span class="por-req">*</span></label>
+          <select id="f-size" class="por-select"><option value="">Select headcount range</option>
+            <option>1–50 employees</option><option>51–200 employees</option>
+            <option>201–500 employees</option><option>501–1,000 employees</option>
+            <option>1,001–5,000 employees</option><option>5,001–10,000 employees</option>
+            <option>10,000+ employees</option></select></div>
+        <div class="por-field"><label class="por-label" for="f-founded">Year Founded</label>
+          <input type="number" id="f-founded" class="por-input" placeholder="e.g. 2008" min="1900" max="2025"></div>
+        <div class="por-field"><label class="por-label" for="f-vendor-type">Vendor Category <span class="por-req">*</span></label>
+          <select id="f-vendor-type" class="por-select"><option value="">Select primary category</option>
+            <option>Contingent Workforce</option><option>Professional Services</option>
+            <option>Software / SaaS</option><option>Cloud &amp; Managed Services</option>
+            <option>Hardware &amp; Infrastructure</option></select></div>
+      </div>
+      <div class="por-field"><label class="por-label" for="f-description">Company Description <span class="por-req">*</span></label>
+        <textarea id="f-description" class="por-textarea" rows="3"
+          placeholder="Brief description of your company, core services, and what differentiates you"></textarea></div>
+    </div>
+
+    <div class="por-section">
+      <div class="por-section-title">&#9889; DET Engagement Context</div>
+      <div class="por-section-sub">Your existing relationship with Salesforce DET</div>
+      <div class="por-grid" style="margin-bottom:12px;">
+        <div class="por-field"><label class="por-label" for="f-sf-rel">Existing Salesforce Relationship?</label>
+          <select id="f-sf-rel" class="por-select"><option value="">Select one</option>
+            <option>Yes — active Salesforce partner</option>
+            <option>Yes — existing DET engagement</option>
+            <option>Previously engaged — not currently active</option>
+            <option>No existing relationship</option></select></div>
+        <div class="por-field"><label class="por-label" for="f-gsa">GSA Schedule Status</label>
+          <select id="f-gsa" class="por-select"><option value="">Select one</option>
+            <option>Active GSA Schedule holder</option>
+            <option>GSA in progress</option>
+            <option>Not applicable</option></select></div>
+      </div>
+      <div class="por-field"><label class="por-label" for="f-det-context">Additional Context</label>
+        <textarea id="f-det-context" class="por-textarea" rows="2"
+          placeholder="Any context about your relationship with Salesforce or DET"></textarea></div>
+    </div>
+
+    <div class="por-section">
+      <div class="por-section-title">&#127919; Capabilities</div>
+      <div class="por-section-sub">Select all capability areas your company actively delivers — be specific, not aspirational</div>
+<div style="margin-bottom:14px;"><div style="font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Core Service Types</div><div class="cap-grid"><input type="checkbox" class="cap-chk" id="cap_application_development" name="cap" value="Application Development"><label class="cap-lbl" for="cap_application_development">Application Development</label><input type="checkbox" class="cap-chk" id="cap_application_maintenance" name="cap" value="Application Maintenance"><label class="cap-lbl" for="cap_application_maintenance">Application Maintenance</label><input type="checkbox" class="cap-chk" id="cap_cloud_infrastructure" name="cap" value="Cloud Infrastructure"><label class="cap-lbl" for="cap_cloud_infrastructure">Cloud Infrastructure</label><input type="checkbox" class="cap-chk" id="cap_data_engineering" name="cap" value="Data Engineering"><label class="cap-lbl" for="cap_data_engineering">Data Engineering</label><input type="checkbox" class="cap-chk" id="cap_ai___ml" name="cap" value="AI / ML"><label class="cap-lbl" for="cap_ai___ml">AI / ML</label><input type="checkbox" class="cap-chk" id="cap_security" name="cap" value="Security"><label class="cap-lbl" for="cap_security">Security</label><input type="checkbox" class="cap-chk" id="cap_staff_augmentation" name="cap" value="Staff Augmentation"><label class="cap-lbl" for="cap_staff_augmentation">Staff Augmentation</label><input type="checkbox" class="cap-chk" id="cap_erp___workday" name="cap" value="ERP / Workday"><label class="cap-lbl" for="cap_erp___workday">ERP / Workday</label><input type="checkbox" class="cap-chk" id="cap_service_desk" name="cap" value="Service Desk"><label class="cap-lbl" for="cap_service_desk">Service Desk</label><input type="checkbox" class="cap-chk" id="cap_hardware_supply" name="cap" value="Hardware Supply"><label class="cap-lbl" for="cap_hardware_supply">Hardware Supply</label><input type="checkbox" class="cap-chk" id="cap_consulting___advisory" name="cap" value="Consulting / Advisory"><label class="cap-lbl" for="cap_consulting___advisory">Consulting / Advisory</label><input type="checkbox" class="cap-chk" id="cap_qa___testing" name="cap" value="QA & Testing"><label class="cap-lbl" for="cap_qa___testing">QA & Testing</label><input type="checkbox" class="cap-chk" id="cap_devops" name="cap" value="DevOps"><label class="cap-lbl" for="cap_devops">DevOps</label><input type="checkbox" class="cap-chk" id="cap_platform_engineering" name="cap" value="Platform Engineering"><label class="cap-lbl" for="cap_platform_engineering">Platform Engineering</label><input type="checkbox" class="cap-chk" id="cap_analytics___bi" name="cap" value="Analytics & BI"><label class="cap-lbl" for="cap_analytics___bi">Analytics & BI</label><input type="checkbox" class="cap-chk" id="cap_managed_services" name="cap" value="Managed Services"><label class="cap-lbl" for="cap_managed_services">Managed Services</label><input type="checkbox" class="cap-chk" id="cap_network___av" name="cap" value="Network & AV"><label class="cap-lbl" for="cap_network___av">Network & AV</label><input type="checkbox" class="cap-chk" id="cap_identity___access" name="cap" value="Identity & Access"><label class="cap-lbl" for="cap_identity___access">Identity & Access</label></div></div><div style="margin-bottom:14px;"><div style="font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Engineering & Development Roles</div><div class="cap-grid"><input type="checkbox" class="cap-chk" id="cap_software_engineer" name="cap" value="Software Engineer"><label class="cap-lbl" for="cap_software_engineer">Software Engineer</label><input type="checkbox" class="cap-chk" id="cap_sr_software_engineer" name="cap" value="Sr Software Engineer"><label class="cap-lbl" for="cap_sr_software_engineer">Sr Software Engineer</label><input type="checkbox" class="cap-chk" id="cap_lead_software_engineer" name="cap" value="Lead Software Engineer"><label class="cap-lbl" for="cap_lead_software_engineer">Lead Software Engineer</label><input type="checkbox" class="cap-chk" id="cap_principal_software_engineer" name="cap" value="Principal Software Engineer"><label class="cap-lbl" for="cap_principal_software_engineer">Principal Software Engineer</label><input type="checkbox" class="cap-chk" id="cap_cloud_engineer" name="cap" value="Cloud Engineer"><label class="cap-lbl" for="cap_cloud_engineer">Cloud Engineer</label><input type="checkbox" class="cap-chk" id="cap_cloud_architect" name="cap" value="Cloud Architect"><label class="cap-lbl" for="cap_cloud_architect">Cloud Architect</label><input type="checkbox" class="cap-chk" id="cap_devops_engineer" name="cap" value="DevOps Engineer"><label class="cap-lbl" for="cap_devops_engineer">DevOps Engineer</label><input type="checkbox" class="cap-chk" id="cap_machine_learning_engineer" name="cap" value="Machine Learning Engineer"><label class="cap-lbl" for="cap_machine_learning_engineer">Machine Learning Engineer</label><input type="checkbox" class="cap-chk" id="cap_data_engineer" name="cap" value="Data Engineer"><label class="cap-lbl" for="cap_data_engineer">Data Engineer</label><input type="checkbox" class="cap-chk" id="cap_sr_data_engineer" name="cap" value="Sr Data Engineer"><label class="cap-lbl" for="cap_sr_data_engineer">Sr Data Engineer</label><input type="checkbox" class="cap-chk" id="cap_database_administrator" name="cap" value="Database Administrator"><label class="cap-lbl" for="cap_database_administrator">Database Administrator</label><input type="checkbox" class="cap-chk" id="cap_system_administrator" name="cap" value="System Administrator"><label class="cap-lbl" for="cap_system_administrator">System Administrator</label><input type="checkbox" class="cap-chk" id="cap_network_engineer" name="cap" value="Network Engineer"><label class="cap-lbl" for="cap_network_engineer">Network Engineer</label><input type="checkbox" class="cap-chk" id="cap_security_analyst" name="cap" value="Security Analyst"><label class="cap-lbl" for="cap_security_analyst">Security Analyst</label><input type="checkbox" class="cap-chk" id="cap_security_engineer" name="cap" value="Security Engineer"><label class="cap-lbl" for="cap_security_engineer">Security Engineer</label><input type="checkbox" class="cap-chk" id="cap_security_architect" name="cap" value="Security Architect"><label class="cap-lbl" for="cap_security_architect">Security Architect</label></div></div><div style="margin-bottom:14px;"><div style="font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Delivery & Management Roles</div><div class="cap-grid"><input type="checkbox" class="cap-chk" id="cap_agile_coach" name="cap" value="Agile Coach"><label class="cap-lbl" for="cap_agile_coach">Agile Coach</label><input type="checkbox" class="cap-chk" id="cap_scrum_master" name="cap" value="Scrum Master"><label class="cap-lbl" for="cap_scrum_master">Scrum Master</label><input type="checkbox" class="cap-chk" id="cap_product_owner" name="cap" value="Product Owner"><label class="cap-lbl" for="cap_product_owner">Product Owner</label><input type="checkbox" class="cap-chk" id="cap_product_manager___project_manager" name="cap" value="Product Manager / Project Manager"><label class="cap-lbl" for="cap_product_manager___project_manager">Product Manager / Project Manager</label><input type="checkbox" class="cap-chk" id="cap_program_director" name="cap" value="Program Director"><label class="cap-lbl" for="cap_program_director">Program Director</label><input type="checkbox" class="cap-chk" id="cap_delivery_manager" name="cap" value="Delivery Manager"><label class="cap-lbl" for="cap_delivery_manager">Delivery Manager</label><input type="checkbox" class="cap-chk" id="cap_tech_lead" name="cap" value="Tech Lead"><label class="cap-lbl" for="cap_tech_lead">Tech Lead</label><input type="checkbox" class="cap-chk" id="cap_solution_architect" name="cap" value="Solution Architect"><label class="cap-lbl" for="cap_solution_architect">Solution Architect</label><input type="checkbox" class="cap-chk" id="cap_business_analyst___ui_ux_designer" name="cap" value="Business Analyst / UI/UX Designer"><label class="cap-lbl" for="cap_business_analyst___ui_ux_designer">Business Analyst / UI/UX Designer</label><input type="checkbox" class="cap-chk" id="cap_qa_engineer" name="cap" value="QA Engineer"><label class="cap-lbl" for="cap_qa_engineer">QA Engineer</label><input type="checkbox" class="cap-chk" id="cap_test_automation_engineer" name="cap" value="Test Automation Engineer"><label class="cap-lbl" for="cap_test_automation_engineer">Test Automation Engineer</label><input type="checkbox" class="cap-chk" id="cap_technical_writer" name="cap" value="Technical Writer"><label class="cap-lbl" for="cap_technical_writer">Technical Writer</label><input type="checkbox" class="cap-chk" id="cap_production_support_analyst" name="cap" value="Production Support Analyst"><label class="cap-lbl" for="cap_production_support_analyst">Production Support Analyst</label><input type="checkbox" class="cap-chk" id="cap_helpdesk_support" name="cap" value="Helpdesk Support"><label class="cap-lbl" for="cap_helpdesk_support">Helpdesk Support</label></div></div><div style="margin-bottom:14px;"><div style="font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Consulting Roles</div><div class="cap-grid"><input type="checkbox" class="cap-chk" id="cap_consultant" name="cap" value="Consultant"><label class="cap-lbl" for="cap_consultant">Consultant</label><input type="checkbox" class="cap-chk" id="cap_consulting_analyst" name="cap" value="Consulting Analyst"><label class="cap-lbl" for="cap_consulting_analyst">Consulting Analyst</label><input type="checkbox" class="cap-chk" id="cap_senior_consulting_analyst" name="cap" value="Senior Consulting Analyst"><label class="cap-lbl" for="cap_senior_consulting_analyst">Senior Consulting Analyst</label><input type="checkbox" class="cap-chk" id="cap_consulting_manager___program_manager" name="cap" value="Consulting Manager / Program Manager"><label class="cap-lbl" for="cap_consulting_manager___program_manager">Consulting Manager / Program Manager</label><input type="checkbox" class="cap-chk" id="cap_information_architect" name="cap" value="Information Architect"><label class="cap-lbl" for="cap_information_architect">Information Architect</label><input type="checkbox" class="cap-chk" id="cap_vendor_manager" name="cap" value="Vendor Manager"><label class="cap-lbl" for="cap_vendor_manager">Vendor Manager</label><input type="checkbox" class="cap-chk" id="cap_senior_vendor_manager" name="cap" value="Senior Vendor Manager"><label class="cap-lbl" for="cap_senior_vendor_manager">Senior Vendor Manager</label></div></div>
+    </div>
+
+    <div class="por-section">
+      <div class="por-section-title">&#127758; Regional Coverage</div>
+      <div class="por-section-sub">Where can your company deliver services?</div>
+      <div class="por-grid">
+        <div class="por-field">
+          <label class="por-label"><input type="checkbox" id="reg-amer"
+            style="margin-right:6px;"> AMER</label>
+          <input type="text" id="reg-amer-detail" class="por-input"
+            placeholder="Key locations in AMER" style="margin-top:4px;">
+        </div>
+        <div class="por-field">
+          <label class="por-label"><input type="checkbox" id="reg-apac_india"
+            style="margin-right:6px;"> APAC / India</label>
+          <input type="text" id="reg-apac_india-detail" class="por-input"
+            placeholder="Key locations in APAC / India" style="margin-top:4px;">
+        </div>
+        <div class="por-field">
+          <label class="por-label"><input type="checkbox" id="reg-latam"
+            style="margin-right:6px;"> LATAM</label>
+          <input type="text" id="reg-latam-detail" class="por-input"
+            placeholder="Key locations in LATAM" style="margin-top:4px;">
+        </div>
+        <div class="por-field">
+          <label class="por-label"><input type="checkbox" id="reg-emea"
+            style="margin-right:6px;"> EMEA</label>
+          <input type="text" id="reg-emea-detail" class="por-input"
+            placeholder="Key locations in EMEA" style="margin-top:4px;">
+        </div>
+
+      </div>
+    </div>
+
+    <div class="por-section">
+      <div class="por-section-title">&#128181; Typical Rate Ranges</div>
+      <div class="por-section-sub">Indicative hourly rates by region and role type.
+        <strong>These are understood to be subject to negotiation.</strong>
+        Enter USD per hour. Leave blank if not applicable.</div>
+<div class="rate-row-hdr"><div>Category / Role Type</div><div>Rate Low ($/hr)</div><div>Rate High ($/hr)</div></div><div style="font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin:10px 0 6px;padding-top:8px;border-top:1px solid var(--gray3);">AMER</div><div class="rate-row"><div style="font-size:8.5pt;">Contingent Workforce — Jr/Mid</div><input type="number" class="por-input" id="rate-amer-contingent_workforce_—_jr_mid-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-amer-contingent_workforce_—_jr_mid-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Contingent Workforce — Sr/Lead</div><input type="number" class="por-input" id="rate-amer-contingent_workforce_—_sr_lead-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-amer-contingent_workforce_—_sr_lead-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Professional Services — Analyst</div><input type="number" class="por-input" id="rate-amer-professional_services_—_analyst-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-amer-professional_services_—_analyst-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Professional Services — Manager/Director</div><input type="number" class="por-input" id="rate-amer-professional_services_—_manager_director-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-amer-professional_services_—_manager_director-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Software as a Service (per user/mo)</div><input type="number" class="por-input" id="rate-amer-software_as_a_service_per_user_mo-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-amer-software_as_a_service_per_user_mo-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div style="font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin:10px 0 6px;padding-top:8px;border-top:1px solid var(--gray3);">APAC / India</div><div class="rate-row"><div style="font-size:8.5pt;">Contingent Workforce — Jr/Mid</div><input type="number" class="por-input" id="rate-apac_india-contingent_workforce_—_jr_mid-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-apac_india-contingent_workforce_—_jr_mid-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Contingent Workforce — Sr/Lead</div><input type="number" class="por-input" id="rate-apac_india-contingent_workforce_—_sr_lead-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-apac_india-contingent_workforce_—_sr_lead-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Professional Services — Analyst</div><input type="number" class="por-input" id="rate-apac_india-professional_services_—_analyst-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-apac_india-professional_services_—_analyst-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Professional Services — Manager/Director</div><input type="number" class="por-input" id="rate-apac_india-professional_services_—_manager_director-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-apac_india-professional_services_—_manager_director-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div style="font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin:10px 0 6px;padding-top:8px;border-top:1px solid var(--gray3);">LATAM</div><div class="rate-row"><div style="font-size:8.5pt;">Contingent Workforce — Jr/Mid</div><input type="number" class="por-input" id="rate-latam-contingent_workforce_—_jr_mid-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-latam-contingent_workforce_—_jr_mid-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Contingent Workforce — Sr/Lead</div><input type="number" class="por-input" id="rate-latam-contingent_workforce_—_sr_lead-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-latam-contingent_workforce_—_sr_lead-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Professional Services — Analyst</div><input type="number" class="por-input" id="rate-latam-professional_services_—_analyst-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-latam-professional_services_—_analyst-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Professional Services — Manager/Director</div><input type="number" class="por-input" id="rate-latam-professional_services_—_manager_director-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-latam-professional_services_—_manager_director-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div style="font-size:8pt;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin:10px 0 6px;padding-top:8px;border-top:1px solid var(--gray3);">EMEA</div><div class="rate-row"><div style="font-size:8.5pt;">Contingent Workforce — Jr/Mid</div><input type="number" class="por-input" id="rate-emea-contingent_workforce_—_jr_mid-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-emea-contingent_workforce_—_jr_mid-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Contingent Workforce — Sr/Lead</div><input type="number" class="por-input" id="rate-emea-contingent_workforce_—_sr_lead-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-emea-contingent_workforce_—_sr_lead-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Professional Services — Analyst</div><input type="number" class="por-input" id="rate-emea-professional_services_—_analyst-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-emea-professional_services_—_analyst-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div><div class="rate-row"><div style="font-size:8.5pt;">Professional Services — Manager/Director</div><input type="number" class="por-input" id="rate-emea-professional_services_—_manager_director-lo" placeholder="e.g. 95" min="0" max="9999" style="text-align:right;"><input type="number" class="por-input" id="rate-emea-professional_services_—_manager_director-hi" placeholder="e.g. 140" min="0" max="9999" style="text-align:right;"></div>
+    </div>
+
+    <div class="por-section">
+      <div class="por-section-title">&#128222; Commercial Contact</div>
+      <div class="por-section-sub">Who should DET reach out to when ready to engage or request a quote?</div>
+      <div class="por-grid" style="margin-bottom:12px;">
+        <div class="por-field"><label class="por-label" for="f-contact-name">Full Name <span class="por-req">*</span></label>
+          <input type="text" id="f-contact-name" class="por-input" placeholder="First Last"></div>
+        <div class="por-field"><label class="por-label" for="f-contact-title">Title / Role <span class="por-req">*</span></label>
+          <input type="text" id="f-contact-title" class="por-input" placeholder="e.g. VP of Business Development"></div>
+      </div>
+      <div class="por-grid" style="margin-bottom:12px;">
+        <div class="por-field"><label class="por-label" for="f-contact-email">Business Email <span class="por-req">*</span></label>
+          <input type="email" id="f-contact-email" class="por-input" placeholder="name@company.com"></div>
+        <div class="por-field"><label class="por-label" for="f-contact-phone">Direct Phone</label>
+          <input type="tel" id="f-contact-phone" class="por-input" placeholder="+1 (555) 000-0000"></div>
+      </div>
+      <div class="por-grid">
+        <div class="por-field"><label class="por-label" for="f-contact2-name">Secondary Contact Name</label>
+          <input type="text" id="f-contact2-name" class="por-input" placeholder="Optional"></div>
+        <div class="por-field"><label class="por-label" for="f-contact2-email">Secondary Contact Email</label>
+          <input type="email" id="f-contact2-email" class="por-input" placeholder="Optional"></div>
+      </div>
+    </div>
+
+    <div class="por-section">
+      <div class="por-section-title">&#128196; Additional Information</div>
+      <div class="por-section-sub">Optional — anything else VER should know</div>
+      <div class="por-field" style="margin-bottom:12px;">
+        <label class="por-label" for="f-differentiators">Key Differentiators</label>
+        <textarea id="f-differentiators" class="por-textarea" rows="2"
+          placeholder="What makes your company uniquely suited to serve Salesforce DET?"></textarea></div>
+      <div class="por-field">
+        <label class="por-label" for="f-capability-stmt">Capability Statement URL</label>
+        <input type="url" id="f-capability-stmt" class="por-input"
+          placeholder="https://link-to-your-capability-statement.pdf (optional)"></div>
+      <div class="por-field" style="margin-top:12px;">
+        <label class="por-label" for="f-rate-card">
+          Rate Card Upload
+          <span style="font-weight:400;color:var(--ink4);margin-left:4px;">(optional — CSV preferred for automatic ingestion; Excel or PDF accepted, max 5MB)</span>
+        </label>
+        <div style="border:1px dashed var(--border2);border-radius:6px;padding:12px;
+          background:var(--gray);margin-top:4px;">
+          <input type="file" id="f-rate-card" accept=".xlsx,.xls,.pdf,.csv"
+            style="font-size:8.5pt;font-family:inherit;width:100%;"
+            onchange="handleRateCardUpload(this)">
+          <div id="rate-card-status" style="font-size:7.5pt;color:var(--ink4);
+            margin-top:6px;display:none;"></div>
+          <div style="font-size:7.5pt;color:var(--ink4);margin-top:6px;">
+            CSV files are parsed automatically and rate data is ingested into VER benchmarking.
+            Excel and PDF files are flagged for manual review. If your file exceeds 5MB, share a link above instead.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="por-section" style="background:var(--gray);border:none;">
+      <div style="font-size:8.5pt;color:var(--ink4);line-height:1.7;margin-bottom:14px;">
+        By submitting, you confirm all information is accurate and your company is interested
+        in DET vendor advisory scope. Submission does not guarantee engagement.
+        All engagements require VER review, Sourcing approval, and an executed SOW or PO.
+      </div>
+      <button class="por-submit" onclick="generateSubmission()">
+        &#128229; Generate &amp; Email Submission
+      </button>
+      <div id="submit-error" style="color:var(--red);font-size:8pt;margin-top:8px;display:none;"></div>
+    </div>
+  </div>
+
+<div class="por-footer">
+  DET Supplier Portal &middot; Powered by VER Intelligence &middot;
+  Salesforce DET &middot; FY27 &middot; Confidential &middot;
+  All submissions reviewed by VER within 5 business days
+</div>
+</div>
+<script>
+// ── Rate card file handler ─────────────────────────────────────
+var RATE_CARD_PARSED = '';  // actual rate data extracted from CSV
+var RATE_CARD_FILENAME = '';
+
+function handleRateCardUpload(input) {
+  var statusEl = document.getElementById('rate-card-status');
+  if (!input.files || !input.files[0]) return;
+
+  var file = input.files[0];
+  var maxSize = 5 * 1024 * 1024;
+
+  if (!statusEl) return;
+
+  if (file.size > maxSize) {
+    statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = '✕ File exceeds 5MB. Please share a link above instead.';
+    input.value = '';
+    RATE_CARD_PARSED = '';
+    RATE_CARD_FILENAME = '';
+    return;
+  }
+
+  RATE_CARD_FILENAME = file.name;
+  var isCSV = file.name.toLowerCase().endsWith('.csv');
+
+  var reader = new FileReader();
+
+  if (isCSV) {
+    reader.onload = function(e) {
+      var raw = e.target.result;
+      var lines = raw.split(/\r?\n/).filter(function(l){ return l.trim(); });
+      // Parse CSV rows into "Role | Region | Low | High | Currency" format
+      // Expects header row then data rows; tries to extract columns intelligently
+      var parsed = [];
+      var headers = [];
+      lines.forEach(function(line, idx) {
+        var cols = line.split(',').map(function(c){ return c.replace(/^"|"$/g,'').trim(); });
+        if (idx === 0) { headers = cols; return; }
+        if (cols.length < 2) return;
+        // Build a readable row string from all columns
+        var row = cols.map(function(c, i){
+          return (headers[i] ? headers[i] + ': ' : '') + c;
+        }).join(' | ');
+        parsed.push(row);
+      });
+      RATE_CARD_PARSED = '[CSV: ' + file.name + ' — ' + parsed.length + ' roles]\n' + parsed.join('\n');
+      try { sessionStorage.setItem('por_rate_card', file.name); } catch(ex) {}
+      statusEl.style.display = 'block';
+      statusEl.style.color = 'var(--green)';
+      statusEl.textContent = '✓ ' + file.name + ' parsed — ' + parsed.length + ' rate rows ready to submit (' + (file.size/1024).toFixed(0) + ' KB)';
+    };
+    reader.onerror = function() {
+      statusEl.style.display = 'block';
+      statusEl.style.color = 'var(--red)';
+      statusEl.textContent = '✕ Error reading file. Please try again.';
+    };
+    reader.readAsText(file);
+  } else {
+    // Excel or PDF — can't parse client-side; flag for manual review
+    RATE_CARD_PARSED = '[Attached: ' + file.name + ' — manual review required (non-CSV format)]';
+    try { sessionStorage.setItem('por_rate_card', file.name); } catch(ex) {}
+    statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--amber)';
+    statusEl.textContent = '✓ ' + file.name + ' noted (' + (file.size/1024).toFixed(0) + ' KB) — for automatic rate ingestion, please use CSV format';
+  }
+}
+
+
+
+var ACCESS_CODE = 'DET-VER-2027';
+
+function checkCode() {
+  var val = (document.getElementById('code-input').value || '').trim().toUpperCase();
+  var err = document.getElementById('code-error');
+  if (val === ACCESS_CODE) {
+    document.getElementById('code-gate').style.display = 'none';
+    document.getElementById('reg-form').style.display  = 'block';
+    err.style.display = 'none';
+  } else {
+    err.style.display = 'block';
+    document.getElementById('code-input').style.borderColor = 'var(--red)';
+    setTimeout(function() {
+      document.getElementById('code-input').style.borderColor = '';
+    }, 2000);
+  }
+}
+
+function get(id) {
+  var el = document.getElementById(id);
+  return el ? (el.value || '').trim() : '';
+}
+
+function getChecked(name) {
+  return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
+    .map(function(el) { return el.value; }).join(' | ');
+}
+
+function getRegions() {
+  var regions = [];
+  ['amer','apac','latam','emea'].forEach(function(r) {
+    var el = document.getElementById('reg-' + r);
+    if (el && el.checked) {
+      var detail = get('reg-' + r + '-detail');
+      regions.push(r.toUpperCase() + (detail ? ': ' + detail : ''));
+    }
+  });
+  return regions.join('; ');
+}
+
+function getRates() {
+  var rows = [];
+  var regions = ['amer','apac / india','latam','emea'];
+  var roles   = [
+    'contingent workforce — jr/mid','contingent workforce — sr/lead',
+    'professional services — analyst','professional services — manager/director',
+    'software as a service (per user/mo)'
+  ];
+  regions.forEach(function(region) {
+    roles.forEach(function(role) {
+      if (region !== 'amer' && role === 'software as a service (per user/mo)') return;
+      var rkey = region.replace(/ \/ /g,'_').replace(/ /g,'_');
+      var loEl = document.getElementById('rate-' + rkey + '-' + role.replace(/ /g,'_') + '-lo');
+      var hiEl = document.getElementById('rate-' + rkey + '-' + role.replace(/ /g,'_') + '-hi');
+      var lo = loEl ? (loEl.value||'').trim() : '';
+      var hi = hiEl ? (hiEl.value||'').trim() : '';
+      if (lo || hi) rows.push(region.toUpperCase() + ' | ' + role + ': $' + (lo||'?') + '-$' + (hi||'?') + '/hr');
+    });
+  });
+  return rows.join(' || ');
+}
+
+function validate() {
+  var required = [
+    ['f-legal-name','Company Legal Name'],
+    ['f-website','Website'],
+    ['f-hq','Headquarters Location'],
+    ['f-size','Company Size'],
+    ['f-vendor-type','Vendor Category'],
+    ['f-description','Company Description'],
+    ['f-contact-name','Contact Name'],
+    ['f-contact-title','Contact Title'],
+    ['f-contact-email','Contact Email'],
+  ];
+  var missing = [];
+  required.forEach(function(pair) {
+    var el = document.getElementById(pair[0]);
+    if (!el || !el.value.trim()) {
+      missing.push(pair[1]);
+      if (el) el.classList.add('invalid');
+    } else {
+      if (el) el.classList.remove('invalid');
+    }
+  });
+  if (!getChecked('cap')) missing.push('At least one Capability');
+  return missing;
+}
+
+function esc(val) {
+  // CSV-safe: wrap in quotes, escape internal quotes
+  return '"' + String(val).replace(/"/g, '""') + '"';
+}
+
+function generateSubmission() {
+  var missing = validate();
+  var errEl = document.getElementById('submit-error');
+
+  if (missing.length) {
+    errEl.textContent = 'Please complete required fields: ' + missing.join(', ');
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  // ── Collect field values ───────────────────────────────────────
+  function gv(id) {
+    var el = document.getElementById(id);
+    return el ? (el.value || '').trim() : '';
+  }
+
+  // Capabilities
+  var caps = [];
+  document.querySelectorAll('input[name="cap"]:checked').forEach(function(cb) {
+    caps.push(cb.value);
+  });
+
+  // Regions
+  var regions = [];
+  ['amer','apac_/_india','latam','emea'].forEach(function(r) {
+    var chk = document.getElementById('reg-' + r);
+    var det = document.getElementById('reg-' + r + '-detail');
+    if (chk && chk.checked) {
+      var detail = det ? det.value.trim() : '';
+      regions.push(r.toUpperCase() + (detail ? ': ' + detail : ''));
+    }
+  });
+
+  // Rate ranges
+  var rateLines = [];
+  document.querySelectorAll('input[id^="rate-"]').forEach(function(inp) {
+    if (inp.id.endsWith('-lo') && inp.value) {
+      var hiEl = document.getElementById(inp.id.replace('-lo','-hi'));
+      var hi   = hiEl ? hiEl.value : '';
+      var label = inp.id.replace('rate-','').replace(/-/g,' ');
+      rateLines.push(label + ': $' + inp.value + (hi ? '-$' + hi : '') + '/hr');
+    }
+  });
+
+  // Reference number and date
+  var ref     = 'VER-2027-' + Date.now().toString().slice(-6);
+  var subDate = new Date().toLocaleDateString('en-US',
+    {year:'numeric',month:'long',day:'numeric'});
+
+  // Store for confirmation page
+  try { sessionStorage.setItem('por_ref',       ref); }                  catch(e) {}
+  try { sessionStorage.setItem('por_company',   gv('f-legal-name')); }   catch(e) {}
+  try { sessionStorage.setItem('por_email',     gv('f-contact-email')); } catch(e) {}
+  try { sessionStorage.setItem('por_rate_card', RATE_CARD_FILENAME || ''); } catch(e) {}
+
+  // ── Build a hidden form and submit via iframe ──────────────────
+  // This bypasses CORS — Google Forms accepts same-origin form POSTs
+  var FIELDS = {
+    'entry.1756789441': ref,
+    'entry.1082540076': subDate,
+    'entry.1674425722': gv('f-legal-name'),
+    'entry.640864023':  gv('f-dba'),
+    'entry.216936901':  gv('f-website'),
+    'entry.855498188':  gv('f-hq'),
+    'entry.1205148560': gv('f-size'),
+    'entry.1183972988': gv('f-vendor-type'),
+    'entry.212469823':  gv('f-description'),
+    'entry.1314180675': gv('f-sf-rel'),
+    'entry.1438486167': gv('f-gsa'),
+    'entry.2108918688': gv('f-det-context'),
+    'entry.46788473':   caps.join(' | '),
+    'entry.1895995067': regions.join(' | '),
+    'entry.714423119':  rateLines.join(' | '),
+    'entry.2105320556': gv('f-contact-name'),
+    'entry.914599661':  gv('f-contact-title'),
+    'entry.1686875952': gv('f-contact-email'),
+    'entry.539030091':  gv('f-contact-phone'),
+    'entry.1929862244': gv('f-contact2-name'),
+    'entry.423214838':  gv('f-contact2-email'),
+    'entry.1574110079': gv('f-differentiators'),
+    'entry.1099345511': gv('f-capability-stmt'),
+    'entry.482673186':  RATE_CARD_PARSED || 'None provided',
+    'entry.1549036969': 'Pending VER Review',
+  };
+
+  // Create hidden iframe to receive the form response
+  var iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe';
+  iframe.id   = 'hidden_iframe';
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+
+  // Create hidden form targeting the iframe
+  var form = document.createElement('form');
+  form.method  = 'POST';
+  form.action  = 'https://docs.google.com/forms/d/e/1FAIpQLSc8P8cU2vk9la3gx--xXcd5OhpaJPUwep_mw64zk_x2HvpEXA/formResponse';
+  form.target  = 'hidden_iframe';
+  form.style.display = 'none';
+
+  // Add all fields
+  Object.keys(FIELDS).forEach(function(name) {
+    var input   = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = name;
+    input.value = FIELDS[name];
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+
+  // Submit and redirect after short delay to allow form to POST
+  form.submit();
+  setTimeout(function() {
+    window.location.href = 'portal_confirm.html';
+  }, 800);
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Rate &amp; Benchmark Intelligence · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --orange:#EA580C;--orange3:#FFF7ED;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+[data-theme="dark"]{
+  --gray:#080F1E;--gray2:#111F35;--gray3:#1A2D47;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --white:#0F1E3C;--ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Hub top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.35);line-height:1.4;}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+.export-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.export-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+.htb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(13,148,136,0.45);
+  background:rgba(13,148,136,0.15);color:rgba(255,255,255,0.75);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.htb-btn:hover{background:rgba(13,148,136,0.3);border-color:var(--teal);color:#fff;}
+@media print{
+  .hub-top-bar,.export-btn,.dm-toggle{display:none!important;}
+  .hero{background:#0F1E3C!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{background:#fff!important;color:#111!important;}
+}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#060D1A 0%,#0F1E3C 50%,#0C2236 100%);padding:28px 0 24px;position:relative;overflow:hidden;}
+.hero-inner-wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+.hero::before{content:'';position:absolute;top:-60px;right:60px;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,0.12),transparent 70%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-40px;left:25%;width:400px;height:220px;
+  background:radial-gradient(ellipse,rgba(13,148,136,0.09),transparent 70%);pointer-events:none;}
+.hero-eyebrow{font-size:6.5pt;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;}
+.hero-title{font-size:22pt;font-weight:900;color:#fff;line-height:1.15;margin-bottom:6px;}
+.hero-sub{font-size:9pt;color:rgba(255,255,255,0.58);line-height:1.6;max-width:560px;}
+.hero-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;position:relative;z-index:1;margin-top:18px;}
+.hkpi{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:13px 15px;}
+.hkpi-val{font-size:18pt;font-weight:900;color:#fff;line-height:1;}
+.hkpi-lbl{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,0.45);margin-top:4px;}
+.hkpi-note{font-size:7pt;color:rgba(255,255,255,0.38);margin-top:2px;}
+.hkpi.red .hkpi-val{color:#FCA5A5;}
+.hkpi.amber .hkpi-val{color:#FCD34D;}
+.hkpi.green .hkpi-val{color:#6EE7B7;}
+.hkpi.teal .hkpi-val{color:#5EEAD4;}
+.hkpi.blue .hkpi-val{color:#93C5FD;}
+
+/* ── PAGE TABS ── */
+.page-tabs{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:48px;z-index:100;}
+.page-tabs-inner{max-width:1280px;margin:0 auto;padding:0 48px;display:flex;gap:0;align-items:center;}
+.ptab{font-size:8.5pt;font-weight:700;padding:13px 20px;cursor:pointer;border:none;background:none;
+  color:var(--ink4);border-bottom:3px solid transparent;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.ptab:hover{color:var(--navy);}
+.ptab.active{color:var(--teal2);border-bottom-color:var(--teal);}
+.ptab-sep{width:1px;height:18px;background:var(--border);margin:0 4px;}
+
+/* ── BENCHMARK DATA TAB CONTROLS ── */
+.tab-controls{background:var(--white);border-bottom:1px solid var(--border);padding:0;}
+.tab-controls-inner{max-width:1280px;margin:0 auto;padding:10px 48px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.fsel{font-size:8pt;padding:6px 10px;border:1px solid var(--border2);border-radius:6px;
+  background:var(--white);color:var(--ink2);cursor:pointer;font-family:inherit;}
+.fsel:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.fsearch{font-size:8pt;padding:6px 12px;border:1px solid var(--border2);border-radius:6px;
+  background:var(--white);color:var(--ink2);font-family:inherit;min-width:200px;}
+.fsearch:focus{outline:2px solid var(--teal);border-color:var(--teal);}
+.fbtn{font-size:8pt;padding:6px 14px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--border2);background:var(--white);font-family:inherit;font-weight:600;transition:all .13s;}
+.fbtn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.fbtn:hover:not(.active){background:var(--gray2);}
+.ctrl-sep{width:1px;height:20px;background:var(--border);margin:0 2px;}
+.ctrl-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+
+/* ── MAIN WRAPPER ── */
+.main{max-width:1280px;margin:0 auto;padding:20px 48px 40px;}
+
+/* ── SECTION HEADER ── */
+.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;margin-top:6px;}
+.sec-accent{width:3px;height:16px;border-radius:3px;flex-shrink:0;}
+.sa-blue{background:var(--blue);}
+.sa-teal{background:var(--teal);}
+.sa-amber{background:var(--amber);}
+.sa-purple{background:var(--purple);}
+.sa-green{background:var(--green);}
+.sec-title{font-size:10.5pt;font-weight:900;color:var(--navy);}
+[data-theme="dark"] .sec-title{color:var(--ink);}
+.sec-sub{font-size:8pt;color:var(--ink4);margin-left:auto;}
+
+/* ── INSIGHT BANNER ── */
+.insight-banner{background:linear-gradient(90deg,#0F1E3C,#1E3A5F);border-radius:10px;
+  padding:14px 20px;margin-bottom:22px;display:flex;gap:24px;align-items:stretch;flex-wrap:wrap;}
+.ib-item{flex:1;min-width:160px;border-right:1px solid rgba(255,255,255,0.08);padding-right:20px;}
+.ib-item:last-child{border-right:none;padding-right:0;}
+.ib-label{font-size:6.5pt;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:4px;}
+.ib-val{font-size:13pt;font-weight:900;color:#fff;line-height:1;margin-bottom:3px;}
+.ib-note{font-size:7.5pt;color:rgba(255,255,255,0.50);}
+.ib-val.green{color:#6EE7B7;} .ib-val.amber{color:#FCD34D;} .ib-val.red{color:#FCA5A5;} .ib-val.blue{color:#93C5FD;}
+
+/* ── SUMMARY CARDS ── */
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.sum-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+.sum-card-title{font-size:8pt;font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.sum-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.sum-bar-label{font-size:7.5pt;color:var(--ink3);width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sum-bar-track{flex:1;height:8px;background:var(--gray2);border-radius:4px;overflow:hidden;}
+.sum-bar-fill{height:100%;border-radius:4px;}
+.sum-bar-val{font-size:7.5pt;font-weight:700;color:var(--ink2);width:44px;text-align:right;flex-shrink:0;}
+
+/* ── RATE TABLE ── */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+.rate-table{width:100%;border-collapse:collapse;font-size:8pt;}
+.rate-table th{background:var(--navy);color:#fff;padding:9px 12px;text-align:left;font-size:7.5pt;font-weight:700;letter-spacing:.03em;cursor:pointer;user-select:none;white-space:nowrap;}
+.rate-table th:hover{background:var(--navy2);}
+.rate-table th .sort-arrow{margin-left:4px;opacity:.5;font-size:8pt;}
+.rate-table th.sorted .sort-arrow{opacity:1;color:#5EEAD4;}
+.rate-table td{padding:8px 12px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.rate-table tr:last-child td{border-bottom:none;}
+.rate-table tr:hover td{background:var(--gray);}
+
+/* ── CHIPS & BADGES ── */
+.rate-chip{display:inline-flex;align-items:center;gap:5px;font-weight:700;padding:3px 9px;border-radius:8px;font-size:8pt;}
+.rc-above{background:var(--red3);color:var(--red2);}
+.rc-below{background:var(--green3);color:var(--green2);}
+.rc-inline{background:var(--gray2);color:var(--ink3);}
+.delta{font-size:7.5pt;font-weight:700;padding:2px 7px;border-radius:6px;}
+.delta.up{background:var(--red3);color:var(--red2);}
+.delta.dn{background:var(--green3);color:var(--green2);}
+.delta.flat{background:var(--gray2);color:var(--ink4);}
+.lev-wrap{display:flex;align-items:center;gap:6px;}
+.lev-bar-track{width:60px;height:6px;background:var(--gray2);border-radius:3px;overflow:hidden;}
+.lev-bar-fill{height:100%;border-radius:3px;}
+.lev-label{font-size:7.5pt;font-weight:700;}
+.rflag{font-size:6.5pt;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--navy3);color:var(--navy2);}
+.rflag.amer{background:#EFF6FF;color:#1E3A5F;}
+.rflag.apac{background:#F0FDF9;color:#065F46;}
+.rflag.latam{background:#FEF3C7;color:#78350F;}
+.rflag.emea{background:#F5F3FF;color:#5B21B6;}
+.src-badge{font-size:7.5pt;padding:2px 8px;border-radius:10px;font-weight:600;}
+.src-ver{background:var(--navy3);color:var(--navy2);}
+.src-aws{background:#FFF7ED;color:#92400E;}
+.src-mkt{background:var(--gray2);color:var(--ink4);}
+
+/* ── BENCHMARK CARD GRID ── */
+.bench-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.bench-card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);transition:box-shadow .15s;}
+.bench-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.09);}
+.bc-top{padding:14px 16px 10px;border-bottom:1px solid var(--gray2);}
+.bc-role{font-size:10pt;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.bc-cat{font-size:7.5pt;color:var(--ink4);margin-bottom:8px;}
+.bc-rate-row{display:flex;align-items:baseline;gap:8px;}
+.bc-our-rate{font-size:14pt;font-weight:900;color:var(--navy);}
+.bc-body{padding:12px 16px;}
+.bc-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.bc-row:last-child{margin-bottom:0;}
+.bc-row-label{font-size:7.5pt;color:var(--ink4);}
+.bc-row-val{font-size:8pt;font-weight:700;color:var(--ink2);}
+.bc-bar-row{margin-bottom:10px;}
+.bc-bar-labels{display:flex;justify-content:space-between;font-size:6.5pt;color:var(--ink4);margin-bottom:3px;}
+.bc-bar-track{height:8px;background:var(--gray2);border-radius:4px;position:relative;}
+.bc-bar-range{position:absolute;height:100%;border-radius:4px;background:#BFDBFE;}
+.bc-bar-marker{position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+
+/* ── NEG TABLE ── */
+.neg-table{width:100%;border-collapse:collapse;font-size:8pt;}
+.neg-table th{background:var(--gray2);color:var(--ink3);padding:8px 12px;text-align:left;font-size:7.5pt;font-weight:800;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.neg-table td{padding:8px 12px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.neg-table tr:last-child td{border-bottom:none;}
+.neg-table tr:hover td{background:var(--gray);}
+
+/* ── CATEGORY GRID ── */
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.cat-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all 0.2s;}
+.cat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08);border-color:var(--teal);}
+.cat-icon{font-size:22pt;margin-bottom:6px;}
+.cat-name{font-size:9.5pt;font-weight:700;color:var(--navy);margin-bottom:3px;}
+[data-theme="dark"] .cat-name{color:var(--ink);}
+.cat-count{font-size:8pt;color:var(--ink4);margin-bottom:10px;}
+.cat-stat{display:flex;justify-content:space-between;font-size:8pt;margin-bottom:4px;}
+.cat-bar-track{height:6px;background:var(--gray2);border-radius:3px;overflow:hidden;margin-top:8px;}
+.cat-bar-fill{height:100%;border-radius:3px;}
+
+/* ── INSIGHT CARDS ── */
+.ins-card{border-left:4px solid;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:10px;background:var(--white);}
+.ins-good{border-color:var(--green);}
+.ins-watch{border-color:var(--amber);}
+.ins-title{font-size:9pt;font-weight:700;color:var(--ink2);margin-bottom:3px;}
+.ins-body{font-size:8.5pt;color:var(--ink4);line-height:1.55;}
+.ins-val{font-size:13pt;font-weight:900;color:var(--navy);margin-top:6px;}
+[data-theme="dark"] .ins-val{color:var(--ink);}
+.insight-lbl{font-size:9.5pt;font-weight:800;color:var(--navy);margin-bottom:12px;}
+[data-theme="dark"] .insight-lbl{color:var(--ink);}
+
+/* ── MODAL ── */
+.modal-bg{opacity:0;pointer-events:none;position:fixed;inset:0;background:rgba(0,0,0,0.48);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;transition:opacity .2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border-radius:14px;padding:28px 32px;max-width:720px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.22);transform:translateY(28px) scale(0.97);transition:transform .25s cubic-bezier(.16,1,.3,1);}
+.modal-bg.open .modal{transform:translateY(0) scale(1);}
+.modal-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-size:14pt;font-weight:900;color:var(--navy);line-height:1.2;}
+[data-theme="dark"] .modal-title{color:var(--ink);}
+.modal-close{background:none;border:none;font-size:20pt;cursor:pointer;color:var(--ink4);line-height:1;padding:0 4px;transition:color .13s;}
+.modal-close:hover{color:var(--red);}
+.m2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.m-tile{background:var(--gray);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.m-tile-label{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:5px;}
+.m-tile-val{font-size:13pt;font-weight:900;color:var(--navy);}
+[data-theme="dark"] .m-tile-val{color:var(--ink);}
+.m-tile-note{font-size:7.5pt;color:var(--ink4);margin-top:3px;}
+.m-tile.highlight{background:var(--teal3);border-color:rgba(13,148,136,.3);}
+.m-tile.highlight .m-tile-val{color:var(--teal2);}
+.m-tile.alert{background:var(--amber3);border-color:rgba(217,119,6,.3);}
+.m-tile.alert .m-tile-val{color:var(--amber2);}
+.m-tile.savings{background:var(--green3);border-color:rgba(5,150,105,.3);}
+.m-tile.savings .m-tile-val{color:var(--green2);}
+.m-section{margin-bottom:16px;}
+.m-section-title{font-size:8.5pt;font-weight:800;color:var(--navy);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+[data-theme="dark"] .m-section-title{color:var(--ink);}
+.m-list{list-style:none;}
+.m-list li{font-size:8.5pt;color:var(--ink3);padding:4px 0 4px 16px;position:relative;border-bottom:1px solid var(--gray2);}
+.m-list li:last-child{border-bottom:none;}
+.m-list li::before{content:'→';position:absolute;left:0;color:var(--teal);font-weight:700;}
+.m-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.m-tag{font-size:7pt;font-weight:700;padding:2px 9px;border-radius:8px;background:var(--navy3);color:var(--navy2);}
+.reg-table{width:100%;border-collapse:collapse;font-size:8.5pt;}
+.reg-table th{background:var(--gray2);color:var(--ink3);padding:6px 10px;text-align:left;font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;border-bottom:1px solid var(--border);}
+.reg-table td{padding:7px 10px;border-bottom:1px solid var(--gray2);vertical-align:middle;}
+.reg-table tr:last-child td{border-bottom:none;}
+
+/* ── EMPTY / PAGINATION ── */
+.empty{text-align:center;padding:40px 20px;color:var(--ink4);}
+.empty-icon{font-size:28pt;margin-bottom:10px;}
+.pagination{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:16px;}
+.pg-btn{font-size:8pt;padding:5px 11px;border-radius:6px;cursor:pointer;border:1px solid var(--border2);background:var(--white);font-family:inherit;font-weight:600;color:var(--ink3);transition:all .13s;}
+.pg-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.pg-btn:hover:not(.active):not([disabled]){background:var(--gray2);}
+.pg-btn[disabled]{opacity:.4;cursor:default;}
+.pg-info{font-size:8pt;color:var(--ink4);padding:0 6px;}
+
+/* ── VIEW PANELS ── */
+.v-view{display:none;}
+.v-view.active{display:block;}
+
+/* ── AI Augmentation Panel ── */
+.ai-panel{
+  background:#fff;
+  border-radius:12px;
+  border:1px solid #E5E7EB;
+  border-left:3px solid #7C3AED;
+  padding:16px;margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.ai-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.ai-panel-title-row{display:flex;align-items:center;gap:8px;}
+.ai-panel-icon{font-size:16px;}
+.ai-panel-title{font-size:10px;font-weight:800;color:#7C3AED;
+  text-transform:uppercase;letter-spacing:0.10em;}
+.ai-panel-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:rgba(124,58,237,0.10);color:#6D28D9;
+  border:1px solid rgba(124,58,237,0.35);}
+.ai-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:10px;color:#6B7280;font-weight:600;}
+.ai-toggle-track{width:28px;height:16px;border-radius:8px;
+  background:#F3F4F6;border:1px solid #D1D5DB;
+  position:relative;transition:background 200ms ease;cursor:pointer;}
+.ai-toggle-track.on{background:rgba(124,58,237,0.55);border-color:rgba(124,58,237,0.70);}
+.ai-toggle-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;
+  border-radius:50%;background:#fff;transition:transform 200ms ease,opacity 200ms ease;opacity:0.5;}
+.ai-toggle-track.on .ai-toggle-thumb{transform:translateX(12px);opacity:1;}
+.ai-toggle-label{font-size:10px;}
+.ai-body{display:none;}
+.ai-body.ai-on{display:block;}
+.ai-desc{font-size:11px;color:#6B7280;line-height:1.6;
+  margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.ai-role-flags{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.ai-role-flag{background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.15);
+  border-radius:8px;padding:10px 12px;}
+.ai-role-flag-title{font-size:10px;font-weight:700;color:#6D28D9;margin-bottom:3px;}
+.ai-role-flag-body{font-size:11px;color:#6B7280;line-height:1.5;}
+.ai-shelf-note{font-size:10px;color:#9CA3AF;
+  font-style:italic;line-height:1.5;margin-top:10px;padding-top:10px;
+  border-top:1px solid rgba(255,255,255,0.06);}
+</style>
+</head>
+<body>
+
+<div id="modal-root"></div>
+
+<nav class="hub-top-bar">
+  <div class="htb-left">
+    <a href="index.html" class="htb-back">&#8592; Hub</a>
+    <div class="htb-divider"></div>
+    <span class="htb-brand">Rate &amp; Benchmark Intelligence</span>
+  </div>
+  <div class="htb-right">
+    <button type="button" class="htb-btn" onclick="openRateHelp()" aria-label="How to use Rate Benchmarks">&#63; How to Use</button>
+    <button type="button" class="export-btn" onclick="exportCSV()">&#8681; Export CSV</button>
+    <button type="button" class="dm-toggle" id="dm-btn" onclick="toggleDark()">&#9789; Dark Mode</button>
+    <div class="htb-meta">DET Portfolio Intelligence &mdash; Powered by VER<br>FY27 &middot; Confidential</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner-wrap">
+    <div class="hero-eyebrow">VER Intelligence Hub &middot; FY27 &middot; Rate &amp; Benchmark Intelligence</div>
+    <div class="hero-title">Market Rate Intelligence</div>
+    <div class="hero-sub">Benchmark DET contractor and vendor rates against market data across all categories, regions, and role types. Identify above-market spend, flag negotiation opportunities, and track VER advisory positions.</div>
+    <div class="hero-sub" style="margin-top:6px;font-size:8pt;opacity:0.7;">Benchmark rates are sourced from global market data &mdash; AWS published schedules, Insight Global rate cards, and publicly available analyst surveys &mdash; not real-time or API-connected. Sources: Insight Global 2026 Rate Cards (as of May 2026) &middot; AWS Published Schedule &middot; Global analyst surveys.</div>
+    <div class="hero-kpis" id="hero-kpis"></div>
+  </div>
+</div>
+
+<!-- PAGE TABS -->
+<div class="page-tabs">
+  <div class="page-tabs-inner">
+    <button class="ptab active" id="ptab-bench" onclick="switchPageTab('bench',this)">&#128202; Benchmark Data</button>
+    <div class="ptab-sep"></div>
+    <button class="ptab" id="ptab-category" onclick="switchPageTab('category',this)">&#128178; By Category</button>
+    <div class="ptab-sep"></div>
+    <button class="ptab" id="ptab-playbooks" onclick="switchPageTab('playbooks',this)">&#9876; Negotiation Playbooks</button>
+    <div class="ptab-sep"></div>
+    <button class="ptab" id="ptab-insights" onclick="switchPageTab('insights',this)">&#128161; VER Insights</button>
+  </div>
+</div>
+
+<!-- BENCHMARK DATA CONTROLS (shown only for bench tab) -->
+<div class="tab-controls" id="bench-controls">
+  <div class="tab-controls-inner">
+    <input class="fsearch" id="search-input" placeholder="Search roles, vendors, categories..." oninput="applyFilters()">
+    <div class="ctrl-sep"></div>
+    <select class="fsel" id="cat-filter" onchange="applyFilters()">
+      <option value="">All Categories</option>
+      <option>Professional Services</option>
+      <option>Software Engineering</option>
+      <option>Data &amp; Analytics</option>
+      <option>Cloud &amp; Infrastructure</option>
+      <option>Cybersecurity</option>
+      <option>AI &amp; Machine Learning</option>
+      <option>Project Management</option>
+      <option>UX &amp; Design</option>
+      <option>Cabling &amp; Physical</option>
+    </select>
+    <select class="fsel" id="region-filter" onchange="applyFilters()">
+      <option value="">All Regions</option>
+      <option>AMER</option><option>APAC</option><option>LATAM</option><option>EMEA</option>
+    </select>
+    <select class="fsel" id="status-filter" onchange="applyFilters()">
+      <option value="">All Positions</option>
+      <option value="above">Above Market</option>
+      <option value="below">Below Market</option>
+      <option value="inline">Inline</option>
+    </select>
+    <div class="ctrl-sep"></div>
+    <button class="fbtn active" id="view-table-btn" onclick="setView('table')">&#9776; Table</button>
+    <button class="fbtn" id="view-card-btn" onclick="setView('cards')">&#9783; Cards</button>
+    <div class="ctrl-r">
+      <span id="result-count" style="font-size:8pt;color:var(--ink4);"></span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ── BENCHMARK DATA VIEW ── -->
+  <div id="view-bench" class="v-view active">
+    <div class="insight-banner" id="insight-banner"></div>
+    <div class="sec-hd">
+      <div class="sec-accent sa-blue"></div>
+      <div class="sec-title">Portfolio Rate Summary</div>
+    </div>
+    <div class="summary-grid" id="summary-grid"></div>
+    <div class="sec-hd">
+      <div class="sec-accent sa-teal"></div>
+      <div class="sec-title">Rate Benchmark Data</div>
+      <div class="sec-sub" id="table-section-sub"></div>
+    </div>
+    <div id="table-view" class="table-wrap">
+      <table class="rate-table" id="rate-table">
+        <thead><tr>
+          <th onclick="sortBy('role')" id="th-role">Role / Skill <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('category')" id="th-category">Category <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('region')" id="th-region">Region <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('our_rate')" id="th-our_rate">DET Rate <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('market_low')" id="th-market_low">Market Range <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('position')" id="th-position">Position <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('leverage')" id="th-leverage">Leverage <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('savings_opp')" id="th-savings_opp">Savings Opp <span class="sort-arrow">↕</span></th>
+          <th>Vendors</th>
+        </tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div id="card-view" style="display:none;"><div class="bench-grid" id="card-grid"></div></div>
+    <div class="empty" id="empty-state" style="display:none;">
+      <div class="empty-icon">&#128202;</div>
+      <div style="font-size:9.5pt;font-weight:600;">No matching rate records</div>
+      <div style="font-size:8.5pt;margin-top:4px;">Try adjusting your filters or search term</div>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <!-- ── BY CATEGORY VIEW ── -->
+  <div id="view-category" class="v-view">
+    <div class="sec-hd">
+      <div class="sec-accent sa-teal"></div>
+      <div class="sec-title">Rate Intelligence by Category</div>
+      <div class="sec-sub">From 767-record benchmark dataset (global market data: AWS published rates, Insight Global, analyst surveys) &middot; Click a category to drill in</div>
+    </div>
+    <div class="cat-grid" id="cat-grid"></div>
+    <div class="sec-hd" style="margin-top:8px;">
+      <div class="sec-accent sa-blue"></div>
+      <div class="sec-title">Regional Rate Comparison</div>
+      <div class="sec-sub">Average rates across all categories by region</div>
+    </div>
+    <div class="table-wrap">
+      <table class="reg-table" id="reg-summary-table">
+        <thead><tr><th>Region</th><th>Avg Low</th><th>Avg Mid</th><th>Avg High</th><th>Records</th><th>Context</th></tr></thead>
+        <tbody id="reg-summary-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── NEGOTIATION PLAYBOOKS VIEW ── -->
+  <div id="view-playbooks" class="v-view">
+    <div class="sec-hd">
+      <div class="sec-accent sa-amber"></div>
+      <div class="sec-title">Negotiation Playbooks</div>
+      <div class="sec-sub">VER advisory positions &middot; Highest leverage opportunities</div>
+    </div>
+    <div class="table-wrap">
+      <table class="neg-table" id="neg-table">
+        <thead><tr>
+          <th>Vendor / Engagement</th><th>Category</th><th>Current Spend</th>
+          <th>Benchmark Gap</th><th>Savings Target</th><th>VER Position</th><th>Action</th>
+        </tr></thead>
+        <tbody id="neg-body"></tbody>
+      </table>
+    </div>
+    <div class="sec-hd" style="margin-top:8px;">
+      <div class="sec-accent sa-purple"></div>
+      <div class="sec-title">Negotiation Playbook — By Priority</div>
+      <div class="sec-sub">Role-level actions from benchmark data</div>
+    </div>
+    <div id="neg-role-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px;"></div>
+  </div>
+
+  <!-- ── VER INSIGHTS VIEW ── -->
+  <div id="view-insights" class="v-view">
+    <div class="sec-hd">
+      <div class="sec-accent sa-green"></div>
+      <div class="sec-title">VER Rate Intelligence Summary</div>
+      <div class="sec-sub">Computed from 767-record benchmark dataset</div>
+    </div>
+    <div id="ins-content"></div>
+
+    <!-- AI Augmentation Panel -->
+    <div class="ai-panel" id="ai-panel-rate">
+      <div class="ai-panel-head">
+        <div class="ai-panel-title-row">
+          <span class="ai-panel-icon">&#10024;</span>
+          <span class="ai-panel-title">AI Impact</span>
+          <span class="ai-panel-badge">Beta</span>
+        </div>
+        <div class="ai-toggle" onclick="toggleAiRate()" aria-label="Toggle AI Impact">
+          <span id="ai-rate-label" class="ai-toggle-label">Off</span>
+          <div class="ai-toggle-track" id="ai-rate-track">
+            <div class="ai-toggle-thumb"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-body" id="ai-rate-body">
+        <div class="ai-desc">Roles with significant AI/agentic tooling overlap are evolving rapidly — both in scope and market rate. Consider these factors when benchmarking AI-adjacent roles.</div>
+        <div class="ai-role-flags">
+          <div class="ai-role-flag">
+            <div class="ai-role-flag-title">&#10024; Prompt Engineer / AI Ops</div>
+            <div class="ai-role-flag-body">Market rates for these roles are increasing 15–25% annually and benchmarks have a shorter shelf life than traditional tech roles. Use the most recent data point available.</div>
+          </div>
+          <div class="ai-role-flag">
+            <div class="ai-role-flag-title">&#10024; ML Platform / MLOps Engineer</div>
+            <div class="ai-role-flag-body">Premium over traditional platform engineering runs 18–30% in the current market. Verify whether the rate includes model infrastructure experience or just ops tooling.</div>
+          </div>
+          <div class="ai-role-flag">
+            <div class="ai-role-flag-title">&#10024; Agentic Workflow Developer</div>
+            <div class="ai-role-flag-body">Emerging role category — limited benchmark data. Proxy using Senior Software Engineer + 10–20% premium. Validate with 3 competitive quotes before finalizing.</div>
+          </div>
+          <div class="ai-role-flag">
+            <div class="ai-role-flag-title">&#10024; AI-Augmented Traditional Roles</div>
+            <div class="ai-role-flag-body">If a vendor claims AI augmentation justifies a higher rate for a standard role, request evidence of output productivity gain. Augmentation should lower cost-per-output, not raise the bill rate.</div>
+          </div>
+        </div>
+        <div class="ai-shelf-note">AI role benchmarks reviewed quarterly. Last update: FY27 Q2. Rates in this category may move significantly between updates.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ── VER BENCHMARK DATA (35 records — rich: leverage, position, actions) ──
+var BENCH_DATA = [
+  {id:'r001',role:'Senior Program Manager',category:'Professional Services',region:'AMER',
+   ver_ref:['rc0069','rc0070'],
+   our_rate:195,market_low:155,market_high:220,market_mid:185,position:'above',leverage:72,
+   savings_opp:18,vendors:['Cognizant','NTT Data','Deloitte'],yoy_change:+8,
+   notes:'DET blended rate 5.4% above market mid. NTT Data restructure under AD model presents rebaseline opportunity.',
+   actions:['Initiate rate card refresh with NTT Data by Q3','Benchmark against Deloitte AMER rates in next SOW renewal','Target $195→$178 through volume commitment negotiation']},
+  {id:'r002',role:'Project Manager III',category:'Professional Services',region:'AMER',
+   ver_ref:['rc0640','rc0644','rc0648'],
+   our_rate:148,market_low:120,market_high:170,market_mid:142,position:'above',leverage:65,
+   savings_opp:12,vendors:['Cognizant','IBM','Infosys'],yoy_change:+5,
+   notes:'Slight above-market position. IBM SOW renewal Aug 2026 provides leverage window.',
+   actions:['Tie rate rebaseline to IBM renewal discussion','Use Cognizant benchmarks as competitive pressure point']},
+  {id:'r003',role:'Business Analyst',category:'Professional Services',region:'AMER',
+   ver_ref:['rc0013','rc0014','rc0039','rc0040','rc0065','rc0066','rc0672','rc0676','rc0760'],
+   our_rate:125,market_low:100,market_high:150,market_mid:122,position:'inline',leverage:45,
+   savings_opp:4,vendors:['Cognizant','Infosys','Wipro'],yoy_change:+2,
+   notes:'At market mid. Limited immediate savings but watch for role inflation over FY27.',
+   actions:['Monitor quarterly — flag if above $135 without scope justification']},
+  {id:'r004',role:'Senior Consultant',category:'Professional Services',region:'APAC',
+   ver_ref:['rc0681','rc0685','rc0689','rc0693','rc0697'],
+   our_rate:95,market_low:80,market_high:130,market_mid:105,position:'below',leverage:30,
+   savings_opp:0,vendors:['TechM','Wipro','HCL'],yoy_change:-3,
+   notes:'APAC rates below market mid. Consider whether role complexity justifies uplift request.',
+   actions:['Review scope — if senior deliverables are being delivered at below-market rates, acknowledge to avoid turnover risk']},
+  {id:'r005',role:'Change Management Lead',category:'Professional Services',region:'AMER',
+   ver_ref:[],
+   our_rate:210,market_low:160,market_high:240,market_mid:195,position:'above',leverage:68,
+   savings_opp:22,vendors:['Deloitte','BCG','Accenture'],yoy_change:+12,
+   notes:'BCG advisory spend spiked +512% YoY. This role category driving above-market aggregate.',
+   actions:['Escalate BCG rate review to VER Lead immediately','Require scope justification for all >$200/hr change mgmt engagements','Benchmark BCG vs Deloitte for equivalent scope']},
+  {id:'r006',role:'PMO Director',category:'Professional Services',region:'AMER',
+   ver_ref:['rc0423','rc0660'],
+   our_rate:265,market_low:210,market_high:290,market_mid:248,position:'above',leverage:61,
+   savings_opp:35,vendors:['Deloitte','BCG'],yoy_change:+9,
+   notes:'Executive-level advisory roles are highest unit cost in portfolio. Selective use only.',
+   actions:['Require executive sponsor sign-off for all PMO Director billings >$250/hr','Explore fixed-fee engagement structure with Deloitte']},
+  {id:'r007',role:'Senior Software Engineer',category:'Software Engineering',region:'AMER',
+   ver_ref:['rc0085','rc0086'],
+   our_rate:155,market_low:140,market_high:195,market_mid:165,position:'below',leverage:22,
+   savings_opp:0,vendors:['Cognizant','NTT Data','Infosys'],yoy_change:+6,
+   notes:'Slightly below market mid. Competitive for talent retention.',
+   actions:['Maintain current rate — competitive positioning appropriate','Monitor market trajectory; rate may need mid-year review if market rises >5%']},
+  {id:'r008',role:'Full Stack Developer',category:'Software Engineering',region:'AMER',
+   ver_ref:['rc0516','rc0520'],
+   our_rate:132,market_low:115,market_high:170,market_mid:138,position:'inline',leverage:40,
+   savings_opp:3,vendors:['Cognizant','Wipro','HCL'],yoy_change:+4,
+   notes:'In range. Watch for offshore vs onshore blending — offshore rates available at $65-85.',
+   actions:['Identify opportunities to shift non-client-facing dev work to offshore model','Target 20% offshore blending by Q4 FY27']},
+  {id:'r009',role:'Senior Software Engineer',category:'Software Engineering',region:'APAC',
+   ver_ref:['rc0099','rc0100','rc0101','rc0102','rc0481','rc0485','rc0489','rc0493','rc0497','rc0741','rc0745'],
+   our_rate:72,market_low:58,market_high:95,market_mid:76,position:'below',leverage:18,
+   savings_opp:0,vendors:['TechM','Infosys','HCL'],yoy_change:+3,
+   notes:'APAC engineering rates competitive and below market. Good value tier.',
+   actions:['Expand APAC engineering headcount for cost-effective backlog delivery']},
+  {id:'r010',role:'DevOps Engineer',category:'Software Engineering',region:'AMER',
+   ver_ref:['rc0428','rc0432','rc0436'],
+   our_rate:168,market_low:145,market_high:210,market_mid:175,position:'below',leverage:25,
+   savings_opp:0,vendors:['NTT Data','AWS PSO','IBM'],yoy_change:+11,
+   notes:'DevOps market rates rising fast (+11% YoY). Our rate may fall behind if not renegotiated.',
+   actions:['Lock 18-month rate agreements before market rises further','Consider AWS PSO managed service to contain DevOps unit cost']},
+  {id:'r011',role:'QA Engineer',category:'Software Engineering',region:'LATAM',
+   ver_ref:['rc0510','rc0514','rc0766'],
+   our_rate:55,market_low:45,market_high:80,market_mid:62,position:'below',leverage:15,
+   savings_opp:0,vendors:['Cognizant','Infosys'],yoy_change:+2,
+   notes:'LATAM QA rates are a significant cost advantage. Increase offshore QA blend.',
+   actions:['Shift additional QA workload to LATAM — target 30% coverage by EOY']},
+  {id:'r012',role:'Mobile Developer',category:'Software Engineering',region:'AMER',
+   ver_ref:[],
+   our_rate:180,market_low:155,market_high:230,market_mid:190,position:'below',leverage:20,
+   savings_opp:0,vendors:['NTT Data','Cognizant'],yoy_change:+9,
+   notes:'Mobile specialist market very competitive. Below market mid — retention risk.',
+   actions:['Do not compress mobile rates further','Explore contractor-to-FTE conversion for key mobile roles']},
+  {id:'r013',role:'Data Engineer',category:'Data & Analytics',region:'AMER',
+   ver_ref:['rc0031','rc0032','rc0079','rc0080','rc0548','rc0552','rc0748','rc0752'],
+   our_rate:162,market_low:140,market_high:200,market_mid:168,position:'inline',leverage:38,
+   savings_opp:5,vendors:['Cognizant','Deloitte','IBM'],yoy_change:+7,
+   notes:'Data engineering rates rising with AI demand. Current position sustainable for 6 months.',
+   actions:['Include rate escalation cap in next SOW renewals for data engineering','Review Q1 FY28 against renewed market benchmark']},
+  {id:'r014',role:'Data Scientist',category:'Data & Analytics',region:'AMER',
+   ver_ref:['rc0564','rc0568'],
+   our_rate:195,market_low:165,market_high:255,market_mid:205,position:'below',leverage:22,
+   savings_opp:0,vendors:['Deloitte','IBM','Google PSO'],yoy_change:+14,
+   notes:'Data science market surging. Our rates risk talent pipeline issues by FY28.',
+   actions:['Do not compress data science rates','Consider fixed-outcome project pricing to cap total cost without rate compression']},
+  {id:'r015',role:'Analytics Engineer',category:'Data & Analytics',region:'APAC',
+   ver_ref:['rc0119','rc0120','rc0121','rc0573','rc0577'],
+   our_rate:88,market_low:72,market_high:118,market_mid:93,position:'below',leverage:20,
+   savings_opp:0,vendors:['TechM','Wipro'],yoy_change:+5,
+   notes:'APAC analytics rates competitive. Good expansion market for analytics delivery.',
+   actions:['Prioritize APAC for analytics workload expansion']},
+  {id:'r016',role:'BI Developer',category:'Data & Analytics',region:'AMER',
+   ver_ref:['rc0580','rc0584'],
+   our_rate:118,market_low:98,market_high:155,market_mid:124,position:'below',leverage:28,
+   savings_opp:0,vendors:['Cognizant','IBM'],yoy_change:+3,
+   notes:'BI development rates stable. Slight below-market position.',
+   actions:['Maintain current rate positioning — favorable for DET']},
+  {id:'r017',role:'Cloud Architect',category:'Cloud & Infrastructure',region:'AMER',
+   ver_ref:['rc0424'],
+   our_rate:225,market_low:190,market_high:285,market_mid:235,position:'below',leverage:20,
+   savings_opp:0,vendors:['AWS PSO','Google PSO','WWT'],yoy_change:+13,
+   notes:'Cloud architect market rates rising sharply. AWS and Google PSO rates are premium.',
+   actions:['Negotiate multi-year engagement agreements with AWS and Google PSO to lock rates','Consider staff augmentation vs managed service trade-off']},
+  {id:'r018',role:'Infrastructure Engineer',category:'Cloud & Infrastructure',region:'AMER',
+   ver_ref:['rc0716','rc0720'],
+   our_rate:142,market_low:120,market_high:175,market_mid:148,position:'below',leverage:26,
+   savings_opp:0,vendors:['WWT','NTT Data','IBM'],yoy_change:+6,
+   notes:'Infra engineer rates stable. WWT relationship pricing competitive.',
+   actions:['Leverage WWT preferred pricing agreement for infra staffing']},
+  {id:'r019',role:'Cloud FinOps Analyst',category:'Cloud & Infrastructure',region:'AMER',
+   ver_ref:[],
+   our_rate:135,market_low:110,market_high:165,market_mid:138,position:'inline',leverage:42,
+   savings_opp:4,vendors:['AWS PSO','Deloitte'],yoy_change:+8,
+   notes:'FinOps is an emerging category; market benchmarks still maturing.',
+   actions:['Document FinOps deliverables clearly to justify rates','Compare AWS PSO advisory vs independent FinOps consultant economics']},
+  {id:'r020',role:'Network Engineer',category:'Cloud & Infrastructure',region:'AMER',
+   ver_ref:['rc0724'],
+   our_rate:115,market_low:95,market_high:148,market_mid:118,position:'inline',leverage:44,
+   savings_opp:3,vendors:['NTT Data','Lumen','AT&T'],yoy_change:+2,
+   notes:'Network engineering stable category. Lumen and AT&T contract rate benchmarks available.',
+   actions:['Include rate comparison in Lumen renewal (if applicable)']},
+  {id:'r021',role:'Security Architect',category:'Cybersecurity',region:'AMER',
+   ver_ref:['rc0456','rc0460','rc0728'],
+   our_rate:235,market_low:200,market_high:310,market_mid:252,position:'below',leverage:15,
+   savings_opp:0,vendors:['IBM','Deloitte','CrowdStrike'],yoy_change:+16,
+   notes:'Cybersecurity architect market rates are one of the fastest-growing segments.',
+   actions:['Do not compress security rates — talent market extremely tight','Consider SOW-based projects vs time-and-materials for security engagements']},
+  {id:'r022',role:'Security Analyst (SOC)',category:'Cybersecurity',region:'AMER',
+   ver_ref:['rc0728'],
+   our_rate:95,market_low:85,market_high:130,market_mid:105,position:'below',leverage:22,
+   savings_opp:0,vendors:['IBM','CrowdStrike'],yoy_change:+8,
+   notes:'SOC analyst rates competitive at current level.',
+   actions:['Maintain SOC analyst rates — below market is acceptable for this role tier']},
+  {id:'r023',role:'Penetration Tester',category:'Cybersecurity',region:'AMER',
+   ver_ref:[],
+   our_rate:185,market_low:165,market_high:250,market_mid:205,position:'below',leverage:18,
+   savings_opp:0,vendors:['IBM','Deloitte'],yoy_change:+11,
+   notes:'Specialized skill — below market is normal and acceptable.',
+   actions:['No action needed — monitor annually']},
+  {id:'r024',role:'ML Engineer',category:'AI & Machine Learning',region:'AMER',
+   ver_ref:['rc0540','rc0544'],
+   our_rate:210,market_low:185,market_high:295,market_mid:238,position:'below',leverage:12,
+   savings_opp:0,vendors:['Google PSO','AWS PSO','Deloitte'],yoy_change:+22,
+   notes:'ML engineer market is the fastest rising rate category in the portfolio (+22% YoY).',
+   actions:['Review all AI/ML role classifications to ensure accurate benchmarking','OpenAI enterprise agreement gap creates risk — prioritize resolution']},
+  {id:'r025',role:'AI/LLM Solutions Architect',category:'AI & Machine Learning',region:'AMER',
+   ver_ref:['rc0424'],
+   our_rate:245,market_low:210,market_high:350,market_mid:272,position:'below',leverage:10,
+   savings_opp:0,vendors:['Google PSO','OpenAI','Anthropic PSO'],yoy_change:+28,
+   notes:'Fastest rising role in DET portfolio. Market shortage driving premium pricing.',
+   actions:['Establish preferred partner agreement with Google/AWS for AI architects','Explore resident architect programs to reduce unit cost through commitment']},
+  {id:'r026',role:'AI Product Manager',category:'AI & Machine Learning',region:'AMER',
+   ver_ref:[],
+   our_rate:195,market_low:175,market_high:260,market_mid:215,position:'below',leverage:14,
+   savings_opp:0,vendors:['Deloitte','Google PSO'],yoy_change:+18,
+   notes:'AI PM is a scarcity skill. Current rate below market.',
+   actions:['Do not compress AI PM rates']},
+  {id:'r027',role:'Scrum Master',category:'Project Management',region:'AMER',
+   ver_ref:['rc0083','rc0084','rc0664','rc0668'],
+   our_rate:108,market_low:88,market_high:138,market_mid:110,position:'inline',leverage:50,
+   savings_opp:6,vendors:['Cognizant','NTT Data','Infosys'],yoy_change:+3,
+   notes:'At market mid. Offshore Scrum Masters available at $45-55 for appropriate workstreams.',
+   actions:['Shift 25% of Scrum Master hours to offshore model by Q3','Prioritize onshore for client-facing delivery only']},
+  {id:'r028',role:'Technical Project Manager',category:'Project Management',region:'AMER',
+   ver_ref:[],
+   our_rate:155,market_low:130,market_high:185,market_mid:158,position:'inline',leverage:46,
+   savings_opp:5,vendors:['NTT Data','Cognizant','IBM'],yoy_change:+5,
+   notes:'Slight above-mid position for some engagements. Watch NTT Data blended rates.',
+   actions:['Include TPM rate benchmarking in NTT Data AD restructure negotiation']},
+  {id:'r029',role:'Agile Coach',category:'Project Management',region:'AMER',
+   ver_ref:['rc0001','rc0002'],
+   our_rate:198,market_low:165,market_high:250,market_mid:205,position:'below',leverage:24,
+   savings_opp:0,vendors:['Deloitte','BCG'],yoy_change:+9,
+   notes:'Agile Coach market rising. BCG advisory spend spike warrants scrutiny of this role category.',
+   actions:['Review Agile Coach utilization rates — flag any billing >40 hrs/week','Justify BCG Agile Coach engagements vs lower-cost alternatives']},
+  {id:'r030',role:'UX Designer',category:'UX & Design',region:'AMER',
+   ver_ref:['rc0013','rc0014','rc0039','rc0073','rc0074'],
+   our_rate:128,market_low:108,market_high:165,market_mid:134,position:'below',leverage:28,
+   savings_opp:0,vendors:['Cognizant','NTT Data'],yoy_change:+6,
+   notes:'UX rates competitive. Design talent market stable.',
+   actions:['Maintain current positioning']},
+  {id:'r031',role:'Product Designer',category:'UX & Design',region:'APAC',
+   ver_ref:['rc0103','rc0104','rc0105','rc0106'],
+   our_rate:68,market_low:55,market_high:92,market_mid:72,position:'below',leverage:22,
+   savings_opp:0,vendors:['TechM','Wipro'],yoy_change:+4,
+   notes:'APAC design talent very cost-competitive.',
+   actions:['Expand APAC design headcount for non-customer-facing work']},
+  {id:'r032',role:'UX Research Lead',category:'UX & Design',region:'AMER',
+   ver_ref:[],
+   our_rate:158,market_low:138,market_high:195,market_mid:165,position:'below',leverage:26,
+   savings_opp:0,vendors:['Deloitte'],yoy_change:+7,
+   notes:'UX Research scarce skill. Below market is competitive.',
+   actions:['Do not compress UX Research rates']},
+  {id:'r033',role:'Structured Cabling Technician',category:'Cabling & Physical',region:'AMER',
+   ver_ref:[],
+   our_rate:75,market_low:65,market_high:98,market_mid:80,position:'below',leverage:35,
+   savings_opp:0,vendors:['JLL','Insight Direct'],yoy_change:+4,
+   notes:'JLL spend spiked +590% YoY — warrants rate card audit across all physical infra roles.',
+   actions:['Conduct full rate card audit for JLL — compare against $8.65M Coupa category','Benchmark JLL cabling rates against 2 alternative providers']},
+  {id:'r034',role:'Data Center Engineer',category:'Cabling & Physical',region:'AMER',
+   ver_ref:['rc0716','rc0720'],
+   our_rate:105,market_low:88,market_high:130,market_mid:108,position:'inline',leverage:45,
+   savings_opp:4,vendors:['JLL','NTT Data'],yoy_change:+5,
+   notes:'DC engineer rates at market. JLL preferred supplier pricing should be enforced.',
+   actions:['Confirm JLL preferred pricing active on all DC engineer SOWs']},
+  {id:'r035',role:'Field Services Technician',category:'Cabling & Physical',region:'LATAM',
+   ver_ref:[],
+   our_rate:38,market_low:30,market_high:55,market_mid:42,position:'below',leverage:28,
+   savings_opp:0,vendors:['Insight Direct','JLL'],yoy_change:+2,
+   notes:'LATAM field services rates competitive and below market.',
+   actions:['Maintain current LATAM field services positioning']},
+];
+
+var NEG_PLAYS = [
+  {vendor:'BCG Advisory',category:'Professional Services',spend:'$9.1M',gap:'+$2.8M above market',target:'$1.8M',position:'Rate card exceeds market by 18–32% across all role types. Spike warrants immediate review.',action:'critical'},
+  {vendor:'NTT Data (AD Restructure)',category:'Professional Services',spend:'$22.8M',gap:'+$1.9M above market',target:'$3.2M',position:'PO model transition creates rate rebaseline opportunity. Target $195→$178 blended.',action:'high'},
+  {vendor:'JLL (Physical Infra)',category:'Cabling & Physical',spend:'$10.9M',gap:'+590% YoY spend spike',target:'$2.1M',position:'Spend spike requires rate card audit before any renewal. Multiple role types need benchmarking.',action:'critical'},
+  {vendor:'IBM (Aug 2026 Renewal)',category:'Professional Services',spend:'$14.3M',gap:'+$1.2M above market',target:'$1.5M',position:'IBM renewal window Aug 2026. Rate rebaseline and scope consolidation opportunity.',action:'high'},
+  {vendor:'Deloitte (Advisory)',category:'Professional Services',spend:'$9.1M',gap:'+$0.9M above market',target:'$0.8M',position:'Executive advisory rates above market. Fixed-fee structure exploration recommended.',action:'medium'},
+  {vendor:'Cognizant (CWF)',category:'Software Engineering',spend:'$9.5M',gap:'Inline — optimize offshore blend',target:'$0.6M',position:'Current rates at market but offshore blending opportunity exists for dev/QA roles.',action:'medium'},
+  {vendor:'WWT (Hardware/Infra)',category:'Cloud & Infrastructure',spend:'$12.5M',gap:'Preferred pricing active',target:'$0.3M',position:'WWT preferred pricing confirmed. Incremental savings through volume consolidation.',action:'low'},
+  {vendor:'AWS (Cloud Spend)',category:'Cloud & Infrastructure',spend:'$17.2M',gap:'+721% YoY — spend spike',target:'$4.0M',position:'Spend spike driven by usage growth. FinOps review and reserved instance optimization needed.',action:'critical'},
+];
+
+var CAT_ICONS = {
+  'AI/ML & Data':'&#129302;','Cloud & Engineering':'&#9729;&#65039;',
+  'Contingent Workforce':'&#128101;','ERP & Workday':'&#9881;&#65039;',
+  'Managed Services':'&#128269;','Professional Services':'&#129516;',
+  'Project Management':'&#128203;','Software Engineering':'&#128187;',
+  'Strategic Consulting':'&#127919;','Data & Analytics':'&#128202;',
+  'Cloud & Infrastructure':'&#9729;&#65039;','AI & Machine Learning':'&#129302;',
+  'Cybersecurity':'&#128274;','UX & Design':'&#127912;','Cabling & Physical':'&#128268;'
+};
+
+// ── STATE ──────────────────────────────────────────────────
+var currentView = 'table';
+var currentSort = {col:'leverage',dir:'desc'};
+var currentPage = 1;
+var pageSize = 20;
+var filtered = [];
+var currentPageTab = 'bench';
+
+// ── INIT ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  (function(){
+    var saved = localStorage.getItem('ver-theme');
+    if(saved) document.documentElement.setAttribute('data-theme',saved);
+    updateDmBtn();
+  })();
+  buildHeroKPIs();
+  buildInsightBanner();
+  buildSummaryGrid();
+  buildNegTable();
+  buildNegRoleCards();
+  applyFilters();
+  // Build category and insights from RATE_DATA (loaded via rate_data.js)
+  if(typeof RATE_DATA !== 'undefined') {
+    buildCategoryGrid();
+    buildRegSummary();
+    buildInsights();
+  }
+});
+
+function toggleDark(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('ver-theme',next);
+  updateDmBtn();
+}
+function updateDmBtn(){
+  var t = document.documentElement.getAttribute('data-theme')||'light';
+  var btn = document.getElementById('dm-btn');
+  if(btn) btn.innerHTML = t==='dark'?'&#9790; Light':'&#9789; Dark Mode';
+}
+
+// ── PAGE TAB SWITCHING ─────────────────────────────────────
+function switchPageTab(key, btn){
+  currentPageTab = key;
+  document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  document.querySelectorAll('.v-view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById('view-'+key).classList.add('active');
+  document.getElementById('bench-controls').style.display = key==='bench' ? '' : 'none';
+}
+
+// ── HERO KPIs ──────────────────────────────────────────────
+function buildHeroKPIs(){
+  var above = BENCH_DATA.filter(function(r){return r.position==='above';}).length;
+  var below = BENCH_DATA.filter(function(r){return r.position==='below';}).length;
+  var totalSavings = BENCH_DATA.reduce(function(s,r){return s+(r.savings_opp||0);},0);
+  var avgLev = Math.round(BENCH_DATA.reduce(function(s,r){return s+r.leverage;},0)/BENCH_DATA.length);
+  var fastest = BENCH_DATA.slice().sort(function(a,b){return b.yoy_change-a.yoy_change;})[0];
+  var el = document.getElementById('hero-kpis');
+  el.innerHTML = [
+    kpi('amber',BENCH_DATA.length,'Rate Records','Across 9 categories · 4 regions'),
+    kpi('red',above,'Above Market','Roles above market mid'),
+    kpi('green',below,'Below Market','Favorable rate positions'),
+    kpi('teal','$'+totalSavings+'M','Savings Opportunity','Identified across portfolio'),
+    kpi('blue',fastest.role.split(' ')[0]+'…','Fastest Rising',fastest.yoy_change+'% YoY — '+fastest.category),
+  ].join('');
+}
+function kpi(cls,val,lbl,note){
+  return '<div class="hkpi '+cls+'"><div class="hkpi-val">'+val+'</div><div class="hkpi-lbl">'+lbl+'</div><div class="hkpi-note">'+note+'</div></div>';
+}
+
+// ── INSIGHT BANNER ─────────────────────────────────────────
+function buildInsightBanner(){
+  var aiRoles = BENCH_DATA.filter(function(r){return r.category==='AI & Machine Learning';});
+  var avgAiYoY = Math.round(aiRoles.reduce(function(s,r){return s+r.yoy_change;},0)/aiRoles.length);
+  var el = document.getElementById('insight-banner');
+  el.innerHTML = [
+    ibItem('Market Trend','AI/ML roles rising '+avgAiYoY+'% YoY','Fastest rising category in portfolio','blue'),
+    ibItem('Critical Action','3 Critical Negotiation Windows','BCG · JLL · AWS — immediate review required','red'),
+    ibItem('Cost Optimization','$'+BENCH_DATA.reduce(function(s,r){return s+(r.savings_opp||0);},0)+'M Savings Identified','Achievable through rate rebaseline + offshore blend','green'),
+    ibItem('Favorable Position',''+BENCH_DATA.filter(function(r){return r.position==='below';}).length+' Roles Below Market','Competitive positioning — do not compress','green'),
+    ibItem('VER Advisory','Rate Card Refresh Recommended','NTT Data &amp; IBM renewals approaching Aug 2026','amber'),
+  ].join('');
+}
+function ibItem(lbl,val,note,cls){
+  return '<div class="ib-item"><div class="ib-label">'+lbl+'</div><div class="ib-val '+(cls||'')+'">'+val+'</div><div class="ib-note">'+note+'</div></div>';
+}
+
+// ── SUMMARY GRID ───────────────────────────────────────────
+function buildSummaryGrid(){
+  var cats = {};
+  BENCH_DATA.forEach(function(r){
+    if(!cats[r.category]) cats[r.category]={above:0,below:0,inline:0,total:0};
+    cats[r.category][r.position]++;
+    cats[r.category].total++;
+  });
+  var catEntries = Object.entries(cats).sort(function(a,b){return b[1].above-a[1].above;});
+  var regions = {AMER:0,APAC:0,LATAM:0,EMEA:0};
+  BENCH_DATA.forEach(function(r){regions[r.region]=(regions[r.region]||0)+1;});
+  var maxReg = Math.max.apply(null,Object.values(regions));
+  var topSavings = BENCH_DATA.slice().sort(function(a,b){return b.savings_opp-a.savings_opp;}).slice(0,5);
+  var el = document.getElementById('summary-grid');
+  el.innerHTML =
+    sumCard('Above vs Below Market',catEntries.slice(0,5).map(function(e){
+      var pct = Math.round((e[1].above/e[1].total)*100);
+      return barRow(e[0],pct,'%',pct>49?'#DC2626':pct<30?'#059669':'#D97706',100);
+    }).join(''))
+    +sumCard('Records by Region',Object.entries(regions).map(function(e){
+      return barRow(e[0],e[1],' records','#2563EB',maxReg);
+    }).join(''))
+    +sumCard('Top Savings Opportunities',topSavings.map(function(r){
+      return barRow(r.role.length>22?r.role.slice(0,22)+'…':r.role,r.savings_opp,'M','#0D9488',35);
+    }).join(''));
+}
+function sumCard(title,content){
+  return '<div class="sum-card"><div class="sum-card-title">'+title+'</div>'+content+'</div>';
+}
+function barRow(label,val,suffix,color,max){
+  var pct = Math.round((val/max)*100);
+  return '<div class="sum-bar-row">'
+    +'<div class="sum-bar-label">'+label+'</div>'
+    +'<div class="sum-bar-track"><div class="sum-bar-fill" style="width:'+pct+'%;background:'+color+';"></div></div>'
+    +'<div class="sum-bar-val">'+val+suffix+'</div>'
+    +'</div>';
+}
+
+// ── BENCHMARK DATA FILTERS ─────────────────────────────────
+function applyFilters(){
+  var search = document.getElementById('search-input').value.toLowerCase();
+  var cat = document.getElementById('cat-filter').value;
+  var region = document.getElementById('region-filter').value;
+  var status = document.getElementById('status-filter').value;
+  filtered = BENCH_DATA.filter(function(r){
+    if(search && !(r.role.toLowerCase().includes(search)||r.category.toLowerCase().includes(search)||r.vendors.some(function(v){return v.toLowerCase().includes(search);}))) return false;
+    if(cat && r.category!==cat) return false;
+    if(region && r.region!==region) return false;
+    if(status && r.position!==status) return false;
+    return true;
+  });
+  sortFiltered();
+  currentPage = 1;
+  render();
+}
+function sortBy(col){
+  if(currentSort.col===col){currentSort.dir=currentSort.dir==='asc'?'desc':'asc';}
+  else{currentSort.col=col;currentSort.dir=col==='leverage'||col==='savings_opp'||col==='our_rate'?'desc':'asc';}
+  document.querySelectorAll('.rate-table th').forEach(function(th){th.classList.remove('sorted');});
+  var th=document.getElementById('th-'+col);if(th)th.classList.add('sorted');
+  sortFiltered();currentPage=1;render();
+}
+function sortFiltered(){
+  var col=currentSort.col,dir=currentSort.dir==='asc'?1:-1;
+  filtered.sort(function(a,b){var av=a[col],bv=b[col];if(typeof av==='string')return av.localeCompare(bv)*dir;return(av-bv)*dir;});
+}
+function render(){
+  var count=filtered.length;
+  document.getElementById('result-count').textContent=count+' record'+(count!==1?'s':'');
+  document.getElementById('table-section-sub').textContent=count+' of '+BENCH_DATA.length+' records shown';
+  var start=(currentPage-1)*pageSize,pageData=filtered.slice(start,start+pageSize);
+  if(count===0){
+    document.getElementById('empty-state').style.display='block';
+    document.getElementById('table-view').style.display='none';
+    document.getElementById('card-view').style.display='none';
+    document.getElementById('pagination').innerHTML='';return;
+  }
+  document.getElementById('empty-state').style.display='none';
+  if(currentView==='table'){
+    document.getElementById('table-view').style.display='block';
+    document.getElementById('card-view').style.display='none';
+    renderTable(pageData);
+  } else {
+    document.getElementById('table-view').style.display='none';
+    document.getElementById('card-view').style.display='block';
+    renderCards(pageData);
+  }
+  renderPagination(count);
+}
+function setView(v){
+  currentView=v;
+  document.getElementById('view-table-btn').classList.toggle('active',v==='table');
+  document.getElementById('view-card-btn').classList.toggle('active',v==='cards');
+  render();
+}
+
+// ── TABLE + CARD RENDER ────────────────────────────────────
+function posChip(pos){
+  if(pos==='above') return '<span class="rate-chip rc-above">▲ Above</span>';
+  if(pos==='below') return '<span class="rate-chip rc-below">▼ Below</span>';
+  return '<span class="rate-chip rc-inline">= Inline</span>';
+}
+function leverageBar(lev){
+  var color=lev>=65?'#DC2626':lev>=40?'#D97706':'#059669';
+  var label=lev>=65?'High':lev>=40?'Med':'Low';
+  return '<div class="lev-wrap"><div class="lev-bar-track"><div class="lev-bar-fill" style="width:'+lev+'%;background:'+color+'"></div></div><span class="lev-label" style="color:'+color+'">'+label+'</span></div>';
+}
+function regionFlag(r){return '<span class="rflag '+r.toLowerCase()+'">'+r+'</span>';}
+function yoyDelta(v){
+  if(v>0)return '<span class="delta up">+'+v+'%</span>';
+  if(v<0)return '<span class="delta dn">'+v+'%</span>';
+  return '<span class="delta flat">0%</span>';
+}
+function renderTable(data){
+  document.getElementById('table-body').innerHTML=data.map(function(r){
+    return '<tr onclick="openBenchModal(\''+r.id+'\')" style="cursor:pointer;">'
+      +'<td><strong>'+r.role+'</strong> '+yoyDelta(r.yoy_change)+'</td>'
+      +'<td style="font-size:7.5pt;color:var(--ink4);">'+r.category+'</td>'
+      +'<td>'+regionFlag(r.region)+'</td>'
+      +'<td><strong>$'+r.our_rate+'/hr</strong></td>'
+      +'<td style="font-size:8pt;color:var(--ink4);">$'+r.market_low+'–$'+r.market_high+' <span style="color:var(--ink3);">(mid $'+r.market_mid+')</span></td>'
+      +'<td>'+posChip(r.position)+'</td>'
+      +'<td>'+leverageBar(r.leverage)+'</td>'
+      +'<td>'+(r.savings_opp>0?'<strong style="color:var(--green);">$'+r.savings_opp+'M</strong>':'<span style="color:var(--ink4);">—</span>')+'</td>'
+      +'<td style="font-size:7.5pt;color:var(--ink4);">'+r.vendors.slice(0,2).join(', ')+(r.vendors.length>2?' +'+( r.vendors.length-2):'')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+function renderCards(data){
+  document.getElementById('card-grid').innerHTML=data.map(function(r){
+    var pct=((r.our_rate-r.market_low)/(r.market_high-r.market_low))*100;
+    pct=Math.max(5,Math.min(95,pct));
+    var mc=r.position==='above'?'#DC2626':r.position==='below'?'#059669':'#D97706';
+    return '<div class="bench-card" onclick="openBenchModal(\''+r.id+'\')" style="cursor:pointer;">'
+      +'<div class="bc-top"><div class="bc-role">'+r.role+'</div>'
+      +'<div class="bc-cat">'+r.category+' &middot; '+regionFlag(r.region)+'</div>'
+      +'<div class="bc-rate-row"><div class="bc-our-rate">$'+r.our_rate+'/hr</div>'
+      +'<div style="font-size:7.5pt;color:var(--ink4);margin:0 6px;">vs</div>'
+      +'<div style="font-size:11pt;font-weight:700;color:var(--ink3);">$'+r.market_mid+' mid</div>'
+      +'<div style="margin-left:auto;">'+posChip(r.position)+'</div></div></div>'
+      +'<div class="bc-body">'
+      +'<div class="bc-bar-row"><div class="bc-bar-labels"><span>$'+r.market_low+'</span><span>Market Range</span><span>$'+r.market_high+'</span></div>'
+      +'<div class="bc-bar-track"><div class="bc-bar-range" style="left:0;width:100%;"></div>'
+      +'<div class="bc-bar-marker" style="left:calc('+pct+'% - 7px);background:'+mc+';"></div></div></div>'
+      +'<div class="bc-row"><span class="bc-row-label">YoY Change</span>'+yoyDelta(r.yoy_change)+'</div>'
+      +'<div class="bc-row"><span class="bc-row-label">Leverage</span>'+leverageBar(r.leverage)+'</div>'
+      +'<div class="bc-row"><span class="bc-row-label">Savings Opp</span><span class="bc-row-val">'+(r.savings_opp>0?'$'+r.savings_opp+'M':'—')+'</span></div>'
+      +'<div class="bc-row"><span class="bc-row-label">Key Vendors</span><span class="bc-row-val" style="font-size:7.5pt;">'+r.vendors.slice(0,2).join(', ')+'</span></div>'
+      +'</div></div>';
+  }).join('');
+}
+function renderPagination(total){
+  var pages=Math.ceil(total/pageSize);
+  if(pages<=1){document.getElementById('pagination').innerHTML='';return;}
+  var btns=[];
+  btns.push('<button class="pg-btn" onclick="goPage('+Math.max(1,currentPage-1)+')" '+(currentPage===1?'disabled':'')+'>&#8592;</button>');
+  for(var i=1;i<=pages;i++) btns.push('<button class="pg-btn'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')">'+i+'</button>');
+  btns.push('<button class="pg-btn" onclick="goPage('+Math.min(pages,currentPage+1)+')" '+(currentPage===pages?'disabled':'')+'>&#8594;</button>');
+  btns.push('<span class="pg-info">'+currentPage+' of '+pages+'</span>');
+  document.getElementById('pagination').innerHTML=btns.join('');
+}
+function goPage(p){currentPage=p;render();window.scrollTo(0,300);}
+
+// ── BENCH MODAL ────────────────────────────────────────────
+function openBenchModal(id){
+  var r=BENCH_DATA.find(function(x){return x.id===id;});if(!r)return;
+  var posColor=r.position==='above'?'var(--red)':r.position==='below'?'var(--green)':'var(--amber)';
+  var posLabel=r.position==='above'?'Above Market':r.position==='below'?'Below Market':'Inline';
+  var html='<div class="modal-bg open" id="modal-overlay" onclick="closeModalIfBg(event)">'
+    +'<div class="modal"><div class="modal-hd">'
+    +'<div class="modal-title">'+r.role+' &middot; '+r.region+'</div>'
+    +'<button class="modal-close" onclick="closeModal()">&#215;</button></div>'
+    +'<div class="m2col">'
+    +'<div class="m-tile"><div class="m-tile-label">DET Rate</div><div class="m-tile-val">$'+r.our_rate+'/hr</div><div class="m-tile-note">Current blended rate</div></div>'
+    +'<div class="m-tile '+(r.position==='above'?'alert':r.position==='below'?'highlight':'')+'"><div class="m-tile-label">Market Position</div><div class="m-tile-val" style="color:'+posColor+';">'+posLabel+'</div><div class="m-tile-note">Mid: $'+r.market_mid+' · Range: $'+r.market_low+'–$'+r.market_high+'</div></div>'
+    +'<div class="m-tile"><div class="m-tile-label">Negotiation Leverage</div><div class="m-tile-val">'+r.leverage+'<span style="font-size:10pt;color:var(--ink4);">/100</span></div><div class="m-tile-note">'+(r.leverage>=65?'High — act now':r.leverage>=40?'Medium — monitor':'Low — maintain')+'</div></div>'
+    +'<div class="m-tile"><div class="m-tile-label">YoY Rate Change</div><div class="m-tile-val" style="color:'+(r.yoy_change>10?'var(--red)':r.yoy_change>5?'var(--amber)':'var(--green)')+';">'+(r.yoy_change>0?'+':'')+r.yoy_change+'%</div><div class="m-tile-note">Market rate movement</div></div>'
+    +'</div>'
+    +(r.savings_opp>0?'<div class="m-tile savings" style="margin-bottom:16px;"><div class="m-tile-label">Identified Savings Opportunity</div><div class="m-tile-val">$'+r.savings_opp+'M</div><div class="m-tile-note">Achievable through rate rebaseline or model optimization</div></div>':'')
+    +'<div class="m-section"><div class="m-section-title">Category &amp; Vendors</div><div style="font-size:8.5pt;color:var(--ink3);margin-bottom:8px;"><strong>'+r.category+'</strong></div><div class="m-tags">'+r.vendors.map(function(v){return '<span class="m-tag">'+v+'</span>';}).join('')+'</div></div>'
+    +'<div class="m-section"><div class="m-section-title">VER Market Commentary</div><div style="font-size:8.5pt;color:var(--ink3);line-height:1.65;">'+r.notes+'</div></div>'
+    +'<div class="m-section"><div class="m-section-title">Recommended Actions</div><ul class="m-list">'+r.actions.map(function(a){return '<li>'+a+'</li>';}).join('')+'</ul></div>'
+    +'</div></div>';
+  document.getElementById('modal-root').innerHTML=html;
+}
+function closeModal(){document.getElementById('modal-root').innerHTML='';}
+function closeModalIfBg(e){if(e.target.id==='modal-overlay')closeModal();}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
+// ── NEGOTIATION TABLE + ROLE CARDS ────────────────────────
+function buildNegTable(){
+  var ac={critical:'var(--red)',high:'var(--amber)',medium:'var(--blue)',low:'var(--green)'};
+  document.getElementById('neg-body').innerHTML=NEG_PLAYS.map(function(n){
+    var c=ac[n.action];
+    return '<tr><td><strong>'+n.vendor+'</strong></td>'
+      +'<td style="font-size:7.5pt;color:var(--ink4);">'+n.category+'</td>'
+      +'<td><strong>'+n.spend+'</strong></td>'
+      +'<td style="color:var(--amber2);font-weight:700;">'+n.gap+'</td>'
+      +'<td style="color:var(--green2);font-weight:700;">'+n.target+'</td>'
+      +'<td style="font-size:7.5pt;color:var(--ink3);max-width:200px;">'+n.position+'</td>'
+      +'<td><span style="font-size:7pt;font-weight:800;padding:2px 9px;border-radius:6px;background:'+c+'22;color:'+c+';text-transform:uppercase;letter-spacing:.05em;">'+n.action+'</span></td>'
+      +'</tr>';
+  }).join('');
+}
+function buildNegRoleCards(){
+  var high = BENCH_DATA.filter(function(r){return r.position==='above'&&r.leverage>=60;}).sort(function(a,b){return b.leverage-a.leverage;});
+  document.getElementById('neg-role-cards').innerHTML = high.map(function(r){
+    return '<div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px;border-left:4px solid var(--amber);">'
+      +'<div style="font-size:9.5pt;font-weight:800;color:var(--navy);margin-bottom:2px;">'+r.role+'</div>'
+      +'<div style="font-size:8pt;color:var(--ink4);margin-bottom:10px;">'+r.category+' &middot; '+r.region+' &middot; Leverage '+r.leverage+'/100</div>'
+      +'<div style="font-size:8.5pt;color:var(--ink3);line-height:1.6;margin-bottom:10px;">'+r.notes+'</div>'
+      +'<ul style="list-style:none;margin:0;padding:0;">'
+      +r.actions.map(function(a){return '<li style="font-size:8pt;color:var(--ink3);padding:3px 0 3px 14px;position:relative;border-bottom:1px solid var(--gray2);">'
+        +'<span style="position:absolute;left:0;color:var(--teal);font-weight:700;">→</span>'+a+'</li>';}).join('')
+      +'</ul></div>';
+  }).join('');
+}
+
+// ── CATEGORY GRID (uses rate_data.js RATE_DATA) ───────────
+function rateColor(pct){
+  if(pct<0.35)return 'var(--green)';
+  if(pct<0.65)return 'var(--teal)';
+  if(pct<0.85)return 'var(--amber)';
+  return 'var(--red)';
+}
+function buildCategoryGrid(){
+  var rd = typeof RATE_DATA !== 'undefined' ? RATE_DATA : [];
+  var bycat={};
+  rd.forEach(function(r){if(!bycat[r.category])bycat[r.category]=[];bycat[r.category].push(r);});
+  var maxAvg=0,catList=[];
+  Object.keys(bycat).forEach(function(c){
+    var mids=bycat[c].map(function(r){return r.rate_mid;});
+    var avg=Math.round(mids.reduce(function(a,b){return a+b;},0)/mids.length);
+    var lo=Math.round(Math.min.apply(null,mids));
+    var hi=Math.round(Math.max.apply(null,mids));
+    if(avg>maxAvg)maxAvg=avg;
+    catList.push({cat:c,avg:avg,lo:lo,hi:hi,roles:new Set(bycat[c].map(function(r){return r.role;})).size,count:bycat[c].length});
+  });
+  document.getElementById('cat-grid').innerHTML=catList.sort(function(a,b){return b.avg-a.avg;}).map(function(item){
+    var pct=maxAvg>0?item.avg/maxAvg:0;
+    var bc=rateColor(pct);
+    return '<div class="cat-card">'
+      +'<div class="cat-icon">'+(CAT_ICONS[item.cat]||'&#128202;')+'</div>'
+      +'<div class="cat-name">'+item.cat+'</div>'
+      +'<div class="cat-count">'+item.roles+' roles &middot; '+item.count+' records</div>'
+      +'<div class="cat-stat"><span style="color:var(--ink4)">Range</span><span style="font-weight:700">$'+item.lo+' &ndash; $'+item.hi+'/hr</span></div>'
+      +'<div class="cat-stat"><span style="color:var(--ink4)">Avg Midpoint</span><span style="font-weight:700;color:'+bc+'">$'+item.avg+'/hr</span></div>'
+      +'<div class="cat-bar-track"><div class="cat-bar-fill" style="width:'+Math.round(pct*100)+'%;background:'+bc+'"></div></div>'
+      +'</div>';
+  }).join('');
+}
+function buildRegSummary(){
+  var rd = typeof RATE_DATA !== 'undefined' ? RATE_DATA : [];
+  var contexts = {AMER:'Onshore US — primary delivery',APAC:'India offshore — cost advantage',LATAM:'Nearshore — hybrid model',EMEA:'Europe — specialized roles'};
+  var rows = ['AMER','APAC','LATAM','EMEA'].map(function(reg){
+    var rr=rd.filter(function(r){return r.region===reg||r.region==='Global';});
+    if(!rr.length)return '';
+    var lo=Math.round(rr.reduce(function(s,r){return s+r.rate_lo;},0)/rr.length);
+    var mid=Math.round(rr.reduce(function(s,r){return s+r.rate_mid;},0)/rr.length);
+    var hi=Math.round(rr.reduce(function(s,r){return s+r.rate_hi;},0)/rr.length);
+    return '<tr><td><strong>'+reg+'</strong></td><td>$'+lo+'/hr</td><td><strong>$'+mid+'/hr</strong></td><td>$'+hi+'/hr</td><td>'+rr.length+'</td><td style="font-size:7.5pt;color:var(--ink4);">'+(contexts[reg]||'')+'</td></tr>';
+  }).join('');
+  document.getElementById('reg-summary-body').innerHTML = rows || '<tr><td colspan="6" style="padding:20px;color:var(--ink4);text-align:center;">Rate data loading…</td></tr>';
+}
+
+// ── VER INSIGHTS (uses rate_data.js RATE_DATA) ─────────────
+function buildInsights(){
+  var rd = typeof RATE_DATA !== 'undefined' ? RATE_DATA : [];
+  var n=rd.length;
+  if(!n){document.getElementById('ins-content').innerHTML='<div style="color:var(--ink4);padding:20px">Rate data unavailable.</div>';return;}
+  var mids=rd.map(function(r){return r.rate_mid;});
+  var avg=Math.round(mids.reduce(function(a,b){return a+b;},0)/n);
+  var byReg={};
+  rd.forEach(function(r){if(!byReg[r.region])byReg[r.region]=[];byReg[r.region].push(r.rate_mid);});
+  var bycat={};
+  rd.forEach(function(r){if(!bycat[r.category])bycat[r.category]=[];bycat[r.category].push(r.rate_mid);});
+  var catAvgs=Object.keys(bycat).map(function(c){
+    return{cat:c,avg:Math.round(bycat[c].reduce(function(a,b){return a+b;},0)/bycat[c].length)};
+  }).sort(function(a,b){return b.avg-a.avg;});
+  var verR=rd.filter(function(r){return r.source==='VER Rate Card';});
+  var mktR=rd.filter(function(r){return r.source!=='VER Rate Card';});
+  var awsR=rd.filter(function(r){return r.source&&r.source.includes('AWS');});
+  var amerArr=byReg['AMER'],apacArr=byReg['APAC'];
+  var amerAvg=amerArr?Math.round(amerArr.reduce(function(a,b){return a+b;},0)/amerArr.length):null;
+  var apacAvg=apacArr?Math.round(apacArr.reduce(function(a,b){return a+b;},0)/apacArr.length):null;
+  var html=insCard('ins-good','Portfolio Avg Midpoint','Average across '+n+' rate records in the benchmark dataset. Use as baseline when evaluating new SOW rates.','$'+avg+'/hr');
+  if(catAvgs.length)html+=insCard('ins-watch','Highest Cost Category',catAvgs[0].cat+' commands the highest avg rate at $'+catAvgs[0].avg+'/hr. Engagements here warrant closest rate scrutiny.','$'+catAvgs[0].avg+'/hr avg');
+  if(amerAvg&&apacAvg){
+    var pctS=Math.round(((amerAvg-apacAvg)/amerAvg)*100);
+    html+=insCard('ins-good','AMER vs APAC Differential','APAC (India offshore) averages '+pctS+'% below AMER onshore for comparable roles. VER uses this spread to benchmark offshore delivery value.',pctS+'% savings potential');
+  }
+  if(awsR.length)html+=insCard('ins-good','AWS Rate Anchor',awsR.length+' rates anchored to AWS published schedule — the most reliable benchmark for cloud/engineering. VER recommends AWS rates as the ceiling in cloud role negotiations.',awsR.length+' anchored rates');
+  if(verR.length&&mktR.length){
+    var vAvg=Math.round(verR.reduce(function(s,r){return s+r.rate_mid;},0)/verR.length);
+    var mAvg=Math.round(mktR.reduce(function(s,r){return s+r.rate_mid;},0)/mktR.length);
+    var diff=vAvg-mAvg;
+    html+=insCard(diff>10?'ins-watch':'ins-good','VER Rate Card vs Market','VER negotiated rates avg $'+vAvg+'/hr vs market $'+mAvg+'/hr. '+(diff>10?'Rates above market — review recommended.':diff<-10?'Below market — strong negotiation position.':'Tracking at market. Solid baseline.'),(diff>=0?'+':'')+diff+'/hr vs market');
+  }
+  var wdR=rd.filter(function(r){return r.category==='ERP & Workday'&&r.region==='AMER';});
+  if(wdR.length){
+    var wdAvg=Math.round(wdR.reduce(function(s,r){return s+r.rate_mid;},0)/wdR.length);
+    html+=insCard('ins-watch','Workday Specialist Premium','Workday-certified consultants command 20–35% above general SI rates. AMER avg $'+wdAvg+'/hr. VER benchmarks Cognizant ADAMS rates against this range at each renewal.','$'+wdAvg+'/hr AMER avg');
+  }
+  html+='<div class="insight-lbl" style="margin-top:20px;">Regional Rate Comparison</div>'
+    +'<div class="table-wrap"><table class="rate-table"><thead><tr>'
+    +'<th>Region</th><th>Avg Low</th><th>Avg Mid</th><th>Avg High</th><th>Records</th>'
+    +'</tr></thead><tbody>';
+  ['AMER','APAC','LATAM','EMEA'].forEach(function(reg){
+    var rr=rd.filter(function(r){return r.region===reg||r.region==='Global';});
+    if(!rr.length)return;
+    var lo=Math.round(rr.reduce(function(s,r){return s+r.rate_lo;},0)/rr.length);
+    var mid=Math.round(rr.reduce(function(s,r){return s+r.rate_mid;},0)/rr.length);
+    var hi=Math.round(rr.reduce(function(s,r){return s+r.rate_hi;},0)/rr.length);
+    html+='<tr><td><strong>'+reg+'</strong></td><td>$'+lo+'</td><td><strong>$'+mid+'</strong></td><td>$'+hi+'</td><td>'+rr.length+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('ins-content').innerHTML=html;
+}
+function insCard(cls,title,body,val){
+  return '<div class="ins-card '+cls+'"><div class="ins-title">'+title+'</div><div class="ins-body">'+body+'</div><div class="ins-val">'+val+'</div></div>';
+}
+
+// ── EXPORT CSV ─────────────────────────────────────────────
+function exportCSV(){
+  var rd = typeof RATE_DATA !== 'undefined' ? RATE_DATA : [];
+  if(!rd.length){alert('No rate data loaded.');return;}
+  var h=['role','level','category','region','rate_lo','rate_hi','rate_mid','source'];
+  var rows=[h.join(',')];
+  rd.forEach(function(r){
+    rows.push(h.map(function(k){var v=String(r[k]||'');return v.includes(',')? '"'+v+'"':v;}).join(','));
+  });
+  var b=new Blob([rows.join('\n')],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='VER_Rate_Benchmark_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+}
+</script>
+<script src="assets/rate_data.js"></script>
+<script>
+// After rate_data.js loads, populate category + insights views if we're on them
+// (DOMContentLoaded may have already fired)
+if(document.readyState !== 'loading'){
+  if(typeof RATE_DATA !== 'undefined'){
+    buildCategoryGrid();
+    buildRegSummary();
+    buildInsights();
+  }
+}
+</script>
+<script src="assets/help-modal.js"></script>
+<script>
+function openRateHelp(){
+  HelpModal.open({
+    title: 'Rate Benchmarks',
+    what: 'The Rate Benchmarks tool lets you <strong>validate contractor and consultant bill rates</strong> against DET market data and internal pay-range norms. Use it to pressure-test a SOW rate card, prepare for a rate negotiation, or audit a supplier\'s submitted rates before approval.',
+    steps: [
+      '<strong>Select a job family and level</strong> from the category filters — the benchmark range updates instantly to reflect current DET market data for that role.',
+      '<strong>Enter the submitted or proposed rate</strong> in the comparison input. The tool flags whether the rate falls within market range, is above cap, or is below floor.',
+      '<strong>Apply location and market modifiers</strong> — rates adjust for AMER/APAC/EMEA and onshore/nearshore/offshore delivery model.',
+      '<strong>Review the benchmark band</strong>: P25 (floor), P50 (market median), P75 (premium), and P90 (cap). Rates above P75 require documented justification; above P90 require VP approval.',
+      '<strong>Export or copy the benchmark output</strong> to attach to a SOW approval request or governance submission.'
+    ],
+    tips: [
+      { icon: '&#x1F4B0;', title: 'P75 is the approval line', body: 'Rates above the 75th percentile require a business justification. Above P90 needs VP sign-off — this is policy, not a suggestion.' },
+      { icon: '&#x1F30E;', title: 'Market reflects DET engagements', body: 'Benchmarks are calibrated from actual DET contractor data, not generic market surveys. They reflect Salesforce-ecosystem rates.' },
+      { icon: '&#x1F4CB;', title: 'Link to SOW Builder', body: 'Validated rate benchmarks can be passed directly to the SOW Builder to pre-populate the rate card section.' },
+      { icon: '&#x1F501;', title: 'Run multiple roles', body: 'For mixed SOWs with multiple job families, run each role separately and use the comparison export to assemble the full rate card picture.' }
+    ],
+    ai: '<strong>AI Augmentation flag:</strong> Roles with significant AI/agentic tooling overlap (prompt engineers, AI ops, ML platform engineers) are flagged with a ✨ indicator — rates for these roles are evolving rapidly and benchmark data has a shorter shelf life.',
+    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+  });
+}
+</script>
+<script>
+function toggleAiRate(){
+  var on = document.getElementById('ai-rate-track').classList.toggle('on');
+  document.getElementById('ai-rate-label').textContent = on ? 'On' : 'Off';
+  document.getElementById('ai-rate-body').classList.toggle('ai-on', on);
+}
+</script>
+</body>
+</html>

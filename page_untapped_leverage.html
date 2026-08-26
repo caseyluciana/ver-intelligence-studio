@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untapped Leverage Report — VER Intelligence Hub</title>
+<style>
+/* ── Reset & Tokens ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root,
+[data-theme="dark"] {
+  --body-bg:#020B18; --section-bg:#020B18;
+  --card-bg:rgba(255,255,255,0.03); --card-border:rgba(255,255,255,0.07);
+  --card-hover:rgba(255,255,255,0.05); --card-shadow:rgba(0,0,0,0.3);
+  --text-primary:#fff; --text-secondary:rgba(255,255,255,0.55);
+  --text-muted:rgba(255,255,255,0.35); --text-dim:rgba(255,255,255,0.25);
+  --divider:rgba(13,148,136,0.2);
+  --top-bar-bg:rgba(2,11,24,0.88); --top-bar-border:rgba(13,148,136,0.15);
+  --teal:#0D9488; --teal2:#0F766E; --teal3:#F0FDF9;
+  --amber:#D97706; --red:#DC2626; --green:#059669;
+  --amber-dim:rgba(217,119,6,0.12); --red-dim:rgba(220,38,38,0.12); --green-dim:rgba(5,150,105,0.12);
+  --surface:rgba(255,255,255,0.03); --surface2:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.07);
+  /* legacy aliases */
+  --bg: #020B18;
+  --text: #fff;
+  --text-sub: rgba(255,255,255,0.55);
+  --text-faint: rgba(255,255,255,0.35);
+  --accent: #0D9488;
+  --accent-dim: rgba(13,148,136,0.12);
+  --teal-dim: rgba(13,148,136,0.12);
+  --purple: #7c3aed;
+  --purple-dim: rgba(124,58,237,0.12);
+  --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+[data-theme="light"] {
+  --body-bg:#F0F4FA; --card-bg:#fff; --card-border:#E5E7EB;
+  --text-primary:#111827; --text-secondary:#374151;
+  --text-muted:#6B7280; --text-dim:#9CA3AF;
+  --top-bar-bg:rgba(15,30,60,0.97); --top-bar-border:rgba(13,148,136,0.2);
+  --surface:#fff; --surface2:#F9FAFB; --border:#E5E7EB;
+  --teal:#0D9488; --teal2:#0F766E; --teal3:#F0FDF9;
+  --amber:#D97706; --red:#DC2626; --green:#059669;
+  --amber-dim:rgba(217,119,6,0.1); --red-dim:rgba(220,38,38,0.1); --green-dim:rgba(5,150,105,0.1);
+  --card-shadow:rgba(0,0,0,0.08);
+  /* legacy aliases */
+  --bg: #F0F4FA;
+  --text: #111827;
+  --text-sub: #374151;
+  --text-faint: #6B7280;
+  --accent: #0D9488;
+  --accent-dim: rgba(13,148,136,0.1);
+  --teal-dim: rgba(13,148,136,0.1);
+  --purple: #7c3aed;
+  --purple-dim: rgba(124,58,237,0.1);
+  --shadow: 0 8px 32px rgba(0,0,0,0.08);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  padding-top: 50px;
+}
+
+.hidden { display: none !important; }
+
+/* ── Top bar ── */
+.top-bar{position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:50px;
+  background:var(--top-bar-bg);
+  border-bottom:1px solid var(--top-bar-border);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  transition:background 0.3s;}
+.tb-left{display:flex;align-items:center;gap:16px;}
+.tb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;
+  display:flex;align-items:center;gap:5px;transition:color 0.2s;}
+.tb-back:hover{color:#0D9488;}
+.tb-sep{width:1px;height:14px;background:rgba(255,255,255,0.12);}
+.tb-brand{font-size:8.5pt;font-weight:800;letter-spacing:0.06em;color:rgba(255,255,255,0.65);}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-live{display:flex;align-items:center;gap:6px;font-size:8pt;font-weight:700;color:#0D9488;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#0D9488;animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(13,148,136,0.4);}
+  50%{opacity:0.6;box-shadow:0 0 0 5px rgba(13,148,136,0);}}
+.tb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:6px;font-size:8pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.18s;letter-spacing:0.04em;border:none;}
+.tb-theme{background:transparent;border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.45);padding:5px 12px;border-radius:6px;
+  font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.18s;}
+.tb-theme:hover{border-color:#0D9488;color:#0D9488;}
+
+/* ── Scanline + particles ── */
+.scanline{position:fixed;left:0;right:0;height:140px;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,transparent,rgba(13,148,136,0.04),transparent);
+  top:0;will-change:transform;animation:scan 7s linear infinite;}
+@keyframes scan{from{transform:translateY(-140px)}to{transform:translateY(100vh)}}
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.6;}
+[data-theme="light"] .scanline{opacity:0.3;}
+[data-theme="light"] #particles{opacity:0.15;}
+
+/* ── Animations ── */
+@keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes punchin{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+
+/* legacy .btn-icon kept for Export CSV button */
+.btn-icon {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-sub);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  letter-spacing: .01em;
+}
+.btn-icon:hover { border-color: #0D9488; color: #0D9488; }
+
+/* ── Layout ── */
+.page-wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Hero Summary ── */
+.hero {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 32px var(--card-shadow);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.hero:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--card-shadow); }
+.hero-left h1 {
+  font-size: clamp(20pt, 3vw, 28pt);
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+  animation: fadeup 0.7s 0.3s both;
+}
+.hero-left p {
+  color: var(--text-sub);
+  font-size: 10pt;
+  max-width: 560px;
+  line-height: 1.7;
+}
+.hero-metrics {
+  display: flex;
+  gap: 20px;
+}
+.hero-metric {
+  text-align: center;
+  min-width: 100px;
+}
+.hero-metric-val {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1;
+}
+.hero-metric-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-top: 4px;
+}
+.metric-green { color: var(--green); }
+.metric-amber { color: var(--amber); }
+.metric-red   { color: var(--red); }
+.metric-teal  { color: var(--teal); }
+
+/* ── Signal Filter Bar ── */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filter-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-sub);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+.filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.filter-pill .pill-count {
+  background: rgba(255,255,255,.25);
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 11px;
+}
+.filter-pill:not(.active) .pill-count {
+  background: var(--surface2);
+  color: var(--text-faint);
+}
+.filter-spacer { flex: 1; }
+.sort-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+.sort-wrap select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-sub);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+/* ── Signal Cards ── */
+.signals-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.signal-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 32px var(--card-shadow);
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.signal-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 14px 0 0 14px;
+}
+.signal-card.sig-rate::before    { background: var(--red); }
+.signal-card.sig-volume::before  { background: var(--amber); }
+.signal-card.sig-window::before  { background: var(--teal); }
+.signal-card.sig-overlap::before { background: var(--purple); }
+.signal-card.sig-competitive::before { background: var(--accent); }
+.signal-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--card-shadow); }
+
+.sig-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.sig-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.sig-rate    .sig-icon { background: var(--red-dim); }
+.sig-volume  .sig-icon { background: var(--amber-dim); }
+.sig-window  .sig-icon { background: var(--teal-dim); }
+.sig-overlap .sig-icon { background: var(--purple-dim); }
+.sig-competitive .sig-icon { background: var(--accent-dim); }
+
+.sig-main { flex: 1; }
+.sig-vendor {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.sig-type {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+.sig-rate .sig-type    { color: var(--red); }
+.sig-volume .sig-type  { color: var(--amber); }
+.sig-window .sig-type  { color: var(--teal); }
+.sig-overlap .sig-type { color: var(--purple); }
+.sig-competitive .sig-type { color: var(--accent); }
+
+.sig-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; }
+.sig-right { text-align: right; flex-shrink: 0; }
+.sig-value {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+.sig-rate .sig-value    { color: var(--red); }
+.sig-volume .sig-value  { color: var(--amber); }
+.sig-window .sig-value  { color: var(--teal); }
+.sig-overlap .sig-value { color: var(--purple); }
+.sig-competitive .sig-value { color: var(--accent); }
+
+.sig-value-lbl { font-size: 11px; color: var(--text-faint); font-weight: 600; margin-top: 3px; }
+.sig-urgency {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 8px;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.urg-high   { background: var(--red-dim); color: var(--red); }
+.urg-medium { background: var(--amber-dim); color: var(--amber); }
+.urg-low    { background: var(--green-dim); color: var(--green); }
+
+/* ── Expanded Detail ── */
+.sig-detail {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.detail-tile { background: var(--surface2); border-radius: 10px; padding: 12px 14px; }
+.detail-tile-lbl {
+  font-size: 11px; font-weight: 600; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px;
+}
+.detail-tile-val { font-size: 15px; font-weight: 700; color: var(--text); }
+.sig-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.btn-action {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-sub);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-action:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-action.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-action.primary:hover { opacity: .85; }
+
+/* ── Two-col layout ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: 1fr; }
+}
+
+/* ── Sidebar ── */
+.sidebar-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px var(--card-shadow);
+  position: sticky;
+  top: 62px;
+}
+.sidebar-hdr {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-hdr-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.btn-add {
+  background: var(--teal); color: #fff; border: none;
+  border-radius: 7px; padding: 5px 12px; font-size: 12px;
+  font-weight: 700; cursor: pointer; transition: opacity .15s;
+}
+.btn-add:hover { opacity: .85; }
+.vendor-list { max-height: 520px; overflow-y: auto; }
+.vendor-row {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: background .12s;
+}
+.vendor-row:last-child { border-bottom: none; }
+.vendor-row:hover { background: var(--surface2); }
+.vr-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.vr-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+.vr-spend { font-size: 12px; color: var(--text-faint); font-weight: 600; }
+.vr-signals { display: flex; gap: 4px; }
+.vr-sig-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* ── Add Vendor Form ── */
+.vendor-form {
+  padding: 16px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+}
+.form-title {
+  font-size: 12px; font-weight: 700; color: var(--text);
+  margin-bottom: 12px; text-transform: uppercase; letter-spacing: .04em;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.form-row.full { grid-template-columns: 1fr; }
+.form-field label {
+  display: block; font-size: 11px; font-weight: 600; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px;
+}
+.form-field input, .form-field select {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); border-radius: 7px; padding: 7px 10px;
+  font-size: 13px; outline: none; transition: border-color .15s;
+}
+.form-field input:focus, .form-field select:focus { border-color: var(--accent); }
+.form-btns { display: flex; gap: 8px; margin-top: 10px; }
+.btn-save {
+  flex: 1; background: var(--teal); color: #fff; border: none;
+  border-radius: 8px; padding: 8px; font-size: 13px;
+  font-weight: 700; cursor: pointer; transition: opacity .15s;
+}
+.btn-save:hover { opacity: .85; }
+.btn-cancel {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-sub); border-radius: 8px; padding: 8px 14px;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s;
+}
+.btn-cancel:hover { background: var(--border); }
+
+/* ── Summary Band ── */
+.summary-band {
+  background: linear-gradient(135deg, var(--teal-dim), var(--accent-dim));
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 18px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.summary-stat { display: flex; flex-direction: column; align-items: center; min-width: 120px; }
+.summary-stat-val { font-size: 26px; font-weight: 800; color: var(--teal); letter-spacing: -.03em; line-height: 1; }
+.summary-stat-lbl { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; text-align: center; }
+.summary-divider { width: 1px; height: 40px; background: var(--border); }
+.summary-insight { flex: 1; min-width: 200px; }
+.summary-insight-lbl { font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+.summary-insight-text { font-size: 14px; color: var(--text); font-weight: 500; line-height: 1.5; }
+.highlight-teal { color: var(--teal); font-weight: 700; }
+
+/* ── Empty ── */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text-faint); }
+.empty-state h3 { font-size: 16px; color: var(--text-sub); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<canvas id="particles"></canvas>
+
+<nav class="top-bar">
+  <div class="tb-left">
+    <a href="index.html" class="tb-back">← Hub</a>
+    <div class="tb-sep"></div>
+    <span class="tb-brand">VER INTELLIGENCE HUB</span>
+  </div>
+  <div class="tb-right">
+    <div class="tb-live"><div class="live-dot"></div>LIVE</div>
+    <button type="button" class="btn-icon" id="btn-export">Export CSV</button>
+    <button class="tb-btn tb-theme" onclick="toggleTheme()">◐ Theme</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="hero">
+    <div class="hero-left">
+      <h1>Untapped Leverage Report</h1>
+      <p>Real-time signal detection across your vendor portfolio — rate gaps, volume cliffs, renewal windows, consolidation plays, and competitive pressure mapped to recoverable dollar value.</p>
+      <div style="margin-top:8px;font-size:11px;color:var(--text-faint);">Source: <strong style="color:var(--teal);">Coupa FY27</strong> · 242 vendors · $295.47M total spend</div>
+    </div>
+    <div class="hero-metrics" id="hero-metrics"></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="summary-band" id="summary-band"></div>
+
+      <div class="filter-bar">
+        <button type="button" class="filter-pill active" data-filter="all">All Signals <span class="pill-count" id="cnt-all">0</span></button>
+        <button type="button" class="filter-pill" data-filter="rate">Rate Gap <span class="pill-count" id="cnt-rate">0</span></button>
+        <button type="button" class="filter-pill" data-filter="volume">Volume Cliff <span class="pill-count" id="cnt-volume">0</span></button>
+        <button type="button" class="filter-pill" data-filter="window">Renewal Window <span class="pill-count" id="cnt-window">0</span></button>
+        <button type="button" class="filter-pill" data-filter="overlap">Consolidation <span class="pill-count" id="cnt-overlap">0</span></button>
+        <button type="button" class="filter-pill" data-filter="competitive">Competitive <span class="pill-count" id="cnt-competitive">0</span></button>
+        <span class="filter-spacer"></span>
+        <div class="sort-wrap">
+          Sort:
+          <select id="sort-select">
+            <option value="value">$ Value</option>
+            <option value="urgency">Urgency</option>
+            <option value="vendor">Vendor Name</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="signals-grid" id="signals-grid"></div>
+    </div>
+
+    <div>
+      <div class="sidebar-card">
+        <div class="sidebar-hdr">
+          <span class="sidebar-hdr-title">Vendor Portfolio</span>
+          <button type="button" class="btn-add" id="btn-add-vendor">+ Add</button>
+        </div>
+        <div class="vendor-list" id="vendor-list"></div>
+        <div class="vendor-form hidden" id="vendor-form">
+          <div class="form-title">Add Vendor</div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="vf-name">Vendor Name</label>
+              <input type="text" id="vf-name" placeholder="e.g. Salesforce">
+            </div>
+            <div class="form-field">
+              <label for="vf-category">Category</label>
+              <select id="vf-category">
+                <option>CRM</option>
+                <option>ERP</option>
+                <option>ITSM</option>
+                <option>Infrastructure</option>
+                <option>Analytics</option>
+                <option>Security</option>
+                <option>Collaboration</option>
+                <option>Staffing</option>
+                <option>Professional Services</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="vf-spend">Annual Spend ($)</label>
+              <input type="number" id="vf-spend" placeholder="0">
+            </div>
+            <div class="form-field">
+              <label for="vf-renewal">Contract End</label>
+              <input type="date" id="vf-renewal" title="Contract renewal date">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="vf-benchmark">vs. Benchmark (%)</label>
+              <input type="number" id="vf-benchmark" placeholder="0 = at market" title="Percent above or below market rate">
+            </div>
+            <div class="form-field">
+              <label for="vf-vol-gap">Vol. Discount Gap ($)</label>
+              <input type="number" id="vf-vol-gap" placeholder="$ to next tier">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="vf-switch">Switching Cost</label>
+              <select id="vf-switch">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="vf-competitors">Competitor Count</label>
+              <input type="number" id="vf-competitors" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-field">
+              <label for="vf-overlap">Overlaps With (comma-separated)</label>
+              <input type="text" id="vf-overlap" placeholder="e.g. ServiceNow, Jira">
+            </div>
+          </div>
+          <div class="form-btns">
+            <button type="button" class="btn-save" id="btn-vendor-save">Save Vendor</button>
+            <button type="button" class="btn-cancel" id="btn-vendor-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/coupa_spend.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ── Utilities ── */
+  function fmt(n) {
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+    return '$' + n.toFixed(0);
+  }
+  function fmtPct(n) { return (n > 0 ? '+' : '') + n.toFixed(1) + '%'; }
+
+  function setHidden(node, hide) {
+    var e = typeof node === 'string' ? document.getElementById(node) : node;
+    if (!e) return;
+    if (hide) e.classList.add('hidden'); else e.classList.remove('hidden');
+  }
+
+  function clearNode(e) {
+    while (e.firstChild) e.removeChild(e.firstChild);
+  }
+
+  function el(tag, opts, kids) {
+    var e = document.createElement(tag);
+    if (!opts) return e;
+    if (opts.cls)  e.className = opts.cls;
+    if (opts.text != null) e.textContent = String(opts.text);
+    if (opts.id)   e.id = opts.id;
+    if (opts.attr) Object.keys(opts.attr).forEach(function(k) { e.setAttribute(k, opts.attr[k]); });
+    if (opts.style) Object.keys(opts.style).forEach(function(k) { e.style[k] = opts.style[k]; });
+    if (opts.on)   Object.keys(opts.on).forEach(function(k) { e.addEventListener(k, opts.on[k]); });
+    if (kids) kids.forEach(function(k) { if (k) e.appendChild(k); });
+    return e;
+  }
+
+  /* ── Persistence ── */
+  var STORE_KEY = 'ver_leverage_v1';
+  function load() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; } catch(x) { return null; } }
+  function persist() { try { localStorage.setItem(STORE_KEY, JSON.stringify({ vendors: vendors })); } catch(x) {} }
+
+  /* ── Demo Data ── */
+  var DEFAULT_VENDORS = [
+    { id:'v1', name:'Salesforce',  category:'CRM',            annualSpend:2400000, contractEnd:'2026-09-30', benchmarkPct:22, volDiscountGap:180000, switchingCost:'high',   competitorCount:3, overlaps:['ServiceNow'], color:'#0f7fd4' },
+    { id:'v2', name:'SAP ECC',     category:'ERP',            annualSpend:1800000, contractEnd:'2025-12-31', benchmarkPct:31, volDiscountGap:0,      switchingCost:'high',   competitorCount:2, overlaps:['Oracle','Workday'], color:'#dc2626' },
+    { id:'v3', name:'ServiceNow',  category:'ITSM',           annualSpend:960000,  contractEnd:'2026-07-15', benchmarkPct:14, volDiscountGap:95000,  switchingCost:'medium', competitorCount:4, overlaps:['Salesforce','Jira'], color:'#7c3aed' },
+    { id:'v4', name:'Workday',     category:'ERP',            annualSpend:1400000, contractEnd:'2027-03-01', benchmarkPct:-5, volDiscountGap:250000, switchingCost:'high',   competitorCount:2, overlaps:['SAP ECC'], color:'#0eb8a0' },
+    { id:'v5', name:'AWS',         category:'Infrastructure', annualSpend:3200000, contractEnd:'2026-06-30', benchmarkPct:8,  volDiscountGap:420000, switchingCost:'medium', competitorCount:3, overlaps:[], color:'#d97706' },
+    { id:'v6', name:'Cognizant',   category:'Staffing',       annualSpend:4800000, contractEnd:'2026-03-31', benchmarkPct:18, volDiscountGap:0,      switchingCost:'low',    competitorCount:8, overlaps:['Infosys','TCS'], color:'#16a34a' },
+    { id:'v7', name:'Okta',        category:'Security',       annualSpend:480000,  contractEnd:'2026-11-30', benchmarkPct:7,  volDiscountGap:60000,  switchingCost:'low',    competitorCount:5, overlaps:[], color:'#0f7fd4' },
+    { id:'v8', name:'Tableau',     category:'Analytics',      annualSpend:620000,  contractEnd:'2026-08-31', benchmarkPct:25, volDiscountGap:0,      switchingCost:'medium', competitorCount:6, overlaps:['Power BI','Looker'], color:'#e11d48' }
+  ];
+
+  function buildVendorsFromCoupa() {
+    if (!window.VER_COUPA) return null;
+    return window.VER_COUPA.vendors.slice(0, 50).map(function(v, i) {
+      var spendM = v.fy27 || 0;
+      var spend  = Math.round(spendM * 1e6);
+      // FY26→FY27 delta drives benchmark pct (spend increase = above market signal)
+      var fy26M  = v.fy26 || 0;
+      var benchmarkPct = fy26M > 0 ? Math.round(((spendM - fy26M) / fy26M) * 100) : 0;
+      // Volume gap: small vendors near round numbers have unclaimed tier potential
+      var volGap = spendM < 1 ? Math.round(spend * 0.12) : spendM < 5 ? Math.round(spend * 0.08) : 0;
+      // Switching cost by category
+      var switchMap = { 'Software': 'medium', 'CWF': 'low', 'Hardware': 'low', 'CWF - Maintenance': 'medium', 'Telecom': 'low', 'Cabling': 'low' };
+      var switchCost = switchMap[v.cat] || 'medium';
+      // Competitor count rough estimate by category
+      var compMap = { 'Software': 4, 'CWF': 6, 'Hardware': 3, 'CWF - Maintenance': 2, 'Telecom': 3, 'Cabling': 2 };
+      var colors = ['#0f7fd4','#0eb8a0','#7c3aed','#d97706','#16a34a','#dc2626','#e11d48','#0f7fd4'];
+      return {
+        id: 'cv_' + i,
+        name: v.n,
+        category: v.cat,
+        annualSpend: spend,
+        contractEnd: null,
+        benchmarkPct: benchmarkPct,
+        volDiscountGap: volGap,
+        switchingCost: switchCost,
+        competitorCount: compMap[v.cat] || 3,
+        overlaps: [],
+        color: colors[i % colors.length]
+      };
+    });
+  }
+
+  var stored   = load();
+  var coupaVendors = buildVendorsFromCoupa();
+  var vendors  = (stored && stored.vendors && stored.vendors.length) ? stored.vendors : (coupaVendors || DEFAULT_VENDORS);
+  var expanded = {};
+  var activeFilter = 'all';
+  var sortBy   = 'value';
+  var TODAY    = new Date('2026-08-18');
+
+  /* ── Signal Engine ── */
+  function daysUntil(d) { return Math.round((new Date(d) - TODAY) / 86400000); }
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+  function generateSignals(v) {
+    var out = [];
+    var sp  = v.annualSpend || 0;
+    var days = v.contractEnd ? daysUntil(v.contractEnd) : Infinity;
+
+    if (v.benchmarkPct > 0) {
+      var over = Math.round(sp * v.benchmarkPct / 100);
+      out.push({
+        type:'rate', value:over, icon:'📊',
+        urgency: v.benchmarkPct >= 20 ? 'high' : v.benchmarkPct >= 10 ? 'medium' : 'low',
+        vendorName:v.name, vendorId:v.id,
+        headline: 'Rate Gap — ' + fmtPct(v.benchmarkPct) + ' above market',
+        desc: v.name + ' pricing is ' + fmtPct(v.benchmarkPct) + ' above benchmarked market rate for comparable ' + v.category + ' vendors. Estimated annual overcharge of ' + fmt(over) + '.',
+        details:[
+          {lbl:'Annual Spend',       val:fmt(sp)},
+          {lbl:'Benchmark Variance', val:fmtPct(v.benchmarkPct)},
+          {lbl:'Recoverable',        val:fmt(over)},
+          {lbl:'Switching Cost',     val:cap(v.switchingCost||'unknown')},
+          {lbl:'Alternatives',       val:(v.competitorCount||0) + ' viable'},
+          {lbl:'Category',           val:v.category}
+        ],
+        actions:[
+          {label:'Run Benchmark Analysis', primary:true},
+          {label:'Request RFP Comparison'},
+          {label:'Flag for Negotiation'}
+        ]
+      });
+    }
+
+    if (v.volDiscountGap > 0) {
+      var pct = v.volDiscountGap / sp * 100;
+      var disc = Math.round(v.volDiscountGap * 0.15);
+      out.push({
+        type:'volume', value:disc, icon:'📦',
+        urgency: pct < 10 ? 'high' : pct < 20 ? 'medium' : 'low',
+        vendorName:v.name, vendorId:v.id,
+        headline: 'Volume Cliff — ' + fmt(v.volDiscountGap) + ' from next tier',
+        desc: 'Adding ' + fmt(v.volDiscountGap) + ' (' + pct.toFixed(1) + '% incremental) unlocks the next volume discount tier — estimated ' + fmt(disc) + '+ in retroactive savings.',
+        details:[
+          {lbl:'Gap to Next Tier',   val:fmt(v.volDiscountGap)},
+          {lbl:'Est. Discount',      val:fmt(disc)},
+          {lbl:'Pct Increase',       val:pct.toFixed(1)+'%'},
+          {lbl:'Current Spend',      val:fmt(sp)},
+          {lbl:'Target Spend',       val:fmt(sp + v.volDiscountGap)},
+          {lbl:'Category',           val:v.category}
+        ],
+        actions:[
+          {label:'Consolidate Spend Here', primary:true},
+          {label:'Request Tier Unlock Waiver'},
+          {label:'Model Consolidation Scenario'}
+        ]
+      });
+    }
+
+    if (days !== Infinity && days >= 0 && days <= 180) {
+      var lev = Math.round(sp * (days <= 30 ? 0.15 : days <= 90 ? 0.10 : 0.06));
+      out.push({
+        type:'window', value:lev, icon:'⏰',
+        urgency: days <= 30 ? 'high' : days <= 90 ? 'medium' : 'low',
+        vendorName:v.name, vendorId:v.id,
+        headline: 'Renewal Window — ' + days + ' days remaining',
+        desc: 'Contract expires ' + v.contractEnd + '. Vendors are most flexible in the 90-day pre-renewal window. Estimated ' + fmt(lev) + ' in concessions through structured negotiation.',
+        details:[
+          {lbl:'Contract End',     val:v.contractEnd},
+          {lbl:'Days Remaining',   val:days + ' days'},
+          {lbl:'Window Status',    val:days <= 30 ? 'CRITICAL' : days <= 90 ? 'Active' : 'Opening Soon'},
+          {lbl:'Est. Concessions', val:fmt(lev)},
+          {lbl:'Annual Spend',     val:fmt(sp)},
+          {lbl:'Flexibility',      val:days <= 30 ? 'Maximum' : 'High'}
+        ],
+        actions:[
+          {label:'Schedule Negotiation Kickoff', primary:true},
+          {label:'Pull Competitive Quotes'},
+          {label:'Draft Counter Proposal'}
+        ]
+      });
+    }
+
+    if (v.overlaps && v.overlaps.length > 0) {
+      var ov = Math.round(sp * 0.20);
+      out.push({
+        type:'overlap', value:ov, icon:'🔗',
+        urgency:'medium',
+        vendorName:v.name, vendorId:v.id,
+        headline: 'Consolidation Play — ' + v.overlaps.length + ' capability overlap' + (v.overlaps.length > 1 ? 's' : ''),
+        desc: v.name + ' capabilities overlap with ' + v.overlaps.join(', ') + '. Rationalizing duplicate spend could recover ' + fmt(ov) + ' annually.',
+        details:[
+          {lbl:'Overlapping Vendors', val:v.overlaps.join(', ')},
+          {lbl:'Overlap Count',       val:v.overlaps.length + ' vendor(s)'},
+          {lbl:'Est. Duplicate Spend',val:fmt(ov)},
+          {lbl:'Switching Cost',      val:cap(v.switchingCost||'unknown')},
+          {lbl:'Annual Spend',        val:fmt(sp)},
+          {lbl:'Category',            val:v.category}
+        ],
+        actions:[
+          {label:'Run Capability Overlap Audit', primary:true},
+          {label:'Request Feature Matrix'},
+          {label:'Model Consolidation TCO'}
+        ]
+      });
+    }
+
+    if ((v.competitorCount || 0) >= 3 && (v.switchingCost === 'low' || v.switchingCost === 'medium')) {
+      var cpres = Math.round(sp * (v.switchingCost === 'low' ? 0.12 : 0.07));
+      out.push({
+        type:'competitive', value:cpres, icon:'⚡',
+        urgency: v.switchingCost === 'low' ? 'high' : 'medium',
+        vendorName:v.name, vendorId:v.id,
+        headline: 'Competitive Pressure — ' + v.competitorCount + ' alternatives, ' + cap(v.switchingCost) + ' switching cost',
+        desc: 'With ' + v.competitorCount + ' viable alternatives and ' + v.switchingCost + ' switching friction, a credible RFP can unlock ' + fmt(cpres) + ' in concessions without switching.',
+        details:[
+          {lbl:'Competitors',       val:v.competitorCount + ' alternatives'},
+          {lbl:'Switching Cost',    val:cap(v.switchingCost)},
+          {lbl:'Pressure Leverage', val:fmt(cpres)},
+          {lbl:'Annual Spend',      val:fmt(sp)},
+          {lbl:'Category',          val:v.category},
+          {lbl:'Best Tactic',       val:'Competitive RFP'}
+        ],
+        actions:[
+          {label:'Initiate Competitive RFP', primary:true},
+          {label:'Share Benchmark with Vendor'},
+          {label:'Request Best and Final Offer'}
+        ]
+      });
+    }
+
+    return out;
+  }
+
+  function getAllSignals() {
+    var all = [];
+    vendors.forEach(function(v) { generateSignals(v).forEach(function(s) { all.push(s); }); });
+    return all;
+  }
+
+  var URG_ORDER = { high:0, medium:1, low:2 };
+  function sortSignals(arr) {
+    return arr.slice().sort(function(a, b) {
+      if (sortBy === 'value')   return b.value - a.value;
+      if (sortBy === 'urgency') return URG_ORDER[a.urgency] - URG_ORDER[b.urgency];
+      if (sortBy === 'vendor')  return a.vendorName.localeCompare(b.vendorName);
+      return 0;
+    });
+  }
+
+  function typeLabel(t) {
+    return { rate:'Rate Gap', volume:'Volume Cliff', window:'Renewal Window', overlap:'Consolidation Play', competitive:'Competitive Pressure' }[t] || t;
+  }
+  function urgLabel(u) {
+    return u === 'high' ? '🔴 High Urgency' : u === 'medium' ? '🟡 Medium' : '🟢 Low';
+  }
+  function sigColor(t) {
+    return { rate:'#dc2626', volume:'#d97706', window:'#0eb8a0', overlap:'#7c3aed', competitive:'#0f7fd4' }[t] || '#888';
+  }
+
+  /* ── Render Hero ── */
+  function renderHero(signals) {
+    var cont = document.getElementById('hero-metrics');
+    clearNode(cont);
+    var totalValue = signals.reduce(function(s,x){ return s+x.value; }, 0);
+    var highCount  = signals.filter(function(s){ return s.urgency==='high'; }).length;
+    var winCount   = signals.filter(function(s){ return s.type==='window'; }).length;
+    [
+      [fmt(totalValue), 'Total Recoverable', 'metric-teal'],
+      [signals.length,  'Active Signals',    'metric-amber'],
+      [highCount,       'High Urgency',      'metric-red'],
+      [winCount,        'Open Windows',      'metric-green']
+    ].forEach(function(m) {
+      cont.appendChild(el('div', {cls:'hero-metric'}, [
+        el('div', {cls:'hero-metric-val '+m[2], text:m[0]}),
+        el('div', {cls:'hero-metric-lbl', text:m[1]})
+      ]));
+    });
+  }
+
+  /* ── Render Summary Band ── */
+  function renderSummary(signals) {
+    var band = document.getElementById('summary-band');
+    clearNode(band);
+    var totalValue = signals.reduce(function(s,x){ return s+x.value; },0);
+    var rateValue  = signals.filter(function(s){ return s.type==='rate'; }).reduce(function(a,s){ return a+s.value; },0);
+    var winCount   = signals.filter(function(s){ return s.type==='window'; }).length;
+
+    [
+      [fmt(totalValue), 'Untapped Value'],
+      [fmt(rateValue),  'Rate Overcharges'],
+      [winCount + ' Contracts', 'In Renewal Window']
+    ].forEach(function(s, i) {
+      band.appendChild(el('div', {cls:'summary-stat'}, [
+        el('div', {cls:'summary-stat-val', text:s[0]}),
+        el('div', {cls:'summary-stat-lbl', text:s[1]})
+      ]));
+      if (i < 2) band.appendChild(el('div', {cls:'summary-divider'}));
+    });
+
+    var top = sortSignals(signals)[0];
+    if (top) {
+      band.appendChild(el('div', {cls:'summary-divider'}));
+      var insight = el('div', {cls:'summary-insight'});
+      insight.appendChild(el('div', {cls:'summary-insight-lbl', text:'Top Opportunity'}));
+      var p = el('p', {cls:'summary-insight-text'});
+      p.appendChild(el('span', {cls:'highlight-teal', text:top.vendorName + ': '}));
+      p.appendChild(document.createTextNode(top.headline + ' — potential '));
+      p.appendChild(el('span', {cls:'highlight-teal', text:fmt(top.value)}));
+      p.appendChild(document.createTextNode(' recoverable.'));
+      insight.appendChild(p);
+      band.appendChild(insight);
+    }
+  }
+
+  /* ── Render Counts ── */
+  function renderCounts(signals) {
+    document.getElementById('cnt-all').textContent = signals.length;
+    ['rate','volume','window','overlap','competitive'].forEach(function(t) {
+      var c = document.getElementById('cnt-' + t);
+      if (c) c.textContent = signals.filter(function(s){ return s.type===t; }).length;
+    });
+  }
+
+  /* ── Render Signals ── */
+  function renderSignals() {
+    var allSignals = getAllSignals();
+    var filtered   = activeFilter === 'all' ? allSignals : allSignals.filter(function(s){ return s.type===activeFilter; });
+    var sorted     = sortSignals(filtered);
+
+    renderHero(allSignals);
+    renderSummary(allSignals);
+    renderCounts(allSignals);
+
+    var grid = document.getElementById('signals-grid');
+    clearNode(grid);
+
+    if (sorted.length === 0) {
+      var empty = el('div', {cls:'empty-state'});
+      empty.appendChild(el('h3', {text:'No signals in this category'}));
+      empty.appendChild(el('p', {text:'Add more vendors or switch filter to see leverage opportunities.'}));
+      grid.appendChild(empty);
+      return;
+    }
+
+    sorted.forEach(function(sig) {
+      var key  = sig.vendorId + '_' + sig.type;
+      var card = el('div', {cls:'signal-card sig-' + sig.type});
+
+      var hdr  = el('div', {cls:'sig-header'});
+      hdr.appendChild(el('div', {cls:'sig-icon', text:sig.icon}));
+
+      var main = el('div', {cls:'sig-main'});
+      main.appendChild(el('div', {cls:'sig-vendor',  text:sig.vendorName}));
+      main.appendChild(el('div', {cls:'sig-type',    text:typeLabel(sig.type)}));
+      main.appendChild(el('div', {cls:'sig-desc',    text:sig.desc}));
+      main.appendChild(el('span',{cls:'sig-urgency urg-' + sig.urgency, text:urgLabel(sig.urgency)}));
+      hdr.appendChild(main);
+
+      var right = el('div', {cls:'sig-right'});
+      right.appendChild(el('div', {cls:'sig-value',     text:fmt(sig.value)}));
+      right.appendChild(el('div', {cls:'sig-value-lbl', text:'Est. Recoverable'}));
+      hdr.appendChild(right);
+      card.appendChild(hdr);
+
+      var det = el('div', {cls:'sig-detail' + (expanded[key] ? '' : ' hidden'), id:'det-'+key});
+      sig.details.forEach(function(d) {
+        det.appendChild(el('div', {cls:'detail-tile'}, [
+          el('div', {cls:'detail-tile-lbl', text:d.lbl}),
+          el('div', {cls:'detail-tile-val', text:d.val})
+        ]));
+      });
+      var acts = el('div', {cls:'sig-actions'});
+      sig.actions.forEach(function(a) {
+        acts.appendChild(el('button', {
+          cls:'btn-action' + (a.primary ? ' primary' : ''),
+          text:a.label,
+          on:{click:function(e){ e.stopPropagation(); }}
+        }));
+      });
+      det.appendChild(acts);
+      card.appendChild(det);
+
+      card.addEventListener('click', function() {
+        expanded[key] = !expanded[key];
+        setHidden(det, !expanded[key]);
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  /* ── Render Vendor List ── */
+  function renderVendorList() {
+    var list = document.getElementById('vendor-list');
+    clearNode(list);
+    if (!vendors.length) {
+      list.appendChild(el('div', {cls:'empty-state', style:{padding:'24px'}}, [
+        el('p', {text:'No vendors added yet.'})
+      ]));
+      return;
+    }
+    vendors.forEach(function(v) {
+      var sigTypes = generateSignals(v).map(function(s){ return s.type; });
+      var row = el('div', {cls:'vendor-row'});
+      row.appendChild(el('div', {cls:'vr-dot', style:{background:v.color||'#888'}}));
+      row.appendChild(el('div', {cls:'vr-name',  text:v.name}));
+      row.appendChild(el('div', {cls:'vr-spend', text:fmt(v.annualSpend||0)}));
+      var dots = el('div', {cls:'vr-signals'});
+      sigTypes.forEach(function(t) {
+        dots.appendChild(el('div', {cls:'vr-sig-dot', style:{background:sigColor(t)}}));
+      });
+      row.appendChild(dots);
+      list.appendChild(row);
+    });
+  }
+
+  /* ── Filter Pills ── */
+  document.querySelectorAll('.filter-pill').forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.filter-pill').forEach(function(p){ p.classList.remove('active'); });
+      pill.classList.add('active');
+      activeFilter = pill.dataset.filter;
+      renderSignals();
+    });
+  });
+
+  document.getElementById('sort-select').addEventListener('change', function() {
+    sortBy = this.value;
+    renderSignals();
+  });
+
+  /* ── Theme (legacy handler — no-op; toggleTheme() handles via onclick) ── */
+
+  /* ── Add Vendor ── */
+  document.getElementById('btn-add-vendor').addEventListener('click', function() { setHidden('vendor-form', false); });
+  document.getElementById('btn-vendor-cancel').addEventListener('click', function() { setHidden('vendor-form', true); clearForm(); });
+  document.getElementById('btn-vendor-save').addEventListener('click', function() {
+    var name = document.getElementById('vf-name').value.trim();
+    if (!name) { window.alert('Vendor name is required.'); return; }
+    vendors.push({
+      id: 'v_' + Date.now(),
+      name: name,
+      category:        document.getElementById('vf-category').value,
+      annualSpend:     parseFloat(document.getElementById('vf-spend').value)       || 0,
+      contractEnd:     document.getElementById('vf-renewal').value                 || null,
+      benchmarkPct:    parseFloat(document.getElementById('vf-benchmark').value)   || 0,
+      volDiscountGap:  parseFloat(document.getElementById('vf-vol-gap').value)     || 0,
+      switchingCost:   document.getElementById('vf-switch').value,
+      competitorCount: parseInt(document.getElementById('vf-competitors').value)   || 0,
+      overlaps: document.getElementById('vf-overlap').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
+      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6,'0')
+    });
+    persist();
+    clearForm();
+    setHidden('vendor-form', true);
+    renderVendorList();
+    renderSignals();
+  });
+
+  function clearForm() {
+    ['vf-name','vf-spend','vf-renewal','vf-benchmark','vf-vol-gap','vf-competitors','vf-overlap'].forEach(function(id) {
+      var f = document.getElementById(id);
+      if (f) f.value = '';
+    });
+  }
+
+  /* ── Export CSV ── */
+  document.getElementById('btn-export').addEventListener('click', function() {
+    var rows = [['Vendor','Signal Type','Urgency','Est. Recoverable','Headline']];
+    getAllSignals().forEach(function(s) {
+      rows.push([s.vendorName, typeLabel(s.type), s.urgency, s.value, s.headline]);
+    });
+    var csv = rows.map(function(r) {
+      return r.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',');
+    }).join('\n');
+    var blob = new Blob([csv], {type:'text/csv'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = url;
+    a.download = 'untapped_leverage_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  /* ── Init ── */
+  renderVendorList();
+  renderSignals();
+
+}());
+</script>
+<script>
+function toggleTheme(){
+  var h=document.documentElement;
+  h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+(function(){
+  var c=document.getElementById('particles');
+  if(!c)return;
+  var ctx=c.getContext('2d');
+  var pts=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  for(var i=0;i<60;i++) pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    vx:(Math.random()-0.5)*0.15,vy:(Math.random()-0.5)*0.15,
+    r:Math.random()*1.2+0.4,a:Math.random()*0.4+0.1});
+  function frame(){
+    ctx.clearRect(0,0,c.width,c.height);
+    pts.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(13,148,136,'+p.a+')';ctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>

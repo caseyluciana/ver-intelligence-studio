@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendor Posture Signal — VER Intelligence Hub</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root,
+[data-theme="dark"] {
+  --body-bg:#020B18; --section-bg:#020B18;
+  --card-bg:rgba(255,255,255,0.03); --card-border:rgba(255,255,255,0.07);
+  --card-hover:rgba(255,255,255,0.05); --card-shadow:rgba(0,0,0,0.3);
+  --text-primary:#fff; --text-secondary:rgba(255,255,255,0.55);
+  --text-muted:rgba(255,255,255,0.35); --text-dim:rgba(255,255,255,0.25);
+  --divider:rgba(13,148,136,0.2);
+  --top-bar-bg:rgba(2,11,24,0.88); --top-bar-border:rgba(13,148,136,0.15);
+  --teal:#0D9488; --teal2:#0F766E; --teal3:#F0FDF9;
+  --amber:#D97706; --red:#DC2626; --green:#059669;
+  --amber-dim:rgba(217,119,6,0.12); --red-dim:rgba(220,38,38,0.12); --green-dim:rgba(5,150,105,0.12);
+  --surface:rgba(255,255,255,0.03); --surface2:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.07);
+  /* legacy aliases */
+  --bg: #020B18;
+  --text: #fff;
+  --text-sub: rgba(255,255,255,0.55);
+  --text-faint: rgba(255,255,255,0.35);
+  --accent: #0D9488;
+  --accent-dim: rgba(13,148,136,0.12);
+  --teal-dim: rgba(13,148,136,0.12);
+  --surface3: rgba(255,255,255,0.07);
+  --purple: #7c3aed;
+  --purple-dim: rgba(124,58,237,0.12);
+  --orange: #ea580c;
+  --orange-dim: rgba(234,88,12,0.12);
+  --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --pulse-bg: rgba(220,38,38,0.06);
+}
+
+[data-theme="light"] {
+  --body-bg:#F0F4FA; --card-bg:#fff; --card-border:#E5E7EB;
+  --text-primary:#111827; --text-secondary:#374151;
+  --text-muted:#6B7280; --text-dim:#9CA3AF;
+  --top-bar-bg:rgba(15,30,60,0.97); --top-bar-border:rgba(13,148,136,0.2);
+  --surface:#fff; --surface2:#F9FAFB; --border:#E5E7EB;
+  --teal:#0D9488; --teal2:#0F766E; --teal3:#F0FDF9;
+  --amber:#D97706; --red:#DC2626; --green:#059669;
+  --amber-dim:rgba(217,119,6,0.1); --red-dim:rgba(220,38,38,0.1); --green-dim:rgba(5,150,105,0.1);
+  --card-shadow:rgba(0,0,0,0.08);
+  /* legacy aliases */
+  --bg: #F0F4FA;
+  --text: #111827;
+  --text-sub: #374151;
+  --text-faint: #6B7280;
+  --accent: #0D9488;
+  --accent-dim: rgba(13,148,136,0.1);
+  --teal-dim: rgba(13,148,136,0.1);
+  --surface3: #F0F4FA;
+  --purple: #7c3aed;
+  --purple-dim: rgba(124,58,237,0.1);
+  --orange: #ea580c;
+  --orange-dim: rgba(234,88,12,0.1);
+  --shadow: 0 8px 32px rgba(0,0,0,0.08);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --pulse-bg: rgba(220,38,38,0.06);
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  padding-top: 50px;
+}
+.hidden { display: none !important; }
+
+/* ── Top bar ── */
+.top-bar{position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:50px;
+  background:var(--top-bar-bg);
+  border-bottom:1px solid var(--top-bar-border);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  transition:background 0.3s;}
+.tb-left{display:flex;align-items:center;gap:16px;}
+.tb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;
+  display:flex;align-items:center;gap:5px;transition:color 0.2s;}
+.tb-back:hover{color:#0D9488;}
+.tb-sep{width:1px;height:14px;background:rgba(255,255,255,0.12);}
+.tb-brand{font-size:8.5pt;font-weight:800;letter-spacing:0.06em;color:rgba(255,255,255,0.65);}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-live{display:flex;align-items:center;gap:6px;font-size:8pt;font-weight:700;color:#0D9488;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#0D9488;animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(13,148,136,0.4);}
+  50%{opacity:0.6;box-shadow:0 0 0 5px rgba(13,148,136,0);}}
+.tb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:6px;font-size:8pt;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.18s;letter-spacing:0.04em;border:none;}
+.tb-theme{background:transparent;border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.45);padding:5px 12px;border-radius:6px;
+  font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.18s;}
+.tb-theme:hover{border-color:#0D9488;color:#0D9488;}
+
+/* ── Scanline + particles ── */
+.scanline{position:fixed;left:0;right:0;height:140px;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,transparent,rgba(13,148,136,0.04),transparent);
+  top:0;will-change:transform;animation:scan 7s linear infinite;}
+@keyframes scan{from{transform:translateY(-140px)}to{transform:translateY(100vh)}}
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.6;}
+[data-theme="light"] .scanline{opacity:0.3;}
+[data-theme="light"] #particles{opacity:0.15;}
+
+/* ── Animations ── */
+@keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes punchin{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+
+/* legacy .btn-top kept for + Add button */
+.btn-top {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-sub);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-top:hover { border-color: #0D9488; color: #0D9488; }
+
+/* ── Layout ── */
+.page-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 24px 60px; position: relative; z-index: 2; }
+
+/* ── Alert Band ── */
+.alert-band {
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.alert-band-icon { font-size: 18px; flex-shrink: 0; }
+.alert-band-text { font-size: 13px; color: var(--text); font-weight: 500; flex: 1; }
+.alert-band-text strong { color: var(--red); }
+.alert-band-dismiss {
+  background: none; border: 1px solid var(--red);
+  color: var(--red); border-radius: 6px;
+  padding: 4px 10px; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.alert-band-dismiss:hover { background: var(--red); color: #fff; }
+
+/* ── Two-col ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+
+/* ── Vendor cards ── */
+.section-title {
+  font-size: 12px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 14px;
+}
+.vendor-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vendor-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px var(--card-shadow);
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+  position: relative;
+}
+.vendor-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--card-shadow); }
+.vendor-card.risk-critical::before { background: var(--red); }
+.vendor-card.risk-high::before     { background: var(--orange); }
+.vendor-card.risk-medium::before   { background: var(--amber); }
+.vendor-card.risk-low::before      { background: var(--green); }
+.vendor-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 4px;
+}
+
+/* Card header */
+.vc-header {
+  padding: 16px 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.vc-avatar {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.vc-info { flex: 1; min-width: 0; }
+.vc-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.vc-category {
+  font-size: 11px; font-weight: 600; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.vc-right { text-align: right; flex-shrink: 0; }
+.vc-risk-badge {
+  display: inline-block;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: .05em;
+  margin-bottom: 6px;
+}
+.risk-critical .vc-risk-badge { background: var(--red-dim);    color: var(--red); }
+.risk-high     .vc-risk-badge { background: var(--orange-dim); color: var(--orange); }
+.risk-medium   .vc-risk-badge { background: var(--amber-dim);  color: var(--amber); }
+.risk-low      .vc-risk-badge { background: var(--green-dim);  color: var(--green); }
+.vc-score {
+  font-size: 28px; font-weight: 800; letter-spacing: -.03em; line-height: 1;
+}
+.risk-critical .vc-score { color: var(--red); }
+.risk-high     .vc-score { color: var(--orange); }
+.risk-medium   .vc-score { color: var(--amber); }
+.risk-low      .vc-score { color: var(--green); }
+.vc-score-lbl { font-size: 10px; color: var(--text-faint); font-weight: 600; }
+
+/* Signal pills row */
+.vc-signals {
+  padding: 0 20px 12px;
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.sig-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 9px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.sp-ma       { background: var(--purple-dim); color: var(--purple); }
+.sp-eol      { background: var(--red-dim);    color: var(--red); }
+.sp-pricing  { background: var(--amber-dim);  color: var(--amber); }
+.sp-support  { background: var(--orange-dim); color: var(--orange); }
+.sp-compet   { background: var(--accent-dim); color: var(--accent); }
+.sp-contract { background: var(--teal-dim);   color: var(--teal); }
+.sp-stable   { background: var(--green-dim);  color: var(--green); }
+
+/* Expanded panel */
+.vc-detail {
+  padding: 0 20px 16px;
+  border-top: 1px dashed var(--border);
+  margin-top: 0;
+}
+.vc-detail-inner {
+  padding-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 600px) { .vc-detail-inner { grid-template-columns: 1fr; } }
+
+.sig-block {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  border-left: 3px solid transparent;
+}
+.sig-block.sev-critical { border-left-color: var(--red); }
+.sig-block.sev-high     { border-left-color: var(--orange); }
+.sig-block.sev-medium   { border-left-color: var(--amber); }
+.sig-block.sev-low      { border-left-color: var(--green); }
+.sig-block.sev-info     { border-left-color: var(--accent); }
+.sig-block-type {
+  font-size: 10px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px;
+}
+.sig-block-title {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  margin-bottom: 4px;
+}
+.sig-block-desc {
+  font-size: 12px; color: var(--text-sub); line-height: 1.5;
+}
+.sig-block-date {
+  font-size: 11px; color: var(--text-faint); margin-top: 6px; font-weight: 600;
+}
+.sig-block-action {
+  margin-top: 8px;
+}
+.btn-sig-action {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-sub);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.btn-sig-action:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── Sidebar ── */
+.sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 62px; }
+
+.side-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px var(--card-shadow);
+}
+.side-card-hdr {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.side-card-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.side-card-tag   { font-size: 10px; color: var(--teal); font-weight: 600; }
+.side-card-body  { padding: 12px 16px; }
+
+/* Watchlist */
+.watch-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.watch-row:last-child { border-bottom: none; }
+.watch-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.watch-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+.watch-score {
+  font-size: 13px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ws-critical { color: var(--red); }
+.ws-high     { color: var(--orange); }
+.ws-medium   { color: var(--amber); }
+.ws-low      { color: var(--green); }
+.watch-trend { font-size: 12px; }
+.trend-up   { color: var(--red); }
+.trend-down { color: var(--green); }
+.trend-flat { color: var(--text-faint); }
+
+/* Signal legend */
+.legend-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--text-sub);
+}
+.legend-row:last-child { border-bottom: none; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-label { flex: 1; font-weight: 600; color: var(--text); font-size: 12px; }
+
+/* Add Vendor form */
+.add-form { padding: 14px 16px; }
+.add-form-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--text-faint); margin-bottom: 10px;
+}
+.add-field { margin-bottom: 8px; }
+.add-field label {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--text-faint); text-transform: uppercase;
+  letter-spacing: .04em; margin-bottom: 3px;
+}
+.add-field input, .add-field select {
+  width: 100%; background: var(--surface2);
+  border: 1px solid var(--border); color: var(--text);
+  border-radius: 7px; padding: 7px 10px;
+  font-size: 13px; outline: none; transition: border-color .15s;
+}
+.add-field input:focus, .add-field select:focus { border-color: var(--accent); }
+.add-btns { display: flex; gap: 8px; margin-top: 10px; }
+.btn-add-save {
+  flex: 1; background: var(--teal); color: #fff;
+  border: none; border-radius: 8px; padding: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .15s;
+}
+.btn-add-save:hover { opacity: .85; }
+.btn-add-cancel {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-sub); border-radius: 8px; padding: 8px 14px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.btn-add-cancel:hover { background: var(--border); }
+
+/* ── Empty state ── */
+.empty-state { text-align: center; padding: 40px 24px; color: var(--text-faint); }
+.empty-state h3 { font-size: 15px; color: var(--text-sub); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; }
+
+/* ── Last updated ── */
+.last-updated { font-size: 11px; color: var(--text-faint); margin-bottom: 12px; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<canvas id="particles"></canvas>
+
+<nav class="top-bar">
+  <div class="tb-left">
+    <a href="index.html" class="tb-back">← Hub</a>
+    <div class="tb-sep"></div>
+    <span class="tb-brand">VER INTELLIGENCE HUB</span>
+  </div>
+  <div class="tb-right">
+    <div class="tb-live"><div class="live-dot"></div>LIVE</div>
+    <button class="tb-btn tb-theme" onclick="toggleTheme()">◐ Theme</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- Alert band (shown when critical signals exist) -->
+  <div class="alert-band hidden" id="alert-band">
+    <span class="alert-band-icon">🚨</span>
+    <span class="alert-band-text" id="alert-band-text">Critical signals detected.</span>
+    <button type="button" class="alert-band-dismiss" id="alert-dismiss">Dismiss</button>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Left: Vendor Cards -->
+    <div>
+      <div class="last-updated" id="last-updated"></div>
+      <div class="section-title">Monitored Vendors</div>
+      <div class="vendor-grid" id="vendor-grid"></div>
+    </div>
+
+    <!-- Right: Sidebar -->
+    <div class="sidebar">
+
+      <!-- Watchlist -->
+      <div class="side-card">
+        <div class="side-card-hdr">
+          <span class="side-card-title">Risk Leaderboard</span>
+        </div>
+        <div class="side-card-body" id="watchlist-body"></div>
+      </div>
+
+      <!-- Coupa Summary -->
+      <div class="side-card">
+        <div class="side-card-hdr">
+          <span class="side-card-title">Coupa Summary</span>
+          <span class="side-card-tag">FY27</span>
+        </div>
+        <div class="side-card-body" id="coupa-summary-body"></div>
+      </div>
+
+      <!-- Add vendor -->
+      <div class="side-card">
+        <div class="side-card-hdr">
+          <span class="side-card-title">Track a Vendor</span>
+          <span class="side-card-tag">Coupa FY27</span>
+          <button type="button" class="btn-top" id="btn-toggle-add">+ Add</button>
+        </div>
+        <div class="add-form hidden" id="add-form">
+          <div class="add-form-title">New Vendor Watch</div>
+          <div class="add-field">
+            <label for="af-name">Vendor Name</label>
+            <input type="text" id="af-name" placeholder="e.g. Oracle">
+          </div>
+          <div class="add-field">
+            <label for="af-category">Category</label>
+            <select id="af-category">
+              <option>CRM</option>
+              <option>ERP</option>
+              <option>ITSM</option>
+              <option>Infrastructure</option>
+              <option>Analytics</option>
+              <option>Security</option>
+              <option>Collaboration</option>
+              <option>Staffing</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="add-field">
+            <label for="af-spend">Annual Spend ($)</label>
+            <input type="number" id="af-spend" placeholder="0">
+          </div>
+          <div class="add-field">
+            <label for="af-notes">Signal Notes (optional)</label>
+            <input type="text" id="af-notes" placeholder="Known concerns...">
+          </div>
+          <div class="add-btns">
+            <button type="button" class="btn-add-save" id="btn-add-save">Add to Watch</button>
+            <button type="button" class="btn-add-cancel" id="btn-add-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signal Legend -->
+      <div class="side-card">
+        <div class="side-card-hdr">
+          <span class="side-card-title">Signal Dictionary</span>
+        </div>
+        <div class="side-card-body" id="legend-body"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/coupa_spend.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ── Utilities ── */
+  function setHidden(node, hide) {
+    var e = typeof node === 'string' ? document.getElementById(node) : node;
+    if (!e) return;
+    if (hide) e.classList.add('hidden'); else e.classList.remove('hidden');
+  }
+  function clearNode(e) { while (e.firstChild) e.removeChild(e.firstChild); }
+  function el(tag, opts, kids) {
+    var e = document.createElement(tag);
+    if (!opts) return e;
+    if (opts.cls)  e.className = opts.cls;
+    if (opts.text != null) e.textContent = String(opts.text);
+    if (opts.id)   e.id = opts.id;
+    if (opts.attr) Object.keys(opts.attr).forEach(function(k) { e.setAttribute(k, opts.attr[k]); });
+    if (opts.style) Object.keys(opts.style).forEach(function(k) { e.style[k] = opts.style[k]; });
+    if (opts.on)   Object.keys(opts.on).forEach(function(k) { e.addEventListener(k, opts.on[k]); });
+    if (kids) kids.forEach(function(k) { if (k) e.appendChild(k); });
+    return e;
+  }
+  function fmt(n) {
+    if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+    return '$' + n;
+  }
+
+  function coupaLookup(name) {
+    if (!window.VER_COUPA) return null;
+    var nl = name.toLowerCase();
+    return window.VER_COUPA.vendors.find(function(v) {
+      return v.n.toLowerCase() === nl || v.n.toLowerCase().indexOf(nl) === 0 || nl.indexOf(v.n.toLowerCase()) === 0;
+    }) || null;
+  }
+
+  /* ── Persistence ── */
+  var STORE_KEY = 'ver_posture_v1';
+  function loadStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; } catch(x) { return null; } }
+  function saveStore() { try { localStorage.setItem(STORE_KEY, JSON.stringify({ vendors: vendors })); } catch(x) {} }
+
+  /* ── Signal Type Definitions ── */
+  var SIGNAL_TYPES = {
+    ma:       { label: 'M&A Activity',        color: '#7c3aed', pillCls: 'sp-ma',       desc: 'Merger, acquisition, or ownership change detected' },
+    eol:      { label: 'EOL / Deprecation',   color: '#dc2626', pillCls: 'sp-eol',      desc: 'Product end-of-life or deprecation announcement' },
+    pricing:  { label: 'Pricing Restructure', color: '#d97706', pillCls: 'sp-pricing',  desc: 'Price increase, model change, or new fee structure' },
+    support:  { label: 'Support Tier Change', color: '#ea580c', pillCls: 'sp-support',  desc: 'Reduction in support tier, SLA change, or team cuts' },
+    compet:   { label: 'Competitive Shift',   color: '#0f7fd4', pillCls: 'sp-compet',   desc: 'Competitor launched stronger alternative' },
+    contract: { label: 'Contract Risk',       color: '#0eb8a0', pillCls: 'sp-contract', desc: 'Renewal lock-in, auto-escalation, or hidden clause' },
+    stable:   { label: 'Stable / Positive',   color: '#16a34a', pillCls: 'sp-stable',   desc: 'No material signals — vendor in healthy posture' }
+  };
+
+  /* ── Demo Vendor Data ── */
+  var DEFAULT_VENDORS = [
+    {
+      id: 'vp1', name: 'SAP', category: 'ERP', annualSpend: 1800000,
+      emoji: '🔷', riskScore: 87,
+      signals: [
+        { type:'eol', severity:'critical', title:'SAP ECC 6.0 Support Ends Dec 2027', desc:'SAP has confirmed end of mainstream maintenance for ECC 6.0 in December 2027. Extended support requires additional contracts. Orgs not migrated to S/4HANA will face unsupported environments.', date:'2026-07-15', action:'Initiate S/4HANA Migration Assessment' },
+        { type:'pricing', severity:'high', title:'S/4HANA Cloud Pricing +18% in New Contracts', desc:'Multiple enterprise customers report new S/4HANA Cloud contracts carrying 15–22% premium over legacy ECC licensing. Maintenance fees for extended support packages showing similar increases.', date:'2026-06-01', action:'Benchmark S/4HANA vs. Oracle vs. Infor' },
+        { type:'support', severity:'high', title:'SAP Support Team Restructuring in AMER', desc:'SAP reduced dedicated enterprise support staff in AMER by an estimated 12% in Q2 2026. Average case-to-resolution times are up 31% per community forum data.', date:'2026-05-20', action:'Escalate to SAP Account Exec; SLA review' }
+      ]
+    },
+    {
+      id: 'vp2', name: 'Salesforce', category: 'CRM', annualSpend: 2400000,
+      emoji: '☁️', riskScore: 52,
+      signals: [
+        { type:'pricing', severity:'medium', title:'Salesforce FY27 Price Increase — 9% List Price Hike', desc:'Salesforce announced a 9% standard list price increase effective August 2026 for new and renewing contracts. Premier Success Plan pricing is increasing 12%. Multi-year ELAs are insulated if signed before August.', date:'2026-07-01', action:'Sign multi-year ELA before Aug 2026 deadline' },
+        { type:'compet', severity:'low', title:'Microsoft Dynamics 365 + Copilot — Gaining Enterprise Traction', desc:'Microsoft Dynamics 365 with integrated Copilot AI is winning competitive evaluations at comparable price points. Three enterprise peers have publicly migrated in the last 6 months.', date:'2026-06-15', action:'Commission side-by-side CRM evaluation' }
+      ]
+    },
+    {
+      id: 'vp3', name: 'Broadcom / VMware', category: 'Infrastructure', annualSpend: 1100000,
+      emoji: '⚡', riskScore: 94,
+      signals: [
+        { type:'ma', severity:'critical', title:'Broadcom Acquisition Complete — Licensing Overhaul Active', desc:'Broadcom completed the VMware acquisition and has eliminated perpetual licensing, transitioning all customers to subscription-only bundles. Effective licensing costs for comparable workloads are 3–5x higher under new bundled SKUs.', date:'2026-04-01', action:'Model migration to AWS/Azure or alternative hypervisor' },
+        { type:'support', severity:'critical', title:'VMware Perpetual Support Discontinued', desc:'Broadcom terminated VMware Perpetual License Support as of June 2026. All support access now requires subscription bundles. Unsupported installs are at direct security risk.', date:'2026-06-01', action:'Immediate: audit all VMware installs, assess exit timeline' },
+        { type:'pricing', severity:'critical', title:'Bundle-Only SKUs — Avg 4.2x Cost Increase', desc:'Analysis of Broadcom\'s new VMware Cloud Foundation bundles shows average cost increases of 4.2x vs prior perpetual + maintenance spend. Renewal quotes from peers confirm 3–7x range.', date:'2026-05-15', action:'Engage cloud migration partner for 90-day assessment' }
+      ]
+    },
+    {
+      id: 'vp4', name: 'ServiceNow', category: 'ITSM', annualSpend: 960000,
+      emoji: '🔧', riskScore: 38,
+      signals: [
+        { type:'pricing', severity:'medium', title:'ServiceNow Pro Plus Bundle — Complexity Increase', desc:'ServiceNow\'s Q3 2026 pricing restructure adds a mandatory Pro Plus tier for AI features. Customers not opting in are losing access to previously included features at next renewal.', date:'2026-07-10', action:'Review contract for AI feature entitlements' },
+        { type:'stable', severity:'low', title:'Strong Platform Momentum — Low Exit Risk', desc:'ServiceNow continues to gain enterprise footprint with 97% renewal rates. No meaningful competitive threats to established installs. Platform roadmap is healthy.', date:'2026-06-01', action:'No immediate action required' }
+      ]
+    },
+    {
+      id: 'vp5', name: 'Cognizant', category: 'Staffing', annualSpend: 4800000,
+      emoji: '🤝', riskScore: 61,
+      signals: [
+        { type:'pricing', severity:'high', title:'Blended Rate Increase 11–14% in New SOWs', desc:'Cognizant Q3 2026 SOW renewals are carrying 11–14% blended rate increases, citing India salary inflation and attrition costs. Offshore delivery center headcount reductions in Pune and Chennai are tightening supply.', date:'2026-07-20', action:'Re-benchmark vs. Infosys, TCS, Wipro; issue RFP' },
+        { type:'support', severity:'medium', title:'Key Delivery Lead Attrition — AMER Program', desc:'Two senior delivery leads assigned to the AMER program tendered resignation in Q2. Replacement timelines are 60–90 days per account team. Continuity risk during transition.', date:'2026-06-30', action:'Require transition plan and backup DL identification' }
+      ]
+    },
+    {
+      id: 'vp6', name: 'Workday', category: 'ERP', annualSpend: 1400000,
+      emoji: '💼', riskScore: 22,
+      signals: [
+        { type:'stable', severity:'low', title:'Workday Platform — Strong Financial Health', desc:'Workday reported 18% YoY revenue growth in FY26. No M&A disruptions. Customer satisfaction scores at 92% in Gartner surveys. Low near-term posture risk.', date:'2026-07-01', action:'No action required' },
+        { type:'compet', severity:'low', title:'Oracle HCM Targeting Mid-Market with AI Play', desc:'Oracle is offering aggressive migration credits to Workday customers in the 500–2000 seat range. Not currently threatening large enterprise accounts but worth monitoring.', date:'2026-06-15', action:'Monitor — flag if Oracle outreach increases' }
+      ]
+    }
+  ];
+
+  var stored = loadStore();
+  var vendors = (stored && stored.vendors && stored.vendors.length) ? stored.vendors : DEFAULT_VENDORS;
+  var expanded = {};
+  var alertDismissed = false;
+
+  /* ── Risk Score → metadata ── */
+  function riskMeta(score) {
+    if (score >= 80) return { level:'critical', label:'Critical Risk' };
+    if (score >= 60) return { level:'high',     label:'High Risk' };
+    if (score >= 35) return { level:'medium',   label:'Medium Risk' };
+    return               { level:'low',     label:'Low Risk' };
+  }
+
+  function riskColor(level) {
+    return { critical:'#dc2626', high:'#ea580c', medium:'#d97706', low:'#16a34a' }[level];
+  }
+
+  function severityOrder(s) {
+    return { critical:0, high:1, medium:2, low:3, info:4 }[s] || 5;
+  }
+
+  /* ── Render Alert Band ── */
+  function renderAlertBand() {
+    if (alertDismissed) return;
+    var critVendors = vendors.filter(function(v) {
+      return riskMeta(v.riskScore).level === 'critical';
+    });
+    if (critVendors.length === 0) { setHidden('alert-band', true); return; }
+    setHidden('alert-band', false);
+    var textEl = document.getElementById('alert-band-text');
+    if (!textEl) return;
+    clearNode(textEl);
+    textEl.appendChild(document.createTextNode('Critical posture risk: '));
+    critVendors.forEach(function(v, i) {
+      textEl.appendChild(el('strong', { text: v.name }));
+      if (i < critVendors.length - 1) textEl.appendChild(document.createTextNode(', '));
+    });
+    textEl.appendChild(document.createTextNode(' — immediate review recommended.'));
+  }
+
+  /* ── Render Vendor Grid ── */
+  function renderVendors() {
+    var grid = document.getElementById('vendor-grid');
+    clearNode(grid);
+
+    var sorted = vendors.slice().sort(function(a, b) { return b.riskScore - a.riskScore; });
+
+    if (sorted.length === 0) {
+      var empty = el('div', { cls:'empty-state' });
+      empty.appendChild(el('h3', { text:'No vendors tracked yet' }));
+      empty.appendChild(el('p', { text:'Add a vendor using the sidebar to start monitoring posture signals.' }));
+      grid.appendChild(empty);
+      return;
+    }
+
+    sorted.forEach(function(v) {
+      var meta   = riskMeta(v.riskScore);
+      var card   = el('div', { cls:'vendor-card risk-' + meta.level, id:'vc-' + v.id });
+      var sigTypes = [];
+      v.signals.forEach(function(s) { if (sigTypes.indexOf(s.type) === -1) sigTypes.push(s.type); });
+
+      // Header
+      var hdr  = el('div', { cls:'vc-header' });
+      var ava  = el('div', { cls:'vc-avatar', text:v.emoji || '📦' });
+      ava.style.background = riskColor(meta.level) + '1a';
+      hdr.appendChild(ava);
+
+      var info = el('div', { cls:'vc-info' });
+      info.appendChild(el('div', { cls:'vc-name', text:v.name }));
+      var sub = el('div', { cls:'vc-category' });
+      sub.appendChild(document.createTextNode(v.category + '  ·  ' + fmt(v.annualSpend)));
+      info.appendChild(sub);
+      hdr.appendChild(info);
+
+      var right = el('div', { cls:'vc-right' });
+      right.appendChild(el('div', { cls:'vc-risk-badge', text:meta.label }));
+      right.appendChild(el('div', { cls:'vc-score', text:v.riskScore }));
+      right.appendChild(el('div', { cls:'vc-score-lbl', text:'Risk Score' }));
+      hdr.appendChild(right);
+      card.appendChild(hdr);
+
+      // Signal pills
+      var pillRow = el('div', { cls:'vc-signals' });
+      sigTypes.forEach(function(t) {
+        var td = SIGNAL_TYPES[t];
+        if (!td) return;
+        pillRow.appendChild(el('span', { cls:'sig-pill ' + td.pillCls, text:td.label }));
+      });
+      card.appendChild(pillRow);
+
+      // Expanded detail
+      var detWrap = el('div', { cls:'vc-detail' + (expanded[v.id] ? '' : ' hidden'), id:'vdet-' + v.id });
+      var detInner = el('div', { cls:'vc-detail-inner' });
+
+      var sortedSigs = v.signals.slice().sort(function(a, b) { return severityOrder(a.severity) - severityOrder(b.severity); });
+      sortedSigs.forEach(function(sig) {
+        var td = SIGNAL_TYPES[sig.type] || { label: sig.type };
+        var block = el('div', { cls:'sig-block sev-' + sig.severity });
+        block.appendChild(el('div', { cls:'sig-block-type', text:td.label }));
+        block.appendChild(el('div', { cls:'sig-block-title', text:sig.title }));
+        block.appendChild(el('div', { cls:'sig-block-desc', text:sig.desc }));
+        if (sig.date) block.appendChild(el('div', { cls:'sig-block-date', text:'Signal date: ' + sig.date }));
+        if (sig.action) {
+          var actDiv = el('div', { cls:'sig-block-action' });
+          actDiv.appendChild(el('button', {
+            cls:'btn-sig-action', text:'→ ' + sig.action,
+            on: { click: function(e) { e.stopPropagation(); } }
+          }));
+          block.appendChild(actDiv);
+        }
+        detInner.appendChild(block);
+      });
+      detWrap.appendChild(detInner);
+      card.appendChild(detWrap);
+
+      // Click to expand
+      card.addEventListener('click', function() {
+        expanded[v.id] = !expanded[v.id];
+        setHidden(detWrap, !expanded[v.id]);
+      });
+
+      grid.appendChild(card);
+    });
+
+    // Last updated
+    var lu = document.getElementById('last-updated');
+    if (lu) lu.textContent = 'Signals last refreshed: 2026-08-18  ·  ' + vendors.length + ' vendors monitored';
+  }
+
+  /* ── Render Watchlist ── */
+  function renderWatchlist() {
+    var body = document.getElementById('watchlist-body');
+    clearNode(body);
+    var sorted = vendors.slice().sort(function(a, b) { return b.riskScore - a.riskScore; });
+    sorted.forEach(function(v) {
+      var meta  = riskMeta(v.riskScore);
+      var row   = el('div', { cls:'watch-row' });
+      var dot   = el('div', { cls:'watch-dot', style:{ background:riskColor(meta.level) } });
+      var name  = el('div', { cls:'watch-name', text:v.name });
+      var score = el('div', { cls:'watch-score ws-' + meta.level, text:v.riskScore });
+      var trend = el('div', { cls:'watch-trend' });
+      var trendVal = v.riskScore >= 80 ? '↑' : v.riskScore <= 25 ? '↓' : '→';
+      var trendCls = v.riskScore >= 80 ? 'trend-up' : v.riskScore <= 25 ? 'trend-down' : 'trend-flat';
+      trend.appendChild(el('span', { cls:trendCls, text:trendVal }));
+      row.appendChild(dot);
+      row.appendChild(name);
+      row.appendChild(score);
+      row.appendChild(trend);
+      body.appendChild(row);
+    });
+  }
+
+  /* ── Render Legend ── */
+  function renderLegend() {
+    var body = document.getElementById('legend-body');
+    clearNode(body);
+    Object.keys(SIGNAL_TYPES).forEach(function(k) {
+      var td  = SIGNAL_TYPES[k];
+      var row = el('div', { cls:'legend-row' });
+      row.appendChild(el('div', { cls:'legend-dot', style:{ background:td.color } }));
+      row.appendChild(el('span', { cls:'legend-label', text:td.label }));
+      row.appendChild(document.createTextNode(td.desc));
+      body.appendChild(row);
+    });
+  }
+
+  /* ── Render Coupa Summary ── */
+  function renderCoupaSummary() {
+    var body = document.getElementById('coupa-summary-body');
+    if (!body) return;
+    clearNode(body);
+
+    var makeRow = function(label, value) {
+      var row = el('div', { cls:'legend-row' });
+      var lbl = el('span', { cls:'legend-label', text:label });
+      var val = el('span', { text:value });
+      row.appendChild(lbl);
+      row.appendChild(val);
+      return row;
+    };
+
+    body.appendChild(makeRow('Total FY27 Spend', '$295.47M'));
+    body.appendChild(makeRow('Total Vendors', '242'));
+    body.appendChild(makeRow('Largest Vendor', 'Workday $23.7M'));
+  }
+
+  /* ── Full render ── */
+  function renderAll() {
+    renderAlertBand();
+    renderVendors();
+    renderWatchlist();
+  }
+
+  /* ── Add Vendor Form ── */
+  document.getElementById('btn-toggle-add').addEventListener('click', function() {
+    var form = document.getElementById('add-form');
+    setHidden(form, !form.classList.contains('hidden'));
+  });
+  document.getElementById('btn-add-cancel').addEventListener('click', function() {
+    setHidden('add-form', true);
+    clearAddForm();
+  });
+  document.getElementById('btn-add-save').addEventListener('click', function() {
+    var name = document.getElementById('af-name').value.trim();
+    if (!name) { window.alert('Vendor name is required.'); return; }
+    var notes = document.getElementById('af-notes').value.trim();
+    var coupaMatch = coupaLookup(name);
+    var annualSpend = parseFloat(document.getElementById('af-spend').value) || 0;
+    if (!annualSpend && coupaMatch) {
+      annualSpend = Math.round(coupaMatch.fy27 * 1e6);
+    }
+    var newVendor = {
+      id: 'vp_' + Date.now(),
+      name: name,
+      category: document.getElementById('af-category').value,
+      annualSpend: annualSpend,
+      emoji: '📦',
+      riskScore: 30,
+      signals: notes ? [{
+        type: 'compet', severity: 'medium',
+        title: 'Manual Signal — ' + name,
+        desc: notes,
+        date: new Date().toISOString().slice(0,10),
+        action: 'Review and categorize this signal'
+      }] : [{
+        type: 'stable', severity: 'low',
+        title: 'Monitoring Started',
+        desc: 'Vendor added to posture monitoring. No signals detected yet. Update risk score and add signals as intelligence arrives.',
+        date: new Date().toISOString().slice(0,10),
+        action: null
+      }]
+    };
+    vendors.push(newVendor);
+    saveStore();
+    setHidden('add-form', true);
+    clearAddForm();
+    renderAll();
+  });
+
+  function clearAddForm() {
+    ['af-name','af-spend','af-notes'].forEach(function(id) {
+      var f = document.getElementById(id); if (f) f.value = '';
+    });
+  }
+
+  /* ── Alert dismiss ── */
+  document.getElementById('alert-dismiss').addEventListener('click', function() {
+    alertDismissed = true;
+    setHidden('alert-band', true);
+  });
+
+  /* ── Theme (legacy handler — toggleTheme() handles via onclick) ── */
+
+  /* ── Init ── */
+  renderLegend();
+  renderCoupaSummary();
+  renderAll();
+
+}());
+</script>
+<script>
+function toggleTheme(){
+  var h=document.documentElement;
+  h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+(function(){
+  var c=document.getElementById('particles');
+  if(!c)return;
+  var ctx=c.getContext('2d');
+  var pts=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  for(var i=0;i<60;i++) pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    vx:(Math.random()-0.5)*0.15,vy:(Math.random()-0.5)*0.15,
+    r:Math.random()*1.2+0.4,a:Math.random()*0.4+0.1});
+  function frame(){
+    ctx.clearRect(0,0,c.width,c.height);
+    pts.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(13,148,136,'+p.a+')';ctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>

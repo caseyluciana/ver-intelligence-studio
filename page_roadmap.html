@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Strategic Roadmap · VER Intelligence Hub</title>
+<style>
+:root{
+  --navy:#0F1E3C;--navy2:#1E3A5F;--navy3:#EFF6FF;
+  --teal:#0D9488;--teal2:#0F766E;--teal3:#F0FDF9;
+  --green:#059669;--green2:#065F46;--green3:#D1FAE5;
+  --amber:#D97706;--amber2:#78350F;--amber3:#FEF3C7;
+  --red:#DC2626;--red2:#7F1D1D;--red3:#FEE2E2;
+  --purple:#7C3AED;--purple2:#5B21B6;--purple3:#F5F3FF;
+  --blue:#2563EB;--blue3:#EFF6FF;
+  --ink:#111827;--ink2:#1F2937;--ink3:#374151;--ink4:#6B7280;
+  --gray:#F9FAFB;--gray2:#F3F4F6;--gray3:#E5E7EB;
+  --border:#E5E7EB;--border2:#D1D5DB;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);color:var(--ink2);font-size:9pt;}
+
+/* ── Hub top bar ── */
+.hub-top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:48px;
+  background:linear-gradient(90deg,rgba(15,30,60,0.98) 0%,rgba(10,22,40,0.98) 100%);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.08);}
+.htb-left{display:flex;align-items:center;gap:14px;}
+.htb-back{font-size:8.5pt;color:rgba(255,255,255,0.5);text-decoration:none;font-weight:500;transition:color 0.15s;}
+.htb-back:hover{color:#fff;}
+.htb-divider{width:1px;height:16px;background:rgba(255,255,255,0.12);}
+.htb-brand{font-size:8.5pt;font-weight:700;color:rgba(255,255,255,0.65);}
+.htb-right{display:flex;align-items:center;gap:12px;}
+.htb-meta{text-align:right;font-size:7.5pt;color:rgba(255,255,255,0.35);line-height:1.4;}
+.dm-toggle{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.dm-toggle:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+[data-theme="dark"] .dm-toggle{background:rgba(13,148,136,0.18);border-color:rgba(13,148,136,0.4);color:#0D9488;}
+.print-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:20px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);
+  font-size:7.5pt;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.15s;white-space:nowrap;}
+.print-btn:hover{background:rgba(13,148,136,0.2);border-color:var(--teal);color:var(--teal);}
+@media print{
+  .hub-top-bar,.print-btn,.dm-toggle,.htb-meta{display:none!important;}
+  .hero{background:#0F1E3C!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{background:#fff!important;color:#111!important;}
+}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#04091A 0%,#0F1E3C 50%,#0D2636 100%);padding:36px 0 32px;position:relative;overflow:hidden;}
+.hero-inner-wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+.hero::before{content:'';position:absolute;top:-60px;right:40px;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,0.10),transparent 70%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-40px;left:20%;width:500px;height:260px;
+  background:radial-gradient(ellipse,rgba(13,148,136,0.10),transparent 70%);pointer-events:none;}
+.hero-eyebrow{font-size:6.5pt;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.hero-title{font-size:24pt;font-weight:900;color:#fff;line-height:1.1;margin-bottom:8px;}
+.hero-sub{font-size:9.5pt;color:rgba(255,255,255,0.6);line-height:1.65;max-width:620px;margin-bottom:20px;}
+.hero-chips{display:flex;gap:8px;flex-wrap:wrap;}
+.hero-chip{font-size:7.5pt;font-weight:700;padding:4px 12px;border-radius:20px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.65);}
+.hero-chip.active{background:rgba(13,148,136,0.2);border-color:rgba(13,148,136,0.4);color:#5EEAD4;}
+
+/* ── PAGE CONTENT ── */
+.page-inner{max-width:1280px;margin:0 auto;padding:32px 48px 48px;}
+
+/* ── SECTION HEADER ── */
+.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.sec-accent{width:3px;border-radius:3px;flex-shrink:0;height:22px;}
+.sa-teal{background:var(--teal);}
+.sa-navy{background:var(--navy);}
+.sa-purple{background:var(--purple);}
+.sa-amber{background:var(--amber);}
+.sa-green{background:var(--green);}
+.sec-title{font-size:12pt;font-weight:900;color:var(--navy);}
+.sec-sub{font-size:8.5pt;color:var(--ink4);line-height:1.5;}
+
+/* ── VISION CALLOUT ── */
+.vision-block{background:linear-gradient(135deg,#0F1E3C 0%,#1a2d50 60%,#0F2D40 100%);
+  border-radius:12px;padding:24px 28px;margin-bottom:32px;position:relative;overflow:hidden;}
+.vision-block::after{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(13,148,136,0.15),transparent 70%);pointer-events:none;}
+.vision-label{font-size:6.5pt;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.vision-text{font-size:10.5pt;color:rgba(255,255,255,0.85);line-height:1.7;max-width:840px;}
+.vision-destination{font-size:8.5pt;color:rgba(255,255,255,0.5);margin-top:10px;font-style:italic;}
+
+/* ── ROADMAP PHASES ── */
+.phases-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;}
+.phase-card{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#fff;}
+.phase-card.active{border-color:var(--teal);box-shadow:0 4px 20px rgba(13,148,136,0.15);}
+.phase-hdr{padding:14px 16px 12px;border-bottom:1px solid var(--gray2);}
+.phase-card.active .phase-hdr{background:linear-gradient(135deg,var(--teal),var(--teal2));border-bottom:none;}
+.phase-num{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.phase-card:not(.active) .phase-num{color:var(--ink4);}
+.phase-card.active .phase-num{color:rgba(255,255,255,0.7);}
+.phase-name{font-size:11pt;font-weight:900;}
+.phase-card:not(.active) .phase-name{color:var(--ink);}
+.phase-card.active .phase-name{color:#fff;}
+.phase-status{display:inline-block;font-size:7pt;font-weight:800;padding:2px 9px;
+  border-radius:10px;margin-top:6px;text-transform:uppercase;letter-spacing:.06em;}
+.ps-active{background:rgba(255,255,255,0.2);color:#fff;}
+.ps-upcoming{background:var(--navy3);color:var(--navy2);}
+.ps-planned{background:var(--gray2);color:var(--ink4);}
+.phase-focus{font-size:7.5pt;font-style:italic;padding:10px 16px 4px;color:var(--ink4);}
+.phase-items{padding:0 16px 14px;display:flex;flex-direction:column;gap:0;}
+.phase-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray2);font-size:8pt;color:var(--ink3);}
+.phase-item:last-child{border-bottom:none;}
+.phase-item::before{content:'→';color:var(--teal);font-weight:700;flex-shrink:0;margin-top:1px;}
+.phase-card.active .phase-item::before{color:var(--teal);}
+
+/* ── PILLARS ── */
+.pillars-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:32px;}
+.pillar-card{background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:18px 16px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;}
+.pillar-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.pc-1::before{background:var(--teal);}
+.pc-2::before{background:var(--navy);}
+.pc-3::before{background:var(--purple);}
+.pc-4::before{background:var(--blue);}
+.pc-5::before{background:var(--amber);}
+.pillar-num{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4);}
+.pillar-title{font-size:9.5pt;font-weight:800;color:var(--ink);}
+.pillar-shift{font-size:7pt;font-weight:700;padding:3px 8px;border-radius:6px;
+  background:var(--gray2);color:var(--ink4);display:inline-block;}
+.pillar-items{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
+.pillar-item{font-size:7.5pt;color:var(--ink3);display:flex;gap:6px;align-items:flex-start;line-height:1.4;}
+.pillar-item::before{content:'·';color:var(--teal);font-weight:900;flex-shrink:0;}
+
+/* ── CHANGE MANAGEMENT ── */
+.cm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;}
+.cm-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;
+  display:flex;flex-direction:column;gap:8px;}
+.cm-icon{font-size:18pt;line-height:1;}
+.cm-title{font-size:9.5pt;font-weight:800;color:var(--ink);}
+.cm-body{font-size:8pt;color:var(--ink3);line-height:1.65;}
+
+/* ── SUCCESS OUTCOMES ── */
+.outcomes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
+.outcome-card{background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:18px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;}
+.outcome-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+.oc-1::after{background:var(--teal);}
+.oc-2::after{background:var(--green);}
+.oc-3::after{background:var(--navy);}
+.oc-4::after{background:var(--purple);}
+.oc-5::after{background:var(--amber);}
+.oc-6::after{background:var(--blue);}
+.oc-icon{font-size:16pt;line-height:1;}
+.oc-title{font-size:9.5pt;font-weight:800;color:var(--ink);}
+.oc-body{font-size:8pt;color:var(--ink3);line-height:1.65;}
+
+/* ── DARK MODE ── */
+[data-theme="dark"]{
+  --gray:#0D1626;--gray2:#111F35;--gray3:#1A2D47;
+  --border:#1E3A5F;--border2:#243E60;
+  --ink:#EFF6FF;--ink2:#C7D9F0;--ink3:#8BAACF;--ink4:#5A7899;
+  --navy3:#0F1E3C;--navy2:#1E3A5F;
+  --teal3:rgba(13,148,136,0.15);--green3:rgba(5,150,105,0.15);
+  --amber3:rgba(217,119,6,0.15);--red3:rgba(220,38,38,0.15);--purple3:rgba(124,58,237,0.15);
+}
+[data-theme="dark"] body{background:var(--gray);}
+[data-theme="dark"] .phase-card:not(.active),[data-theme="dark"] .pillar-card,
+[data-theme="dark"] .cm-card,[data-theme="dark"] .outcome-card{background:var(--gray2);border-color:var(--border);}
+[data-theme="dark"] .phase-hdr,[data-theme="dark"] .phase-focus{border-color:var(--border);}
+[data-theme="dark"] .phase-item{border-color:var(--border);}
+[data-theme="dark"] .phase-status.ps-upcoming{background:rgba(15,30,60,0.8);color:var(--ink3);}
+[data-theme="dark"] .phase-status.ps-planned{background:var(--gray3);color:var(--ink4);}
+[data-theme="dark"] .sec-title{color:var(--ink);}
+[data-theme="dark"] .phase-name{color:var(--ink);}
+[data-theme="dark"] .pillar-title,[data-theme="dark"] .cm-title,[data-theme="dark"] .oc-title{color:var(--ink);}
+[data-theme="dark"] .pillar-shift{background:var(--gray3);color:var(--ink4);}
+
+@media(max-width:1100px){
+  .phases-grid{grid-template-columns:repeat(2,1fr);}
+  .pillars-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:800px){
+  .phases-grid,.pillars-grid,.cm-grid,.outcomes-grid{grid-template-columns:1fr;}
+  .page-inner{padding:24px 20px 40px;}
+  .hero-inner-wrap{padding:0 20px;}
+}
+
+/* ── Resources sidebar layout ── */
+.vp-wrap{display:flex;min-height:100vh;}
+.vp-side{width:220px;background:var(--navy);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;}
+.vp-main{flex:1;overflow-x:hidden;}
+.vp-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vp-logo-title{font-size:10.5pt;font-weight:800;color:#fff;line-height:1.2;}
+.vp-logo-sub{font-size:8pt;color:rgba(255,255,255,0.65);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+.vp-nav{padding:12px 0;}
+.vp-nav-section{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.60);padding:10px 18px 4px;}
+.vp-nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;font-size:8.5pt;font-weight:600;color:rgba(255,255,255,0.85);text-decoration:none;transition:all 0.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.vp-nav-item:hover,.vp-nav-item.active{background:rgba(255,255,255,0.10);color:#fff;}
+.vp-nav-item.active{border-left:3px solid var(--teal);}
+.vp-nav-icon{font-size:12pt;flex-shrink:0;}
+.vp-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0;}
+.vp-side-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);font-size:8pt;color:rgba(255,255,255,0.55);}
+</style>
+</head>
+<body>
+<div class="vp-wrap">
+
+  <!-- Sidebar -->
+  <div class="vp-side">
+    <div class="vp-logo">
+      <div class="vp-logo-title">VER Intelligence<br>Hub</div>
+      <div class="vp-logo-sub">DET &middot; FY27</div>
+    </div>
+    <nav class="vp-nav">
+      <div class="vp-nav-section">Resources</div>
+      <a href="page_cqbr.html" class="vp-nav-item"><span class="vp-nav-icon">&#128196;</span>CQBR Library</a>
+      <a href="page_digest.html" class="vp-nav-item"><span class="vp-nav-icon">&#128240;</span>Monthly Digest</a>
+      <a href="page_vision_series.html" class="vp-nav-item"><span class="vp-nav-icon">&#127909;</span>Vision Series</a>
+      <a href="page_roadmap.html" class="vp-nav-item active"><span class="vp-nav-icon">&#128506;</span>Roadmap</a>
+      <a href="page_team.html" class="vp-nav-item"><span class="vp-nav-icon">&#128105;</span>Team &amp; Charter</a>
+      <a href="page_guide.html" class="vp-nav-item"><span class="vp-nav-icon">&#128216;</span>VER Guide</a>
+      <div class="vp-nav-divider"></div>
+      <a href="index.html" class="vp-nav-item"><span class="vp-nav-icon">&#8617;</span>Back to Hub</a>
+    </nav>
+    <div class="vp-side-footer">VER Intelligence Hub<br>Salesforce DET &middot; FY27</div>
+  </div>
+
+  <!-- Main -->
+  <div class="vp-main">
+    <div style="position:fixed;top:12px;right:20px;z-index:200;"><button type="button" class="dm-toggle" id="dm-btn" onclick="toggleDark()">&#9789; Dark</button></div>
+
+<div class="hero">
+  <div class="hero-inner-wrap">
+    <div class="hero-eyebrow">VER Intelligence Hub &middot; FY27 &middot; Strategy</div>
+    <div class="hero-title">VER Strategic Roadmap</div>
+    <div class="hero-sub">A four-phase transformation journey from operational stabilization through an Automated Governance Engine — redefining how Salesforce DET governs, optimizes, and derives value from its vendor ecosystem.</div>
+    <div class="hero-chips">
+      <span class="hero-chip active">&#9679; Phase 1 Active</span>
+      <span class="hero-chip">Director: Casey Luciana Candelaria-Logan</span>
+      <span class="hero-chip">April 2026</span>
+      <span class="hero-chip">DET Monitored Portfolio</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-inner">
+
+  <!-- Vision -->
+  <div class="vision-block">
+    <div class="vision-label">&#10022; VER Vision</div>
+    <div class="vision-text">We are moving beyond traditional vendor oversight. VER is building a Strategic Intelligence Hub — a living system that transforms how Salesforce DET governs, optimizes, and derives value from its vendor ecosystem.</div>
+    <div class="vision-destination">Our destination is not just operational excellence — it is an <strong style="color:rgba(255,255,255,0.75)">Automated Governance Engine.</strong></div>
+  </div>
+
+  <!-- Phases -->
+  <div class="sec-hd">
+    <div class="sec-accent sa-teal"></div>
+    <div>
+      <div class="sec-title">&#128205; Roadmap Phases</div>
+      <div class="sec-sub">Four-phase transformation from Stabilization through Optimization</div>
+    </div>
+  </div>
+  <div class="phases-grid">
+
+    <div class="phase-card active">
+      <div class="phase-hdr">
+        <div class="phase-num">Phase 1</div>
+        <div class="phase-name">Stabilization</div>
+        <span class="phase-status ps-active">&#9679; Active</span>
+      </div>
+      <div class="phase-focus">Operating model audit, baseline FinOps, governance guardrails</div>
+      <div class="phase-items">
+        <div class="phase-item">Operating model audit — function rebuild underway</div>
+        <div class="phase-item">VER Intelligence Hub launched — April 2026</div>
+        <div class="phase-item">FinOps baseline and portfolio mapping in progress</div>
+        <div class="phase-item">Governance guardrails and intake framework being established</div>
+      </div>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-hdr" style="border-bottom:1px solid var(--gray2);">
+        <div class="phase-num">Phase 2</div>
+        <div class="phase-name">Modernization</div>
+        <span class="phase-status ps-upcoming">Upcoming</span>
+      </div>
+      <div class="phase-focus">Intelligence Hub launch, automated reporting, canvas debut</div>
+      <div class="phase-items">
+        <div class="phase-item">Automated Tableau dashboard publishing</div>
+        <div class="phase-item">Intelligence Hub expanded to full 10-page platform</div>
+        <div class="phase-item">AI-assisted reporting and build story</div>
+        <div class="phase-item">Team Charter and role framework</div>
+      </div>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-hdr" style="border-bottom:1px solid var(--gray2);">
+        <div class="phase-num">Phase 3</div>
+        <div class="phase-name">Scaling</div>
+        <span class="phase-status ps-upcoming">Upcoming</span>
+      </div>
+      <div class="phase-focus">Reliability maturity, Health Check system, self-service agents</div>
+      <div class="phase-items">
+        <div class="phase-item">Reliability maturity framework — Q3 FY27</div>
+        <div class="phase-item">Vendor Health Monitor live — Q3 FY27</div>
+        <div class="phase-item">VER Intake Requests fully operational — Q3 FY27</div>
+        <div class="phase-item">Self-service agent framework launched</div>
+      </div>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-hdr" style="border-bottom:1px solid var(--gray2);">
+        <div class="phase-num">Phase 4</div>
+        <div class="phase-name">Optimization</div>
+        <span class="phase-status ps-planned">Planned</span>
+      </div>
+      <div class="phase-focus">Value realization, AI-synthesized QBRs, economic dashboard</div>
+      <div class="phase-items">
+        <div class="phase-item">AI-synthesized QBRs — Q4 FY27</div>
+        <div class="phase-item">Economic performance dashboard — Q4 FY27</div>
+        <div class="phase-item">Full Automated Governance Engine operational</div>
+        <div class="phase-item">Annual Vendor Insights Report — AI-synthesized</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 5 Pillars -->
+  <div class="sec-hd" style="margin-top:8px;">
+    <div class="sec-accent sa-navy"></div>
+    <div>
+      <div class="sec-title">&#9881; The 5 Strategic Pillars</div>
+      <div class="sec-sub">Core capability domains driving the VER transformation</div>
+    </div>
+  </div>
+  <div class="pillars-grid">
+
+    <div class="pillar-card pc-1">
+      <div class="pillar-num">Pillar 1</div>
+      <div class="pillar-title">Economic Intelligence &amp; FinOps</div>
+      <div class="pillar-shift">From cost tracking → value optimization</div>
+      <div class="pillar-items">
+        <div class="pillar-item">Real-time spend intelligence across the managed portfolio</div>
+        <div class="pillar-item">Savings realization tracking and forecasting</div>
+        <div class="pillar-item">FinOps discipline embedded across all engagement work</div>
+      </div>
+    </div>
+
+    <div class="pillar-card pc-2">
+      <div class="pillar-num">Pillar 2</div>
+      <div class="pillar-title">Ecosystem Governance &amp; Reliability</div>
+      <div class="pillar-shift">From reactive oversight → proactive health</div>
+      <div class="pillar-items">
+        <div class="pillar-item">SLA accountability and engagement health scorecards</div>
+        <div class="pillar-item">QBR coordination and performance escalation management</div>
+        <div class="pillar-item">Contract compliance and engagement terms alignment</div>
+      </div>
+    </div>
+
+    <div class="pillar-card pc-3">
+      <div class="pillar-num">Pillar 3</div>
+      <div class="pillar-title">Strategic Relationship Management</div>
+      <div class="pillar-shift">From vendor management → engagement strategy</div>
+      <div class="pillar-items">
+        <div class="pillar-item">Renewal positioning and commercial awareness</div>
+        <div class="pillar-item">Engagement terms alignment with Procurement &amp; Sourcing</div>
+        <div class="pillar-item">Strategic alignment between VER and DET business priorities</div>
+      </div>
+    </div>
+
+    <div class="pillar-card pc-4">
+      <div class="pillar-num">Pillar 4</div>
+      <div class="pillar-title">Unified Collaboration &amp; Integration</div>
+      <div class="pillar-shift">From siloed ops → connected intelligence</div>
+      <div class="pillar-items">
+        <div class="pillar-item">VER intake coordination and operational workflows</div>
+        <div class="pillar-item">Cross-functional alignment across DET organizations</div>
+        <div class="pillar-item">Intelligence Hub as the connective platform</div>
+      </div>
+    </div>
+
+    <div class="pillar-card pc-5">
+      <div class="pillar-num">Pillar 5</div>
+      <div class="pillar-title">Stakeholder Enablement &amp; Change</div>
+      <div class="pillar-shift">From compliance → capability building</div>
+      <div class="pillar-items">
+        <div class="pillar-item">VER-Ready Manager program and pre-contract education</div>
+        <div class="pillar-item">Internal communications and governance cadence</div>
+        <div class="pillar-item">Stakeholder readiness and change management</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Change Management -->
+  <div class="sec-hd" style="margin-top:8px;">
+    <div class="sec-accent sa-purple"></div>
+    <div>
+      <div class="sec-title">&#127916; Change Management Approach</div>
+      <div class="sec-sub">How VER brings stakeholders on the journey</div>
+    </div>
+  </div>
+  <div class="cm-grid">
+
+    <div class="cm-card">
+      <div class="cm-icon">&#127919;</div>
+      <div class="cm-title">AI-Assisted Stakeholder Surveys</div>
+      <div class="cm-body">AI-assisted surveys deployed at scale to gather stakeholder friction points across DET. Structured data collection replaces manual interviews — surfacing patterns and engagement gaps that would otherwise take months to identify.</div>
+    </div>
+
+    <div class="cm-card">
+      <div class="cm-icon">&#127916;</div>
+      <div class="cm-title">Cinematic QBRs</div>
+      <div class="cm-body">Quarterly business reviews reimagined — replacing hour-long meetings and slide decks with on-demand, narrative-driven intelligence experiences. QBR insights delivered through the Intelligence Hub, consumed on leadership's own time.</div>
+    </div>
+
+    <div class="cm-card">
+      <div class="cm-icon">&#129504;</div>
+      <div class="cm-title">Self-Service Agents</div>
+      <div class="cm-body">AI-powered self-service for managers — answering engagement questions, surfacing contract terms, and guiding pre-contract evaluation without requiring direct VER intervention for every request.</div>
+    </div>
+
+    <div class="cm-card">
+      <div class="cm-icon">&#128640;</div>
+      <div class="cm-title">VER Vision Series</div>
+      <div class="cm-body">An on-demand roadshow bringing VER's strategy and vision directly to DET leadership and stakeholders. Episodic, accessible, and built for consumption on the viewer's schedule — not a calendar invite.</div>
+    </div>
+
+  </div>
+
+  <!-- Success Outcomes -->
+  <div class="sec-hd" style="margin-top:8px;">
+    <div class="sec-accent sa-green"></div>
+    <div>
+      <div class="sec-title">&#127942; Defining Success</div>
+      <div class="sec-sub">Measurable outcomes across all four phases — reported through the Intelligence Hub</div>
+    </div>
+  </div>
+  <div class="outcomes-grid">
+
+    <div class="outcome-card oc-1">
+      <div class="oc-icon">&#128202;</div>
+      <div class="oc-title">Intelligence Hub Live</div>
+      <div class="oc-body">Actively used by DET leadership as the single source of truth for vendor performance, spend intelligence, and strategic engagement status across the managed portfolio.</div>
+    </div>
+
+    <div class="outcome-card oc-2">
+      <div class="oc-icon">&#128176;</div>
+      <div class="oc-title">$10.236M Savings Target</div>
+      <div class="oc-body">100% to target. NTT AD restructure and Cognizant engagement avoidance delivered in full. NTT AMS cost reduction tracked as next milestone.</div>
+    </div>
+
+    <div class="outcome-card oc-3">
+      <div class="oc-icon">&#128274;</div>
+      <div class="oc-title">Ecosystem Reliability</div>
+      <div class="oc-body">All active engagements scored on SLA performance quarterly. Vendor Health Monitor live and updated monthly. Zero unmanaged escalations across the portfolio.</div>
+    </div>
+
+    <div class="outcome-card oc-4">
+      <div class="oc-icon">&#9881;</div>
+      <div class="oc-title">Intake Process Adoption</div>
+      <div class="oc-body">All new SOWs and vendor engagements routed through VER intake. No engagement bypasses governance. Pre-contract checklist adoption active across DET.</div>
+    </div>
+
+    <div class="outcome-card oc-5">
+      <div class="oc-icon">&#127775;</div>
+      <div class="oc-title">Manager Readiness</div>
+      <div class="oc-body">VER-Ready program active and adopted across DET. Managers understand how to engage VER, what we review, and how to navigate the pre-contract process independently.</div>
+    </div>
+
+    <div class="outcome-card oc-6">
+      <div class="oc-icon">&#127916;</div>
+      <div class="oc-title">First Cinematic QBR</div>
+      <div class="oc-body">Delivered Q4 FY27 — replacing hour-long meetings and slide decks with on-demand, narrative-driven intelligence experiences powered by the VER Intelligence Hub.</div>
+    </div>
+
+  </div>
+
+  <div style="border-top:1px solid var(--border);padding-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:7.5pt;color:var(--ink4);">
+    <span>VER Strategic Roadmap &middot; FY27 &middot; Last updated April 2026 &middot; DET Leadership Confidential</span>
+    <span>Director: Casey Luciana Candelaria-Logan &middot; VER &amp; FinOps &middot; Salesforce DET</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var t; try { t = localStorage.getItem('ver-theme'); } catch(e){}
+  if(!t) t = window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  var btn = document.getElementById('dm-btn');
+  if(btn) btn.textContent = t === 'dark' ? '☀ Light Mode' : '☽ Dark Mode';
+})();
+function toggleDark(){
+  var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem('ver-theme', t); } catch(e){}
+  var btn = document.getElementById('dm-btn');
+  if(btn) btn.textContent = t === 'dark' ? '☀ Light Mode' : '☽ Dark Mode';
+}
+</script>
+  </div><!-- /vp-main -->
+</div><!-- /vp-wrap -->
+</body>
+</html>
