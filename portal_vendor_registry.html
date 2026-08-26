@@ -1116,6 +1116,7 @@ function openRegistryHelp() {
 // ── User chip (shared portal pattern) ────────────────────────────
 (function(){
   try {
+    function _decodeEmoji(s){if(!s)return'👤';if(s.indexOf('&#')===-1)return s;var t=document.createElement('textarea');t.innerHTML=s;return t.value;}
     var u = JSON.parse(localStorage.getItem('ver-team-user') || 'null');
     if (u) {
       var ne = document.getElementById('sb-user-name');
@@ -1123,7 +1124,7 @@ function openRegistryHelp() {
       var ee = document.getElementById('sb-user-emoji');
       if (ne) ne.textContent = u.name || 'Team VER';
       if (re) re.textContent = u.role || 'VER Team';
-      if (ee) ee.innerHTML = u.emoji || '&#128100;';
+      if (ee) ee.textContent = _decodeEmoji(u.emoji);
     }
   } catch(e){}
 })();

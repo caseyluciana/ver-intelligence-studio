@@ -1115,12 +1115,13 @@ function _toggleTheme() {
    ============================================================ */
 (function() {
   try {
-    var u = JSON.parse(localStorage.getItem('ver-team-user') || 'null');
+    function _decodeEmoji(s){if(!s)return'👤';if(s.indexOf('&#')===-1)return s;var t=document.createElement('textarea');t.innerHTML=s;return t.value;}
+  var u = JSON.parse(localStorage.getItem('ver-team-user') || 'null');
     if (u) {
       var e = document.getElementById('sb-user-emoji');
       var n = document.getElementById('sb-user-name');
       var r = document.getElementById('sb-user-role');
-      if (e) e.textContent = u.emoji || '👤';
+      if (e) e.textContent = _decodeEmoji(u.emoji);
       if (n) n.textContent = u.name || 'Casey';
       if (r) r.textContent = u.role || 'VER Team';
     }

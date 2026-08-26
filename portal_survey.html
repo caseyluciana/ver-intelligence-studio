@@ -691,6 +691,7 @@ body.light-mode .scan{opacity:0.12;}
     {name:'Guest',  role:'VER Team',        emoji:'👤', team:'VER', rel:'VER Analyst'},
   ];
   var LS_USER = 'ver-team-user';
+function _decodeEmoji(s){if(!s)return'👤';if(s.indexOf('&#')===-1)return s;var t=document.createElement('textarea');t.innerHTML=s;return t.value;}
 
   function loadUser(){
     try{ return JSON.parse(localStorage.getItem(LS_USER)||'null'); }catch(e){ return null; }
@@ -698,7 +699,7 @@ body.light-mode .scan{opacity:0.12;}
   function saveUser(u){ localStorage.setItem(LS_USER, JSON.stringify(u)); }
 
   function applyUser(u){
-    document.getElementById('sb-user-emoji').innerHTML   = u.emoji;
+    document.getElementById('sb-user-emoji').textContent = _decodeEmoji(u.emoji);
     document.getElementById('sb-user-name').textContent  = u.name;
     document.getElementById('sb-user-role').textContent  = u.role;
     // Auto-fill respondent fields

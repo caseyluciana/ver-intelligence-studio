@@ -1230,7 +1230,7 @@ function _initUser() {
   var raw = localStorage.getItem('ver-team-user');
   var user = null;
   if (raw) { try { user = JSON.parse(raw); } catch(e) {} }
-  if (!user) user = { id:'casey', name:'Casey', role:'Director', emoji:'&#128081;' };
+  if (!user) user = { id:'casey', name:'Casey', role:'Director', emoji:'👑' };
 
   _isDirector = (user.role === 'Director');
 
@@ -1239,7 +1239,8 @@ function _initUser() {
   var emojiEl = document.getElementById('sb-user-emoji');
   if (nameEl)  nameEl.textContent  = user.name;
   if (roleEl)  roleEl.textContent  = user.role;
-  if (emojiEl) emojiEl.innerHTML   = user.emoji || '&#128100;';
+  function _decodeEmoji(s){if(!s)return'👤';if(s.indexOf('&#')===-1)return s;var t=document.createElement('textarea');t.innerHTML=s;return t.value;}
+  if (emojiEl) emojiEl.textContent = _decodeEmoji(user.emoji);
 
   var addBtn = document.getElementById('add-btn');
   if (addBtn) addBtn.style.display = _isDirector ? '' : 'none';
