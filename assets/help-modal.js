@@ -330,8 +330,8 @@
     _injectCss();
     if(_overlay){ close(); }
     var wrap = document.createElement('div');
-    wrap.innerHTML = _render(cfg);
-    _overlay = wrap.firstChild;
+    var _parsed = (new DOMParser()).parseFromString(_render(cfg), 'text/html');
+    _overlay = _parsed.body.firstChild;
     document.body.appendChild(_overlay);
 
     // Apply theme class

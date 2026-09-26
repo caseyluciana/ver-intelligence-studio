@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>CQBR Library · VER Intelligence Hub</title>
+<title>Cinematics Library · VER Intelligence Hub</title>
 <style>
 :root {
   --navy:#0F1E3C; --navy2:#1E3A5F; --navy3:#EFF6FF;
@@ -37,14 +37,27 @@ body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);co
 .vp-page-title{font-size:15pt;font-weight:900;color:var(--navy);}
 .vp-page-sub{font-size:9pt;color:var(--ink3);margin-top:2px;}
 
+/* ── Type tabs ── */
+.type-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.type-tab{font-size:8pt;font-weight:700;padding:5px 14px;border-radius:20px;border:1.5px solid var(--border2);background:#fff;color:var(--ink3);cursor:pointer;transition:all 0.15s;}
+.type-tab:hover{border-color:var(--teal);color:var(--teal);}
+.type-tab.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+
 /* ── Filter bar ── */
 .filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
 .fsel{font-size:8pt;padding:5px 10px;border:1px solid var(--border2);border-radius:6px;background:#fff;color:var(--ink2);cursor:pointer;}
 .fsearch{font-size:8pt;padding:5px 12px;border:1px solid var(--border2);border-radius:6px;background:#fff;color:var(--ink2);width:200px;}
 .f-count{font-size:8pt;color:var(--ink4);margin-left:auto;}
 
-/* ── QBR grid ── */
-.qbr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+/* ── Section headers ── */
+.section-header{display:flex;align-items:center;gap:10px;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--border);}
+.section-header:first-child{margin-top:0;}
+.section-title{font-size:10.5pt;font-weight:900;color:var(--navy);}
+.section-count{font-size:8.5pt;color:var(--ink4);font-weight:600;}
+.section-icon{font-size:13pt;}
+
+/* ── Cinematic grid ── */
+.cin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:8px;}
 .qbr-card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:box-shadow 0.15s,transform 0.15s;cursor:pointer;text-decoration:none;display:block;}
 .qbr-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.09);transform:translateY(-2px);}
 .qbr-card-banner{height:6px;}
@@ -58,7 +71,6 @@ body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);co
 .qbr-tag.status-complete{background:var(--green3);color:var(--green2);}
 .qbr-tag.status-upcoming{background:var(--amber3);color:var(--amber2);}
 .qbr-highlights{font-size:8pt;color:var(--ink3);line-height:1.55;border-top:1px solid var(--gray2);padding-top:10px;}
-.qbr-highlights strong{color:var(--ink2);}
 .qbr-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:var(--gray);border-top:1px solid var(--border);}
 .qbr-footer-lbl{font-size:8.5pt;color:var(--ink4);}
 .qbr-cta{font-size:8.5pt;font-weight:700;color:var(--teal);display:flex;align-items:center;gap:4px;}
@@ -80,7 +92,7 @@ body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);co
     </div>
     <nav class="vp-nav">
       <div class="vp-nav-section">Resources</div>
-      <a href="page_cqbr.html" class="vp-nav-item active"><span class="vp-nav-icon">&#128196;</span>CQBR Library</a>
+      <a href="page_cqbr.html" class="vp-nav-item active"><span class="vp-nav-icon">&#127909;</span>Cinematics Library</a>
       <a href="page_digest.html" class="vp-nav-item"><span class="vp-nav-icon">&#128240;</span>Monthly Digest</a>
       <a href="page_vision_series.html" class="vp-nav-item"><span class="vp-nav-icon">&#127909;</span>Vision Series</a>
       <a href="page_roadmap.html" class="vp-nav-item"><span class="vp-nav-icon">&#128506;</span>Roadmap</a>
@@ -96,30 +108,31 @@ body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);co
   <div class="vp-main">
     <div class="vp-topbar">
       <div>
-        <div class="vp-page-title">&#128196; CQBR Library</div>
-        <div class="vp-page-sub">Collaborative Quarterly Business Reviews — all vendors, all quarters</div>
+        <div class="vp-page-title">&#127909; Cinematics Library</div>
+        <div class="vp-page-sub">All cinematic presentations — QBRs, MBRs, Training &amp; more</div>
       </div>
-      <button type="button" onclick="openCqbrHelp()" aria-label="How to use the CQBR Library"
+      <button type="button" onclick="openCinematicsHelp()" aria-label="How to use the Cinematics Library"
         style="padding:5px 14px;border-radius:6px;background:var(--navy);border:1px solid var(--navy2);color:#fff;font-size:8pt;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;">&#63; How to Use</button>
+    </div>
+
+    <!-- Type tabs -->
+    <div class="type-tabs" id="type-tabs">
+      <button type="button" class="type-tab active" data-type="">All</button>
+      <button type="button" class="type-tab" data-type="cqbr">&#127909; Cinematic QBR</button>
+      <button type="button" class="type-tab" data-type="mbr">&#128200; Monthly Business Review</button>
+      <button type="button" class="type-tab" data-type="training">&#127891; Peer-to-Peer Training</button>
+      <button type="button" class="type-tab" data-type="other">&#10024; Other</button>
     </div>
 
     <!-- Filters -->
     <div class="filter-bar">
       <select class="fsel" id="f-vendor" onchange="render()">
-        <option value="">All Vendors</option>
+        <option value="">All Vendors / Subjects</option>
       </select>
       <select class="fsel" id="f-quarter" onchange="render()">
         <option value="">All Quarters</option>
         <option>FY27 Q1</option><option>FY27 Q2</option><option>FY27 Q3</option><option>FY27 Q4</option>
         <option>FY26 Q4</option><option>FY26 Q3</option><option>FY26 Q2</option><option>FY26 Q1</option>
-      </select>
-      <select class="fsel" id="f-cat" onchange="render()">
-        <option value="">All Categories</option>
-        <option>Contingent Workforce</option>
-        <option>Professional Services</option>
-        <option>Software / SaaS</option>
-        <option>Cloud & Managed Services</option>
-        <option>Hardware & Infrastructure</option>
       </select>
       <select class="fsel" id="f-status" onchange="render()">
         <option value="">All Statuses</option>
@@ -128,13 +141,30 @@ body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);co
       <span class="f-count" id="f-count"></span>
     </div>
 
-    <!-- Grid -->
-    <div class="qbr-grid" id="qbr-grid"></div>
+    <!-- Content area -->
+    <div id="content-area"></div>
   </div>
 </div>
 
 <script>
-// One-time seed: bootstrap any CQBRs that predate the localStorage system
+// ── Type definitions ──
+var TYPE_DEFS = [
+  { id:'cqbr',     label:'Cinematic QBR',            icon:'&#127909;', names:['Cinematic QBR','Collaborative Quarterly Business Review','CQBR'] },
+  { id:'mbr',      label:'Monthly Business Review',   icon:'&#128200;', names:['Monthly Business Review','MBR'] },
+  { id:'training', label:'Peer-to-Peer Training',     icon:'&#127891;', names:['Training / Enablement','Training','Enablement','Peer-to-Peer Training'] },
+  { id:'other',    label:'Other',                     icon:'&#10024;',  names:[] }
+];
+
+function classifyEntry(q) {
+  var cat = (q.typeId || q.category || '').toLowerCase();
+  var name = (q.typeName || q.category || '').toLowerCase();
+  if (cat === 'cqbr' || name.indexOf('qbr') >= 0 || name.indexOf('quarterly') >= 0) return 'cqbr';
+  if (cat === 'mbr' || name.indexOf('monthly business') >= 0 || name.indexOf('mbr') >= 0) return 'mbr';
+  if (cat === 'training' || name.indexOf('training') >= 0 || name.indexOf('enablement') >= 0) return 'training';
+  return 'other';
+}
+
+// ── One-time seed ──
 (function() {
   try {
     var lib = JSON.parse(localStorage.getItem('ver_cqbr_library') || '[]');
@@ -143,20 +173,40 @@ body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--gray);co
         vendor: 'Cognizant',
         quarter: 'FY26 Q4',
         date: 'June 2026',
-        category: 'Contingent Workforce',
+        category: 'Cinematic QBR',
+        typeId: 'cqbr',
         status: 'Complete',
         color: '#0D9488',
-        highlights: '<strong>Key themes:</strong> Headcount optimization, rate normalization across AMER pillars, and AI practice capability review. <strong>Actions:</strong> 3 open governance items, 2 rate renegotiations in progress.',
+        highlights: 'Key themes: Headcount optimization, rate normalization across AMER pillars, and AI practice capability review. Actions: 3 open governance items, 2 rate renegotiations in progress.',
         href: 'Cognizant_QBR_FY26Q4_Cinematic_v2.html',
         generated: true,
         generatedAt: '2026-06-01T00:00:00.000Z'
+      },
+      {
+        vendor: 'VER Team',
+        quarter: 'Q1 FY27',
+        date: 'July 2026',
+        category: 'Peer-to-Peer Training',
+        typeId: 'training',
+        status: 'Complete',
+        color: '#7C3AED',
+        highlights: 'Building the Cinematic CQBR — peer-led walkthrough of the VER cinematic generator: form design, parse logic, scene architecture, and live generation demo. Presented by Casey Luciana Candelaria-Logan.',
+        href: 'test/VER_Peer_Learning_Presentation.html',
+        generated: false
       }
     ];
     var changed = false;
     SEEDS.forEach(function(seed) {
       var key = seed.vendor + '||' + seed.quarter;
-      var exists = lib.some(function(r){ return (r.vendor+'||'+r.quarter) === key; });
-      if (!exists) { lib.push(seed); changed = true; }
+      var idx = lib.findIndex(function(r){ return (r.vendor+'||'+r.quarter) === key; });
+      if (idx < 0) { lib.push(seed); changed = true; }
+      else {
+        // Always sync category/typeId so stale entries get corrected
+        var r = lib[idx];
+        if (r.category !== seed.category || r.typeId !== seed.typeId) {
+          r.category = seed.category; r.typeId = seed.typeId; changed = true;
+        }
+      }
     });
     if (changed) localStorage.setItem('ver_cqbr_library', JSON.stringify(lib));
   } catch(e) {}
@@ -167,9 +217,21 @@ function loadQBRS() {
 }
 
 var QBRS = loadQBRS();
+var activeType = '';
+
+// ── Tab wiring ──
+document.getElementById('type-tabs').addEventListener('click', function(e) {
+  var btn = e.target.closest('.type-tab');
+  if (!btn) return;
+  activeType = btn.dataset.type;
+  document.querySelectorAll('.type-tab').forEach(function(b){ b.classList.toggle('active', b === btn); });
+  render();
+});
 
 function buildVendorFilter() {
   var sel = document.getElementById('f-vendor');
+  var kept = sel.options[0];
+  while (sel.options.length > 1) sel.remove(1);
   var vendors = [...new Set(QBRS.map(function(q){ return q.vendor; }))].sort();
   vendors.forEach(function(v){
     var o = document.createElement('option');
@@ -178,58 +240,139 @@ function buildVendorFilter() {
   });
 }
 
+function openGeneratedCinematic(htmlKey) {
+  var html = '';
+  try { html = localStorage.getItem(htmlKey) || ''; } catch(e) {}
+  if (!html) { alert('Cinematic not found. It may have been cleared from storage.'); return; }
+  var blob = new Blob([html], { type: 'text/html' });
+  var url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+}
+
+function _el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
+function _txt(tag, cls, text) { var e = _el(tag, cls); e.textContent = text || ''; return e; }
+
+function buildCard(q) {
+  var status = q.status || 'Complete';
+  var isBlob = !!(q.htmlKey && (!q.href || q.href === '#'));
+  var card = _el('a', 'qbr-card');
+  if (isBlob) {
+    card.href = '#';
+    card.addEventListener('click', (function(k){ return function(e){ e.preventDefault(); openGeneratedCinematic(k); }; })(q.htmlKey));
+  } else {
+    card.href = q.href || '#';
+  }
+
+  var banner = _el('div', 'qbr-card-banner');
+  banner.style.background = q.color || '#0D9488';
+  card.appendChild(banner);
+
+  var body = _el('div', 'qbr-card-body');
+  body.appendChild(_txt('div', 'qbr-vendor', q.vendor || ''));
+
+  var typeLabel = (q.typeName || q.category || 'Cinematic');
+  var meta = _el('div', 'qbr-meta');
+  meta.textContent = (q.date || '') + ' · ' + typeLabel;
+  body.appendChild(meta);
+
+  var tags = _el('div', 'qbr-tags');
+  if (q.quarter) tags.appendChild(_txt('span', 'qbr-tag quarter', q.quarter));
+  tags.appendChild(_txt('span', 'qbr-tag status-' + status.toLowerCase(), status));
+  if (q.generated) {
+    var gb = _txt('span', 'qbr-tag', '⚡ VER Generated');
+    gb.style.background = '#EFF6FF'; gb.style.color = '#1D4ED8'; gb.style.marginLeft = 'auto';
+    tags.appendChild(gb);
+  }
+  body.appendChild(tags);
+
+  var hl = _el('div', 'qbr-highlights');
+  hl.textContent = q.highlights ? q.highlights.replace(/<[^>]+>/g, '') : '';
+  body.appendChild(hl);
+  card.appendChild(body);
+
+  var footer = _el('div', 'qbr-footer');
+  footer.appendChild(_txt('span', 'qbr-footer-lbl', 'VER Intelligence Hub'));
+  footer.appendChild(_txt('span', 'qbr-cta', 'View Cinematic →'));
+  card.appendChild(footer);
+  return card;
+}
+
 function render() {
   var vendor  = document.getElementById('f-vendor').value;
   var quarter = document.getElementById('f-quarter').value;
-  var cat     = document.getElementById('f-cat').value;
   var status  = document.getElementById('f-status').value;
 
   var filtered = QBRS.filter(function(q){
-    if (vendor  && q.vendor   !== vendor)  return false;
-    if (quarter && q.quarter  !== quarter) return false;
-    if (cat     && q.category !== cat)     return false;
-    if (status  && q.status   !== status)  return false;
+    if (vendor  && q.vendor !== vendor) return false;
+    if (quarter && q.quarter !== quarter) return false;
+    if (status  && (q.status || 'Complete') !== status) return false;
+    if (activeType) {
+      var t = classifyEntry(q);
+      if (activeType === 'other') {
+        if (t !== 'other') return false;
+      } else {
+        if (t !== activeType) return false;
+      }
+    }
     return true;
-  }).sort(function(a,b){ return a.vendor.localeCompare(b.vendor); });
+  });
 
-  document.getElementById('f-count').textContent = filtered.length + ' of ' + QBRS.length + ' QBRs';
+  document.getElementById('f-count').textContent = filtered.length + ' of ' + QBRS.length + ' cinematics';
 
-  var grid = document.getElementById('qbr-grid');
+  var area = document.getElementById('content-area');
+  area.innerHTML = '';
+
   if (!filtered.length) {
-    var msg = QBRS.length === 0
-      ? '<div class="empty"><div class="empty-icon">&#128196;</div><div class="empty-title">No CQBRs yet</div><div style="font-size:9pt;color:var(--ink4);margin-top:6px;">Generate your first CQBR from the Team Portal to populate this library.</div></div>'
-      : '<div class="empty"><div class="empty-icon">&#128269;</div><div class="empty-title">No QBRs match your filters</div></div>';
-    grid.innerHTML = msg;
+    var emptyDiv = _el('div', 'empty');
+    var iconDiv = _el('div', 'empty-icon');
+    iconDiv.textContent = QBRS.length === 0 ? '🎬' : '🔍';
+    emptyDiv.appendChild(iconDiv);
+    emptyDiv.appendChild(_txt('div', 'empty-title', QBRS.length === 0 ? 'No cinematics yet' : 'No cinematics match your filters'));
+    if (QBRS.length === 0) {
+      var hint = _el('div');
+      hint.style.cssText = 'font-size:9pt;color:var(--ink4);margin-top:6px;';
+      hint.textContent = 'Generate your first cinematic from the Team Portal to populate this library.';
+      emptyDiv.appendChild(hint);
+    }
+    area.appendChild(emptyDiv);
     return;
   }
 
-  grid.innerHTML = filtered.map(function(q){
-    var genBadge = q.generated ? '<span class="qbr-tag" style="background:#EFF6FF;color:#1D4ED8;margin-left:auto;">&#9889; VER Generated</span>' : '';
-    return '<a href="'+q.href+'" class="qbr-card">'
-      + '<div class="qbr-card-banner" style="background:'+q.color+'"></div>'
-      + '<div class="qbr-card-body">'
-      + '<div class="qbr-vendor">'+q.vendor+'</div>'
-      + '<div class="qbr-meta">'+q.date+' &middot; Collaborative QBR</div>'
-      + '<div class="qbr-tags">'
-      + '<span class="qbr-tag quarter">'+q.quarter+'</span>'
-      + '<span class="qbr-tag cat">'+q.category+'</span>'
-      + '<span class="qbr-tag status-'+q.status.toLowerCase()+'">'+q.status+'</span>'
-      + genBadge
-      + '</div>'
-      + '<div class="qbr-highlights">'+q.highlights+'</div>'
-      + '</div>'
-      + '<div class="qbr-footer">'
-      + '<span class="qbr-footer-lbl">VER Intelligence Hub</span>'
-      + '<span class="qbr-cta">View Deck &#8594;</span>'
-      + '</div>'
-      + '</a>';
-  }).join('');
+  if (activeType) {
+    // Single type selected — flat grid, no section headers
+    var grid = _el('div', 'cin-grid');
+    filtered.sort(function(a,b){ return (a.vendor||'').localeCompare(b.vendor||''); })
+            .forEach(function(q){ grid.appendChild(buildCard(q)); });
+    area.appendChild(grid);
+  } else {
+    // All types — grouped sections
+    var SECTIONS = [
+      { typeId:'cqbr',     label:'Cinematic QBR',           icon:'&#127909;' },
+      { typeId:'mbr',      label:'Monthly Business Review',  icon:'&#128200;' },
+      { typeId:'training', label:'Peer-to-Peer Training',    icon:'&#127891;' },
+      { typeId:'other',    label:'Other Cinematics',         icon:'&#10024;' }
+    ];
+    SECTIONS.forEach(function(sec) {
+      var items = filtered.filter(function(q){ return classifyEntry(q) === sec.typeId; })
+                          .sort(function(a,b){ return (a.vendor||'').localeCompare(b.vendor||''); });
+      if (!items.length) return;
+      var hdr = _el('div', 'section-header');
+      var iconEl = _el('span', 'section-icon');
+      iconEl.innerHTML = sec.icon;
+      hdr.appendChild(iconEl);
+      hdr.appendChild(_txt('span', 'section-title', sec.label));
+      hdr.appendChild(_txt('span', 'section-count', '(' + items.length + ')'));
+      area.appendChild(hdr);
+      var grid = _el('div', 'cin-grid');
+      items.forEach(function(q){ grid.appendChild(buildCard(q)); });
+      area.appendChild(grid);
+    });
+  }
 }
 
 buildVendorFilter();
 render();
 
-// Pick up any new records written after page load (e.g. if generator tab is open simultaneously)
 window.addEventListener('storage', function(e) {
   if (e.key === 'ver_cqbr_library') {
     QBRS = loadQBRS();
@@ -240,22 +383,22 @@ window.addEventListener('storage', function(e) {
 </script>
 <script src="assets/help-modal.js"></script>
 <script>
-function openCqbrHelp(){
+function openCinematicsHelp(){
   HelpModal.open({
-    title: 'CQBR Library',
-    what: 'The CQBR Library is the <strong>searchable archive of all Collaborative Quarterly Business Reviews</strong> — every vendor, every quarter, with full performance data, VER commentary, and action outcomes. It is the institutional memory of every supplier conversation DET has had.',
+    title: 'Cinematics Library',
+    what: 'The Cinematics Library is the <strong>searchable archive of all VER cinematic presentations</strong> — QBRs, Monthly Business Reviews, Training sessions, and more. Every vendor, every quarter, with full performance data, VER commentary, and action outcomes.',
     steps: [
-      '<strong>Search by vendor name</strong> to pull up all CQBRs for that supplier — see performance trends across quarters at a glance.',
-      '<strong>Filter by quarter, pillar, or risk status</strong> to find CQBRs relevant to a current decision or governance review.',
-      '<strong>Click any CQBR card</strong> to open the full review — includes scorecard, action items, VER commentary, and outcome tracking.',
-      '<strong>Use the comparison view</strong> to put two vendors\' CQBR histories side by side — useful for consolidation decisions or competitive sourcing.',
-      '<strong>Export CQBRs</strong> for escalation packages, renewal preparation, or SteerCo materials.'
+      '<strong>Use the type tabs</strong> to filter by presentation type — Cinematic QBR, Monthly Business Review, Peer-to-Peer Training, or Other.',
+      '<strong>Search by vendor / subject</strong> to pull up all cinematics for that supplier or topic.',
+      '<strong>Filter by quarter or status</strong> to find cinematics relevant to a current decision or governance review.',
+      '<strong>Click any card</strong> to open the full cinematic — includes scorecard, action items, VER commentary, and outcome tracking.',
+      '<strong>Export cinematics</strong> for escalation packages, renewal preparation, or SteerCo materials.'
     ],
     tips: [
-      { icon: '&#x1F4C5;', title: 'Trend beats snapshot', body: 'One bad quarter is noise. Three consecutive declining quarters is a pattern. Always look at the trend line, not just the latest score.' },
-      { icon: '&#x26A0;', title: 'Action items are binding', body: 'Action items committed to in a CQBR are tracked to completion. Open items from prior quarters are escalated automatically.' },
-      { icon: '&#x1F50D;', title: 'Search before renewal', body: 'Always pull the CQBR history before entering a renewal conversation. Performance history is your strongest negotiation evidence.' },
-      { icon: '&#x1F517;', title: 'Links to Vendor 360', body: 'Each CQBR links to the vendor\'s full 360 dossier in the Vendor Registry for complete context.' }
+      { icon: '&#x1F3AC;', title: 'Trend beats snapshot', body: 'One bad quarter is noise. Three consecutive declining quarters is a pattern. Always look at the trend line, not just the latest.' },
+      { icon: '&#x26A0;', title: 'Action items are binding', body: 'Action items committed to in a cinematic are tracked to completion. Open items from prior quarters are escalated automatically.' },
+      { icon: '&#x1F50D;', title: 'Search before renewal', body: 'Always pull the cinematic history before entering a renewal conversation. Performance history is your strongest negotiation evidence.' },
+      { icon: '&#x26A1;', title: 'VER Generated', body: 'Cards marked ⚡ VER Generated were created in the Cinematic Generator and live in your browser storage. They open instantly.' }
     ],
     footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
   });

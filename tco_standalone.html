@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>TCO Calculator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --font-sans:'Inter',system-ui,-apple-system,sans-serif;
@@ -58,6 +55,47 @@
   --tint-amber:rgba(251,191,36,0.12);--tint-red:rgba(248,113,113,0.12);
   --tint-purple:rgba(167,139,250,0.12);--tint-navy:rgba(255,255,255,0.04);
 }
+/* ── Light mode overrides for hardcoded-dark elements ── */
+html[data-theme="light"] .back-bar{
+  background:rgba(6,13,26,0.82);
+  border-bottom:1px solid rgba(255,255,255,0.07);}
+html[data-theme="light"] .back-link{color:rgba(255,255,255,0.55);}
+html[data-theme="light"] .back-divider{background:rgba(255,255,255,0.15);}
+html[data-theme="light"] .back-brand{color:rgba(255,255,255,0.80);}
+html[data-theme="light"] .page-stage{
+  background:linear-gradient(160deg,#DBEAFE 0%,#CCFBF1 35%,#EFF6FF 70%,#D1FAE5 100%);}
+html[data-theme="light"] .page-stage::before{
+  background:radial-gradient(ellipse at 75% 10%,rgba(13,148,136,0.18) 0%,transparent 50%),
+    radial-gradient(ellipse at 10% 90%,rgba(124,58,237,0.10) 0%,transparent 45%),
+    radial-gradient(ellipse at 50% 50%,rgba(13,148,136,0.06) 0%,transparent 70%);}
+html[data-theme="light"] .page-stage::after{
+  background-image:linear-gradient(rgba(13,148,136,0.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(13,148,136,0.06) 1px,transparent 1px);}
+html[data-theme="light"] .stage-title{color:#0F172A;}
+html[data-theme="light"] .stage-sub{color:#1E3A5F;}
+html[data-theme="light"] .mode-btn{
+  border:1px solid rgba(0,0,0,0.20);
+  background:rgba(255,255,255,0.70);color:#1E3A5F;
+  font-weight:600;}
+html[data-theme="light"] .mode-btn:hover{background:rgba(255,255,255,0.90);color:#0F172A;}
+html[data-theme="light"] .mode-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+html[data-theme="light"] .mode-desc{color:#374151;}
+html[data-theme="light"] .term-btn{
+  border:1px solid rgba(0,0,0,0.18);
+  background:rgba(255,255,255,0.65);color:#1E3A5F;
+  font-weight:600;}
+html[data-theme="light"] .term-btn:hover{background:rgba(255,255,255,0.90);color:#0F172A;}
+html[data-theme="light"] .term-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+html[data-theme="light"] .term-note{color:#374151;}
+html[data-theme="light"] .total-strip{
+  background:rgba(6,13,26,0.82);
+  border-bottom:1px solid rgba(255,255,255,0.07);}
+html[data-theme="light"] .ts-total{color:var(--on-dark-primary);}
+html[data-theme="light"] .ts-kpi-val{color:var(--on-dark-primary);}
+html[data-theme="light"] .ts-kpi-lbl{color:var(--on-dark-micro);}
+html[data-theme="light"] .ts-period{color:var(--on-dark-muted);}
+html[data-theme="light"] .ts-label{color:var(--teal);}
+html[data-theme="light"] .stage-eyebrow{color:var(--teal-dim);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font-sans);background:var(--surface-light);
   color:var(--text-primary);-webkit-font-smoothing:antialiased;
@@ -1869,9 +1907,7 @@ input[type=range]::-moz-range-thumb{
         &#128193; Saved Reports <span class="saved-btn-badge" id="saved-count-badge" style="display:none;">0</span>
       </button>
       <button type="button" class="theme-toggle help-toggle" id="help-modal-btn" onclick="openTcoHelp()" aria-label="How to use TCO Calculator">&#63; How to Use</button>
-      <button type="button" class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">
-        <span class="toggle-icon">&#9789;</span> Dark
-      </button>
+      <button type="button" class="theme-toggle" id="theme-toggle-btn">Dark Mode</button>
     </div>
   </div>
 </div>
@@ -2247,7 +2283,7 @@ input[type=range]::-moz-range-thumb{
 
     <!-- ── AI Augmentation Panel ── -->
     <div class="ai-panel" id="ai-panel">
-      <div class="ai-panel-head">
+      <div class="ai-panel-head" id="ai-panel-head" onclick="toggleAiPanel()" style="cursor:pointer">
         <div class="ai-panel-title-row">
           <span class="ai-panel-icon">&#10024;</span>
           <span class="ai-panel-title">AI Impact</span>
@@ -2327,10 +2363,10 @@ input[type=range]::-moz-range-thumb{
 
     <!-- Hidden Costs Explainer -->
     <div class="hc-explainer">
-      <div class="hc-explainer-head" onclick="toggleHCExplainer()" aria-expanded="false" id="hc-head">
-        <div class="hc-explainer-title-row">
-          <span class="hc-explainer-icon">&#128273;</span>
-          <span class="hc-explainer-title">What Are Hidden Costs?</span>
+      <div class="hc-explainer-head" onclick="toggleHCExplainer()" aria-expanded="false" id="hc-head" style="cursor:pointer">
+        <div class="hc-explainer-title-row" id="hc-title-row">
+          <span class="hc-explainer-icon" id="hc-explainer-icon">&#128273;</span>
+          <span class="hc-explainer-title" id="hc-explainer-title">What Are Hidden Costs?</span>
         </div>
         <span class="hc-toggle-icon" id="hc-toggle-icon">&#9660;</span>
       </div>
@@ -2610,34 +2646,22 @@ input[type=range]::-moz-range-thumb{
 
 <script>
 // ── Theme ─────────────────────────────────────────────────────
-(function(){
-  var saved = localStorage.getItem('ver-theme');
-  var prefersDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
-  var theme = saved||(prefersDark?'dark':'light');
-  document.documentElement.setAttribute('data-theme',theme);
-  updateToggle(theme);
-})();
 function toggleTheme(){
   var cur=document.documentElement.getAttribute('data-theme')||'light';
   var next=cur==='dark'?'light':'dark';
   document.documentElement.setAttribute('data-theme',next);
-  localStorage.setItem('ver-theme',next);
-  updateToggle(next);
-  drawDonut();
-}
-function updateToggle(t){
+  try{localStorage.setItem('ver-theme',next);}catch(e){}
   var btn=document.getElementById('theme-toggle-btn');
-  if(!btn)return;
-  btn.innerHTML=t==='dark'
-    ?'<span class="toggle-icon" style="transform:rotate(180deg);">&#9790;</span> Light'
-    :'<span class="toggle-icon">&#9789;</span> Dark';
+  if(btn) btn.textContent=next==='dark'?'Light Mode':'Dark Mode';
+  try{drawDonut();}catch(e){}
 }
-window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(e){
-  if(!localStorage.getItem('ver-theme')){
-    var t=e.matches?'dark':'light';
-    document.documentElement.setAttribute('data-theme',t);
-    updateToggle(t);
-  }
+document.addEventListener('DOMContentLoaded',function(){
+  var saved;
+  try{saved=localStorage.getItem('ver-theme');}catch(e){}
+  var theme=saved||'light';
+  document.documentElement.setAttribute('data-theme',theme);
+  var btn=document.getElementById('theme-toggle-btn');
+  if(btn) btn.textContent=theme==='dark'?'Light Mode':'Dark Mode';
 });
 
 // ── State ─────────────────────────────────────────────────────
@@ -4174,14 +4198,56 @@ function buildCategories() {
     container.style.transition = 'none';
     container.style.opacity = '0';
     container.style.transform = 'translateY(10px)';
-    container.innerHTML = '';
+    while(container.firstChild) container.removeChild(container.firstChild);
 
   cats.forEach(function(cat) {
     var div = document.createElement('div');
     div.className = 'cat-section';
     div.id = 'cat-' + cat.id;
 
-    var inputsHtml = cat.inputs.map(function(inp) {
+    // ── cat-header ──
+    var header = document.createElement('div');
+    header.className = 'cat-header';
+
+    var iconEl = document.createElement('div');
+    iconEl.className = 'cat-icon';
+    iconEl.style.background = cat.iconBg;
+    iconEl.textContent = cat.icon;
+    header.appendChild(iconEl);
+
+    var titleWrap = document.createElement('div');
+    titleWrap.className = 'cat-title-wrap';
+    var titleEl = document.createElement('div');
+    titleEl.className = 'cat-title';
+    titleEl.textContent = cat.title;
+    var subtitleEl = document.createElement('div');
+    subtitleEl.className = 'cat-subtitle';
+    subtitleEl.textContent = cat.subtitle;
+    titleWrap.appendChild(titleEl);
+    titleWrap.appendChild(subtitleEl);
+    header.appendChild(titleWrap);
+
+    var catTotal = document.createElement('div');
+    catTotal.className = 'cat-total';
+    catTotal.id = 'cattot-' + cat.id;
+    catTotal.style.color = cat.color;
+    catTotal.textContent = '$0';
+    header.appendChild(catTotal);
+
+    var infoBtn = document.createElement('button');
+    infoBtn.className = 'cat-info-btn';
+    infoBtn.title = "What's included?";
+    infoBtn.textContent = 'ⓘ';
+    (function(catId){ infoBtn.addEventListener('click', function(){ openInfoModal(catId); }); })(cat.id);
+    header.appendChild(infoBtn);
+
+    div.appendChild(header);
+
+    // ── cat-inputs ──
+    var catInputs = document.createElement('div');
+    catInputs.className = 'cat-inputs';
+
+    cat.inputs.forEach(function(inp) {
       var val = inputValues[inp.id];
       if(val === undefined) {
         val = currentMode === 'decision' ? inp.defaultVal : 0;
@@ -4195,43 +4261,78 @@ function buildCategories() {
         : inp.unit==='×' ? val+'×'
         : val + (inp.unit ? ' '+inp.unit : '');
 
-      return '<div class="input-row">'
-        + '<div class="input-label-row">'
-        + '<span class="input-label">' + inp.label + '</span>'
-        + '<div class="input-value-wrap">'
-        + '<span class="input-value" id="val-' + inp.id + '">' + displayVal + '</span>'
-        + '<span class="input-mode-tag ' + (currentMode==='decision'?'tag-estimate':'tag-actual') + '">'
-        + (currentMode==='decision'?'Est':'Act') + '</span>'
-        + '<span class="benchmark-flag ' + getBenchFlag(inp,val) + '" '
-        + 'onclick="openBenchModal(\'' + inp.id + '\')" '
-        + 'id="flag-' + inp.id + '">'
-        + getBenchLabel(inp,val) + '</span>'
-        + '</div></div>'
-        + '<div class="slider-wrap">'
-        + '<input type="range" min="' + inp.min + '" max="' + inp.max + '" '
-        + 'step="' + inp.step + '" value="' + val + '" '
-        + 'id="slider-' + inp.id + '" '
-        + 'oninput="updateInput(\'' + inp.id + '\',+this.value,this)">'
-        + '<div class="slider-range">'
-        + '<span class="slider-min">' + fmtMin(inp) + '</span>'
-        + '<span class="slider-max">' + fmtMax(inp) + '</span>'
-        + '</div>'
-        + buildBenchZoneHtml(inp, val)
-        + '</div>'
-        + '</div>';
-    }).join('');
+      var row = document.createElement('div');
+      row.className = 'input-row';
 
-    div.innerHTML = '<div class="cat-header">'
-      + '<div class="cat-icon" style="background:' + cat.iconBg + ';">' + cat.icon + '</div>'
-      + '<div class="cat-title-wrap">'
-      + '<div class="cat-title">' + cat.title + '</div>'
-      + '<div class="cat-subtitle">' + cat.subtitle + '</div>'
-      + '</div>'
-      + '<div class="cat-total" id="cattot-' + cat.id + '" style="color:' + cat.color + ';">$0</div>'
-      + '<button class="cat-info-btn" onclick="openInfoModal(\'' + cat.id + '\')" title="What\'s included?">ⓘ</button>'
-      + '</div>'
-      + '<div class="cat-inputs">' + inputsHtml + '</div>';
+      var labelRow = document.createElement('div');
+      labelRow.className = 'input-label-row';
 
+      var labelEl = document.createElement('span');
+      labelEl.className = 'input-label';
+      labelEl.textContent = inp.label;
+      labelRow.appendChild(labelEl);
+
+      var valueWrap = document.createElement('div');
+      valueWrap.className = 'input-value-wrap';
+
+      var valueEl = document.createElement('span');
+      valueEl.className = 'input-value';
+      valueEl.id = 'val-' + inp.id;
+      valueEl.textContent = displayVal;
+      valueWrap.appendChild(valueEl);
+
+      var modeTag = document.createElement('span');
+      modeTag.className = 'input-mode-tag ' + (currentMode==='decision' ? 'tag-estimate' : 'tag-actual');
+      modeTag.textContent = currentMode==='decision' ? 'Est' : 'Act';
+      valueWrap.appendChild(modeTag);
+
+      var flagSpan = document.createElement('span');
+      flagSpan.className = 'benchmark-flag ' + getBenchFlag(inp, val);
+      flagSpan.id = 'flag-' + inp.id;
+      flagSpan.textContent = getBenchLabel(inp, val);
+      (function(inpId){ flagSpan.addEventListener('click', function(){ openBenchModal(inpId); }); })(inp.id);
+      valueWrap.appendChild(flagSpan);
+
+      labelRow.appendChild(valueWrap);
+      row.appendChild(labelRow);
+
+      var sliderWrap = document.createElement('div');
+      sliderWrap.className = 'slider-wrap';
+
+      var slider = document.createElement('input');
+      slider.type = 'range';
+      slider.min = inp.min;
+      slider.max = inp.max;
+      slider.step = inp.step;
+      slider.value = val;
+      slider.id = 'slider-' + inp.id;
+      (function(inpId){ slider.addEventListener('input', function(){ updateInput(inpId, +this.value, this); }); })(inp.id);
+      sliderWrap.appendChild(slider);
+
+      var sliderRange = document.createElement('div');
+      sliderRange.className = 'slider-range';
+      var sliderMin = document.createElement('span');
+      sliderMin.className = 'slider-min';
+      sliderMin.textContent = fmtMin(inp);
+      var sliderMax = document.createElement('span');
+      sliderMax.className = 'slider-max';
+      sliderMax.textContent = fmtMax(inp);
+      sliderRange.appendChild(sliderMin);
+      sliderRange.appendChild(sliderMax);
+      sliderWrap.appendChild(sliderRange);
+
+      if(inp.bench) {
+        var bzDiv = document.createElement('div');
+        bzDiv.innerHTML = buildBenchZoneHtml(inp, val);
+        var bzNode = bzDiv.firstChild;
+        if(bzNode) sliderWrap.appendChild(bzNode);
+      }
+
+      row.appendChild(sliderWrap);
+      catInputs.appendChild(row);
+    });
+
+    div.appendChild(catInputs);
     container.appendChild(div);
   });
 
@@ -4246,7 +4347,7 @@ function buildCategories() {
   } // end _rebuild
 
   // If container already has content, fade it out first then rebuild
-  if(container.innerHTML.trim()) {
+  if(container.firstChild) {
     container.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
     container.style.opacity = '0';
     container.style.transform = 'translateY(6px)';
@@ -4476,9 +4577,10 @@ function toggleHCExplainer() {
   var body = document.getElementById('hc-explainer-body');
   var icon = document.getElementById('hc-toggle-icon');
   var head = document.getElementById('hc-head');
+  if(!body) return;
   var open = body.classList.toggle('open');
-  icon.classList.toggle('open', open);
-  head.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if(icon) icon.classList.toggle('open', open);
+  if(head) head.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 
 // ── Update single input ───────────────────────────────────────
@@ -5156,7 +5258,7 @@ function buildDashEngGrid(filter){
         +'<div style="height:4px;background:var(--amber);opacity:0.55;border-radius:0 99px 99px 0;width:'+hPct+'%"></div>'
       +'</div>'
       +'<div style="font-size:11px;color:var(--text-muted);line-height:1.55;">'+e.advisory+'</div>'
-      +'<button onclick="prePopCalculator(\''+e.name+'\','+e.contracted+','+e.hidden+')" style="margin-top:10px;width:100%;padding:7px;background:rgba(13,148,136,0.12);border:1px solid rgba(13,148,136,0.25);border-radius:6px;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">⬇ Model in Calculator</button>'
+      +'<button data-prepop=\''+JSON.stringify({name:e.name,contracted:e.contracted,hidden:e.hidden})+'\' style="margin-top:10px;width:100%;padding:7px;background:rgba(13,148,136,0.12);border:1px solid rgba(13,148,136,0.25);border-radius:6px;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">⬇ Model in Calculator</button>'
     +'</div>';
   }).join('');
 }
@@ -7372,7 +7474,7 @@ function openNegPlaybook() {
           +'<br>This conversation should happen <strong style="color:var(--text-primary);">in parallel with the vendor negotiation</strong> — not after it. A vendor win that brings the invoice to '+fmt(vendorCost - targetReduction)+' still leaves a '+fmt(internalCost)+' organizational commitment unaddressed if leadership has not acknowledged it.'
           +'</div>'
           +'<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(37,99,235,0.15);">'
-            +'<button onclick="downloadExecBrief()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;background:rgba(37,99,235,0.10);border:1px solid rgba(37,99,235,0.30);border-radius:7px;font-size:12px;font-weight:700;color:var(--blue,#2563EB);cursor:pointer;">&#128196; Download Exec Brief</button>'
+            +'<button data-exec-brief="1" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;background:rgba(37,99,235,0.10);border:1px solid rgba(37,99,235,0.30);border-radius:7px;font-size:12px;font-weight:700;color:var(--blue,#2563EB);cursor:pointer;">&#128196; Download Exec Brief</button>'
             +'<span style="font-size:11px;color:var(--text-muted);margin-left:10px;">One-page budget ask doc — pre-filled with this engagement\'s numbers</span>'
           +'</div>'
         +'</div>'
@@ -8171,7 +8273,7 @@ function downloadExecBrief() {
   +'<body>'
 
   +'<div class="no-print" style="display:flex;align-items:center;margin-bottom:22px;padding:12px 16px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;">'
-    +'<button class="print-btn" onclick="window.print()">&#128438; Print / Save PDF</button>'
+    +'<button class="print-btn" data-print="1">&#128438; Print / Save PDF</button>'
     +'<span class="edit-hint">Fill in accountability owners and resource plan below, then print. Fields are editable — they save while the file is open.</span>'
   +'</div>'
 
@@ -8357,7 +8459,7 @@ function _refreshSavedUI() {
     div.innerHTML =
       '<div class="saved-item-top">'
         +'<span class="saved-item-name">'+r.name.replace(/</g,'&lt;')+'</span>'
-        +'<button class="saved-item-delete" title="Delete" onclick="deleteSavedReport('+r.id+',event)">&#10005;</button>'
+        +'<button class="saved-item-delete" title="Delete" data-rid="'+r.id+'">&#10005;</button>'
       +'</div>'
       +'<div class="saved-item-meta">'
         +'<span class="saved-item-badge '+r.mode+'">'+r.mode+'</span>'
@@ -9707,7 +9809,175 @@ function resetCalculator() {
   window.history.replaceState(null, '', window.location.pathname);
   buildCategories();
 }
+function _wire(id, evt, fn){ var el=document.getElementById(id); if(el) el.addEventListener(evt,fn); }
+
+function initStaticHandlers(){
+  // ── HC Explainer (direct wire — delegator alone insufficient post-hardener) ──
+  _wire('hc-head','click',toggleHCExplainer);
+  _wire('hc-title-row','click',toggleHCExplainer);
+  _wire('hc-explainer-title','click',toggleHCExplainer);
+  _wire('hc-explainer-icon','click',toggleHCExplainer);
+  _wire('hc-toggle-icon','click',toggleHCExplainer);
+
+  // ── Navbar ──
+  _wire('saved-reports-btn','click',toggleSavedDrawer);
+
+  // ── Saved drawer ──
+  _wire('saved-drawer-close','click',toggleSavedDrawer);   // added id below via selector
+  _wire('saved-clear-btn','click',clearAllSaved);
+
+  // Draw-close by class (no id)
+  var drawerClose = document.querySelector('.saved-drawer-close');
+  if(drawerClose) drawerClose.addEventListener('click',toggleSavedDrawer);
+  var clearBtn = document.querySelector('.saved-clear-btn');
+  if(clearBtn) clearBtn.addEventListener('click',clearAllSaved);
+
+  // ── Mode buttons ──
+  _wire('mode-decision','click',function(){ setMode('decision'); });
+  _wire('mode-audit','click',function(){ setMode('audit'); });
+
+  // ── Term buttons — delegate on each term-btns group ──
+  ['term-btns-software','term-btns-sow','term-btns-project'].forEach(function(gid){
+    var g = document.getElementById(gid);
+    if(!g) return;
+    g.addEventListener('click', function(e){
+      var btn = e.target.closest('.term-btn');
+      if(!btn) return;
+      var txt = btn.textContent.trim();
+      var map = {'1 Yr':1,'2 Yrs':2,'3 Yrs':3,'4 Yrs':4,'5 Yrs':5,
+                 '3 Mo':0.25,'6 Mo':0.5,'9 Mo':0.75,'12 Mo':1,'18 Mo':1.5,'24 Mo':2,'36 Mo':3};
+      if(map[txt] !== undefined) setTerm(map[txt]);
+    });
+  });
+
+  // ── Generate / Reset ──
+  var genBtn = document.querySelector('.ts-generate'); if(genBtn) genBtn.addEventListener('click',openAssessModal);
+  var rstBtn = document.querySelector('.ts-reset'); if(rstBtn) rstBtn.addEventListener('click',resetCalculator);
+
+  // ── Inputs: vendor, budget, internal rate ──
+  var vendorInput = document.querySelector('.vendor-name-input');
+  if(vendorInput) vendorInput.addEventListener('input', function(){ vendorName=this.value; });
+  var budgetInput = document.querySelector('.budget-input');
+  if(budgetInput) budgetInput.addEventListener('input', updateBudgetPanel);
+  var rateInput = document.getElementById('internal-rate-input');
+  if(rateInput) rateInput.addEventListener('input', function(){ updateInternalRate(this.value); });
+
+  // ── Pre-pop clear ──
+  var ppClear = document.querySelector('.prepop-clear');
+  if(ppClear) ppClear.addEventListener('click', clearPrePop);
+
+  // ── Engagement type + region dropdowns ──
+  _wire('type-dropdown','change',function(){ setType(this.value); });
+  _wire('region-dropdown','change',function(){ setRegion(this.value); });
+
+  // ── Agentic selects ──
+  _wire('agentic-maturity-select','change',setAgenticBehavior);
+  _wire('agentic-interact-select','change',setAgenticBehavior);
+  _wire('agentic-quality-select','change',setAgenticBehavior);
+
+  // ── Legacy horizon select (no id — use querySelector) ──
+  var legacyHorizonSel = document.querySelector('#legacy-panel select');
+  if(legacyHorizonSel) legacyHorizonSel.addEventListener('change',function(){ setLegacyInput('legacy_horizon',this.value); });
+
+  // ── Coupa ──
+  var coupaIn = document.getElementById('coupa-search-input');
+  if(coupaIn) coupaIn.addEventListener('keydown',function(e){ if(e.key==='Enter') coupaSearch(); });
+  _wire('coupa-search-btn','click',coupaSearch);
+  _wire('coupa-po-select','change',function(){ coupaSelectPO(this.value); });
+  _wire('coupa-apply-btn','click',coupaApply);
+
+  // ── Projected cost ──
+  _wire('projected-input','input',function(){ updateProjected(this.value); });
+
+  // ── Cost allocation ──
+  var allocHdr = document.querySelector('.alloc-header');
+  if(allocHdr) allocHdr.addEventListener('click',toggleAlloc);
+  _wire('alloc-slider','input',function(){ updateAlloc(+this.value); });
+  var allocName = document.getElementById('alloc-split-name');
+  if(allocName) allocName.addEventListener('input', updateAllocContext);
+  var allocCtx = document.getElementById('alloc-context-area');
+  if(allocCtx) allocCtx.addEventListener('input', updateAllocContext);
+
+  // ── AI panel ──
+  _wire('ai-scn-conservative','click',function(){ setAiScenario('conservative'); });
+  _wire('ai-scn-base','click',function(){ setAiScenario('base'); });
+  _wire('ai-scn-aggressive','click',function(){ setAiScenario('aggressive'); });
+  _wire('ai-adoption','input', updateAiPanel);
+  _wire('ai-automation','input', updateAiPanel);
+  _wire('ai-productivity','input', updateAiPanel);
+
+  // ── Dashboard filter buttons — delegate ──
+  var filterRow = document.getElementById('dash-filter-row');
+  if(filterRow) filterRow.addEventListener('click',function(e){
+    var btn = e.target.closest('.df-btn');
+    if(!btn) return;
+    var map = {'All':'all','Watch / Critical':'critical','SF on SF':'sf-on-sf','IT':'it','Eng Dev':'eng-dev','DA&O':'da-ops'};
+    var lbl = btn.textContent.trim().replace(/^[^\s]+\s/,'');
+    var txt = btn.textContent.trim();
+    var key = Object.keys(map).find(function(k){ return txt.indexOf(k)!==-1; }) || 'all';
+    dashFilterEng(map[key]||'all', btn);
+  });
+
+  // ── Modal close buttons ──
+  _wire('info-modal','click',function(e){ if(e.target===this) closeModal('info-modal'); });
+  _wire('bench-modal','click',function(e){ if(e.target===this) closeModal('bench-modal'); });
+  _wire('assess-modal','click',function(e){ if(e.target===this) closeModal('assess-modal'); });
+  _wire('playbook-modal','click',function(e){ if(e.target===this) closeModal('playbook-modal'); });
+
+  // Buttons inside fixed modals
+  document.querySelectorAll('.modal-x').forEach(function(btn){
+    var modal = btn.closest('.modal-backdrop');
+    if(modal) btn.addEventListener('click',function(){ closeModal(modal.id); });
+  });
+  document.querySelectorAll('.modal-ftr .btn-primary').forEach(function(btn){
+    var modal = btn.closest('.modal-backdrop');
+    if(modal) btn.addEventListener('click',function(){ closeModal(modal.id); });
+  });
+
+  // ── Assessment modal footer ──
+  var closeAssess = document.querySelector('#assess-modal .btn-secondary');
+  if(closeAssess) closeAssess.addEventListener('click',function(){ closeModal('assess-modal'); });
+  _wire('playbook-btn','click',openNegPlaybook);
+  var pdfBtn = document.querySelector('.btn-primary-pdf');
+  if(pdfBtn) pdfBtn.addEventListener('click',exportPDF);
+  _wire('csv-split-main','click',exportCSVSummary);
+  _wire('csv-split-arrow','click',toggleCSVMenu);
+
+  // CSV menu items
+  var csvItems = document.querySelectorAll('.csv-menu-item');
+  if(csvItems[0]) csvItems[0].addEventListener('click',exportCSVSummary);
+  if(csvItems[1]) csvItems[1].addEventListener('click',exportCSVFull);
+
+  // ── Playbook modal footer ──
+  var closePlaybook = document.querySelector('#playbook-modal .btn-secondary');
+  if(closePlaybook) closePlaybook.addEventListener('click',function(){ closeModal('playbook-modal'); });
+  var playbookPdf = document.querySelector('#playbook-modal .btn-primary-pdf');
+  if(playbookPdf) playbookPdf.addEventListener('click',exportPlaybookPDF);
+
+  // ── Global delegation for dynamic buttons (dashboard cards, exec brief, print, saved delete) ──
+  document.addEventListener('click',function(e){
+    var t = e.target;
+    // "Model in Calculator" buttons inside dashboard cards
+    if(t.matches && t.matches('[data-prepop]')){
+      var d = JSON.parse(t.getAttribute('data-prepop'));
+      prePopCalculator(d.name,d.contracted,d.hidden);
+      return;
+    }
+    // Download Exec Brief
+    if(t.matches && t.matches('[data-exec-brief]')){ downloadExecBrief(); return; }
+    // Print
+    if(t.hasAttribute && t.hasAttribute('data-print')){ window.print(); return; }
+    // Delete saved report
+    if(t.className && typeof t.className === 'string' && t.className.indexOf('saved-item-delete')!==-1){
+      var rid = t.getAttribute('data-rid');
+      if(rid) deleteSavedReport(+rid, e);
+      return;
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function(){
+  initStaticHandlers();
   renderHCContent(currentType);
   buildCategories();
   loadFromURL();
@@ -9741,10 +10011,7 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   }
   if(document.readyState==='loading'){
-    
-
-
-document.addEventListener('DOMContentLoaded',rewriteLinks);
+    document.addEventListener('DOMContentLoaded',rewriteLinks);
   } else { rewriteLinks(); }
   new MutationObserver(rewriteLinks).observe(document.body,{childList:true,subtree:true});
 })();
@@ -9756,13 +10023,14 @@ function _dmToggle(){
   var btn=document.getElementById('dm-btn');
   if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
 }
-(function(){
+try{(function(){
   var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
-  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  try{if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}catch(e){}
+  if(!t) t='light';
   document.documentElement.setAttribute('data-theme',t);
   var btn=document.getElementById('dm-btn');
   if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
-})();
+})();}catch(e){}
 </script>
 <script src="assets/help-modal.js"></script>
 <script>
@@ -9797,9 +10065,9 @@ function toggleAiPanel(){
   var track = document.getElementById('ai-toggle-track');
   var label = document.getElementById('ai-toggle-label');
   var body  = document.getElementById('ai-body');
-  track.classList.toggle('on', aiPanelOn);
-  label.textContent = aiPanelOn ? 'On' : 'Off';
-  body.classList.toggle('ai-on', aiPanelOn);
+  if(track) track.classList.toggle('on', aiPanelOn);
+  if(label) label.textContent = aiPanelOn ? 'On' : 'Off';
+  if(body) body.classList.toggle('ai-on', aiPanelOn);
   if(aiPanelOn) updateAiPanel();
   else { aiNetOffset = 0; updateAllTotals(); }
 }
@@ -9889,10 +10157,24 @@ function openTcoHelp(){
       { icon: '&#x1F501;', title: 'Run multiple scenarios', body: 'Open two browser tabs with different assumptions to compare renewal vs. renegotiate vs. replace scenarios.' },
       { icon: '&#x1F512;', title: 'Outputs are read-only shareable', body: 'Generated reports open in a print-friendly view — safe to share with stakeholders without exposing the working model.' }
     ],
-    ai: '<strong>AI Augmentation available:</strong> The TCO Calculator can layer in AI/agentic tooling cost offsets — capturing potential FTE reduction, automation savings, and productivity uplift from AI-assisted workflows. Look for the ✨ AI Impact panel when it is enabled on your instance.',
+    ai: '<strong>AI Augmentation available:</strong> The TCO Calculator can layer in AI/agentic tooling cost offsets — capturing potential FTE reduction, automation savings, and productivity uplift from AI-assisted workflows. Look for the AI Impact panel when it is enabled on your instance.',
     footNote: 'TCO Calculator &middot; Total Cost of Ownership Analysis'
   });
 }
+
+// Bulletproof click delegation — survives hardener stripping all onclick values
+document.addEventListener('click', function(e){
+  var t = e.target;
+  while(t && t !== document){
+    var id = t.id || '';
+    var cls = (t.className && typeof t.className === 'string') ? t.className : '';
+    if(id === 'theme-toggle-btn'){ toggleTheme(); return; }
+    if(id === 'hc-head' || id === 'hc-title-row' || id === 'hc-explainer-icon' || id === 'hc-explainer-title' || id === 'hc-toggle-icon' || cls.indexOf('hc-explainer-head') !== -1){ toggleHCExplainer(); return; }
+    if(id === 'ai-panel-head' || cls.indexOf('ai-toggle') !== -1 && t.tagName !== 'INPUT'){ toggleAiPanel(); return; }
+    if(id === 'help-modal-btn' || cls.indexOf('help-toggle') !== -1){ openTcoHelp(); return; }
+    t = t.parentNode;
+  }
+});
 </script>
 </body>
 </html>

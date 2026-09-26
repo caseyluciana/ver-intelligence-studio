@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -247,10 +247,151 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(-
 [data-theme="dark"] .top-btn.dm{background:rgba(13,148,136,.18);border-color:rgba(13,148,136,.4);color:#0D9488;}
 
 @media print{
-  .hub-top-bar,.pillar-nav-wrap{display:none!important;}
-  .page-wrap{padding:12px;}
-  .v2-cover{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .hub-top-bar,.pillar-nav-wrap,.tab-strip-wrap,.intel-signals-wrap,
+  .vendor-view-toggle,.vvt-btn,.note-btn,.ctx-menu,
+  #compare-overlay,#compare-drawer,#cto-overlay,#cto-drawer,
+  #hotkey-overlay,.changed-banner { display:none!important; }
+  body { background:#fff!important; color:#111!important; font-size:9pt; }
+  .page-wrap { padding:0!important; }
+  .pd-hero { background:#0F1E3C!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; padding:28px 32px 20px!important; }
+  .pd-hero-strip { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .ph-kpi-val { font-size:14pt!important; }
+  .v2-card,.spend-bar-wrap,.advisory-box { box-shadow:none!important; border:1px solid #ddd!important; break-inside:avoid; }
+  .main-grid { grid-template-columns:1fr 1fr!important; }
+  .vendor-grid { grid-template-columns:1fr 1fr!important; }
+  .v2-cover { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .action-table { width:100%!important; }
+  canvas { display:none!important; }
 }
+
+/* ── RENEWAL TIMELINE SWIMLANE ── */
+.rtl-wrap {
+  position:relative; height:52px; background:var(--gray2); border-radius:8px;
+  overflow:hidden; margin-bottom:16px;
+}
+.rtl-track {
+  position:absolute; top:50%; transform:translateY(-50%);
+  left:16px; right:16px; height:4px;
+  background:linear-gradient(90deg,var(--green),var(--amber),var(--red));
+  border-radius:2px; opacity:.35;
+}
+.rtl-marker {
+  position:absolute; top:50%; transform:translate(-50%,-50%);
+  width:14px; height:14px; border-radius:50%; border:2.5px solid #fff;
+  box-shadow:0 0 0 3px currentColor; transition:left 1.2s cubic-bezier(.4,0,.2,1);
+  z-index:2;
+}
+.rtl-label-today { position:absolute; bottom:6px; left:16px; font-size:7pt; color:var(--ink4); }
+.rtl-label-end   { position:absolute; bottom:6px; right:16px; font-size:7pt; color:var(--ink4); }
+.rtl-days-label  {
+  position:absolute; top:6px; left:50%; transform:translateX(-50%);
+  font-size:7.5pt; font-weight:800; white-space:nowrap;
+  color:var(--ink); background:var(--white); padding:1px 7px; border-radius:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+[data-theme="dark"] .rtl-wrap { background:rgba(255,255,255,.05); }
+[data-theme="dark"] .rtl-days-label { background:#1E3A5F; color:#E2E8F0; }
+[data-theme="dark"] .rtl-label-today,[data-theme="dark"] .rtl-label-end { color:rgba(255,255,255,.35); }
+
+/* ── WHAT CHANGED BANNER ── */
+.changed-banner {
+  display:flex; align-items:flex-start; gap:12px;
+  margin:0 0 18px; padding:14px 18px; border-radius:12px;
+  background:linear-gradient(135deg,rgba(13,148,136,.10),rgba(37,99,235,.07));
+  border:1px solid rgba(13,148,136,.20); animation:banner-slide-in .4s ease;
+}
+@keyframes banner-slide-in {
+  from { opacity:0; transform:translateY(-8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.changed-banner-icon { font-size:18pt; flex-shrink:0; margin-top:1px; }
+.changed-banner-body { flex:1; }
+.changed-banner-title { font-size:9pt; font-weight:800; color:var(--teal); margin-bottom:4px; }
+.changed-banner-list { list-style:none; display:flex; flex-direction:column; gap:3px; }
+.changed-banner-list li { font-size:8.5pt; color:var(--ink3); display:flex; align-items:baseline; gap:7px; }
+.changed-banner-list li::before { content:'→'; color:var(--teal); font-size:8pt; flex-shrink:0; }
+.changed-banner-dismiss {
+  background:none; border:none; color:var(--ink4); font-size:14pt; cursor:pointer;
+  padding:0; line-height:1; flex-shrink:0; margin-top:-2px; opacity:.5; transition:opacity .15s;
+}
+.changed-banner-dismiss:hover { opacity:1; }
+[data-theme="dark"] .changed-banner { background:rgba(13,148,136,.08); border-color:rgba(13,148,136,.18); }
+[data-theme="dark"] .changed-banner-list li { color:rgba(255,255,255,.55); }
+[data-theme="dark"] .changed-banner-dismiss { color:rgba(255,255,255,.4); }
+
+/* ── KEYBOARD SHORTCUT OVERLAY ── */
+#hotkey-overlay {
+  display:none; position:fixed; inset:0; z-index:800;
+  background:rgba(5,10,20,.72); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center;
+}
+#hotkey-overlay.open { display:flex; }
+.hotkey-box {
+  background:var(--white); border-radius:20px; padding:32px 36px;
+  width:min(580px,92vw); box-shadow:0 24px 80px rgba(0,0,0,.4);
+  animation:hk-pop .22s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes hk-pop { from { transform:scale(.88); opacity:0; } to { transform:scale(1); opacity:1; } }
+.hk-title { font-size:13pt; font-weight:900; color:var(--ink); margin-bottom:4px; }
+.hk-sub { font-size:8.5pt; color:var(--ink4); margin-bottom:24px; }
+.hk-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 28px; }
+.hk-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--gray2); }
+.hk-key {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:30px; height:24px; padding:0 6px;
+  background:var(--gray2); border:1px solid var(--border2); border-radius:5px;
+  font-size:8pt; font-weight:800; color:var(--ink2); font-family:monospace; flex-shrink:0;
+  box-shadow:0 2px 0 var(--border2);
+}
+.hk-desc { font-size:8.5pt; color:var(--ink3); }
+.hk-close-row { margin-top:20px; text-align:right; }
+.hk-close-btn {
+  padding:8px 20px; border-radius:20px; border:1px solid var(--border2);
+  background:var(--white); color:var(--ink4); font-size:8pt; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.hk-close-btn:hover { background:var(--navy); color:#fff; border-color:var(--navy); }
+[data-theme="dark"] .hotkey-box { background:#0F1E3C; }
+[data-theme="dark"] .hk-title { color:#E2E8F0; }
+[data-theme="dark"] .hk-sub { color:rgba(255,255,255,.38); }
+[data-theme="dark"] .hk-row { border-bottom-color:rgba(255,255,255,.05); }
+[data-theme="dark"] .hk-key { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12); color:#E2E8F0; box-shadow:0 2px 0 rgba(0,0,0,.3); }
+[data-theme="dark"] .hk-desc { color:rgba(255,255,255,.55); }
+[data-theme="dark"] .hk-close-btn { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.12); color:rgba(255,255,255,.5); }
+
+/* ── AI ANALYST PULL-QUOTE ── */
+.analyst-quote {
+  display:flex; gap:14px; padding:18px 20px; border-radius:12px; margin-bottom:22px;
+  background:linear-gradient(135deg,var(--navy3),var(--teal3));
+  border:1px solid rgba(13,148,136,.18); position:relative; overflow:hidden;
+}
+.analyst-quote::before {
+  content:''; position:absolute; top:0; left:0; width:4px; height:100%;
+  background:linear-gradient(180deg,var(--teal),var(--navy));
+}
+.analyst-quote-icon { font-size:20pt; flex-shrink:0; margin-top:1px; opacity:.7; }
+.analyst-quote-body { flex:1; }
+.analyst-quote-eyebrow {
+  font-size:7pt; font-weight:800; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--teal2); margin-bottom:6px;
+}
+.analyst-quote-text {
+  font-size:9.5pt; font-weight:500; color:var(--ink2); line-height:1.7;
+  font-style:italic; border-left:none;
+}
+.analyst-quote-source { font-size:7.5pt; color:var(--ink4); margin-top:6px; }
+[data-theme="dark"] .analyst-quote {
+  background:linear-gradient(135deg,rgba(13,148,136,.10),rgba(37,99,235,.07));
+  border-color:rgba(13,148,136,.2);
+}
+[data-theme="dark"] .analyst-quote-text { color:rgba(255,255,255,.70); }
+[data-theme="dark"] .analyst-quote-source { color:rgba(255,255,255,.35); }
+
+/* ── VENDOR HEATMAP (engagement tint) ── */
+.vendor-card.heat-cold { box-shadow:0 0 0 2px rgba(100,116,139,.18) inset; }
+.vendor-card.heat-warm  { box-shadow:0 0 0 2px rgba(13,148,136,.22) inset; }
+.vendor-card.heat-hot   { box-shadow:0 0 0 2px rgba(13,148,136,.55) inset; }
+
 
 /* ── COST TO OPERATE ── */
 #cto-overlay{display:none;position:fixed;inset:0;background:rgba(5,10,20,.55);
@@ -526,6 +667,926 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(-
 [data-theme="dark"] .opp-item{background:var(--gray2);border-color:var(--border);}
 [data-theme="dark"] .bench-table{background:var(--gray2);}
 [data-theme="dark"] .bench-table tr:hover td{background:var(--gray3);}
+
+/* ==============================
+   VER CINEMATIC UPGRADE v2
+============================== */
+[data-theme="dark"] body { background: #060C18; }
+[data-theme="dark"] .hub-top-bar {
+  background: linear-gradient(90deg,rgba(6,12,24,0.98),rgba(10,16,32,0.98));
+}
+[data-theme="dark"] .pillar-nav-wrap {
+  background: rgba(6,12,24,0.98);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+[data-theme="dark"] .tab-strip-wrap {
+  background: rgba(8,14,28,0.97);
+  border-bottom: 2px solid rgba(255,255,255,0.06);
+}
+
+/* Sticky tabs */
+.tab-strip-wrap {
+  position: sticky;
+  top: 42px;
+  z-index: 90;
+}
+
+/* Active pillar nav accent */
+.pnav-item.active {
+  border-bottom: 2px solid var(--active-pillar-color, #0D9488) !important;
+}
+
+/* Nav links in top bar */
+.htb-nav { display:flex; gap:4px; }
+.htb-nav a {
+  font-size:11px; color:rgba(255,255,255,0.45); text-decoration:none;
+  padding:4px 10px; border-radius:6px; transition:all .15s;
+}
+.htb-nav a:hover { color:rgba(255,255,255,0.9); background:rgba(255,255,255,0.07); }
+
+/* ── CINEMATIC PILLAR HERO ── */
+.pd-hero {
+  background: linear-gradient(160deg,#060C18 0%,#0F1E3C 55%,#080C18 100%);
+  position: relative; overflow: hidden; padding: 40px 0 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+/* Pillar-tinted orb glow — color set via JS CSS variable */
+.pd-hero::before {
+  content:''; position:absolute; top:-100px; right:-80px;
+  width:640px; height:640px; border-radius:50%;
+  background: radial-gradient(circle, var(--pillar-glow,rgba(13,148,136,0.12)) 0%, transparent 65%);
+  pointer-events:none;
+}
+.pd-hero::after {
+  content:''; position:absolute; bottom:-60px; left:15%;
+  width:500px; height:260px; border-radius:50%;
+  background: radial-gradient(circle, rgba(37,99,235,0.07), transparent 70%);
+  pointer-events:none;
+}
+/* Faint grid overlay */
+.pd-hero-grid {
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);
+  background-size:52px 52px;
+  -webkit-mask-image:radial-gradient(ellipse 85% 85% at 50% 30%,black 20%,transparent 75%);
+  mask-image:radial-gradient(ellipse 85% 85% at 50% 30%,black 20%,transparent 75%);
+  pointer-events:none;
+}
+.pd-hero-body {
+  position:relative; z-index:1;
+  max-width:1280px; margin:0 auto; padding:0 32px 32px;
+  display:grid; grid-template-columns:1fr 180px; gap:32px; align-items:center;
+}
+.pd-hero-identity { display:flex; flex-direction:column; }
+.pd-hero-eyebrow {
+  font-size:8pt; font-weight:700; text-transform:uppercase; letter-spacing:.14em;
+  color:rgba(255,255,255,.32); margin-bottom:12px;
+  display:flex; align-items:center; gap:10px;
+}
+.pd-hero-eyebrow::before {
+  content:''; width:28px; height:1.5px;
+  background:var(--active-pillar-color,#0D9488);
+  transition:background .5s;
+}
+.pd-hero-title {
+  font-size:26pt; font-weight:900; color:#fff; line-height:1.05;
+  margin-bottom:12px; letter-spacing:-.025em;
+  display:flex; align-items:center; gap:12px;
+}
+.pd-hero-title-icon { font-size:30pt; flex-shrink:0; }
+.pd-hero-risk-row { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.pd-hero-sub {
+  font-size:9pt; color:rgba(255,255,255,.50); line-height:1.75;
+  max-width:560px; margin-bottom:20px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+/* Mini P&L waterfall bar */
+.h-pl-bar-wrap { display:flex; flex-direction:column; gap:8px; }
+.h-pl-bar {
+  height:8px; border-radius:4px; background:rgba(255,255,255,.07);
+  display:flex; overflow:hidden; max-width:480px;
+}
+.h-pl-seg { height:100%; transition:width 1s cubic-bezier(.4,0,.2,1); }
+.h-pl-legend { display:flex; gap:16px; flex-wrap:wrap; }
+.h-pl-legend-item { display:flex; align-items:center; gap:5px; font-size:8pt; color:rgba(255,255,255,.42); }
+.h-pl-dot { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+
+/* Ring column */
+.pd-hero-ring-col { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.h-ring-svg { width:156px; height:156px; transition:filter .6s ease; }
+.h-ring-bg { fill:none; stroke:rgba(255,255,255,0.07); stroke-width:12; }
+.h-ring-fill { fill:none; stroke:#10B981; stroke-width:12; stroke-linecap:round; transform:rotate(-90deg); transform-origin:50% 50%; }
+.h-ring-pct { font-size:28px; font-weight:800; fill:#E2E8F0; text-anchor:middle; dominant-baseline:central; }
+.h-ring-sub { font-size:8.5px; fill:#64748B; text-anchor:middle; dominant-baseline:central; }
+.h-risk-label { font-size:11px; font-weight:700; color:#10B981; letter-spacing:.3px; text-align:center; }
+.h-open-count { font-size:9px; color:rgba(255,255,255,.32); text-align:center; line-height:1.5; }
+
+/* KPI strip — bottom bar */
+.pd-hero-strip {
+  position:relative; z-index:1;
+  border-top:1px solid rgba(255,255,255,.06);
+  max-width:100%;
+}
+.pd-hero-strip-inner {
+  max-width:1280px; margin:0 auto; padding:0 32px;
+  display:grid; grid-template-columns:repeat(5,1fr); gap:0;
+}
+.ph-kpi {
+  padding:15px 20px;
+  border-right:1px solid rgba(255,255,255,.05);
+  border-top:2px solid transparent;
+  transition:background .15s;
+  cursor:default;
+}
+.ph-kpi:last-child { border-right:none; }
+.ph-kpi:hover { background:rgba(255,255,255,.03); }
+.ph-kpi.c-spend { border-top-color:rgba(99,130,200,0.7); }
+.ph-kpi.c-forecast { border-top-color:var(--amber); }
+.ph-kpi.c-green { border-top-color:var(--green); }
+.ph-kpi.c-blue { border-top-color:#3B82F6; }
+.ph-kpi.c-renewal { border-top-color:#6366F1; }
+.ph-kpi-lbl { font-size:7.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:rgba(255,255,255,.35); margin-bottom:6px; }
+.ph-kpi-val { font-size:18pt; font-weight:900; line-height:1; color:#E2E8F0; margin-bottom:3px; letter-spacing:-.02em; }
+.ph-kpi.c-green  .ph-kpi-val { color:#6EE7B7; }
+.ph-kpi.c-forecast .ph-kpi-val { color:#FCD34D; }
+.ph-kpi.c-blue   .ph-kpi-val { color:#93C5FD; }
+.ph-kpi-note { font-size:8pt; color:rgba(255,255,255,.35); line-height:1.4; }
+.h-accent-bar { height:3px; width:100%; background:#0D9488; transition:background .5s ease; }
+
+/* Light mode */
+[data-theme="light"] .pd-hero {
+  background:linear-gradient(180deg,#0F1E3C 0%,#1E3A5F 100%);
+}
+
+@media(max-width:900px) {
+  .pd-hero-body { grid-template-columns:1fr; gap:20px; }
+  .pd-hero-ring-col { order:-1; }
+  .pd-hero-strip-inner { grid-template-columns:repeat(3,1fr); }
+}
+@media(max-width:600px) { .pd-hero { padding:28px 0 0; } .pd-hero-body { padding:0 16px 24px; } }
+
+/* ── INTELLIGENCE SIGNALS STRIP ── */
+.intel-signals-wrap {
+  background: linear-gradient(90deg, #060C18 0%, #0B1428 50%, #060C18 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  position: relative;
+}
+.intel-signals-inner {
+  max-width: 1280px; margin: 0 auto; padding: 0 32px;
+  display: flex; align-items: stretch; min-height: 42px;
+}
+.intel-signals-label {
+  flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+  padding: 0 16px 0 0; border-right: 1px solid rgba(255,255,255,0.08);
+  margin-right: 20px;
+  font-size: 7pt; font-weight: 800; text-transform: uppercase; letter-spacing: .12em;
+  color: rgba(255,255,255,0.25);
+}
+.intel-signals-label::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 6px #10B981;
+  animation: signal-pulse 2s ease-in-out infinite;
+}
+@keyframes signal-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+.intel-signals-scroll {
+  flex: 1; overflow: hidden; position: relative;
+  display: flex; align-items: center;
+}
+.intel-signals-track {
+  display: flex; align-items: center; gap: 20px;
+  animation: signals-scroll 32s linear infinite;
+  width: max-content;
+}
+.intel-signals-track:hover { animation-play-state: paused; }
+@keyframes signals-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.intel-signal-chip {
+  flex-shrink: 0; display: flex; align-items: center; gap: 7px;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 8pt; font-weight: 600; white-space: nowrap;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+@keyframes chip-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.isc-green  { background: rgba(16,185,129,0.10); color: #6EE7B7; border-color: rgba(16,185,129,0.2); }
+.isc-amber  { background: rgba(245,158,11,0.10); color: #FCD34D; border-color: rgba(245,158,11,0.2); }
+.isc-red    { background: rgba(239,68,68,0.10);  color: #FCA5A5; border-color: rgba(239,68,68,0.2); }
+.isc-blue   { background: rgba(59,130,246,0.10); color: #93C5FD; border-color: rgba(59,130,246,0.2); }
+.isc-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── VENDOR CARD ENHANCEMENTS ── */
+.vendor-card { position: relative; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease; }
+.vendor-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
+.vendor-spend-bar-wrap { margin-top: 10px; }
+.vendor-spend-bar-track {
+  height: 4px; background: var(--gray2); border-radius: 2px; overflow: hidden; margin-bottom: 5px;
+}
+.vendor-spend-bar-fill {
+  height: 100%; border-radius: 2px;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+  background: linear-gradient(90deg, var(--navy), #2563EB);
+}
+.vendor-card.amber .vendor-spend-bar-fill { background: linear-gradient(90deg,#78350F,#D97706); }
+.vendor-card.red   .vendor-spend-bar-fill { background: linear-gradient(90deg,#7F1D1D,#DC2626); }
+.vendor-card.green .vendor-spend-bar-fill { background: linear-gradient(90deg,#065F46,#059669); }
+.vendor-spend-bar-label { display: flex; justify-content: space-between; font-size: 7.5pt; color: var(--ink4); }
+
+/* KPI count-up: glow flash when value lands */
+@keyframes kpi-land {
+  0%  { text-shadow: 0 0 0 transparent; }
+  40% { text-shadow: 0 0 14px currentColor; }
+  100%{ text-shadow: 0 0 0 transparent; }
+}
+.ph-kpi-val.landed { animation: kpi-land .7s ease; }
+
+/* Score breakdown bars in hero */
+.h-score-breakdown { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.h-sbd-row { display: flex; align-items: center; gap: 6px; }
+.h-sbd-lbl { font-size: 7pt; color: rgba(255,255,255,.3); width: 64px; flex-shrink: 0; text-align: right; }
+.h-sbd-bar { flex: 1; height: 4px; background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden; }
+.h-sbd-fill { height: 100%; border-radius: 2px; transition: width .9s cubic-bezier(.4,0,.2,1); }
+
+/* Animated entrance for main-grid cards */
+.v2-card { animation: card-enter .4s ease both; }
+@keyframes card-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger vendor cards */
+.vendor-card { opacity: 0; }
+.vendor-card.visible { animation: card-enter .4s ease both; opacity: 1; }
+
+/* ── P&L WATERFALL ── */
+.wf-wrap { display:flex; flex-direction:column; gap:10px; flex:1; padding:2px 0; }
+.wf-row { display:flex; align-items:center; gap:10px; }
+.wf-lbl { font-size:7.5pt; font-weight:700; color:var(--ink4); width:78px; flex-shrink:0; text-align:right; }
+.wf-bar-col { flex:1; }
+.wf-bar-track { height:24px; background:var(--gray2); border-radius:4px; overflow:hidden; }
+.wf-bar-fill { height:100%; border-radius:4px; transition:width 1s cubic-bezier(.4,0,.2,1); }
+.wf-bar-fill.wf-forecast { background:linear-gradient(90deg,var(--amber2),var(--amber)); }
+.wf-bar-fill.wf-spend    { background:linear-gradient(90deg,var(--navy),var(--navy2)); }
+.wf-bar-fill.wf-savings  { background:linear-gradient(90deg,var(--green2),var(--green)); }
+.wf-bar-fill.wf-net      { background:linear-gradient(90deg,var(--blue),#60A5FA); }
+.wf-val  { font-size:8.5pt; font-weight:800; color:var(--ink); white-space:nowrap; min-width:44px; }
+.wf-delta { font-size:7pt; font-weight:700; padding:2px 7px; border-radius:10px; margin-left:2px; }
+.wf-delta.up   { background:var(--amber3);  color:var(--amber2); }
+.wf-delta.down { background:var(--green3);  color:var(--green2); }
+.wf-delta.eq   { background:var(--gray2);   color:var(--ink4); }
+.wf-divider { height:1px; background:var(--border); margin:2px 0 2px 88px; }
+.wf-conc { margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+.wf-conc-lbl { font-size:7.5pt; color:var(--ink4); margin-bottom:6px; font-weight:700; }
+.wf-conc-row { display:flex; align-items:center; gap:8px; }
+.wf-conc-bar { flex:1; height:8px; border-radius:4px; display:flex; overflow:hidden; gap:1px; background:var(--gray2); }
+.wf-conc-seg { height:100%; border-radius:2px; transition:width .9s cubic-bezier(.4,0,.2,1); }
+.wf-conc-note { font-size:7.5pt; color:var(--ink4); white-space:nowrap; }
+
+/* ── SAVINGS PIPELINE ── */
+.sp-funnel { display:flex; align-items:flex-start; }
+.sp-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:10px 6px; border-radius:10px; text-align:center; }
+.sp-step.sp-done    { background:var(--green3); }
+.sp-step.sp-active  { background:var(--blue3); }
+.sp-step.sp-pending { background:var(--gray2); opacity:.65; }
+.sp-icon { font-size:18pt; line-height:1; }
+.sp-lbl  { font-size:7pt; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--ink4); }
+.sp-val  { font-size:11pt; font-weight:900; color:var(--ink); line-height:1; }
+.sp-sub  { font-size:7pt; color:var(--ink4); line-height:1.4; }
+.sp-arrow { display:flex; align-items:center; padding:0 2px; margin-top:28px; color:var(--border2); font-size:11pt; }
+.sp-roi { margin-top:12px; padding:10px 14px; background:var(--green3); border-radius:8px; border-left:3px solid var(--green); }
+.sp-roi-lbl { font-size:7pt; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--green2); margin-bottom:3px; }
+.sp-roi-val { font-size:10pt; font-weight:900; color:var(--green2); }
+.sp-pipeline-note { margin-top:8px; padding:8px 12px; background:var(--blue3); border-radius:8px; border-left:3px solid var(--blue); }
+.sp-pipeline-lbl { font-size:7pt; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:2px; }
+.sp-pipeline-val { font-size:8.5pt; font-weight:700; color:var(--ink2); line-height:1.4; }
+
+/* ── MINI Q SPARKLINE in Spend KPI strip ── */
+.ph-kpi-spark { display:flex; align-items:flex-end; gap:2px; height:18px; margin-top:6px; width:100%; }
+.ph-kpi-spark-bar { width:20%; border-radius:1.5px 1.5px 0 0; min-height:3px; flex-shrink:0; }
+
+/* Quarterly distribution pattern note */
+.qbar-note { margin-top:8px; padding:7px 10px; border-radius:6px; font-size:7.5pt; font-weight:700; }
+.qbar-note.q-heavy { background:var(--amber3); color:var(--amber2); }
+.qbar-note.q-even  { background:var(--green3); color:var(--green2); }
+
+/* Advisory Feed in signals strip */
+.intel-signal-feed { font-size:8pt; color:rgba(255,255,255,.55); display:flex; align-items:center; gap:8px; overflow:hidden; }
+.intel-feed-sep { color:rgba(255,255,255,.15); flex-shrink:0; }
+
+/* ── THRESHOLD ALERT BADGES ── */
+@keyframes badge-pulse { 0%,100%{opacity:1;} 50%{opacity:.55;} }
+.ph-kpi-alert {
+  display:inline-flex; align-items:center; gap:4px; font-size:7pt; font-weight:800;
+  padding:2px 7px; border-radius:10px; margin-top:5px;
+  animation:badge-pulse 2.2s ease infinite; cursor:default; white-space:nowrap;
+}
+.ph-kpi-alert.a-red   { background:rgba(239,68,68,.18); color:#FCA5A5; border:1px solid rgba(239,68,68,.35); }
+.ph-kpi-alert.a-amber { background:rgba(251,191,36,.14); color:#FCD34D; border:1px solid rgba(251,191,36,.35); }
+.ph-kpi-alert.a-green { background:rgba(16,185,129,.12); color:#6EE7B7; border:1px solid rgba(16,185,129,.3); }
+
+/* threshold alert in card context */
+.card-alert-badge {
+  display:inline-flex; align-items:center; gap:4px; font-size:7pt; font-weight:800;
+  padding:3px 8px; border-radius:10px; margin-bottom:8px;
+  animation:badge-pulse 2.2s ease infinite;
+}
+.card-alert-badge.a-red   { background:rgba(239,68,68,.12); color:#DC2626; border:1px solid rgba(239,68,68,.25); }
+.card-alert-badge.a-amber { background:rgba(251,191,36,.1);  color:#D97706; border:1px solid rgba(251,191,36,.25); }
+[data-theme="dark"] .card-alert-badge.a-red   { background:rgba(239,68,68,.18); color:#FCA5A5; }
+[data-theme="dark"] .card-alert-badge.a-amber { background:rgba(251,191,36,.14); color:#FCD34D; }
+
+/* ── SECTION HIGHLIGHT (chip-link target) ── */
+@keyframes section-flash {
+  0%   { box-shadow:0 0 0 0 rgba(13,148,136,0); }
+  25%  { box-shadow:0 0 0 4px rgba(13,148,136,.45); }
+  100% { box-shadow:0 0 0 0 rgba(13,148,136,0); }
+}
+.section-highlight { animation:section-flash 2s ease forwards !important; border-color:var(--teal) !important; }
+.vendor-card.chip-highlight { animation:section-flash 2s ease forwards !important; }
+
+/* clickable chips */
+.intel-signal-chip[data-target] { cursor:pointer; }
+.intel-signal-chip[data-target]:hover { opacity:.8; transform:scale(1.03); transition:all .12s; }
+
+/* ── INLINE NOTES ── */
+.card-wrap-relative { position:relative; }
+.note-btn {
+  position:absolute; top:14px; right:14px; width:24px; height:24px;
+  display:flex; align-items:center; justify-content:center;
+  border:none; background:transparent; cursor:pointer; font-size:11pt;
+  color:rgba(0,0,0,.2); border-radius:6px; transition:all .15s; z-index:5; line-height:1;
+}
+[data-theme="dark"] .note-btn { color:rgba(255,255,255,.18); }
+.note-btn:hover { background:rgba(13,148,136,.1); color:var(--teal); }
+.note-btn.has-note { color:var(--teal); }
+.note-btn.has-note::after {
+  content:''; position:absolute; top:4px; right:4px;
+  width:6px; height:6px; border-radius:50%; background:var(--teal);
+  border:1.5px solid var(--white);
+}
+[data-theme="dark"] .note-btn.has-note::after { border-color:#0F1E3C; }
+#notes-popover {
+  position:fixed; z-index:8500; width:272px; display:none;
+  background:#fff; border-radius:12px; padding:14px;
+  box-shadow:0 8px 36px rgba(0,0,0,.2); border:1px solid var(--border);
+}
+[data-theme="dark"] #notes-popover { background:#0F1E3C; border-color:rgba(255,255,255,.1); box-shadow:0 8px 36px rgba(0,0,0,.5); }
+#notes-popover .np-title { font-size:7.5pt; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--ink4); margin-bottom:8px; }
+[data-theme="dark"] #notes-popover .np-title { color:rgba(255,255,255,.4); }
+#notes-popover textarea {
+  width:100%; resize:none; height:88px; border:1px solid var(--border);
+  border-radius:8px; padding:8px 10px; font-family:inherit; font-size:8.5pt;
+  color:var(--ink2); background:var(--gray); outline:none; display:block;
+}
+[data-theme="dark"] #notes-popover textarea { background:#060C18; border-color:rgba(255,255,255,.1); color:#E2E8F0; }
+#notes-popover textarea:focus { border-color:var(--teal); }
+.np-btns { display:flex; justify-content:flex-end; gap:7px; margin-top:9px; }
+.np-btn { padding:5px 12px; border-radius:8px; border:none; cursor:pointer; font-family:inherit; font-size:7.5pt; font-weight:700; }
+.np-btn.save { background:var(--teal); color:#fff; }
+.np-btn.cancel { background:var(--gray2); color:var(--ink3); }
+[data-theme="dark"] .np-btn.cancel { background:rgba(255,255,255,.08); color:rgba(255,255,255,.6); }
+
+/* ── BUBBLE / RISK MATRIX VIEW ── */
+.vendor-view-toggle { display:flex; gap:6px; margin-bottom:14px; }
+.vvt-btn {
+  padding:5px 14px; border-radius:20px; font-size:7.5pt; font-weight:700;
+  border:1px solid var(--border); background:var(--white); color:var(--ink4);
+  cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.vvt-btn.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+[data-theme="dark"] .vvt-btn { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.12); color:rgba(255,255,255,.5); }
+[data-theme="dark"] .vvt-btn.active { background:var(--teal); border-color:var(--teal); color:#fff; }
+#bubble-view { display:none; }
+#bubble-view canvas { display:block; width:100%; }
+.bubble-legend { display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; }
+.bl-item { display:flex; align-items:center; gap:6px; font-size:7.5pt; color:var(--ink4); }
+.bl-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* ── COMPARISON DRAWER ── */
+#compare-overlay {
+  display:none; position:fixed; inset:0; z-index:700;
+  background:rgba(0,0,0,.45); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+}
+#compare-drawer {
+  position:fixed; right:0; top:0; bottom:0; z-index:701;
+  width:min(520px,92vw); background:#0B1428;
+  border-left:1px solid rgba(255,255,255,.07);
+  box-shadow:-12px 0 48px rgba(0,0,0,.5);
+  transform:translateX(100%); transition:transform .32s cubic-bezier(.4,0,.2,1);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+#compare-drawer.open { transform:translateX(0); }
+.cmp-head {
+  padding:20px 24px 16px; border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex; align-items:flex-start; justify-content:space-between; flex-shrink:0;
+}
+.cmp-title { font-size:12pt; font-weight:800; color:#fff; margin-bottom:3px; }
+.cmp-sub { font-size:8pt; color:rgba(255,255,255,.38); }
+.cmp-close { background:none; border:none; color:rgba(255,255,255,.35); font-size:20pt; cursor:pointer; line-height:1; padding:0; }
+.cmp-close:hover { color:#fff; }
+.cmp-body { flex:1; overflow-y:auto; padding:20px 24px; }
+.cmp-select-row { margin-bottom:20px; }
+.cmp-select-row label { font-size:7.5pt; font-weight:800; text-transform:uppercase; letter-spacing:.09em; color:rgba(255,255,255,.38); display:block; margin-bottom:7px; }
+.cmp-select-row select {
+  width:100%; padding:9px 12px; background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12); border-radius:8px;
+  color:#fff; font-family:inherit; font-size:9pt; outline:none; cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+}
+.cmp-select-row select:focus { border-color:var(--teal); }
+.cmp-table { width:100%; border-collapse:collapse; }
+.cmp-table th {
+  font-size:7pt; font-weight:800; text-transform:uppercase; letter-spacing:.09em;
+  color:rgba(255,255,255,.3); padding:8px 0 7px; text-align:left;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.cmp-table th:not(:first-child) { text-align:right; }
+.cmp-table td {
+  padding:11px 0; border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:9pt; color:rgba(255,255,255,.75); vertical-align:middle;
+}
+.cmp-table td:not(:first-child) { text-align:right; }
+.cmp-row-lbl { font-size:7.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.35); }
+.c-better { color:#6EE7B7 !important; font-weight:800; }
+.c-worse  { color:#FCA5A5 !important; font-weight:800; }
+.c-same   { color:rgba(255,255,255,.55) !important; }
+.cmp-winner-badge {
+  display:inline-block; font-size:6.5pt; font-weight:800; text-transform:uppercase;
+  letter-spacing:.06em; padding:2px 6px; border-radius:6px; margin-left:6px;
+  vertical-align:middle;
+}
+
+/* ── COMPARE DRAWER — light mode overrides ── */
+[data-theme="light"] #compare-drawer {
+  background:#FFFFFF;
+  border-left:1px solid rgba(0,0,0,.10);
+}
+[data-theme="light"] .cmp-head {
+  border-bottom:1px solid rgba(0,0,0,.08);
+}
+[data-theme="light"] .cmp-title { color:var(--ink); }
+[data-theme="light"] .cmp-sub { color:var(--ink4); }
+[data-theme="light"] .cmp-close { color:var(--ink4); }
+[data-theme="light"] .cmp-close:hover { color:var(--ink); }
+[data-theme="light"] .cmp-select-row label { color:var(--ink4); }
+[data-theme="light"] .cmp-select-row select {
+  background:#F8FAFC; border-color:var(--border2);
+  color:var(--ink); option-color:var(--ink);
+}
+[data-theme="light"] .cmp-table th {
+  color:var(--ink4);
+  border-bottom-color:var(--border);
+}
+[data-theme="light"] .cmp-table td {
+  color:var(--ink2);
+  border-bottom-color:var(--border);
+}
+[data-theme="light"] .cmp-row-lbl { color:var(--ink4); }
+[data-theme="light"] .c-better { color:var(--green) !important; }
+[data-theme="light"] .c-worse  { color:var(--red)   !important; }
+[data-theme="light"] .c-same   { color:var(--ink4)  !important; }
+[data-theme="light"] .cmp-body > div[style] { color:var(--ink4) !important; }
+
+/* Dark mode — fix pillar name visibility in table headers */
+[data-theme="dark"] .cmp-table th {
+  color:rgba(255,255,255,.65);
+}
+
+/* ── CONTEXT MENU ── */
+#ctx-menu {
+  position:fixed; z-index:9500; display:none;
+  background:#fff; border-radius:10px; padding:5px 0;
+  box-shadow:0 8px 32px rgba(0,0,0,.18); border:1px solid var(--border);
+  min-width:188px;
+}
+[data-theme="dark"] #ctx-menu { background:#0F1E3C; border-color:rgba(255,255,255,.1); }
+.ctx-item {
+  display:flex; align-items:center; gap:9px; padding:8px 14px;
+  font-size:8.5pt; color:var(--ink2); cursor:pointer; transition:background .1s;
+  -webkit-user-select:none; user-select:none;
+}
+[data-theme="dark"] .ctx-item { color:rgba(255,255,255,.75); }
+.ctx-item:hover { background:var(--gray2); }
+[data-theme="dark"] .ctx-item:hover { background:rgba(255,255,255,.07); }
+.ctx-icon { font-size:10pt; width:16px; text-align:center; flex-shrink:0; }
+.ctx-sep { height:1px; background:var(--border); margin:4px 0; }
+[data-theme="dark"] .ctx-sep { background:rgba(255,255,255,.07); }
+
+/* ── SCROLL REVEAL for late-rendered sections ── */
+@keyframes reveal-in { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+.scroll-reveal { opacity:0; }
+.scroll-reveal.revealed { animation:reveal-in .4s ease both; }
+
+/* ── EXPORT TOAST ── */
+#export-toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:rgba(13,148,136,.95); color:#fff; padding:10px 22px; border-radius:24px;
+  font-size:8.5pt; font-weight:700; z-index:9999; opacity:0;
+  transition:opacity .25s ease, transform .25s ease; pointer-events:none;
+}
+#export-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ══════════════════════════════════════════
+   CROSS-PILLAR COMMAND PANEL
+══════════════════════════════════════════ */
+#cmd-panel {
+  position:fixed; inset:0; z-index:8000; display:none;
+  background:rgba(2,6,18,0.82); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  align-items:flex-start; justify-content:center; padding-top:80px;
+}
+#cmd-panel.open { display:flex; }
+.cmd-box {
+  background:linear-gradient(160deg,#060C18 0%,#0F1E3C 100%);
+  border:1px solid rgba(255,255,255,.10); border-radius:18px;
+  width:min(880px,96vw); max-height:82vh; display:flex; flex-direction:column;
+  box-shadow:0 32px 96px rgba(0,0,0,.6);
+}
+.cmd-head {
+  padding:22px 28px 18px; border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+}
+.cmd-head-left { display:flex; flex-direction:column; gap:4px; }
+.cmd-title { font-size:13pt; font-weight:900; color:#E2E8F0; letter-spacing:-.02em; }
+.cmd-sub { font-size:8pt; color:rgba(255,255,255,.35); }
+.cmd-close {
+  background:none; border:none; color:rgba(255,255,255,.4); font-size:16pt;
+  cursor:pointer; padding:4px 8px; border-radius:6px; transition:color .15s;
+}
+.cmd-close:hover { color:#fff; }
+.cmd-filter-row {
+  padding:12px 28px 14px; border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex; gap:8px; flex-shrink:0;
+}
+.cmd-filter-btn {
+  padding:4px 14px; border-radius:20px; font-size:7.5pt; font-weight:700;
+  border:1px solid rgba(255,255,255,.12); background:transparent;
+  color:rgba(255,255,255,.45); cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.cmd-filter-btn.active-all  { border-color:rgba(255,255,255,.35); color:#E2E8F0; background:rgba(255,255,255,.07); }
+.cmd-filter-btn.active-red  { border-color:#EF4444; color:#FCA5A5; background:rgba(239,68,68,.12); }
+.cmd-filter-btn.active-amber{ border-color:#F59E0B; color:#FCD34D; background:rgba(245,158,11,.12); }
+.cmd-body { overflow-y:auto; flex:1; padding:10px 0; }
+.cmd-body::-webkit-scrollbar { width:5px; }
+.cmd-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:3px; }
+.cmd-item {
+  display:grid; grid-template-columns:24px 1fr auto auto;
+  gap:0 14px; align-items:start;
+  padding:13px 28px; border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .12s; cursor:pointer;
+}
+.cmd-item:hover { background:rgba(255,255,255,.03); }
+.cmd-item:last-child { border-bottom:none; }
+.cmd-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; margin-top:3px; }
+.cmd-dot.red   { background:#EF4444; box-shadow:0 0 6px rgba(239,68,68,.6); }
+.cmd-dot.amber { background:#F59E0B; box-shadow:0 0 6px rgba(245,158,11,.5); }
+.cmd-item-main { display:flex; flex-direction:column; gap:3px; }
+.cmd-item-what  { font-size:9pt; font-weight:700; color:#E2E8F0; line-height:1.3; }
+.cmd-item-ctx   { font-size:7.5pt; color:rgba(255,255,255,.38); }
+.cmd-item-action{ font-size:7.5pt; color:rgba(99,179,237,.7); font-style:italic; max-width:220px; text-align:right; line-height:1.3; }
+.cmd-due {
+  font-size:7.5pt; font-weight:700; white-space:nowrap; text-align:right;
+  padding:2px 8px; border-radius:10px;
+}
+.cmd-due.urgent { background:rgba(239,68,68,.15); color:#FCA5A5; }
+.cmd-due.warn   { background:rgba(245,158,11,.12); color:#FCD34D; }
+.cmd-due.ok     { background:rgba(16,185,129,.10); color:#6EE7B7; }
+.cmd-empty { padding:40px 28px; color:rgba(255,255,255,.28); font-size:9pt; text-align:center; }
+.cmd-footer {
+  padding:12px 28px; border-top:1px solid rgba(255,255,255,.06);
+  display:flex; justify-content:space-between; align-items:center; flex-shrink:0;
+}
+.cmd-footer-stat { font-size:7.5pt; color:rgba(255,255,255,.28); }
+.cmd-footer-hint { font-size:7pt; color:rgba(255,255,255,.20); }
+[data-theme="light"] .cmd-box {
+  background:linear-gradient(160deg,#F8FAFC 0%,#EFF6FF 100%);
+  border-color:rgba(0,0,0,.10);
+}
+[data-theme="light"] .cmd-title { color:#0F172A; }
+[data-theme="light"] .cmd-sub { color:#64748B; }
+[data-theme="light"] .cmd-close { color:#64748B; }
+[data-theme="light"] .cmd-item-what { color:#0F172A; }
+[data-theme="light"] .cmd-item-ctx  { color:#64748B; }
+
+/* ══════════════════════════════════════════
+   EXEC BRIEF GENERATOR
+══════════════════════════════════════════ */
+#exec-brief-modal {
+  position:fixed; inset:0; z-index:8500; display:none;
+  background:rgba(2,6,18,0.82); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; padding:24px;
+}
+#exec-brief-modal.open { display:flex; }
+.eb-box {
+  background:linear-gradient(160deg,#060C18 0%,#0D1B36 100%);
+  border:1px solid rgba(255,255,255,.10); border-radius:18px;
+  width:min(640px,96vw); display:flex; flex-direction:column;
+  box-shadow:0 32px 96px rgba(0,0,0,.6);
+}
+.eb-head {
+  padding:20px 24px 16px; border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.eb-title { font-size:11pt; font-weight:900; color:#E2E8F0; }
+.eb-close {
+  background:none; border:none; color:rgba(255,255,255,.4); font-size:16pt;
+  cursor:pointer; padding:4px 8px; border-radius:6px; transition:color .15s;
+}
+.eb-close:hover { color:#fff; }
+.eb-body { padding:20px 24px; }
+.eb-section { margin-bottom:16px; }
+.eb-lbl {
+  font-size:7pt; font-weight:800; text-transform:uppercase; letter-spacing:.12em;
+  color:rgba(255,255,255,.28); margin-bottom:6px;
+}
+.eb-subject {
+  font-size:10pt; font-weight:800; color:#E2E8F0; line-height:1.3;
+  padding:10px 14px; background:rgba(255,255,255,.04); border-radius:8px;
+  border-left:3px solid var(--active-pillar-color,#0D9488);
+}
+.eb-bullets { display:flex; flex-direction:column; gap:6px; }
+.eb-bullet {
+  display:flex; gap:10px; align-items:flex-start;
+  font-size:8.5pt; color:#CBD5E1; line-height:1.5;
+  padding:8px 12px; background:rgba(255,255,255,.03); border-radius:8px;
+}
+.eb-bullet-num {
+  width:18px; height:18px; border-radius:50%; flex-shrink:0;
+  background:rgba(255,255,255,.08); font-size:7pt; font-weight:800;
+  color:rgba(255,255,255,.5); display:flex; align-items:center; justify-content:center;
+  margin-top:1px;
+}
+.eb-risk-row {
+  display:flex; align-items:center; gap:10px; padding:10px 14px;
+  background:rgba(255,255,255,.04); border-radius:8px;
+}
+.eb-risk-badge {
+  padding:3px 10px; border-radius:12px; font-size:8pt; font-weight:800;
+  text-transform:uppercase; letter-spacing:.06em;
+}
+.eb-risk-badge.red    { background:rgba(239,68,68,.2); color:#FCA5A5; border:1px solid rgba(239,68,68,.3); }
+.eb-risk-badge.amber  { background:rgba(245,158,11,.15); color:#FCD34D; border:1px solid rgba(245,158,11,.3); }
+.eb-risk-badge.green  { background:rgba(16,185,129,.12); color:#6EE7B7; border:1px solid rgba(16,185,129,.25); }
+.eb-rec { font-size:8.5pt; color:#94A3B8; line-height:1.55; }
+.eb-ask {
+  font-size:8.5pt; font-weight:700; color:#93C5FD; line-height:1.5;
+  padding:10px 14px; background:rgba(59,130,246,.06); border-radius:8px;
+  border:1px solid rgba(59,130,246,.15);
+}
+.eb-foot {
+  padding:14px 24px 18px; border-top:1px solid rgba(255,255,255,.07);
+  display:flex; gap:10px; justify-content:flex-end;
+}
+.eb-copy-btn {
+  padding:8px 20px; border-radius:20px; font-size:8pt; font-weight:700;
+  background:rgba(13,148,136,.8); border:1px solid rgba(13,148,136,.5);
+  color:#fff; cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.eb-copy-btn:hover { background:rgba(13,148,136,1); }
+.eb-copy-btn.copied { background:rgba(16,185,129,.6); }
+.eb-dismiss-btn {
+  padding:8px 20px; border-radius:20px; font-size:8pt; font-weight:700;
+  background:transparent; border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.5); cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.eb-dismiss-btn:hover { border-color:rgba(255,255,255,.3); color:rgba(255,255,255,.8); }
+[data-theme="light"] .eb-box {
+  background:linear-gradient(160deg,#F8FAFC 0%,#EFF6FF 100%);
+  border-color:rgba(0,0,0,.10);
+}
+[data-theme="light"] .eb-title { color:#0F172A; }
+[data-theme="light"] .eb-subject { color:#0F172A; }
+[data-theme="light"] .eb-bullet  { color:#334155; }
+[data-theme="light"] .eb-rec     { color:#475569; }
+
+/* ══════════════════════════════════════════
+   PRESENTATION MODE — SLIDE ENGINE
+══════════════════════════════════════════ */
+#pres-overlay {
+  display:none; position:fixed; inset:0; z-index:10000;
+  background:#060C18; overflow:hidden;
+}
+#pres-overlay.open { display:flex; flex-direction:column; }
+
+/* Ambient orb glow */
+#pres-overlay::before {
+  content:''; position:absolute; top:-120px; right:-100px;
+  width:700px; height:700px; border-radius:50%;
+  background:radial-gradient(circle, var(--pillar-glow,rgba(13,148,136,0.10)) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+/* Top chrome */
+.pres-chrome {
+  position:absolute; top:0; left:0; right:0; z-index:2;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 36px;
+  background:linear-gradient(to bottom, rgba(6,12,24,0.85) 0%, transparent 100%);
+  pointer-events:none;
+}
+.pres-chrome > * { pointer-events:auto; }
+.pres-pillar-id { display:flex; align-items:center; gap:10px; }
+.pres-pillar-icon { font-size:16pt; }
+.pres-pillar-name { font-size:8.5pt; font-weight:800; color:rgba(255,255,255,.45); letter-spacing:.05em; text-transform:uppercase; }
+.pres-slide-counter { font-size:8pt; font-weight:700; color:rgba(255,255,255,.22); letter-spacing:.10em; text-transform:uppercase; }
+.pres-exit-btn {
+  padding:5px 14px; border-radius:20px; font-size:7.5pt; font-weight:700;
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.10);
+  color:rgba(255,255,255,.4); cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.pres-exit-btn:hover { background:rgba(255,255,255,.14); color:#fff; }
+
+/* Slide container */
+.pres-slides { flex:1; position:relative; }
+.pres-slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  padding:80px 100px 110px;
+  opacity:0; transform:translateX(40px);
+  transition:opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+.pres-slide.active { opacity:1; transform:translateX(0); pointer-events:auto; }
+.pres-slide.exit-left { opacity:0; transform:translateX(-40px); }
+
+/* Slide heading */
+.ps-heading {
+  font-size:7pt; font-weight:800; text-transform:uppercase; letter-spacing:.22em;
+  color:rgba(255,255,255,.20); margin-bottom:28px; align-self:flex-start;
+  display:flex; align-items:center; gap:14px;
+}
+.ps-heading::before { content:''; width:32px; height:2px; background:var(--active-pillar-color,#0D9488); flex-shrink:0; }
+
+/* Slide 1 — Identity */
+.ps1-icon { font-size:56pt; margin-bottom:12px; line-height:1; }
+.ps1-title {
+  font-size:54pt; font-weight:900; color:#fff; line-height:1.0;
+  letter-spacing:-.035em; text-align:center; margin-bottom:18px;
+}
+.ps1-risk-row { display:flex; align-items:center; gap:18px; margin-bottom:20px; }
+.ps1-risk-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 18px; border-radius:30px;
+  font-size:11pt; font-weight:800; letter-spacing:.02em;
+}
+.ps1-risk-pill .ps1-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.ps1-advisory {
+  font-size:11.5pt; color:rgba(255,255,255,.46); line-height:1.8;
+  max-width:840px; text-align:center; font-weight:400;
+}
+.ps1-score-strip { display:flex; gap:32px; margin-top:40px; align-items:center; }
+.ps1-score-ring-wrap { position:relative; width:140px; height:140px; flex-shrink:0; }
+.ps1-score-ring-wrap svg { width:140px; height:140px; }
+.ps1-score-overlay {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.ps1-score-big { font-size:38pt; font-weight:900; line-height:1; letter-spacing:-.04em; }
+.ps1-score-tiny { font-size:7pt; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(255,255,255,.3); margin-top:2px; }
+.ps1-score-side { display:flex; flex-direction:column; gap:8px; }
+.ps1-score-lbl { font-size:7.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.14em; color:rgba(255,255,255,.25); }
+.ps1-score-headline { font-size:18pt; font-weight:900; line-height:1.1; }
+.ps1-score-sub { font-size:10pt; color:rgba(255,255,255,.38); line-height:1.55; max-width:320px; margin-top:4px; }
+
+/* Slide 2 — Financials */
+.ps2-grid {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:22px;
+  max-width:1000px; width:100%;
+}
+.ps2-tile {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+  border-radius:22px; padding:34px 32px;
+  display:flex; flex-direction:column; gap:12px;
+  position:relative; overflow:hidden;
+}
+/* Pillar-color left accent bar */
+.ps2-tile::before {
+  content:''; position:absolute; top:0; left:0; bottom:0; width:4px;
+  background:var(--active-pillar-color,#0D9488); opacity:.7;
+  border-radius:22px 0 0 22px;
+}
+.ps2-tile.t-spend::before  { background:rgba(99,130,200,1); }
+.ps2-tile.t-forecast::before { background:#D97706; }
+.ps2-tile.t-savings::before { background:#10B981; }
+.ps2-tile.t-net::before     { background:#3B82F6; }
+.ps2-tile.t-savings { background:rgba(16,185,129,.05); }
+.ps2-lbl { font-size:8pt; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:rgba(255,255,255,.26); }
+.ps2-val { font-size:48pt; font-weight:900; line-height:1; color:#E2E8F0; letter-spacing:-.04em; }
+.ps2-tile.t-savings .ps2-val  { color:#6EE7B7; }
+.ps2-tile.t-forecast .ps2-val { color:#FCD34D; }
+.ps2-tile.t-net .ps2-val      { color:#93C5FD; }
+.ps2-note { font-size:10pt; color:rgba(255,255,255,.34); line-height:1.5; }
+.ps2-delta {
+  display:inline-flex; align-items:center; gap:5px; margin-top:2px;
+  font-size:8.5pt; font-weight:700;
+}
+
+/* Slide 3 — Vendors */
+.ps3-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; max-width:1120px; width:100%; }
+.ps3-card {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+  border-radius:18px; padding:28px 24px;
+  display:flex; flex-direction:column; gap:9px;
+  position:relative; overflow:hidden;
+}
+/* Pillar-color top accent per card */
+.ps3-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:var(--active-pillar-color,#0D9488); opacity:.4;
+}
+.ps3-card.amber::before { background:#F59E0B; opacity:.8; }
+.ps3-card.red::before   { background:#EF4444; opacity:.9; }
+.ps3-card.amber { border-color:rgba(245,158,11,.2); }
+.ps3-card.red   { border-color:rgba(239,68,68,.2); }
+.ps3-vname { font-size:14pt; font-weight:800; color:#E2E8F0; margin-top:4px; }
+.ps3-spend { font-size:30pt; font-weight:900; color:#93C5FD; letter-spacing:-.02em; line-height:1.05; }
+.ps3-meta  { font-size:9pt; color:rgba(255,255,255,.30); }
+.ps3-status { font-size:8.5pt; font-weight:700; margin-top:auto; padding-top:10px; }
+.ps3-empty { font-size:13pt; color:rgba(255,255,255,.28); text-align:center; padding:48px; width:100%; }
+
+/* Slide 4 — Open Items */
+.ps4-list { display:flex; flex-direction:column; gap:13px; max-width:940px; width:100%; }
+.ps4-item {
+  display:grid; grid-template-columns:14px 1fr auto;
+  gap:0 24px; align-items:center;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);
+  border-radius:16px; padding:22px 28px;
+  position:relative; overflow:hidden;
+}
+.ps4-item.status-red   { border-color:rgba(239,68,68,.18); background:rgba(239,68,68,.04); }
+.ps4-item.status-amber { border-color:rgba(245,158,11,.15); background:rgba(245,158,11,.03); }
+.ps4-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.ps4-dot.red   { background:#EF4444; box-shadow:0 0 12px rgba(239,68,68,.7); }
+.ps4-dot.amber { background:#F59E0B; box-shadow:0 0 12px rgba(245,158,11,.6); }
+.ps4-dot.green { background:#10B981; box-shadow:0 0 8px rgba(16,185,129,.4); }
+.ps4-body { display:flex; flex-direction:column; gap:5px; }
+.ps4-what  { font-size:12pt; font-weight:700; color:#E2E8F0; line-height:1.3; }
+.ps4-owner { font-size:9pt; color:rgba(255,255,255,.34); }
+.ps4-due { font-size:8.5pt; font-weight:700; white-space:nowrap; padding:5px 16px; border-radius:22px; }
+.ps4-due.urgent { background:rgba(239,68,68,.15); color:#FCA5A5; }
+.ps4-due.warn   { background:rgba(245,158,11,.12); color:#FCD34D; }
+.ps4-due.ok     { background:rgba(16,185,129,.10); color:#6EE7B7; }
+.ps4-allclear { font-size:15pt; color:rgba(255,255,255,.28); text-align:center; padding:60px; }
+
+/* Slide 5 — Renewal */
+.ps5-wrap { max-width:900px; width:100%; display:flex; flex-direction:column; gap:30px; align-items:center; }
+.ps5-days-hero { text-align:center; }
+.ps5-days-num { font-size:108pt; font-weight:900; line-height:1; letter-spacing:-.05em; }
+.ps5-days-lbl { font-size:9pt; color:rgba(255,255,255,.30); margin-top:6px; font-weight:700; text-transform:uppercase; letter-spacing:.16em; }
+.ps5-note { font-size:12pt; color:rgba(255,255,255,.50); text-align:center; line-height:1.8; max-width:660px; }
+.ps5-timeline { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:18px; padding:26px 36px; width:100%; display:flex; flex-direction:column; gap:12px; }
+.ps5-tl-bar { height:10px; border-radius:5px; background:rgba(255,255,255,.06); overflow:hidden; }
+.ps5-tl-fill { height:100%; border-radius:5px; transition:width 1.4s cubic-bezier(.4,0,.2,1); }
+.ps5-tl-labels { display:flex; justify-content:space-between; font-size:8pt; color:rgba(255,255,255,.26); }
+.ps5-vendor-note { font-size:10pt; color:rgba(255,255,255,.4); text-align:center; line-height:1.6; }
+
+/* Slide 6 — VER Asks */
+.ps6-wrap { max-width:860px; width:100%; display:flex; flex-direction:column; gap:16px; }
+.ps6-intro { font-size:11pt; color:rgba(255,255,255,.40); text-align:center; margin-bottom:8px; line-height:1.7; }
+.ps6-ask {
+  display:flex; gap:20px; align-items:flex-start;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+  border-radius:16px; padding:22px 26px;
+  border-left:4px solid var(--active-pillar-color,#0D9488);
+}
+.ps6-num {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center;
+  font-size:9.5pt; font-weight:900; color:rgba(255,255,255,.5); margin-top:1px;
+}
+.ps6-text { font-size:11pt; color:#CBD5E1; line-height:1.65; font-weight:500; }
+.ps6-noasks { font-size:13pt; color:rgba(255,255,255,.28); text-align:center; padding:48px; }
+
+/* Bottom nav */
+.pres-nav {
+  position:absolute; bottom:0; left:0; right:0; z-index:2;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:22px 32px;
+  background:linear-gradient(to top, rgba(6,12,24,0.85) 0%, transparent 100%);
+}
+.pres-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.16); cursor:pointer; transition:all .25s; }
+.pres-dot.active { width:26px; border-radius:4px; background:var(--active-pillar-color,#0D9488); }
+.pres-arrow {
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:none; border:none; cursor:pointer;
+  color:rgba(255,255,255,.22); font-size:20pt; padding:14px 22px;
+  transition:color .15s; z-index:3; font-family:inherit;
+}
+.pres-arrow:hover { color:rgba(255,255,255,.75); }
+.pres-arrow.left  { left:0; }
+.pres-arrow.right { right:0; }
+.pres-hint { font-size:7pt; color:rgba(255,255,255,.16); letter-spacing:.06em; text-transform:uppercase; }
+@media print { #pres-overlay { display:none !important; } }
+
 </style>
 </head>
 <body>
@@ -533,15 +1594,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(-
 <div class="hub-top-bar">
   <div class="hub-top-bar-inner">
     <div class="htb-left">
-      <a href="page_pillar.html" class="htb-back">&#8592; Portfolio Intelligence</a>
+      <a href="index.html" class="htb-back">&#8592; Hub</a>
+      <div class="htb-divider"></div>
+      <span class="htb-meta" style="color:rgba(255,255,255,0.35);font-size:7.5pt;">VER Internal</span>
       <div class="htb-divider"></div>
       <span class="htb-brand" id="pd-title-bar">Pillar Intelligence</span>
     </div>
     <div class="htb-right">
       <button type="button" class="top-btn" onclick="openPillarDetailHelp()">&#63; How to Read</button>
-      <button type="button" class="top-btn" onclick="openCTODrawer()">&#128200; Cost to Operate</button>
+      <button type="button" class="top-btn" onclick="openCmdPanel()" title="All critical items across all pillars (X)">&#9888; Command</button>
+      <button type="button" class="top-btn" onclick="openExecBrief()" title="Generate exec situation brief (B)">&#128196; Brief</button>
+      <button type="button" class="top-btn" onclick="toggleFocusMode()" title="Presentation focus mode (F)">&#9654; Focus</button>
+      <button type="button" class="top-btn" onclick="openCompareDrawer()">&#8646; Compare</button>
+      <button type="button" class="top-btn" onclick="_exportCSV()">&#8595; Export CSV</button>
       <button type="button" class="top-btn" onclick="window.print()">&#128438; Print / PDF</button>
-      <span class="htb-meta">FY27 &middot; Salesforce DET &middot; Confidential</span>
+      <button type="button" class="top-btn" onclick="openHotkeyOverlay()" title="Keyboard shortcuts (press ?)">&#9000; Shortcuts</button>
       <button type="button" class="top-btn dm" id="dm-btn" onclick="_dmToggle()">&#9789; Dark Mode</button>
     </div>
   </div>
@@ -550,6 +1617,79 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(-
 <div class="pillar-nav-wrap">
   <div class="pillar-nav-inner">
     <div class="pillar-nav" id="pillar-nav"></div>
+  </div>
+</div>
+
+
+<div id="pd-hero" class="pd-hero">
+  <div class="pd-hero-grid"></div>
+  <div class="pd-hero-body">
+    <div class="pd-hero-identity">
+      <div class="pd-hero-eyebrow">FY27 &middot; DET Vendor Intelligence &middot; VER Advisory</div>
+      <div class="pd-hero-title">
+        <span class="pd-hero-title-icon" id="h-icon">&#9889;</span>
+        <span id="h-name">Loading&hellip;</span>
+      </div>
+      <div class="pd-hero-risk-row">
+        <div id="h-risk-label" class="h-risk-label">—</div>
+        <div class="h-open-count" id="h-open">—</div>
+      </div>
+      <div class="pd-hero-sub" id="h-advisory-peek">—</div>
+      <div class="h-pl-bar-wrap">
+        <div class="h-pl-bar" id="h-pl-bar"></div>
+        <div class="h-pl-legend" id="h-pl-legend"></div>
+      </div>
+    </div>
+    <div class="pd-hero-ring-col">
+      <svg id="h-ring-svg" class="h-ring-svg" viewBox="0 0 160 160" aria-label="VER Intelligence Score">
+        <circle class="h-ring-bg" cx="80" cy="80" r="64"/>
+        <circle class="h-ring-fill" id="h-ring-fill" cx="80" cy="80" r="64"
+          stroke-dasharray="402.12" stroke-dashoffset="402.12"/>
+        <text class="h-ring-pct" id="h-ring-pct" x="80" y="74">—</text>
+        <text class="h-ring-sub" x="80" y="92">VER SCORE</text>
+      </svg>
+      <div id="h-risk-ring-label" class="h-risk-label">—</div>
+      <div class="h-score-breakdown" id="h-score-breakdown"></div>
+    </div>
+  </div>
+  <div class="pd-hero-strip">
+    <div class="pd-hero-strip-inner">
+      <div class="ph-kpi c-spend">
+        <div class="ph-kpi-lbl">SOW &amp; PO Spend</div>
+        <div class="ph-kpi-val" id="h-spend">—</div>
+        <div class="ph-kpi-note" id="h-spend-sub">—</div>
+      </div>
+      <div class="ph-kpi c-forecast">
+        <div class="ph-kpi-lbl">MFT Forecast</div>
+        <div class="ph-kpi-val" id="h-forecast">—</div>
+        <div class="ph-kpi-note" id="h-forecast-sub">—</div>
+      </div>
+      <div class="ph-kpi c-green">
+        <div class="ph-kpi-lbl">Savings Realized</div>
+        <div class="ph-kpi-val" id="h-savings">—</div>
+        <div class="ph-kpi-note" id="h-savings-sub">—</div>
+      </div>
+      <div class="ph-kpi c-blue">
+        <div class="ph-kpi-lbl">Net Exposure</div>
+        <div class="ph-kpi-val" id="h-net">—</div>
+        <div class="ph-kpi-note" id="h-net-sub">—</div>
+      </div>
+      <div class="ph-kpi c-renewal">
+        <div class="ph-kpi-lbl">Days to Renewal</div>
+        <div class="ph-kpi-val" id="h-renewal">—</div>
+        <div class="ph-kpi-note" id="h-renewal-sub">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="h-accent-bar" id="h-accent-bar"></div>
+
+<div class="intel-signals-wrap" id="intel-signals-wrap">
+  <div class="intel-signals-inner">
+    <div class="intel-signals-label">&#128200; Intel Feed</div>
+    <div class="intel-signals-scroll">
+      <div class="intel-signals-track" id="intel-signals-scroll"></div>
+    </div>
   </div>
 </div>
 
@@ -745,6 +1885,50 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(-
   </div>
 </div>
 
+<!-- ── COMPARE DRAWER ── -->
+<div id="compare-overlay" onclick="closeCompareDrawer()"></div>
+<div id="compare-drawer" role="dialog" aria-modal="true" aria-label="Pillar Comparison">
+  <div class="cmp-head">
+    <div>
+      <div class="cmp-title">&#8646; Pillar Comparison</div>
+      <div class="cmp-sub">Side-by-side intelligence across pillars</div>
+    </div>
+    <button type="button" class="cmp-close" onclick="closeCompareDrawer()" aria-label="Close">&#215;</button>
+  </div>
+  <div class="cmp-body">
+    <div class="cmp-select-row">
+      <label>Compare against</label>
+      <select id="cmp-pillar-select" onchange="renderCompare()"></select>
+    </div>
+    <div id="cmp-table-wrap"></div>
+  </div>
+</div>
+
+<!-- ── INLINE NOTES POPOVER ── -->
+<div id="notes-popover">
+  <div class="np-title">&#128203; Note</div>
+  <textarea id="notes-textarea" placeholder="Add a note…" rows="4"></textarea>
+  <div class="np-btns">
+    <button type="button" class="np-btn cancel" onclick="closeNotePopover()">Cancel</button>
+    <button type="button" class="np-btn save" onclick="saveNote()">Save</button>
+  </div>
+</div>
+
+<!-- ── CONTEXT MENU ── -->
+<div id="ctx-menu">
+  <div class="ctx-item" id="ctx-open-modal"><span class="ctx-icon">&#128269;</span>Open Vendor Dossier</div>
+  <div class="ctx-item" id="ctx-flag"><span class="ctx-icon">&#9873;</span>Flag for Rate Benchmarking</div>
+  <div class="ctx-item" id="ctx-note"><span class="ctx-icon">&#128203;</span>Add Note</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" id="ctx-copy"><span class="ctx-icon">&#128203;</span>Copy Vendor Summary</div>
+</div>
+
+<!-- ── BUBBLE TOOLTIP ── -->
+<div id="bubble-tooltip" style="display:none;position:fixed;background:rgba(15,30,60,.95);color:#fff;padding:8px 12px;border-radius:8px;font-size:8.5pt;z-index:9999;pointer-events:none;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);"></div>
+
+<!-- ── EXPORT TOAST ── -->
+<div id="export-toast">&#10003; CSV copied to clipboard</div>
+
 <div id="vendor-modal">
   <div class="vm-box">
     <div class="vm-head" id="vm-head">
@@ -825,64 +2009,8 @@ function renderPillar(key) {
 
   var html = '';
 
-  /* COVER */
-  html += '<div class="v2-cover" style="background:linear-gradient(140deg,'+p.color+' 0%,#05091A 100%);">'
-    +'<div class="cover-eyebrow">FY27 &middot; DET Vendor Intelligence &middot; '+p.lead+'</div>'
-    +'<div class="cover-name">'+p.emoji+' '+p.name+'</div>'
-    +'<div class="cover-sub">Spend &amp; Savings P&amp;L &middot; VER Advisory &middot; Confidential</div>'
-    +'<div class="cover-kpi-strip">';
-
-  /* KPI 1: SOW Spend */
-  html += '<div class="ckpi"><div class="ckpi-lbl">SOW & PO Spend</div>'
-    +'<div class="ckpi-val">'+fmtM(p.sow_value)+'</div>'
-    +'<div class="ckpi-note">'+(p.mft_items>0?p.mft_items+' active POs':'No Coupa POs')+'</div></div>';
-
-  /* KPI 2: MFT Forecast */
-  html += '<div class="ckpi"><div class="ckpi-lbl">MFT Forecast</div>'
-    +'<div class="ckpi-val">'+fmtM(p.mft_total)+'</div>'
-    +'<div class="ckpi-note">'+fmtM(p.mft_approved)+' approved</div></div>';
-
-  /* KPI 3: Savings — green accent if realized */
-  html += '<div class="ckpi'+(p.savings>0?' savings-win':'')+'"><div class="ckpi-lbl">Savings Realized</div>'
-    +'<div class="ckpi-val">'+fmtM(p.savings)+'</div>'
-    +'<div class="ckpi-note">'+(p.savings>0?'Advisory win confirmed FY27':p.savings_pipeline||'In pipeline')+'</div></div>';
-
-  /* KPI 4: Days to Renewal */
-  html += '<div class="ckpi"><div class="ckpi-lbl">Days to Renewal</div>'
-    +'<div class="ckpi-val" style="color:'+(p.days_to_renewal<90?'#FCA5A5':p.days_to_renewal<180?'#FCD34D':'#6EE7B7')+';">'
-    +p.days_to_renewal+'d</div>'
-    +'<div class="ckpi-note">'+(p.days_to_renewal<90?'Critical window':'On track')+'</div></div>';
-
-  /* KPI 5: Risk Status — pill, not text */
-  html += '<div class="ckpi"><div class="ckpi-lbl">Risk Status</div>'
-    +'<div style="margin-top:4px;">'+riskPillHtml(p.risk,'9pt')+'</div>'
-    +'<div class="ckpi-note">Gov: '+riskPillHtml(p.governance,'7.5pt')+'</div></div>';
-
-  html += '</div></div>'; /* end cover */
-
-  /* P&L ROW */
-  html += '<div class="pl-row">'
-    +'<div class="pl-card spend">'
-      +'<div class="pl-lbl">SOW & PO Spend</div>'
-      +'<div class="pl-val">'+fmtM(p.sow_value)+'</div>'
-      +'<div class="pl-note">'+(p.mft_items>0?p.mft_items+' purchase orders':'No Coupa POs recorded')+'</div>'
-    +'</div>'
-    +'<div class="pl-card forecast">'
-      +'<div class="pl-lbl">MFT Forecast</div>'
-      +'<div class="pl-val">'+fmtM(p.mft_total)+'</div>'
-      +'<div class="pl-note">'+fmtM(p.mft_approved)+' approved &middot; full-year view</div>'
-    +'</div>'
-    +'<div class="pl-card savings">'
-      +'<div class="pl-lbl">&#10003; Savings Realized</div>'
-      +'<div class="pl-val">'+fmtM(p.savings)+'</div>'
-      +'<div class="pl-note">'+(p.savings>0?'Advisory savings confirmed FY27':p.savings_pipeline||'Pipeline in progress')+'</div>'
-    +'</div>'
-    +'<div class="pl-card exposure">'
-      +'<div class="pl-lbl">Net Exposure</div>'
-      +'<div class="pl-val">'+fmtM(netExposure)+'</div>'
-      +'<div class="pl-note">MFT forecast minus realized savings</div>'
-    +'</div>'
-  +'</div>';
+  /* WHAT CHANGED BANNER */
+  html += _getChangedBanner(p, key);
 
   /* SPEND PROGRESS BAR */
   var barTotal = Math.max(p.sow_value, p.mft_total, 1);
@@ -921,10 +2049,16 @@ function renderPillar(key) {
     ?'VER has initiated renewal advisory. Rate benchmarking in scope before commitment.'
     :'VER monitoring. Advisory engagement will begin 180 days before renewal window.';
 
-  html += '<div class="v2-card">'
+  var renewBadge = p.days_to_renewal < 90
+    ? '<div class="card-alert-badge a-red">&#9888; Critical — action required</div>'
+    : p.days_to_renewal < 180
+    ? '<div class="card-alert-badge a-amber">&#9888; Advisory engaged — renews soon</div>'
+    : '';
+  html += '<div class="v2-card scroll-reveal">'
+    +renewBadge
     +'<div class="card-title">Renewal Horizon</div>'
     +'<div class="card-sub">Next critical contract renewal</div>'
-    +'<div id="renewal-timeline" style="position:relative;height:56px;background:var(--gray2);border-radius:8px;overflow:hidden;margin-bottom:16px;"></div>'
+    +'<div id="renewal-timeline" class="rtl-wrap"></div>'
     +'<div class="renewal-meta" style="margin-bottom:16px;">'
       +'<div class="rm-item"><div class="lbl">Contract</div><div class="val">'+(rParts[0]||'See advisory')+'</div></div>'
       +'<div class="rm-item"><div class="lbl">Notice Required</div><div class="val">'+(rParts[1]||'—')+'</div></div>'
@@ -940,38 +2074,126 @@ function renderPillar(key) {
     +'</div>'
   +'</div>';
 
-  /* ROW 1 RIGHT: Donut chart */
-  html += '<div class="v2-card">'
-    +'<div class="card-title">Spend Composition</div>'
-    +'<div class="card-sub">SOW vs MFT vs Savings</div>'
-    +'<canvas id="chart-donut" width="280" height="210" style="display:block;margin:0 auto;cursor:pointer;"></canvas>'
-    +'<div id="donut-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;justify-content:center;font-size:8pt;"></div>'
-  +'</div>';
+  /* ROW 1 RIGHT: P&L Waterfall */
+  var wfMax = Math.max(p.mft_total||0, p.sow_value||0, 0.01);
+  var wfFPct = Math.round(((p.mft_total||0)/wfMax)*100);
+  var wfSPct = Math.round(((p.sow_value||0)/wfMax)*100);
+  var wfSvPct = p.savings>0 ? Math.round((p.savings/wfMax)*100) : 0;
+  var wfNPct  = Math.round((netExposure/wfMax)*100);
+  var spendDelta = p.sow_value > 0 && p.mft_total > 0
+    ? (p.sow_value > p.mft_total ? '+'+Math.round(((p.sow_value-p.mft_total)/p.mft_total)*100)+'% vs forecast'
+       : '-'+Math.round(((p.mft_total-p.sow_value)/p.mft_total)*100)+'% vs forecast')
+    : '';
+  var spendDeltaCls = p.spend_vs_plan==='above' ? 'up' : p.spend_vs_plan==='below' ? 'down' : 'eq';
+  var utilPct = p.mft_total > 0 && p.mft_approved > 0 ? Math.round((p.mft_approved/p.mft_total)*100) : 0;
+  var topVendor = (p.key_vendors||[]).slice().sort(function(a,b){return (b.fy27||0)-(a.fy27||0);})[0];
+  var concPct = topVendor && p.sow_value > 0 ? Math.round(((topVendor.fy27||0)/p.sow_value)*100) : 0;
 
-  /* ROW 2 LEFT: Savings Intelligence */
-  html += '<div class="v2-card" style="background:linear-gradient(135deg,var(--green3) 0%,var(--white) 60%);">'
-    +'<div class="card-title" style="color:var(--green2);">Savings Intelligence</div>'
-    +'<div class="card-sub">Realized &amp; pipeline</div>'
-    +'<div style="display:flex;gap:20px;align-items:flex-start;flex:1;">'
-      +'<div style="flex:1;">'
-        +'<div style="font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:4px;">Realized FY27</div>'
-        +'<div style="font-size:28pt;font-weight:900;line-height:1;color:'+(p.savings>0?'var(--green2)':'var(--ink4)')+';margin-bottom:4px;">'
-          +fmtM(p.savings)+'</div>'
-        +'<div style="font-size:8pt;color:var(--ink4);">'+(p.savings>0?'Advisory savings confirmed':'No savings this period')+'</div>'
+  var plBadge = concPct > 60
+    ? '<div class="card-alert-badge a-red">&#9888; Concentration risk — '+(topVendor?topVendor.name:'top vendor')+' = '+concPct+'%</div>'
+    : concPct > 40
+    ? '<div class="card-alert-badge a-amber">&#9888; Monitor concentration — '+concPct+'% in one vendor</div>'
+    : '';
+  html += '<div class="v2-card scroll-reveal">'
+    +plBadge
+    +'<div class="card-title">P&amp;L Waterfall</div>'
+    +'<div class="card-sub">Budget flow: Forecast → Spend → Savings → Net Exposure</div>'
+    +'<div class="wf-wrap" id="wf-wrap">'
+      +'<div class="wf-row">'
+        +'<div class="wf-lbl">Forecast</div>'
+        +'<div class="wf-bar-col"><div class="wf-bar-track"><div class="wf-bar-fill wf-forecast" style="width:0" data-target="'+wfFPct+'%"></div></div></div>'
+        +'<div class="wf-val">'+fmtM(p.mft_total)+'</div>'
+        +'<span class="wf-delta eq">MFT</span>'
       +'</div>'
-      +'<div style="flex:1;padding-left:16px;border-left:1px solid var(--border);">'
-        +'<div style="font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:6px;">Pipeline</div>'
-        +'<div style="font-size:10pt;font-weight:700;color:var(--navy);line-height:1.45;">'+(p.savings_pipeline||'Under VER review')+'</div>'
+      +'<div class="wf-row">'
+        +'<div class="wf-lbl">SOW Spend</div>'
+        +'<div class="wf-bar-col"><div class="wf-bar-track"><div class="wf-bar-fill wf-spend" style="width:0" data-target="'+wfSPct+'%"></div></div></div>'
+        +'<div class="wf-val">'+fmtM(p.sow_value)+'</div>'
+        +(spendDelta?'<span class="wf-delta '+spendDeltaCls+'">'+spendDelta+'</span>':'')
+      +'</div>'
+      +(p.savings>0
+        ?'<div class="wf-row">'
+          +'<div class="wf-lbl" style="color:var(--green2);">&#9660; Savings</div>'
+          +'<div class="wf-bar-col"><div class="wf-bar-track"><div class="wf-bar-fill wf-savings" style="width:0" data-target="'+wfSvPct+'%"></div></div></div>'
+          +'<div class="wf-val" style="color:var(--green2);">'+fmtM(p.savings)+'</div>'
+          +'<span class="wf-delta down">Advisory win</span>'
+        +'</div>'
+        :'')
+      +'<div class="wf-divider"></div>'
+      +'<div class="wf-row">'
+        +'<div class="wf-lbl" style="'+(netExposure>10?'color:var(--red)':netExposure>3?'color:var(--amber)':'color:var(--green)')+'">Net Exp.</div>'
+        +'<div class="wf-bar-col"><div class="wf-bar-track"><div class="wf-bar-fill wf-net" style="width:0" data-target="'+wfNPct+'%"></div></div></div>'
+        +'<div class="wf-val" style="'+(netExposure>10?'color:var(--red)':netExposure>3?'color:var(--amber)':'color:var(--green)')+'">'+fmtM(netExposure)+'</div>'
       +'</div>'
     +'</div>'
+    +(concPct>0
+      ?'<div class="wf-conc">'
+        +'<div class="wf-conc-lbl">Vendor Concentration — top vendor ('+topVendor.name+')</div>'
+        +'<div class="wf-conc-row">'
+          +'<div class="wf-conc-bar" id="wf-conc-bar"><div class="wf-conc-seg" style="width:0;background:var(--navy2);" data-target="'+concPct+'%"></div></div>'
+          +'<div class="wf-conc-note">'+concPct+'% of pillar'+(concPct>50?' ⚠ High concentration':'')+'</div>'
+        +'</div>'
+      +'</div>'
+      :'')
   +'</div>';
 
-  /* ROW 2 RIGHT: Bar chart */
-  html += '<div class="v2-card">'
+  /* ROW 2 LEFT: Savings Pipeline */
+  var hasSavings = p.savings > 0;
+  var hasPipeline = !!(p.savings_pipeline && p.savings_pipeline.length > 0);
+  var roiPct = p.sow_value > 0 && p.savings > 0 ? ((p.savings / p.sow_value) * 100).toFixed(1) : null;
+  html += '<div class="v2-card scroll-reveal">'
+    +'<div class="card-title">Savings Pipeline</div>'
+    +'<div class="card-sub">Advisory opportunity → in-flight → realized</div>'
+    +'<div class="sp-funnel">'
+      +'<div class="sp-step '+(hasPipeline?'sp-active':'sp-pending')+'">'
+        +'<div class="sp-icon">&#128269;</div>'
+        +'<div class="sp-lbl">Opportunity</div>'
+        +'<div class="sp-val">'+(hasPipeline?'Active':'None')+'</div>'
+        +'<div class="sp-sub">VER research</div>'
+      +'</div>'
+      +'<div class="sp-arrow">&#8250;</div>'
+      +'<div class="sp-step '+(hasPipeline?'sp-active':'sp-pending')+'">'
+        +'<div class="sp-icon">&#9881;</div>'
+        +'<div class="sp-lbl">In Pipeline</div>'
+        +'<div class="sp-val">'+(hasPipeline?'Yes':'—')+'</div>'
+        +'<div class="sp-sub">Advisory active</div>'
+      +'</div>'
+      +'<div class="sp-arrow">&#8250;</div>'
+      +'<div class="sp-step '+(hasSavings?'sp-done':'sp-pending')+'">'
+        +'<div class="sp-icon">&#10003;</div>'
+        +'<div class="sp-lbl">Realized</div>'
+        +'<div class="sp-val">'+(hasSavings?fmtM(p.savings):'—')+'</div>'
+        +'<div class="sp-sub">'+(hasSavings?'FY27 confirmed':'Pending')+'</div>'
+      +'</div>'
+    +'</div>'
+    +(roiPct
+      ?'<div class="sp-roi">'
+        +'<div class="sp-roi-lbl">Advisory ROI — savings vs SOW spend</div>'
+        +'<div class="sp-roi-val">'+roiPct+'% realized this cycle</div>'
+      +'</div>'
+      :'')
+    +(hasPipeline
+      ?'<div class="sp-pipeline-note">'
+        +'<div class="sp-pipeline-lbl">Pipeline</div>'
+        +'<div class="sp-pipeline-val">'+(p.savings_pipeline||'Under VER review')+'</div>'
+      +'</div>'
+      :'')
+  +'</div>';
+
+  /* ROW 2 RIGHT: Quarterly Distribution + velocity note */
+  var qd = p.q_distribution||[25,25,25,25];
+  var maxQ = Math.max.apply(null, qd);
+  var heavyQ = qd.indexOf(maxQ);
+  var qLabels = ['Q1','Q2','Q3','Q4'];
+  var isQHeavy = maxQ > 40;
+  var utilNote = utilPct > 0 ? ' · '+utilPct+'% of forecast approved' : '';
+  html += '<div class="v2-card scroll-reveal">'
     +'<div class="card-title">Quarterly Distribution</div>'
-    +'<div class="card-sub">FY27 spend concentration</div>'
-    +'<canvas id="chart-bars" width="280" height="160" style="display:block;margin:0 auto;cursor:pointer;"></canvas>'
-    +'<div id="bar-tooltip" style="display:none;position:fixed;background:rgba(15,30,60,.95);color:#fff;padding:8px 12px;border-radius:8px;font-size:8.5pt;z-index:500;pointer-events:none;"></div>'
+    +'<div class="card-sub">FY27 spend concentration by quarter'+utilNote+'</div>'
+    +'<canvas id="chart-bars" height="160" style="display:block;width:100%;cursor:pointer;"></canvas>'
+    +(isQHeavy
+      ?'<div class="qbar-note q-heavy">&#9888; '+qLabels[heavyQ]+' concentration ('+maxQ+'%) — renewal and scope activity peaks this quarter</div>'
+      :'<div class="qbar-note q-even">&#10003; Spend distributed across quarters — no single-quarter concentration risk</div>')
   +'</div>';
 
   html += '</div>'; /* end main-grid */
@@ -982,7 +2204,20 @@ function renderPillar(key) {
   var vTotal = p.sow_value>0?p.sow_value:1;
 
   html += '<div class="v2-section">Vendor Intelligence</div>';
-  html += '<div class="vendor-grid">';
+  html += '<div class="vendor-view-toggle">'
+    +'<button type="button" class="vvt-btn active" id="vvt-grid" onclick="_setVendorView(\'grid\')">&#9776; Grid View</button>'
+    +'<button type="button" class="vvt-btn" id="vvt-bubble" onclick="_setVendorView(\'bubble\')">&#9673; Risk Matrix</button>'
+  +'</div>';
+  html += '<div id="bubble-view">'
+    +'<canvas id="bubble-canvas" height="260" style="display:block;width:100%;"></canvas>'
+    +'<div class="bubble-legend">'
+      +'<div class="bl-item"><div class="bl-dot" style="background:#10B981;"></div>On Track</div>'
+      +'<div class="bl-item"><div class="bl-dot" style="background:#F59E0B;"></div>Watch</div>'
+      +'<div class="bl-item"><div class="bl-dot" style="background:#EF4444;"></div>Action Required</div>'
+      +'<div class="bl-item" style="color:var(--ink4);font-style:italic;">Bubble size = spend</div>'
+    +'</div>'
+  +'</div>';
+  html += '<div class="vendor-grid" id="vendor-grid">';
   if (!kv.length) {
     html += '<div style="grid-column:span 2;padding:20px;color:var(--ink4);font-size:9pt;">No key vendor data recorded for this pillar yet.</div>';
   } else {
@@ -998,7 +2233,14 @@ function renderPillar(key) {
           +'display:flex;align-items:center;justify-content:center;font-size:12pt;font-weight:800;flex-shrink:0;">'+v.name.charAt(0)+'</div>';
       var pillCls = v.status==='amber'?'vp-a':v.status==='red'?'vp-r':'vp-g';
       var pillTxt = v.status==='green'?'&#10003; Active':v.status==='amber'?'&#9888; Watch':'&#9888; Action';
-      html += '<div class="vendor-card '+v.status+'" onclick="openVendorModal(\''+key+'\','+idx+')" role="button" tabindex="0">'
+      var noteKey = 'note-vendor-'+key+'-'+idx;
+      var hasNote = false; try { hasNote = !!localStorage.getItem(noteKey); } catch(e) {}
+      html += '<div class="vendor-card '+v.status+' card-wrap-relative" data-vendor-idx="'+idx+'" data-pillar-key="'+key+'"'
+        +' onclick="openVendorModal(\''+key+'\','+idx+')"'
+        +' oncontextmenu="openCtxMenu(event,\''+key+'\','+idx+')"'
+        +' role="button" tabindex="0" style="animation-delay:'+(idx*60)+'ms">'
+        +'<button type="button" class="note-btn'+(hasNote?' has-note':'')+'" data-note-key="'+noteKey+'"'
+          +' onclick="event.stopPropagation();openNotePopover(event,\''+noteKey+'\')" title="Add note">&#128203;</button>'
         +'<div class="vendor-top">'
           +logo
           +'<div style="flex:1;min-width:0;">'
@@ -1011,10 +2253,21 @@ function renderPillar(key) {
           +'</div>'
         +'</div>'
         +'<span class="v-pill '+pillCls+'">'+pillTxt+'</span>'
+        +'<div class="vendor-spend-bar-wrap">'
+          +'<div class="vendor-spend-bar-track">'
+            +'<div class="vendor-spend-bar-fill" style="width:0%" data-target="'+pct+'"></div>'
+          +'</div>'
+          +'<div class="vendor-spend-bar-label">'
+            +'<span>Pillar spend share</span><span>'+pct+'%</span>'
+          +'</div>'
+        +'</div>'
       +'</div>';
     });
   }
   html += '</div>';
+
+  /* AI ANALYST PULL-QUOTE */
+  html += _buildAnalystQuote(p, key);
 
   /* ACTION REGISTER + ADVISORY (left col stacked) · VER ASKS (right col full height) */
   var items = p.open_items||[];
@@ -1088,12 +2341,336 @@ function renderPillar(key) {
   html += '<div class="data-notes"><strong style="color:var(--navy);">Coupa Data Notes</strong> &mdash; '+p.ver_notes+'</div>';
 
   document.getElementById('pd-content').innerHTML = html;
+  updatePillarHero(p);
+
+  // Save snapshot AFTER render (so first-visit doesn't show banner on same session)
+  setTimeout(function(){ _saveSnapshot(p); }, 2000);
 
   setTimeout(function(){
-    drawDonut(p);
+    // Animate waterfall bars
+    document.querySelectorAll('.wf-bar-fill[data-target]').forEach(function(el){
+      el.style.width = el.getAttribute('data-target');
+    });
+    document.querySelectorAll('.wf-conc-seg[data-target]').forEach(function(el){
+      el.style.width = el.getAttribute('data-target');
+    });
+
     drawBars(p);
     drawRenewalTimeline(p);
+
+    // Stagger vendor card entrance + animate spend bars
+    var cards = document.querySelectorAll('.vendor-card');
+    cards.forEach(function(c, i){
+      setTimeout(function(){
+        c.classList.add('visible');
+        var bar = c.querySelector('.vendor-spend-bar-fill');
+        if (bar) bar.style.width = bar.getAttribute('data-target') + '%';
+      }, i * 60);
+    });
+
+    // Apply vendor engagement heatmap
+    _applyVendorHeatmap(key, p.key_vendors || []);
+
+    // Trigger scroll-reveal observer on newly rendered cards
+    if (window._observeRevealable) window._observeRevealable();
+
+    // Reset vendor view toggle to grid on pillar switch
+    _setVendorView('grid');
   }, 60);
+}
+
+
+/* ── PILLAR HERO ── */
+function computePillarScore(p) {
+  var score = 100;
+  if (p.risk === 'red') score -= 30;
+  else if (p.risk === 'amber') score -= 15;
+  if (p.days_to_renewal < 90) score -= 20;
+  else if (p.days_to_renewal < 180) score -= 10;
+  if (p.governance === 'amber') score -= 10;
+  else if (p.governance === 'red') score -= 20;
+  var redItems = (p.open_items || []).filter(function(x) { return x.status === 'red'; }).length;
+  score -= redItems * 8;
+  return Math.max(0, Math.min(100, score));
+}
+
+function animateHeroRing(score, color) {
+  var fill = document.getElementById('h-ring-fill');
+  var pctEl = document.getElementById('h-ring-pct');
+  if (!fill) return;
+  var C = 2 * Math.PI * 64;
+  fill.setAttribute('stroke-dasharray', C);
+  fill.setAttribute('stroke-dashoffset', C);
+  fill.setAttribute('stroke', color);
+  var start = performance.now();
+  function step(ts) {
+    var prog = Math.min((ts - start) / 1200, 1);
+    var ease = 1 - Math.pow(1 - prog, 3);
+    fill.setAttribute('stroke-dashoffset', C - ease * (score / 100) * C);
+    pctEl.textContent = Math.round(ease * score);
+    if (prog < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* Count-up animator for KPI strip values */
+function _countUpKpi(el, targetText, delay) {
+  if (!el) return;
+  var numMatch = targetText.match(/[\d.]+/);
+  if (!numMatch) { setTimeout(function(){ el.textContent = targetText; el.classList.add('landed'); setTimeout(function(){ el.classList.remove('landed'); }, 700); }, delay); return; }
+  var prefix = targetText.slice(0, targetText.indexOf(numMatch[0]));
+  var suffix = targetText.slice(targetText.indexOf(numMatch[0]) + numMatch[0].length);
+  var target = parseFloat(numMatch[0]);
+  var start = performance.now();
+  var dur = 900;
+  function step(ts) {
+    var prog = Math.min((ts - start) / dur, 1);
+    var ease = 1 - Math.pow(1 - prog, 3);
+    var cur = ease * target;
+    var dec = numMatch[0].indexOf('.') >= 0 ? numMatch[0].split('.')[1].length : 0;
+    el.textContent = prefix + cur.toFixed(dec) + suffix;
+    if (prog < 1) { requestAnimationFrame(step); }
+    else { el.textContent = targetText; el.classList.add('landed'); setTimeout(function(){ el.classList.remove('landed'); }, 700); }
+  }
+  setTimeout(function(){ requestAnimationFrame(step); }, delay);
+}
+
+function updatePillarHero(p) {
+  var score = computePillarScore(p);
+  var scoreColor = score >= 80 ? '#10B981' : score >= 60 ? '#F59E0B' : '#EF4444';
+
+  // Pillar identity
+  var iconEl = document.getElementById('h-icon');
+  var nameEl = document.getElementById('h-name');
+  if (iconEl) iconEl.textContent = p.emoji;
+  if (nameEl) nameEl.textContent = p.name;
+
+  // Advisory peek (first 180 chars)
+  var peekEl = document.getElementById('h-advisory-peek');
+  if (peekEl) {
+    var adv = p.advisory_position || p.ver_notes || '';
+    peekEl.textContent = adv.length > 180 ? adv.slice(0, 180).replace(/\w+$/, '') + '…' : adv;
+  }
+
+  // Risk labels (both hero-left and ring-col)
+  var rlabel = p.risk === 'red' ? 'Action Required' : p.risk === 'amber' ? 'Watch' : 'On Track';
+  var rcolor = p.risk === 'red' ? '#EF4444' : p.risk === 'amber' ? '#F59E0B' : '#10B981';
+  var riskEl = document.getElementById('h-risk-label');
+  if (riskEl) { riskEl.textContent = rlabel; riskEl.style.color = rcolor; }
+  var riskRingEl = document.getElementById('h-risk-ring-label');
+  if (riskRingEl) { riskRingEl.textContent = rlabel; riskRingEl.style.color = rcolor; }
+
+  // Open items badge
+  var openItems = p.open_items || [];
+  var redCount  = openItems.filter(function(x){return x.status==='red';}).length;
+  var ambCount  = openItems.filter(function(x){return x.status==='amber';}).length;
+  var openEl    = document.getElementById('h-open');
+  if (openEl) {
+    openEl.textContent = openItems.length + ' open items'
+      + (redCount > 0 ? ' · ' + redCount + ' critical' : ambCount > 0 ? ' · ' + ambCount + ' watch' : ' · all clear');
+    openEl.style.color = redCount > 0 ? '#FCA5A5' : ambCount > 0 ? '#FCD34D' : 'rgba(255,255,255,0.32)';
+  }
+
+  // KPI strip — animated count-up
+  var netExposure = Math.max(0, (p.mft_total||0) - (p.savings||0));
+  _countUpKpi(document.getElementById('h-spend'), fmtM(p.sow_value), 0);
+  _countUpKpi(document.getElementById('h-forecast'), fmtM(p.mft_total), 80);
+  _countUpKpi(document.getElementById('h-savings'), fmtM(p.savings || 0), 160);
+  _countUpKpi(document.getElementById('h-net'), fmtM(netExposure), 240);
+  _countUpKpi(document.getElementById('h-renewal'), p.days_to_renewal + 'd', 320);
+
+  var spendSubEl = document.getElementById('h-spend-sub');
+  if (spendSubEl) spendSubEl.textContent = (p.mft_items||0) + ' active POs';
+  var forecastSubEl = document.getElementById('h-forecast-sub');
+  if (forecastSubEl) forecastSubEl.textContent = fmtM(p.mft_approved) + ' approved';
+
+  // Inject Q-distribution sparkline into Spend KPI cell
+  var spendKpi = document.querySelector('.ph-kpi.c-spend');
+  if (spendKpi && p.q_distribution) {
+    var existSpark = spendKpi.querySelector('.ph-kpi-spark');
+    if (existSpark) existSpark.remove();
+    var qd = p.q_distribution;
+    var maxQd = Math.max.apply(null, qd);
+    var sparkEl = document.createElement('div');
+    sparkEl.className = 'ph-kpi-spark';
+    var maxPx = 16;
+    qd.forEach(function(v, i){
+      var b = document.createElement('div');
+      b.className = 'ph-kpi-spark-bar';
+      var hpx = maxQd > 0 ? Math.max(3, Math.round((v / maxQd) * maxPx)) : 4;
+      var isPeak = v === maxQd;
+      b.style.cssText = 'height:' + hpx + 'px;background:' + (isPeak ? 'rgba(251,191,36,0.85)' : 'rgba(255,255,255,0.30)') + ';';
+      sparkEl.appendChild(b);
+    });
+    spendKpi.appendChild(sparkEl);
+  }
+  var savingsSubEl = document.getElementById('h-savings-sub');
+  if (savingsSubEl) savingsSubEl.textContent = p.savings > 0 ? 'Advisory win FY27' : 'In pipeline';
+  var netSubEl = document.getElementById('h-net-sub');
+  if (netSubEl) netSubEl.textContent = 'Forecast less savings';
+  var netEl = document.getElementById('h-net');
+  if (netEl) setTimeout(function(){ netEl.style.color = netExposure > 10 ? '#FCA5A5' : netExposure > 3 ? '#FCD34D' : '#6EE7B7'; }, 240);
+  var renewalEl = document.getElementById('h-renewal');
+  if (renewalEl) setTimeout(function(){ renewalEl.style.color = p.days_to_renewal < 90 ? '#FCA5A5' : p.days_to_renewal < 180 ? '#FCD34D' : '#6EE7B7'; }, 320);
+  var savEl2 = document.getElementById('h-savings');
+  if (savEl2) setTimeout(function(){ savEl2.style.color = p.savings > 0 ? '#6EE7B7' : '#E2E8F0'; }, 160);
+  var renewalSubEl = document.getElementById('h-renewal-sub');
+  if (renewalSubEl) {
+    var rparts = (p.renewal_note || '').split(' · ');
+    renewalSubEl.textContent = rparts[0] || 'See advisory';
+  }
+
+  // Mini P&L waterfall bar
+  var plBar    = document.getElementById('h-pl-bar');
+  var plLegend = document.getElementById('h-pl-legend');
+  if (plBar) {
+    var total   = Math.max(p.sow_value||0, p.mft_total||0, 0.01);
+    var spendW  = Math.round(((p.sow_value||0) / total) * 100);
+    var savW    = p.savings > 0 ? Math.round((p.savings / total) * 100) : 0;
+    var remW    = Math.max(0, 100 - spendW - savW);
+    plBar.innerHTML =
+      (spendW > 0 ? '<div class="h-pl-seg" style="width:'+spendW+'%;background:#1E3A5F;" title="SOW Spend"></div>' : '')
+      + (savW > 0  ? '<div class="h-pl-seg" style="width:'+savW+'%;background:#10B981;" title="Savings"></div>' : '')
+      + (remW > 0  ? '<div class="h-pl-seg" style="width:'+remW+'%;background:rgba(37,99,235,0.35);" title="Net Exposure"></div>' : '');
+  }
+  if (plLegend) {
+    plLegend.innerHTML =
+      (p.sow_value > 0  ? '<div class="h-pl-legend-item"><div class="h-pl-dot" style="background:#1E3A5F;"></div>Spend '+fmtM(p.sow_value)+'</div>' : '')
+      + (p.savings > 0  ? '<div class="h-pl-legend-item"><div class="h-pl-dot" style="background:#10B981;"></div>Savings '+fmtM(p.savings)+'</div>' : '')
+      + (netExposure > 0 ? '<div class="h-pl-legend-item"><div class="h-pl-dot" style="background:rgba(37,99,235,0.5);"></div>Net '+fmtM(netExposure)+'</div>' : '');
+  }
+
+  // Score breakdown mini-bars under ring
+  var sbdEl = document.getElementById('h-score-breakdown');
+  if (sbdEl) {
+    var riskPenalty = p.risk === 'red' ? 30 : p.risk === 'amber' ? 15 : 0;
+    var renewPenalty = p.days_to_renewal < 90 ? 20 : p.days_to_renewal < 180 ? 10 : 0;
+    var govPenalty = p.governance === 'red' ? 20 : p.governance === 'amber' ? 10 : 0;
+    var openPenalty = (p.open_items||[]).filter(function(x){return x.status==='red';}).length * 8;
+    var riskScore  = Math.max(0, 100 - riskPenalty);
+    var renewScore = Math.max(0, 100 - renewPenalty);
+    var govScore   = Math.max(0, 100 - govPenalty);
+    var openScore  = Math.max(0, 100 - openPenalty);
+    function sbdBar(lbl, val, col) {
+      return '<div class="h-sbd-row">'
+        +'<div class="h-sbd-lbl">'+lbl+'</div>'
+        +'<div class="h-sbd-bar"><div class="h-sbd-fill" style="width:0%;background:'+col+'" data-target="'+val+'"></div></div>'
+        +'</div>';
+    }
+    sbdEl.innerHTML =
+      sbdBar('Risk', riskScore, riskScore >= 70 ? '#10B981' : riskScore >= 40 ? '#F59E0B' : '#EF4444')
+      + sbdBar('Renewal', renewScore, renewScore >= 70 ? '#10B981' : renewScore >= 40 ? '#F59E0B' : '#EF4444')
+      + sbdBar('Govern', govScore, govScore >= 70 ? '#10B981' : govScore >= 40 ? '#F59E0B' : '#EF4444')
+      + sbdBar('Actions', openScore, openScore >= 70 ? '#10B981' : openScore >= 40 ? '#F59E0B' : '#EF4444');
+    setTimeout(function(){
+      sbdEl.querySelectorAll('.h-sbd-fill').forEach(function(f){
+        f.style.width = f.getAttribute('data-target') + '%';
+      });
+    }, 200);
+  }
+
+  // Live Intelligence Signals
+  _renderIntelSignals(p);
+
+  // Pillar-tinted orb glow + accent bar
+  function hexToRgb(h) { var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return r+','+g+','+b; }
+  var rgb = hexToRgb(p.color || '#0D9488');
+  document.documentElement.style.setProperty('--pillar-glow', 'rgba('+rgb+',0.14)');
+  document.documentElement.style.setProperty('--active-pillar-color', p.color);
+
+  var accentBar = document.getElementById('h-accent-bar');
+  if (accentBar) accentBar.style.background = p.color;
+
+  // Ring
+  var svgEl = document.getElementById('h-ring-svg');
+  if (svgEl) svgEl.style.filter = 'drop-shadow(0 0 22px ' + scoreColor + '55)';
+  animateHeroRing(score, scoreColor);
+
+  // Threshold alert badges on KPI strip cells
+  _injectKpiBadge(document.querySelector('.ph-kpi.c-renewal'), p.days_to_renewal < 90
+    ? { cls:'a-red', txt:'&#9888; Critical' }
+    : p.days_to_renewal < 180 ? { cls:'a-amber', txt:'&#9888; Watch' } : null);
+  _injectKpiBadge(document.querySelector('.ph-kpi.c-blue'), netExposure > 10
+    ? { cls:'a-red', txt:'&#9888; High exposure' }
+    : netExposure > 3 ? { cls:'a-amber', txt:'&#9888; Monitor' } : { cls:'a-green', txt:'&#10003; Managed' });
+  _injectKpiBadge(document.querySelector('.ph-kpi.c-green'), p.savings > 0
+    ? { cls:'a-green', txt:'&#10003; Win confirmed' } : null);
+}
+
+function _injectKpiBadge(cell, badge) {
+  if (!cell) return;
+  var existing = cell.querySelector('.ph-kpi-alert');
+  if (existing) existing.remove();
+  if (!badge) return;
+  var el = document.createElement('div');
+  el.className = 'ph-kpi-alert ' + badge.cls;
+  el.innerHTML = badge.txt;
+  cell.appendChild(el);
+}
+
+function _renderIntelSignals(p) {
+  var el = document.getElementById('intel-signals-scroll');
+  if (!el) return;
+
+  var chips = [];
+  var netExposure = Math.max(0, (p.mft_total||0) - (p.savings||0));
+  var kv = p.key_vendors || [];
+  var topVendor = kv.slice().sort(function(a,b){ return (b.fy27||0)-(a.fy27||0); })[0];
+  var qd = p.q_distribution || [25,25,25,25];
+  var maxQval = Math.max.apply(null, qd);
+  var heavyQidx = qd.indexOf(maxQval);
+  var qLabels = ['Q1','Q2','Q3','Q4'];
+
+  // 1. Vendor concentration signal — links to vendor grid
+  if (topVendor && p.sow_value > 0) {
+    var concPct = Math.round(((topVendor.fy27||0) / p.sow_value) * 100);
+    if (concPct > 60) chips.push({ cls: 'isc-amber', dot: '#F59E0B', text: topVendor.name + ' = ' + concPct + '% of pillar spend — concentration risk', target: 'vendor-grid' });
+    else if (concPct > 40) chips.push({ cls: 'isc-blue', dot: '#60A5FA', text: topVendor.name + ' leads at ' + concPct + '% — monitor scope creep', target: 'vendor-grid' });
+    else chips.push({ cls: 'isc-green', dot: '#10B981', text: 'Vendor base diversified — top vendor ' + concPct + '%', target: 'vendor-grid' });
+  }
+
+  // 2. Budget utilization — links to P&L waterfall
+  if (p.mft_total > 0 && p.mft_approved > 0) {
+    var approvedPct = Math.round((p.mft_approved / p.mft_total) * 100);
+    if (approvedPct < 30) chips.push({ cls: 'isc-amber', dot: '#F59E0B', text: 'Only ' + approvedPct + '% of MFT forecast approved — spend velocity concern', target: 'wf-wrap' });
+    else chips.push({ cls: 'isc-blue', dot: '#60A5FA', text: approvedPct + '% of ' + fmtM(p.mft_total) + ' forecast approved', target: 'wf-wrap' });
+  }
+
+  // 3. Quarterly pattern — links to chart-bars
+  if (maxQval > 40) {
+    chips.push({ cls: 'isc-amber', dot: '#F59E0B', text: qLabels[heavyQidx] + ' back-loaded (' + maxQval + '%) — renewal &amp; scope risk clusters this quarter', target: 'chart-bars' });
+  } else {
+    chips.push({ cls: 'isc-green', dot: '#10B981', text: 'Spend distributed evenly — no single-quarter concentration', target: 'chart-bars' });
+  }
+
+  // 4. Advisory ROI
+  if (p.savings > 0 && p.sow_value > 0) {
+    var roi = ((p.savings / p.sow_value) * 100).toFixed(1);
+    chips.push({ cls: 'isc-green', dot: '#10B981', text: roi + '% advisory ROI this cycle · VER saved ' + fmtM(p.savings) + ' against ' + fmtM(p.sow_value) + ' spend', target: 'wf-wrap' });
+  } else if (p.savings_pipeline) {
+    chips.push({ cls: 'isc-blue', dot: '#60A5FA', text: 'Pipeline: ' + p.savings_pipeline, target: 'wf-wrap' });
+  }
+
+  // 5. Vendor flags — links to vendor grid
+  var amberVendors = kv.filter(function(v){ return v.status === 'amber' || v.status === 'red'; });
+  if (amberVendors.length > 0) {
+    chips.push({ cls: amberVendors.some(function(v){ return v.status==='red'; }) ? 'isc-red' : 'isc-amber',
+      dot: amberVendors.some(function(v){ return v.status==='red'; }) ? '#EF4444' : '#F59E0B',
+      text: amberVendors.length + ' of ' + kv.length + ' vendors flagged: ' + amberVendors.map(function(v){ return v.name; }).join(', '),
+      target: 'vendor-grid'
+    });
+  } else if (kv.length > 0) {
+    chips.push({ cls: 'isc-green', dot: '#10B981', text: 'All ' + kv.length + ' tracked vendors green — no advisory flags', target: 'vendor-grid' });
+  }
+
+  var chipsHtml = chips.map(function(c){
+    var tgt = c.target ? ' data-target="' + c.target + '" onclick="_chipNav(this)" role="button" tabindex="0"' : '';
+    return '<div class="intel-signal-chip ' + c.cls + '"' + tgt + '>'
+      + '<div class="isc-dot" style="background:' + c.dot + ';box-shadow:0 0 5px ' + c.dot + '55;"></div>'
+      + c.text + '</div>';
+  }).join('');
+  // Duplicate for seamless loop
+  el.innerHTML = chipsHtml + chipsHtml;
 }
 
 /* ── VENDOR MODAL ── */
@@ -1108,36 +2685,27 @@ function openVendorModal(pillarKey, vendorIdx) {
   var pct = Math.round((fy/vTotal)*100);
   var note = (p.vendor_notes||{})[v.name]||'';
 
-  /* Modal head color */
   var hColor = v.status==='amber'?'linear-gradient(135deg,#78350F,#D97706)'
     :v.status==='red'?'linear-gradient(135deg,#7F1D1D,#DC2626)'
     :'linear-gradient(135deg,#065F46,#059669)';
   document.getElementById('vm-head').style.background = hColor;
 
-  /* Logo */
   document.getElementById('vm-logo').innerHTML = vendorLogo(v.domain||'', v.name, 48, 'border-radius:10px;border:2px solid rgba(255,255,255,.3);');
-
-  /* Name / cats */
   document.getElementById('vm-name').textContent = v.name;
   document.getElementById('vm-cats').textContent = v.pos+' POs · '+v.cats+' · '+p.short;
 
-  /* KPIs */
   document.getElementById('vm-kpis').innerHTML =
     '<div class="vm-kpi"><div class="vm-kpi-lbl">FY27 Spend</div><div class="vm-kpi-val">'+fmtM(fy)+'</div></div>'
     +'<div class="vm-kpi"><div class="vm-kpi-lbl">Pillar Share</div><div class="vm-kpi-val">'+pct+'%</div></div>'
     +'<div class="vm-kpi"><div class="vm-kpi-lbl">Status</div><div class="vm-kpi-val" style="font-size:10pt;margin-top:4px;">'+riskPillHtml(v.status,'9pt')+'</div></div>';
 
-  /* Body */
   var bodyHtml = '';
-
-  /* Advisory note — strip leading "Color — " prefix from raw data strings */
   var cleanNote = note.replace(/^(Green|Amber|Red)\s*[—–-]+\s*/i, '');
   if (cleanNote) {
     bodyHtml += '<div class="vm-section-lbl">VER Advisory Note</div>'
       +'<div class="vm-note-box">'+cleanNote+'</div>';
   }
 
-  /* Vendor-related open items */
   var relItems = (p.open_items||[]).filter(function(it){
     return it.item.toLowerCase().indexOf(v.name.toLowerCase().split(' ')[0])>=0
       || it.owner.toLowerCase().indexOf(v.name.toLowerCase().split(' ')[0])>=0;
@@ -1158,13 +2726,12 @@ function openVendorModal(pillarKey, vendorIdx) {
     bodyHtml += '</div>';
   }
 
-  /* VER asks mentioning this vendor */
   var relAsks = (p.ver_asks||[]).filter(function(a){
     return a.toLowerCase().indexOf(v.name.toLowerCase().split(' ')[0])>=0;
   });
   if (relAsks.length) {
     bodyHtml += '<div class="vm-section-lbl">VER Ask — '+p.short+' Pillar Lead</div>';
-    relAsks.forEach(function(a, i){
+    relAsks.forEach(function(a){
       bodyHtml += '<div class="vm-item">'
         +'<div class="vm-item-dot" style="background:var(--navy);"></div>'
         +'<div style="font-size:9pt;color:var(--ink2);">'+a+'</div>'
@@ -1177,7 +2744,6 @@ function openVendorModal(pillarKey, vendorIdx) {
   }
 
   document.getElementById('vm-body').innerHTML = bodyHtml;
-
   var modal = document.getElementById('vendor-modal');
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1193,7 +2759,6 @@ document.getElementById('vendor-modal').addEventListener('click', function(e) {
 });
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeVendorModal(); });
 
-/* ── CHARTS (verbatim from v1) ── */
 function drawDonut(p) {
   var canvas=document.getElementById('chart-donut');
   if(!canvas) return;
@@ -1208,8 +2773,13 @@ function drawDonut(p) {
   if(p.savings>0) segs.push({label:'Savings Realized',val:p.savings,color:'#10B981',colorLight:'#34D399'});
   if(!segs.length) segs.push({label:'No spend recorded',val:1,color:'#E2E8F0',colorLight:'#F1F5F9'});
   var total=segs.reduce(function(s,x){return s+x.val;},0),angle=-Math.PI/2,GAP=.025;
+  var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  var trackBg = isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9';
+  var centerBg = isDark ? '#111827' : '#FFFFFF';
+  var centerText = isDark ? '#E2E8F0' : '#0F1E3C';
+  var centerSub  = isDark ? '#94A3B8' : '#64748B';
   ctx.clearRect(0,0,W,H);
-  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.arc(cx,cy,R-thick,Math.PI*2,0,true);ctx.closePath();ctx.fillStyle='#F1F5F9';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.arc(cx,cy,R-thick,Math.PI*2,0,true);ctx.closePath();ctx.fillStyle=trackBg;ctx.fill();
   segs.forEach(function(seg){
     var sweep=(seg.val/total)*Math.PI*2,sa=angle+GAP/2,ss=sweep-GAP;if(ss<0)ss=sweep;
     var ma=sa+ss/2,grad=ctx.createLinearGradient(cx+(R-thick/2)*Math.cos(ma-Math.PI/4),cy+(R-thick/2)*Math.sin(ma-Math.PI/4),cx+(R-thick/2)*Math.cos(ma+Math.PI/4),cy+(R-thick/2)*Math.sin(ma+Math.PI/4));
@@ -1220,11 +2790,11 @@ function drawDonut(p) {
   });
   var ig=ctx.createRadialGradient(cx,cy,R-thick-2,cx,cy,R-thick+8);ig.addColorStop(0,'rgba(0,0,0,.08)');ig.addColorStop(1,'rgba(0,0,0,0)');
   ctx.beginPath();ctx.arc(cx,cy,R-thick+8,0,Math.PI*2);ctx.arc(cx,cy,R-thick-2,Math.PI*2,0,true);ctx.closePath();ctx.fillStyle=ig;ctx.fill();
-  ctx.beginPath();ctx.arc(cx,cy,R-thick-2,0,Math.PI*2);ctx.fillStyle='#FFFFFF';ctx.fill();
-  ctx.beginPath();ctx.arc(cx,cy,R-thick-2,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,.06)';ctx.lineWidth=1;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R-thick-2,0,Math.PI*2);ctx.fillStyle=centerBg;ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,R-thick-2,0,Math.PI*2);ctx.strokeStyle=isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.06)';ctx.lineWidth=1;ctx.stroke();
   var cv=p.sow_value>0?p.sow_value:p.mft_total,cl=p.sow_value>0?'SOW Spend':'MFT Forecast';
-  ctx.fillStyle='#0F1E3C';ctx.font='bold 14pt Arial';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(fmtM(cv),cx,cy-9);ctx.font='8pt Arial';ctx.fillStyle='#64748B';ctx.fillText(cl,cx,cy+11);
+  ctx.fillStyle=centerText;ctx.font='bold 14pt Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(fmtM(cv),cx,cy-9);ctx.font='8pt Arial';ctx.fillStyle=centerSub;ctx.fillText(cl,cx,cy+11);
   var leg=document.getElementById('donut-legend');
   if(leg) leg.innerHTML=segs.map(function(s){if(s.label==='No spend recorded')return'';return'<span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:50%;background:'+s.color+';display:inline-block;"></span><span style="color:var(--ink3);">'+s.label+' <strong>'+fmtM(s.val)+'</strong></span></span>';}).join('');
   var tt=document.getElementById('donut-tooltip');if(!tt){tt=document.createElement('div');tt.id='donut-tooltip';tt.style.cssText='display:none;position:fixed;background:rgba(15,30,60,.95);color:#fff;padding:8px 12px;border-radius:8px;font-size:8.5pt;z-index:500;pointer-events:none;line-height:1.5;';document.body.appendChild(tt);}
@@ -1234,33 +2804,27 @@ function drawDonut(p) {
 
 function drawBars(p) {
   var canvas=document.getElementById('chart-bars');if(!canvas)return;
+  canvas.width = canvas.offsetWidth || 280;
   var ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
   var qd=p.q_distribution||[25,25,25,25],maxQ=Math.max.apply(null,qd);
-  var labels=['Q1 FY27','Q2 FY27','Q3 FY27','Q4 FY27'],barW=44,gap=18,totalW=qd.length*(barW+gap)-gap,startX=(W-totalW)/2,maxH=H-50,tooltip=document.getElementById('bar-tooltip');
+  var labels=['Q1 FY27','Q2 FY27','Q3 FY27','Q4 FY27'],barW=44,gap=18,totalW=qd.length*(barW+gap)-gap,startX=(W-totalW)/2,maxH=H-50;
+  var isD = document.documentElement.getAttribute('data-theme') !== 'light';
+  var valColor = isD ? '#CBD5E1' : '#374151';
+  var lblColor = isD ? 'rgba(255,255,255,0.38)' : '#94A3B8';
   ctx.clearRect(0,0,W,H);
-  qd.forEach(function(val,i){var bh=maxQ>0?(val/maxQ)*maxH:0,x=startX+i*(barW+gap),y=H-30-bh,grad=ctx.createLinearGradient(x,y,x,y+bh);grad.addColorStop(0,p.color);grad.addColorStop(1,p.color+'88');ctx.fillStyle=grad;ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,barW,bh,4):ctx.rect(x,y,barW,bh);ctx.fill();ctx.fillStyle='#374151';ctx.font='bold 9pt Arial';ctx.textAlign='center';ctx.fillText(val+'%',x+barW/2,y-6);ctx.fillStyle='#94A3B8';ctx.font='8pt Arial';ctx.fillText(labels[i],x+barW/2,H-12);});
-  canvas.addEventListener('mousemove',function(e){var rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left,found=-1;qd.forEach(function(val,i){var x=startX+i*(barW+gap);if(mx>=x&&mx<=x+barW)found=i;});if(found>=0){tooltip.style.display='block';tooltip.style.left=(e.clientX+12)+'px';tooltip.style.top=(e.clientY-8)+'px';var es=p.sow_value>0?fmtM(p.sow_value*qd[found]/100):'--';tooltip.innerHTML='<strong>'+labels[found]+'</strong><br>Distribution: '+qd[found]+'%<br>'+(p.sow_value>0?'Est. spend: '+es:'');}else tooltip.style.display='none';});
-  canvas.addEventListener('mouseleave',function(){tooltip.style.display='none';});
+  qd.forEach(function(val,i){var bh=maxQ>0?(val/maxQ)*maxH:0,x=startX+i*(barW+gap),y=H-30-bh,grad=ctx.createLinearGradient(x,y,x,y+bh);grad.addColorStop(0,p.color);grad.addColorStop(1,p.color+'88');ctx.fillStyle=grad;ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,barW,bh,4):ctx.rect(x,y,barW,bh);ctx.fill();ctx.fillStyle=valColor;ctx.font='bold 9pt Arial';ctx.textAlign='center';ctx.fillText(val+'%',x+barW/2,y-6);ctx.fillStyle=lblColor;ctx.font='8pt Arial';ctx.fillText(labels[i],x+barW/2,H-12);});
+  // Tooltip lives on body so position:fixed isn't broken by card transform/animation stacking contexts
+  var tooltip = document.getElementById('bar-tooltip-body');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'bar-tooltip-body';
+    tooltip.style.cssText = 'display:none;position:fixed;background:rgba(15,30,60,.95);color:#fff;padding:8px 12px;border-radius:8px;font-size:8.5pt;z-index:9999;pointer-events:none;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);';
+    document.body.appendChild(tooltip);
+  }
+  canvas.onmousemove=function(e){var rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left,found=-1;qd.forEach(function(val,i){var x=startX+i*(barW+gap);if(mx>=x&&mx<=x+barW)found=i;});if(found>=0){tooltip.style.display='block';tooltip.style.left=Math.min(e.clientX+14,window.innerWidth-170)+'px';tooltip.style.top=(e.clientY-44)+'px';var es=p.sow_value>0?fmtM(p.sow_value*qd[found]/100):'—';tooltip.innerHTML='<strong style="color:#E2E8F0;">'+labels[found]+'</strong><br><span style="color:rgba(255,255,255,.55);">Distribution:</span> '+qd[found]+'%'+(p.sow_value>0?'<br><span style="color:rgba(255,255,255,.55);">Est. spend:</span> <span style="color:#6EE7B7;">'+es+'</span>':'');}else tooltip.style.display='none';};
+  canvas.onmouseleave=function(){tooltip.style.display='none';};
 }
 
-function drawRenewalTimeline(p) {
-  var el=document.getElementById('renewal-timeline');if(!el)return;
-  var days=p.days_to_renewal,maxDays=730,pct=Math.min(100,Math.max(2,(days/maxDays)*100));
-  var col=days<90?'var(--red)':days<180?'var(--amber)':'var(--green)';
-  el.innerHTML='<div style="position:absolute;inset:0;background:var(--gray2);"></div>'
-    +'<div style="position:absolute;left:0;top:0;bottom:0;width:'+pct+'%;background:'+col+';opacity:.18;transition:width .6s;"></div>'
-    +'<div style="position:absolute;left:'+pct+'%;top:10px;bottom:10px;width:3px;background:'+col+';border-radius:2px;transform:translateX(-50%);"></div>'
-    +'<div style="position:absolute;left:'+pct+'%;top:50%;transform:translate(-50%,-50%);"><div style="width:14px;height:14px;border-radius:50%;background:'+col+';box-shadow:0 0 0 3px white,0 0 0 5px '+col+';"></div></div>'
-    +'<div style="position:absolute;left:'+Math.min(pct,78)+'%;top:50%;transform:translateY(-50%) translateX(12px);">'
-      +'<div style="font-size:8pt;font-weight:700;color:var(--ink2);">'+days+'d until renewal</div>'
-      +'<div style="font-size:7.5pt;color:var(--ink4);">'+p.renewal_note+'</div>'
-    +'</div>'
-    +'<div style="position:absolute;left:0;bottom:4px;font-size:7pt;color:var(--ink4);padding-left:6px;">Today</div>'
-    +'<div style="position:absolute;left:'+((90/maxDays)*100)+'%;bottom:4px;font-size:7pt;color:var(--red);transform:translateX(-50%);">90d</div>'
-    +'<div style="position:absolute;left:'+((180/maxDays)*100)+'%;bottom:4px;font-size:7pt;color:var(--amber);transform:translateX(-50%);">180d</div>'
-    +'<div style="position:absolute;left:'+((365/maxDays)*100)+'%;bottom:4px;font-size:7pt;color:var(--ink4);transform:translateX(-50%);">1yr</div>'
-    +'<div style="position:absolute;right:6px;bottom:4px;font-size:7pt;color:var(--ink4);">2yr</div>';
-}
 
 /* ── COST TO OPERATE ── */
 var _ctoResult = null;
@@ -2253,6 +3817,600 @@ function _drawCTOGauge(pctOfSpend, hasSpend) {
   });
 }
 
+/* ══════════════════════════════════════════
+   PREDICTIVE RENEWAL TIMELINE
+══════════════════════════════════════════ */
+function drawRenewalTimeline(p) {
+  var wrap = document.getElementById('renewal-timeline');
+  if (!wrap) return;
+  var days = p.days_to_renewal || 365;
+  var horizon = Math.max(days + 30, 400);
+  var pct = Math.min(Math.max((days / horizon) * 100, 4), 96);
+  var color = days < 90 ? '#EF4444' : days < 180 ? '#F59E0B' : '#10B981';
+  var urgencyLabel = days < 90 ? days + 'd — critical window' : days < 180 ? days + 'd — advisory engaged' : days + 'd to renewal';
+  wrap.innerHTML =
+    '<div class="rtl-track"></div>'
+    + '<div class="rtl-marker" id="rtl-marker" style="left:0%;color:' + color + ';"></div>'
+    + '<div class="rtl-days-label">' + urgencyLabel + '</div>'
+    + '<div class="rtl-label-today">Today</div>'
+    + '<div class="rtl-label-end">Renewal</div>';
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      var marker = document.getElementById('rtl-marker');
+      if (marker) marker.style.left = 'calc(' + pct + '% - 7px)';
+    });
+  });
+}
+
+/* ══════════════════════════════════════════
+   AI ANALYST PULL-QUOTE
+══════════════════════════════════════════ */
+var _ANALYST_INSIGHTS = {
+  'sf-on-sf': 'Procurement concentration in this pillar exceeds the DET single-vendor threshold — Workday ELP represents 52% of total pillar exposure. The 90-day notice window compresses the decision timeline to fewer than 60 effective negotiating days.',
+  'eng-dev':  'The NTT Data AD restructure delivered the largest single advisory realization in the DET portfolio this fiscal year. The savings-to-spend ratio for this pillar is 57% — industry benchmark for comparable advisory programs is 18-22%.',
+  'it':       'At $116.76M across 542 POs, this pillar accounts for 62% of total DET managed spend. Vendor fragmentation (top 5 vendors represent 47% of spend) reduces concentration risk but increases governance overhead proportionally.',
+  'da-ops':   "DA&O carries the highest advisory ROI in the portfolio — $9M savings realized against a pillar spend base of effectively zero Coupa POs. The GSA re-assignment introduces transition risk that VER is monitoring at the master agreement level.",
+  'data':     'Renewal clustering in Q1 and Q3 is the defining risk pattern for this pillar. A coordinated Procurement engagement 90 days before each cluster would give VER advisory leverage across multiple vendors simultaneously — a force-multiplier approach.',
+  'dig-mkt':  "StaffUp's 61% spend concentration in a $4.7M pillar is atypical for a marketing technology stack. Rate card benchmarking ahead of any scope expansion is the highest-ROI advisory action VER can take in this pillar.",
+  'agentic':  "Governance infrastructure should precede spend commitment in any AI/ML engagement. VER's earliest intervention point — vendor qualification before selection — is where advisory leverage is highest and switching cost is zero.",
+  'cdo':      "BCG's 95% spend concentration exceeds every other pillar in the portfolio. Strategic consulting engagements without fixed-fee structures carry unbounded scope risk. VER's recommended SOW reform would create a measurable cost floor.",
+  'emerging': 'POC-to-production transitions are the highest-risk governance gap in emerging technology programs. Without a formal SOW handoff gate, vendors deployed in POC status frequently achieve production-scale billing before governance review.'
+};
+
+function _buildAnalystQuote(p, key) {
+  var insight = _ANALYST_INSIGHTS[key] || (p.advisory_position ? p.advisory_position.slice(0, 220).replace(/\w+$/, '') + '...' : '');
+  if (!insight) return '';
+  return '<div class="analyst-quote">'
+    + '<div class="analyst-quote-icon">&#128202;</div>'
+    + '<div class="analyst-quote-body">'
+      + '<div class="analyst-quote-eyebrow">VER Assessment</div>'
+      + '<div class="analyst-quote-text">"' + insight + '"</div>'
+      + '<div class="analyst-quote-source">' + p.short + ' Pillar &middot; VER Intelligence Hub &middot; Auto-generated from portfolio data</div>'
+    + '</div>'
+  + '</div>';
+}
+
+/* ══════════════════════════════════════════
+   WHAT CHANGED SINCE LAST VISIT
+══════════════════════════════════════════ */
+function _saveSnapshot(p) {
+  if (!p) return;
+  try {
+    var snap = {
+      ts: Date.now(),
+      score: computePillarScore(p),
+      risk: p.risk,
+      days_to_renewal: p.days_to_renewal,
+      sow_value: p.sow_value,
+      savings: p.savings,
+      open_red: (p.open_items||[]).filter(function(x){return x.status==='red';}).length
+    };
+    localStorage.setItem('ver-snap-' + (Object.keys(PILLARS).find(function(k){return PILLARS[k]===p;})||''), JSON.stringify(snap));
+  } catch(e) {}
+}
+
+function _getChangedBanner(p, key) {
+  var prev;
+  try { prev = JSON.parse(localStorage.getItem('ver-snap-' + key) || 'null'); } catch(e) {}
+  if (!prev || !prev.ts) return '';
+  var daysSince = Math.round((Date.now() - prev.ts) / 86400000);
+  if (daysSince < 0.02) return '';
+  var changes = [];
+  var curScore = computePillarScore(p);
+  if (curScore !== prev.score) {
+    var delta = curScore - prev.score;
+    changes.push('VER Score ' + (delta > 0 ? 'improved' : 'dropped') + ' ' + Math.abs(delta) + ' pts now ' + curScore);
+  }
+  if (p.risk !== prev.risk) changes.push('Risk status changed: ' + prev.risk + ' to ' + p.risk);
+  if (Math.abs(p.days_to_renewal - prev.days_to_renewal) > 5)
+    changes.push('Renewal horizon: ' + prev.days_to_renewal + 'd to ' + p.days_to_renewal + 'd');
+  if (p.sow_value !== prev.sow_value && prev.sow_value > 0)
+    changes.push('SOW spend updated: ' + fmtM(prev.sow_value) + ' to ' + fmtM(p.sow_value));
+  var curRed = (p.open_items||[]).filter(function(x){return x.status==='red';}).length;
+  if (curRed !== prev.open_red) changes.push('Critical items: ' + prev.open_red + ' to ' + curRed + ' open');
+  if (!changes.length) return '';
+  var sinceLabel = daysSince < 1 ? 'earlier today' : daysSince === 1 ? 'yesterday' : daysSince + ' days ago';
+  return '<div class="changed-banner" id="changed-banner">'
+    + '<div class="changed-banner-icon">&#128260;</div>'
+    + '<div class="changed-banner-body">'
+      + '<div class="changed-banner-title">' + changes.length + ' thing' + (changes.length > 1 ? 's' : '') + ' changed since your last visit (' + sinceLabel + ')</div>'
+      + '<ul class="changed-banner-list">'
+      + changes.map(function(c){ return '<li>' + c + '</li>'; }).join('')
+      + '</ul>'
+    + '</div>'
+    + '<button class="changed-banner-dismiss" onclick="this.closest(\'.changed-banner\').remove()" title="Dismiss">&#215;</button>'
+  + '</div>';
+}
+
+/* ══════════════════════════════════════════
+   VENDOR ENGAGEMENT HEATMAP
+══════════════════════════════════════════ */
+function _applyVendorHeatmap(pillarKey, vendors) {
+  vendors.forEach(function(v, idx) {
+    var noteKey = 'note-vendor-' + pillarKey + '-' + idx;
+    var card = document.querySelector('[data-vendor-idx="' + idx + '"]');
+    if (!card) return;
+    var hasNote = false, noteAge = Infinity;
+    try {
+      var raw = localStorage.getItem(noteKey);
+      if (raw) {
+        hasNote = true;
+        var ts = parseInt(localStorage.getItem(noteKey + '-ts') || '0', 10);
+        if (ts > 0) noteAge = (Date.now() - ts) / 86400000;
+      }
+    } catch(e) {}
+    card.classList.remove('heat-cold', 'heat-warm', 'heat-hot');
+    card.classList.add(hasNote ? (noteAge < 3 ? 'heat-hot' : 'heat-warm') : 'heat-cold');
+  });
+}
+
+/* ══════════════════════════════════════════
+   CROSS-PILLAR COMMAND PANEL
+══════════════════════════════════════════ */
+var _cmdActiveFilter = 'all';
+
+function openCmdPanel() {
+  _buildCmdPanel();
+  var el = document.getElementById('cmd-panel');
+  if (el) el.classList.add('open');
+}
+function closeCmdPanel() {
+  var el = document.getElementById('cmd-panel');
+  if (el) el.classList.remove('open');
+}
+function _cmdFilter(f, btn) {
+  _cmdActiveFilter = f;
+  document.querySelectorAll('.cmd-filter-btn').forEach(function(b) {
+    b.className = 'cmd-filter-btn';
+  });
+  if (btn) btn.className = 'cmd-filter-btn active-' + f;
+  _buildCmdPanel();
+}
+
+function _buildCmdPanel() {
+  var body = document.getElementById('cmd-body');
+  var stat = document.getElementById('cmd-footer-stat');
+  if (!body) return;
+
+  var allItems = [];
+  Object.keys(PILLARS).forEach(function(key) {
+    var p = PILLARS[key];
+    (p.open_items || []).forEach(function(item) {
+      allItems.push({
+        pillarKey:  key,
+        pillarName: p.short,
+        pillarEmoji:p.emoji,
+        pillarColor:p.color,
+        item:       item.item   || '',
+        owner:      item.owner  || '—',
+        due:        item.due    || '',
+        status:     item.status || 'green',
+        action:     item.action || item.recommended_action || ''
+      });
+    });
+    // Also surface renewal urgency as items
+    if (p.days_to_renewal <= 90) {
+      allItems.push({
+        pillarKey:  key,
+        pillarName: p.short,
+        pillarEmoji:p.emoji,
+        pillarColor:p.color,
+        item:       'Renewal in ' + p.days_to_renewal + ' days',
+        owner:      'VER / Procurement',
+        due:        p.renewal_note ? p.renewal_note.split(' · ')[0] : '',
+        status:     'red',
+        action:     'Initiate renewal sourcing immediately'
+      });
+    }
+  });
+
+  // Sort: red first, then amber, then by days-to-due (crude parse)
+  function _urgencyScore(itm) {
+    var s = itm.status === 'red' ? 0 : itm.status === 'amber' ? 1 : 2;
+    var dueStr = itm.due || '';
+    var m = dueStr.match(/(\w+)\s+(\d+)/);
+    var daysLeft = 999;
+    if (m) {
+      var months = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+      var mo = months[m[1]] || 6;
+      var dy = parseInt(m[2], 10);
+      var now = new Date();
+      var due = new Date(2027, mo - 1, dy);
+      daysLeft = Math.max(0, Math.round((due - now) / 86400000));
+    }
+    return s * 10000 + daysLeft;
+  }
+  allItems.sort(function(a, b) { return _urgencyScore(a) - _urgencyScore(b); });
+
+  var filtered = _cmdActiveFilter === 'all' ? allItems
+    : allItems.filter(function(x) { return x.status === _cmdActiveFilter; });
+
+  var redCount   = allItems.filter(function(x){ return x.status==='red'; }).length;
+  var amberCount = allItems.filter(function(x){ return x.status==='amber'; }).length;
+  if (stat) stat.textContent = redCount + ' critical · ' + amberCount + ' watch · ' + allItems.length + ' total open items';
+
+  if (!filtered.length) {
+    body.innerHTML = '<div class="cmd-empty">No items match the current filter.</div>';
+    return;
+  }
+
+  var html = '';
+  filtered.forEach(function(it) {
+    var dotClass = it.status === 'red' ? 'red' : it.status === 'amber' ? 'amber' : 'ok';
+    var dueStr = it.due || '';
+    var dueClass = it.status === 'red' ? 'urgent' : it.status === 'amber' ? 'warn' : 'ok';
+    html += '<div class="cmd-item" onclick="closeCmdPanel();window.location.href=\'?pillar='+it.pillarKey+'\'">'
+      + '<div class="cmd-dot '+dotClass+'" style="margin-top:5px;"></div>'
+      + '<div class="cmd-item-main">'
+      +   '<div class="cmd-item-what">'+it.item+'</div>'
+      +   '<div class="cmd-item-ctx">'+it.pillarEmoji+' '+it.pillarName+' &nbsp;&#183;&nbsp; Owner: '+it.owner+'</div>'
+      + '</div>'
+      + (it.action ? '<div class="cmd-item-action">'+it.action+'</div>' : '<div></div>')
+      + (dueStr ? '<div class="cmd-due '+dueClass+'">'+dueStr+'</div>' : '<div></div>')
+      + '</div>';
+  });
+  body.innerHTML = html;
+}
+
+
+/* ══════════════════════════════════════════
+   EXEC BRIEF GENERATOR
+══════════════════════════════════════════ */
+var _execBriefText = '';
+
+function openExecBrief() {
+  var p = _currentPillar;
+  if (!p) return;
+  var key = Object.keys(PILLARS).find(function(k){ return PILLARS[k] === p; }) || '';
+  _buildExecBrief(p, key);
+  var el = document.getElementById('exec-brief-modal');
+  if (el) el.classList.add('open');
+}
+function closeExecBrief() {
+  var el = document.getElementById('exec-brief-modal');
+  if (el) el.classList.remove('open');
+  var btn = document.getElementById('eb-copy-btn');
+  if (btn) { btn.textContent = '📋 Copy Brief'; btn.classList.remove('copied'); }
+}
+
+function _buildExecBrief(p, key) {
+  var score = computePillarScore(p);
+  var riskLabel = p.risk === 'red' ? 'Action Required' : p.risk === 'amber' ? 'Watch' : 'On Track';
+  var riskClass = p.risk === 'red' ? 'red' : p.risk === 'amber' ? 'amber' : 'green';
+
+  var openItems = p.open_items || [];
+  var redItems  = openItems.filter(function(x){ return x.status === 'red'; });
+  var ambItems  = openItems.filter(function(x){ return x.status === 'amber'; });
+
+  // Subject line
+  var urgencyWord = p.risk === 'red' ? '[ACTION REQUIRED]' : p.risk === 'amber' ? '[WATCH]' : '[UPDATE]';
+  var subject = urgencyWord + ' ' + p.name + ' — VER Intelligence Brief · ' + new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+
+  // 3 bullets derived from live data
+  var bullets = [];
+  var spendStr = p.sow_value ? '$' + p.sow_value + 'M' : 'tracked';
+  var forecastStr = p.mft_total ? '$' + p.mft_total + 'M' : 'in forecast';
+  bullets.push('Current SOW & PO spend is ' + spendStr + ' with ' + forecastStr + ' in active MFT forecast across ' + (p.mft_items || 0) + ' purchase orders.');
+
+  if (redItems.length > 0) {
+    var topRed = redItems[0];
+    bullets.push(redItems.length + ' critical item' + (redItems.length > 1 ? 's' : '') + ' require immediate action — lead item: "' + topRed.item + '" (Owner: ' + (topRed.owner || 'TBD') + ', Due: ' + (topRed.due || 'TBD') + ').');
+  } else if (ambItems.length > 0) {
+    bullets.push(ambItems.length + ' watch item' + (ambItems.length > 1 ? 's' : '') + ' are being monitored — no critical blockers at this time.');
+  } else {
+    bullets.push('All open items are resolved or on track. VER score is ' + score + '/100 — no escalation required.');
+  }
+
+  if (p.days_to_renewal <= 180) {
+    bullets.push('Contract renewal window is ' + p.days_to_renewal + ' days out. ' + (p.renewal_note ? p.renewal_note.split(' · ')[0] + '.' : 'Sourcing prep should begin immediately.'));
+  } else if (p.savings > 0) {
+    bullets.push('Savings of $' + p.savings + 'M have been confirmed in FY27 through VER advisory engagement — net exposure is $' + Math.max(0, (p.mft_total||0)-(p.savings||0)).toFixed(1) + 'M.');
+  } else {
+    bullets.push('Renewal timeline is healthy at ' + p.days_to_renewal + ' days. VER advisory is engaged on ' + (p.key_vendors||[]).length + ' key vendor relationship' + ((p.key_vendors||[]).length !== 1 ? 's' : '') + '.');
+  }
+
+  // Recommended action
+  var rec = p.risk === 'red'
+    ? 'Escalate flagged items to pillar leadership within 48 hours. VER recommends a structured vendor review session before next renewal milestone.'
+    : p.risk === 'amber'
+    ? 'Schedule a VER advisory checkpoint to review watch items. No immediate escalation required but trajectory needs monitoring.'
+    : 'No action required. Continue standard quarterly review cadence. VER will surface any material changes in the next intel cycle.';
+
+  // VER ask
+  var ask = p.risk === 'red'
+    ? 'VER requests 30 minutes with pillar leadership this week to align on response actions and vendor engagement posture.'
+    : p.risk === 'amber'
+    ? 'VER requests awareness from stakeholders and a standing agenda slot in the next pillar sync.'
+    : 'VER requests acknowledgment of this brief and confirmation that the pillar advisory cadence continues.';
+
+  // Build plain-text version for copy
+  _execBriefText = subject + '\n\n'
+    + 'SUMMARY\n'
+    + bullets.map(function(b, i){ return (i+1) + '. ' + b; }).join('\n') + '\n\n'
+    + 'RISK LEVEL: ' + riskLabel.toUpperCase() + '\n\n'
+    + 'RECOMMENDED ACTION\n' + rec + '\n\n'
+    + 'VER ASK\n' + ask + '\n\n'
+    + '---\nVER Intelligence · ' + p.name + ' Pillar · VER Score ' + score + '/100\nGenerated ' + new Date().toLocaleString();
+
+  var body = document.getElementById('eb-body');
+  if (!body) return;
+  body.innerHTML = '<div class="eb-section">'
+    + '<div class="eb-lbl">Subject</div>'
+    + '<div class="eb-subject">'+subject+'</div>'
+    + '</div>'
+    + '<div class="eb-section">'
+    + '<div class="eb-lbl">3-Bullet Summary</div>'
+    + '<div class="eb-bullets">'
+    + bullets.map(function(b, i){
+        return '<div class="eb-bullet"><div class="eb-bullet-num">'+(i+1)+'</div><div>'+b+'</div></div>';
+      }).join('')
+    + '</div>'
+    + '</div>'
+    + '<div class="eb-section">'
+    + '<div class="eb-lbl">Risk Level</div>'
+    + '<div class="eb-risk-row"><span class="eb-risk-badge '+riskClass+'">'+riskLabel+'</span>'
+    + '<span class="eb-rec" style="flex:1;padding-left:12px;">VER Score: <strong>'+score+'</strong>/100</span></div>'
+    + '</div>'
+    + '<div class="eb-section">'
+    + '<div class="eb-lbl">Recommended Action</div>'
+    + '<div class="eb-rec">'+rec+'</div>'
+    + '</div>'
+    + '<div class="eb-section" style="margin-bottom:0">'
+    + '<div class="eb-lbl">VER Ask</div>'
+    + '<div class="eb-ask">'+ask+'</div>'
+    + '</div>';
+}
+
+function _copyExecBrief() {
+  if (!_execBriefText) return;
+  var btn = document.getElementById('eb-copy-btn');
+  try {
+    navigator.clipboard.writeText(_execBriefText).then(function(){
+      if (btn) { btn.textContent = '&#10003; Copied!'; btn.classList.add('copied'); }
+      setTimeout(function(){ if (btn) { btn.innerHTML = '&#128203; Copy Brief'; btn.classList.remove('copied'); } }, 2500);
+    });
+  } catch(e) {
+    var ta = document.createElement('textarea');
+    ta.value = _execBriefText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (btn) { btn.textContent = '&#10003; Copied!'; btn.classList.add('copied'); }
+    setTimeout(function(){ if (btn) { btn.innerHTML = '&#128203; Copy Brief'; btn.classList.remove('copied'); } }, 2500);
+  }
+}
+
+
+/* ══════════════════════════════════════════
+   PRESENTATION MODE — SLIDE ENGINE
+══════════════════════════════════════════ */
+var _focusActive = false;
+var _presSlide = 0;
+var _PRES_TOTAL = 6;
+
+function toggleFocusMode() {
+  _focusActive = !_focusActive;
+  var overlay = document.getElementById('pres-overlay');
+  if (!overlay) return;
+  if (_focusActive) {
+    var p = _currentPillar;
+    if (!p) { _focusActive = false; return; }
+    _presBuild(p);
+    overlay.classList.add('open');
+    _presGoTo(0);
+  } else {
+    overlay.classList.remove('open');
+  }
+}
+
+function _presBuild(p) {
+  var score = computePillarScore(p);
+  var scoreColor = score >= 80 ? '#10B981' : score >= 60 ? '#F59E0B' : '#EF4444';
+  var riskLabel = p.risk === 'red' ? 'Action Required' : p.risk === 'amber' ? 'Watch' : 'On Track';
+  var riskColor = p.risk === 'red' ? '#EF4444' : p.risk === 'amber' ? '#F59E0B' : '#10B981';
+  var riskBg    = p.risk === 'red' ? 'rgba(239,68,68,.15)' : p.risk === 'amber' ? 'rgba(245,158,11,.12)' : 'rgba(16,185,129,.10)';
+  var pillarColor = p.color || '#0D9488';
+
+  // Chrome
+  var ic = document.getElementById('pres-icon'); if (ic) ic.textContent = p.emoji;
+  var nm = document.getElementById('pres-name'); if (nm) nm.textContent = p.name;
+
+  // ── Slide 1: Identity + Score Ring ──
+  var s1icon = document.getElementById('ps1-icon'); if (s1icon) s1icon.textContent = p.emoji;
+  var s1title = document.getElementById('ps1-title'); if (s1title) s1title.textContent = p.name;
+
+  var riskRow = document.getElementById('ps1-risk-row');
+  if (riskRow) {
+    var openItems = p.open_items || [];
+    var redCount  = openItems.filter(function(x){ return x.status==='red'; }).length;
+    riskRow.innerHTML =
+      '<span class="ps1-risk-pill" style="background:'+riskBg+';color:'+riskColor+';">'
+        +'<span class="ps1-dot" style="background:'+riskColor+';"></span>'+riskLabel
+      +'</span>'
+      +'<span style="font-size:9.5pt;color:rgba(255,255,255,.32);">'
+        +openItems.length+' open item'+(openItems.length!==1?'s':'')
+        +(redCount > 0 ? ' &nbsp;&#183;&nbsp; <span style="color:#FCA5A5;font-weight:700;">'+redCount+' critical</span>' : '')
+      +'</span>';
+  }
+
+  var adv = document.getElementById('ps1-advisory');
+  if (adv) {
+    var txt = p.advisory_position || p.ver_notes || '';
+    adv.textContent = txt.length > 260 ? txt.slice(0,260).replace(/\w+$/, '') + '…' : txt;
+  }
+
+  // Score ring (SVG)
+  var C = 2 * Math.PI * 52; // r=52
+  var offset = C - (score / 100) * C;
+  var ringWrap = document.getElementById('ps1-score-ring');
+  if (ringWrap) {
+    ringWrap.innerHTML =
+      '<svg viewBox="0 0 120 120" width="130" height="130">'
+        +'<circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="10"/>'
+        +'<circle cx="60" cy="60" r="52" fill="none" stroke="'+scoreColor+'" stroke-width="10"'
+          +' stroke-linecap="round" stroke-dasharray="'+C.toFixed(2)+'" stroke-dashoffset="'+C.toFixed(2)+'"'
+          +' transform="rotate(-90 60 60)" id="ps1-ring-arc"/>'
+      +'</svg>'
+      +'<div class="ps1-score-overlay">'
+        +'<div class="ps1-score-big" style="color:'+scoreColor+'">'+score+'</div>'
+        +'<div class="ps1-score-tiny">/ 100</div>'
+      +'</div>';
+    setTimeout(function(){
+      var arc = document.getElementById('ps1-ring-arc');
+      if (arc) arc.style.cssText += 'stroke-dashoffset:'+offset.toFixed(2)+';transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);';
+    }, 80);
+  }
+
+  var scoreHeadline = document.getElementById('ps1-score-headline');
+  if (scoreHeadline) {
+    scoreHeadline.textContent = score >= 80 ? 'Healthy' : score >= 60 ? 'Watch' : 'Action Required';
+    scoreHeadline.style.color = scoreColor;
+  }
+  var scoreSub = document.getElementById('ps1-score-sub');
+  if (scoreSub) scoreSub.textContent = score >= 80 ? 'No escalations required. Standard advisory cadence.' : score >= 60 ? 'Watch items identified — monitoring in progress.' : 'Escalation advised — critical items open.';
+
+  // ── Slide 2: Financials ──
+  var netExp = Math.max(0, (p.mft_total||0) - (p.savings||0));
+  var netColor = netExp > 10 ? '#FCA5A5' : netExp > 3 ? '#FCD34D' : '#6EE7B7';
+  var s2 = document.getElementById('ps2-grid');
+  if (s2) {
+    s2.innerHTML =
+      '<div class="ps2-tile t-spend">'
+        +'<div class="ps2-lbl">SOW &amp; PO Spend</div>'
+        +'<div class="ps2-val">'+fmtM(p.sow_value)+'</div>'
+        +'<div class="ps2-note">'+(p.mft_items||0)+' active purchase orders</div>'
+        +'<div class="ps2-delta" style="color:rgba(255,255,255,.35);">across '+(p.key_vendors||[]).length+' key vendors</div>'
+      +'</div>'
+      +'<div class="ps2-tile t-forecast">'
+        +'<div class="ps2-lbl">MFT Forecast</div>'
+        +'<div class="ps2-val">'+fmtM(p.mft_total)+'</div>'
+        +'<div class="ps2-note">'+fmtM(p.mft_approved)+' approved</div>'
+        +'<div class="ps2-delta" style="color:#FCD34D;">'+fmtM(Math.max(0,p.mft_total - p.mft_approved))+' pending approval</div>'
+      +'</div>'
+      +'<div class="ps2-tile t-savings">'
+        +'<div class="ps2-lbl">Savings Realized</div>'
+        +'<div class="ps2-val">'+fmtM(p.savings||0)+'</div>'
+        +'<div class="ps2-note">'+(p.savings > 0 ? 'VER advisory win FY27' : 'In pipeline')+'</div>'
+        +(p.savings_pipeline ? '<div class="ps2-delta" style="color:rgba(110,231,183,.6);">'+p.savings_pipeline+'</div>' : '')
+      +'</div>'
+      +'<div class="ps2-tile t-net">'
+        +'<div class="ps2-lbl">Net Exposure</div>'
+        +'<div class="ps2-val" style="color:'+netColor+'">'+fmtM(netExp)+'</div>'
+        +'<div class="ps2-note">Forecast minus savings</div>'
+        +'<div class="ps2-delta" style="color:'+netColor+';opacity:.7;">'+(netExp>10?'High exposure — VER action in progress':netExp>3?'Moderate — monitored':'Low — within acceptable range')+'</div>'
+      +'</div>';
+  }
+
+  // ── Slide 3: Key Vendors ──
+  var s3 = document.getElementById('ps3-grid');
+  if (s3) {
+    var vendors = (p.key_vendors || []).slice(0, 6);
+    if (!vendors.length) {
+      s3.innerHTML = '<div class="ps3-empty">No vendor data recorded for this pillar yet.</div>';
+    } else {
+      s3.innerHTML = vendors.map(function(v) {
+        var sc = v.status === 'red' ? 'red' : v.status === 'amber' ? 'amber' : '';
+        var sLabel = v.status === 'amber' ? '<span style="color:#FCD34D;">&#9888; Watch</span>'
+                   : v.status === 'red'   ? '<span style="color:#FCA5A5;">&#9888; Action Required</span>'
+                   : '<span style="color:#6EE7B7;">&#10003; On Track</span>';
+        return '<div class="ps3-card '+(sc||'')+'">'
+          +'<div class="ps3-vname">'+v.name+'</div>'
+          +'<div class="ps3-spend">'+fmtM(v.fy27)+'</div>'
+          +'<div class="ps3-meta">'+(v.pos||0)+' PO'+(v.pos!==1?'s':'')+' &nbsp;&#183;&nbsp; '+(v.cats||'—')+'</div>'
+          +'<div class="ps3-status">'+sLabel+'</div>'
+          +'</div>';
+      }).join('');
+    }
+  }
+
+  // ── Slide 4: Open Items ──
+  var s4 = document.getElementById('ps4-list');
+  if (s4) {
+    var items = (p.open_items || []).slice().sort(function(a,b){
+      var o = {red:0,amber:1,green:2};
+      return (o[a.status]||2) - (o[b.status]||2);
+    });
+    if (!items.length) {
+      s4.innerHTML = '<div class="ps4-allclear">&#10003; All clear — no open items for this pillar.</div>';
+    } else {
+      s4.innerHTML = items.map(function(it) {
+        var dc = it.status==='red' ? 'urgent' : it.status==='amber' ? 'warn' : 'ok';
+        var rowCls = it.status==='red' ? 'status-red' : it.status==='amber' ? 'status-amber' : '';
+        return '<div class="ps4-item '+rowCls+'">'
+          +'<div class="ps4-dot '+it.status+'"></div>'
+          +'<div class="ps4-body">'
+            +'<div class="ps4-what">'+it.item+'</div>'
+            +'<div class="ps4-owner">Owner: '+(it.owner||'—')+'</div>'
+          +'</div>'
+          +(it.due ? '<div class="ps4-due '+dc+'">'+it.due+'</div>' : '<div></div>')
+          +'</div>';
+      }).join('');
+    }
+  }
+
+  // ── Slide 5: Renewal Horizon ──
+  var s5 = document.getElementById('ps5-wrap');
+  if (s5) {
+    var days = p.days_to_renewal || 0;
+    var daysColor = days < 90 ? '#EF4444' : days < 180 ? '#F59E0B' : '#10B981';
+    var fillPct = Math.min(100, Math.round((1 - days / 730) * 100));
+    s5.innerHTML =
+      '<div class="ps5-days-hero">'
+        +'<div class="ps5-days-num" style="color:'+daysColor+'">'+days+'</div>'
+        +'<div class="ps5-days-lbl">Days to Renewal</div>'
+      +'</div>'
+      +'<div class="ps5-note">'+(p.renewal_note || 'See VER advisory for full renewal schedule.')+'</div>'
+      +'<div class="ps5-timeline">'
+        +'<div class="ps5-tl-bar"><div class="ps5-tl-fill" id="ps5-fill" style="width:0%;background:'+daysColor+'"></div></div>'
+        +'<div class="ps5-tl-labels"><span style="color:'+daysColor+'">&#9679; Now</span><span>90d</span><span>180d</span><span>1 year+</span></div>'
+      +'</div>'
+      +(p.risk_note ? '<div class="ps5-vendor-note">'+p.risk_note+'</div>' : '');
+    setTimeout(function(){
+      var f = document.getElementById('ps5-fill');
+      if (f) f.style.width = fillPct + '%';
+    }, 120);
+  }
+
+  // ── Slide 6: VER Asks ──
+  var s6 = document.getElementById('ps6-wrap');
+  if (s6) {
+    var asks = p.ver_asks || [];
+    if (!asks.length) {
+      s6.innerHTML = '<div class="ps6-noasks">No specific asks recorded for this pillar.</div>';
+    } else {
+      s6.innerHTML =
+        '<div class="ps6-intro">What VER needs from this pillar\'s stakeholders to deliver the best advisory outcomes.</div>'
+        + asks.map(function(ask, i) {
+          return '<div class="ps6-ask" style="border-left-color:'+pillarColor+'">'
+            +'<div class="ps6-num">'+(i+1)+'</div>'
+            +'<div class="ps6-text">'+ask+'</div>'
+            +'</div>';
+        }).join('');
+    }
+  }
+}
+
+function _presNav(dir) {
+  _presGoTo(_presSlide + dir);
+}
+
+function _presGoTo(idx) {
+  var total = _PRES_TOTAL;
+  idx = Math.max(0, Math.min(total - 1, idx));
+  var slides = document.querySelectorAll('.pres-slide');
+  var dots   = document.querySelectorAll('.pres-dot');
+  slides.forEach(function(s, i) {
+    s.classList.remove('active', 'exit-left');
+    if (i < idx) s.classList.add('exit-left');
+  });
+  if (slides[idx]) slides[idx].classList.add('active');
+  dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+  var counter = document.getElementById('pres-counter');
+  if (counter) counter.textContent = 'Slide ' + (idx+1) + ' of ' + total;
+  _presSlide = idx;
+}
+
 /* ── INIT ── */
 (function() {
   var params = new URLSearchParams(window.location.search);
@@ -2277,14 +4435,580 @@ function _dmToggle(){
   var btn=document.getElementById('dm-btn');
   if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
 }
+
+/* ══════════════════════════════════════════
+   CHIP NAV — Intel Feed chip → section link
+══════════════════════════════════════════ */
+function _chipNav(chip) {
+  var id = chip.getAttribute('data-target');
+  if (!id) return;
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Flash the target element
+  var card = el.closest('.v2-card') || el.closest('.vendor-grid') || el;
+  card.classList.remove('section-highlight');
+  void card.offsetWidth; // reflow to restart animation
+  card.classList.add('section-highlight');
+  setTimeout(function(){ card.classList.remove('section-highlight'); }, 2100);
+}
+
+/* ══════════════════════════════════════════
+   SCROLL REVEAL — Intersection Observer
+══════════════════════════════════════════ */
+(function() {
+  if (!window.IntersectionObserver) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('revealed');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  window._observeRevealable = function() {
+    document.querySelectorAll('.scroll-reveal:not(.revealed)').forEach(function(el) {
+      obs.observe(el);
+    });
+  };
+  document.addEventListener('DOMContentLoaded', window._observeRevealable);
+  setTimeout(window._observeRevealable, 400);
+})();
+
+/* ══════════════════════════════════════════
+   BUBBLE / RISK MATRIX VIEW
+══════════════════════════════════════════ */
+var _vendorViewMode = 'grid';
+function _setVendorView(mode) {
+  _vendorViewMode = mode;
+  var grid = document.getElementById('vendor-grid');
+  var bubble = document.getElementById('bubble-view');
+  var btnG = document.getElementById('vvt-grid');
+  var btnB = document.getElementById('vvt-bubble');
+  if (!grid || !bubble) return;
+  if (mode === 'bubble') {
+    grid.style.display = 'none';
+    bubble.style.display = 'block';
+    if (btnG) { btnG.classList.remove('active'); }
+    if (btnB) { btnB.classList.add('active'); }
+    drawBubbleChart(_currentPillar);
+  } else {
+    grid.style.display = '';
+    bubble.style.display = 'none';
+    if (btnG) { btnG.classList.add('active'); }
+    if (btnB) { btnB.classList.remove('active'); }
+  }
+}
+
+function drawBubbleChart(p) {
+  var canvas = document.getElementById('bubble-canvas');
+  if (!canvas || !p) return;
+  canvas.width = canvas.offsetWidth || 560;
+  var W = canvas.width, H = canvas.height;
+  var ctx = canvas.getContext('2d');
+  var kv = p.key_vendors || [];
+  if (!kv.length) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(100,116,139,0.5)';
+    ctx.font = '9pt Inter,Arial'; ctx.textAlign = 'center';
+    ctx.fillText('No vendor data for this pillar', W/2, H/2);
+    return;
+  }
+  var isD = document.documentElement.getAttribute('data-theme') !== 'light';
+  var axisColor = isD ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)';
+  var lblColor  = isD ? 'rgba(255,255,255,0.38)' : '#94A3B8';
+  var textColor = isD ? '#E2E8F0' : '#1F2937';
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Layout: X = risk band (green|amber|red), Y = % of pillar, bubble size = spend $
+  var padL = 56, padR = 28, padT = 24, padB = 40;
+  var chartW = W - padL - padR, chartH = H - padT - padB;
+
+  // X bands
+  var bands = ['green','amber','red'];
+  var bandW = chartW / 3;
+
+  // Band shading
+  bands.forEach(function(b, i) {
+    var x = padL + i * bandW;
+    var shade = b === 'green'
+      ? (isD ? 'rgba(16,185,129,0.04)' : 'rgba(16,185,129,0.05)')
+      : b === 'amber' ? (isD ? 'rgba(251,191,36,0.04)' : 'rgba(251,191,36,0.05)')
+      : (isD ? 'rgba(239,68,68,0.06)' : 'rgba(239,68,68,0.06)');
+    ctx.fillStyle = shade;
+    ctx.fillRect(x, padT, bandW, chartH);
+    // Band label
+    ctx.fillStyle = b === 'green' ? '#10B981' : b === 'amber' ? '#F59E0B' : '#EF4444';
+    ctx.font = 'bold 7pt Inter,Arial'; ctx.textAlign = 'center';
+    ctx.fillText(b === 'green' ? 'On Track' : b === 'amber' ? 'Watch' : 'Action', x + bandW/2, padT + chartH + 26);
+    // Divider
+    if (i > 0) {
+      ctx.strokeStyle = axisColor; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + chartH); ctx.stroke();
+    }
+  });
+
+  // Y axis label
+  ctx.save(); ctx.translate(14, padT + chartH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle = lblColor; ctx.font = '7pt Inter,Arial'; ctx.textAlign = 'center';
+  ctx.fillText('% of Pillar Spend', 0, 0);
+  ctx.restore();
+
+  // Y gridlines + labels
+  [0, 25, 50, 75, 100].forEach(function(pct) {
+    var y = padT + chartH - (pct / 100) * chartH;
+    ctx.strokeStyle = axisColor; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + chartW, y); ctx.stroke();
+    ctx.fillStyle = lblColor; ctx.font = '7pt Inter,Arial'; ctx.textAlign = 'right';
+    ctx.fillText(pct + '%', padL - 6, y + 3);
+  });
+
+  // Max spend for bubble sizing
+  var maxSpend = Math.max.apply(null, kv.map(function(v){ return parseFloat(v.fy27)||0; }));
+  var totalSpend = p.sow_value > 0 ? p.sow_value : 1;
+  var bubbles = [];
+
+  kv.forEach(function(v) {
+    var spend = parseFloat(v.fy27) || 0;
+    var pct = Math.round((spend / totalSpend) * 100);
+    var bandIdx = v.status === 'red' ? 2 : v.status === 'amber' ? 1 : 0;
+    // Jitter within band to avoid overlap
+    var jitter = (v.name.length * 7.3) % (bandW * 0.55);
+    var x = padL + bandIdx * bandW + bandW * 0.22 + jitter;
+    var y = padT + chartH - (Math.min(pct, 98) / 100) * chartH;
+    var r = maxSpend > 0 ? Math.max(8, Math.round(Math.sqrt(spend / maxSpend) * 28)) : 10;
+    var col = v.status === 'red' ? '#EF4444' : v.status === 'amber' ? '#F59E0B' : '#10B981';
+    bubbles.push({ v: v, x: x, y: y, r: r, col: col, pct: pct, spend: spend });
+  });
+
+  // Draw bubbles
+  bubbles.forEach(function(b) {
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fillStyle = b.col + (isD ? '33' : '22');
+    ctx.fill();
+    ctx.strokeStyle = b.col;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Label
+    ctx.fillStyle = textColor;
+    ctx.font = 'bold 7pt Inter,Arial'; ctx.textAlign = 'center';
+    var shortName = b.v.name.split(' ')[0];
+    ctx.fillText(shortName, b.x, b.y + b.r + 11);
+  });
+
+  // Hover
+  var tt = document.getElementById('bubble-tooltip');
+  canvas.onmousemove = function(e) {
+    var rect = canvas.getBoundingClientRect(), scX = W / rect.width;
+    var mx = (e.clientX - rect.left) * scX, my = (e.clientY - rect.top) * scX;
+    var found = null;
+    bubbles.forEach(function(b) {
+      if (Math.sqrt(Math.pow(mx-b.x,2)+Math.pow(my-b.y,2)) <= b.r + 4) found = b;
+    });
+    if (found) {
+      tt.style.display = 'block';
+      tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 170) + 'px';
+      tt.style.top = (e.clientY - 44) + 'px';
+      tt.innerHTML = '<strong style="color:#E2E8F0;">' + found.v.name + '</strong>'
+        + '<br><span style="color:rgba(255,255,255,.55);">Spend:</span> <span style="color:#6EE7B7;">' + fmtM(found.spend) + '</span>'
+        + '<br><span style="color:rgba(255,255,255,.55);">Pillar share:</span> ' + found.pct + '%'
+        + '<br><span style="color:rgba(255,255,255,.55);">Status:</span> ' + (found.v.status === 'red' ? '<span style="color:#FCA5A5;">Action Required</span>' : found.v.status === 'amber' ? '<span style="color:#FCD34D;">Watch</span>' : '<span style="color:#6EE7B7;">On Track</span>');
+    } else {
+      tt.style.display = 'none';
+    }
+  };
+  canvas.onmouseleave = function() { tt.style.display = 'none'; };
+  canvas.onclick = function(e) {
+    var rect = canvas.getBoundingClientRect(), scX = W / rect.width;
+    var mx = (e.clientX - rect.left) * scX, my = (e.clientY - rect.top) * scX;
+    var found = null, foundIdx = -1;
+    bubbles.forEach(function(b, i) {
+      if (Math.sqrt(Math.pow(mx-b.x,2)+Math.pow(my-b.y,2)) <= b.r + 4) { found = b; foundIdx = i; }
+    });
+    if (found) {
+      var key = Object.keys(PILLARS).find(function(k){ return PILLARS[k] === _currentPillar; });
+      if (key) openVendorModal(key, foundIdx);
+    }
+  };
+}
+
+/* ══════════════════════════════════════════
+   INLINE NOTES
+══════════════════════════════════════════ */
+var _activeNoteKey = null;
+function openNotePopover(e, noteKey) {
+  _activeNoteKey = noteKey;
+  var popover = document.getElementById('notes-popover');
+  var ta = document.getElementById('notes-textarea');
+  var existing = '';
+  try { existing = localStorage.getItem(noteKey) || ''; } catch(ex) {}
+  ta.value = existing;
+  // Position near the button
+  var rect = e.target.getBoundingClientRect();
+  popover.style.left = Math.min(rect.left, window.innerWidth - 290) + 'px';
+  popover.style.top = (rect.bottom + 6) + 'px';
+  popover.style.display = 'block';
+  ta.focus();
+  e.stopPropagation();
+}
+function closeNotePopover() {
+  document.getElementById('notes-popover').style.display = 'none';
+  _activeNoteKey = null;
+}
+function saveNote() {
+  if (!_activeNoteKey) return;
+  var val = document.getElementById('notes-textarea').value.trim();
+  try {
+    if (val) {
+      localStorage.setItem(_activeNoteKey, val);
+      localStorage.setItem(_activeNoteKey + '-ts', String(Date.now()));
+    } else {
+      localStorage.removeItem(_activeNoteKey);
+      localStorage.removeItem(_activeNoteKey + '-ts');
+    }
+  } catch(e) {}
+  // Update the button state on the card
+  var btn = document.querySelector('[data-note-key="' + _activeNoteKey + '"]');
+  if (btn) { btn.classList.toggle('has-note', !!val); }
+  closeNotePopover();
+}
+// Close popover on outside click
+document.addEventListener('click', function(e) {
+  var pop = document.getElementById('notes-popover');
+  if (pop && pop.style.display === 'block' && !pop.contains(e.target) && !e.target.classList.contains('note-btn')) {
+    closeNotePopover();
+  }
+});
+
+/* ══════════════════════════════════════════
+   CONTEXT MENU — right-click vendor cards
+══════════════════════════════════════════ */
+var _ctxVendorKey = null, _ctxVendorIdx = -1;
+function openCtxMenu(e, pillarKey, idx) {
+  e.preventDefault();
+  _ctxVendorKey = pillarKey; _ctxVendorIdx = idx;
+  var menu = document.getElementById('ctx-menu');
+  var x = Math.min(e.clientX, window.innerWidth - 200);
+  var y = Math.min(e.clientY, window.innerHeight - 160);
+  menu.style.left = x + 'px'; menu.style.top = y + 'px'; menu.style.display = 'block';
+}
+document.getElementById('ctx-open-modal').onclick = function() {
+  closeCtxMenu();
+  if (_ctxVendorKey !== null) openVendorModal(_ctxVendorKey, _ctxVendorIdx);
+};
+document.getElementById('ctx-flag').onclick = function() {
+  closeCtxMenu();
+  if (_ctxVendorKey === null) return;
+  var p = PILLARS[_ctxVendorKey]; var v = p && p.key_vendors[_ctxVendorIdx];
+  if (v) { _showToast('&#9873; ' + v.name + ' flagged for rate benchmarking'); }
+};
+document.getElementById('ctx-note').onclick = function() {
+  closeCtxMenu();
+  var noteKey = 'note-vendor-' + _ctxVendorKey + '-' + _ctxVendorIdx;
+  var btn = document.querySelector('[data-note-key="' + noteKey + '"]');
+  if (btn) btn.click();
+};
+document.getElementById('ctx-copy').onclick = function() {
+  closeCtxMenu();
+  if (_ctxVendorKey === null) return;
+  var p = PILLARS[_ctxVendorKey]; var v = p && p.key_vendors[_ctxVendorIdx];
+  if (!v) return;
+  var txt = v.name + ' — ' + fmtM(v.fy27) + ' FY27 spend — ' + v.cats + ' — ' + v.status.toUpperCase();
+  try { navigator.clipboard.writeText(txt); } catch(e) {}
+  _showToast('&#128203; Vendor summary copied');
+};
+function closeCtxMenu() { document.getElementById('ctx-menu').style.display = 'none'; }
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('ctx-menu');
+  if (menu && !menu.contains(e.target)) closeCtxMenu();
+});
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeCtxMenu(); });
+
+/* ══════════════════════════════════════════
+   COMPARE DRAWER
+══════════════════════════════════════════ */
+function openCompareDrawer() {
+  var overlay = document.getElementById('compare-overlay');
+  var drawer  = document.getElementById('compare-drawer');
+  var sel = document.getElementById('cmp-pillar-select');
+  var currentKey = Object.keys(PILLARS).find(function(k){ return PILLARS[k] === _currentPillar; }) || '';
+  // Populate select with all pillars except current
+  sel.innerHTML = Object.keys(PILLARS).filter(function(k){ return k !== currentKey; }).map(function(k){
+    return '<option value="' + k + '">' + PILLARS[k].emoji + ' ' + PILLARS[k].name + '</option>';
+  }).join('');
+  overlay.style.display = 'block';
+  drawer.classList.add('open');
+  renderCompare();
+}
+function closeCompareDrawer() {
+  document.getElementById('compare-overlay').style.display = 'none';
+  document.getElementById('compare-drawer').classList.remove('open');
+}
+function renderCompare() {
+  var sel = document.getElementById('cmp-pillar-select');
+  var wrap = document.getElementById('cmp-table-wrap');
+  if (!sel || !wrap || !_currentPillar) return;
+  var cmpKey = sel.value;
+  var B = PILLARS[cmpKey];
+  var A = _currentPillar;
+  if (!B) { wrap.innerHTML = '<div style="color:rgba(255,255,255,.4);padding:20px 0;font-size:9pt;">Select a pillar to compare.</div>'; return; }
+
+  function _cmpVal(aVal, bVal, higherIsBetter) {
+    if (!aVal || !bVal) return ['c-same','c-same'];
+    return higherIsBetter
+      ? [aVal >= bVal ? 'c-better' : 'c-worse', aVal <= bVal ? 'c-better' : 'c-worse']
+      : [aVal <= bVal ? 'c-better' : 'c-worse', aVal >= bVal ? 'c-better' : 'c-worse'];
+  }
+  function _scoreLabel(s) { return s >= 80 ? '&#128994; ' + s : s >= 60 ? '&#128993; ' + s : '&#128308; ' + s; }
+  function _riskLabel(r) { return r === 'green' ? '&#128994; On Track' : r === 'amber' ? '&#128993; Watch' : '&#128308; Action'; }
+  function _govLabel(g)  { return g === 'green' ? '&#128994; On Track' : g === 'amber' ? '&#128993; Watch' : '&#128308; Action'; }
+
+  var scoreA = computePillarScore(A), scoreB = computePillarScore(B);
+  var sClass = _cmpVal(scoreA, scoreB, true);
+  var spendClass = _cmpVal(A.sow_value, B.sow_value, false);
+  var savClass = _cmpVal(A.savings, B.savings, true);
+  var renewClass = _cmpVal(A.days_to_renewal, B.days_to_renewal, true);
+  var openA = (A.open_items||[]).length, openB = (B.open_items||[]).length;
+  var openClass = _cmpVal(openA, openB, false);
+
+  var winner = scoreA > scoreB ? A.short : scoreA < scoreB ? B.short : null;
+  var winnerBadge = winner ? '<span class="cmp-winner-badge" style="background:rgba(16,185,129,.15);color:#10B981;">&#9733; ' + winner + ' leads</span>' : '';
+
+  wrap.innerHTML = '<div style="font-size:8.5pt;color:rgba(255,255,255,.45);margin-bottom:14px;">VER Intelligence Score comparison' + (winner ? ' — ' + winnerBadge : '') + '</div>'
+    + '<table class="cmp-table">'
+    + '<thead><tr><th>Metric</th><th>' + A.emoji + ' ' + A.short + '</th><th>' + B.emoji + ' ' + B.short + '</th></tr></thead>'
+    + '<tbody>'
+    + '<tr><td class="cmp-row-lbl">VER Score</td><td class="' + sClass[0] + '">' + _scoreLabel(scoreA) + '</td><td class="' + sClass[1] + '">' + _scoreLabel(scoreB) + '</td></tr>'
+    + '<tr><td class="cmp-row-lbl">SOW Spend</td><td class="' + spendClass[0] + '">' + fmtM(A.sow_value) + '</td><td class="' + spendClass[1] + '">' + fmtM(B.sow_value) + '</td></tr>'
+    + '<tr><td class="cmp-row-lbl">MFT Forecast</td><td>' + fmtM(A.mft_total) + '</td><td>' + fmtM(B.mft_total) + '</td></tr>'
+    + '<tr><td class="cmp-row-lbl">Savings</td><td class="' + savClass[0] + '">' + fmtM(A.savings) + '</td><td class="' + savClass[1] + '">' + fmtM(B.savings) + '</td></tr>'
+    + '<tr><td class="cmp-row-lbl">Days to Renewal</td><td class="' + renewClass[0] + '">' + A.days_to_renewal + 'd</td><td class="' + renewClass[1] + '">' + B.days_to_renewal + 'd</td></tr>'
+    + '<tr><td class="cmp-row-lbl">Open Items</td><td class="' + openClass[0] + '">' + openA + '</td><td class="' + openClass[1] + '">' + openB + '</td></tr>'
+    + '<tr><td class="cmp-row-lbl">Risk Status</td><td>' + _riskLabel(A.risk) + '</td><td>' + _riskLabel(B.risk) + '</td></tr>'
+    + '<tr><td class="cmp-row-lbl">Governance</td><td>' + _govLabel(A.governance) + '</td><td>' + _govLabel(B.governance) + '</td></tr>'
+    + '<tr><td class="cmp-row-lbl">Vendors</td><td>' + (A.key_vendors||[]).length + '</td><td>' + (B.key_vendors||[]).length + '</td></tr>'
+    + '</tbody></table>'
+    + '<div style="margin-top:16px;font-size:7.5pt;color:rgba(255,255,255,.25);">Green = better · Red = needs attention · FY27 VER Intelligence data</div>';
+}
+
+/* ══════════════════════════════════════════
+   EXPORT CSV
+══════════════════════════════════════════ */
+function _exportCSV() {
+  var p = _currentPillar;
+  if (!p) return;
+  var rows = [
+    ['Pillar', 'Metric', 'Value'],
+    [p.name, 'SOW & PO Spend', p.sow_value ? '$' + p.sow_value + 'M' : '--'],
+    [p.name, 'MFT Forecast', p.mft_total ? '$' + p.mft_total + 'M' : '--'],
+    [p.name, 'MFT Approved', p.mft_approved ? '$' + p.mft_approved + 'M' : '--'],
+    [p.name, 'Savings Realized', p.savings ? '$' + p.savings + 'M' : '--'],
+    [p.name, 'Days to Renewal', p.days_to_renewal + 'd'],
+    [p.name, 'Risk Status', p.risk],
+    [p.name, 'Governance', p.governance],
+    [p.name, 'VER Score', computePillarScore(p)],
+    [''],
+    ['Vendor', 'FY27 Spend', 'POs', 'Categories', 'Status']
+  ];
+  (p.key_vendors || []).forEach(function(v) {
+    rows.push([v.name, v.fy27 ? '$' + v.fy27 + 'M' : '--', v.pos, v.cats, v.status]);
+  });
+  rows.push(['']);
+  rows.push(['Open Items', 'Owner', 'Due', 'Status']);
+  (p.open_items || []).forEach(function(it) {
+    rows.push([it.item, it.owner, it.due, it.status]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(c){ return '"' + String(c||'').replace(/"/g,'""') + '"'; }).join(','); }).join('\n');
+  try {
+    navigator.clipboard.writeText(csv);
+    _showToast('&#8595; CSV copied to clipboard');
+  } catch(e) {
+    // Fallback: create download link
+    var a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = (p.short || 'pillar') + '-ver-export.csv';
+    a.click();
+    _showToast('&#8595; CSV downloading…');
+  }
+}
+
+/* ══════════════════════════════════════════
+   TOAST HELPER
+══════════════════════════════════════════ */
+var _toastTimer = null;
+function _showToast(msg) {
+  var t = document.getElementById('export-toast');
+  if (!t) return;
+  t.innerHTML = msg;
+  t.classList.add('show');
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
 (function(){
   var t;try{t=localStorage.getItem('ver-theme');}catch(e){}
-  if(!t) t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  if(!t) t='dark';
   document.documentElement.setAttribute('data-theme',t);
   var btn=document.getElementById('dm-btn');
   if(btn) btn.innerHTML=t==='dark'?'&#9790; Light Mode':'&#9789; Dark Mode';
 })();
 </script>
+<!-- ── CROSS-PILLAR COMMAND PANEL ── -->
+<div id="cmd-panel" role="dialog" aria-modal="true" aria-label="Cross-Pillar Command Panel" onclick="if(event.target===this)closeCmdPanel()">
+  <div class="cmd-box">
+    <div class="cmd-head">
+      <div class="cmd-head-left">
+        <div class="cmd-title">&#9888; Cross-Pillar Command Panel</div>
+        <div class="cmd-sub">All open items across every pillar, ranked by urgency</div>
+      </div>
+      <button class="cmd-close" onclick="closeCmdPanel()" aria-label="Close">&#215;</button>
+    </div>
+    <div class="cmd-filter-row">
+      <button class="cmd-filter-btn active-all" onclick="_cmdFilter('all',this)">All Items</button>
+      <button class="cmd-filter-btn" onclick="_cmdFilter('red',this)">&#128308; Critical Only</button>
+      <button class="cmd-filter-btn" onclick="_cmdFilter('amber',this)">&#128993; Watch Items</button>
+    </div>
+    <div class="cmd-body" id="cmd-body"></div>
+    <div class="cmd-footer">
+      <div class="cmd-footer-stat" id="cmd-footer-stat"></div>
+      <div class="cmd-footer-hint">Click any item to navigate to that pillar</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── EXEC BRIEF MODAL ── -->
+<div id="exec-brief-modal" role="dialog" aria-modal="true" aria-label="Exec Brief Generator" onclick="if(event.target===this)closeExecBrief()">
+  <div class="eb-box">
+    <div class="eb-head">
+      <div class="eb-title">&#128196; Exec Situation Brief</div>
+      <button class="eb-close" onclick="closeExecBrief()" aria-label="Close">&#215;</button>
+    </div>
+    <div class="eb-body" id="eb-body"></div>
+    <div class="eb-foot">
+      <button class="eb-dismiss-btn" onclick="closeExecBrief()">Dismiss</button>
+      <button class="eb-copy-btn" id="eb-copy-btn" onclick="_copyExecBrief()">&#128203; Copy Brief</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PRESENTATION MODE OVERLAY
+══════════════════════════════════════════ -->
+<div id="pres-overlay" onclick="if(event.target===this)toggleFocusMode()">
+
+  <!-- Chrome -->
+  <div class="pres-chrome">
+    <div class="pres-pillar-id">
+      <span class="pres-pillar-icon" id="pres-icon"></span>
+      <span class="pres-pillar-name" id="pres-name"></span>
+    </div>
+    <div class="pres-slide-counter" id="pres-counter">Slide 1 of 5</div>
+    <button class="pres-exit-btn" onclick="toggleFocusMode()">&#9632; Exit Presentation</button>
+  </div>
+
+  <!-- Slides -->
+  <div class="pres-slides">
+
+    <!-- Slide 1: Identity & Score -->
+    <div class="pres-slide active" id="pres-slide-0">
+      <div class="ps-heading">Pillar Overview</div>
+      <div class="ps1-icon" id="ps1-icon"></div>
+      <div class="ps1-title" id="ps1-title"></div>
+      <div class="ps1-risk-row" id="ps1-risk-row"></div>
+      <div class="ps1-advisory" id="ps1-advisory"></div>
+      <div class="ps1-score-strip">
+        <div class="ps1-score-ring-wrap" id="ps1-score-ring"></div>
+        <div class="ps1-score-side">
+          <div class="ps1-score-lbl">VER Intelligence Score</div>
+          <div class="ps1-score-headline" id="ps1-score-headline"></div>
+          <div class="ps1-score-sub" id="ps1-score-sub"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: Financial Picture -->
+    <div class="pres-slide" id="pres-slide-1">
+      <div class="ps-heading">Financial Picture</div>
+      <div class="ps2-grid" id="ps2-grid"></div>
+    </div>
+
+    <!-- Slide 3: Key Vendors -->
+    <div class="pres-slide" id="pres-slide-2">
+      <div class="ps-heading">Key Vendors</div>
+      <div class="ps3-grid" id="ps3-grid"></div>
+    </div>
+
+    <!-- Slide 4: Open Items -->
+    <div class="pres-slide" id="pres-slide-3">
+      <div class="ps-heading">Open Items &amp; Actions</div>
+      <div class="ps4-list" id="ps4-list"></div>
+    </div>
+
+    <!-- Slide 5: Renewal Horizon -->
+    <div class="pres-slide" id="pres-slide-4">
+      <div class="ps-heading">Renewal Horizon</div>
+      <div class="ps5-wrap" id="ps5-wrap"></div>
+    </div>
+
+    <!-- Slide 6: VER Asks -->
+    <div class="pres-slide" id="pres-slide-5">
+      <div class="ps-heading">VER Asks of Stakeholders</div>
+      <div class="ps6-wrap" id="ps6-wrap"></div>
+    </div>
+
+  </div>
+
+  <!-- Arrow nav -->
+  <button class="pres-arrow left" onclick="_presNav(-1)" title="Previous (←)">&#8592;</button>
+  <button class="pres-arrow right" onclick="_presNav(1)" title="Next (→)">&#8594;</button>
+
+  <!-- Bottom dots + hint -->
+  <div class="pres-nav">
+    <div class="pres-dot active" onclick="_presGoTo(0)"></div>
+    <div class="pres-dot" onclick="_presGoTo(1)"></div>
+    <div class="pres-dot" onclick="_presGoTo(2)"></div>
+    <div class="pres-dot" onclick="_presGoTo(3)"></div>
+    <div class="pres-dot" onclick="_presGoTo(4)"></div>
+    <div class="pres-dot" onclick="_presGoTo(5)"></div>
+    <div class="pres-hint">&#8592; &#8594; Navigate &nbsp;&#183;&nbsp; 1-9 Switch pillar &nbsp;&#183;&nbsp; F or Esc to exit</div>
+  </div>
+
+</div>
+
+<!-- ── KEYBOARD SHORTCUT OVERLAY ── -->
+<div id="hotkey-overlay" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+  <div class="hotkey-box">
+    <div class="hk-title">Keyboard Shortcuts</div>
+    <div class="hk-sub">Navigate the Pillar Intelligence Hub without lifting your mouse.</div>
+    <div class="hk-grid">
+      <div class="hk-row"><span class="hk-key">1</span><span class="hk-desc">SF on Salesforce</span></div>
+      <div class="hk-row"><span class="hk-key">2</span><span class="hk-desc">Eng Dev &amp; Delivery</span></div>
+      <div class="hk-row"><span class="hk-key">3</span><span class="hk-desc">IT</span></div>
+      <div class="hk-row"><span class="hk-key">4</span><span class="hk-desc">DA &amp; Ops</span></div>
+      <div class="hk-row"><span class="hk-key">5</span><span class="hk-desc">Data Solutions</span></div>
+      <div class="hk-row"><span class="hk-key">6</span><span class="hk-desc">Digital Mkt Tech</span></div>
+      <div class="hk-row"><span class="hk-key">7</span><span class="hk-desc">Agentic</span></div>
+      <div class="hk-row"><span class="hk-key">8</span><span class="hk-desc">Office of CDO</span></div>
+      <div class="hk-row"><span class="hk-key">9</span><span class="hk-desc">Emerging Tech</span></div>
+      <div class="hk-row"><span class="hk-key">X</span><span class="hk-desc">Cross-Pillar Command Panel</span></div>
+      <div class="hk-row"><span class="hk-key">B</span><span class="hk-desc">Generate Exec Brief</span></div>
+      <div class="hk-row"><span class="hk-key">F</span><span class="hk-desc">Presentation mode (5 slides)</span></div>
+      <div class="hk-row"><span class="hk-key">&#8592; &#8594;</span><span class="hk-desc">Advance slides (in presentation)</span></div>
+      <div class="hk-row"><span class="hk-key">C</span><span class="hk-desc">Open Compare drawer</span></div>
+      <div class="hk-row"><span class="hk-key">E</span><span class="hk-desc">Export CSV</span></div>
+      <div class="hk-row"><span class="hk-key">P</span><span class="hk-desc">Print / PDF</span></div>
+      <div class="hk-row"><span class="hk-key">D</span><span class="hk-desc">Toggle dark mode</span></div>
+      <div class="hk-row"><span class="hk-key">?</span><span class="hk-desc">This shortcuts panel</span></div>
+      <div class="hk-row"><span class="hk-key">Esc</span><span class="hk-desc">Close any open panel</span></div>
+    </div>
+    <div class="hk-close-row">
+      <button class="hk-close-btn" onclick="closeHotkeyOverlay()">Got it</button>
+    </div>
+  </div>
+</div>
+
 <script src="assets/help-modal.js"></script>
 <script>
 function openPillarDetailHelp(){
@@ -2304,9 +5028,63 @@ function openPillarDetailHelp(){
       { icon: '&#x26A0;', title: 'Tier 1 vendors get quarterly reviews', body: 'Every Tier 1 vendor in this pillar requires a CQBR. The status of those reviews is tracked on the vendor card.' },
       { icon: '&#x1F517;', title: 'Cross-links to all VER tools', body: 'Each vendor card links to TCO, Rate Benchmarks, Governance, and Renewal tools pre-filtered for that vendor.' }
     ],
-    footNote: 'FY27 &middot; Salesforce DET &middot; Confidential'
+    footNote: 'VER Internal &middot; FY27 &middot; DET Vendor Intelligence'
   });
 }
+
+/* ══════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+══════════════════════════════════════════ */
+var _PILLAR_KEYS = ['sf-on-sf','eng-dev','it','da-ops','data','dig-mkt','agentic','cdo','emerging'];
+
+function openHotkeyOverlay()  { document.getElementById('hotkey-overlay').classList.add('open'); }
+function closeHotkeyOverlay() { document.getElementById('hotkey-overlay').classList.remove('open'); }
+document.getElementById('hotkey-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeHotkeyOverlay();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (_focusActive) { toggleFocusMode(); return; }
+    closeHotkeyOverlay(); closeCmdPanel(); closeExecBrief(); return;
+  }
+  if (_focusActive) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); _presNav(1); return; }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); _presNav(-1); return; }
+    var _fn = parseInt(e.key, 10);
+    if (_fn >= 1 && _fn <= 9 && _PILLAR_KEYS[_fn-1]) {
+      e.preventDefault();
+      renderPillar(_PILLAR_KEYS[_fn-1]);
+      _presBuild(_currentPillar);
+      _presGoTo(0);
+      return;
+    }
+    return;
+  }
+  var tag = (e.target.tagName||'').toUpperCase();
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+  var k = e.key;
+  if (k === '?' || k === '/') { e.preventDefault(); openHotkeyOverlay(); return; }
+
+  // 1-9: jump pillar
+  var n = parseInt(k, 10);
+  if (n >= 1 && n <= 9 && _PILLAR_KEYS[n-1]) {
+    e.preventDefault();
+    window.location.href = '?pillar=' + _PILLAR_KEYS[n - 1];
+    return;
+  }
+
+  if (k === 'x' || k === 'X') { e.preventDefault(); openCmdPanel(); return; }
+  if (k === 'b' || k === 'B') { e.preventDefault(); openExecBrief(); return; }
+  if (k === 'f' || k === 'F') { e.preventDefault(); toggleFocusMode(); return; }
+  if (k === 'c' || k === 'C') { e.preventDefault(); openCompareDrawer(); return; }
+  if (k === 'e' || k === 'E') { e.preventDefault(); _exportCSV(); return; }
+  if (k === 'p' || k === 'P') { e.preventDefault(); window.print(); return; }
+  if (k === 'd' || k === 'D') { e.preventDefault(); _dmToggle(); return; }
+});
+
 </script>
 </body>
 </html>
