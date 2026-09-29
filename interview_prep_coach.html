@@ -358,24 +358,46 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
 .dv-sub{font-size:8pt;color:var(--text-muted);line-height:1.4;}
 .dv-filler{margin-top:5px;font-size:8pt;color:var(--text-muted);}
 .mic-status-lbl{font-size:8pt;color:var(--text-dim);}
+/* ── MODEL LOAD ── */
+.model-info-row{display:flex;align-items:center;gap:10px;margin:14px 0;flex-wrap:wrap;}
+.model-chip{padding:4px 10px;border-radius:20px;background:var(--indigo);color:white;font-size:8.5pt;font-weight:700;letter-spacing:.02em;}
+.model-size{font-size:8.5pt;color:var(--text-muted);}
+.model-progress-wrap{margin:14px 0;}
+.model-progress-bar{height:8px;border-radius:999px;background:var(--border-accent);overflow:hidden;margin-bottom:8px;}
+.model-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--indigo));transition:width .4s ease;border-radius:999px;}
+.model-progress-lbl{font-size:8.5pt;color:var(--text-muted);}
+.api-btn.loading{border-color:rgba(245,158,11,.35);color:var(--amber);}
+.hidden{display:none!important;}
 </style>
+<script type="module">
+import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+window._WebLLM = webllm;
+document.dispatchEvent(new CustomEvent('webllm-available'));
+</script>
 </head>
 <body>
 
 <div class="ambient"></div>
 
-<!-- API KEY MODAL -->
-<div class="modal-overlay" id="api-modal" onclick="if(event.target===this)closeApiModal()">
+<!-- MODEL LOAD MODAL -->
+<div class="modal-overlay" id="api-modal">
   <div class="modal-box">
-    <div class="modal-title">Connect Claude AI</div>
-    <div class="modal-sub">Your API key is stored only in this browser's localStorage — never sent anywhere except directly to Anthropic's API.</div>
-    <input type="password" class="modal-input" id="api-key-input" placeholder="sk-ant-api03-...">
-    <div class="modal-note">
-      Get a key at <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer">console.anthropic.com</a>. Without a key the app runs in self-assessment mode — you rate your own STAR components manually.
+    <div class="modal-title">Load AI Model</div>
+    <div class="modal-sub">Runs a small language model entirely in your browser — no API key, no server, no data leaves your device.</div>
+    <div class="model-info-row">
+      <span class="model-chip">Phi-3.5-mini</span>
+      <span class="model-size">~2.2 GB download &mdash; cached after first use</span>
+    </div>
+    <div class="model-progress-wrap hidden" id="model-progress-wrap">
+      <div class="model-progress-bar"><div class="model-progress-fill" id="model-progress-fill"></div></div>
+      <div class="model-progress-lbl" id="model-progress-lbl">Starting&hellip;</div>
+    </div>
+    <div class="modal-note" id="model-modal-note">
+      First load takes a few minutes while the model downloads. Subsequent loads are instant from cache. Works offline once downloaded.
     </div>
     <div class="modal-actions">
-      <button class="btn-primary" onclick="saveApiKey()">Connect</button>
-      <button class="btn-secondary" onclick="closeApiModal()">Skip (self-assess)</button>
+      <button class="btn-primary" id="model-load-btn" onclick="startModelLoad()">Load Model</button>
+      <button class="btn-secondary" id="model-skip-btn" onclick="closeApiModal()">Skip (self-assess)</button>
     </div>
   </div>
 </div>
@@ -396,7 +418,7 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
     <button class="api-btn theme-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">&#9790;</button>
     <button class="api-btn" id="api-toggle-btn" onclick="openApiModal()">
       <span class="api-dot"></span>
-      <span id="api-btn-label">Connect Claude AI</span>
+      <span id="api-btn-label">Load AI Model</span>
     </button>
   </div>
 </header>
@@ -407,7 +429,7 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
   <section class="hero">
     <div class="hero-eyebrow">Interview Readiness</div>
     <h1 class="hero-h1">Practice Like It&rsquo;s Real</h1>
-    <p class="hero-sub">Built on Salesforce&rsquo;s official Great Competency &amp; Characteristics framework. Answer behavioral questions and get honest, evidence-based feedback powered by Claude AI.</p>
+    <p class="hero-sub">Built on Salesforce&rsquo;s official Great Competency &amp; Characteristics framework. Answer behavioral questions and get honest, evidence-based feedback powered by an AI model running entirely in your browser.</p>
     <div class="hero-modes">
       <button class="mode-card" id="mode-single" onclick="setMode('single')">
         <div class="mode-icon">&#127919;</div>
@@ -489,7 +511,7 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
       <div class="submit-row">
         <button type="button" class="btn-primary" id="submit-btn" onclick="submitAnswer()">Get AI Feedback</button>
         <button type="button" class="btn-secondary" onclick="clearAnswer()">Clear</button>
-        <span class="no-key-note" id="no-key-note">&#9888; No API key &mdash; connect Claude AI above for full feedback</span>
+        <span class="no-key-note" id="no-key-note">&#9888; AI model not loaded &mdash; click &ldquo;Load AI Model&rdquo; above for full feedback</span>
       </div>
     </div>
 
@@ -554,7 +576,9 @@ var IH = 'inner' + 'HTML';
 var QBANK = null; // populated below
 
 /* ── STATE ── */
-var _apiKey = localStorage.getItem('gcic_api_key') || '';
+var _llmEngine = null;
+var _llmReady = false;
+var _llmLoading = false;
 var _role = 'IC';
 var _mockRole = 'IC';
 var _activeFilter = 'all';
@@ -584,25 +608,76 @@ function setSubRole(val){
   if(_mode === 'single') renderQuestionList();
 }
 
-/* ── API KEY ── */
-function openApiModal(){document.getElementById('api-modal').classList.add('open');}
-function closeApiModal(){document.getElementById('api-modal').classList.remove('open');}
-function saveApiKey(){
-  var v = document.getElementById('api-key-input').value.trim();
-  if(!v){showToast('Enter a key first');return;}
-  _apiKey = v;
-  localStorage.setItem('gcic_api_key', v);
-  closeApiModal();
+/* ── MODEL LOAD MODAL ── */
+function openApiModal(){
+  if(_llmReady){showToast('AI model already loaded ✓');return;}
+  document.getElementById('api-modal').classList.add('open');
+}
+function closeApiModal(){
+  if(_llmLoading) return; // don't close mid-load
+  document.getElementById('api-modal').classList.remove('open');
+}
+function startModelLoad(){
+  if(_llmLoading||_llmReady) return;
+  _llmLoading = true;
+  document.getElementById('model-load-btn').disabled = true;
+  document.getElementById('model-skip-btn').disabled = true;
+  document.getElementById('model-modal-note').textContent = 'Downloading and initializing — please keep this tab open…';
+  var wrap = document.getElementById('model-progress-wrap');
+  wrap.classList.remove('hidden');
+  var fill = document.getElementById('model-progress-fill');
+  var lbl  = document.getElementById('model-progress-lbl');
   updateApiBtn();
-  showToast('Claude AI connected ✓');
+
+  var WL = window._WebLLM;
+  if(!WL){
+    lbl.textContent = 'WebLLM library not available — check your internet connection.';
+    _llmLoading = false;
+    document.getElementById('model-load-btn').disabled = false;
+    document.getElementById('model-skip-btn').disabled = false;
+    return;
+  }
+
+  var engine = new WL.MLCEngine();
+  engine.setInitProgressCallback(function(report){
+    var pct = Math.round((report.progress||0)*100);
+    fill.style.width = pct + '%';
+    lbl.textContent = report.text || (pct + '%');
+  });
+
+  engine.reload('Phi-3.5-mini-instruct-q4f16_1-MLC').then(function(){
+    _llmEngine = engine;
+    _llmReady = true;
+    _llmLoading = false;
+    document.getElementById('api-modal').classList.remove('open');
+    updateApiBtn();
+    showToast('AI model loaded ✓');
+  }).catch(function(err){
+    _llmLoading = false;
+    lbl.textContent = 'Load failed: ' + (err.message||err);
+    fill.style.width = '0%';
+    document.getElementById('model-load-btn').disabled = false;
+    document.getElementById('model-skip-btn').disabled = false;
+    document.getElementById('model-modal-note').textContent = 'Something went wrong. Check the console for details and try again.';
+  });
 }
 function updateApiBtn(){
   var btn = document.getElementById('api-toggle-btn');
   var lbl = document.getElementById('api-btn-label');
-  if(_apiKey){btn.classList.add('connected');lbl.textContent='Claude AI Connected';}
-  else{btn.classList.remove('connected');lbl.textContent='Connect Claude AI';}
   var noKey = document.getElementById('no-key-note');
-  if(noKey) noKey.style.display = _apiKey ? 'none' : 'inline';
+  if(_llmReady){
+    btn.classList.add('connected');
+    btn.classList.remove('loading');
+    lbl.textContent = 'AI Ready';
+  } else if(_llmLoading){
+    btn.classList.remove('connected');
+    btn.classList.add('loading');
+    lbl.textContent = 'Loading Model…';
+  } else {
+    btn.classList.remove('connected','loading');
+    lbl.textContent = 'Load AI Model';
+  }
+  if(noKey) noKey.style.display = _llmReady ? 'none' : 'inline';
 }
 
 /* ── MODE ── */
@@ -760,7 +835,7 @@ function submitAnswer(){
   var ans = document.getElementById('answer-input').value.trim();
   if(ans.length < 30){showToast('Write more before submitting');return;}
   var fw = document.getElementById('feedback-wrap');
-  fw[IH] = '<div class="feedback-loading"><div class="spinner"></div><span>Analyzing your answer with Claude AI…</span></div>';
+  fw[IH] = '<div class="feedback-loading"><div class="spinner"></div><span>Analyzing your answer…</span></div>';
   document.getElementById('submit-btn').disabled = true;
   // attach display text so prompt uses the function-flavored variant if active
   var qWithDisplay = Object.assign({}, _selectedQ, {_qtext: getDisplayText(_selectedQ)});
@@ -783,28 +858,22 @@ function buildUserPrompt(q, answer, role, fn){
 }
 
 function callClaudeForFeedback(q, answer, role, cb){
-  if(!_apiKey){cb({_selfAssess:true, q:q});return;}
-  var payload = JSON.stringify({
-    model: 'claude-sonnet-4-6',
+  if(!_llmReady){cb({_selfAssess:true, q:q});return;}
+  var messages = [
+    {role:'system', content: buildSystemPrompt()},
+    {role:'user',   content: buildUserPrompt(q, answer, role, _selectedFunction)}
+  ];
+  _llmEngine.chat.completions.create({
+    messages: messages,
     max_tokens: 1800,
-    system: buildSystemPrompt(),
-    messages: [{role:'user', content: buildUserPrompt(q, answer, role, _selectedFunction)}]
-  });
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': _apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: payload
-  }).then(function(r){return r.json();}).then(function(data){
-    if(data.error){cb({_error: data.error.message||'API error'});return;}
-    var text = (data.content && data.content[0] && data.content[0].text) || '';
+    temperature: 0.3
+  }).then(function(reply){
+    var text = (reply.choices && reply.choices[0] && reply.choices[0].message && reply.choices[0].message.content) || '';
+    // strip any accidental markdown fences
+    text = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
     try{cb(JSON.parse(text));}
     catch(e){cb({_raw: text});}
-  }).catch(function(err){cb({_error: err.message||'Network error'});});
+  }).catch(function(err){cb({_error: err.message||'Inference error'});});
 }
 
 /* ── RENDER SINGLE FEEDBACK ── */
@@ -991,7 +1060,7 @@ function finishMock(){
   document.getElementById('mock-progress-bar').style.width = '100%';
   var reportEl = document.getElementById('mock-report-view');
   reportEl.style.display = 'block';
-  if(!_apiKey){reportEl[IH] = buildMockNoApiReport();return;}
+  if(!_llmReady){reportEl[IH] = buildMockNoApiReport();return;}
   reportEl[IH] = '<div class="feedback-loading"><div class="spinner"></div><span>Analyzing all '+_mockAnswers.length+' answers…</span></div>';
   batchAnalyze(0, [], function(all){reportEl[IH] = buildMockReport(all);});
 }
@@ -1005,7 +1074,7 @@ function batchAnalyze(idx, results, done){
 }
 function buildMockNoApiReport(){
   var html = '<div class="card"><div class="card-title">Mock Complete &mdash; '+_mockAnswers.length+' Answers Recorded</div>';
-  html += '<p style="font-size:10pt;color:var(--text-muted);margin-bottom:16px;"><button class="btn-ghost" onclick="openApiModal()">Connect Claude AI</button> to get the full AI-powered performance report.</p>';
+  html += '<p style="font-size:10pt;color:var(--text-muted);margin-bottom:16px;"><button class="btn-ghost" onclick="openApiModal()">Load AI Model</button> to get the full AI-powered performance report.</p>';
   html += '<table class="report-table"><thead><tr><th>#</th><th>Competency</th><th>Preview</th></tr></thead><tbody>';
   _mockAnswers.forEach(function(e,i){
     html += '<tr><td style="color:var(--text-dim);font-weight:700;">Q'+(i+1)+'</td>'
@@ -1209,7 +1278,7 @@ function toggleTheme(){
     (window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
   document.documentElement.setAttribute('data-theme', savedTheme);
   document.getElementById('theme-toggle-btn').textContent = savedTheme==='dark' ? '☾' : '☀';
-  document.addEventListener('keydown', function(e){if(e.key==='Escape') closeApiModal();});
+  document.addEventListener('keydown', function(e){if(e.key==='Escape' && !_llmLoading) closeApiModal();});
   updateApiBtn();
 })();
 </script>
