@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Great Competency Interview Coach</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#060C18;
+  --surface:rgba(255,255,255,.04);
+  --surface-hover:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.08);
+  --border-accent:rgba(255,255,255,.14);
+  --text:#E2E8F0;
+  --text-muted:rgba(255,255,255,.40);
+  --text-dim:rgba(255,255,255,.22);
+  --teal:#0D9488;
+  --teal-light:#2DD4BF;
+  --green:#10B981;
+  --green-light:#6EE7B7;
+  --amber:#F59E0B;
+  --amber-light:#FCD34D;
+  --red:#EF4444;
+  --red-light:#FCA5A5;
+  --indigo:#6366F1;
+  --blue:#3B82F6;
+  --radius:14px;
+  --radius-sm:8px;
+  --shadow:0 24px 64px rgba(0,0,0,.55);
+}
+html{min-height:100%;background:var(--bg);color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.6;}
+body{min-height:100vh;}
+button,input,select,textarea{font:inherit;color:inherit;}
+a{color:inherit;text-decoration:none;}
+
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.ambient::before{content:'';position:absolute;top:-200px;right:-150px;width:800px;height:800px;border-radius:50%;
+  background:radial-gradient(circle,rgba(13,148,136,0.09) 0%,transparent 65%);}
+.ambient::after{content:'';position:absolute;bottom:-100px;left:10%;width:600px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,0.06),transparent 70%);}
+
+/* TOP BAR */
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(16px,4vw,48px);background:rgba(6,12,24,0.92);
+  border-bottom:1px solid var(--border);backdrop-filter:blur(20px);}
+.topbar-brand{display:flex;align-items:center;gap:12px;}
+.topbar-logo{width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,#0D9488 0%,#0F766E 100%);
+  display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;}
+.topbar-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.01em;}
+.topbar-sub{font-size:10px;color:var(--text-muted);font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.api-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;
+  border:1px solid var(--border-accent);background:var(--surface);cursor:pointer;transition:all .15s;
+  font-size:11px;font-weight:600;color:var(--text-muted);}
+.api-btn:hover{background:var(--surface-hover);color:var(--text);}
+.api-btn.connected{border-color:rgba(16,185,129,.3);color:var(--green);}
+.api-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+
+/* PAGE */
+.page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:40px clamp(16px,4vw,48px) 80px;}
+
+/* HERO */
+.hero{text-align:center;padding:48px 0 40px;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:8pt;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--teal);margin-bottom:16px;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:24px;height:1.5px;background:currentColor;}
+.hero-h1{font-size:clamp(28pt,5vw,42pt);font-weight:900;line-height:1.05;letter-spacing:-.035em;color:#fff;margin-bottom:16px;}
+.hero-sub{font-size:11pt;color:var(--text-muted);max-width:520px;margin:0 auto 32px;line-height:1.75;}
+.hero-modes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.mode-card{flex:1;min-width:220px;max-width:300px;padding:24px 22px;border-radius:var(--radius);
+  border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all .2s;text-align:left;
+  position:relative;overflow:hidden;}
+.mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--teal);opacity:0;transition:opacity .2s;}
+.mode-card.mock-card::before{background:var(--indigo);}
+.mode-card:hover{background:var(--surface-hover);border-color:var(--border-accent);transform:translateY(-2px);}
+.mode-card:hover::before,.mode-card.active::before{opacity:1;}
+.mode-card.active{border-color:var(--teal);background:rgba(13,148,136,.08);}
+.mode-card.mock-card.active{border-color:var(--indigo);background:rgba(99,102,241,.08);}
+.mode-card.mock-card.active::before{background:var(--indigo);}
+.mode-icon{font-size:22px;margin-bottom:10px;}
+.mode-title{font-size:12pt;font-weight:800;color:#fff;margin-bottom:4px;}
+.mode-desc{font-size:9pt;color:var(--text-muted);line-height:1.6;}
+
+/* PANELS */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:20px;}
+.card-title{font-size:10pt;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:16px;}
+.card-title span{color:var(--teal);font-size:8pt;margin-left:8px;text-transform:none;letter-spacing:0;}
+
+/* FILTERS */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;
+  cursor:pointer;transition:all .15s;font-size:9pt;font-weight:600;color:var(--text-muted);}
+.filter-btn:hover{background:var(--surface-hover);color:var(--text);}
+.filter-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+.filter-btn.all-btn.active{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);color:#fff;}
+
+/* QUESTION LIST */
+.q-list{display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+.q-item{padding:14px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:transparent;cursor:pointer;transition:all .15s;text-align:left;
+  display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;width:100%;}
+.q-item:hover{background:var(--surface-hover);border-color:var(--border-accent);}
+.q-item.selected{border-color:var(--teal);background:rgba(13,148,136,.06);}
+.q-text{font-size:10pt;color:var(--text);line-height:1.55;}
+.q-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.q-comp{font-size:8pt;font-weight:700;color:var(--teal);white-space:nowrap;}
+.q-char{font-size:8pt;color:var(--text-dim);}
+.q-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;
+  font-size:7.5pt;font-weight:700;background:rgba(255,255,255,.06);color:var(--text-muted);white-space:nowrap;}
+.q-badge.pm{background:rgba(99,102,241,.15);color:#A5B4FC;}
+.q-badge.supp{background:rgba(245,158,11,.12);color:var(--amber-light);font-style:italic;}
+
+/* ROLE TOGGLE */
+.role-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:24px;overflow:hidden;margin-bottom:20px;width:fit-content;}
+.role-btn{padding:8px 22px;background:transparent;border:none;cursor:pointer;font-size:10pt;font-weight:700;color:var(--text-muted);transition:all .15s;}
+.role-btn.active{background:var(--teal);color:#fff;}
+.role-btn.pm-btn.active{background:var(--indigo);}
+
+/* ANSWER */
+.answer-section{margin-top:4px;}
+.selected-q-display{padding:16px 20px;border-radius:var(--radius-sm);background:rgba(13,148,136,.07);
+  border-left:3px solid var(--teal);margin-bottom:16px;font-size:10pt;color:var(--text);line-height:1.65;}
+.selected-q-display .q-label{font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:6px;}
+.answer-label{font-size:9pt;font-weight:700;color:var(--text-muted);margin-bottom:8px;}
+.answer-hint{font-size:8.5pt;color:var(--text-dim);margin-bottom:10px;font-style:italic;}
+textarea.answer-input{width:100%;min-height:180px;padding:16px 18px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);resize:vertical;
+  transition:border .15s;line-height:1.7;font-size:10pt;}
+textarea.answer-input:focus{outline:none;border-color:var(--teal);}
+.char-count{font-size:8pt;color:var(--text-dim);text-align:right;margin-top:4px;}
+.submit-row{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap;}
+.btn-primary{padding:11px 28px;border-radius:24px;border:none;
+  background:linear-gradient(135deg,var(--teal) 0%,#0F766E 100%);
+  color:#fff;font-weight:800;font-size:10pt;cursor:pointer;transition:all .2s;letter-spacing:-.01em;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(13,148,136,.4);}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-secondary{padding:11px 22px;border-radius:24px;border:1px solid var(--border-accent);
+  background:transparent;color:var(--text-muted);font-weight:700;font-size:10pt;cursor:pointer;transition:all .15s;}
+.btn-secondary:hover{background:var(--surface-hover);color:var(--text);}
+.btn-ghost{padding:8px 16px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--text-muted);font-weight:600;font-size:9pt;cursor:pointer;transition:all .15s;}
+.btn-ghost:hover{background:var(--surface-hover);color:var(--text);}
+.no-key-note{font-size:8.5pt;color:var(--amber);display:none;}
+
+/* FEEDBACK */
+.feedback-wrap{margin-top:24px;}
+.feedback-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px;gap:16px;color:var(--text-muted);font-size:10pt;}
+.spinner{width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.08);
+  border-top-color:var(--teal);animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.feedback-card{border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:16px;}
+.fb-header{padding:14px 20px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;font-size:9pt;font-weight:800;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--text-muted);}
+.fb-body{padding:20px;}
+.star-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:4px;}
+@media(max-width:600px){.star-grid{grid-template-columns:repeat(2,1fr);}}
+.star-cell{padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:rgba(255,255,255,.02);}
+.star-label{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:4px;}
+.star-verdict{font-size:10pt;font-weight:800;margin-bottom:4px;}
+.star-verdict.strong{color:var(--green-light);}
+.star-verdict.partial{color:var(--amber-light);}
+.star-verdict.missing{color:var(--red-light);}
+.star-reason{font-size:8pt;color:var(--text-muted);line-height:1.5;}
+.comp-list{display:flex;flex-direction:column;gap:8px;}
+.comp-row{display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:start;
+  padding:10px 12px;border-radius:var(--radius-sm);background:rgba(255,255,255,.02);border:1px solid var(--border);}
+@media(max-width:600px){.comp-row{grid-template-columns:1fr;}}
+.comp-behavior{font-size:8.5pt;font-weight:700;color:var(--text-muted);}
+.comp-evidence{font-size:9pt;color:var(--text);line-height:1.55;}
+.verdict-block{padding:18px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:12px;}
+.verdict-block.strong{border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.05);}
+.verdict-block.adequate{border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.04);}
+.verdict-block.weak{border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.04);}
+.verdict-badge{display:inline-flex;align-items:center;gap:5px;font-size:8pt;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;padding:3px 10px;border-radius:10px;margin-bottom:10px;}
+.verdict-badge.strong{background:rgba(16,185,129,.15);color:var(--green-light);}
+.verdict-badge.adequate{background:rgba(245,158,11,.15);color:var(--amber-light);}
+.verdict-badge.weak{background:rgba(239,68,68,.15);color:var(--red-light);}
+.verdict-text{font-size:10pt;color:var(--text);line-height:1.7;}
+.sharpen-block{padding:16px 20px;border-radius:var(--radius-sm);border:1px solid rgba(99,102,241,.2);background:rgba(99,102,241,.05);}
+.sharpen-label{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#A5B4FC;margin-bottom:8px;}
+.sharpen-before{font-size:9pt;color:var(--text-muted);margin-bottom:6px;line-height:1.6;}
+.sharpen-after{font-size:9pt;color:#C7D2FE;line-height:1.6;font-weight:600;}
+.nudge-block{padding:16px 20px;border-radius:var(--radius-sm);border:1px solid rgba(245,158,11,.2);
+  background:rgba(245,158,11,.05);font-size:9.5pt;color:var(--amber-light);line-height:1.65;margin-top:8px;}
+.raw-feedback{font-size:9.5pt;color:var(--text);line-height:1.8;white-space:pre-wrap;word-break:break-word;}
+.error-block{font-size:10pt;color:var(--red-light);padding:16px;}
+
+/* MOCK */
+.mock-setup{display:flex;flex-direction:column;gap:20px;}
+.mock-char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.char-check{display:flex;align-items:center;gap:10px;padding:12px 14px;
+  border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:all .15s;}
+.char-check:hover{background:var(--surface-hover);border-color:var(--border-accent);}
+.char-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--indigo);flex-shrink:0;cursor:pointer;}
+.char-check-label{font-size:9.5pt;font-weight:600;color:var(--text);}
+.mock-count-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.mock-count-label{font-size:9pt;font-weight:700;color:var(--text-muted);}
+.mock-count-input{width:64px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:rgba(255,255,255,.04);color:var(--text);font-weight:700;font-size:10pt;text-align:center;}
+.mock-count-input:focus{outline:none;border-color:var(--indigo);}
+.mock-progress-bar-wrap{height:4px;border-radius:2px;background:rgba(255,255,255,.07);margin-bottom:24px;overflow:hidden;}
+.mock-progress-bar{height:100%;border-radius:2px;background:var(--indigo);transition:width .5s;}
+.mock-q-num{font-size:9pt;font-weight:700;color:var(--text-dim);margin-bottom:8px;}
+.mock-q-text{font-size:13pt;font-weight:700;color:#fff;line-height:1.55;margin-bottom:20px;}
+.mock-next-btn{background:linear-gradient(135deg,var(--indigo) 0%,#4338CA 100%) !important;}
+.mock-next-btn:hover{box-shadow:0 8px 24px rgba(99,102,241,.4) !important;}
+
+/* REPORT */
+.report-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.report-stat{padding:16px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);text-align:center;}
+.report-stat-val{font-size:22pt;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;}
+.report-stat-lbl{font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-top:6px;}
+.report-table{width:100%;border-collapse:collapse;font-size:9pt;}
+.report-table th{text-align:left;font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text-dim);padding:10px 12px;border-bottom:1px solid var(--border);}
+.report-table td{padding:12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+.report-table tr:last-child td{border-bottom:none;}
+.pill{display:inline-flex;padding:2px 9px;border-radius:10px;font-size:8pt;font-weight:700;margin-right:3px;}
+.pill.strong{background:rgba(16,185,129,.15);color:var(--green-light);}
+.pill.partial{background:rgba(245,158,11,.13);color:var(--amber-light);}
+.pill.missing,.pill.weak{background:rgba(239,68,68,.13);color:var(--red-light);}
+.pill.adequate{background:rgba(245,158,11,.13);color:var(--amber-light);}
+.priority-block{padding:20px 22px;border-radius:var(--radius-sm);border-left:4px solid var(--indigo);
+  background:rgba(99,102,241,.05);margin-bottom:12px;}
+.priority-label{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#A5B4FC;margin-bottom:6px;}
+.priority-text{font-size:10pt;color:var(--text);line-height:1.65;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:9000;background:rgba(2,6,18,.82);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:linear-gradient(160deg,#0A1628 0%,#0F1E3C 100%);border:1px solid var(--border-accent);
+  border-radius:var(--radius);padding:36px;width:min(500px,100%);}
+.modal-title{font-size:16pt;font-weight:900;color:#fff;margin-bottom:8px;}
+.modal-sub{font-size:9.5pt;color:var(--text-muted);line-height:1.65;margin-bottom:24px;}
+.modal-input{width:100%;padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border-accent);
+  background:rgba(255,255,255,.04);color:var(--text);font-size:10pt;margin-bottom:16px;}
+.modal-input:focus{outline:none;border-color:var(--teal);}
+.modal-note{font-size:8.5pt;color:var(--text-dim);line-height:1.6;margin-bottom:20px;}
+.modal-note a{color:var(--teal);text-decoration:underline;}
+.modal-actions{display:flex;gap:10px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);
+  padding:12px 22px;border-radius:24px;background:#1E293B;border:1px solid var(--border-accent);
+  font-size:10pt;font-weight:600;color:var(--text);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  z-index:9999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+.empty-state{text-align:center;padding:48px 24px;color:var(--text-dim);font-size:10pt;line-height:1.7;}
+.empty-icon{font-size:32px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<!-- API KEY MODAL -->
+<div class="modal-overlay" id="api-modal" onclick="if(event.target===this)closeApiModal()">
+  <div class="modal-box">
+    <div class="modal-title">Connect Claude AI</div>
+    <div class="modal-sub">Your API key is stored only in this browser's localStorage — never sent anywhere except directly to Anthropic's API.</div>
+    <input type="password" class="modal-input" id="api-key-input" placeholder="sk-ant-api03-...">
+    <div class="modal-note">
+      Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. Without a key the app runs in self-assessment mode — you rate your own STAR components manually.
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveApiKey()">Connect</button>
+      <button class="btn-secondary" onclick="closeApiModal()">Skip (self-assess)</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">GC</div>
+    <div>
+      <div class="topbar-title">Great Competency Interview Coach</div>
+      <div class="topbar-sub">Salesforce Behavioral Interview Practice &middot; FY27</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="api-btn" id="api-toggle-btn" onclick="openApiModal()">
+      <span class="api-dot"></span>
+      <span id="api-btn-label">Connect Claude AI</span>
+    </button>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Interview Readiness</div>
+    <h1 class="hero-h1">Practice Like It&rsquo;s Real</h1>
+    <p class="hero-sub">Built on Salesforce&rsquo;s official Great Competency &amp; Characteristics framework. Answer behavioral questions and get honest, evidence-based feedback powered by Claude AI.</p>
+    <div class="hero-modes">
+      <button class="mode-card" id="mode-single" onclick="setMode('single')">
+        <div class="mode-icon">&#127919;</div>
+        <div class="mode-title">Single Practice</div>
+        <div class="mode-desc">Pick any question, write your answer, get detailed STAR + competency feedback instantly.</div>
+      </button>
+      <button class="mode-card mock-card" id="mode-mock" onclick="setMode('mock')">
+        <div class="mode-icon">&#127917;</div>
+        <div class="mode-title">Mock Interview</div>
+        <div class="mode-desc">Full loop across characteristics. No feedback between questions &mdash; then a complete performance report.</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- SINGLE PRACTICE PANEL -->
+  <div class="panel" id="panel-single">
+
+    <div class="card">
+      <div class="card-title">Role Type</div>
+      <div class="role-toggle">
+        <button class="role-btn active" id="role-ic" onclick="setRole('IC')">Individual Contributor</button>
+        <button class="role-btn pm-btn" id="role-pm" onclick="setRole('PM')">People Manager</button>
+      </div>
+      <div class="card-title" style="margin-top:8px;">Filter by Characteristic <span id="filter-count-label"></span></div>
+      <div class="filter-row" id="filter-row"></div>
+      <div class="q-list" id="q-list"></div>
+    </div>
+
+    <div class="card answer-section" id="answer-card" style="display:none;">
+      <div class="selected-q-display">
+        <div class="q-label" id="sq-comp-label"></div>
+        <div id="sq-text"></div>
+      </div>
+      <div class="answer-label">Your Answer</div>
+      <div class="answer-hint">Use the STAR method: Situation &rarr; Task &rarr; Action &rarr; Result. Aim for 200&ndash;400 words.</div>
+      <textarea class="answer-input" id="answer-input" placeholder="Tell me about a time when..." rows="8" oninput="updateCharCount()"></textarea>
+      <div class="char-count" id="char-count">0 words</div>
+      <div class="submit-row">
+        <button class="btn-primary" id="submit-btn" onclick="submitAnswer()">Get AI Feedback</button>
+        <button class="btn-secondary" onclick="clearAnswer()">Clear</button>
+        <span class="no-key-note" id="no-key-note">&#9888; No API key &mdash; connect Claude AI above for full feedback</span>
+      </div>
+    </div>
+
+    <div class="feedback-wrap" id="feedback-wrap"></div>
+
+  </div>
+
+  <!-- MOCK INTERVIEW PANEL -->
+  <div class="panel" id="panel-mock">
+
+    <div id="mock-setup-view">
+      <div class="card">
+        <div class="card-title">Role Type</div>
+        <div class="role-toggle">
+          <button class="role-btn active" id="mock-role-ic" onclick="setMockRole('IC')">Individual Contributor</button>
+          <button class="role-btn pm-btn" id="mock-role-pm" onclick="setMockRole('PM')">People Manager</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Characteristics to Cover</div>
+        <div class="mock-char-grid" id="mock-char-grid"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;">
+          <button class="btn-ghost" onclick="mockSelectAll(true)">Select All</button>
+          <button class="btn-ghost" onclick="mockSelectAll(false)">Clear All</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Questions Per Characteristic</div>
+        <div class="mock-count-row">
+          <span class="mock-count-label">Ask</span>
+          <input type="number" class="mock-count-input" id="mock-q-per-char" value="1" min="1" max="2">
+          <span class="mock-count-label">question(s) per characteristic (max 2)</span>
+        </div>
+      </div>
+      <button class="btn-primary mock-next-btn" onclick="startMock()">Start Mock Interview</button>
+    </div>
+
+    <div id="mock-inprogress-view" style="display:none;">
+      <div class="mock-progress-bar-wrap">
+        <div class="mock-progress-bar" id="mock-progress-bar" style="width:0%"></div>
+      </div>
+      <div class="mock-q-num" id="mock-q-num">Question 1 of 5</div>
+      <div class="mock-q-text" id="mock-q-text"></div>
+      <textarea class="answer-input" id="mock-answer-input" placeholder="Take your time &mdash; think through your STAR structure..." rows="9" oninput="updateMockCharCount()"></textarea>
+      <div class="char-count" id="mock-char-count">0 words</div>
+      <div class="submit-row" style="margin-top:16px;">
+        <button class="btn-primary mock-next-btn" id="mock-next-btn" onclick="mockNext()">Next Question &rarr;</button>
+        <button class="btn-secondary" onclick="abandonMock()">Abandon Mock</button>
+      </div>
+    </div>
+
+    <div id="mock-report-view" style="display:none;"></div>
+
+  </div>
+
+</main>
+
+<script>
+var IH = 'inner' + 'HTML';
+
+/* ── QUESTION BANK (injected) ── */
+var QBANK = null; // populated below
+
+/* ── STATE ── */
+var _apiKey = localStorage.getItem('gcic_api_key') || '';
+var _role = 'IC';
+var _mockRole = 'IC';
+var _activeFilter = 'all';
+var _selectedQ = null;
+var _mode = null;
+var _mockQueue = [];
+var _mockAnswers = [];
+var _mockIdx = 0;
+var _weakPatterns = {result:0,situation:0,task:0,action:0};
+
+/* ── API KEY ── */
+function openApiModal(){document.getElementById('api-modal').classList.add('open');}
+function closeApiModal(){document.getElementById('api-modal').classList.remove('open');}
+function saveApiKey(){
+  var v = document.getElementById('api-key-input').value.trim();
+  if(!v){showToast('Enter a key first');return;}
+  _apiKey = v;
+  localStorage.setItem('gcic_api_key', v);
+  closeApiModal();
+  updateApiBtn();
+  showToast('Claude AI connected ✓');
+}
+function updateApiBtn(){
+  var btn = document.getElementById('api-toggle-btn');
+  var lbl = document.getElementById('api-btn-label');
+  if(_apiKey){btn.classList.add('connected');lbl.textContent='Claude AI Connected';}
+  else{btn.classList.remove('connected');lbl.textContent='Connect Claude AI';}
+  var noKey = document.getElementById('no-key-note');
+  if(noKey) noKey.style.display = _apiKey ? 'none' : 'inline';
+}
+
+/* ── MODE ── */
+function setMode(m){
+  _mode = m;
+  document.getElementById('mode-single').classList.toggle('active', m==='single');
+  document.getElementById('mode-mock').classList.toggle('active', m==='mock');
+  document.getElementById('panel-single').classList.toggle('active', m==='single');
+  document.getElementById('panel-mock').classList.toggle('active', m==='mock');
+  if(m==='single') renderQuestionList();
+  if(m==='mock') renderMockSetup();
+  window.scrollTo({top: document.querySelector('.hero').offsetHeight + 60, behavior:'smooth'});
+}
+
+/* ── ROLE ── */
+function setRole(r){
+  _role = r;
+  document.getElementById('role-ic').classList.toggle('active', r==='IC');
+  document.getElementById('role-pm').classList.toggle('active', r==='PM');
+  _selectedQ = null;
+  _activeFilter = 'all';
+  document.getElementById('answer-card').style.display = 'none';
+  document.getElementById('feedback-wrap')[IH] = '';
+  renderQuestionList();
+}
+function setMockRole(r){
+  _mockRole = r;
+  document.getElementById('mock-role-ic').classList.toggle('active', r==='IC');
+  document.getElementById('mock-role-pm').classList.toggle('active', r==='PM');
+  renderMockCharGrid();
+}
+
+/* ── HELPERS ── */
+function esc(s){
+  if(s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');}, 2800);
+}
+function shuffleArr(arr){
+  for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;}
+  return arr;
+}
+function wordCount(s){var t=(s||'').trim();return t?t.split(/\s+/).length:0;}
+function getPool(role){return (QBANK && QBANK[role]) || [];}
+function getCharacteristics(role){
+  var seen={}, chars=[];
+  getPool(role).forEach(function(q){if(!seen[q.characteristic]){seen[q.characteristic]=1;chars.push(q.characteristic);}});
+  return chars;
+}
+
+/* ── FILTERS + QUESTION LIST ── */
+function renderFilters(){
+  var chars = getCharacteristics(_role);
+  var row = document.getElementById('filter-row');
+  var html = '<button class="filter-btn all-btn'+(_activeFilter==='all'?' active':'')+'" onclick="setFilter(\'all\')">All</button>';
+  chars.forEach(function(c){
+    html += '<button class="filter-btn'+(_activeFilter===c?' active':'')+'" onclick="setFilter(\''+esc(c)+'\')" >'+esc(c)+'</button>';
+  });
+  row[IH] = html;
+}
+function setFilter(f){_activeFilter=f;renderFilters();renderQuestionList();}
+
+function renderQuestionList(){
+  renderFilters();
+  var pool = getPool(_role).filter(function(q){return _activeFilter==='all'||q.characteristic===_activeFilter;});
+  var list = document.getElementById('q-list');
+  var countLbl = document.getElementById('filter-count-label');
+  if(countLbl) countLbl.textContent = '— '+pool.length+' question'+(pool.length===1?'':'s');
+  if(!pool.length){list[IH]='<div class="empty-state"><div class="empty-icon">&#128269;</div>No questions match this filter.</div>';return;}
+  list[IH] = pool.map(function(q){
+    var sel = _selectedQ && _selectedQ._uid===q._uid ? ' selected' : '';
+    var badge = q._isSupplementary
+      ? '<span class="q-badge supp">Practice+</span>'
+      : (q._pmOnly ? '<span class="q-badge pm">PM Only</span>' : '<span class="q-badge">Official</span>');
+    return '<button class="q-item'+sel+'" onclick="selectQ(\''+esc(q._uid)+'\') ">'
+      +'<div class="q-text">'+esc(q._qtext)+'</div>'
+      +'<div class="q-meta">'
+        +'<span class="q-comp">'+esc(q.competency)+'</span>'
+        +'<span class="q-char">'+esc(q.characteristic)+'</span>'
+        +badge
+      +'</div>'
+      +'</button>';
+  }).join('');
+}
+
+function selectQ(uid){
+  var q = getPool(_role).find(function(x){return x._uid===uid;});
+  if(!q) return;
+  _selectedQ = q;
+  renderQuestionList();
+  var card = document.getElementById('answer-card');
+  card.style.display = 'block';
+  document.getElementById('sq-comp-label').textContent = q.characteristic + ' · ' + q.competency;
+  document.getElementById('sq-text').textContent = q._qtext;
+  document.getElementById('answer-input').value = '';
+  document.getElementById('char-count').textContent = '0 words';
+  document.getElementById('feedback-wrap')[IH] = '';
+  updateApiBtn();
+  card.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ── ANSWER INPUT ── */
+function updateCharCount(){
+  var w = wordCount(document.getElementById('answer-input').value);
+  document.getElementById('char-count').textContent = w + ' words' + (w<150?' · aim for 200+':'') + (w>500?' · consider tightening':'');
+}
+function updateMockCharCount(){
+  var w = wordCount(document.getElementById('mock-answer-input').value);
+  document.getElementById('mock-char-count').textContent = w + ' words';
+}
+function clearAnswer(){
+  document.getElementById('answer-input').value = '';
+  document.getElementById('char-count').textContent = '0 words';
+  document.getElementById('feedback-wrap')[IH] = '';
+}
+
+/* ── SUBMIT SINGLE ── */
+function submitAnswer(){
+  if(!_selectedQ){showToast('Select a question first');return;}
+  var ans = document.getElementById('answer-input').value.trim();
+  if(ans.length < 30){showToast('Write more before submitting');return;}
+  var fw = document.getElementById('feedback-wrap');
+  fw[IH] = '<div class="feedback-loading"><div class="spinner"></div><span>Analyzing your answer with Claude AI…</span></div>';
+  document.getElementById('submit-btn').disabled = true;
+  callClaudeForFeedback(_selectedQ, ans, _role, function(result){
+    document.getElementById('submit-btn').disabled = false;
+    renderSingleFeedback(result, _selectedQ);
+    trackWeakPatterns(result);
+  });
+}
+
+/* ── CLAUDE API ── */
+function buildSystemPrompt(){
+  return 'You are an honest, evidence-based interview coach for Salesforce\'s Great Competency & Characteristics interview framework.\n\nEvaluate the candidate\'s answer and return ONLY valid JSON with no markdown, no extra text.\n\nGUARDRAILS:\n1. Only evaluate against the exact question, competency, and sub_behaviors provided.\n2. Evaluate ONLY STAR structure and named sub-behaviors. Never comment on accent, fluency, or protected characteristics.\n3. Frame verdicts as practice feedback only — never hiring verdicts.\n4. If the answer does not address the question, set overall.verdict to "Weak" and explain in overall.text.\n5. If borderline, mark Result as "Missing" rather than inferring.\n6. Direct, not harsh. Never praise without quoting specific evidence from the answer.\n\nOUTPUT: Return exactly this JSON schema:\n{\n  "star": {\n    "situation": {"verdict": "Strong|Partial|Missing", "reason": "..."},\n    "task": {"verdict": "Strong|Partial|Missing", "reason": "..."},\n    "action": {"verdict": "Strong|Partial|Missing", "reason": "..."},\n    "result": {"verdict": "Strong|Partial|Missing", "reason": "..."}\n  },\n  "competency_evidence": [\n    {"behavior": "...", "evidence": "..."}\n  ],\n  "overall": {\n    "verdict": "Strong|Adequate|Weak",\n    "text": "..."\n  },\n  "sharpen": {\n    "before": "...",\n    "after": "..."\n  },\n  "nudge": null\n}';
+}
+
+function buildUserPrompt(q, answer, role){
+  return 'QUESTION: '+q._qtext+'\n\nCOMPETENCY: '+q.competency+'\nCHARACTERISTIC: '+q.characteristic+'\nROLE TYPE: '+role+'\nSUB-BEHAVIORS: '+q.sub_behaviors.join(', ')+'\n\nCANDIDATE ANSWER:\n'+answer+'\n\nReturn only the JSON object as specified.';
+}
+
+function callClaudeForFeedback(q, answer, role, cb){
+  if(!_apiKey){cb({_selfAssess:true, q:q});return;}
+  var payload = JSON.stringify({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1800,
+    system: buildSystemPrompt(),
+    messages: [{role:'user', content: buildUserPrompt(q, answer, role)}]
+  });
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': _apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: payload
+  }).then(function(r){return r.json();}).then(function(data){
+    if(data.error){cb({_error: data.error.message||'API error'});return;}
+    var text = (data.content && data.content[0] && data.content[0].text) || '';
+    try{cb(JSON.parse(text));}
+    catch(e){cb({_raw: text});}
+  }).catch(function(err){cb({_error: err.message||'Network error'});});
+}
+
+/* ── RENDER SINGLE FEEDBACK ── */
+function renderSingleFeedback(result, q){
+  var fw = document.getElementById('feedback-wrap');
+  if(result._error){
+    fw[IH] = '<div class="card"><div class="error-block">Error: '+esc(result._error)+'</div></div>';
+    return;
+  }
+  if(result._selfAssess){fw[IH] = buildSelfAssessHtml(q);fw.scrollIntoView({behavior:'smooth',block:'start'});return;}
+  if(result._raw){
+    fw[IH] = '<div class="feedback-card"><div class="fb-header"><span>&#129302;</span>Claude Feedback</div><div class="fb-body"><div class="raw-feedback">'+esc(result._raw)+'</div></div></div>';
+    fw.scrollIntoView({behavior:'smooth',block:'start'});return;
+  }
+  var html = buildFeedbackHtml(result, q);
+  fw[IH] = html;
+  fw.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function buildFeedbackHtml(result, q){
+  var html = '';
+  // STAR
+  var starData = result.star || {};
+  var comps = ['situation','task','action','result'];
+  html += '<div class="feedback-card">';
+  html += '<div class="fb-header"><span>&#11088;</span>&nbsp;STAR Breakdown</div>';
+  html += '<div class="fb-body"><div class="star-grid">';
+  comps.forEach(function(c){
+    var d = starData[c] || {};
+    var v = (d.verdict||'missing').toLowerCase();
+    html += '<div class="star-cell">';
+    html += '<div class="star-label">'+c.charAt(0).toUpperCase()+c.slice(1)+'</div>';
+    html += '<div class="star-verdict '+v+'">'+esc(d.verdict||'Missing')+'</div>';
+    html += '<div class="star-reason">'+esc(d.reason||'')+'</div>';
+    html += '</div>';
+  });
+  html += '</div></div></div>';
+  // Competency evidence
+  var evList = result.competency_evidence || [];
+  if(evList.length){
+    html += '<div class="feedback-card">';
+    html += '<div class="fb-header"><span>&#127919;</span>&nbsp;Competency Evidence &mdash; '+esc(q.competency)+'</div>';
+    html += '<div class="fb-body"><div class="comp-list">';
+    evList.forEach(function(row){
+      html += '<div class="comp-row">';
+      html += '<div class="comp-behavior">'+esc(row.behavior||'')+'</div>';
+      html += '<div class="comp-evidence">'+esc(row.evidence||'')+'</div>';
+      html += '</div>';
+    });
+    html += '</div></div></div>';
+  }
+  // Overall + sharpen
+  if(result.overall){
+    var ov = (result.overall.verdict||'adequate').toLowerCase();
+    html += '<div class="feedback-card">';
+    html += '<div class="fb-header"><span>&#128202;</span>&nbsp;Overall Verdict</div>';
+    html += '<div class="fb-body">';
+    html += '<div class="verdict-block '+ov+'">';
+    html += '<div class="verdict-badge '+ov+'">'+esc(result.overall.verdict||'')+'</div>';
+    html += '<div class="verdict-text">'+esc(result.overall.text||'')+'</div>';
+    html += '</div>';
+    if(result.sharpen){
+      html += '<div class="sharpen-block" style="margin-top:12px;">';
+      html += '<div class="sharpen-label">&#9889; Sharpen This</div>';
+      html += '<div class="sharpen-before"><strong>Before:</strong> '+esc(result.sharpen.before||'')+'</div>';
+      html += '<div class="sharpen-after" style="margin-top:6px;"><strong>After:</strong> '+esc(result.sharpen.after||'')+'</div>';
+      html += '</div>';
+    }
+    if(result.nudge){
+      html += '<div class="nudge-block" style="margin-top:12px;">&#128172; '+esc(result.nudge)+'</div>';
+    }
+    html += '</div></div>';
+  }
+  html += '<div style="display:flex;gap:10px;margin-top:8px;">';
+  html += '<button class="btn-secondary" onclick="clearAnswer();document.getElementById(\'answer-card\').scrollIntoView({behavior:\'smooth\'})">Try Again</button>';
+  html += '<button class="btn-ghost" onclick="document.querySelector(\'#q-list\').scrollIntoView({behavior:\'smooth\'})">New Question</button>';
+  html += '</div>';
+  return html;
+}
+
+function buildSelfAssessHtml(q){
+  var html = '<div class="feedback-card">';
+  html += '<div class="fb-header"><span>&#128269;</span>&nbsp;Self-Assessment (No API Key)</div>';
+  html += '<div class="fb-body">';
+  html += '<p style="font-size:9.5pt;color:var(--text-muted);margin-bottom:16px;">Rate each STAR component. <button class="btn-ghost" onclick="openApiModal()" style="font-size:8.5pt;padding:4px 12px;">Connect Claude AI</button> for full AI feedback.</p>';
+  ['Situation','Task','Action','Result'].forEach(function(c){
+    html += '<div style="margin-bottom:14px;">';
+    html += '<div style="font-size:9pt;font-weight:700;color:var(--text-muted);margin-bottom:6px;">'+c+'</div>';
+    html += '<div style="display:flex;gap:8px;">';
+    ['Strong','Partial','Missing'].forEach(function(v){
+      html += '<button class="btn-ghost sa-btn" style="font-size:9pt;" data-comp="'+esc(c)+'" data-val="'+esc(v)+'" onclick="selfAssessSelect(this)">'+v+'</button>';
+    });
+    html += '</div></div>';
+  });
+  html += '<div style="margin-top:16px;padding:14px 16px;border-radius:var(--radius-sm);background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);font-size:9pt;color:var(--amber-light);">';
+  html += '<strong>Sub-behaviors for '+esc(q.competency)+':</strong> '+esc(q.sub_behaviors.join(' · '));
+  html += '</div></div></div>';
+  return html;
+}
+function selfAssessSelect(btn){
+  var parent = btn.parentNode;
+  parent.querySelectorAll('button').forEach(function(b){b.style.background='';b.style.color='';});
+  btn.style.background = 'var(--surface-hover)';
+  btn.style.color = 'var(--text)';
+}
+
+/* ── WEAK PATTERN TRACKING ── */
+function trackWeakPatterns(result){
+  if(!result||!result.star) return;
+  ['situation','task','action','result'].forEach(function(s){
+    if(result.star[s] && result.star[s].verdict && result.star[s].verdict.toLowerCase()!=='strong'){
+      _weakPatterns[s] = (_weakPatterns[s]||0)+1;
+    }
+  });
+}
+
+/* ── MOCK MODE ── */
+function renderMockSetup(){renderMockCharGrid();}
+function renderMockCharGrid(){
+  var chars = getCharacteristics(_mockRole);
+  var grid = document.getElementById('mock-char-grid');
+  grid[IH] = chars.map(function(c){
+    return '<label class="char-check">'
+      +'<input type="checkbox" checked data-char="'+esc(c)+'">'
+      +'<div class="char-check-label">'+esc(c)+'</div>'
+      +'</label>';
+  }).join('');
+}
+function mockSelectAll(v){
+  document.querySelectorAll('#mock-char-grid input[type=checkbox]').forEach(function(cb){cb.checked=v;});
+}
+function startMock(){
+  var selected = [];
+  document.querySelectorAll('#mock-char-grid input[type=checkbox]:checked').forEach(function(cb){selected.push(cb.dataset.char);});
+  if(!selected.length){showToast('Select at least one characteristic');return;}
+  var qPerChar = Math.min(2, Math.max(1, parseInt(document.getElementById('mock-q-per-char').value,10)||1));
+  var pool = getPool(_mockRole);
+  _mockQueue = [];
+  selected.forEach(function(char){
+    var charQs = pool.filter(function(q){return q.characteristic===char && !q._isSupplementary;});
+    if(!charQs.length) charQs = pool.filter(function(q){return q.characteristic===char;});
+    shuffleArr(charQs);
+    for(var i=0;i<qPerChar && i<charQs.length;i++) _mockQueue.push(charQs[i]);
+  });
+  shuffleArr(_mockQueue);
+  _mockAnswers = [];
+  _mockIdx = 0;
+  document.getElementById('mock-setup-view').style.display = 'none';
+  document.getElementById('mock-inprogress-view').style.display = 'block';
+  document.getElementById('mock-report-view').style.display = 'none';
+  renderMockQuestion();
+}
+function renderMockQuestion(){
+  if(_mockIdx>=_mockQueue.length){finishMock();return;}
+  var q = _mockQueue[_mockIdx];
+  document.getElementById('mock-progress-bar').style.width = (_mockIdx/_mockQueue.length*100)+'%';
+  document.getElementById('mock-q-num').textContent = 'Question '+(_mockIdx+1)+' of '+_mockQueue.length+' · '+q.characteristic+' / '+q.competency;
+  document.getElementById('mock-q-text').textContent = q._qtext;
+  document.getElementById('mock-answer-input').value = '';
+  document.getElementById('mock-char-count').textContent = '0 words';
+  document.getElementById('mock-next-btn').textContent = _mockIdx===_mockQueue.length-1 ? 'Finish & See Report →' : 'Next Question →';
+}
+function mockNext(){
+  var ans = document.getElementById('mock-answer-input').value.trim();
+  if(ans.length < 20){showToast('Write something before continuing');return;}
+  _mockAnswers.push({q:_mockQueue[_mockIdx], answer:ans});
+  _mockIdx++;
+  if(_mockIdx>=_mockQueue.length) finishMock();
+  else renderMockQuestion();
+}
+function abandonMock(){
+  if(_mockAnswers.length > 0){
+    if(!confirm('Abandon mock? You\'ll get a partial report on questions answered so far.')) return;
+    finishMock();
+  } else { resetMockSetup(); }
+}
+function resetMockSetup(){
+  document.getElementById('mock-setup-view').style.display = 'block';
+  document.getElementById('mock-inprogress-view').style.display = 'none';
+  document.getElementById('mock-report-view').style.display = 'none';
+}
+function finishMock(){
+  document.getElementById('mock-inprogress-view').style.display = 'none';
+  document.getElementById('mock-progress-bar').style.width = '100%';
+  var reportEl = document.getElementById('mock-report-view');
+  reportEl.style.display = 'block';
+  if(!_apiKey){reportEl[IH] = buildMockNoApiReport();return;}
+  reportEl[IH] = '<div class="feedback-loading"><div class="spinner"></div><span>Analyzing all '+_mockAnswers.length+' answers…</span></div>';
+  batchAnalyze(0, [], function(all){reportEl[IH] = buildMockReport(all);});
+}
+function batchAnalyze(idx, results, done){
+  if(idx>=_mockAnswers.length){done(results);return;}
+  var e = _mockAnswers[idx];
+  callClaudeForFeedback(e.q, e.answer, _mockRole, function(res){
+    results.push({q:e.q, answer:e.answer, feedback:res});
+    batchAnalyze(idx+1, results, done);
+  });
+}
+function buildMockNoApiReport(){
+  var html = '<div class="card"><div class="card-title">Mock Complete &mdash; '+_mockAnswers.length+' Answers Recorded</div>';
+  html += '<p style="font-size:10pt;color:var(--text-muted);margin-bottom:16px;"><button class="btn-ghost" onclick="openApiModal()">Connect Claude AI</button> to get the full AI-powered performance report.</p>';
+  html += '<table class="report-table"><thead><tr><th>#</th><th>Competency</th><th>Preview</th></tr></thead><tbody>';
+  _mockAnswers.forEach(function(e,i){
+    html += '<tr><td style="color:var(--text-dim);font-weight:700;">Q'+(i+1)+'</td>'
+      +'<td>'+esc(e.q.competency)+'</td>'
+      +'<td style="color:var(--text-muted);font-size:8.5pt;">'+esc(e.answer.slice(0,80))+'&hellip;</td></tr>';
+  });
+  html += '</tbody></table>';
+  html += '<div style="margin-top:20px;"><button class="btn-secondary" onclick="resetMockSetup()">Run Again</button></div>';
+  html += '</div>';
+  return html;
+}
+function buildMockReport(results){
+  var total = results.length;
+  var sc = {strong:0,partial:0,missing:0};
+  var vc = {strong:0,adequate:0,weak:0};
+  var wc = {result:0,situation:0,task:0,action:0};
+  var rows = '';
+  results.forEach(function(r,i){
+    var fb = r.feedback;
+    var ov = ((fb.overall && fb.overall.verdict)||'adequate').toLowerCase();
+    vc[ov] = (vc[ov]||0)+1;
+    var starPills = '';
+    if(fb.star){
+      ['situation','task','action','result'].forEach(function(s){
+        var v = (fb.star[s]&&fb.star[s].verdict||'missing').toLowerCase();
+        sc[v] = (sc[v]||0)+1;
+        if(v!=='strong') wc[s]=(wc[s]||0)+1;
+        starPills += '<span class="pill '+v+'">'+s.charAt(0).toUpperCase()+' '+v.charAt(0).toUpperCase()+'</span>';
+      });
+    }
+    var note = (fb.sharpen && fb.sharpen.before) || (fb._error||'');
+    rows += '<tr>'
+      +'<td style="color:var(--text-dim);font-weight:700;">Q'+(i+1)+'</td>'
+      +'<td><div style="font-size:9pt;font-weight:700;color:var(--text);">'+esc(r.q.competency)+'</div>'
+        +'<div style="font-size:8pt;color:var(--text-dim);">'+esc(r.q.characteristic)+'</div></td>'
+      +'<td>'+starPills+'</td>'
+      +'<td><span class="pill '+(ov||'adequate')+'">'+esc((fb.overall&&fb.overall.verdict)||'N/A')+'</span></td>'
+      +'<td style="font-size:8.5pt;color:var(--text-muted);">'+esc((note||'').slice(0,100))+'</td>'
+      +'</tr>';
+  });
+  var starTotal = sc.strong+sc.partial+sc.missing;
+  var starPct = starTotal > 0 ? Math.round(sc.strong/starTotal*100) : 0;
+  var compPct = total > 0 ? Math.round(vc.strong/total*100) : 0;
+  var worstStar = Object.keys(wc).sort(function(a,b){return wc[b]-wc[a];})[0];
+  var html = '<div class="card"><div class="card-title">Session Report &mdash; '+total+' Question'+(total>1?'s':'')+' Analyzed</div>';
+  html += '<div class="report-summary">';
+  html += '<div class="report-stat"><div class="report-stat-val" style="color:var(--green-light);">'+starPct+'%</div><div class="report-stat-lbl">STAR Strong Rate</div></div>';
+  html += '<div class="report-stat"><div class="report-stat-val" style="color:'+(compPct>=70?'var(--green-light)':compPct>=40?'var(--amber-light)':'var(--red-light)')+';">'+compPct+'%</div><div class="report-stat-lbl">Competency Strong</div></div>';
+  html += '<div class="report-stat"><div class="report-stat-val" style="color:var(--red-light);">'+sc.missing+'</div><div class="report-stat-lbl">Missing Components</div></div>';
+  html += '<div class="report-stat"><div class="report-stat-val">'+total+'</div><div class="report-stat-lbl">Answered</div></div>';
+  html += '</div>';
+  html += '<table class="report-table"><thead><tr><th>#</th><th>Competency</th><th>STAR</th><th>Verdict</th><th>Top Note</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  html += '</div>';
+  html += '<div class="card"><div class="card-title">Priority Fixes</div>';
+  if(wc[worstStar]>=2){
+    html += '<div class="priority-block"><div class="priority-label">&#127919; Focus Area #1</div>';
+    html += '<div class="priority-text"><strong>'+worstStar.charAt(0).toUpperCase()+worstStar.slice(1)+'</strong> was weak or missing in '+wc[worstStar]+' of '+total+' answers. Make this component explicit, specific, and measurable.</div></div>';
+  }
+  if(vc.weak>=2){
+    html += '<div class="priority-block" style="border-left-color:var(--amber);"><div class="priority-label" style="color:var(--amber-light);">&#9889; Focus Area #2</div>';
+    html += '<div class="priority-text">'+vc.weak+' of '+total+' competencies landed Weak. Review sub-behaviors and build stories that explicitly hit each one.</div></div>';
+  }
+  if(vc.weak<2 && wc[worstStar]<2){
+    html += '<div style="padding:16px;font-size:10pt;color:var(--green-light);">&#10003; Strong overall session &mdash; no critical patterns detected.</div>';
+  }
+  if(vc.weak>=2 || sc.missing>=3){
+    html += '<div class="nudge-block">You\'ve got a good base here, but a couple of these could really benefit from saying them out loud to a real person. Loop in a peer for a quick practice round or find a Mentor Circle mock-interview session.</div>';
+  }
+  html += '</div>';
+  html += '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
+  html += '<button class="btn-primary mock-next-btn" onclick="resetMockSetup()">Run Another Mock</button>';
+  html += '<button class="btn-secondary" onclick="setMode(\'single\')">Practice Weak Competencies</button>';
+  html += '</div>';
+  return html;
+}
+
+/* ── INIT ── */
+(function(){
+  document.addEventListener('keydown', function(e){if(e.key==='Escape') closeApiModal();});
+  updateApiBtn();
+})();
+</script>
+
+<script>
+/* Inject question bank and flatten */
+(function(){
+  var raw = {"IC":[{"characteristic":"Courageous Communicator","competency":"Build Trust & Authenticity","questions":["Tell me about a time when you decided not to move forward with a product or service to an external or internal customer because you knew the product or service didn't meet the customer's needs.","Sometimes we need to create trust with those who hold a different point of view from our own. Describe a time when you found yourself in this situation.","Tell me about a time at work when you objectively considered others' ideas, even when they conflicted with yours."],"sub_behaviors":["Acts with integrity","Discloses own positions","Remains open to ideas","Values others"],"supplementary_practice_question":"Tell me about a time you had to rebuild trust with someone after a misstep on your part."},{"characteristic":"Courageous Communicator","competency":"Communicate Effectively","questions":["Give me an example of a situation in which you adjusted your communication style to a given situation.","Tell me about a time when you had to keep the engagement of a group during a presentation or meeting. What did you do?","Can you provide an example of a time when you had to make space for others to talk so you can better understand their perspective?"],"sub_behaviors":["Organizes the communication","Maintains attention","Adjusts to the listener","Listens actively"],"supplementary_practice_question":"Describe a time you had to simplify a complex or technical topic for a non-technical audience."},{"characteristic":"Courageous Communicator","competency":"Demonstrate Courage","questions":["Tell me about a specific situation in which you stuck with a position or plan of action in spite of barriers or difficulties.","Describe a time when you supported somebody's idea that had a low probability of success. Why did you support the idea?","Describe the biggest professional risk you've taken. What information did you consider before taking action?"],"sub_behaviors":["Takes a stand","Initiates bold action","Takes personal accountability"],"supplementary_practice_question":"Tell me about a time you challenged a decision made by someone more senior than you."},{"characteristic":"Get it Done","competency":"Achieve Results","questions":["Describe a time when you set challenging work goals and met them.","Describe a situation when you discovered that your work was not up to your manager's expectations. What did you do?","Tell me about something you've done to encourage peers to take responsibility for improving their work standards."],"sub_behaviors":["Sets standards for excellence","Ensures high quality","Takes responsibility","Encourages others to take responsibility"],"supplementary_practice_question":"Describe a goal you almost didn't hit — what did you change to get there?"},{"characteristic":"Get it Done","competency":"Take Accountability","questions":["How have you ensured that you and others shared responsibility for accomplishing a long-term objective? Give an example.","It can be challenging to achieve the objectives of a complex organizational initiative. Describe a difficult initiative that you were responsible for. How were you able to achieve the objectives you set?","Think of a recent initiative that you were responsible for and describe what you did to plan for it."],"sub_behaviors":["Maintains focus","Measures progress and outcome","Ensures accountability"],"supplementary_practice_question":"Tell me about a time a project you owned went off track. What did you do?"},{"characteristic":"Motivate & Champion","competency":"Manage Ambiguity","questions":["Tell me about a time when you were faced with an unexpected change in your work responsibilities. What did you do?","Can you describe a recent time when you had to make an adjustment due to a changing policy or procedure?","Describe a time when you helped a group of employees understand why a specific change was necessary."],"sub_behaviors":["Tries to understand changes","Approaches change with a positive mind-set","Adjusts behavior"],"supplementary_practice_question":"Describe a time you had to make progress without complete information."},{"characteristic":"Motivate & Champion","competency":"Influence","questions":["Describe one of the most successful techniques you've used to gain others' agreement. Share a recent example.","Describe a situation in which you had to influence an inflexible person. What did you do?","Describe a time when you needed information and contributions from other people to ensure the success of one of your projects."],"sub_behaviors":["Clarifies the situation","Shares own perspective to build trust","Builds a compelling case","Involves others in exploring solutions","Empathizes with others' concerns","Steers commitment to action"],"supplementary_practice_question":"Tell me about a time you changed someone's mind on a decision they'd already made."},{"characteristic":"Salesforce Smart","competency":"Champion Customer Success","questions":["Tell me about a time when you identified customer expectations after it was initially difficult to do so.","Tell me about a recent customer complaint that came to you and how you resolved it.","Describe a time when you identified and helped remove a barrier to effective customer service."],"sub_behaviors":["Seeks to understand customers","Recognizes customer service issues","Implements customer-focused practices","Checks for customer satisfaction"],"supplementary_practice_question":"Describe a time you advocated internally for a customer need against internal resistance."},{"characteristic":"Salesforce Smart","competency":"Drive Innovation","questions":["Give me an example of a time when you experimented with a new approach to solve a problem at work.","Give me an example of an idea you had for improving your organization's processes, procedures, or products. How did you come up with this idea?","Can you provide an example of an idea that you brought from another work group or organization to your own?"],"sub_behaviors":["Seeks to understand existing perspectives","Challenges current thinking","Experiments to learn","Takes action on ideas"],"supplementary_practice_question":"Tell me about an idea you had that failed. What did you learn?"},{"characteristic":"Salesforce Smart","competency":"Make Informed Decisions","questions":["What sources of information have you used to monitor/uncover problems in your job? Tell me about a situation in which you used one of those sources.","Give me an example of a good decision you made recently. What, if any, alternatives did you consider?","Describe a difficult decision you recently made at work. What factors did you consider? How long did it take to make your decision?"],"sub_behaviors":["Identifies problems and opportunities","Gathers information","Interprets information","Evaluates alternatives and risks","Chooses an effective option","Commits to action","Considers others' perspectives"],"supplementary_practice_question":"Describe a decision you made with incomplete data. How did you mitigate the risk?"},{"characteristic":"Win as a Team","competency":"Foster Equality & Inclusion","questions":["Describe when you were working on a project or task with a diverse group of peers. How did you work with each one?","Can you describe a time when you helped to ensure that divergent ideas were heard?","Tell me about a time when you worked with someone who had a very different work style than your own."],"sub_behaviors":["Seeks understanding","Conveys respect","Uses diversity as an advantage"],"supplementary_practice_question":"Tell me about a time you noticed an inclusion gap on your team and addressed it."},{"characteristic":"Win as a Team","competency":"Build Networks & Partnerships","questions":["Tell me about a recent idea you explored and developed with another peer/team member. Why did you share it with that person?","Describe a time when you found yourself needing to build a relationship with a peer/coworker who held very different points of view from your own.","Tell me about a time when it was difficult to get along with a peer, team member, or another person at work."],"sub_behaviors":["Contributes to goal accomplishment","Asks for help and encourages involvement","Informs others on team","Models commitment"],"supplementary_practice_question":"Describe a partnership you built that wasn't obviously required by your role."}],"PM":[{"characteristic":"Courageous Communicator","competency":"Build Trust & Authenticity","questions":["Think about what you have done to establish a work environment based on trust between you and your direct reports. Give me an example of what you said or did to create this environment.","Describe a time when you thanked or rewarded a direct report/peer for sharing his/her thoughts and feelings about a work-related issue.","It can be difficult to share your mistakes with your direct reports/peers. Tell me about a time when you decided to share a mistake with your direct reports/peers."],"sub_behaviors":["Demonstrates personal integrity","Encourages disclosure","Facilitates an open exchange of ideas","Advocates for others"],"supplementary_practice_question":"Tell me about a time you had to rebuild trust with someone after a misstep on your part."},{"characteristic":"Courageous Communicator","competency":"Communicate Effectively","questions":["Give me an example of a situation in which you adjusted your communication style to a given situation.","Tell me about a time when you had to keep the engagement of a group during a presentation or meeting. What did you do?","Can you provide an example of a time when you had to make space for others to talk so you can better understand their perspective?"],"sub_behaviors":["Delivers clear messages","Communicates with impact","Uses language appropriately","Ensures understanding"],"supplementary_practice_question":"Describe a time you had to simplify a complex or technical topic for a non-technical audience."},{"characteristic":"Courageous Communicator","competency":"Demonstrate Courage","questions":["Describe a time when you supported somebody's idea that had a low probability of success. Why did you support the idea?","Risk taking is never easy, especially when your peers or coworkers don't support you. Tell me about a risk that you took even if others did not support you.","Communicating poor performance ratings can be difficult. Describe how you've handled a situation like this with a direct report."],"sub_behaviors":["Takes a stand","Initiates bold action","Takes personal accountability"],"supplementary_practice_question":"Tell me about a time you challenged a decision made by someone more senior than you."},{"characteristic":"Get it Done","competency":"Achieve Results","questions":["Describe a time when you were particularly effective at achieving end results.","Achieving required work goals or objectives is not always easy. Describe a difficult goal that you were able to achieve. Why was it difficult?","How have you managed and measured your and your team's progress toward a project's due date?"],"sub_behaviors":["Targets opportunities","Establishes stretch goals","Achieves goals","Stays focused"],"supplementary_practice_question":"Describe a goal you almost didn't hit — what did you change to get there?"},{"characteristic":"Get it Done","competency":"Take Accountability","questions":["Describe a difficult initiative that you were responsible for. How were you able to achieve the objectives you set?","Describe a time when you needed to make sure that people were accountable for their actions.","How have you aligned people with new responsibilities during a major project or initiative? Give me an example."],"sub_behaviors":["Maintains focus","Measures progress and outcome","Ensures accountability"],"supplementary_practice_question":"Tell me about a time a project you owned went off track. What did you do?"},{"characteristic":"Motivate & Champion","competency":"Manage Ambiguity","questions":["Tell me about a time when you were involved in an effort to clarify the reasons for a major organizational change. What did you do?","Describe the strategies you have used to facilitate the implementation of a major change in your group/team/organization.","What systems have you put in place to recognize or reward associates who suggest or make effective changes?"],"sub_behaviors":["Communicates what is changing and why","Approaches change with a positive mind-set","Helps others adjust behavior"],"supplementary_practice_question":"Describe a time you had to make progress without complete information."},{"characteristic":"Motivate & Champion","competency":"Influence","questions":["Describe one of the most successful techniques you've used to gain others' agreement. Share a recent example.","Describe a situation in which you had to influence an inflexible person. What did you do?","Describe a time when you needed information and contributions from other people to ensure the success of one of your projects."],"sub_behaviors":["Clarifies the situation","Builds a compelling case","Steers commitment to action"],"supplementary_practice_question":"Tell me about a time you changed someone's mind on a decision they'd already made."},{"characteristic":"Motivate & Champion","competency":"Coach & Develop","pm_only":true,"questions":["Give me examples of what you've done to address the development needs of your direct reports.","What are the most effective techniques you have used to help another person develop his or her skills and abilities? Give me an example of when you used one of these techniques.","Tell me about a time when you helped an individual who was not performing satisfactorily. What did you do?"],"sub_behaviors":["Assesses to identify goals","Establishes acquisition plan","Creates a learning environment","Ensures immediate learning application","Monitors progress"],"supplementary_practice_question":"Describe how you've tailored your coaching style to two very different direct reports."},{"characteristic":"Motivate & Champion","competency":"Inspire","pm_only":true,"questions":["Tell me about a recent time when you had to instill confidence in a team that was working on a challenging project.","Describe a time when you helped someone understand why the team, department, or business unit was going in a particular direction.","What have you done to make your organization's vision and values meaningful to others?"],"sub_behaviors":["Inspires effort","Builds confidence in success","Models the vision and values","Leads through vision and values"],"supplementary_practice_question":"Tell me about a time morale was low on your team and what you did about it."},{"characteristic":"Salesforce Smart","competency":"Champion Customer Success","questions":["Tell me about a time when you identified customer expectations after it was initially difficult to do so.","Tell me about a recent customer complaint that was escalated to you and how you resolved it.","How do you ensure that internal or external customers keep you informed of issues, concerns, and satisfaction in a timely fashion? Give me a recent example."],"sub_behaviors":["Seeks to understand customers","Identifies customer service issues","Drives customer-focused practices","Assures customer satisfaction"],"supplementary_practice_question":"Describe a time you advocated internally for a customer need against internal resistance."},{"characteristic":"Salesforce Smart","competency":"Drive Innovation","questions":["Tell me how you have worked with direct reports/group members to develop new and innovative ideas to solve business problems.","Describe a time when an employee came to you with a new solution that didn't work. What did you do?","Describe a time when you helped others experiment with a new way to approach a problem."],"sub_behaviors":["Inspires curiosity","Challenges current thinking","Supports experimentation","Advances ideas to the next stage"],"supplementary_practice_question":"Tell me about an idea you had that failed. What did you learn?"},{"characteristic":"Salesforce Smart","competency":"Make Informed Decisions","questions":["Can you give me an example of a decision you made that significantly impacted your team? Describe your decision-making process.","Think about a good decision you made recently. Describe the process you followed in making the decision.","Describe a difficult decision you recently made at work. What factors did you consider?"],"sub_behaviors":["Identifies problems and opportunities","Gathers information","Interprets information","Generates alternatives","Evaluates alternatives and risks","Chooses an effective option","Commits to action","Considers others' perspectives"],"supplementary_practice_question":"Describe a decision you made with incomplete data. How did you mitigate the risk?"},{"characteristic":"Win as a Team","competency":"Foster Equality & Inclusion","questions":["Describe how you have encouraged divergent perspectives in a group setting.","Tell me about a time when members of a team had difficulty adapting to the differences of others on the team. How did you handle the situation?","We all hold biases and stereotypes to some degree. What steps have you taken to examine your own biases and stereotypes?"],"sub_behaviors":["Seeks understanding","Uses diversity as an advantage","Conveys respect","Champions diversity"],"supplementary_practice_question":"Tell me about a time you noticed an inclusion gap on your team and addressed it."},{"characteristic":"Win as a Team","competency":"Build Networks & Partnerships","questions":["Tell me about a time you collaborated with others to determine actions needed to achieve mutual goals.","Describe a situation in which you proactively developed an important relationship outside of your work group. Why was it important to do this?","Tell me about the greatest difficulty you faced when trying to get along with peers, team members, or others at work."],"sub_behaviors":["Seeks opportunities to build relationships","Clarifies shared goals","Develops others' and own ideas","Supports partners","Involves others"],"supplementary_practice_question":"Describe a partnership you built that wasn't obviously required by your role."}]};
+
+  // Flatten each role pool
+  ['IC','PM'].forEach(function(role){
+    var entries = raw[role] || [];
+    var flat = [];
+    entries.forEach(function(entry, ei){
+      (entry.questions||[]).forEach(function(qt, qi){
+        var q = {};
+        for(var k in entry) if(entry.hasOwnProperty(k)) q[k] = entry[k];
+        q._qtext = qt;
+        q._uid = role + '_' + ei + '_' + qi;
+        q._isSupplementary = false;
+        q._pmOnly = !!entry.pm_only;
+        flat.push(q);
+      });
+      if(entry.supplementary_practice_question){
+        var sq = {};
+        for(var k in entry) if(entry.hasOwnProperty(k)) sq[k] = entry[k];
+        sq._qtext = entry.supplementary_practice_question;
+        sq._uid = role + '_' + ei + '_s';
+        sq._isSupplementary = true;
+        sq._pmOnly = !!entry.pm_only;
+        flat.push(sq);
+      }
+    });
+    raw[role] = flat;
+  });
+
+  QBANK = raw;
+  // Default to Single Practice mode
+  setMode('single');
+})();
+</script>
+
+</body>
+</html>
