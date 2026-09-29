@@ -29,10 +29,63 @@
   --radius-sm:8px;
   --shadow:0 24px 64px rgba(0,0,0,.55);
 }
+/* ── LIGHT MODE OVERRIDES ── */
+[data-theme="light"]{
+  --bg:#F6F8FB;
+  --surface:rgba(0,0,0,.035);
+  --surface-hover:rgba(0,0,0,.06);
+  --border:rgba(0,0,0,.10);
+  --border-accent:rgba(0,0,0,.16);
+  --text:#172033;
+  --text-muted:rgba(23,32,51,.55);
+  --text-dim:rgba(23,32,51,.35);
+  --green-light:#059669;
+  --amber-light:#B45309;
+  --red-light:#DC2626;
+  --shadow:0 24px 64px rgba(23,32,51,.12);
+}
+[data-theme="light"] html,[data-theme="light"] body,[data-theme="light"]{background:var(--bg);}
+[data-theme="light"] .ambient::before{background:radial-gradient(circle,rgba(13,148,136,0.06) 0%,transparent 65%);}
+[data-theme="light"] .ambient::after{background:radial-gradient(circle,rgba(99,102,241,0.04),transparent 70%);}
+[data-theme="light"] .topbar{background:rgba(246,248,251,0.95);border-bottom-color:var(--border);}
+[data-theme="light"] .hero-h1{color:#0F172A;}
+[data-theme="light"] .mode-title{color:#0F172A;}
+[data-theme="light"] .modal-box{background:linear-gradient(160deg,#F8FAFC 0%,#EEF4F3 100%);border-color:var(--border-accent);}
+[data-theme="light"] .modal-title{color:#0F172A;}
+[data-theme="light"] .fb-header{background:rgba(0,0,0,.025);}
+[data-theme="light"] .star-cell{background:rgba(0,0,0,.02);}
+[data-theme="light"] .comp-row{background:rgba(0,0,0,.02);}
+[data-theme="light"] .verdict-block.strong{border-color:rgba(5,150,105,.3);background:rgba(5,150,105,.06);}
+[data-theme="light"] .verdict-block.adequate{border-color:rgba(180,83,9,.2);background:rgba(180,83,9,.05);}
+[data-theme="light"] .verdict-block.weak{border-color:rgba(220,38,38,.2);background:rgba(220,38,38,.05);}
+[data-theme="light"] .verdict-badge.strong{background:rgba(5,150,105,.12);color:#065F46;}
+[data-theme="light"] .verdict-badge.adequate{background:rgba(180,83,9,.12);color:#92400E;}
+[data-theme="light"] .verdict-badge.weak{background:rgba(220,38,38,.12);color:#991B1B;}
+[data-theme="light"] .sharpen-block{border-color:rgba(99,102,241,.25);background:rgba(99,102,241,.06);}
+[data-theme="light"] .sharpen-label{color:#4338CA;}
+[data-theme="light"] .sharpen-after{color:#3730A3;}
+[data-theme="light"] .nudge-block{border-color:rgba(180,83,9,.2);background:rgba(180,83,9,.05);color:#92400E;}
+[data-theme="light"] .priority-block{background:rgba(99,102,241,.05);}
+[data-theme="light"] .priority-label{color:#4338CA;}
+[data-theme="light"] .pill.strong{background:rgba(5,150,105,.12);color:#065F46;}
+[data-theme="light"] .pill.partial{background:rgba(180,83,9,.12);color:#92400E;}
+[data-theme="light"] .pill.missing,.pill.weak,[data-theme="light"] .pill.weak{background:rgba(220,38,38,.12);color:#991B1B;}
+[data-theme="light"] .pill.adequate{background:rgba(180,83,9,.12);color:#92400E;}
+[data-theme="light"] .q-badge{background:rgba(0,0,0,.06);color:var(--text-muted);}
+[data-theme="light"] .q-badge.pm{background:rgba(99,102,241,.12);color:#4338CA;}
+[data-theme="light"] .q-badge.supp{background:rgba(180,83,9,.10);color:#92400E;}
+[data-theme="light"] .filter-btn.all-btn.active{background:rgba(0,0,0,.12);border-color:rgba(0,0,0,.2);color:var(--text);}
+[data-theme="light"] .selected-q-display{background:rgba(13,148,136,.06);}
+[data-theme="light"] textarea.answer-input{background:rgba(0,0,0,.02);}
+[data-theme="light"] .spinner{border-color:rgba(0,0,0,.08);border-top-color:var(--teal);}
+[data-theme="light"] .report-stat{background:#fff;border-color:var(--border);}
+[data-theme="light"] .report-stat-val{color:#0F172A;}
+[data-theme="light"] .toast{background:#fff;border-color:var(--border-accent);color:var(--text);}
+[data-theme="light"] .mock-count-input{background:rgba(0,0,0,.03);}
 html{min-height:100%;background:var(--bg);color:var(--text);
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   font-size:15px;line-height:1.6;}
-body{min-height:100vh;}
+body{min-height:100vh;transition:background .25s,color .25s;}
 button,input,select,textarea{font:inherit;color:inherit;}
 a{color:inherit;text-decoration:none;}
 
@@ -59,6 +112,7 @@ a{color:inherit;text-decoration:none;}
 .api-btn:hover{background:var(--surface-hover);color:var(--text);}
 .api-btn.connected{border-color:rgba(16,185,129,.3);color:var(--green);}
 .api-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+.theme-btn{font-size:13px;padding:6px 12px;}
 
 /* PAGE */
 .page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:40px clamp(16px,4vw,48px) 80px;}
@@ -296,6 +350,7 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
     </div>
   </div>
   <div class="topbar-right">
+    <button class="api-btn theme-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">&#9790;</button>
     <button class="api-btn" id="api-toggle-btn" onclick="openApiModal()">
       <span class="api-dot"></span>
       <span id="api-btn-label">Connect Claude AI</span>
@@ -890,8 +945,21 @@ function buildMockReport(results){
   return html;
 }
 
+/* ── THEME ── */
+function toggleTheme(){
+  var html = document.documentElement;
+  var next = html.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('gcic_theme', next);
+  document.getElementById('theme-toggle-btn').textContent = next==='dark' ? '☾' : '☀';
+}
+
 /* ── INIT ── */
 (function(){
+  var savedTheme = localStorage.getItem('gcic_theme') ||
+    (window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-toggle-btn').textContent = savedTheme==='dark' ? '☾' : '☀';
   document.addEventListener('keydown', function(e){if(e.key==='Escape') closeApiModal();});
   updateApiBtn();
 })();
