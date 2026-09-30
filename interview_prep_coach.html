@@ -1695,7 +1695,15 @@ function finishMock(){
   document.getElementById('mock-progress-bar').style.width = '100%';
   var reportEl = document.getElementById('mock-report-view');
   reportEl.style.display = 'block';
-  if(false){reportEl[IH] = buildMockNoApiReport();return;} /* rule engine always available */
+  /* WASM is too slow to run 5× in series — use rule engine for the full report,
+     WASM/LLM only fires in single-question practice mode where user waits per answer */
+  if(!_openaiKey){
+    var ruleResults = _mockAnswers.map(function(e){
+      return {q:e.q, answer:e.answer, feedback:window._ruleScore(e.q, e.answer)};
+    });
+    reportEl[IH] = buildMockReport(ruleResults);
+    return;
+  }
   reportEl[IH] = '<div class="feedback-loading"><div class="spinner"></div><span>Analyzing all '+_mockAnswers.length+' answers…</span></div>';
   batchAnalyze(0, [], function(all){reportEl[IH] = buildMockReport(all);});
 }
