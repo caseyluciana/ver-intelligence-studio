@@ -429,6 +429,12 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
 .model-info-row{display:flex;align-items:center;gap:10px;margin:14px 0;flex-wrap:wrap;}
 .model-chip{padding:4px 10px;border-radius:20px;background:var(--indigo);color:white;font-size:8.5pt;font-weight:700;letter-spacing:.02em;}
 .model-size{font-size:8.5pt;color:var(--text-muted);}
+.modal-path-divider{margin-top:16px;padding-top:14px;border-top:1px solid var(--border-accent);}
+.modal-path-divider .modal-note{margin-bottom:10px;}
+.modal-back-row{margin-top:14px;padding-top:12px;border-top:1px solid var(--border-accent);}
+.modal-key-note{margin-top:10px;}
+.modal-key-actions{margin-top:18px;}
+.btn-full{width:100%;}
 .model-progress-wrap{margin:14px 0;}
 .model-progress-bar{height:8px;border-radius:999px;background:var(--border-accent);overflow:hidden;margin-bottom:8px;}
 .model-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--indigo));transition:width .4s ease;border-radius:999px;}
@@ -449,22 +455,44 @@ document.dispatchEvent(new CustomEvent('webllm-available'));
 <!-- MODEL LOAD MODAL -->
 <div class="modal-overlay" id="api-modal">
   <div class="modal-box">
-    <div class="modal-title">Load AI Model</div>
-    <div class="modal-sub">Runs a small language model entirely in your browser — no API key, no server, no data leaves your device.</div>
-    <div class="model-info-row">
-      <span class="model-chip">Phi-3.5-mini</span>
-      <span class="model-size">~2.2 GB download &mdash; cached after first use</span>
+    <div class="modal-title" id="modal-main-title">Enable AI Feedback</div>
+
+    <!-- PATH A: local WebGPU model -->
+    <div id="modal-path-local">
+      <div class="modal-sub">Runs a small language model entirely in your browser — no API key, no server, no data leaves your device.</div>
+      <div class="model-info-row">
+        <span class="model-chip">Phi-3.5-mini</span>
+        <span class="model-size">~2.2 GB download &mdash; cached after first use</span>
+      </div>
+      <div class="model-progress-wrap hidden" id="model-progress-wrap">
+        <div class="model-progress-bar"><div class="model-progress-fill" id="model-progress-fill"></div></div>
+        <div class="model-progress-lbl" id="model-progress-lbl">Starting&hellip;</div>
+      </div>
+      <div class="modal-note" id="model-modal-note">
+        First load takes a few minutes while the model downloads. Subsequent loads are instant from cache. Works offline once downloaded.
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="model-load-btn" onclick="startModelLoad()">Load Model</button>
+        <button class="btn-secondary" id="model-skip-btn" onclick="closeApiModal()">Skip (self-assess)</button>
+      </div>
+      <div class="modal-path-divider">
+        <div class="modal-note">Or use an OpenAI API key instead:</div>
+        <button type="button" class="btn-secondary btn-full" onclick="showOpenAIPath()">Use OpenAI API Key</button>
+      </div>
     </div>
-    <div class="model-progress-wrap hidden" id="model-progress-wrap">
-      <div class="model-progress-bar"><div class="model-progress-fill" id="model-progress-fill"></div></div>
-      <div class="model-progress-lbl" id="model-progress-lbl">Starting&hellip;</div>
-    </div>
-    <div class="modal-note" id="model-modal-note">
-      First load takes a few minutes while the model downloads. Subsequent loads are instant from cache. Works offline once downloaded.
-    </div>
-    <div class="modal-actions">
-      <button class="btn-primary" id="model-load-btn" onclick="startModelLoad()">Load Model</button>
-      <button class="btn-secondary" id="model-skip-btn" onclick="closeApiModal()">Skip (self-assess)</button>
+
+    <!-- PATH B: no WebGPU / OpenAI fallback -->
+    <div id="modal-path-openai" class="hidden">
+      <div class="modal-sub" id="openai-modal-sub">Your browser doesn't support WebGPU — the local model can't run. Enter an OpenAI API key to get full AI feedback.</div>
+      <input class="modal-input" type="password" id="openai-key-input" placeholder="sk-..." autocomplete="off" />
+      <div class="modal-note modal-key-note">Your key is only stored in memory for this session — never saved to disk or sent anywhere except OpenAI.</div>
+      <div class="modal-actions modal-key-actions">
+        <button type="button" class="btn-primary" onclick="saveOpenAIKey()">Use This Key</button>
+        <button type="button" class="btn-secondary" onclick="closeApiModal()">Skip (self-assess)</button>
+      </div>
+      <div id="modal-has-webgpu-note" class="hidden modal-back-row">
+        <button type="button" class="btn-secondary btn-full" onclick="showLocalPath()">← Back: use local model instead</button>
+      </div>
     </div>
   </div>
 </div>
@@ -668,6 +696,8 @@ var QBANK = null; // populated below
 var _llmEngine = null;
 var _llmReady = false;
 var _llmLoading = false;
+var _openaiKey = '';
+var _hasWebGPU = (typeof navigator !== 'undefined' && !!navigator.gpu);
 var _role = 'IC';
 var _mockRole = 'IC';
 var _activeFilter = 'all';
@@ -699,12 +729,47 @@ function setSubRole(val){
 
 /* ── MODEL LOAD MODAL ── */
 function openApiModal(){
-  if(_llmReady){showToast('AI model already loaded ✓');return;}
+  if(_llmReady || _openaiKey){showToast('AI already enabled ✓');return;}
+  if(!_hasWebGPU){
+    showOpenAIPath(true);
+  } else {
+    showLocalPath();
+  }
   document.getElementById('api-modal').classList.add('open');
 }
 function closeApiModal(){
-  if(_llmLoading) return; // don't close mid-load
+  if(_llmLoading) return;
   document.getElementById('api-modal').classList.remove('open');
+}
+function showLocalPath(){
+  document.getElementById('modal-path-local').classList.remove('hidden');
+  document.getElementById('modal-path-openai').classList.add('hidden');
+  document.getElementById('modal-main-title').textContent = 'Load AI Model';
+}
+function showOpenAIPath(noGpu){
+  document.getElementById('modal-path-local').classList.add('hidden');
+  document.getElementById('modal-path-openai').classList.remove('hidden');
+  document.getElementById('modal-main-title').textContent = 'Enable AI Feedback';
+  var sub = document.getElementById('openai-modal-sub');
+  if(noGpu){
+    sub.textContent = 'Your browser doesn\'t support WebGPU — the local model can\'t run. Enter an OpenAI API key to get full AI feedback.';
+    document.getElementById('modal-has-webgpu-note').classList.add('hidden');
+  } else {
+    sub.textContent = 'Enter your OpenAI API key to use GPT-4o-mini for feedback instead of the local model.';
+    document.getElementById('modal-has-webgpu-note').classList.remove('hidden');
+  }
+}
+function saveOpenAIKey(){
+  var val = (document.getElementById('openai-key-input').value || '').trim();
+  if(!val || !val.startsWith('sk-')){
+    showToast('Enter a valid OpenAI key (starts with sk-)');
+    return;
+  }
+  _openaiKey = val;
+  _llmReady = true;
+  document.getElementById('api-modal').classList.remove('open');
+  updateApiBtn();
+  showToast('OpenAI key saved — AI feedback enabled ✓');
 }
 function startModelLoad(){
   if(_llmLoading||_llmReady) return;
@@ -953,13 +1018,25 @@ function callClaudeForFeedback(q, answer, role, cb){
     {role:'system', content: buildSystemPrompt()},
     {role:'user',   content: buildUserPrompt(q, answer, role, _selectedFunction)}
   ];
+  if(_openaiKey){
+    fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+_openaiKey},
+      body: JSON.stringify({model:'gpt-4o-mini', messages:messages, max_tokens:800, temperature:0.2})
+    }).then(function(r){return r.json();}).then(function(data){
+      if(data.error){cb({_error: data.error.message||'OpenAI error'});return;}
+      var text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+      text = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+      try{cb(JSON.parse(text));}catch(e){cb({_raw:text});}
+    }).catch(function(err){cb({_error:err.message||'Network error'});});
+    return;
+  }
   _llmEngine.chat.completions.create({
     messages: messages,
     max_tokens: 800,
     temperature: 0.2
   }).then(function(reply){
     var text = (reply.choices && reply.choices[0] && reply.choices[0].message && reply.choices[0].message.content) || '';
-    // strip any accidental markdown fences
     text = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
     try{cb(JSON.parse(text));}
     catch(e){cb({_raw: text});}
