@@ -319,6 +319,17 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
 .sharpen-after{font-size:9pt;color:#C7D2FE;line-height:1.6;font-weight:600;}
 .nudge-block{padding:16px 20px;border-radius:var(--radius-sm);border:1px solid rgba(245,158,11,.2);
   background:rgba(245,158,11,.05);font-size:9.5pt;color:var(--amber-light);line-height:1.65;margin-top:8px;}
+.callout-list{display:grid;gap:10px;}
+.callout-item{display:grid;gap:4px;padding:12px 14px;border-radius:var(--radius-sm);background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06);}
+.callout-q{font-size:9pt;font-weight:900;color:var(--text);}
+.callout-preview{font-size:8.5pt;color:var(--text-dim);font-style:italic;line-height:1.5;}
+.callout-reason{font-size:8.5pt;color:var(--red-light);line-height:1.5;}
+.callout-tip{font-size:8.5pt;color:var(--amber-light);line-height:1.5;}
+[data-theme="light"] .callout-item{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);}
+[data-theme="light"] .callout-q{color:#0F172A;}
+[data-theme="light"] .callout-preview{color:#64748B;}
+[data-theme="light"] .callout-reason{color:#B91C1C;}
+[data-theme="light"] .callout-tip{color:#92400E;}
 .raw-feedback{font-size:9.5pt;color:var(--text);line-height:1.8;white-space:pre-wrap;word-break:break-word;}
 .error-block{font-size:10pt;color:var(--red-light);padding:16px;}
 
@@ -1654,35 +1665,69 @@ function buildMockReport(results){
     html += '<div class="priority-block" style="border-left-color:var(--amber);"><div class="priority-label" style="color:var(--amber-light);">&#9889; Focus Area #2</div>';
     html += '<div class="priority-text">'+vc.weak+' of '+total+' competencies landed Weak. Review sub-behaviors and build stories that explicitly hit each one.</div></div>';
   }
-  /* ── Honest session-level verdict ── */
-  var totalQ = total;
-  var pctWeak = totalQ ? vc.weak/totalQ : 0;
-  var pctStrong = totalQ ? vc.strong/totalQ : 0;
+  /* ── Answer-specific session verdict ── */
+  var pctWeak   = total ? vc.weak/total   : 0;
+  var pctStrong = total ? vc.strong/total : 0;
+
+  /* Build a specific callout per weak/missing answer */
+  function buildAnswerCallouts(threshold){
+    var lines = [];
+    results.forEach(function(r, i){
+      var fb = r.feedback;
+      var ov = ((fb.overall&&fb.overall.verdict)||'adequate').toLowerCase();
+      if(ov !== threshold) return;
+      var missingComps = [];
+      var partialComps = [];
+      ['situation','task','action','result'].forEach(function(k){
+        var v = (fb.star&&fb.star[k]&&fb.star[k].verdict||'missing').toLowerCase();
+        if(v==='missing') missingComps.push({comp:k, reason: fb.star[k].reason||''});
+        else if(v==='partial') partialComps.push({comp:k, reason: fb.star[k].reason||''});
+      });
+      var worst = missingComps.length ? missingComps[0] : partialComps.length ? partialComps[0] : null;
+      var preview = r.answer.length > 60 ? '"'+r.answer.slice(0,60).trim()+'…"' : '"'+r.answer+'"';
+      var line = '<div class="callout-item">'
+        +'<span class="callout-q">Q'+(i+1)+' — '+esc(r.q.competency)+'</span>'
+        +'<span class="callout-preview">You wrote: '+esc(preview)+'</span>';
+      if(worst){
+        line += '<span class="callout-reason">'+esc(worst.comp.charAt(0).toUpperCase()+worst.comp.slice(1))+': '+esc(worst.reason)+'</span>';
+      }
+      if(fb.sharpen&&fb.sharpen.tip){
+        line += '<span class="callout-tip">Fix: '+esc(fb.sharpen.tip)+'</span>';
+      }
+      line += '</div>';
+      lines.push(line);
+    });
+    return lines.join('');
+  }
+
   if(pctWeak >= 0.6){
-    html += '<div class="nudge-block" style="border-left-color:var(--red);background:rgba(194,65,45,.08);">'
-      +'<strong style="color:var(--red);">Honest assessment:</strong> '+(Math.round(pctWeak*100))+'% of your answers scored Weak. '
-      +'If you walked into an interview with these answers today, you would likely not advance. '
-      +'The issues are structural — missing STAR components, "we" instead of "I", and no measurable results. '
-      +'These are fixable, but they require rebuilding the stories, not just polishing them. '
-      +'Use the single-practice mode to rework each Weak answer before running another mock.</div>';
+    var callouts = buildAnswerCallouts('weak');
+    html += '<div class="nudge-block" style="border-left-color:var(--red);background:rgba(194,65,45,.07);">'
+      +'<div style="font-size:10pt;font-weight:900;color:var(--red);margin-bottom:10px;">Honest assessment: '+(Math.round(pctWeak*100))+'% of answers scored Weak</div>'
+      +'<div style="font-size:9.5pt;color:var(--text-muted);margin-bottom:14px;">These answers would not advance you in a real Salesforce interview. Here\'s exactly what failed in each one:</div>'
+      +'<div class="callout-list">'+callouts+'</div>'
+      +'</div>';
   } else if(pctWeak >= 0.3 || sc.missing >= 3){
-    html += '<div class="nudge-block" style="border-left-color:var(--amber);background:rgba(183,121,31,.08);">'
-      +'<strong style="color:var(--amber-light);">Room for improvement:</strong> '
-      +Math.round(pctWeak*100)+'% of answers scored Weak and '+sc.missing+' result'+(sc.missing===1?'':'s')+' had no measurable outcome. '
-      +'These answers would likely pass a phone screen but stall in a panel interview where calibration is tighter. '
-      +'Focus on Result — adding a single metric to each weak answer is the highest-leverage fix.</div>';
+    var callouts2 = buildAnswerCallouts('weak');
+    var missingResultCount = results.filter(function(r){ return r.feedback.star&&r.feedback.star.result&&r.feedback.star.result.verdict==='Missing'; }).length;
+    html += '<div class="nudge-block" style="border-left-color:var(--amber);background:rgba(183,121,31,.07);">'
+      +'<div style="font-size:10pt;font-weight:900;color:var(--amber-light);margin-bottom:10px;">Room for improvement — '+(Math.round(pctWeak*100))+'% Weak, '+missingResultCount+' answer'+(missingResultCount===1?'':'s')+' with no result</div>'
+      +'<div style="font-size:9.5pt;color:var(--text-muted);margin-bottom:14px;">These would pass a phone screen but stall in a calibration panel. Specific issues:</div>'
+      +'<div class="callout-list">'+callouts2+'</div>'
+      +'</div>';
   } else if(pctStrong >= 0.6){
-    html += '<div class="nudge-block" style="border-left-color:var(--green);background:rgba(20,137,90,.08);">'
-      +'<strong style="color:var(--green);">Solid session.</strong> '
-      +'Most answers are competitive. Review the Partial and Weak ones specifically — '
-      +'one underprepared story in a real panel can cost you the loop. '
-      +'Make sure every story has a metric and uses "I" not "we".</div>';
+    var weakCallouts = buildAnswerCallouts('weak') + buildAnswerCallouts('adequate');
+    html += '<div class="nudge-block" style="border-left-color:var(--green);background:rgba(20,137,90,.07);">'
+      +'<div style="font-size:10pt;font-weight:900;color:var(--green);margin-bottom:10px;">Solid session — but don\'t leave these on the table</div>'
+      +(weakCallouts ? '<div class="callout-list">'+weakCallouts+'</div>' : '<div style="font-size:9.5pt;color:var(--text-muted);">No critical gaps. Make sure every story has a metric and uses "I" not "we" before your real interview.</div>')
+      +'</div>';
   } else {
-    html += '<div class="nudge-block" style="border-left-color:var(--indigo);background:rgba(79,70,229,.08);">'
-      +'<strong style="color:var(--indigo);">Mixed results.</strong> '
-      +'You have some strong answers and some that need work. '
-      +'Interviewers calibrate across the full loop — one Weak answer on a core competency can sink an otherwise strong performance. '
-      +'Prioritize rebuilding any story with a Missing STAR component before your next practice session.</div>';
+    var mixedCallouts = buildAnswerCallouts('weak');
+    html += '<div class="nudge-block" style="border-left-color:var(--indigo);background:rgba(79,70,229,.07);">'
+      +'<div style="font-size:10pt;font-weight:900;color:var(--indigo);margin-bottom:10px;">Mixed session — fix these before the real thing</div>'
+      +'<div style="font-size:9.5pt;color:var(--text-muted);margin-bottom:14px;">One Weak answer on a core competency can sink an otherwise strong loop:</div>'
+      +'<div class="callout-list">'+mixedCallouts+'</div>'
+      +'</div>';
   }
   html += '</div>';
   html += '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
