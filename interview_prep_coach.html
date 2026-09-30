@@ -1020,163 +1020,252 @@ function buildUserPrompt(q, answer, role, fn){
 
 /* ── RULE-BASED SCORING ENGINE ── */
 (function(){
-  /* helpers */
-  function norm(s){ return s.toLowerCase().replace(/['']/g,"'"); }
+  function norm(s){ return s.toLowerCase().replace(/[''`]/g,"'"); }
   function has(text, patterns){
     var t = norm(text);
     return patterns.some(function(p){ return t.indexOf(norm(p)) !== -1; });
+  }
+  function countMatches(text, patterns){
+    var t = norm(text);
+    return patterns.filter(function(p){ return t.indexOf(norm(p)) !== -1; }).length;
   }
   function extract(text, patterns){
     var t = norm(text);
     for(var i=0;i<patterns.length;i++){
       var idx = t.indexOf(norm(patterns[i]));
       if(idx !== -1){
-        var start = Math.max(0, idx - 6);
-        var end = Math.min(text.length, idx + patterns[i].length + 18);
-        return text.slice(start, end).replace(/\s+/g,' ').trim();
+        var start = Math.max(0, idx-8);
+        var end   = Math.min(text.length, idx+patterns[i].length+22);
+        return '"'+text.slice(start,end).replace(/\s+/g,' ').trim()+'…"';
       }
     }
     return '';
   }
-  function words(text){ return text.trim().split(/\s+/).filter(Boolean).length; }
+  function wc(text){ return text.trim().split(/\s+/).filter(Boolean).length; }
 
+  /* ─── Signal patterns ─── */
   var SIT_PATTERNS = [
-    'at the time','background','context','back in','when i was','we were','our team was',
-    'the situation','in my role','at my company','at the org','the project was',
-    'we had a','i was working','faced with','dealing with','the problem was',
-    'we needed to','the challenge was','working on','back when'
+    'at the time','the background','some context','back in','when i was','we were facing',
+    'our team was','the situation','in my previous role','at my company','at the org',
+    'the project was','we had a','i was working on','faced with','dealing with',
+    'the problem was','the challenge was','working at','our organization','the environment'
+  ];
+  var SIT_SPECIFIC = [ /* names, dates, orgs — signals concrete specificity */
+    'q1','q2','q3','q4','fy','january','february','march','april','may','june',
+    'july','august','september','october','november','december','team of','org of',
+    'salesforce','my manager','my director','my vp','my skip'
   ];
   var TASK_PATTERNS = [
-    'i was responsible','my job was','my goal was','i needed to','i was tasked','i had to',
-    'my role was','i was asked to','my objective','the requirement','i owned','assigned to me',
-    'i led','i was leading','my task was','i was the','i managed'
+    'i was responsible for','my job was to','my goal was to','i needed to','i was tasked with',
+    'i was asked to','my objective was','i owned','i led','i was leading','my task was',
+    'i was the one','i managed','i was accountable','i had to make sure','the ask was'
   ];
-  var ACTION_PATTERNS = [
-    'i decided','i reached out','i set up','i started','i put together','i created',
-    'i built','i developed','i scheduled','i spoke','i talked','i met with',
-    'i did','i took','i worked','i implemented','i proposed','i introduced',
-    'first i','then i','next i','i began','i launched','i facilitated',
-    'i drafted','i presented','i advocated','i designed','i analyzed','i identified'
+  var ACTION_VERBS = [
+    'i decided to','i reached out','i set up a','i started','i put together','i created',
+    'i built','i developed','i scheduled','i spoke with','i talked to','i met with',
+    'i implemented','i proposed','i introduced','i facilitated','i drafted',
+    'i presented','i advocated','i designed','i analyzed','i identified','i restructured',
+    'i escalated','i negotiated','i aligned','i prioritized','i pushed','i challenged',
+    'i coached','i ran a','i pulled','i rolled out','i secured','i partnered'
   ];
   var RESULT_PATTERNS = [
-    'as a result','the result was','in the end','ultimately','this led to','which resulted',
-    'the outcome','we achieved','we hit','we delivered','we reduced','we increased',
-    'we saved','it worked','the impact','by doing this','this helped','we were able',
-    'the feedback','it resulted','reduced by','increased by','grew by','improved',
-    'we closed','we finished','we launched','the team was','stakeholders were',
-    'my manager','we exceeded','we completed','the project was delivered'
+    'as a result','the result was','in the end','ultimately','this led to','which resulted in',
+    'the outcome was','we achieved','we hit','we delivered','we reduced','we increased',
+    'we saved','the impact was','it resulted in','reduced by','increased by','grew by',
+    'we exceeded','we completed','the project shipped','the team saw','stakeholders',
+    'my manager said','the feedback was','we went from','moved from','improved from'
   ];
   var METRIC_PATTERNS = [
-    '%','percent','reduced','increased','saved','grew','hit','exceeded','delivered',
-    'within','on time','on budget','days','weeks','months','quarter','points','x faster',
-    'approved','promoted','hired','launched','shipped','deployed','resolved'
+    '%','percent','x faster','x more','doubled','tripled','halved',
+    'reduced by','increased by','saved','grew by','hit quota','exceeded quota',
+    'on time','on budget','ahead of','under budget','within','days','weeks',
+    'approved','hired','shipped','deployed','launched','closed','resolved',
+    'points','score','nps','satisfaction','revenue','pipeline','accounts'
+  ];
+  var VAGUE_WORDS = [
+    'things','stuff','something','someone','somehow','various','multiple','several','many',
+    'generally','typically','usually','always','often','sometimes','basically','essentially',
+    'kind of','sort of','you know','just','like i said','as i mentioned'
   ];
 
-  function scoreComponent(text, patterns, name){
-    if(!has(text, patterns)){
-      return {verdict:'Missing', reason: name+' signals not found — no context-setting language detected'};
+  /* ─── Strict per-component scoring ─── */
+  function scoreSituation(text){
+    var t = norm(text);
+    if(!has(text, SIT_PATTERNS)){
+      return {verdict:'Missing', reason:'No context-setting language — never established where, when, or what the stakes were. Interviewers cannot evaluate relevance without a clear situation.'};
     }
-    var snippet = extract(text, patterns);
-    var hasMetric = name === 'Result' && has(text, METRIC_PATTERNS);
-    var longEnough = words(text) > (name === 'Action' ? 60 : 30);
-    if(longEnough && (name !== 'Result' || hasMetric)){
-      return {verdict:'Strong', reason: snippet ? '"'+snippet.slice(0,40)+'…"' : 'Clear '+name.toLowerCase()+' framing with sufficient detail'};
+    var snippet = extract(text, SIT_PATTERNS);
+    var hasSpecific = has(text, SIT_SPECIFIC);
+    var vagueCount  = countMatches(text, VAGUE_WORDS);
+    /* Strong: grounded with specific identifiers, minimal vague language */
+    if(hasSpecific && vagueCount < 3){
+      return {verdict:'Strong', reason:'Specific context with named timeframe or org: '+snippet};
     }
-    return {verdict:'Partial', reason: snippet ? '"'+snippet.slice(0,40)+'…"' : name+' present but thin — add more specifics'};
+    /* Partial: signal present but thin or generic */
+    return {verdict:'Partial', reason:'Situation present but generic — '+snippet+'. Add a specific timeframe, org name, team size, or stakes to anchor the story.'};
   }
 
+  function scoreTask(text){
+    if(!has(text, TASK_PATTERNS)){
+      return {verdict:'Missing', reason:'Never claimed personal ownership. "We" language throughout makes your individual role invisible to the interviewer — use "I was responsible for" or "I led".'};
+    }
+    var snippet = extract(text, TASK_PATTERNS);
+    /* Check for "we" dominance — weak ownership signal */
+    var weCount = (text.match(/\bwe\b/gi)||[]).length;
+    var iCount  = (text.match(/\bi\b/gi)||[]).length;
+    if(iCount === 0 || weCount > iCount * 2){
+      return {verdict:'Partial', reason:'Ownership is ambiguous — "we" dominates over "I". '+snippet+'. The interviewer needs to know what YOU specifically owned, not what the team did.'};
+    }
+    /* Strong: clear personal ownership, not diluted by "we" */
+    return {verdict:'Strong', reason:'Clear personal ownership established: '+snippet};
+  }
+
+  function scoreAction(text){
+    var actionCount = countMatches(text, ACTION_VERBS);
+    if(actionCount === 0){
+      return {verdict:'Missing', reason:'No concrete "I did X" action steps — the answer describes the problem or outcome but skips the actual work. Walk through 2-3 specific things you personally did.'};
+    }
+    var snippet = extract(text, ACTION_VERBS);
+    var vagueCount = countMatches(text, VAGUE_WORDS);
+    /* Strong: 3+ distinct action steps, low vague language, sufficient length */
+    if(actionCount >= 3 && vagueCount < 4 && wc(text) >= 120){
+      return {verdict:'Strong', reason:actionCount+' distinct action steps with low vague language: '+snippet};
+    }
+    /* 1-2 actions or vague = Partial */
+    if(actionCount < 3){
+      return {verdict:'Partial', reason:'Only '+actionCount+' action step'+(actionCount===1?'':'s')+' detected (need 3+): '+snippet+'. Add more specific steps — what did you do first, then, next?'};
+    }
+    return {verdict:'Partial', reason:'Actions present but vague language dilutes them: '+snippet+'. Replace "things", "stuff", "basically" with exact names, methods, and decisions.'};
+  }
+
+  function scoreResult(text){
+    if(!has(text, RESULT_PATTERNS)){
+      return {verdict:'Missing', reason:'No outcome described at all. Every behavioral answer must land on a result — what actually changed because of your actions? Without this the story is incomplete.'};
+    }
+    var snippet = extract(text, RESULT_PATTERNS);
+    var hasMetric = has(text, METRIC_PATTERNS);
+    var weResult = /\b(we|the team)\b.{0,40}(achieved|delivered|hit|launched|shipped|completed)/i.test(text);
+    var iResult  = /\b(i|my)\b.{0,40}(achieved|delivered|hit|launched|shipped|completed|earned|secured)/i.test(text);
+    /* Strong: metric present AND result is personally attributed */
+    if(hasMetric && iResult){
+      return {verdict:'Strong', reason:'Quantified, personally attributed result: '+snippet};
+    }
+    /* Partial: result present but no metric, or team-attributed only */
+    if(!hasMetric){
+      return {verdict:'Partial', reason:'Result described but no metric: '+snippet+'. Add a number — %, days, dollars, NPS points, headcount, or a named business outcome — to make this credible.'};
+    }
+    return {verdict:'Partial', reason:'Metric present but result is attributed to "we/the team" only: '+snippet+'. Also name your personal contribution to the outcome.'};
+  }
+
+  /* ─── Competency-specific coaching tips ─── */
   var TIPS = {
-    'Build Trust & Authenticity':     'Name a specific moment where you showed vulnerability or corrected a misstep — generic "I always value honesty" answers score low.',
-    'Communicate Effectively':        'Show the adjustment you made mid-conversation, not just that you adjusted — quote what you actually said or changed.',
-    'Demonstrate Courage':            'Describe what you personally risked and why you acted anyway — the stakes must be clear for this to land.',
-    'Achieve Results':                'Add a metric: % improved, days saved, quota hit. Without a number the result sounds soft.',
-    'Take Accountability':            'Own the setback explicitly before describing the fix — interviewers notice when accountability language is passive.',
-    'Manage Ambiguity':               'Show your thought process during uncertainty, not just the happy ending — what signals did you act on?',
-    'Influence':                      'Name the person you needed to move and what their objection was before showing how you overcame it.',
-    'Champion Customer Success':      'Make the customer\'s specific need central — answers that lead with internal process instead of customer impact miss the mark.',
-    'Drive Innovation':               'Show how you validated the idea before scaling it — experimentation implies testing, not just having an idea.',
-    'Make Informed Decisions':        'List the alternatives you considered and why you rejected them — showing your evaluation process is the whole point.',
-    'Foster Equality & Inclusion':    'Name the specific inclusion gap you noticed — "I respect everyone" is not an example, a concrete observation is.',
-    'Build Networks & Partnerships':  'Explain why you chose that specific person/team to partner with and what you brought to them.',
-    'Coach & Develop':                'Describe what you observed (behavior, not trait) before explaining the intervention you used.',
-    'Inspire':                        'Show what the team was feeling before you acted, then what changed — the emotional arc is what makes this believable.',
-    '_default':                       'Add a concrete measurable outcome and quote at least one specific thing you said or did to make the story tangible.'
+    'Build Trust & Authenticity':
+      'Name the exact moment trust broke or was tested and what YOU said or did in response. Phrases like "I always prioritize honesty" are not examples — they are claims. Interviewers are looking for evidence, not self-description.',
+    'Communicate Effectively':
+      'Show the specific adjustment you made: what did you change, cut, simplify, or add? Quote something you actually said. If you just say "I adjusted my style," you haven\'t answered the question.',
+    'Demonstrate Courage':
+      'Make the personal risk explicit — what could you have lost (relationship, standing, outcome) by taking this position? Courage without stakes is just preference.',
+    'Achieve Results':
+      'A result without a metric is a claim. Add a number: % improvement, days reduced, revenue impact, quota hit. If you don\'t have exact numbers, use approximations — "roughly 30%" is better than none.',
+    'Take Accountability':
+      'Strong accountability answers lead with "I failed at X" or "I made the wrong call on Y" before pivoting to the fix. If your answer skips the failure or makes it sound like it wasn\'t your fault, it won\'t land.',
+    'Manage Ambiguity':
+      'Show your reasoning process in the absence of information — what signals did you act on, what assumptions did you make, and how did you validate them? Saying "I stayed calm" is not the same as showing how you navigated uncertainty.',
+    'Influence':
+      'You must name: (1) who you needed to influence, (2) what their specific objection or resistance was, and (3) the exact approach you used. Vague influence answers ("I made a compelling case") without these three elements will not score well.',
+    'Champion Customer Success':
+      'The customer\'s specific need must be the center of the story, not the process you followed. If your answer sounds like a process answer rather than a customer answer, reframe it around what the customer actually needed and why it mattered.',
+    'Drive Innovation':
+      'Showing that you had an idea is not enough — show how you tested it before scaling it. Interviewers want to see that you validated, iterated, and learned. Launching without testing is not innovation, it\'s guessing.',
+    'Make Informed Decisions':
+      'Name the alternatives you considered and explicitly say why you rejected them. The decision itself matters less than demonstrating a rigorous evaluation process. Skipping the alternatives makes the story thin.',
+    'Foster Equality & Inclusion':
+      'Name the specific gap or dynamic you observed — "I noticed X group wasn\'t being heard in Y context." Generic answers about valuing diversity do not demonstrate this competency. Show the exact moment and your exact response.',
+    'Build Networks & Partnerships':
+      'Explain what motivated you to build this specific relationship — what did you need from them, and what did you offer? Partnerships built out of necessity score lower than those you proactively developed before you needed them.',
+    'Coach & Develop':
+      'Describe what you specifically observed in the person\'s behavior (not a trait like "they lacked confidence") and then walk through the exact coaching intervention you used and how the person changed.',
+    'Inspire':
+      'Ground this in a specific low point — morale, motivation, or direction was failing. Describe what you observed, then walk through what you said or did, and close with a visible behavioral change in the team. Inspiration without evidence of change is just a nice story.',
+    '_default':
+      'Strengthen this answer by: (1) naming a specific metric in your result, (2) replacing any "we did" language with "I did", and (3) removing vague phrases like "various things" or "basically" and replacing them with exact names, numbers, and decisions.'
   };
 
+  /* ─── Sub-behavior evidence matching ─── */
   var SUB_BEHAVIOR_SIGNALS = {
-    'Acts with integrity':            ['honest','integrity','transparent','told the truth','disclosed','admitted','came clean'],
-    'Discloses own positions':        ['my view','i believe','my position','in my opinion','i thought','i felt','i said'],
-    'Remains open to ideas':          ['listened','considered','open to','took their input','heard them out','changed my mind'],
-    'Values others':                  ['recognized','appreciated','thanked','acknowledged','their contribution','credit to'],
-    'Demonstrates personal integrity':['my word','stood by','committed','kept my promise','held myself'],
-    'Encourages disclosure':          ['asked for','encouraged','created space','made it safe','open door','invited feedback'],
-    'Facilitates an open exchange':   ['everyone could','invited','included','round table','asked for input'],
-    'Advocates for others':           ['advocated','went to bat','defended','spoke up for','championed'],
-    'Organizes the communication':    ['structured','agenda','outline','framed','organized my message','clear narrative'],
-    'Maintains attention':            ['engaged the group','kept them','checked in','paused','asked questions'],
-    'Adjusts to the listener':        ['simplified','adjusted','tailored','reframed','language they','analogies'],
-    'Listens actively':               ['listened','paraphrased','reflected back','asked clarifying','confirmed i understood'],
-    'Delivers clear messages':        ['clear','concise','one-pager','summary','takeaway','bottom line'],
-    'Communicates with impact':       ['landed','resonated','they got it','persuaded','compelling'],
-    'Uses language appropriately':    ['appropriate tone','adjusted my language','word choice','vocabulary'],
-    'Ensures understanding':          ['checked for understanding','followed up','confirmed','did they understand','summary email'],
-    'Takes a stand':                  ['stood my ground','pushed back','disagreed','held my position','said no','said this isn'],
-    'Initiates bold action':          ['first to','took the initiative','proactively','without being asked','stepped up'],
-    'Takes personal accountability':  ['my fault','i owned','i was responsible','apologized','took accountability','took responsibility'],
-    'Sets standards for excellence':  ['high standard','quality bar','raised the bar','expected','best in class','benchmark'],
-    'Ensures high quality':           ['reviewed','checked','quality','tested','validated','ensured accuracy'],
-    'Takes responsibility':           ['owned','responsible for','my accountability','i committed','i followed through'],
-    'Encourages others to take responsibility': ['held them accountable','set expectations','clear ownership','assigned','team members'],
-    'Targets opportunities':          ['spotted','identified','saw an opportunity','found a way','uncovered'],
-    'Establishes stretch goals':      ['ambitious','stretch','beyond','higher bar','aggressive goal'],
-    'Achieves goals':                 ['hit','achieved','delivered','reached','met the goal','on target'],
-    'Stays focused':                  ['stayed focused','prioritized','kept on track','despite','didn\'t lose sight'],
-    'Maintains focus':                ['tracked','checked in on progress','stayed focused','kept eye on'],
-    'Measures progress and outcome':  ['measured','tracked metrics','reviewed weekly','status update','progress check'],
-    'Ensures accountability':         ['held accountable','clear ownership','followed up','deadline'],
-    'Tries to understand changes':    ['asked why','understood the reason','learned about','researched the change'],
-    'Approaches change with a positive mind-set': ['embraced','saw it as','positive','opportunity','silver lining'],
-    'Adjusts behavior':               ['changed my approach','adapted','shifted','modified how i'],
-    'Communicates what is changing and why': ['explained the why','context for','reason behind','communicated clearly'],
-    'Helps others adjust behavior':   ['supported the team','helped them','coached through','walked them through'],
-    'Clarifies the situation':        ['explained','laid out','described the context','made it clear','clarified'],
-    'Shares own perspective to build trust': ['shared my view','was transparent','told them my thinking','honest about'],
-    'Builds a compelling case':       ['data','evidence','numbers','case for','argument','showed them','demonstrated'],
-    'Involves others in exploring solutions': ['asked for input','together we','brought in','collaborative','their ideas'],
-    'Empathizes with others\' concerns': ['understood their concern','acknowledged','saw it from','their perspective','empathized'],
-    'Steers commitment to action':    ['committed','next steps','agreed to','moved forward','aligned'],
-    'Seeks to understand customers':  ['asked the customer','customer feedback','their needs','what they needed','customer said'],
-    'Recognizes customer service issues': ['noticed','identified the issue','spotted','saw a gap','realized the customer'],
-    'Implements customer-focused practices': ['changed the process','updated the approach','put in place','created a workflow'],
-    'Checks for customer satisfaction': ['followed up with','confirmed they were','asked if','satisfaction check','their reaction'],
-    'Seeks to understand existing perspectives': ['asked','researched','looked into','explored','reviewed','studied'],
-    'Challenges current thinking':    ['questioned','challenged','pushed back on','proposed a different','why are we'],
-    'Experiments to learn':           ['tested','piloted','ran an experiment','tried','prototyped','a/b'],
-    'Takes action on ideas':          ['implemented','shipped','launched','moved forward','took it live'],
-    'Identifies problems and opportunities': ['noticed','identified','recognized','spotted','saw that','realized'],
-    'Gathers information':            ['data','researched','talked to','gathered','surveyed','pulled reports','looked at'],
-    'Interprets information':         ['analyzed','reviewed','concluded','found that','the data showed','what it meant'],
-    'Evaluates alternatives and risks': ['considered','weighed','pros and cons','options','risk','alternative'],
-    'Chooses an effective option':    ['decided to','chose','went with','selected','the right option'],
-    'Commits to action':              ['committed','moved forward','took the step','pulled the trigger','decided'],
-    'Considers others\' perspectives': ['asked for input','heard from','their view','team\'s perspective','others felt'],
-    'Seeks understanding':            ['asked','curious about','wanted to understand','learned','explored their view'],
-    'Conveys respect':                ['treated them','showed respect','valued their','recognized','appreciated'],
-    'Uses diversity as an advantage': ['different perspectives','strength','richer','better outcome','diverse voices'],
-    'Champions diversity':            ['advocated for','made space for','ensured','inclusive','representation'],
-    'Contributes to goal accomplishment': ['helped achieve','contributed to','played a part','my piece','supported the goal'],
-    'Asks for help and encourages involvement': ['reached out to','pulled in','asked for','brought in','looped in'],
-    'Informs others on team':         ['shared with','updated','communicated','kept them in the loop','informed'],
-    'Models commitment':              ['showed up','stayed late','led by example','modeled','demonstrated'],
-    'Assesses to identify goals':     ['assessed','evaluated where','identified the gap','learning goals','development area'],
-    'Establishes acquisition plan':   ['created a plan','outlined steps','set milestones','development plan'],
-    'Creates a learning environment': ['safe space','encouraged questions','made it okay','learning culture'],
-    'Ensures immediate learning application': ['practice','apply it','opportunity to try','put it to use'],
-    'Monitors progress':              ['checked in','followed up','how are they doing','progress review'],
-    'Inspires effort':                ['motivated','energized','got the team','inspired','rallied'],
-    'Builds confidence in success':   ['confident we could','believed in','showed them it was possible','boosted morale'],
-    'Models the vision and values':   ['modeled','lived the values','showed by example','walked the talk'],
-    'Leads through vision and values':['connected to the mission','linked to our goals','tied to why we']
+    'Acts with integrity':            ['told the truth','was honest','was transparent','disclosed','admitted','came clean','i said no','i wouldn\'t'],
+    'Discloses own positions':        ['my view was','i believe','my position was','in my opinion','i told them','i said directly','i was clear that'],
+    'Remains open to ideas':          ['changed my mind','they were right','took their input','heard them out','reconsidered','updated my view','was wrong'],
+    'Values others':                  ['gave them credit','recognized their','publicly thanked','acknowledged their contribution','their idea','they deserved'],
+    'Demonstrates personal integrity':['kept my word','stood by my commitment','followed through on','didn\'t walk back','held myself accountable'],
+    'Encourages disclosure':          ['made it safe to','created space for','asked them directly','open door','what are your concerns','tell me honestly'],
+    'Facilitates an open exchange':   ['asked everyone','went around the room','made sure all voices','no one was dominating','invited the quieter'],
+    'Advocates for others':           ['went to bat for','advocated for','made the case for them','pushed leadership to','defended their position'],
+    'Organizes the communication':    ['structured my message','used a framework','opened with the bottom line','framed it as','gave them the context first'],
+    'Maintains attention':            ['noticed they were losing interest','checked engagement','changed the format','paused and asked','read the room'],
+    'Adjusts to the listener':        ['simplified it to','used an analogy','dropped the jargon','reframed it','translated it into','their language'],
+    'Listens actively':               ['paraphrased back','reflected what i heard','asked a clarifying question','confirmed i understood','summarized their point'],
+    'Delivers clear messages':        ['bottom line up front','one clear ask','kept it to three points','summarized in one sentence','no ambiguity'],
+    'Communicates with impact':       ['they changed their position','it landed','the room shifted','they approved','they moved forward'],
+    'Uses language appropriately':    ['adjusted my tone','chose my words carefully','matched their register','was direct but respectful'],
+    'Ensures understanding':          ['checked for understanding','asked if that made sense','followed up to confirm','sent a summary','verified they understood'],
+    'Takes a stand':                  ['pushed back','disagreed with','said no to','held my ground','refused to','said this isn\'t right','stood firm'],
+    'Initiates bold action':          ['without being asked','proactively','first to raise','didn\'t wait for permission','took the initiative','stepped up'],
+    'Takes personal accountability':  ['my mistake','i was wrong','i dropped the ball','took ownership of','apologized for','i should have','i owned it'],
+    'Sets standards for excellence':  ['raised the quality bar','wouldn\'t accept','required','expected more','set the standard','pushed for better'],
+    'Ensures high quality':           ['reviewed it myself','ran it by','checked every','validated the','tested before','would not ship until'],
+    'Takes responsibility':           ['i owned that','responsible for the outcome','it was on me','i followed through','i committed to'],
+    'Encourages others to take responsibility': ['made it clear who owned','assigned accountability','held them to it','set clear expectations','didn\'t let them off'],
+    'Targets opportunities':          ['spotted an opening','identified an opportunity','saw that we could','noticed a gap','found a way to'],
+    'Establishes stretch goals':      ['set an ambitious goal','pushed beyond','higher than expected','aggressive timeline','stretch target'],
+    'Achieves goals':                 ['hit the target','achieved the goal','delivered on','met the deadline','on track by'],
+    'Stays focused':                  ['despite the distractions','stayed on target','didn\'t let','kept the team focused','resisted scope creep'],
+    'Maintains focus':                ['tracked weekly','checked in on progress','kept the priority clear','didn\'t lose sight of','monitored'],
+    'Measures progress and outcome':  ['tracked it against','measured week over week','reviewed the metrics','set up a dashboard','progress check'],
+    'Ensures accountability':         ['held them accountable','clear ownership','followed up on','called it out when','deadline was non-negotiable'],
+    'Tries to understand changes':    ['asked why this was changing','wanted to understand the reason','researched the background','learned about'],
+    'Approaches change with a positive mind-set': ['saw it as an opportunity','embraced the change','positive about','silver lining','could work in our favor'],
+    'Adjusts behavior':               ['changed how i','modified my approach','shifted my behavior','adapted by','stopped doing','started doing instead'],
+    'Communicates what is changing and why': ['explained the reason for','gave them the why','context behind the change','communicated clearly that'],
+    'Helps others adjust behavior':   ['walked them through it','supported the team through','helped them see','coached them to','made the transition easier'],
+    'Clarifies the situation':        ['made it clear that','explained the context','laid out the situation','described what was happening','framed the problem'],
+    'Shares own perspective to build trust': ['shared my honest view','told them what i actually thought','was transparent about','said directly that'],
+    'Builds a compelling case':       ['brought data to','showed them the numbers','made the business case','evidence i used was','demonstrated that'],
+    'Involves others in exploring solutions': ['brought them in early','asked for their ideas','explored options together','collaborative process','didn\'t decide alone'],
+    'Empathizes with others\' concerns': ['understood their concern was','acknowledged that from their perspective','saw why they felt','their worry was valid','put myself in'],
+    'Steers commitment to action':    ['got them to agree to','aligned on next steps','left with clear commitments','they committed to','moved them from skeptical to'],
+    'Seeks to understand customers':  ['asked the customer directly','listened to what they needed','customer told me','their exact words were','what the customer said'],
+    'Recognizes customer service issues': ['noticed the customer was','identified that the issue was','saw a recurring pattern','spotted that customers were'],
+    'Implements customer-focused practices': ['changed the process for customers','updated how we handled','created a new workflow','put in place a system'],
+    'Checks for customer satisfaction': ['followed up to make sure','asked them if they were satisfied','checked in after','confirmed the issue was resolved','their reaction was'],
+    'Seeks to understand existing perspectives': ['first i researched','asked people who had done it','looked into how others','studied the existing','understood the current state'],
+    'Challenges current thinking':    ['questioned why we','challenged the assumption','pushed back on the existing','proposed we do it differently','asked why we couldn\'t'],
+    'Experiments to learn':           ['ran a small test','piloted with','tried it on a subset','a/b tested','prototyped','ran an experiment before'],
+    'Takes action on ideas':          ['implemented it','rolled it out','shipped','moved it from idea to','put it into production','launched'],
+    'Identifies problems and opportunities': ['identified that','noticed a pattern','recognized the issue','spotted an opportunity','saw that we were missing'],
+    'Gathers information':            ['talked to','pulled the data','ran a survey','interviewed','reviewed the reports','gathered feedback from','looked at the numbers'],
+    'Interprets information':         ['the data showed','concluded from','what i found was','the pattern was','analysis revealed','what it told me'],
+    'Evaluates alternatives and risks': ['considered three options','weighed','pros and cons were','risk of doing nothing','evaluated whether','alternative was'],
+    'Chooses an effective option':    ['decided to go with','chose this approach because','went with option','selected because','rejected because'],
+    'Commits to action':              ['pulled the trigger','made the call','committed even though','moved forward despite','decided and didn\'t look back'],
+    'Considers others\' perspectives': ['got input from','heard their view','asked the team','others on the team felt','surfaced different opinions'],
+    'Seeks understanding':            ['asked to understand','curious about their view','wanted to hear their perspective','explored what they meant','understood where they were coming from'],
+    'Conveys respect':                ['respected their view','valued what they said','treated them as','acknowledged their expertise','gave them the floor'],
+    'Uses diversity as an advantage': ['their different perspective improved','diversity in the room helped us','stronger because of the different views','caught something we\'d missed'],
+    'Champions diversity':            ['advocated for','made sure underrepresented voices','pushed to include','called out when','created space for'],
+    'Contributes to goal accomplishment': ['my part was','i contributed by','my role in achieving','delivered my piece','what i brought to'],
+    'Asks for help and encourages involvement': ['reached out to','pulled in','asked for their expertise','looped in','brought them to the table'],
+    'Informs others on team':         ['kept them informed','shared the update','communicated the change','sent a summary to','made sure they knew'],
+    'Models commitment':              ['led by example','showed up','stayed until','did it myself first','demonstrated that i was committed'],
+    'Assesses to identify goals':     ['assessed where they were','identified the development gap','evaluated their current skill','asked what they wanted to work on'],
+    'Establishes acquisition plan':   ['created a development plan','set milestones for','outlined the steps they would take','built a plan together'],
+    'Creates a learning environment': ['made it safe to make mistakes','encouraged them to try','normalized failure','created space to experiment'],
+    'Ensures immediate learning application': ['gave them a chance to practice','put them in a situation where','applied it within','opportunity to use it right away'],
+    'Monitors progress':              ['checked in on their progress','reviewed how they were developing','regular 1-1 to discuss','tracked their improvement'],
+    'Inspires effort':                ['motivated the team','got them excited','rallied','energized','re-engaged','shifted their attitude'],
+    'Builds confidence in success':   ['showed them it was possible','broke it down so it felt achievable','reminded them of past wins','believed in them'],
+    'Models the vision and values':   ['embodied','walked the talk','showed what it looked like','demonstrated through my own behavior','lived the values'],
+    'Leads through vision and values':['connected the work to','reminded them of why we','tied it back to our purpose','linked it to the mission']
   };
 
   function matchSubBehaviors(text, subBehaviors){
@@ -1187,37 +1276,69 @@ function buildUserPrompt(q, answer, role, fn){
       var found = signals.find(function(s){ return t.indexOf(norm(s)) !== -1; });
       if(found){
         var snippet = extract(text, [found]);
-        evidence.push({behavior: sb, evidence: snippet ? '"'+snippet.slice(0,50)+'…"' : 'Detected in answer'});
+        evidence.push({behavior: sb, evidence: snippet || 'Detected in answer'});
       }
     });
     return evidence;
   }
 
-  function overallVerdict(star){
-    var counts = {strong:0,partial:0,missing:0};
+  /* ─── Strict overall verdict ─── */
+  function overallVerdict(star, evidence, subBehaviors){
+    var counts = {Strong:0, Partial:0, Missing:0};
     ['situation','task','action','result'].forEach(function(k){
-      var v = (star[k]&&star[k].verdict||'missing').toLowerCase();
-      counts[v] = (counts[v]||0)+1;
+      counts[star[k].verdict] = (counts[star[k].verdict]||0)+1;
     });
-    if(counts.strong >= 3) return {verdict:'Strong', text:'Solid STAR structure with clear context, ownership, actions, and outcomes. Focus on adding metrics if missing.'};
-    if(counts.missing >= 2) return {verdict:'Weak', text:'Key STAR components are missing. Make sure you set up the situation, claim your task, walk through your specific actions, and land on a measurable result.'};
-    return {verdict:'Adequate', text:'Answer has most STAR elements but some are thin. Strengthen the weakest component — usually Result — with a concrete number or measurable outcome.'};
+    var evidenceRatio = subBehaviors && subBehaviors.length ? evidence.length / subBehaviors.length : 0;
+
+    /* Strong: all 4 at Strong OR 3 Strong + 1 Partial with solid competency evidence */
+    if(counts.Strong === 4 && evidenceRatio >= 0.5){
+      return {verdict:'Strong', text:'Complete STAR answer with clear personal ownership, specific actions, and a measurable result. Strong competency evidence. This would score well in a real interview.'};
+    }
+    if(counts.Strong >= 3 && counts.Missing === 0 && evidenceRatio >= 0.4){
+      return {verdict:'Strong', text:'Solid answer with mostly strong STAR components and good competency evidence. One component needs polish but this would likely pass a bar.'};
+    }
+    /* Weak: any Missing, or result is Missing, or action is Missing */
+    if(counts.Missing >= 1 || star.result.verdict === 'Missing' || star.action.verdict === 'Missing'){
+      var gaps = ['situation','task','action','result'].filter(function(k){ return star[k].verdict === 'Missing'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
+      return {verdict:'Weak', text:'This answer has significant gaps that would hurt it in a real interview. Missing: '+gaps.join(', ')+'. A trained behavioral interviewer will probe these gaps — build the full STAR structure before relying on this story.'};
+    }
+    /* Adequate: something is there but thin */
+    var thinParts = ['situation','task','action','result'].filter(function(k){ return star[k].verdict === 'Partial'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
+    return {verdict:'Adequate', text:'Adequate but not competitive. The '+thinParts.join(' and ')+' component'+(thinParts.length>1?'s are':' is')+' too thin to differentiate you. Interviewers at Salesforce see hundreds of answers — Partial components in Action and Result are the most common reason candidates don\'t advance.'};
+  }
+
+  /* ─── Sharpen tip: pick the most actionable fix for the weakest part ─── */
+  function buildTip(star, q){
+    /* Priority: Missing > Result metric > Action depth > competency tip */
+    var missing = ['situation','task','action','result'].filter(function(k){ return star[k].verdict==='Missing'; });
+    if(missing.length){
+      var fixes = {
+        situation: 'Open with a concrete scene — name a timeframe, team, company, or project. Without this anchoring, the rest of the story floats.',
+        task:      'Claim your role explicitly: "I was responsible for X." Remove or reduce "we" language — the interviewer is evaluating you, not your team.',
+        action:    'Walk through at least 3 things you personally did, in sequence. Use "First I…, then I…, finally I…" to make the structure obvious.',
+        result:    'Always close with an outcome. Use: "As a result…" or "The impact was…" and attach a number or named business result.'
+      };
+      return fixes[missing[0]] || TIPS[q.competency] || TIPS['_default'];
+    }
+    if(star.result.verdict !== 'Strong'){
+      return 'Your result needs a metric. Pick any of these: %, days saved or reduced, revenue, headcount, NPS/CSAT, quota attainment, or a specific named decision that got approved. Approximate numbers ("roughly 25%") are fine — no metric at all is not.';
+    }
+    if(star.action.verdict !== 'Strong'){
+      return 'Deepen your Action section: name 3+ specific steps you took, remove vague language ("various things", "basically"), and replace any "we did" with "I did." Interviewers cannot credit the team — only your specific actions count.';
+    }
+    return TIPS[q.competency] || TIPS['_default'];
   }
 
   window._ruleScore = function(q, answer){
     var star = {
-      situation: scoreComponent(answer, SIT_PATTERNS, 'Situation'),
-      task:      scoreComponent(answer, TASK_PATTERNS, 'Task'),
-      action:    scoreComponent(answer, ACTION_PATTERNS, 'Action'),
-      result:    scoreComponent(answer, RESULT_PATTERNS, 'Result')
+      situation: scoreSituation(answer),
+      task:      scoreTask(answer),
+      action:    scoreAction(answer),
+      result:    scoreResult(answer)
     };
     var evidence = matchSubBehaviors(answer, q.sub_behaviors);
-    var overall = overallVerdict(star);
-    var tip = TIPS[q.competency] || TIPS['_default'];
-    var weakComp = ['situation','task','action','result'].find(function(k){ return star[k].verdict !== 'Strong'; });
-    if(weakComp === 'result' && !has(answer, METRIC_PATTERNS)){
-      tip = 'Your result section needs a metric — add a number, percentage, timeline, or named outcome to make the impact tangible. '+tip;
-    }
+    var overall  = overallVerdict(star, evidence, q.sub_behaviors);
+    var tip      = buildTip(star, q);
     return {
       star: star,
       competency_evidence: evidence,
