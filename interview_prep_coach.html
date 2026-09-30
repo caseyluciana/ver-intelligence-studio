@@ -937,13 +937,34 @@ function submitAnswer(){
 
 /* ── CLAUDE API ── */
 function buildSystemPrompt(){
-  return 'You are an honest, evidence-based interview coach for Salesforce\'s Great Competency & Characteristics interview framework.\n\nEvaluate the candidate\'s answer and return ONLY valid JSON with no markdown, no extra text.\n\nGUARDRAILS:\n1. Only evaluate against the exact question, competency, and sub_behaviors provided.\n2. Evaluate ONLY STAR structure and named sub-behaviors. Never comment on accent, fluency, or protected characteristics.\n3. Frame verdicts as practice feedback only — never hiring verdicts.\n4. If the answer does not address the question, set overall.verdict to "Weak" and explain in overall.text.\n5. If borderline, mark Result as "Missing" rather than inferring.\n6. Direct, not harsh. Never praise without quoting specific evidence from the answer.\n\nOUTPUT: Return exactly this JSON schema:\n{\n  "star": {\n    "situation": {"verdict": "Strong|Partial|Missing", "reason": "..."},\n    "task": {"verdict": "Strong|Partial|Missing", "reason": "..."},\n    "action": {"verdict": "Strong|Partial|Missing", "reason": "..."},\n    "result": {"verdict": "Strong|Partial|Missing", "reason": "..."}\n  },\n  "competency_evidence": [\n    {"behavior": "...", "evidence": "..."}\n  ],\n  "overall": {\n    "verdict": "Strong|Adequate|Weak",\n    "text": "..."\n  },\n  "sharpen": {\n    "before": "...",\n    "after": "..."\n  },\n  "nudge": null\n}';
+  return 'You are a strict interview coach scoring a Salesforce behavioral answer. Output ONLY a single JSON object — no markdown, no prose before or after.
+
+SCORING RULES:
+- STAR verdicts: Strong = clearly present with specifics; Partial = vague or thin; Missing = absent.
+- overall.verdict: Strong = hits most sub-behaviors with evidence; Adequate = partial coverage; Weak = misses question or sub-behaviors.
+- reason fields: quote 3-6 words directly from the answer as evidence. Be blunt.
+- competency_evidence: list only sub-behaviors that ARE evidenced. Skip ones that are missing.
+- sharpen.tip: one concrete actionable sentence for next time. Do NOT rewrite their answer.
+- Never invent facts. Only score what is actually in the answer.
+
+JSON SCHEMA — output exactly this structure:
+{"star":{"situation":{"verdict":"Strong|Partial|Missing","reason":"..."},"task":{"verdict":"Strong|Partial|Missing","reason":"..."},"action":{"verdict":"Strong|Partial|Missing","reason":"..."},"result":{"verdict":"Strong|Partial|Missing","reason":"..."}},"competency_evidence":[{"behavior":"sub-behavior name","evidence":"quote from answer"}],"overall":{"verdict":"Strong|Adequate|Weak","text":"2-3 sentence honest assessment"},"sharpen":{"tip":"one actionable sentence"},"nudge":null}';
 }
 
 function buildUserPrompt(q, answer, role, fn){
-  var fnLine = fn ? '\nFUNCTION CONTEXT: '+fn+' — weight examples toward this domain where relevant.' : '';
-  var srLine = _selectedSubRole ? '\nSUB-ROLE CONTEXT: '+_selectedSubRole+' — frame sub-behavior evidence in terms of this job family where relevant.' : '';
-  return 'QUESTION: '+q._qtext+'\n\nCOMPETENCY: '+q.competency+'\nCHARACTERISTIC: '+q.characteristic+'\nROLE TYPE: '+role+fnLine+srLine+'\nSUB-BEHAVIORS: '+q.sub_behaviors.join(', ')+'\n\nCANDIDATE ANSWER:\n'+answer+'\n\nReturn only the JSON object as specified.';
+  var ctx = '';
+  if(fn) ctx += ' | Function: '+fn;
+  if(_selectedSubRole) ctx += ' | Sub-role: '+_selectedSubRole;
+  var subB = q.sub_behaviors ? q.sub_behaviors.join(' / ') : '';
+  return 'ROLE: '+role+ctx+'
+COMPETENCY: '+q.competency+' ('+q.characteristic+')
+SUB-BEHAVIORS TO SCORE: '+subB+'
+QUESTION ASKED: '+q._qtext+'
+
+ANSWER:
+'+answer+'
+
+Score this answer. Return only the JSON object.';
 }
 
 function callClaudeForFeedback(q, answer, role, cb){
@@ -954,8 +975,8 @@ function callClaudeForFeedback(q, answer, role, cb){
   ];
   _llmEngine.chat.completions.create({
     messages: messages,
-    max_tokens: 1800,
-    temperature: 0.3
+    max_tokens: 800,
+    temperature: 0.2
   }).then(function(reply){
     var text = (reply.choices && reply.choices[0] && reply.choices[0].message && reply.choices[0].message.content) || '';
     // strip any accidental markdown fences
@@ -1024,11 +1045,11 @@ function buildFeedbackHtml(result, q){
     html += '<div class="verdict-badge '+ov+'">'+esc(result.overall.verdict||'')+'</div>';
     html += '<div class="verdict-text">'+esc(result.overall.text||'')+'</div>';
     html += '</div>';
-    if(result.sharpen){
+    if(result.sharpen && (result.sharpen.tip || result.sharpen.before)){
+      var tip = result.sharpen.tip || result.sharpen.after || result.sharpen.before || '';
       html += '<div class="sharpen-block" style="margin-top:12px;">';
-      html += '<div class="sharpen-label">&#9889; Sharpen This</div>';
-      html += '<div class="sharpen-before"><strong>Before:</strong> '+esc(result.sharpen.before||'')+'</div>';
-      html += '<div class="sharpen-after" style="margin-top:6px;"><strong>After:</strong> '+esc(result.sharpen.after||'')+'</div>';
+      html += '<div class="sharpen-label">&#9889; Next Time</div>';
+      html += '<div class="sharpen-after">'+esc(tip)+'</div>';
       html += '</div>';
     }
     if(result.nudge){
