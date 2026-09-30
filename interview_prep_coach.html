@@ -769,6 +769,7 @@ var _mockQueue = [];
 var _mockAnswers = [];
 var _mockIdx = 0;
 var _weakPatterns = {result:0,situation:0,task:0,action:0};
+var _usedQTexts = {}; /* tracks used question texts per characteristic across mocks */
 var _selectedFunction = '';
 var _selectedSubRole = '';
 
@@ -1744,8 +1745,24 @@ function startMock(){
   selected.forEach(function(char){
     var charQs = pool.filter(function(q){return q.characteristic===char && !q._isSupplementary;});
     if(!charQs.length) charQs = pool.filter(function(q){return q.characteristic===char;});
-    shuffleArr(charQs);
-    for(var i=0;i<qPerChar && i<charQs.length;i++) _mockQueue.push(charQs[i]);
+    if(!charQs.length) return;
+
+    /* Prefer questions not yet seen for this characteristic this session.
+       When all are exhausted, reset that characteristic's used set and cycle. */
+    var used = _usedQTexts[char] || {};
+    var fresh = charQs.filter(function(q){ return !used[q._qtext]; });
+    if(fresh.length < qPerChar){
+      /* Not enough fresh — reset this characteristic and use the full pool */
+      _usedQTexts[char] = {};
+      used = {};
+      fresh = charQs.slice();
+    }
+    shuffleArr(fresh);
+    for(var i=0;i<qPerChar && i<fresh.length;i++){
+      _mockQueue.push(fresh[i]);
+      if(!_usedQTexts[char]) _usedQTexts[char] = {};
+      _usedQTexts[char][fresh[i]._qtext] = true;
+    }
   });
   shuffleArr(_mockQueue);
   _mockAnswers = [];
