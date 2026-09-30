@@ -1654,11 +1654,35 @@ function buildMockReport(results){
     html += '<div class="priority-block" style="border-left-color:var(--amber);"><div class="priority-label" style="color:var(--amber-light);">&#9889; Focus Area #2</div>';
     html += '<div class="priority-text">'+vc.weak+' of '+total+' competencies landed Weak. Review sub-behaviors and build stories that explicitly hit each one.</div></div>';
   }
-  if(vc.weak<2 && wc[worstStar]<2){
-    html += '<div style="padding:16px;font-size:10pt;color:var(--green-light);">&#10003; Strong overall session &mdash; no critical patterns detected.</div>';
-  }
-  if(vc.weak>=2 || sc.missing>=3){
-    html += '<div class="nudge-block">You\'ve got a good base here, but a couple of these could really benefit from saying them out loud to a real person. Loop in a peer for a quick practice round or find a Mentor Circle mock-interview session.</div>';
+  /* ── Honest session-level verdict ── */
+  var totalQ = total;
+  var pctWeak = totalQ ? vc.weak/totalQ : 0;
+  var pctStrong = totalQ ? vc.strong/totalQ : 0;
+  if(pctWeak >= 0.6){
+    html += '<div class="nudge-block" style="border-left-color:var(--red);background:rgba(194,65,45,.08);">'
+      +'<strong style="color:var(--red);">Honest assessment:</strong> '+(Math.round(pctWeak*100))+'% of your answers scored Weak. '
+      +'If you walked into an interview with these answers today, you would likely not advance. '
+      +'The issues are structural — missing STAR components, "we" instead of "I", and no measurable results. '
+      +'These are fixable, but they require rebuilding the stories, not just polishing them. '
+      +'Use the single-practice mode to rework each Weak answer before running another mock.</div>';
+  } else if(pctWeak >= 0.3 || sc.missing >= 3){
+    html += '<div class="nudge-block" style="border-left-color:var(--amber);background:rgba(183,121,31,.08);">'
+      +'<strong style="color:var(--amber-light);">Room for improvement:</strong> '
+      +Math.round(pctWeak*100)+'% of answers scored Weak and '+sc.missing+' result'+(sc.missing===1?'':'s')+' had no measurable outcome. '
+      +'These answers would likely pass a phone screen but stall in a panel interview where calibration is tighter. '
+      +'Focus on Result — adding a single metric to each weak answer is the highest-leverage fix.</div>';
+  } else if(pctStrong >= 0.6){
+    html += '<div class="nudge-block" style="border-left-color:var(--green);background:rgba(20,137,90,.08);">'
+      +'<strong style="color:var(--green);">Solid session.</strong> '
+      +'Most answers are competitive. Review the Partial and Weak ones specifically — '
+      +'one underprepared story in a real panel can cost you the loop. '
+      +'Make sure every story has a metric and uses "I" not "we".</div>';
+  } else {
+    html += '<div class="nudge-block" style="border-left-color:var(--indigo);background:rgba(79,70,229,.08);">'
+      +'<strong style="color:var(--indigo);">Mixed results.</strong> '
+      +'You have some strong answers and some that need work. '
+      +'Interviewers calibrate across the full loop — one Weak answer on a core competency can sink an otherwise strong performance. '
+      +'Prioritize rebuilding any story with a Missing STAR component before your next practice session.</div>';
   }
   html += '</div>';
   html += '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
