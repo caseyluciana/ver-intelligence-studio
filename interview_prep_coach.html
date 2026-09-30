@@ -458,6 +458,26 @@ import * as webllm from "https://esm.run/@mlc-ai/web-llm@0.2.79";
 window._WebLLM = webllm;
 document.dispatchEvent(new CustomEvent('webllm-available'));
 </script>
+<script type="module">
+import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/transformers.min.js";
+env.allowLocalModels = false;
+window._TFJSReady = false;
+window._TFJSLoad = async function(onProgress){
+  const pipe = await pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
+    dtype: 'q4',
+    device: 'wasm',
+    progress_callback: onProgress
+  });
+  window._TFJSPipe = pipe;
+  window._TFJSReady = true;
+};
+window._TFJSInfer = async function(messages){
+  if(!window._TFJSPipe) throw new Error('Model not loaded');
+  const out = await window._TFJSPipe(messages, {max_new_tokens: 600, temperature: 0.2, do_sample: false});
+  return out[0].generated_text.at(-1).content;
+};
+document.dispatchEvent(new CustomEvent('transformers-available'));
+</script>
 </head>
 <body>
 
@@ -487,8 +507,32 @@ document.dispatchEvent(new CustomEvent('webllm-available'));
         <button class="btn-secondary" id="model-skip-btn" onclick="closeApiModal()">Skip (self-assess)</button>
       </div>
       <div class="modal-path-divider">
-        <div class="modal-note">Or use an OpenAI API key instead:</div>
-        <button type="button" class="btn-secondary btn-full" onclick="showOpenAIPath()">Use OpenAI API Key</button>
+        <div class="modal-note">No GPU? Try the CPU model or an API key:</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn-secondary" style="flex:1;" onclick="showWasmPath()">Run on CPU (no GPU needed)</button>
+          <button type="button" class="btn-secondary" style="flex:1;" onclick="showOpenAIPath()">Use API Key</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATH C: WASM / CPU model -->
+    <div id="modal-path-wasm" class="hidden">
+      <div class="modal-sub">Runs entirely in your browser on CPU — no GPU, no API key, no data leaves your device.</div>
+      <div class="model-info-row">
+        <span class="model-chip" style="background:var(--teal);">Qwen2.5-0.5B</span>
+        <span class="model-size">~250 MB download · CPU only · ~30–60s per answer</span>
+      </div>
+      <div class="model-progress-wrap hidden" id="wasm-progress-wrap">
+        <div class="model-progress-bar"><div class="model-progress-fill" id="wasm-progress-fill"></div></div>
+        <div class="model-progress-lbl" id="wasm-progress-lbl">Starting…</div>
+      </div>
+      <div class="modal-note" id="wasm-modal-note">First load downloads ~250 MB and is cached after that. Each answer takes 30–60 seconds to score on CPU — that's normal.</div>
+      <div class="modal-actions">
+        <button type="button" class="btn-primary" id="wasm-load-btn" onclick="startWasmLoad()">Load CPU Model</button>
+        <button type="button" class="btn-secondary" onclick="closeApiModal()">Skip for now</button>
+      </div>
+      <div class="modal-back-row">
+        <button type="button" class="btn-secondary btn-full" onclick="showLocalPath()">← Back</button>
       </div>
     </div>
 
@@ -713,6 +757,8 @@ var _llmEngine = null;
 var _llmReady = false;
 var _llmLoading = false;
 var _openaiKey = '';
+var _wasmReady = false;
+var _wasmLoading = false;
 var _hasWebGPU = (typeof navigator !== 'undefined' && !!navigator.gpu);
 var _role = 'IC';
 var _mockRole = 'IC';
@@ -745,9 +791,9 @@ function setSubRole(val){
 
 /* ── MODEL LOAD MODAL ── */
 function openApiModal(){
-  if(_llmReady || _openaiKey){showToast('AI already enabled ✓');return;}
+  if(_llmReady || _openaiKey || _wasmReady){showToast('AI already enabled ✓');return;}
   if(!_hasWebGPU){
-    showOpenAIPath(true);
+    showWasmPath();
   } else {
     showLocalPath();
   }
@@ -760,10 +806,18 @@ function closeApiModal(){
 function showLocalPath(){
   document.getElementById('modal-path-local').classList.remove('hidden');
   document.getElementById('modal-path-openai').classList.add('hidden');
+  document.getElementById('modal-path-wasm').classList.add('hidden');
   document.getElementById('modal-main-title').textContent = 'Load AI Model';
+}
+function showWasmPath(){
+  document.getElementById('modal-path-local').classList.add('hidden');
+  document.getElementById('modal-path-openai').classList.add('hidden');
+  document.getElementById('modal-path-wasm').classList.remove('hidden');
+  document.getElementById('modal-main-title').textContent = 'Load CPU Model';
 }
 function showOpenAIPath(noGpu){
   document.getElementById('modal-path-local').classList.add('hidden');
+  document.getElementById('modal-path-wasm').classList.add('hidden');
   document.getElementById('modal-path-openai').classList.remove('hidden');
   document.getElementById('modal-main-title').textContent = 'Enable AI Feedback';
   var sub = document.getElementById('openai-modal-sub');
@@ -830,18 +884,56 @@ function startModelLoad(){
     document.getElementById('model-modal-note').textContent = 'Something went wrong. Check the console for details and try again.';
   });
 }
+function startWasmLoad(){
+  if(_wasmLoading || _wasmReady) return;
+  if(!window._TFJSLoad){
+    showToast('Transformers library not available — check your internet connection.');
+    return;
+  }
+  _wasmLoading = true;
+  document.getElementById('wasm-load-btn').disabled = true;
+  var wrap = document.getElementById('wasm-progress-wrap');
+  wrap.classList.remove('hidden');
+  var fill = document.getElementById('wasm-progress-fill');
+  var lbl  = document.getElementById('wasm-progress-lbl');
+  document.getElementById('wasm-modal-note').textContent = 'Downloading model — keep this tab open. Cached after first load.';
+  updateApiBtn();
+  window._TFJSLoad(function(progress){
+    if(progress.status === 'progress' && progress.total){
+      var pct = Math.round(progress.loaded / progress.total * 100);
+      fill.style.width = pct + '%';
+      lbl.textContent = (progress.file || 'Loading') + ' — ' + pct + '%';
+    } else if(progress.status === 'done'){
+      lbl.textContent = 'Loaded ✓';
+    } else if(progress.status === 'initiate'){
+      lbl.textContent = 'Fetching ' + (progress.file || '…');
+    }
+  }).then(function(){
+    _wasmReady = true;
+    _wasmLoading = false;
+    document.getElementById('api-modal').classList.remove('open');
+    updateApiBtn();
+    showToast('CPU model loaded — feedback will take ~30–60s per answer ✓');
+  }).catch(function(err){
+    _wasmLoading = false;
+    lbl.textContent = 'Load failed: ' + (err.message || err);
+    fill.style.width = '0%';
+    document.getElementById('wasm-load-btn').disabled = false;
+    document.getElementById('wasm-modal-note').textContent = 'Download may be blocked on this network. Try the API key option instead.';
+  });
+}
 function updateApiBtn(){
   var btn = document.getElementById('api-toggle-btn');
   var lbl = document.getElementById('api-btn-label');
   var noKey = document.getElementById('no-key-note');
-  if(_llmReady){
+  if(_llmReady || _wasmReady){
     btn.classList.add('connected');
     btn.classList.remove('loading');
-    lbl.textContent = _openaiKey ? 'AI Ready' : 'AI Ready';
-  } else if(_llmLoading){
+    lbl.textContent = _wasmReady ? 'CPU Model Ready' : 'AI Ready';
+  } else if(_llmLoading || _wasmLoading){
     btn.classList.remove('connected');
     btn.classList.add('loading');
-    lbl.textContent = 'Loading Model…';
+    lbl.textContent = _wasmLoading ? 'Loading CPU Model…' : 'Loading Model…';
   } else {
     btn.classList.remove('connected','loading');
     btn.classList.add('connected');
@@ -1380,6 +1472,21 @@ function callClaudeForFeedback(q, answer, role, cb){
       text = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
       try{cb(JSON.parse(text));}catch(e){cb({_raw:text});}
     }).catch(function(err){cb({_error:err.message||'Network error'});});
+    return;
+  }
+  if(_wasmReady && window._TFJSInfer){
+    var wasmMessages = [
+      {role:'system', content: buildSystemPrompt()},
+      {role:'user',   content: buildUserPrompt(q, answer, role, _selectedFunction)}
+    ];
+    window._TFJSInfer(wasmMessages).then(function(text){
+      text = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+      /* Qwen sometimes wraps in extra prose — try to extract the JSON object */
+      var jsonMatch = text.match(/\{[\s\S]*\}/);
+      if(jsonMatch) text = jsonMatch[0];
+      try{cb(JSON.parse(text));}
+      catch(e){cb({_raw: text});}
+    }).catch(function(err){cb({_error: err.message||'CPU inference error'});});
     return;
   }
   if(_llmEngine){
