@@ -1432,7 +1432,102 @@ function buildUserPrompt(q, answer, role, fn){
     return TIPS[q.competency] || TIPS['_default'];
   }
 
+  /* ─── Hostile content detector ─── */
+  /* Returns a blunt override when the answer actively contradicts the competency.
+     Checked before STAR so the feedback calls out WHAT was said, not just structural gaps. */
+  var HOSTILE_SIGNALS = {
+    'Drive Innovation': [
+      {match: ["don't bring new ideas","don't share ideas","save those for","don't suggest","not my job to innovate","not paid to think"],
+       verdict:'Weak', reason:'Your answer states you withhold ideas from your team. That is the opposite of Drive Innovation — this competency requires you to actively surface, test, and champion new thinking.',
+       tip: 'Start over. Describe a time you spotted an unmet need, proposed a new approach, and moved it toward execution. "I save my ideas" will not advance you in any Salesforce interview.'},
+      {match: ["not my idea","it was someone else","they came up with","wasn't my innovation"],
+       verdict:'Weak', reason:'You\'re attributing the innovation to someone else. This competency scores YOUR ability to originate, test, and drive new ideas — not your ability to support someone else\'s.',
+       tip: 'Tell a story where the innovation started with you. Even a small process change you proposed and implemented counts more than a large initiative you helped someone else run.'}
+    ],
+    'Take Accountability': [
+      {match: ["shouldn't have to explain","not my fault","wasn't my responsibility","don't owe","not accountable","not responsible"],
+       verdict:'Weak', reason:'Your answer rejects the premise of accountability. This competency requires you to demonstrate ownership of outcomes, including failures. Deflection is the opposite of what\'s being scored.',
+       tip: 'Reframe entirely: pick a real mistake you made, own it clearly ("I made the wrong call on X"), describe what you did to fix it, and close with what you changed going forward. Lead with the failure — that\'s what scores.'},
+      {match: ["blame","it was their fault","they should have","my manager should","upper management","not up to me"],
+       verdict:'Weak', reason:'Your answer shifts blame outward. Even if others contributed to the failure, Take Accountability scores whether YOU own your piece — interviewers are looking for "I" statements, not explanations of why others failed.',
+       tip: 'Strip out any blame language. Rewrite the answer so you are the only subject. "I decided X. It didn\'t work. Here is what I personally did to fix it and prevent it from happening again."'}
+    ],
+    'Influence': [
+      {match: ["don't care how","not my problem if they","can't help if they're inflexible","their loss","force them","make them","they have to"],
+       verdict:'Weak', reason:'Your answer describes coercion or indifference to the other party\'s position. Influence requires understanding and addressing resistance — "forcing" or not caring about the other person\'s reaction is not influence.',
+       tip: 'Pick a story where someone genuinely disagreed with you. Name their specific objection, describe how you tried to understand their position, then walk through the approach you used to change their mind. The other person must ultimately choose to move — that\'s what influence means.'},
+      {match: ["i don't need to influence","they should just","it's obvious","common sense","they were wrong to resist"],
+       verdict:'Weak', reason:'Your answer dismisses the need to influence rather than demonstrating it. Interviewers know alignment is hard — treating it as trivial signals low self-awareness.',
+       tip: 'Influence is hardest when the other person has a reasonable objection. Find a story where the resistance was legitimate, not just stubbornness on their part.'}
+    ],
+    'Build Networks & Partnerships': [
+      {match: ["like to work alone","prefer to work alone","avoid dealing with","don't like working with","don't need others","i work better solo","don't enjoy collaborating"],
+       verdict:'Weak', reason:'Your answer describes active avoidance of collaboration. Build Networks & Partnerships scores your ability to proactively form relationships before you need them — the opposite of what you described.',
+       tip: 'This answer needs a full replacement. Think of a time you reached out to someone outside your immediate team, built a real working relationship, and then that relationship produced a result neither of you could have achieved alone.'},
+      {match: ["peers aren't helpful","my colleagues don't","don't trust my team","prefer to go it alone","they slow me down"],
+       verdict:'Weak', reason:'Your answer signals distrust or frustration with colleagues. Interviewers at Salesforce will hear this as a culture-fit concern, not a competency story.',
+       tip: 'Reframe toward a success story. Even one example of a productive cross-functional relationship — built by you, leading to a concrete outcome — is enough for this competency.'}
+    ],
+    'Communicate Effectively': [
+      {match: ["don't concern myself","don't care about keeping","not my job to keep","if they don't pay attention","their problem","can't force people to listen"],
+       verdict:'Weak', reason:'Your answer says you place no responsibility on yourself for whether your audience is engaged. Communicate Effectively scores YOUR ability to adapt and maintain attention — not the audience\'s.',
+       tip: 'Reframe around an adjustment you made. Describe a time your audience lost interest or didn\'t understand, what you noticed, and the specific thing you changed — format, language, length, channel — that brought them back.'},
+      {match: ["i just say what i think","don't filter","don't adjust","say the same thing to everyone","not my style to change"],
+       verdict:'Weak', reason:'Refusing to adapt your communication is described in the scoring rubric as the defining failure for this competency. Every word you said reinforces that.',
+       tip: 'Pick a story where you actively adjusted — simplified for a non-technical audience, changed the format when people were disengaged, or matched your tone to a difficult conversation. The adjustment is the answer.'}
+    ],
+    'Demonstrate Courage': [
+      {match: ["don't take risks","avoid conflict","keep my head down","not my place","not worth the fight","don't push back"],
+       verdict:'Weak', reason:'Avoiding risk and conflict is the behavioral opposite of Demonstrate Courage. This competency specifically scores whether you take a stand when it\'s uncomfortable — and your answer describes opting out.',
+       tip: 'Find a story where you said something unpopular to someone with power over you, held your ground under pressure, or took an action you knew might have professional consequences. The discomfort is what makes it courage.'}
+    ],
+    'Achieve Results': [
+      {match: ["don't focus on results","process is what matters","not about the numbers","metrics aren't important","results aren't everything"],
+       verdict:'Weak', reason:'Dismissing results in an answer to a results-focused competency is a disqualifying signal. Salesforce is a performance culture — interviewers expect concrete outcomes with numbers.',
+       tip: 'Pick any story where you hit or exceeded a target, and lead with the number. "I increased X by Y%" or "I delivered Z ahead of schedule" as the opening line is the correct structure for this competency.'}
+    ],
+    'Champion Customer Success': [
+      {match: ["customer isn't always right","don't always prioritize the customer","internal work comes first","customer is secondary","not my main focus"],
+       verdict:'Weak', reason:'Deprioritizing the customer in a customer-success competency is an automatic disqualifier. This value is core to Salesforce\'s identity — any answer that hedges on it will end an interview.',
+       tip: 'Lead with the customer\'s specific need. What did they tell you, or what did you observe? Then show the specific thing you did to address it — and close with how they responded. The customer must be the center of the story from the first sentence.'}
+    ]
+  };
+
+  function detectHostile(competency, answer){
+    var signals = HOSTILE_SIGNALS[competency];
+    if(!signals) return null;
+    var t = answer.toLowerCase();
+    for(var i=0;i<signals.length;i++){
+      var s = signals[i];
+      for(var j=0;j<s.match.length;j++){
+        if(t.indexOf(s.match[j]) !== -1){
+          return s;
+        }
+      }
+    }
+    return null;
+  }
+
   window._ruleScore = function(q, answer){
+    /* Check for content that actively contradicts the competency first */
+    var hostile = detectHostile(q.competency, answer);
+    if(hostile){
+      var preview = answer.length > 55 ? '"'+answer.slice(0,55).trim()+'…"' : '"'+answer+'"';
+      return {
+        star: {
+          situation: {verdict:'Missing', reason:'Answer contains content that contradicts this competency — STAR structure is irrelevant until the substance is corrected.'},
+          task:      {verdict:'Missing', reason:'See above.'},
+          action:    {verdict:'Missing', reason:'See above.'},
+          result:    {verdict:'Missing', reason:'See above.'}
+        },
+        competency_evidence: [],
+        overall: {verdict:'Weak', text: hostile.reason + ' You wrote: ' + preview},
+        sharpen: {tip: hostile.tip},
+        nudge: null,
+        _rulebased: true,
+        _hostile: true
+      };
+    }
     var star = {
       situation: scoreSituation(answer),
       task:      scoreTask(answer),
@@ -1803,7 +1898,10 @@ function buildMockReport(results){
       var line = '<div class="callout-item">'
         +'<span class="callout-q">Q'+(i+1)+' — '+esc(r.q.competency)+'</span>'
         +'<span class="callout-preview">You wrote: '+esc(preview)+'</span>';
-      if(worst){
+      if(fb._hostile){
+        /* Content contradicts the competency — surface the content verdict, skip STAR labels */
+        line += '<span class="callout-reason">'+esc(fb.overall&&fb.overall.text||'')+'</span>';
+      } else if(worst){
         line += '<span class="callout-reason">'+esc(worst.comp.charAt(0).toUpperCase()+worst.comp.slice(1))+': '+esc(worst.reason)+'</span>';
       }
       if(fb.sharpen&&fb.sharpen.tip){
