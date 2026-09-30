@@ -437,7 +437,7 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
 .hidden{display:none!important;}
 </style>
 <script type="module">
-import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+import * as webllm from "https://esm.run/@mlc-ai/web-llm@0.2.79";
 window._WebLLM = webllm;
 document.dispatchEvent(new CustomEvent('webllm-available'));
 </script>
@@ -727,14 +727,13 @@ function startModelLoad(){
     return;
   }
 
-  var engine = new WL.MLCEngine();
-  engine.setInitProgressCallback(function(report){
-    var pct = Math.round((report.progress||0)*100);
-    fill.style.width = pct + '%';
-    lbl.textContent = report.text || (pct + '%');
-  });
-
-  engine.reload('Phi-3.5-mini-instruct-q4f16_1-MLC').then(function(){
+  WL.CreateMLCEngine('Phi-3.5-mini-instruct-q4f16_1-MLC', {
+    initProgressCallback: function(report){
+      var pct = Math.round((report.progress||0)*100);
+      fill.style.width = pct + '%';
+      lbl.textContent = report.text || (pct + '%');
+    }
+  }).then(function(engine){
     _llmEngine = engine;
     _llmReady = true;
     _llmLoading = false;
