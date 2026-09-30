@@ -937,18 +937,7 @@ function submitAnswer(){
 
 /* ── CLAUDE API ── */
 function buildSystemPrompt(){
-  return 'You are a strict interview coach scoring a Salesforce behavioral answer. Output ONLY a single JSON object — no markdown, no prose before or after.
-
-SCORING RULES:
-- STAR verdicts: Strong = clearly present with specifics; Partial = vague or thin; Missing = absent.
-- overall.verdict: Strong = hits most sub-behaviors with evidence; Adequate = partial coverage; Weak = misses question or sub-behaviors.
-- reason fields: quote 3-6 words directly from the answer as evidence. Be blunt.
-- competency_evidence: list only sub-behaviors that ARE evidenced. Skip ones that are missing.
-- sharpen.tip: one concrete actionable sentence for next time. Do NOT rewrite their answer.
-- Never invent facts. Only score what is actually in the answer.
-
-JSON SCHEMA — output exactly this structure:
-{"star":{"situation":{"verdict":"Strong|Partial|Missing","reason":"..."},"task":{"verdict":"Strong|Partial|Missing","reason":"..."},"action":{"verdict":"Strong|Partial|Missing","reason":"..."},"result":{"verdict":"Strong|Partial|Missing","reason":"..."}},"competency_evidence":[{"behavior":"sub-behavior name","evidence":"quote from answer"}],"overall":{"verdict":"Strong|Adequate|Weak","text":"2-3 sentence honest assessment"},"sharpen":{"tip":"one actionable sentence"},"nudge":null}';
+  return 'You are a strict interview coach scoring a Salesforce behavioral answer. Output ONLY a single JSON object - no markdown, no prose before or after.\nSCORING RULES:\n- STAR: Strong=clearly present with specifics; Partial=vague or thin; Missing=absent.\n- overall.verdict: Strong=hits most sub-behaviors; Adequate=partial; Weak=misses question.\n- reason fields: quote 3-6 words directly from the answer. Be blunt.\n- competency_evidence: only list sub-behaviors that ARE evidenced.\n- sharpen.tip: one concrete actionable sentence for next time.\n- Never invent facts. Only score what is in the answer.\nOUTPUT exactly this JSON (no other text):\n{"star":{"situation":{"verdict":"Strong|Partial|Missing","reason":"..."},"task":{"verdict":"Strong|Partial|Missing","reason":"..."},"action":{"verdict":"Strong|Partial|Missing","reason":"..."},"result":{"verdict":"Strong|Partial|Missing","reason":"..."}},"competency_evidence":[{"behavior":"...","evidence":"..."}],"overall":{"verdict":"Strong|Adequate|Weak","text":"..."},"sharpen":{"tip":"..."},"nudge":null}';
 }
 
 function buildUserPrompt(q, answer, role, fn){
