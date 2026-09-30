@@ -163,17 +163,18 @@ a{color:inherit;text-decoration:none;}
 .hero-modes{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
 .mode-card{flex:1;min-width:230px;max-width:320px;border-radius:var(--radius);
   border:1px solid rgba(255,255,255,.1);
-  background:linear-gradient(145deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.03) 100%);
+  background:linear-gradient(145deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.03) 100%) !important;
   box-shadow:0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);
-  cursor:pointer;transition:all .22s;text-align:left;position:relative;overflow:hidden;}
+  cursor:pointer;transition:all .22s;text-align:left;position:relative;overflow:hidden;
+  appearance:none;-webkit-appearance:none;}
 
 .mode-accent-bar{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),#2DD4BF);opacity:.7;transition:opacity .2s;}
 .mode-card.mock-card .mode-accent-bar{background:linear-gradient(90deg,var(--indigo),#818CF8);}
 .mode-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.18);
   box-shadow:0 16px 48px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.1);}
 .mode-card:hover .mode-accent-bar,.mode-card.active .mode-accent-bar{opacity:1;}
-.mode-card.active{border-color:rgba(13,148,136,.4);background:linear-gradient(145deg,rgba(13,148,136,.12),rgba(13,148,136,.05));}
-.mode-card.mock-card.active{border-color:rgba(99,102,241,.4);background:linear-gradient(145deg,rgba(99,102,241,.12),rgba(99,102,241,.05));}
+.mode-card.active{border-color:rgba(13,148,136,.4);background:linear-gradient(145deg,rgba(13,148,136,.12),rgba(13,148,136,.05)) !important;}
+.mode-card.mock-card.active{border-color:rgba(99,102,241,.4);background:linear-gradient(145deg,rgba(99,102,241,.12),rgba(99,102,241,.05)) !important;}
 .mode-card-inner{padding:24px 22px 20px;}
 .mode-icon-wrap{display:inline-flex;align-items:center;justify-content:center;
   width:44px;height:44px;border-radius:12px;margin-bottom:14px;
@@ -337,7 +338,9 @@ textarea.answer-input:focus{outline:none;border-color:var(--teal);}
 .mock-progress-bar-wrap{height:4px;border-radius:2px;background:rgba(255,255,255,.07);margin-bottom:24px;overflow:hidden;}
 .mock-progress-bar{height:100%;border-radius:2px;background:var(--indigo);transition:width .5s;}
 .mock-q-num{font-size:9pt;font-weight:700;color:var(--text-dim);margin-bottom:8px;}
-.mock-q-text{font-size:13pt;font-weight:700;color:#fff;line-height:1.55;margin-bottom:20px;}
+[data-theme="light"] .mock-q-num{color:#667085;}
+[data-theme="light"] .mock-q-text{color:#172033;}
+.mock-q-text{font-size:13pt;font-weight:700;color:var(--text);line-height:1.55;margin-bottom:20px;}
 .mock-next-btn{background:linear-gradient(135deg,var(--indigo) 0%,#4338CA 100%) !important;}
 .mock-next-btn:hover{box-shadow:0 8px 24px rgba(99,102,241,.4) !important;}
 
@@ -636,6 +639,11 @@ document.dispatchEvent(new CustomEvent('webllm-available'));
       </div>
       <div class="mock-q-num" id="mock-q-num">Question 1 of 5</div>
       <div class="mock-q-text" id="mock-q-text"></div>
+      <div class="answer-toolbar">
+        <button type="button" class="mic-btn" id="mock-mic-btn" onclick="toggleMockMic()">&#127908; Record Answer</button>
+        <span id="mock-mic-status" class="mic-status-lbl"></span>
+      </div>
+      <div class="live-tx" id="mock-live-tx"></div>
       <textarea class="answer-input" id="mock-answer-input" placeholder="Take your time &mdash; think through your STAR structure..." rows="9" oninput="updateMockCharCount()"></textarea>
       <div class="char-count" id="mock-char-count">0 words</div>
       <div class="submit-row" style="margin-top:16px;">
@@ -1118,6 +1126,7 @@ function renderMockQuestion(){
   document.getElementById('mock-next-btn').textContent = _mockIdx===_mockQueue.length-1 ? 'Finish & See Report →' : 'Next Question →';
 }
 function mockNext(){
+  if(_mockIsRecording) stopMockMic();
   var ans = document.getElementById('mock-answer-input').value.trim();
   if(ans.length < 20){showToast('Write something before continuing');return;}
   _mockAnswers.push({q:_mockQueue[_mockIdx], answer:ans});
@@ -1303,6 +1312,61 @@ function stopMic(){
 
 function updateMicBtn(on){
   var btn = document.getElementById('mic-btn');
+  if(on){btn.classList.add('recording');btn[IH]='&#9679; Stop Recording';}
+  else{btn.classList.remove('recording');btn[IH]='&#127908; Record Answer';}
+}
+
+/* ── MOCK VOICE CAPTURE (simple — appends to mock textarea) ── */
+var _mockRecognition = null;
+var _mockIsRecording = false;
+function toggleMockMic(){
+  if(_mockIsRecording){stopMockMic();return;}
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){showToast('Voice not supported in this browser — type your answer instead');return;}
+  var liveTx = document.getElementById('mock-live-tx');
+  liveTx.classList.add('active');
+  liveTx.textContent = '';
+  var interim = '';
+  _mockRecognition = new SR();
+  _mockRecognition.continuous = true;
+  _mockRecognition.interimResults = true;
+  _mockRecognition.lang = 'en-US';
+  _mockRecognition.onresult = function(e){
+    var finals = '';
+    interim = '';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) finals += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    if(finals){
+      var ta = document.getElementById('mock-answer-input');
+      ta.value += finals;
+      updateMockCharCount();
+    }
+    liveTx.textContent = interim;
+  };
+  _mockRecognition.onerror = function(e){
+    if(e.error !== 'aborted') showToast('Mic error: ' + e.error);
+    _mockIsRecording = false;
+    updateMockMicBtn(false);
+  };
+  _mockRecognition.onend = function(){if(_mockIsRecording) _mockRecognition.start();};
+  _mockRecognition.start();
+  _mockIsRecording = true;
+  updateMockMicBtn(true);
+  document.getElementById('mock-mic-status').textContent = 'Recording… click again to stop';
+}
+function stopMockMic(){
+  _mockIsRecording = false;
+  if(_mockRecognition){_mockRecognition.onend=null;_mockRecognition.stop();}
+  updateMockMicBtn(false);
+  document.getElementById('mock-mic-status').textContent = '';
+  document.getElementById('mock-live-tx').classList.remove('active');
+  document.getElementById('mock-live-tx').textContent = '';
+}
+function updateMockMicBtn(on){
+  var btn = document.getElementById('mock-mic-btn');
+  if(!btn) return;
   if(on){btn.classList.add('recording');btn[IH]='&#9679; Stop Recording';}
   else{btn.classList.remove('recording');btn[IH]='&#127908; Record Answer';}
 }
