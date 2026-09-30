@@ -458,12 +458,13 @@ import * as webllm from "https://esm.run/@mlc-ai/web-llm@0.2.79";
 window._WebLLM = webllm;
 document.dispatchEvent(new CustomEvent('webllm-available'));
 </script>
-<script type="module">
-import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/transformers.min.js";
-env.allowLocalModels = false;
+<script>
+/* Transformers.js WASM — loaded lazily only when user clicks Load CPU Model */
 window._TFJSReady = false;
 window._TFJSLoad = async function(onProgress){
-  const pipe = await pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
+  var mod = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/transformers.min.js');
+  mod.env.allowLocalModels = false;
+  var pipe = await mod.pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
     dtype: 'q4',
     device: 'wasm',
     progress_callback: onProgress
@@ -473,10 +474,9 @@ window._TFJSLoad = async function(onProgress){
 };
 window._TFJSInfer = async function(messages){
   if(!window._TFJSPipe) throw new Error('Model not loaded');
-  const out = await window._TFJSPipe(messages, {max_new_tokens: 600, temperature: 0.2, do_sample: false});
+  var out = await window._TFJSPipe(messages, {max_new_tokens: 600, temperature: 0.2, do_sample: false});
   return out[0].generated_text.at(-1).content;
 };
-document.dispatchEvent(new CustomEvent('transformers-available'));
 </script>
 </head>
 <body>
