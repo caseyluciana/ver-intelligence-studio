@@ -483,6 +483,52 @@ textarea.answer-input:focus{outline:none;border-color:var(--indigo);
   cursor:pointer;transition:border .15s;min-width:200px;}
 .function-select:focus{outline:none;border-color:var(--indigo);}
 
+/* ── BRIEFING MODAL ── */
+.briefing-overlay{position:fixed;inset:0;z-index:8500;
+  background:rgba(15,18,32,.8);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;padding:24px;}
+.briefing-overlay.open{display:flex;}
+.briefing-box{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);width:min(560px,100%);
+  box-shadow:var(--shadow-lg);overflow:hidden;}
+.briefing-progress{display:flex;gap:6px;padding:20px 28px 0;}
+.briefing-pip{flex:1;height:3px;border-radius:999px;background:var(--border);transition:background .3s;}
+.briefing-pip.done{background:var(--indigo);}
+.briefing-pip.active{background:linear-gradient(90deg,var(--indigo),var(--indigo-mid));}
+.briefing-step{padding:28px 28px 24px;}
+.briefing-eyebrow{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--indigo);margin-bottom:10px;}
+.briefing-q{font-size:17pt;font-weight:900;letter-spacing:-.02em;color:var(--text);
+  line-height:1.2;margin-bottom:6px;}
+.briefing-sub{font-size:9pt;color:var(--text-muted);margin-bottom:22px;line-height:1.6;}
+.briefing-pills{display:flex;flex-direction:column;gap:9px;}
+.briefing-pill{display:flex;align-items:center;gap:14px;padding:14px 18px;
+  border-radius:var(--radius-sm);border:2px solid var(--border);
+  background:var(--surface-2);cursor:pointer;transition:all .18s;
+  text-align:left;width:100%;-webkit-appearance:none;appearance:none;}
+.briefing-pill:hover{border-color:var(--indigo-line);background:var(--indigo-soft);}
+.briefing-pill.selected{border-color:var(--indigo);background:var(--indigo-soft);
+  box-shadow:0 0 0 3px rgba(67,56,202,.12);}
+.briefing-pill-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center;}
+.briefing-pill-body{flex:1;}
+.briefing-pill-label{font-size:10.5pt;font-weight:800;color:var(--text);line-height:1.2;}
+.briefing-pill-desc{font-size:8.5pt;color:var(--text-muted);margin-top:2px;line-height:1.4;}
+.briefing-pill.selected .briefing-pill-label{color:var(--indigo);}
+.briefing-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);
+  flex-shrink:0;transition:all .18s;display:flex;align-items:center;justify-content:center;}
+.briefing-pill.selected .briefing-check{background:var(--indigo);border-color:var(--indigo);}
+.briefing-check::after{content:'✓';font-size:10px;font-weight:900;color:#fff;opacity:0;transition:opacity .15s;}
+.briefing-pill.selected .briefing-check::after{opacity:1;}
+.briefing-footer{display:flex;align-items:center;justify-content:space-between;
+  padding:16px 28px 24px;border-top:1px solid var(--border);}
+.briefing-skip{font-size:8.5pt;color:var(--text-dim);cursor:pointer;background:none;border:none;
+  padding:0;transition:color .15s;}
+.briefing-skip:hover{color:var(--text-muted);}
+[data-theme="dark"] .briefing-box{background:linear-gradient(160deg,#0e1228 0%,#131a38 100%);border-color:rgba(255,255,255,.14);}
+[data-theme="dark"] .briefing-pill{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);}
+[data-theme="dark"] .briefing-pill:hover{background:var(--indigo-soft);border-color:var(--indigo-line);}
+[data-theme="dark"] .briefing-pill.selected{background:var(--indigo-soft);}
+
 /* ── CONTEXT BAR ── */
 .context-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
   padding:10px 14px;border-radius:var(--radius-sm);
@@ -652,6 +698,145 @@ window._TFJSInfer = async function(messages){
       <div id="modal-has-webgpu-note" class="hidden modal-back-row">
         <button type="button" class="btn-secondary btn-full" onclick="showLocalPath()">← Back: use local model instead</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- BRIEFING MODAL -->
+<div class="briefing-overlay" id="briefing-modal">
+  <div class="briefing-box">
+    <div class="briefing-progress">
+      <div class="briefing-pip active" id="bpip-0"></div>
+      <div class="briefing-pip" id="bpip-1"></div>
+      <div class="briefing-pip" id="bpip-2"></div>
+    </div>
+
+    <!-- STEP 1: Who are you? -->
+    <div class="briefing-step" id="bstep-0">
+      <div class="briefing-eyebrow">Step 1 of 3</div>
+      <div class="briefing-q">Who are you going in as?</div>
+      <div class="briefing-sub">This shapes which questions and scoring lens Candor uses.</div>
+      <div class="briefing-pills">
+        <button type="button" class="briefing-pill" data-bstep="0" data-val="IC" onclick="briefingSelect(0,this)">
+          <div class="briefing-pill-icon">&#129489;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Individual Contributor</div>
+            <div class="briefing-pill-desc">You own your work directly — no direct reports.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="0" data-val="PM" onclick="briefingSelect(0,this)">
+          <div class="briefing-pill-icon">&#128101;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">People Manager</div>
+            <div class="briefing-pill-desc">You lead a team — hiring, coaching, and org impact are in scope.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: What stage? -->
+    <div class="briefing-step hidden" id="bstep-1">
+      <div class="briefing-eyebrow">Step 2 of 3</div>
+      <div class="briefing-q">What stage is this?</div>
+      <div class="briefing-sub">Candor calibrates the scoring bar to match what the interviewer actually expects at each stage.</div>
+      <div class="briefing-pills">
+        <button type="button" class="briefing-pill" data-bstep="1" data-val="phone-screen" onclick="briefingSelect(1,this)">
+          <div class="briefing-pill-icon">&#128222;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Phone Screen</div>
+            <div class="briefing-pill-desc">Recruiter or initial screen — lower bar, fit and basics.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="1" data-val="hiring-manager" onclick="briefingSelect(1,this)">
+          <div class="briefing-pill-icon">&#128084;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Hiring Manager</div>
+            <div class="briefing-pill-desc">Standard 1:1 — full STAR required, measurable results expected.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="1" data-val="panel" onclick="briefingSelect(1,this)">
+          <div class="briefing-pill-icon">&#128101;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Panel Interview</div>
+            <div class="briefing-pill-desc">Multiple interviewers comparing notes — every gap gets flagged in calibration.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="1" data-val="skip-level" onclick="briefingSelect(1,this)">
+          <div class="briefing-pill-icon">&#9650;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Skip-Level</div>
+            <div class="briefing-pill-desc">Your manager&rsquo;s manager — strategic framing and org impact matter here.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="1" data-val="executive" onclick="briefingSelect(1,this)">
+          <div class="briefing-pill-icon">&#11088;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Executive / Final Round</div>
+            <div class="briefing-pill-desc">Highest bar — measurable outcomes, cross-functional impact, zero vagueness.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Who's in the room? -->
+    <div class="briefing-step hidden" id="bstep-2">
+      <div class="briefing-eyebrow">Step 3 of 3</div>
+      <div class="briefing-q">Who&rsquo;s in the room?</div>
+      <div class="briefing-sub">Your audience changes what a strong answer sounds like.</div>
+      <div class="briefing-pills">
+        <button type="button" class="briefing-pill" data-bstep="2" data-val="peer" onclick="briefingSelect(2,this)">
+          <div class="briefing-pill-icon">&#129309;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Peer / Teammate</div>
+            <div class="briefing-pill-desc">Someone at your level — collaboration and technical depth.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="2" data-val="hiring-manager" onclick="briefingSelect(2,this)">
+          <div class="briefing-pill-icon">&#128084;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Hiring Manager</div>
+            <div class="briefing-pill-desc">Direct future manager — ownership, results, and team fit.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="2" data-val="cross-functional" onclick="briefingSelect(2,this)">
+          <div class="briefing-pill-icon">&#128279;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Cross-Functional Partner</div>
+            <div class="briefing-pill-desc">Stakeholder from another team — influence and collaboration are key.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="2" data-val="senior-leader" onclick="briefingSelect(2,this)">
+          <div class="briefing-pill-icon">&#128196;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Senior Leader (VP/SVP)</div>
+            <div class="briefing-pill-desc">Org-level perspective — strategy, scale, and business impact.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+        <button type="button" class="briefing-pill" data-bstep="2" data-val="executive" onclick="briefingSelect(2,this)">
+          <div class="briefing-pill-icon">&#11088;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">C-Suite / Executive</div>
+            <div class="briefing-pill-desc">Top of the house — enterprise narrative, measurable outcomes, no fluff.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="briefing-footer">
+      <button type="button" class="briefing-skip" onclick="closeBriefing(true)">Skip &mdash; use defaults</button>
+      <button type="button" class="btn-primary" id="briefing-next-btn" onclick="briefingNext()" disabled>Next &rarr;</button>
     </div>
   </div>
 </div>
@@ -1079,8 +1264,84 @@ function updateApiBtn(){
   if(noKey) noKey.style.display = 'none'; /* rule engine always available */
 }
 
-/* ── MODE ── */
-function setMode(m){
+/* ── BRIEFING MODAL ── */
+var _briefingStep = 0;
+var _briefingVals = [null, null, null]; /* [roleType, stage, interviewerLevel] */
+var _briefingPendingMode = null;
+
+function openBriefing(mode){
+  _briefingPendingMode = mode;
+  _briefingStep = 0;
+  _briefingVals = [null, null, null];
+  /* reset all pills and pips */
+  document.querySelectorAll('.briefing-pill').forEach(function(p){ p.classList.remove('selected'); });
+  [0,1,2].forEach(function(i){
+    var pip = document.getElementById('bpip-'+i);
+    pip.className = 'briefing-pip' + (i===0?' active':'');
+    document.getElementById('bstep-'+i).classList.toggle('hidden', i!==0);
+  });
+  document.getElementById('briefing-next-btn').disabled = true;
+  document.getElementById('briefing-next-btn').textContent = 'Next →';
+  document.getElementById('briefing-modal').classList.add('open');
+}
+
+function briefingSelect(step, btn){
+  /* deselect siblings */
+  btn.closest('.briefing-pills').querySelectorAll('.briefing-pill').forEach(function(p){ p.classList.remove('selected'); });
+  btn.classList.add('selected');
+  _briefingVals[step] = btn.getAttribute('data-val');
+  document.getElementById('briefing-next-btn').disabled = false;
+}
+
+function briefingNext(){
+  if(_briefingVals[_briefingStep] === null) return;
+  /* mark current pip done */
+  document.getElementById('bpip-'+_briefingStep).className = 'briefing-pip done';
+  _briefingStep++;
+  if(_briefingStep >= 3){
+    applyBriefingAndLaunch();
+    return;
+  }
+  /* advance to next step */
+  document.getElementById('bstep-'+(_briefingStep-1)).classList.add('hidden');
+  document.getElementById('bstep-'+_briefingStep).classList.remove('hidden');
+  document.getElementById('bpip-'+_briefingStep).className = 'briefing-pip active';
+  document.getElementById('briefing-next-btn').disabled = true;
+  /* last step — change button label */
+  if(_briefingStep === 2) document.getElementById('briefing-next-btn').textContent = 'Let’s go →';
+}
+
+function applyBriefingAndLaunch(){
+  document.getElementById('briefing-modal').classList.remove('open');
+  var role      = _briefingVals[0] || 'IC';
+  var stage     = _briefingVals[1] || 'hiring-manager';
+  var interviewer = _briefingVals[2] || 'hiring-manager';
+  /* apply to both single and mock state */
+  _role = role; _mockRole = role;
+  _interviewStage = stage; _mockStage = stage;
+  _interviewerLevel = interviewer; _mockInterviewerLevel = interviewer;
+  /* sync visible selectors */
+  var rs = document.getElementById('stage-select');
+  var ri = document.getElementById('interviewer-select');
+  var ms = document.getElementById('mock-stage-select');
+  var mi = document.getElementById('mock-interviewer-select');
+  if(rs) rs.value = stage;
+  if(ri) ri.value = interviewer;
+  if(ms) ms.value = stage;
+  if(mi) mi.value = interviewer;
+  document.getElementById('role-ic').classList.toggle('active', role==='IC');
+  document.getElementById('role-pm').classList.toggle('active', role==='PM');
+  document.getElementById('mock-role-ic').classList.toggle('active', role==='IC');
+  document.getElementById('mock-role-pm').classList.toggle('active', role==='PM');
+  launchMode(_briefingPendingMode);
+}
+
+function closeBriefing(useDefaults){
+  document.getElementById('briefing-modal').classList.remove('open');
+  if(useDefaults) launchMode(_briefingPendingMode);
+}
+
+function launchMode(m){
   _mode = m;
   document.getElementById('mode-single').classList.toggle('active', m==='single');
   document.getElementById('mode-mock').classList.toggle('active', m==='mock');
@@ -1089,6 +1350,11 @@ function setMode(m){
   if(m==='single') renderQuestionList();
   if(m==='mock') renderMockSetup();
   window.scrollTo({top: document.querySelector('.hero').offsetHeight + 60, behavior:'smooth'});
+}
+
+/* ── MODE ── */
+function setMode(m){
+  openBriefing(m);
 }
 
 /* ── ROLE ── */
