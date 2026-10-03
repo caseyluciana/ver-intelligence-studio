@@ -791,6 +791,14 @@ window._TFJSInfer = async function(messages){
       <div class="briefing-q">Who&rsquo;s in the room?</div>
       <div class="briefing-sub">Your audience changes what a strong answer sounds like.</div>
       <div class="briefing-pills">
+        <button type="button" class="briefing-pill" data-bstep="2" data-val="recruiter" onclick="briefingSelect(2,this)">
+          <div class="briefing-pill-icon">&#128203;</div>
+          <div class="briefing-pill-body">
+            <div class="briefing-pill-label">Recruiter</div>
+            <div class="briefing-pill-desc">Screening for fit and clarity — coherent story matters more than depth.</div>
+          </div>
+          <div class="briefing-check"></div>
+        </button>
         <button type="button" class="briefing-pill" data-bstep="2" data-val="peer" onclick="briefingSelect(2,this)">
           <div class="briefing-pill-icon">&#129309;</div>
           <div class="briefing-pill-body">
@@ -941,6 +949,7 @@ window._TFJSInfer = async function(messages){
         </select>
         <span class="function-label">Interviewing with:</span>
         <select class="function-select" id="interviewer-select" onchange="setInterviewerLevel(this.value)">
+          <option value="recruiter">Recruiter</option>
           <option value="peer">Peer / Teammate</option>
           <option value="hiring-manager" selected>Hiring Manager</option>
           <option value="cross-functional">Cross-Functional Partner</option>
@@ -1384,6 +1393,7 @@ var STAGE_LABELS = {
   'executive':'Executive / Final Round'
 };
 var INTERVIEWER_LABELS = {
+  'recruiter':'Recruiter',
   'peer':'Peer',
   'hiring-manager':'Hiring Manager',
   'cross-functional':'Cross-Functional Partner',
@@ -1410,7 +1420,7 @@ function getStageContext(stage, interviewerLevel){
   /* Returns {bar, label} where bar is the scoring bar string for prompts/verdicts */
   var high = (stage === 'executive' || stage === 'skip-level' || interviewerLevel === 'executive' || interviewerLevel === 'senior-leader');
   var mid  = (stage === 'panel' || interviewerLevel === 'cross-functional');
-  var low  = (stage === 'phone-screen' || interviewerLevel === 'peer');
+  var low  = (stage === 'phone-screen' || interviewerLevel === 'peer' || interviewerLevel === 'recruiter');
   if(high) return {bar:'executive', label:'Executive / Senior Leader bar'};
   if(mid)  return {bar:'panel',     label:'Panel bar'};
   if(low)  return {bar:'phone',     label:'Phone Screen bar'};
@@ -1558,7 +1568,7 @@ function submitAnswer(){
 function buildSystemPrompt(stageCtx){
   var stageNote = '';
   if(stageCtx){
-    if(stageCtx.bar === 'phone') stageNote = '\nSTAGE: Phone Screen. Bar is lower — Partial STAR components can still advance. Focus feedback on what would fail, not perfection.';
+    if(stageCtx.bar === 'phone') stageNote = '\nSTAGE: Phone Screen / Recruiter Screen. Bar is lower — clarity, coherence, and basic fit matter most. Partial STAR can still advance. Focus feedback on what would fail, not perfection.';
     else if(stageCtx.bar === 'panel') stageNote = '\nSTAGE: Panel Interview. Bar is high — Partial Action or Result components will be probed hard. Call out thin specifics explicitly.';
     else if(stageCtx.bar === 'executive') stageNote = '\nSTAGE: Executive / Senior Leader. Bar is highest — expect strategic framing, measurable outcomes, and cross-functional impact. Penalize vague results and "we" language heavily.';
     else stageNote = '\nSTAGE: Hiring Manager 1:1. Standard bar — full STAR required, measurable result expected.';
