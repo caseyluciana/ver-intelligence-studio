@@ -13,7 +13,7 @@
 - [Chief of Staff — Two Separate Modules](project_chief_of_staff_split.md) — team portal has built-in daily briefing; standalone CoS is separate personal tool, NOT in portal sidebar
 - [User Identity](user_identity.md) — full name is Casey Luciana Candelaria-Logan; never guess "Carlos" from username ccandelaria
 - [VER Hub Origin Story & Exec Narrative](project_ver_hub_origin_story.md) — Casey's personal build story; Joe (Org President) already excited; goal = formal adoption + potential packaging for broader orgs
-- [User Nickname for Claude](user_nickname.md) — Casey calls Claude "Yoruichi"; respond naturally to this name
+- [User Nickname for Claude](user_nickname.md) — Casey calls Claude "Ashborn" (Shadow Monarch, Solo Leveling); respond naturally to this name
 - [VER Hub ROI Slides](project_roi_slides.md) — internal Salesforce story; audience = leadership incl. Joe (Org President); goal = formal adoption + packaging for broader orgs
 - [Cinematic Generator QA](project_cinematic_generator_qa.md) — generated outputs have layout issues (too big, off-center, misaligned); audit + fix all meeting types; Offsite confirmed broken first
 - [Selector UI — Dropdown Preference](feedback_selector_ui.md) — use styled `<select>` dropdown over pill buttons when there are 6+ options; Casey loves this pattern
@@ -23,3 +23,4 @@
 - [TCO — Two Files Always in Parallel](project_tco_parallel.md) — page_tco.html (hub) and tco_standalone.html (standalone) must always be updated together
 - [TCO — Hardener Wiring Pattern](feedback_tco_hardener_wiring.md) — use direct _wire() in initStaticHandlers for deployed elements; delegator alone is not reliable post-hardener
 - [Git Remotes](project_git_remotes.md) — origin = github.com/caseyluciana/ver-intelligence-studio (push here only); studio = Salesforce GHE (do not push unless asked)
+- [Session Close — Sync Memory to Repo](feedback_session_close.md) — end of every big session: re-copy .memory/ files and commit to GitHub; do this automatically
