@@ -24,3 +24,6 @@
 - [TCO — Hardener Wiring Pattern](feedback_tco_hardener_wiring.md) — use direct _wire() in initStaticHandlers for deployed elements; delegator alone is not reliable post-hardener
 - [Git Remotes](project_git_remotes.md) — origin = github.com/caseyluciana/ver-intelligence-studio (push here only); studio = Salesforce GHE (do not push unless asked)
 - [Session Close — Sync Memory to Repo](feedback_session_close.md) — end of every big session: re-copy .memory/ files and commit to GitHub; do this automatically
+- [Recovery — Auto-backup before major edits](feedback_recovery.md) — create dated backup in backups/ before major sessions; restore via cp or git checkout
+- [Bash Permissions — How to pre-approve](feedback_bash_permissions.md) — Casey wants bash auto-approved; set via .claude/settings.json or VS Code Claude Code settings
+- [Next Session — Apply Candor Standard to Hub/Portal](project_next_session_candor_standard.md) — Candor is the design lab; apply centered brand/context chips/scoring strip to all hub pages next session

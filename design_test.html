@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Test — Card Style Comparison</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+  :root {
+    --paper:          #f5f7fc;
+    --surface:        #ffffff;
+    --indigo:         #4338ca;
+    --indigo-mid:     #6366f1;
+    --indigo-soft:    #eef2ff;
+    --indigo-line:    #c7d2fe;
+    --amber:          #d97706;
+    --amber-soft:     #fffbeb;
+    --amber-line:     #fcd34d;
+    --ink:            #0f172a;
+    --ink-soft:       #475569;
+    --ink-dim:        #94a3b8;
+    --line:           #e2e8f0;
+    --red:            #be123c;
+    --red-soft:       #fff1f2;
+    --red-line:       #fda4af;
+    --green:          #047857;
+    --green-soft:     #ecfdf5;
+    --green-line:     #6ee7b7;
+    --shadow-md:      0 4px 16px rgba(15,23,42,0.08), 0 2px 6px rgba(15,23,42,0.05);
+    --shadow-lg:      0 12px 40px rgba(15,23,42,0.10), 0 4px 12px rgba(15,23,42,0.06);
+    --shadow-indigo:  0 12px 40px rgba(67,56,202,0.14), 0 4px 12px rgba(67,56,202,0.08);
+    --radius:         10px;
+    --radius-lg:      16px;
+    --mono:           'JetBrains Mono', monospace;
+    --sans:           'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    padding: 32px clamp(16px, 4vw, 52px) 80px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    margin-bottom: 44px;
+  }
+
+  .proto-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    margin-bottom: 14px;
+    border-radius: 999px;
+    border: 1px solid var(--indigo-line);
+    background: var(--indigo-soft);
+    color: var(--indigo);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .page-sub {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  /* ── COMPARISON GRID ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 48px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .compare-col {
+    background: var(--paper);
+    padding: 28px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .compare-col-head {
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 4px;
+  }
+
+  .compare-option-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ink-dim);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .compare-option-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .compare-option-desc {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+
+  /* ── BASE CARD RESET ── */
+  .card {
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--c-line, var(--line));
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-inner {
+    padding: 20px 18px 18px;
+  }
+
+  .verdict-eyebrow {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--c-color);
+    margin-bottom: 6px;
+  }
+
+  .verdict-stamp {
+    font-family: var(--mono);
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -.02em;
+    color: var(--c-color);
+    margin-bottom: 10px;
+  }
+
+  .verdict-text {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  /* State colors */
+  .state-weak   { --c-color: #be123c; --c-line: #fda4af; --c-soft: #fff1f2; --c-stripe: linear-gradient(90deg,#be123c,#f43f5e); --c-wash: linear-gradient(160deg,rgba(190,18,60,0.05) 0%,transparent 60%); }
+  .state-adequate { --c-color: #b45309; --c-line: #fcd34d; --c-soft: #fffbeb; --c-stripe: linear-gradient(90deg,#d97706,#fbbf24); --c-wash: linear-gradient(160deg,rgba(180,83,9,0.05) 0%,transparent 60%); }
+  .state-strong { --c-color: #047857; --c-line: #6ee7b7; --c-soft: #ecfdf5; --c-stripe: linear-gradient(90deg,#047857,#10b981); --c-wash: linear-gradient(160deg,rgba(4,120,87,0.05) 0%,transparent 60%); }
+
+  /* ── OPTION A: Top stripe (current) ── */
+  .opt-a::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--c-stripe);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  /* ── OPTION B: Left bar ── */
+  .opt-b::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 4px;
+    background: var(--c-stripe);
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  }
+
+  /* ── OPTION C: Wash only — no stripe at all ── */
+  .opt-c {
+    background: var(--c-wash), var(--surface);
+  }
+
+  /* ── OPTION D: Full colored header band ── */
+  .opt-d-head {
+    padding: 14px 18px 12px;
+    background: var(--c-stripe);
+  }
+
+  .opt-d-head .verdict-eyebrow {
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 4px;
+  }
+
+  .opt-d-head .verdict-stamp {
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    margin-bottom: 0;
+  }
+
+  /* ── VERDICT TRIPLE (3 cards stacked) ── */
+  .verdict-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ── SECTION DIVIDER ── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 44px 0 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ink-dim);
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* ── VOTE STRIP ── */
+  .vote-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .vote-cell {
+    background: var(--surface);
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .vote-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .vote-note {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  .vote-btn {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius);
+    background: var(--indigo-soft);
+    color: var(--indigo);
+    border: 1px solid var(--indigo-line);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    width: fit-content;
+    transition: background 140ms;
+  }
+
+  .vote-btn:hover {
+    background: var(--indigo-line);
+  }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="proto-label">⚡ Side-by-Side — Card Treatment Options · Do Not Ship</div>
+  <h1 class="page-title">Which card treatment feels most Casey?</h1>
+  <p class="page-sub">All four show the same three verdict states. Only the accent treatment differs. Pick the one that feels most yours.</p>
+</div>
+
+<!-- COMPARISON GRID -->
+<div class="compare-grid">
+
+  <!-- OPTION A: TOP STRIPE (current) -->
+  <div class="compare-col">
+    <div class="compare-col-head">
+      <div class="compare-option-num">Option A</div>
+      <div class="compare-option-name">Top Stripe</div>
+      <div class="compare-option-desc">Current direction. Thin gradient bar across the top. Clean but common — this is the Claude default that everyone's using.</div>
+    </div>
+    <div class="verdict-stack">
+      <div class="card opt-a state-weak">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">WEAK</div>
+          <div class="verdict-text">Significant gaps. Missing Situation and Result — a trained interviewer will probe both.</div>
+        </div>
+      </div>
+      <div class="card opt-a state-adequate">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">OK</div>
+          <div class="verdict-text">Adequate but not competitive. Action and Result are too thin to differentiate you.</div>
+        </div>
+      </div>
+      <div class="card opt-a state-strong">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">STRONG</div>
+          <div class="verdict-text">Complete STAR answer with personal ownership and a measurable result.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION B: LEFT BAR -->
+  <div class="compare-col">
+    <div class="compare-col-head">
+      <div class="compare-option-num">Option B</div>
+      <div class="compare-option-name">Left Bar</div>
+      <div class="compare-option-desc">Accent moves to a 4px left edge bar. More editorial, less default-feeling. The hub already uses this in pillar cards.</div>
+    </div>
+    <div class="verdict-stack">
+      <div class="card opt-b state-weak">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">WEAK</div>
+          <div class="verdict-text">Significant gaps. Missing Situation and Result — a trained interviewer will probe both.</div>
+        </div>
+      </div>
+      <div class="card opt-b state-adequate">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">OK</div>
+          <div class="verdict-text">Adequate but not competitive. Action and Result are too thin to differentiate you.</div>
+        </div>
+      </div>
+      <div class="card opt-b state-strong">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">STRONG</div>
+          <div class="verdict-text">Complete STAR answer with personal ownership and a measurable result.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION C: WASH ONLY -->
+  <div class="compare-col">
+    <div class="compare-col-head">
+      <div class="compare-option-num">Option C</div>
+      <div class="compare-option-name">Wash Only</div>
+      <div class="compare-option-desc">No stripe at all. State communicates entirely through the stamp color and a subtle background wash. Cleanest — nothing to copy.</div>
+    </div>
+    <div class="verdict-stack">
+      <div class="card opt-c state-weak">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">WEAK</div>
+          <div class="verdict-text">Significant gaps. Missing Situation and Result — a trained interviewer will probe both.</div>
+        </div>
+      </div>
+      <div class="card opt-c state-adequate">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">OK</div>
+          <div class="verdict-text">Adequate but not competitive. Action and Result are too thin to differentiate you.</div>
+        </div>
+      </div>
+      <div class="card opt-c state-strong">
+        <div class="card-inner">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">STRONG</div>
+          <div class="verdict-text">Complete STAR answer with personal ownership and a measurable result.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION D: FULL HEADER BAND -->
+  <div class="compare-col">
+    <div class="compare-col-head">
+      <div class="compare-option-num">Option D</div>
+      <div class="compare-option-name">Full Header Band</div>
+      <div class="compare-option-desc">The entire card header becomes the color. Bold, intentional, zero ambiguity. Goes hardest — nothing subtle about it.</div>
+    </div>
+    <div class="verdict-stack">
+      <div class="card state-weak">
+        <div class="opt-d-head">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">WEAK</div>
+        </div>
+        <div class="card-inner">
+          <div class="verdict-text">Significant gaps. Missing Situation and Result — a trained interviewer will probe both.</div>
+        </div>
+      </div>
+      <div class="card state-adequate">
+        <div class="opt-d-head">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">OK</div>
+        </div>
+        <div class="card-inner">
+          <div class="verdict-text">Adequate but not competitive. Action and Result are too thin to differentiate you.</div>
+        </div>
+      </div>
+      <div class="card state-strong">
+        <div class="opt-d-head">
+          <div class="verdict-eyebrow">Verdict</div>
+          <div class="verdict-stamp">STRONG</div>
+        </div>
+        <div class="card-inner">
+          <div class="verdict-text">Complete STAR answer with personal ownership and a measurable result.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- VOTE STRIP -->
+<div class="section-label">Your pick</div>
+<div class="vote-strip">
+  <div class="vote-cell">
+    <span class="vote-label">A — Top Stripe</span>
+    <span class="vote-note">Familiar, consistent with current direction. But common.</span>
+    <div class="vote-btn">Pick A</div>
+  </div>
+  <div class="vote-cell">
+    <span class="vote-label">B — Left Bar</span>
+    <span class="vote-note">More editorial. Already lives in the hub — creates family feel.</span>
+    <div class="vote-btn">Pick B</div>
+  </div>
+  <div class="vote-cell">
+    <span class="vote-label">C — Wash Only</span>
+    <span class="vote-note">Cleanest. Most unique. State lives in the stamp, nowhere else.</span>
+    <div class="vote-btn">Pick C</div>
+  </div>
+  <div class="vote-cell">
+    <span class="vote-label">D — Full Band</span>
+    <span class="vote-note">Goes hardest. Most distinctive. Zero chance of being confused for anything else.</span>
+    <div class="vote-btn">Pick D</div>
+  </div>
+</div>
+
+</body>
+</html>
