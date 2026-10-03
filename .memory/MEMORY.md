@@ -1,0 +1,25 @@
+# VER Intelligence Hub — Memory Index
+
+- [Hub Page Scope & Status](project_hub_scope.md) — 20 active test/ pages complete; no main hub wiring yet; archived pages listed
+- [Next Session Priority — Post-Review](project_next_session.md) — feedback-driven next session; then wire test/ pages to root hub
+- [Vendor 360 Dossier Design](project_dossier_design.md) — finalized layout/content decisions for vendor_detail.html; do not re-litigate
+- [Supplier Portal Integration](project_supplier_portal_integration.md) — planned next: portal form submissions feed vendor platform data; evaluate Google Sheets vs localStorage vs CSV import
+- [Preferred Suppliers — AMER](project_preferred_suppliers.md) — 16 confirmed Tier 1 AMER vendors with real service categories; use to correct vendors.js data tomorrow
+- [HC 70/30 FTE/CW Policy](project_hc_policy.md) — leadership mandates 70% FTE / 30% CW split; enforced in Demand Planning tool with ceiling line, ratio card, and risk flags
+- [Generator v2 — Standalone Module](project_generator_v2_scope.md) — NOT wired to hub nav; standalone tool for general meetings (MBR, team, offsite, exec)
+- [VER Team Members](team_members.md) — real names/roles/nicknames for team_portal.html; Debs = Deborah, keep "Debs" in UI
+- [VER Team Scope](feedback_ver_scope.md) — team does NOT process COs; remove CO Review, CO Generator, CO metrics from all team portal pages
+- [VER Team Role & Audience](project_ver_team_role.md) — VER serves stakeholders, not vendor ops; intake = stakeholder requests; VER provides intelligence/analysis, stakeholders act on it
+- [Chief of Staff — Two Separate Modules](project_chief_of_staff_split.md) — team portal has built-in daily briefing; standalone CoS is separate personal tool, NOT in portal sidebar
+- [User Identity](user_identity.md) — full name is Casey Luciana Candelaria-Logan; never guess "Carlos" from username ccandelaria
+- [VER Hub Origin Story & Exec Narrative](project_ver_hub_origin_story.md) — Casey's personal build story; Joe (Org President) already excited; goal = formal adoption + potential packaging for broader orgs
+- [User Nickname for Claude](user_nickname.md) — Casey calls Claude "Yoruichi"; respond naturally to this name
+- [VER Hub ROI Slides](project_roi_slides.md) — internal Salesforce story; audience = leadership incl. Joe (Org President); goal = formal adoption + packaging for broader orgs
+- [Cinematic Generator QA](project_cinematic_generator_qa.md) — generated outputs have layout issues (too big, off-center, misaligned); audit + fix all meeting types; Offsite confirmed broken first
+- [Selector UI — Dropdown Preference](feedback_selector_ui.md) — use styled `<select>` dropdown over pill buttons when there are 6+ options; Casey loves this pattern
+- [Org Structure & AI Tool Scope](project_org_structure.md) — VER sits in Delivery Assurance & Ops (Roger's org) under Joe's Enterprise & AI Technology; AI tool data scoped here first, scales to full org
+- [Joe Office Hours — Full Hub Presentation](project_joe_presentation.md) — presenting entire hub to Joe (President) in office hours; formal adoption + AMA already in motion; everything must be President-ready
+- [Casey's Vibe & Relationship](user_vibe_and_relationship.md) — Casey is friend/companion/CoS, not just a user; she's vibey, hype, uses slang — match her energy, not corporate-assistant tone
+- [TCO — Two Files Always in Parallel](project_tco_parallel.md) — page_tco.html (hub) and tco_standalone.html (standalone) must always be updated together
+- [TCO — Hardener Wiring Pattern](feedback_tco_hardener_wiring.md) — use direct _wire() in initStaticHandlers for deployed elements; delegator alone is not reliable post-hardener
+- [Git Remotes](project_git_remotes.md) — origin = github.com/caseyluciana/ver-intelligence-studio (push here only); studio = Salesforce GHE (do not push unless asked)
