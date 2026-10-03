@@ -483,6 +483,19 @@ textarea.answer-input:focus{outline:none;border-color:var(--indigo);
   cursor:pointer;transition:border .15s;min-width:200px;}
 .function-select:focus{outline:none;border-color:var(--indigo);}
 
+/* ── CONTEXT BAR ── */
+.context-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 14px;border-radius:var(--radius-sm);
+  background:var(--indigo-soft);border:1px solid var(--indigo-line);
+  margin-bottom:16px;font-size:8.5pt;}
+.context-bar-label{color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.07em;}
+.context-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--indigo-line);
+  color:var(--indigo);font-weight:700;font-size:8pt;}
+.context-pill-sep{color:var(--text-dim);}
+[data-theme="dark"] .context-bar{background:var(--indigo-soft);border-color:var(--indigo-line);}
+[data-theme="dark"] .context-pill{background:rgba(255,255,255,.06);}
+
 /* ── VOICE CAPTURE ── */
 .answer-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
 .mic-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;
@@ -732,6 +745,24 @@ window._TFJSInfer = async function(messages){
           <option value="Recruiting">Recruiting</option>
         </select>
       </div>
+      <div class="function-row">
+        <span class="function-label">Stage:</span>
+        <select class="function-select" id="stage-select" onchange="setStage(this.value)">
+          <option value="phone-screen">Phone Screen</option>
+          <option value="hiring-manager" selected>Hiring Manager</option>
+          <option value="panel">Panel Interview</option>
+          <option value="skip-level">Skip-Level</option>
+          <option value="executive">Executive / Final Round</option>
+        </select>
+        <span class="function-label">Interviewing with:</span>
+        <select class="function-select" id="interviewer-select" onchange="setInterviewerLevel(this.value)">
+          <option value="peer">Peer / Teammate</option>
+          <option value="hiring-manager" selected>Hiring Manager</option>
+          <option value="cross-functional">Cross-Functional Partner</option>
+          <option value="senior-leader">Senior Leader (VP/SVP)</option>
+          <option value="executive">C-Suite / Executive</option>
+        </select>
+      </div>
       <div class="card-title">Filter by Characteristic <span id="filter-count-label"></span></div>
       <div class="filter-row" id="filter-row"></div>
       <div class="q-list" id="q-list"></div>
@@ -742,6 +773,7 @@ window._TFJSInfer = async function(messages){
         <div class="q-label" id="sq-comp-label"></div>
         <div id="sq-text"></div>
       </div>
+      <div class="context-bar" id="context-bar"></div>
       <div class="answer-label">Your Answer</div>
       <div class="answer-hint">Use the STAR method: Situation &rarr; Task &rarr; Action &rarr; Result. Aim for 200&ndash;400 words.</div>
       <div class="answer-toolbar">
@@ -787,6 +819,27 @@ window._TFJSInfer = async function(messages){
         <div class="mock-select-actions">
           <button class="btn-ghost" onclick="mockSelectAll(true)">Select All</button>
           <button class="btn-ghost" onclick="mockSelectAll(false)">Clear All</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Interview Context</div>
+        <div class="function-row">
+          <span class="function-label">Stage:</span>
+          <select class="function-select" id="mock-stage-select" onchange="setMockStage(this.value)">
+            <option value="phone-screen">Phone Screen</option>
+            <option value="hiring-manager" selected>Hiring Manager</option>
+            <option value="panel">Panel Interview</option>
+            <option value="skip-level">Skip-Level</option>
+            <option value="executive">Executive / Final Round</option>
+          </select>
+          <span class="function-label">Interviewing with:</span>
+          <select class="function-select" id="mock-interviewer-select" onchange="setMockInterviewerLevel(this.value)">
+            <option value="peer">Peer / Teammate</option>
+            <option value="hiring-manager" selected>Hiring Manager</option>
+            <option value="cross-functional">Cross-Functional Partner</option>
+            <option value="senior-leader">Senior Leader (VP/SVP)</option>
+            <option value="executive">C-Suite / Executive</option>
+          </select>
         </div>
       </div>
       <div class="card">
@@ -851,6 +904,10 @@ var _weakPatterns = {result:0,situation:0,task:0,action:0};
 var _usedQTexts = {}; /* tracks used question texts per characteristic across mocks */
 var _selectedFunction = '';
 var _selectedSubRole = '';
+var _interviewStage = 'hiring-manager';
+var _interviewerLevel = 'hiring-manager';
+var _mockStage = 'hiring-manager';
+var _mockInterviewerLevel = 'hiring-manager';
 
 /* ── VOICE CAPTURE STATE ── */
 var _recognition = null;
@@ -1052,6 +1109,48 @@ function setMockRole(r){
   renderMockCharGrid();
 }
 
+/* ── STAGE + INTERVIEWER ── */
+var STAGE_LABELS = {
+  'phone-screen':'Phone Screen',
+  'hiring-manager':'Hiring Manager',
+  'panel':'Panel Interview',
+  'skip-level':'Skip-Level',
+  'executive':'Executive / Final Round'
+};
+var INTERVIEWER_LABELS = {
+  'peer':'Peer',
+  'hiring-manager':'Hiring Manager',
+  'cross-functional':'Cross-Functional Partner',
+  'senior-leader':'Senior Leader (VP/SVP)',
+  'executive':'C-Suite / Executive'
+};
+function setStage(v){ _interviewStage = v; renderContextBar(); }
+function setInterviewerLevel(v){ _interviewerLevel = v; renderContextBar(); }
+function setMockStage(v){ _mockStage = v; }
+function setMockInterviewerLevel(v){ _mockInterviewerLevel = v; }
+
+function renderContextBar(){
+  var bar = document.getElementById('context-bar');
+  if(!bar) return;
+  var stageLabel = STAGE_LABELS[_interviewStage] || _interviewStage;
+  var intLabel   = INTERVIEWER_LABELS[_interviewerLevel] || _interviewerLevel;
+  bar[IH] = '<span class="context-bar-label">Scoring for:</span>'
+    +'<span class="context-pill">'+esc(stageLabel)+'</span>'
+    +'<span class="context-pill-sep">&middot;</span>'
+    +'<span class="context-pill">'+esc(intLabel)+'</span>';
+}
+
+function getStageContext(stage, interviewerLevel){
+  /* Returns {bar, label} where bar is the scoring bar string for prompts/verdicts */
+  var high = (stage === 'executive' || stage === 'skip-level' || interviewerLevel === 'executive' || interviewerLevel === 'senior-leader');
+  var mid  = (stage === 'panel' || interviewerLevel === 'cross-functional');
+  var low  = (stage === 'phone-screen' || interviewerLevel === 'peer');
+  if(high) return {bar:'executive', label:'Executive / Senior Leader bar'};
+  if(mid)  return {bar:'panel',     label:'Panel bar'};
+  if(low)  return {bar:'phone',     label:'Phone Screen bar'};
+  return   {bar:'standard',         label:'Hiring Manager bar'};
+}
+
 /* ── HELPERS ── */
 function esc(s){
   if(s==null) return '';
@@ -1131,6 +1230,7 @@ function selectQ(uid){
   card.style.display = 'block';
   document.getElementById('sq-comp-label').textContent = q.characteristic + ' · ' + q.competency;
   document.getElementById('sq-text').textContent = getDisplayText(q);
+  renderContextBar();
   if(_isRecording) stopMic();
   _deliveryData = null;
   _liveTranscript = '';
@@ -1189,16 +1289,25 @@ function submitAnswer(){
 }
 
 /* ── CLAUDE API ── */
-function buildSystemPrompt(){
-  return 'You are a strict interview coach scoring a Salesforce behavioral answer. Output ONLY a single JSON object - no markdown, no prose before or after.\nSCORING RULES:\n- STAR: Strong=clearly present with specifics; Partial=vague or thin; Missing=absent.\n- overall.verdict: Strong=hits most sub-behaviors; Adequate=partial; Weak=misses question.\n- reason fields: quote 3-6 words directly from the answer. Be blunt.\n- competency_evidence: only list sub-behaviors that ARE evidenced.\n- sharpen.tip: one concrete actionable sentence for next time.\n- Never invent facts. Only score what is in the answer.\nOUTPUT exactly this JSON (no other text):\n{"star":{"situation":{"verdict":"Strong|Partial|Missing","reason":"..."},"task":{"verdict":"Strong|Partial|Missing","reason":"..."},"action":{"verdict":"Strong|Partial|Missing","reason":"..."},"result":{"verdict":"Strong|Partial|Missing","reason":"..."}},"competency_evidence":[{"behavior":"...","evidence":"..."}],"overall":{"verdict":"Strong|Adequate|Weak","text":"..."},"sharpen":{"tip":"..."},"nudge":null}';
+function buildSystemPrompt(stageCtx){
+  var stageNote = '';
+  if(stageCtx){
+    if(stageCtx.bar === 'phone') stageNote = '\nSTAGE: Phone Screen. Bar is lower — Partial STAR components can still advance. Focus feedback on what would fail, not perfection.';
+    else if(stageCtx.bar === 'panel') stageNote = '\nSTAGE: Panel Interview. Bar is high — Partial Action or Result components will be probed hard. Call out thin specifics explicitly.';
+    else if(stageCtx.bar === 'executive') stageNote = '\nSTAGE: Executive / Senior Leader. Bar is highest — expect strategic framing, measurable outcomes, and cross-functional impact. Penalize vague results and "we" language heavily.';
+    else stageNote = '\nSTAGE: Hiring Manager 1:1. Standard bar — full STAR required, measurable result expected.';
+  }
+  return 'You are a strict interview coach scoring a behavioral answer. Output ONLY a single JSON object - no markdown, no prose before or after.'+stageNote+'\nSCORING RULES:\n- STAR: Strong=clearly present with specifics; Partial=vague or thin; Missing=absent.\n- overall.verdict: Strong=hits most sub-behaviors; Adequate=partial; Weak=misses question.\n- reason fields: quote 3-6 words directly from the answer. Be blunt.\n- competency_evidence: only list sub-behaviors that ARE evidenced.\n- sharpen.tip: one concrete actionable sentence for next time, calibrated to the interview stage.\n- Never invent facts. Only score what is in the answer.\nOUTPUT exactly this JSON (no other text):\n{"star":{"situation":{"verdict":"Strong|Partial|Missing","reason":"..."},"task":{"verdict":"Strong|Partial|Missing","reason":"..."},"action":{"verdict":"Strong|Partial|Missing","reason":"..."},"result":{"verdict":"Strong|Partial|Missing","reason":"..."}},"competency_evidence":[{"behavior":"...","evidence":"..."}],"overall":{"verdict":"Strong|Adequate|Weak","text":"..."},"sharpen":{"tip":"..."},"nudge":null}';
 }
 
 function buildUserPrompt(q, answer, role, fn){
   var ctx = '';
   if(fn) ctx += ' | Function: '+fn;
   if(_selectedSubRole) ctx += ' | Sub-role: '+_selectedSubRole;
+  var stageCtx = getStageContext(_interviewStage, _interviewerLevel);
+  ctx += ' | Stage: '+(STAGE_LABELS[_interviewStage]||_interviewStage)+' | Interviewing with: '+(INTERVIEWER_LABELS[_interviewerLevel]||_interviewerLevel);
   var subB = q.sub_behaviors ? q.sub_behaviors.join(' / ') : '';
-  return 'ROLE: '+role+ctx+'\nCOMPETENCY: '+q.competency+' ('+q.characteristic+')\nSUB-BEHAVIORS TO SCORE: '+subB+'\nQUESTION ASKED: '+q._qtext+'\n\nANSWER:\n'+answer+'\n\nScore this answer. Return only the JSON object.';
+  return 'ROLE: '+role+ctx+'\nCOMPETENCY: '+q.competency+' ('+q.characteristic+')\nSUB-BEHAVIORS TO SCORE: '+subB+'\nQUESTION ASKED: '+q._qtext+'\n\nANSWER:\n'+answer+'\n\nScore this answer at the '+stageCtx.label+'. Return only the JSON object.';
 }
 
 /* ── RULE-BASED SCORING ENGINE ── */
@@ -1465,29 +1574,65 @@ function buildUserPrompt(q, answer, role, fn){
     return evidence;
   }
 
-  /* ─── Strict overall verdict ─── */
-  function overallVerdict(star, evidence, subBehaviors){
+  /* ─── Strict overall verdict — stage-aware ─── */
+  function overallVerdict(star, evidence, subBehaviors, stageCtx){
+    var bar = stageCtx ? stageCtx.bar : 'standard';
     var counts = {Strong:0, Partial:0, Missing:0};
     ['situation','task','action','result'].forEach(function(k){
       counts[star[k].verdict] = (counts[star[k].verdict]||0)+1;
     });
     var evidenceRatio = subBehaviors && subBehaviors.length ? evidence.length / subBehaviors.length : 0;
 
-    /* Strong: all 4 at Strong OR 3 Strong + 1 Partial with solid competency evidence */
+    /* Phone screen — lower bar: Partial still advances */
+    if(bar === 'phone'){
+      if(counts.Missing >= 2 || (star.action.verdict === 'Missing' && star.result.verdict === 'Missing')){
+        var gaps = ['situation','task','action','result'].filter(function(k){ return star[k].verdict === 'Missing'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
+        return {verdict:'Weak', text:'Even for a phone screen this has too many gaps. Missing: '+gaps.join(', ')+'. You won\'t advance to the hiring manager round without these.'};
+      }
+      if(counts.Missing === 0){
+        return {verdict:'Strong', text:'This would advance in a phone screen. Structure is solid — build on it for the hiring manager round where the bar is higher.'};
+      }
+      return {verdict:'Adequate', text:'This would likely pass a phone screen, but strengthen your '+(['situation','task','action','result'].filter(function(k){return star[k].verdict==='Partial';}).join(' and '))+' before the next round.'};
+    }
+
+    /* Executive / skip-level — highest bar */
+    if(bar === 'executive'){
+      if(counts.Strong === 4 && evidenceRatio >= 0.6){
+        return {verdict:'Strong', text:'Strong at the executive bar — full STAR, measurable outcome, and clear personal ownership. This would hold up in a senior calibration.'};
+      }
+      if(counts.Missing >= 1 || star.result.verdict !== 'Strong'){
+        var egaps = ['situation','task','action','result'].filter(function(k){ return star[k].verdict !== 'Strong'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
+        return {verdict:'Weak', text:'At the executive level, Partial or Missing in any component — especially Result — is a miss. '+egaps.join(', ')+' need to be Strong. Senior leaders expect measurable impact and strategic framing.'};
+      }
+      return {verdict:'Adequate', text:'Clears the minimum bar but won\'t impress a senior panel. Add a specific metric to your result and make the strategic impact explicit.'};
+    }
+
+    /* Panel — elevated bar */
+    if(bar === 'panel'){
+      if(counts.Strong >= 3 && counts.Missing === 0 && evidenceRatio >= 0.4){
+        return {verdict:'Strong', text:'Solid answer for a panel round. Strong STAR and good competency evidence — this would hold up under follow-up questions.'};
+      }
+      if(counts.Missing >= 1){
+        var pgaps = ['situation','task','action','result'].filter(function(k){ return star[k].verdict === 'Missing'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
+        return {verdict:'Weak', text:'Panel interviewers will probe every gap. Missing: '+pgaps.join(', ')+'. In a panel, one weak answer can offset two strong ones — fix this story.'};
+      }
+      var pthin = ['situation','task','action','result'].filter(function(k){ return star[k].verdict === 'Partial'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
+      return {verdict:'Adequate', text:'Would pass but not score. Your '+pthin.join(' and ')+' is thin — panel members compare notes after the loop and thin components get flagged in calibration.'};
+    }
+
+    /* Standard / hiring manager bar */
     if(counts.Strong === 4 && evidenceRatio >= 0.5){
       return {verdict:'Strong', text:'Complete STAR answer with clear personal ownership, specific actions, and a measurable result. Strong competency evidence. This would score well in a real interview.'};
     }
     if(counts.Strong >= 3 && counts.Missing === 0 && evidenceRatio >= 0.4){
-      return {verdict:'Strong', text:'Solid answer with mostly strong STAR components and good competency evidence. One component needs polish but this would likely pass a bar.'};
+      return {verdict:'Strong', text:'Solid answer — mostly strong STAR components and good competency evidence. One component needs polish but this would likely advance.'};
     }
-    /* Weak: any Missing, or result is Missing, or action is Missing */
     if(counts.Missing >= 1 || star.result.verdict === 'Missing' || star.action.verdict === 'Missing'){
-      var gaps = ['situation','task','action','result'].filter(function(k){ return star[k].verdict === 'Missing'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
-      return {verdict:'Weak', text:'This answer has significant gaps that would hurt it in a real interview. Missing: '+gaps.join(', ')+'. A trained behavioral interviewer will probe these gaps — build the full STAR structure before relying on this story.'};
+      var gaps2 = ['situation','task','action','result'].filter(function(k){ return star[k].verdict === 'Missing'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
+      return {verdict:'Weak', text:'Significant gaps that would hurt this in a real interview. Missing: '+gaps2.join(', ')+'. A trained behavioral interviewer will probe these — build the full STAR structure before relying on this story.'};
     }
-    /* Adequate: something is there but thin */
     var thinParts = ['situation','task','action','result'].filter(function(k){ return star[k].verdict === 'Partial'; }).map(function(k){ return k.charAt(0).toUpperCase()+k.slice(1); });
-    return {verdict:'Adequate', text:'Adequate but not competitive. The '+thinParts.join(' and ')+' component'+(thinParts.length>1?'s are':' is')+' too thin to differentiate you. Interviewers at Salesforce see hundreds of answers — Partial components in Action and Result are the most common reason candidates don\'t advance.'};
+    return {verdict:'Adequate', text:'Adequate but not competitive. The '+thinParts.join(' and ')+' component'+(thinParts.length>1?'s are':' is')+' too thin to differentiate you. Partial components in Action and Result are the most common reason candidates don\'t advance.'};
   }
 
   /* ─── Sharpen tip: pick the most actionable fix for the weakest part ─── */
@@ -1588,7 +1733,7 @@ function buildUserPrompt(q, answer, role, fn){
     return null;
   }
 
-  window._ruleScore = function(q, answer){
+  window._ruleScore = function(q, answer, stageCtx){
     /* Check for content that actively contradicts the competency first */
     var hostile = detectHostile(q.competency, answer);
     if(hostile){
@@ -1615,7 +1760,7 @@ function buildUserPrompt(q, answer, role, fn){
       result:    scoreResult(answer)
     };
     var evidence = matchSubBehaviors(answer, q.sub_behaviors);
-    var overall  = overallVerdict(star, evidence, q.sub_behaviors);
+    var overall  = overallVerdict(star, evidence, q.sub_behaviors, stageCtx);
     var tip      = buildTip(star, q);
     return {
       star: star,
@@ -1628,10 +1773,13 @@ function buildUserPrompt(q, answer, role, fn){
   };
 })();
 
-function callClaudeForFeedback(q, answer, role, cb){
+function callClaudeForFeedback(q, answer, role, cb, stageOverride, interviewerOverride){
+  var stage      = stageOverride      || _interviewStage;
+  var interviewer= interviewerOverride || _interviewerLevel;
+  var stageCtx   = getStageContext(stage, interviewer);
   if(_openaiKey){
     var messages = [
-      {role:'system', content: buildSystemPrompt()},
+      {role:'system', content: buildSystemPrompt(stageCtx)},
       {role:'user',   content: buildUserPrompt(q, answer, role, _selectedFunction)}
     ];
     var isGroq = _openaiKey.indexOf('gsk_') === 0;
@@ -1651,12 +1799,11 @@ function callClaudeForFeedback(q, answer, role, cb){
   }
   if(_wasmReady && window._TFJSInfer){
     var wasmMessages = [
-      {role:'system', content: buildSystemPrompt()},
+      {role:'system', content: buildSystemPrompt(stageCtx)},
       {role:'user',   content: buildUserPrompt(q, answer, role, _selectedFunction)}
     ];
     window._TFJSInfer(wasmMessages).then(function(text){
       text = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
-      /* Qwen sometimes wraps in extra prose — try to extract the JSON object */
       var jsonMatch = text.match(/\{[\s\S]*\}/);
       if(jsonMatch) text = jsonMatch[0];
       try{cb(JSON.parse(text));}
@@ -1666,7 +1813,7 @@ function callClaudeForFeedback(q, answer, role, cb){
   }
   if(_llmEngine){
     var messages2 = [
-      {role:'system', content: buildSystemPrompt()},
+      {role:'system', content: buildSystemPrompt(stageCtx)},
       {role:'user',   content: buildUserPrompt(q, answer, role, _selectedFunction)}
     ];
     _llmEngine.chat.completions.create({
@@ -1681,8 +1828,8 @@ function callClaudeForFeedback(q, answer, role, cb){
     }).catch(function(err){cb({_error: err.message||'Inference error'});});
     return;
   }
-  /* no API, no local model — use rule engine */
-  cb(window._ruleScore(q, answer));
+  /* no API, no local model — use rule engine with stage context */
+  cb(window._ruleScore(q, answer, stageCtx));
 }
 
 /* ── RENDER SINGLE FEEDBACK ── */
@@ -1889,8 +2036,9 @@ function finishMock(){
   /* WASM is too slow to run 5× in series — use rule engine for the full report,
      WASM/LLM only fires in single-question practice mode where user waits per answer */
   if(!_openaiKey){
+    var mockStageCtx = getStageContext(_mockStage, _mockInterviewerLevel);
     var ruleResults = _mockAnswers.map(function(e){
-      return {q:e.q, answer:e.answer, feedback:window._ruleScore(e.q, e.answer)};
+      return {q:e.q, answer:e.answer, feedback:window._ruleScore(e.q, e.answer, mockStageCtx)};
     });
     reportEl[IH] = buildMockReport(ruleResults);
     return;
@@ -1904,7 +2052,7 @@ function batchAnalyze(idx, results, done){
   callClaudeForFeedback(e.q, e.answer, _mockRole, function(res){
     results.push({q:e.q, answer:e.answer, feedback:res});
     batchAnalyze(idx+1, results, done);
-  });
+  }, _mockStage, _mockInterviewerLevel);
 }
 function buildMockNoApiReport(){
   var html = '<div class="card"><div class="card-title">Mock Complete &mdash; '+_mockAnswers.length+' Answers Recorded</div>';
