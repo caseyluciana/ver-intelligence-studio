@@ -240,6 +240,18 @@ a{color:inherit;text-decoration:none;}
 .hero-kpi-val{font-family:var(--mono);font-size:22pt;font-weight:700;color:#ffffff;line-height:1;}
 .hero-kpi-lbl{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.45);margin-top:5px;}
 
+/* ── HERO COMPACT (mode active) ── */
+.hero.compact{padding-top:28px;padding-bottom:28px;}
+.hero.compact .candor-mark{margin-bottom:12px;}
+.hero.compact .candor-wordmark{font-size:clamp(22pt,3.5vw,32pt);}
+.hero.compact .candor-tagline{display:none;}
+.hero.compact .company-row{display:none;}
+.hero.compact .hero-theme-row{display:none;}
+.hero.compact .hero-modes{margin-top:12px;}
+.hero.compact .mode-card-inner{padding:14px 16px 12px 18px;}
+.hero.compact .mode-icon-wrap{width:32px;height:32px;margin-bottom:8px;}
+.hero.compact .mode-desc{display:none;}
+
 /* ── MODE CARDS ── */
 .hero-modes{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
 .mode-card{flex:1;min-width:230px;max-width:320px;border-radius:var(--radius);
@@ -254,7 +266,11 @@ a{color:inherit;text-decoration:none;}
 .mode-card.mock-card .mode-accent-bar{background:linear-gradient(180deg,var(--indigo-mid),#a78bfa);}
 .mode-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.24);
   box-shadow:0 16px 48px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.16);}
-.mode-card.active{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.14) !important;}
+.mode-card.active{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.18) !important;box-shadow:0 0 0 2px rgba(255,255,255,.18),0 8px 32px rgba(0,0,0,.25);}
+.mode-card.active .mode-arrow{color:rgba(255,255,255,.9);}
+.mode-card.active .mode-title{color:#fff;}
+.mode-card.inactive{opacity:.52;transform:scale(.97);}
+.mode-card.inactive:hover{opacity:.8;transform:scale(.99) translateY(-2px);}
 .mode-card-inner{padding:24px 22px 20px 26px;}
 .mode-icon-wrap{display:inline-flex;align-items:center;justify-content:center;
   width:44px;height:44px;border-radius:12px;margin-bottom:14px;
@@ -635,7 +651,7 @@ textarea.answer-input:focus{outline:none;border-color:var(--indigo);
 
 /* ── INTRO MODAL ── */
 .intro-overlay{position:fixed;inset:0;z-index:9000;
-  background:rgba(10,12,28,.85);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  background:rgba(10,12,28,1);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);
   display:none;align-items:center;justify-content:center;padding:24px;}
 .intro-overlay.open{display:flex;}
 .intro-box{background:var(--surface);border:1px solid var(--border);
@@ -1242,26 +1258,19 @@ window._TFJSInfer = async function(messages){
     <div id="mock-setup-view">
       <div class="card">
         <div id="mock-context-strip-wrap"></div>
-        <div class="card-title">Focus Areas</div>
-        <div class="mock-char-sub">Candor will draw questions from these areas — you won&rsquo;t see them in advance.</div>
-        <div class="mock-char-grid" id="mock-char-grid"></div>
-        <div class="mock-select-actions">
-          <button class="btn-ghost" onclick="mockSelectAll(true)">Select All</button>
-          <button class="btn-ghost" onclick="mockSelectAll(false)">Clear All</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Questions Per Area</div>
-        <div class="mock-count-row">
-          <span class="mock-count-label">Ask</span>
+        <div class="card-title">Your Mock Interview</div>
+        <div class="mock-char-sub">Candor will select questions across all key areas — you&rsquo;ll face them one at a time, just like the real thing.</div>
+        <div id="mock-char-grid" style="display:none"></div>
+        <div class="mock-count-row" style="margin-top:12px">
+          <span class="mock-count-label">Depth:</span>
           <input type="number" class="mock-count-input" id="mock-q-per-char" value="1" min="1" max="2">
-          <span class="mock-count-label">question(s) per area (max 2)</span>
+          <span class="mock-count-label">question(s) per area</span>
         </div>
       </div>
       <button class="btn-primary mock-next-btn" onclick="startMock()">Start Mock Interview</button>
     </div>
 
-    <div id="mock-inprogress-view" class="hidden">
+    <div id="mock-inprogress-view" style="display:none">
       <div class="mock-progress-bar-wrap">
         <div class="mock-progress-bar" id="mock-progress-bar" style="width:0%"></div>
       </div>
@@ -1280,7 +1289,7 @@ window._TFJSInfer = async function(messages){
       </div>
     </div>
 
-    <div id="mock-report-view" class="hidden"></div>
+    <div id="mock-report-view" style="display:none"></div>
 
   </div>
 
@@ -1631,14 +1640,25 @@ function closeBriefing(useDefaults){
 
 function launchMode(m){
   _mode = m;
-  document.getElementById('mode-single').classList.toggle('active', m==='single');
-  document.getElementById('mode-mock').classList.toggle('active', m==='mock');
+  var sCard = document.getElementById('mode-single');
+  var mCard = document.getElementById('mode-mock');
+  sCard.classList.toggle('active', m==='single');
+  sCard.classList.toggle('inactive', m!=='single');
+  mCard.classList.toggle('active', m==='mock');
+  mCard.classList.toggle('inactive', m!=='mock');
+  /* Update arrow text on the inactive card to signal "switch" */
+  var sArrow = sCard.querySelector('.mode-arrow');
+  var mArrow = mCard.querySelector('.mode-arrow');
+  if(sArrow) sArrow.textContent = m==='single' ? 'Start practicing →' : 'Switch to Single Practice →';
+  if(mArrow) mArrow.textContent = m==='mock'   ? 'Run the loop →'      : 'Switch to Mock Interview →';
   document.getElementById('panel-single').classList.toggle('active', m==='single');
   document.getElementById('panel-mock').classList.toggle('active', m==='mock');
   if(m==='single'){ _usedQUids = []; serveColdQuestion(); }
   if(m==='mock') renderMockSetup();
+  /* Collapse hero so panel content is immediately visible without scrolling */
   var hero = document.querySelector('.hero');
-  if(hero){ var hRect = hero.getBoundingClientRect(); window.scrollTo({top: window.scrollY + hRect.bottom + 16, behavior:'smooth'}); }
+  if(hero) hero.classList.add('compact');
+  window.scrollTo({top: 0});
 }
 
 /* ── MODE ── */
@@ -1773,7 +1793,7 @@ function serveColdQuestion(){
   var qtxt = document.getElementById('cold-q-text');
   var qmeta = document.getElementById('cold-q-meta');
   if(qtxt) qtxt.textContent = getDisplayText(q);
-  if(qmeta) qmeta.textContent = q.characteristic + ' · ' + q.competency;
+  if(qmeta) qmeta.textContent = '';
   /* reset answer + feedback */
   document.getElementById('answer-input').value = '';
   document.getElementById('char-count').textContent = '0 words';
@@ -2569,15 +2589,16 @@ function trackWeakPatterns(result){
 }
 
 /* ── MOCK MODE ── */
-function renderMockSetup(){renderMockCharGrid();}
+function renderMockSetup(){
+  document.getElementById('mock-setup-view').style.display = 'block';
+  document.getElementById('mock-inprogress-view').style.display = 'none';
+  renderMockCharGrid();
+}
 function renderMockCharGrid(){
   var chars = getCharacteristics(_mockRole);
   var grid = document.getElementById('mock-char-grid');
   grid[IH] = chars.map(function(c){
-    return '<label class="char-check">'
-      +'<input type="checkbox" checked data-char="'+esc(c)+'">'
-      +'<div class="char-check-label">'+esc(c)+'</div>'
-      +'</label>';
+    return '<input type="checkbox" checked data-char="'+esc(c)+'" style="display:none">';
   }).join('');
 }
 function mockSelectAll(v){
@@ -2624,7 +2645,7 @@ function renderMockQuestion(){
   if(_mockIdx>=_mockQueue.length){finishMock();return;}
   var q = _mockQueue[_mockIdx];
   document.getElementById('mock-progress-bar').style.width = (_mockIdx/_mockQueue.length*100)+'%';
-  document.getElementById('mock-q-num').textContent = 'Question '+(_mockIdx+1)+' of '+_mockQueue.length+' · '+q.characteristic+' / '+q.competency;
+  document.getElementById('mock-q-num').textContent = 'Question '+(_mockIdx+1)+' of '+_mockQueue.length;
   document.getElementById('mock-q-text').textContent = q._qtext;
   document.getElementById('mock-answer-input').value = '';
   document.getElementById('mock-char-count').textContent = '0 words';

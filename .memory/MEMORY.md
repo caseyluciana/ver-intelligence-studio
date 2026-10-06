@@ -27,3 +27,4 @@
 - [Recovery — Auto-backup before major edits](feedback_recovery.md) — create dated backup in backups/ before major sessions; restore via cp or git checkout
 - [Bash Permissions — How to pre-approve](feedback_bash_permissions.md) — Casey wants bash auto-approved; set via .claude/settings.json or VS Code Claude Code settings
 - [Next Session — Apply Candor Standard to Hub/Portal](project_next_session_candor_standard.md) — Candor is the design lab; apply centered brand/context chips/scoring strip to all hub pages next session
+- [Candor Session Status](project_candor_status.md) — mock interview fully working after hidden!important bug fix; ready to apply standard to hub/portal
