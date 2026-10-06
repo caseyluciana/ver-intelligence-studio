@@ -304,24 +304,30 @@ body.light-mode .modal-input::placeholder{color:rgba(8,6,18,0.30);}
   font-size:10px;color:var(--ink-muted);}
 
 /* PERSON DRAWER */
-.pm-overlay{position:fixed;inset:0;z-index:700;display:none;pointer-events:none;}
-.pm-overlay.open{display:block;pointer-events:auto;}
-/* dark wash left of drawer */
-.pm-scrim{position:absolute;inset:0;background:rgba(7,4,17,0);transition:background 0.28s var(--ease);}
+.pm-overlay{position:fixed;inset:0;z-index:700;pointer-events:none;
+  display:flex;align-items:center;justify-content:flex-end;padding:20px;visibility:hidden;}
+.pm-overlay.open{pointer-events:auto;visibility:visible;}
+/* dark wash */
+.pm-scrim{position:absolute;inset:0;background:rgba(7,4,17,0);transition:background 0.32s var(--ease);}
 body.light-mode .pm-scrim{background:rgba(20,10,40,0);}
-.pm-overlay.open .pm-scrim{background:rgba(7,4,17,0.55);}
-body.light-mode .pm-overlay.open .pm-scrim{background:rgba(20,10,40,0.32);}
-/* the drawer itself */
-.pm-box{position:absolute;top:0;right:0;bottom:0;width:min(520px,100vw);
+.pm-overlay.open .pm-scrim{background:rgba(7,4,17,0.52);}
+body.light-mode .pm-overlay.open .pm-scrim{background:rgba(20,10,40,0.28);}
+/* the drawer — floating card, rounded, vertically centered, slightly shorter than viewport */
+.pm-box{position:relative;z-index:1;width:min(500px,calc(100vw - 40px));
+  height:calc(100vh - 40px);max-height:900px;
   background:rgba(10,7,24,0.98);
-  border-left:1px solid rgba(168,85,247,0.22);
+  border:1px solid rgba(168,85,247,0.26);border-radius:18px;
   display:flex;flex-direction:column;
-  transform:translateX(100%);transition:transform 0.28s var(--ease);
-  box-shadow:-24px 0 60px rgba(0,0,0,0.55);}
-body.light-mode .pm-box{background:rgba(248,245,255,0.99);border-left-color:rgba(124,58,237,0.18);box-shadow:-24px 0 60px rgba(0,0,0,0.12);}
-.pm-overlay.open .pm-box{transform:translateX(0);}
+  transform:translateX(calc(100% + 40px));
+  transition:transform 0.42s cubic-bezier(0.22,1,0.36,1),opacity 0.28s ease;
+  opacity:0;
+  box-shadow:-12px 0 48px rgba(0,0,0,0.50),0 0 0 1px rgba(168,85,247,0.10);}
+body.light-mode .pm-box{background:rgba(250,248,255,0.99);border-color:rgba(124,58,237,0.20);box-shadow:-12px 0 48px rgba(0,0,0,0.10),0 0 0 1px rgba(124,58,237,0.08);}
+.pm-overlay.open .pm-box{transform:translateX(0);opacity:1;}
+/* hide overflow only on body scroll, not the container */
+.pm-box{overflow:hidden;}
 /* hero strip at top of drawer */
-.pm-hero{padding:24px 24px 20px;position:relative;flex-shrink:0;}
+.pm-hero{padding:22px 22px 18px;position:relative;flex-shrink:0;border-radius:17px 17px 0 0;overflow:hidden;}
 .pm-hero-bg{position:absolute;inset:0;opacity:0.7;pointer-events:none;}
 .pm-hero-inner{position:relative;z-index:1;display:flex;align-items:flex-start;gap:16px;}
 .pm-av{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;
@@ -545,7 +551,7 @@ body.light-mode .ht-track{background:rgba(0,0,0,0.08);}
         <option value="low">Low</option>
       </select></div>
     <div class="modal-field"><div class="modal-label">Owner</div>
-      <input type="text" class="modal-input" id="ma-owner" placeholder="e.g. Erin, Halley, Aimee…"></div>
+      <select class="modal-input" id="ma-owner"><option value="">—</option></select></div>
     <div class="modal-field"><div class="modal-label">Source</div>
       <select class="modal-input" id="ma-source">
         <option value="">—</option>
@@ -726,7 +732,7 @@ body.light-mode .ht-track{background:rgba(0,0,0,0.08);}
     <div class="panel" id="panel-team">
       <div class="sec-hd">
         <span class="sec-title">&#128101; CoS Team</span>
-        <span class="sec-pill">6 members</span>
+        <span class="sec-pill sec-pill-sky">6 members</span>
         <div class="sec-rule"></div>
       </div>
       <div class="team-grid" id="team-grid"></div>
@@ -749,7 +755,7 @@ body.light-mode .ht-track{background:rgba(0,0,0,0.08);}
           <option value="critical">Critical</option><option value="high">High</option>
           <option value="medium" selected>Medium</option><option value="low">Low</option>
         </select>
-        <input type="text" class="add-input" id="ai-owner" placeholder="Owner…" style="max-width:130px;">
+        <select class="add-select" id="ai-owner"><option value="">Owner…</option></select>
         <select class="add-select" id="ai-source">
           <option value="">Source</option>
           <option value="Alex">Alex</option><option value="Alice">Alice</option>
@@ -876,13 +882,49 @@ var DEF_BUDGET=[
   {id:_uid(),name:'Program Operations',icon:'⚙️',budget:0,spent:0},
   {id:_uid(),name:'Misc / Contingency',icon:'🔮',budget:0,spent:0}
 ];
-var PROGRAM_PRIORITIES=[
-  {title:'Establish CoS Program Operating Rhythm',owner:'Alice',status:'on-track',progress:65,desc:'Weekly CoS team sync, monthly cross-pillar readout, quarterly exec brief to Alex.'},
-  {title:'FY27 Cross-Pillar Workforce Planning',owner:'Erin',status:'on-track',progress:40,desc:'Coordinating headcount review across all four org pillars for Roger, Andy, Dan, Matt.'},
-  {title:'CoS Team Onboarding & Standards Doc',owner:'Halley',status:'at-risk',progress:25,desc:'Build shared operating standards for new CoS officers. Delayed pending program charter.'},
-  {title:'Annual Program Summit Planning',owner:'Aimee',status:'planned',progress:10,desc:'Planning a joint CoS team offsite for alignment, retrospective, and FY28 priority setting.'},
-  {title:'Executive Operating Cadence — All Pillars',owner:'Chris',status:'on-track',progress:55,desc:'Standardizing MBR/QBR rhythm and exec comms format across all four exec orgs.'}
+/* Program priorities per role — each person sees their own lens */
+var PRIORITIES_ALEX=[
+  {title:'Formalize CoS Program — Exec Sponsorship',owner:'Alex',status:'on-track',progress:55,desc:'Drive formal org adoption of the CoS Program model; build the exec narrative and present to leadership for ratification.'},
+  {title:'FY27 Cross-Org Workforce Strategy',owner:'Alex',status:'on-track',progress:40,desc:'Oversee cross-pillar headcount review across DA&O, SoST, CIO, and EDD to ensure 70/30 FTE/CW targets are met.'},
+  {title:'CoS Program Summit — Annual Alignment',owner:'Alice',status:'planned',progress:10,desc:'One annual in-person gathering across all CoS officers for retrospective, FY28 priority-setting, and team alignment.'},
+  {title:'Exec Operating Cadence — All Pillars',owner:'Alice',status:'on-track',progress:65,desc:'Standardizing MBR/QBR rhythm and exec comms across Roger, Andy, Dan, and Matt orgs — all four CoS officers aligned.'},
+  {title:'CoS Program Charter — Formal Doc',owner:'Alice',status:'at-risk',progress:25,desc:'Draft and ratify the program charter defining CoS officer scope, reporting lines, and operating norms. Delayed pending exec sign-off.'}
 ];
+var PRIORITIES_ALICE=[
+  {title:'CoS Team Operating Rhythm',owner:'Alice',status:'on-track',progress:65,desc:'Weekly CoS team sync, monthly cross-pillar readout, and quarterly exec brief to Alex — cadence established and running.'},
+  {title:'Officer Onboarding & Standards Doc',owner:'Alice',status:'at-risk',progress:25,desc:'Build shared operating standards for CoS officers — role clarity, reporting norms, exec comms format. Blocked on charter.'},
+  {title:'Cross-Pillar Actions Tracking',owner:'Alice',status:'on-track',progress:80,desc:'Maintain visibility into all open actions across 4 pillars; flag high/critical items to Alex weekly.'},
+  {title:'CoS Team Summit Planning',owner:'Alice',status:'planned',progress:15,desc:'Coordinate logistics for the annual CoS program offsite — venue, agenda, budget alignment with Alex.'},
+  {title:'Officer Development & Feedback Loop',owner:'Alice',status:'planned',progress:5,desc:'Establish quarterly 1:1 rhythm with each officer and a structured feedback mechanism to surface blockers early.'}
+];
+var PRIORITIES_BY_OFFICER={
+  erin:[
+    {title:'DA&O V2MOM Status Consolidation',owner:'Erin',status:'on-track',progress:45,desc:'Aggregate Roger org V2MOM progress across all DA&O teams; prep consolidated view for exec readout.'},
+    {title:'Roger Org MBR Prep — Q3 Close',owner:'Erin',status:'on-track',progress:70,desc:'Lead MBR deck prep for Roger Williams — data pulls, narrative, and exec talking points.'},
+    {title:'DA&O Workforce Planning Coordination',owner:'Erin',status:'at-risk',progress:30,desc:'Align headcount projections across DA&O orgs with FY27 plan. Delayed by two team lead vacancies.'},
+    {title:'Offsite Planning — Roger Org FY27',owner:'Erin',status:'planned',progress:10,desc:'Coordinate the Roger org full-team offsite for H2; budget, venue, and agenda in progress.'}
+  ],
+  halley:[
+    {title:'SoST V2MOM Tracking & Reporting',owner:'Halley',status:'on-track',progress:50,desc:'Track SoST V2MOM measures; produce weekly status summary for Andy White leadership review.'},
+    {title:'Andy Org QBR Preparation',owner:'Halley',status:'on-track',progress:60,desc:'Own the QBR prep process for Andy White — data synthesis, slide narrative, pre-brief coordination.'},
+    {title:'SoST Operating Rhythm Setup',owner:'Halley',status:'on-track',progress:75,desc:'Establish weekly staff meeting rhythm, action item tracking, and decision log for the SoST org.'},
+    {title:'Team Onboarding — New SoST Hires',owner:'Halley',status:'planned',progress:5,desc:'Coordinate onboarding logistics and first-30-day plans for incoming SoST team members.'}
+  ],
+  aimee:[
+    {title:'CIO Org Executive Comms Calendar',owner:'Aimee',status:'on-track',progress:55,desc:'Build and maintain the executive communications calendar for Dan Shmitt — all-hands, town halls, and key stakeholder moments.'},
+    {title:'CIO Strategy Document — FY27 Refresh',owner:'Aimee',status:'at-risk',progress:20,desc:'Facilitate the FY27 CIO strategy narrative refresh with Dan; currently delayed by open org restructure.'},
+    {title:'Cross-CIO Team Integration Actions',owner:'Aimee',status:'on-track',progress:65,desc:'Drive integration milestones for newly merged CIO sub-teams; track blockers and escalate to Dan weekly.'},
+    {title:'CIO Offsite — H2 Planning',owner:'Aimee',status:'planned',progress:15,desc:'Plan the CIO org offsite — initial scope is a 2-day working session for senior leaders.'}
+  ],
+  chris:[
+    {title:'EDD V2MOM Measure Tracking',owner:'Chris',status:'on-track',progress:60,desc:'Own V2MOM tracking for Matt Gelbman EDD org; produce bi-weekly progress report for leadership.'},
+    {title:'EDD MBR — Q3 Deck & Narrative',owner:'Chris',status:'on-track',progress:55,desc:'Lead MBR prep for Matt Williams — complete data pulls, executive narrative, and talking points.'},
+    {title:'EDD Operating Norms — Documentation',owner:'Chris',status:'at-risk',progress:35,desc:'Document EDD team operating norms, decision rights, and escalation paths. At risk due to team capacity.'},
+    {title:'EDD Annual Planning Coordination',owner:'Chris',status:'planned',progress:10,desc:'Facilitate EDD annual planning process — prep materials, coordinate stakeholder inputs for Matt.'}
+  ]
+};
+/* For backward compat — analyst/default view uses Alex's priorities */
+var PROGRAM_PRIORITIES=PRIORITIES_ALEX;
 
 /* ── STATE ── */
 var SK_OB='cos-hub-officer-budgets';
@@ -1283,10 +1325,9 @@ function _renderHomeAnalyst(open,pct,tot,spt){
 function _renderTeam(){
   var grid=document.getElementById('team-grid');
   grid[IH]='';
-  /* Alex sees Alice at top; everyone else sees officers + analysts */
-  var showAlice=(S.role==='alex'||S.role==='alice');
+  /* Alex sees Alice at top; Alice sees officers + analysts (not herself) */
   var members=[];
-  if(showAlice) members.push(ALICE);
+  if(S.role==='alex') members.push(ALICE);
   members=members.concat(OFFICERS).concat(ANALYSTS);
   members.forEach(function(m,i){
     var isAnalyst=m.pillarShort==='Analyst';
@@ -1330,6 +1371,39 @@ function _renderTeam(){
 var P_ORDER={critical:0,high:1,medium:2,low:3};
 var P_LABELS={critical:'Critical',high:'High',medium:'Medium',low:'Low'};
 
+function _assignableMembers(){
+  /* Alex can assign to Alice + all officers + analysts */
+  if(S.role==='alex') return [ALICE].concat(OFFICERS).concat(ANALYSTS);
+  /* Alice can assign to officers + analysts (not herself, not Alex) */
+  if(S.role==='alice') return OFFICERS.concat(ANALYSTS);
+  /* Officers / Analysts: read-only, no assignment */
+  return [];
+}
+
+function _populateOwnerSelects(){
+  var members=_assignableMembers();
+  var canEdit=(S.role==='alex'||S.role==='alice');
+  ['ai-owner','ma-owner'].forEach(function(selId){
+    var sel=document.getElementById(selId);
+    if(!sel) return;
+    var cur=sel.value;
+    sel[IH]='<option value="">—</option>';
+    members.forEach(function(m){
+      var opt=document.createElement('option');
+      opt.value=m.name.split(' ')[0];
+      opt.textContent=m.name;
+      sel.appendChild(opt);
+    });
+    if(cur) sel.value=cur;
+  });
+  var addRow=document.getElementById('add-row');
+  var toggleBtn=document.getElementById('toggle-add-btn');
+  var clearBtn=document.getElementById('clear-done-btn');
+  if(addRow) addRow.style.display=canEdit?'':'none';
+  if(toggleBtn) toggleBtn.style.display=canEdit?'':'none';
+  if(clearBtn) clearBtn.style.display=canEdit?'':'none';
+}
+
 document.getElementById('toggle-add-btn').addEventListener('click',function(){
   var row=document.getElementById('add-row');
   row.classList.toggle('open');
@@ -1343,6 +1417,7 @@ document.getElementById('clear-done-btn').addEventListener('click',function(){
 });
 
 function _renderActions(){
+  _populateOwnerSelects();
   var list=document.getElementById('actions-list');
   list[IH]='';
   var items=S.actions.slice().sort(function(a,b){
@@ -1367,7 +1442,10 @@ function _renderActions(){
     body.appendChild(meta);
     var badge=_txt('span','ai-pri '+(item.priority||'medium'),P_LABELS[item.priority]||'Medium');
     var del=_el('button','ai-del');del.textContent='×';
+    if(S.role!=='alex'&&S.role!=='alice') del.style.display='none';
     del.addEventListener('click',(function(id){return function(){_deleteAction(id);};})(item.id));
+    var chkVisible=(S.role!=='officer'&&S.role!=='analyst');
+    if(!chkVisible) chk.style.pointerEvents='none';
     row.appendChild(chk);row.appendChild(dot);row.appendChild(body);row.appendChild(badge);row.appendChild(del);
     list.appendChild(row);
   });
@@ -1384,7 +1462,7 @@ function _addAction(){
     done:false});
   _save(SK.actions,S.actions);
   document.getElementById('ai-text').value='';
-  document.getElementById('ai-owner').value='';
+  document.getElementById('ai-owner').selectedIndex=0;
   _renderActions();
 }
 function _toggleAction(id){
@@ -1564,7 +1642,7 @@ function _renderBudget(){
     document.getElementById('add-cat-btn').style.display=S.role==='alex'?'':'none';
     var isEdit=(S.role==='alex');
     /* Alice's own team budget — shown first */
-    var ahd2=_el('div','sec-hd');ahd2.appendChild(_txt('span','sec-title','Alice · Program Team Budget'));ahd2.appendChild(_txt('span','sec-pill',ALICE.pillarShort));ahd2.appendChild(_el('div','sec-rule'));
+    var ahd2=_el('div','sec-hd');ahd2.appendChild(_txt('span','sec-title','Alice · Program Team Budget'));ahd2.appendChild(_txt('span','sec-pill sec-pill-sky',ALICE.pillarShort));ahd2.appendChild(_el('div','sec-rule'));
     container.appendChild(ahd2);
     _renderOfficerBudgetSection(ALICE,container,isEdit);
     /* all 4 officer pillar budgets */
@@ -1618,32 +1696,40 @@ function _saveCatModal(){
 }
 
 /* ── PROGRAM ── */
+function _getActivePriorities(){
+  if(S.role==='alice') return PRIORITIES_ALICE;
+  if(S.role==='officer'&&S.officer) return PRIORITIES_BY_OFFICER[S.officer]||PRIORITIES_ALEX;
+  return PRIORITIES_ALEX; /* alex + analyst */
+}
+
 function _renderProgram(){
   var SM={
     'on-track':{cls:'sec-pill-green',label:'On Track'},
     'at-risk':{cls:'sec-pill-amber',label:'At Risk'},
     'blocked':{cls:'sec-pill sec-pill-bloom',label:'Blocked'},
-    'planned':{cls:'sec-pill',label:'Planned'},
+    'planned':{cls:'sec-pill-sky',label:'Planned'},
     'complete':{cls:'sec-pill-green',label:'Complete'}
   };
   var FILL={'on-track':'var(--green)','at-risk':'var(--amber)','blocked':'var(--red)','planned':'rgba(255,255,255,0.15)','complete':'var(--teal)'};
   var container=document.getElementById('program-content');
   container[IH]='';
-  PROGRAM_PRIORITIES.forEach(function(p,i){
+  _getActivePriorities().forEach(function(p,i){
     var sm=SM[p.status]||SM['planned'];
     var pct=Math.min(100,Math.max(0,p.progress||0));
     var card=_el('div','home-card');card.style.animationDelay=(i*0.06)+'s';
     var hd=_el('div','sec-hd');
     hd.appendChild(_txt('div','sec-title',p.title));
     hd.appendChild(_txt('span','sec-pill '+sm.cls,sm.label));
-    hd.appendChild(_txt('span','sec-pill',p.owner));
+    hd.appendChild(_txt('span','sec-pill sec-pill-teal',p.owner));
     card.appendChild(hd);
     var desc=_txt('p','',p.desc);
     desc.style.cssText='font-size:12px;color:var(--ink-muted);line-height:1.65;margin-bottom:12px;';
     card.appendChild(desc);
     var bar=_el('div','bbar-track');bar.style.height='6px';
-    var fill=_el('div','bbar-fill');fill.style.width=pct+'%';fill.style.background=FILL[p.status]||'var(--violet)';
+    var fill=_el('div','bbar-fill');fill.style.width='0';fill.style.background=FILL[p.status]||'var(--violet)';
+    fill.style.transition='width 0.7s cubic-bezier(0.16,1,0.3,1)';
     bar.appendChild(fill);card.appendChild(bar);
+    (function(f,w){setTimeout(function(){f.style.width=w+'%';},80+i*40);})(fill,pct);
     var sub=_txt('div','kc-sub',pct+'% complete');sub.style.marginTop='6px';
     card.appendChild(sub);
     container.appendChild(card);
@@ -1884,7 +1970,7 @@ document.getElementById('export-btn').addEventListener('click',function(){
 function _enterHub(role,officer){
   S.role=role||'alex';
   if(officer) S.officer=officer;
-  _applyRole();_renderHome();_renderActions();_renderBudget();
+  _applyRole();_renderHome();_renderActions();_renderBudget();_renderProgram();
   var s=document.getElementById('splash');
   s.classList.add('hidden');
   setTimeout(function(){s.style.display='none';},420);
@@ -1900,7 +1986,7 @@ function _enterHub(role,officer){
   });
 
   /* always show splash on load — no session persistence, fresh pick each time */
-  _applyRole();_renderHome();_renderActions();_renderBudget();
+  _applyRole();_renderHome();_renderActions();_renderBudget();_renderProgram();
 })();
 </script>
 </body>
