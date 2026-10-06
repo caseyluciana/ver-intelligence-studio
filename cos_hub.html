@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CoS Program Hub · Alex Labeck's Office</title>
+<style>
+:root{
+  --bloom:#F43F5E;--bloom-bright:#FB7185;--bloom-dim:#9F1239;--bloom-border:rgba(244,63,94,0.22);
+  --magenta:#C026D3;--violet:#A855F7;--violet-bright:#C084FC;
+  --green:#34D399;--amber:#FBBF24;--red:#F87171;--teal:#2DD4BF;--sky:#38BDF8;
+  --bg:#070411;--bg-surface:rgba(255,255,255,0.038);--bg-hover:rgba(168,85,247,0.07);
+  --ink:rgba(255,255,255,0.96);--ink-dim:rgba(255,255,255,0.74);
+  --ink-muted:rgba(255,255,255,0.50);--ink-ghost:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.07);--border-soft:rgba(255,255,255,0.12);
+  --font:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',monospace;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+body.light-mode{
+  --bg:#F0EDF8;--bg-surface:rgba(0,0,0,0.05);--bg-hover:rgba(168,85,247,0.07);
+  --ink:rgba(8,6,18,0.93);--ink-dim:rgba(8,6,18,0.70);--ink-muted:rgba(8,6,18,0.46);
+  --ink-ghost:rgba(0,0,0,0.06);--border:rgba(0,0,0,0.09);--border-soft:rgba(0,0,0,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;}
+body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+
+/* scan */
+.scan{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 0%,rgba(168,85,247,0.018) 50%,transparent 100%);
+  background-size:100% 280px;background-repeat:no-repeat;
+  animation:scanMove 16s linear infinite;will-change:background-position;}
+@keyframes scanMove{0%{background-position:0 -280px}100%{background-position:0 calc(100vh + 280px)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.shell{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 clamp(14px,3vw,36px);height:56px;
+  background:rgba(7,4,17,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(18px);}
+body.light-mode .topbar{background:rgba(240,237,248,0.94);border-bottom-color:rgba(0,0,0,0.10);}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.tb-gem{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--violet),var(--magenta));
+  display:grid;place-items:center;font-size:15px;box-shadow:0 0 14px rgba(168,85,247,0.38);}
+.tb-title{font-size:15px;font-weight:800;letter-spacing:-0.02em;}
+.tb-sub{font-size:10px;color:var(--ink-muted);margin-top:1px;}
+.tb-actions{display:flex;align-items:center;gap:8px;}
+.tb-date{font-size:11px;color:var(--ink-muted);}
+.tb-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;
+  border:1px solid var(--border-soft);background:var(--bg-surface);color:var(--ink-dim);
+  font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.15s;}
+.tb-btn:hover{background:var(--bg-hover);color:var(--violet-bright);}
+.theme-btn{width:32px;height:32px;padding:0;justify-content:center;}
+
+/* ROLE SELECTOR — hidden; splash is the sole entry */
+.role-bar{display:none;}
+
+/* CONTENT */
+.content{flex:1;padding:20px clamp(14px,3vw,36px) 56px;}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;
+  border:1px solid transparent;background:transparent;color:var(--ink-muted);
+  font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);
+  transition:all 0.15s;white-space:nowrap;}
+.tab-btn:hover{background:var(--bg-hover);color:var(--ink-dim);}
+.tab-btn.active{background:rgba(168,85,247,0.14);color:var(--violet-bright);border-color:rgba(168,85,247,0.25);}
+.tab-count{font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;
+  background:rgba(168,85,247,0.18);color:var(--violet-bright);}
+
+/* PANELS */
+.panel{display:none;}
+.panel.active{display:block;animation:rise 0.32s var(--ease) both;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0e0c28 0%,#1a1550 30%,#2d1d78 55%,#1a1040 78%,#0a0c1e 100%);
+  border:1px solid rgba(168,85,247,0.28);border-radius:14px;padding:22px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px;overflow:hidden;position:relative;}
+body.light-mode .hero{background:linear-gradient(135deg,#2d1d78 0%,#4c2db0 35%,#6d3dd8 60%,#4c2db0 80%,#2d1d78 100%);}
+.hero::before{content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(168,85,247,0.10) 1px,transparent 1px);
+  background-size:24px 24px;pointer-events:none;}
+.hero-eyebrow{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;
+  color:var(--violet-bright);margin-bottom:6px;}
+.hero-name{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-0.03em;
+  background:linear-gradient(90deg,#fff,var(--violet-bright));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;}
+.hero-date-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px;}
+.hero-tagline{font-size:12px;color:rgba(255,255,255,0.62);margin-top:8px;line-height:1.6;max-width:440px;}
+.hero-kpis{display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;}
+.hkpi{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);border-radius:10px;
+  padding:12px 16px;text-align:center;min-width:80px;}
+.hkpi-val{font-size:22px;font-weight:900;letter-spacing:-0.02em;font-family:var(--mono);}
+.hkpi-val.violet{color:#C084FC;}
+.hkpi-val.bloom{color:#FB7185;}
+.hkpi-val.green{color:#4ADE80;}
+.hkpi-val.amber{color:#FCD34D;}
+.hkpi-label{font-size:9px;color:rgba(255,255,255,0.60);font-weight:600;margin-top:3px;text-transform:uppercase;letter-spacing:0.06em;}
+
+/* KPI CARDS — Candor style, no top bar */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:18px;}
+.kpi-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;animation:rise 0.3s var(--ease) both;}
+.kc-label{font-size:9px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.kc-val{font-size:24px;font-weight:900;letter-spacing:-0.03em;font-family:var(--mono);}
+.kc-violet .kc-val{color:var(--tx-violet);}
+.kc-bloom .kc-val{color:var(--tx-bloom);}
+.kc-green .kc-val{color:var(--tx-green);}
+.kc-amber .kc-val{color:var(--tx-amber);}
+.kc-sub{font-size:10px;color:var(--ink-muted);margin-top:4px;}
+
+/* SECTION HEAD */
+.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sec-title{font-size:13px;font-weight:800;color:var(--ink);}
+.sec-rule{flex:1;height:1px;background:var(--border);}
+.sec-pill{font-size:9px;font-weight:700;padding:2px 9px;border-radius:99px;
+  background:rgba(168,85,247,0.18);color:var(--tx-violet);border:1px solid rgba(168,85,247,0.30);}
+.sec-pill-amber{background:rgba(251,191,36,0.18);color:var(--tx-amber);border-color:rgba(251,191,36,0.35);}
+.sec-pill-bloom{background:rgba(244,63,94,0.18);color:var(--tx-bloom);border-color:rgba(244,63,94,0.35);}
+.sec-pill-green{background:rgba(52,211,153,0.18);color:var(--tx-green);border-color:rgba(52,211,153,0.35);}
+.sec-actions{margin-left:auto;display:flex;gap:6px;}
+
+/* TEAM GRID */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:18px;}
+.officer-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:13px;padding:18px;
+  cursor:pointer;transition:border-color 0.18s,box-shadow 0.18s;animation:rise 0.3s var(--ease) both;}
+.officer-card:hover{border-color:rgba(168,85,247,0.35);box-shadow:0 0 0 1px rgba(168,85,247,0.12),0 6px 20px rgba(0,0,0,0.25);}
+.officer-card.analyst-card{border-color:rgba(56,189,248,0.15);}
+.officer-card.analyst-card:hover{border-color:rgba(56,189,248,0.35);}
+.oc-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.oc-avatar{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;
+  font-size:16px;font-weight:900;color:#fff;}
+.oc-av-violet{background:linear-gradient(135deg,var(--violet),var(--magenta));}
+.oc-av-bloom{background:linear-gradient(135deg,var(--bloom-dim),var(--bloom));}
+.oc-av-sky{background:linear-gradient(135deg,#0284C7,var(--sky));}
+.oc-av-teal{background:linear-gradient(135deg,#0D9488,var(--teal));}
+.oc-av-green{background:linear-gradient(135deg,#059669,var(--green));}
+.oc-av-amber{background:linear-gradient(135deg,#B45309,var(--amber));}
+.oc-info{flex:1;min-width:0;}
+.oc-name{font-size:13px;font-weight:800;color:var(--ink);}
+.oc-role{font-size:10px;color:var(--ink-muted);margin-top:2px;}
+.oc-pillar{display:inline-block;margin-top:4px;font-size:9px;font-weight:700;padding:2px 8px;
+  border-radius:5px;background:rgba(168,85,247,0.18);color:var(--tx-violet);border:1px solid rgba(168,85,247,0.30);}
+.oc-pillar.sky{background:rgba(56,189,248,0.18);color:var(--tx-sky);border-color:rgba(56,189,248,0.30);}
+.oc-pillar.bloom{background:rgba(244,63,94,0.18);color:var(--tx-bloom);border-color:rgba(244,63,94,0.30);}
+.oc-pillar.teal{background:rgba(45,212,191,0.18);color:var(--tx-teal);border-color:rgba(45,212,191,0.30);}
+.oc-pillar.green{background:rgba(52,211,153,0.18);color:var(--tx-green);border-color:rgba(52,211,153,0.30);}
+.oc-pillar.amber{background:rgba(251,191,36,0.18);color:var(--tx-amber);border-color:rgba(251,191,36,0.30);}
+.oc-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.oc-stat{background:rgba(255,255,255,0.032);border-radius:7px;padding:8px 10px;text-align:center;}
+body.light-mode .oc-stat{background:rgba(0,0,0,0.04);}
+.oc-stat-val{font-size:16px;font-weight:900;color:var(--ink);}
+.oc-stat-lbl{font-size:8px;color:var(--ink-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
+
+/* BUDGET */
+.budget-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.bk{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.bk-violet{border-left:3px solid var(--tx-violet);}
+.bk-amber{border-left:3px solid var(--tx-amber);}
+.bk-green{border-left:3px solid var(--tx-green);}
+.bk-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);margin-bottom:6px;}
+.bk-val{font-size:22px;font-weight:900;font-family:var(--mono);}
+.bk-violet .bk-val{color:var(--tx-violet);}
+.bk-amber .bk-val{color:var(--tx-amber);}
+.bk-green .bk-val{color:var(--tx-green);}
+.bk-sub{font-size:10px;color:var(--ink-muted);margin-top:4px;}
+
+.budget-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
+.bc-item{background:var(--bg-surface);border:1px solid var(--border);border-radius:11px;padding:14px 16px;}
+.bc-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.bc-icon{font-size:18px;}
+.bc-name{flex:1;font-size:12px;font-weight:700;color:var(--ink-dim);}
+.bc-pct{font-size:12px;font-weight:800;}
+.bc-pct.good{color:var(--green);}.bc-pct.warn{color:var(--amber);}.bc-pct.over{color:var(--red);}
+.bc-track{height:5px;border-radius:99px;background:rgba(255,255,255,0.06);overflow:hidden;margin-bottom:8px;}
+.bc-fill{height:100%;border-radius:99px;transition:width 0.5s var(--ease);}
+.bc-fill.good{background:var(--green);}.bc-fill.warn{background:var(--amber);}.bc-fill.over{background:var(--red);}
+.bc-bottom{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-muted);}
+.bc-edit-row{display:none;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.bc-edit-row.open{display:flex;}
+.bc-input{background:rgba(255,255,255,0.06);border:1px solid var(--border-soft);border-radius:6px;
+  padding:5px 9px;color:var(--ink);font-family:var(--font);font-size:11px;width:100px;outline:none;}
+.bc-input:focus{border-color:rgba(168,85,247,0.40);}
+.bc-save-btn{padding:4px 12px;border-radius:6px;border:none;background:var(--violet);color:#fff;
+  font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.bc-del-btn{padding:4px 10px;border-radius:6px;border:1px solid rgba(248,113,113,0.25);background:transparent;
+  color:var(--red);font-size:11px;cursor:pointer;font-family:var(--font);}
+.bc-cancel-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border-soft);background:transparent;
+  color:var(--ink-muted);font-size:11px;cursor:pointer;font-family:var(--font);}
+.bc-actions{margin-top:8px;display:flex;justify-content:flex-end;}
+
+/* ACTIONS */
+.add-row{display:none;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px;
+  padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border-soft);border-radius:10px;}
+.add-row.open{display:flex;}
+.add-input{flex:1;min-width:180px;background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);
+  border-radius:7px;padding:7px 11px;color:var(--ink);font-family:var(--font);font-size:12px;outline:none;}
+.add-input:focus{border-color:rgba(168,85,247,0.40);}
+.add-input::placeholder{color:rgba(255,255,255,0.25);}
+.add-select{background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);border-radius:7px;
+  padding:7px 10px;color:var(--ink-dim);font-family:var(--font);font-size:11px;outline:none;cursor:pointer;}
+.add-btn{padding:7px 16px;border-radius:7px;border:none;background:linear-gradient(135deg,var(--violet),var(--magenta));
+  color:#fff;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);}
+.ai-list{display:flex;flex-direction:column;gap:6px;}
+.ai-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:9px;
+  background:var(--bg-surface);border:1px solid var(--border);transition:border-color 0.15s;}
+.ai-item:hover{border-color:var(--border-soft);}
+.ai-item.done{opacity:0.45;}
+.ai-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-soft);
+  flex-shrink:0;cursor:pointer;display:grid;place-items:center;font-size:10px;
+  transition:all 0.15s;margin-top:1px;}
+.ai-check.checked{background:var(--green);border-color:var(--green);color:#fff;}
+.ai-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.ai-dot.critical{background:var(--bloom-bright);}
+.ai-dot.high{background:var(--amber);}
+.ai-dot.medium{background:var(--violet-bright);}
+.ai-dot.low{background:rgba(255,255,255,0.25);}
+.ai-body{flex:1;min-width:0;}
+.ai-label{font-size:12px;color:var(--ink-dim);line-height:1.45;}
+.ai-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.ai-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;
+  background:rgba(255,255,255,0.08);color:var(--ink-muted);border:1px solid var(--border);}
+body.light-mode .ai-chip{background:rgba(0,0,0,0.06);}
+.ai-chip.owner{background:rgba(168,85,247,0.18);color:var(--tx-violet);border-color:rgba(168,85,247,0.28);}
+.ai-chip.source{background:rgba(255,255,255,0.06);}
+.ai-pri{font-size:9px;font-weight:700;padding:2px 8px;border-radius:5px;flex-shrink:0;align-self:center;border:1px solid transparent;}
+.ai-pri.critical{background:rgba(244,63,94,0.18);color:var(--tx-bloom);border-color:rgba(244,63,94,0.30);}
+.ai-pri.high{background:rgba(251,191,36,0.18);color:var(--tx-amber);border-color:rgba(251,191,36,0.30);}
+.ai-pri.medium{background:rgba(168,85,247,0.18);color:var(--tx-violet);border-color:rgba(168,85,247,0.28);}
+.ai-pri.low{background:rgba(255,255,255,0.06);color:var(--ink-muted);}
+.ai-del{background:none;border:none;color:rgba(255,255,255,0.18);font-size:16px;cursor:pointer;
+  flex-shrink:0;align-self:center;transition:color 0.12s;}
+.ai-del:hover{color:var(--red);}
+
+/* HOME CARDS */
+.home-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.home-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.home-card-title{font-size:11px;font-weight:800;color:var(--ink-muted);text-transform:uppercase;
+  letter-spacing:0.09em;margin-bottom:12px;}
+.bbar-list{display:flex;flex-direction:column;gap:8px;}
+.bbar-item{display:flex;flex-direction:column;gap:4px;}
+.bbar-top{display:flex;justify-content:space-between;align-items:center;}
+.bbar-name{font-size:11px;color:var(--ink-dim);}
+.bbar-amt{font-size:10px;color:var(--ink-muted);}
+.bbar-track{height:4px;border-radius:99px;background:rgba(255,255,255,0.06);overflow:hidden;}
+.bbar-fill{height:100%;border-radius:99px;}
+
+/* HOME ACTIONS STRIP */
+.home-action-row{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;
+  background:var(--bg-surface);border:1px solid var(--border);margin-bottom:5px;}
+.har-text{flex:1;font-size:11px;color:var(--ink-dim);}
+.har-chip{font-size:9px;font-weight:600;padding:1px 7px;border-radius:4px;
+  background:rgba(255,255,255,0.06);color:var(--ink-muted);}
+.view-all-link{display:block;text-align:right;font-size:11px;color:var(--violet-bright);
+  cursor:pointer;margin-top:6px;font-weight:600;}
+.view-all-link:hover{text-decoration:underline;}
+
+/* MODALS — Candor clean */
+.modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(7,4,17,0.82);
+  backdrop-filter:blur(18px);display:none;align-items:center;justify-content:center;padding:24px;}
+body.light-mode .modal-overlay{background:rgba(200,195,220,0.72);}
+.modal-overlay.open{display:flex;}
+.modal-box{width:100%;max-width:460px;
+  background:rgba(14,10,28,0.97);
+  border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:28px;
+  animation:rise 0.35s var(--ease) both;box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+body.light-mode .modal-box{background:rgba(248,246,255,0.99);border-color:rgba(124,58,237,0.20);box-shadow:0 24px 60px rgba(0,0,0,0.14);}
+.modal-title{font-size:16px;font-weight:900;color:var(--ink);margin-bottom:4px;letter-spacing:-0.02em;}
+.modal-sub{font-size:11px;color:var(--ink-muted);margin-bottom:20px;line-height:1.6;}
+.modal-field{margin-bottom:12px;}
+.modal-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink-muted);margin-bottom:5px;}
+.modal-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border-soft);
+  border-radius:8px;padding:9px 12px;color:var(--ink);font-family:var(--font);
+  font-size:12px;outline:none;transition:border-color 0.15s;}
+body.light-mode .modal-input{background:rgba(0,0,0,0.04);color:rgba(8,6,18,0.93);}
+.modal-input:focus{border-color:rgba(168,85,247,0.50);box-shadow:0 0 0 3px rgba(168,85,247,0.08);}
+.modal-input::placeholder{color:rgba(255,255,255,0.22);}
+body.light-mode .modal-input::placeholder{color:rgba(8,6,18,0.30);}
+.modal-actions{display:flex;gap:8px;margin-top:20px;}
+.modal-save{flex:1;padding:10px;border-radius:10px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--violet),var(--magenta));color:#fff;
+  font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:0.01em;}
+.modal-save:hover{filter:brightness(1.08);}
+.modal-cancel{padding:10px 20px;border-radius:10px;border:1px solid var(--border-soft);
+  background:none;color:var(--ink-dim);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;}
+.modal-cancel:hover{background:var(--bg-hover);}
+
+/* EMPTY / FOOTER */
+.empty-state{text-align:center;padding:32px 24px;color:var(--ink-muted);font-size:12px;}
+.page-footer{margin-top:8px;padding:10px 14px;border-radius:8px;
+  background:rgba(168,85,247,0.04);border:1px solid rgba(168,85,247,0.10);
+  font-size:10px;color:var(--ink-muted);}
+
+/* PERSON MODAL */
+.pm-overlay{position:fixed;inset:0;z-index:700;background:rgba(7,4,17,0.86);
+  backdrop-filter:blur(22px);display:none;align-items:flex-start;justify-content:center;
+  padding:28px 20px;overflow-y:auto;}
+body.light-mode .pm-overlay{background:rgba(180,170,210,0.78);}
+.pm-overlay.open{display:flex;}
+.pm-box{width:100%;max-width:580px;background:rgba(12,8,30,0.98);
+  border:1px solid rgba(168,85,247,0.24);border-radius:18px;overflow:hidden;
+  animation:rise 0.32s var(--ease) both;box-shadow:0 28px 80px rgba(0,0,0,0.6);margin:auto;}
+body.light-mode .pm-box{background:rgba(248,245,255,0.99);border-color:rgba(124,58,237,0.22);box-shadow:0 28px 80px rgba(0,0,0,0.16);}
+.pm-hero{padding:24px 24px 20px;position:relative;}
+.pm-hero-bg{position:absolute;inset:0;opacity:0.6;pointer-events:none;}
+.pm-hero-inner{position:relative;z-index:1;display:flex;align-items:flex-start;gap:16px;}
+.pm-av{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;
+  font-size:20px;font-weight:900;color:#fff;flex-shrink:0;}
+.pm-meta{flex:1;min-width:0;}
+.pm-name{font-size:19px;font-weight:900;letter-spacing:-0.02em;color:#fff;margin-bottom:3px;}
+.pm-role{font-size:11px;color:rgba(255,255,255,0.62);margin-bottom:8px;}
+.pm-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.pm-tag{font-size:9px;font-weight:700;padding:3px 10px;border-radius:99px;
+  border:1px solid rgba(255,255,255,0.20);background:rgba(255,255,255,0.10);color:rgba(255,255,255,0.85);}
+.pm-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;
+  border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.70);font-size:16px;cursor:pointer;display:grid;place-items:center;
+  font-family:var(--font);z-index:2;transition:background 0.15s;}
+.pm-close:hover{background:rgba(255,255,255,0.18);}
+.pm-body{padding:0 24px 24px;}
+.pm-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.pm-kpi{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:12px 14px;text-align:center;}
+body.light-mode .pm-kpi{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.10);}
+.pm-kpi-val{font-size:22px;font-weight:900;font-family:var(--mono);}
+.pm-kpi-lbl{font-size:9px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;}
+.pm-sec{margin-bottom:18px;}
+.pm-sec-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.10em;
+  color:var(--ink-muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.pm-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+/* budget bars inside person modal */
+.pm-bcat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  border-radius:10px;padding:12px 14px;margin-bottom:7px;}
+body.light-mode .pm-bcat{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.09);}
+.pm-bcat-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.pm-bcat-icon{font-size:15px;flex-shrink:0;}
+.pm-bcat-name{flex:1;font-size:11px;font-weight:700;color:var(--ink);}
+.pm-bcat-pct{font-size:11px;font-weight:800;}
+.pm-bcat-track{height:5px;border-radius:99px;background:rgba(255,255,255,0.07);overflow:hidden;margin-bottom:6px;}
+body.light-mode .pm-bcat-track{background:rgba(0,0,0,0.08);}
+.pm-bcat-fill{height:100%;border-radius:99px;transition:width 0.5s var(--ease);}
+.pm-bcat-foot{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-muted);}
+.pm-bcat-edit{display:none;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center;}
+.pm-bcat-edit.open{display:flex;}
+.pm-input{background:rgba(255,255,255,0.06);border:1px solid var(--border-soft);border-radius:6px;
+  padding:5px 9px;color:var(--ink);font-family:var(--font);font-size:11px;outline:none;width:100px;}
+body.light-mode .pm-input{background:rgba(0,0,0,0.06);color:var(--ink);}
+.pm-input:focus{border-color:rgba(168,85,247,0.40);}
+.pm-save-btn{padding:4px 12px;border-radius:6px;border:none;background:var(--violet);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.pm-add-budget-btn{display:flex;align-items:center;gap:6px;width:100%;padding:10px 14px;border-radius:10px;
+  border:1px dashed rgba(168,85,247,0.28);background:rgba(168,85,247,0.04);
+  color:var(--violet-bright);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);
+  transition:background 0.15s;margin-top:4px;}
+.pm-add-budget-btn:hover{background:rgba(168,85,247,0.10);}
+/* actions mini-list in person modal */
+.pm-action-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:5px;}
+body.light-mode .pm-action-row{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.07);}
+.pm-action-text{flex:1;font-size:11px;color:var(--ink-dim);}
+/* clickable pillar card */
+.pc.clickable,.officer-card.clickable{cursor:pointer;}
+.pc.clickable:hover{border-color:rgba(168,85,247,0.40);box-shadow:0 0 0 1px rgba(168,85,247,0.14),0 6px 20px rgba(0,0,0,0.22);}
+
+/* SPLASH / ROLE SELECT */
+.splash-overlay{position:fixed;inset:0;z-index:900;
+  background:linear-gradient(135deg,#07040f 0%,#0e0c28 35%,#1a1550 60%,#0e0c1e 100%);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  transition:opacity 0.4s var(--ease);}
+.splash-overlay.hidden{opacity:0;pointer-events:none;}
+.splash-box{width:100%;max-width:780px;text-align:center;}
+.splash-gem{width:54px;height:54px;border-radius:16px;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--violet),var(--magenta));
+  display:grid;place-items:center;font-size:24px;
+  box-shadow:0 0 40px rgba(168,85,247,0.45);}
+.splash-title{font-size:clamp(22px,4vw,30px);font-weight:900;letter-spacing:-0.03em;
+  background:linear-gradient(90deg,#fff,var(--violet-bright));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;}
+.splash-sub{font-size:12px;color:rgba(255,255,255,0.52);margin-bottom:36px;line-height:1.6;}
+.splash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+@media(max-width:700px){.splash-cards{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:420px){.splash-cards{grid-template-columns:1fr;}}
+.splash-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);
+  border-radius:14px;padding:18px 16px;cursor:pointer;text-align:left;
+  transition:border-color 0.18s,background 0.18s,transform 0.18s;font-family:var(--font);}
+.splash-card:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.40);transform:translateY(-2px);}
+.splash-card.alex:hover{border-color:rgba(168,85,247,0.50);background:rgba(168,85,247,0.10);}
+.splash-card.alice:hover{border-color:rgba(56,189,248,0.50);background:rgba(56,189,248,0.08);}
+.splash-card.officer:hover{border-color:rgba(244,63,94,0.50);background:rgba(244,63,94,0.08);}
+.splash-card.analyst:hover{border-color:rgba(52,211,153,0.50);background:rgba(52,211,153,0.08);}
+.sc-avatar{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+  font-size:15px;font-weight:900;color:#fff;margin-bottom:12px;}
+.sc-av-alex{background:linear-gradient(135deg,var(--violet),var(--magenta));}
+.sc-av-alice{background:linear-gradient(135deg,#0284C7,var(--sky));}
+.sc-av-officer{background:linear-gradient(135deg,var(--bloom-dim),var(--bloom));}
+.sc-av-analyst{background:linear-gradient(135deg,#059669,var(--green));}
+.sc-av-violet{background:linear-gradient(135deg,var(--violet),var(--magenta));}
+.sc-av-sky{background:linear-gradient(135deg,#0284C7,var(--sky));}
+.sc-av-bloom{background:linear-gradient(135deg,var(--bloom-dim),var(--bloom));}
+.sc-av-teal{background:linear-gradient(135deg,#0D9488,var(--teal));}
+.sc-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:3px;}
+.sc-role{font-size:10px;color:rgba(255,255,255,0.50);line-height:1.5;}
+.sc-badge{display:inline-block;margin-top:8px;font-size:8px;font-weight:700;padding:2px 8px;
+  border-radius:99px;letter-spacing:0.08em;text-transform:uppercase;}
+.sc-badge.alex{background:rgba(168,85,247,0.20);color:#C084FC;border:1px solid rgba(168,85,247,0.35);}
+.sc-badge.alice{background:rgba(56,189,248,0.18);color:#38BDF8;border:1px solid rgba(56,189,248,0.30);}
+.sc-badge.officer{background:rgba(244,63,94,0.16);color:#FB7185;border:1px solid rgba(244,63,94,0.28);}
+.sc-badge.analyst{background:rgba(52,211,153,0.14);color:#4ADE80;border:1px solid rgba(52,211,153,0.26);}
+.splash-footer{font-size:10px;color:rgba(255,255,255,0.28);}
+
+/* ANALYST BANNER */
+.analyst-banner{background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(45,212,191,0.05));
+  border:1px solid rgba(56,189,248,0.18);border-radius:12px;padding:14px 18px;
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;font-size:12px;color:var(--ink-muted);}
+.ab-icon{font-size:20px;flex-shrink:0;}
+
+@media(max-width:900px){.home-two-col{grid-template-columns:1fr;}.kpi-row{grid-template-columns:1fr 1fr;}.budget-kpi-row{grid-template-columns:1fr;}}
+@media(max-width:640px){.hero{flex-direction:column;}.hero-kpis{display:none;}.team-grid{grid-template-columns:1fr;}.budget-cats{grid-template-columns:1fr;}.kpi-row{grid-template-columns:1fr 1fr;}}
+
+/* SAFE ACCENT TEXT — readable on both dark/light */
+:root{--tx-violet:#C084FC;--tx-bloom:#FB7185;--tx-green:#4ADE80;--tx-amber:#FCD34D;--tx-teal:#2DD4BF;--tx-sky:#38BDF8;}
+body.light-mode{--tx-violet:#7C3AED;--tx-bloom:#BE123C;--tx-green:#15803D;--tx-amber:#92400E;--tx-teal:#0D9488;--tx-sky:#0369A1;}
+
+/* ROLE HERO VARIANTS — deep Candor-indigo base, role-accent tint overlay */
+.hero-alex{background:linear-gradient(135deg,#0e0c28 0%,#1a1550 28%,#2d1d78 52%,#3b1a6e 68%,#1a1040 85%,#0a0a1a 100%)!important;border-color:rgba(168,85,247,0.36)!important;}
+.hero-alice{background:linear-gradient(135deg,#080e28 0%,#0d1a40 28%,#0f2a5e 52%,#0e2a4e 68%,#091830 85%,#050c1e 100%)!important;border-color:rgba(56,189,248,0.32)!important;}
+.hero-officer{background:linear-gradient(135deg,#1a0c1e 0%,#2a0e28 28%,#3d0e30 52%,#2a1020 68%,#160c18 85%,#0c0610 100%)!important;border-color:rgba(244,63,94,0.30)!important;}
+.hero-analyst{background:linear-gradient(135deg,#071a14 0%,#0a2420 28%,#0e3428 52%,#0c2820 68%,#071a14 85%,#040e0c 100%)!important;border-color:rgba(52,211,153,0.26)!important;}
+/* light mode — keep deep rich gradients (hero should always feel immersive) */
+body.light-mode .hero-alex{background:linear-gradient(135deg,#1e1060 0%,#2d1d78 30%,#4c2db0 55%,#3b1a8e 75%,#1e1060 100%)!important;}
+body.light-mode .hero-alice{background:linear-gradient(135deg,#0a1840 0%,#0f2a5e 30%,#1a3d80 55%,#0f2a5e 75%,#0a1840 100%)!important;}
+body.light-mode .hero-officer{background:linear-gradient(135deg,#380a28 0%,#5e1040 30%,#8c1050 55%,#5e1040 75%,#380a28 100%)!important;}
+body.light-mode .hero-analyst{background:linear-gradient(135deg,#073818 0%,#0a5028 30%,#0d6830 55%,#0a5028 75%,#073818 100%)!important;}
+.hero-alex .hero-eyebrow{color:var(--tx-violet);}
+.hero-alice .hero-eyebrow{color:var(--tx-sky);}
+.hero-officer .hero-eyebrow{color:var(--tx-bloom);}
+.hero-analyst .hero-eyebrow{color:var(--tx-green);}
+
+/* PILLAR HEALTH GRID (Alex home) */
+.pillar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-bottom:18px;}
+.pc{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:border-color 0.18s;}
+.pc:hover{border-color:rgba(168,85,247,0.30);}
+.pc-top{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.pc-av{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0;}
+.pc-info{flex:1;min-width:0;}
+.pc-name{font-size:12px;font-weight:800;color:var(--ink);}
+.pc-pillar{font-size:9px;color:var(--ink-muted);margin-top:1px;}
+.pc-health-row{display:flex;flex-direction:column;gap:6px;}
+.pc-hrow{display:flex;align-items:center;gap:8px;}
+.pc-hlabel{font-size:9px;font-weight:700;color:var(--ink-muted);width:60px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.05em;}
+.pc-bar-track{flex:1;height:4px;border-radius:99px;background:rgba(255,255,255,0.07);overflow:hidden;}
+body.light-mode .pc-bar-track{background:rgba(0,0,0,0.08);}
+.pc-bar-fill{height:100%;border-radius:99px;transition:width 0.55s var(--ease);}
+.pc-hval{font-size:9px;font-weight:700;color:var(--ink-muted);width:30px;text-align:right;flex-shrink:0;}
+
+/* HEALTH TABLE (Alice home) */
+.htable-wrap{overflow-x:auto;margin-bottom:18px;}
+.htable{width:100%;border-collapse:collapse;}
+.htable th{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;}
+.htable td{font-size:11px;color:var(--ink-dim);padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+body.light-mode .htable td{border-bottom-color:rgba(0,0,0,0.05);}
+.htable tr{cursor:pointer;}.htable tr:hover td{background:var(--bg-hover);}
+.ht-bar{display:flex;align-items:center;gap:6px;}
+.ht-track{flex:1;min-width:60px;height:4px;border-radius:99px;background:rgba(255,255,255,0.07);overflow:hidden;}
+body.light-mode .ht-track{background:rgba(0,0,0,0.08);}
+.ht-fill{height:100%;border-radius:99px;}
+.ht-pct{font-size:10px;font-weight:700;white-space:nowrap;}
+
+/* RISK STRIP */
+.risk-strip{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.risk-chip{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;font-size:10px;font-weight:700;border:1px solid transparent;}
+.risk-chip.red{background:rgba(244,63,94,0.10);color:var(--tx-bloom);border-color:rgba(244,63,94,0.22);}
+.risk-chip.amber{background:rgba(251,191,36,0.10);color:var(--tx-amber);border-color:rgba(251,191,36,0.22);}
+.risk-chip.green{background:rgba(52,211,153,0.08);color:var(--tx-green);border-color:rgba(52,211,153,0.18);}
+
+/* SVG DONUT */
+.donut-section{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;margin-bottom:18px;}
+.donut-legend{display:flex;flex-direction:column;gap:6px;}
+.dl-row{display:flex;align-items:center;gap:7px;}
+.dl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.dl-label{font-size:11px;color:var(--ink-dim);flex:1;}
+.dl-amt{font-size:10px;font-weight:700;color:var(--ink-muted);}
+.dl-pct{font-size:10px;font-weight:800;margin-left:4px;}
+
+/* OFFICER HOME — pillar card */
+.officer-home-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+.ohc-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink-muted);margin-bottom:12px;}
+.ohc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.ohc-stat{background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 12px;text-align:center;}
+.ohc-stat-val{font-size:20px;font-weight:900;color:var(--ink);}
+.ohc-stat-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-muted);margin-top:3px;}
+
+/* ALEX HERO GRADIENT TEXT */
+.hero-alex .hero-name{background:linear-gradient(90deg,#fff,var(--tx-violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-alice .hero-name{background:linear-gradient(90deg,#fff,var(--tx-sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-officer .hero-name{background:linear-gradient(90deg,#fff,var(--tx-bloom));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-analyst .hero-name{background:linear-gradient(90deg,#fff,var(--tx-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+</style>
+</head>
+<body>
+<div class="scan" aria-hidden="true"></div>
+
+<!-- Add Action Modal -->
+<div class="modal-overlay" id="action-modal">
+  <div class="modal-box">
+    <div class="modal-title">New Action Item</div>
+    <div class="modal-sub">Add a program-level action to track across the CoS team.</div>
+    <div class="modal-field"><div class="modal-label">Action</div>
+      <input type="text" class="modal-input" id="ma-text" placeholder="What needs to happen?"></div>
+    <div class="modal-field"><div class="modal-label">Priority</div>
+      <select class="modal-input" id="ma-priority">
+        <option value="critical">Critical</option>
+        <option value="high">High</option>
+        <option value="medium" selected>Medium</option>
+        <option value="low">Low</option>
+      </select></div>
+    <div class="modal-field"><div class="modal-label">Owner</div>
+      <input type="text" class="modal-input" id="ma-owner" placeholder="e.g. Erin, Halley, Aimee…"></div>
+    <div class="modal-field"><div class="modal-label">Source</div>
+      <select class="modal-input" id="ma-source">
+        <option value="">—</option>
+        <option value="Alex">Alex</option>
+        <option value="Alice">Alice</option>
+        <option value="Roger">Roger</option>
+        <option value="Program">Program</option>
+        <option value="Leadership">Leadership</option>
+        <option value="Other">Other</option>
+      </select></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="action-modal-cancel">Cancel</button>
+      <button class="modal-save" id="action-modal-save">Save Action</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Budget Category Modal -->
+<div class="modal-overlay" id="cat-modal">
+  <div class="modal-box">
+    <div class="modal-title">New Budget Category</div>
+    <div class="modal-sub">Add a budget line for the CoS Program.</div>
+    <div class="modal-field"><div class="modal-label">Category Name</div>
+      <input type="text" class="modal-input" id="mc-name" placeholder="e.g. Offsite Planning"></div>
+    <div class="modal-field"><div class="modal-label">Icon (emoji)</div>
+      <input type="text" class="modal-input" id="mc-icon" placeholder="🎯" maxlength="4"></div>
+    <div class="modal-field"><div class="modal-label">Budget ($)</div>
+      <input type="number" class="modal-input" id="mc-budget" placeholder="0"></div>
+    <div class="modal-field"><div class="modal-label">Spent to Date ($)</div>
+      <input type="number" class="modal-input" id="mc-spent" placeholder="0"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="cat-modal-cancel">Cancel</button>
+      <button class="modal-save" id="cat-modal-save">Save Category</button>
+    </div>
+  </div>
+</div>
+
+<!-- ROLE SELECT SPLASH -->
+<div class="splash-overlay" id="splash">
+  <div class="splash-box">
+    <div class="splash-gem">&#10024;</div>
+    <div class="splash-title">CoS Program Hub</div>
+    <div class="splash-sub">Alex Labeck's Office &nbsp;&middot;&nbsp; Enterprise &amp; AI Technology<br>Select your card to enter your hub.</div>
+    <div class="splash-cards">
+      <!-- Alex -->
+      <button class="splash-card alex" data-splash-role="alex" data-splash-officer="">
+        <div class="sc-avatar sc-av-alex">&#127775;</div>
+        <div class="sc-name">Alex Labeck</div>
+        <div class="sc-role">Full program view — all pillars, all people, budget &amp; priorities.</div>
+        <span class="sc-badge alex">Program Lead</span>
+      </button>
+      <!-- Alice -->
+      <button class="splash-card alice" data-splash-role="alice" data-splash-officer="">
+        <div class="sc-avatar sc-av-alice">&#128100;</div>
+        <div class="sc-name">Alice</div>
+        <div class="sc-role">Team oversight — officer health, cross-pillar actions &amp; risk flags.</div>
+        <span class="sc-badge alice">Team Lead</span>
+      </button>
+      <!-- CoS Officers — each their own card -->
+      <button class="splash-card officer" data-splash-role="officer" data-splash-officer="erin">
+        <div class="sc-avatar sc-av-violet">EA</div>
+        <div class="sc-name">Erin Albert</div>
+        <div class="sc-role">Chief of Staff<br>Roger Williams · DA&amp;O</div>
+        <span class="sc-badge officer">DA&amp;O</span>
+      </button>
+      <button class="splash-card officer" data-splash-role="officer" data-splash-officer="halley">
+        <div class="sc-avatar sc-av-sky">HR</div>
+        <div class="sc-name">Halley Ramminger</div>
+        <div class="sc-role">Chief of Staff<br>Andy White · SoST</div>
+        <span class="sc-badge officer">SoST</span>
+      </button>
+      <button class="splash-card officer" data-splash-role="officer" data-splash-officer="aimee">
+        <div class="sc-avatar sc-av-bloom">AH</div>
+        <div class="sc-name">Aimee Hartman</div>
+        <div class="sc-role">Chief of Staff<br>Dan Shmitt · CIO</div>
+        <span class="sc-badge officer">CIO</span>
+      </button>
+      <button class="splash-card officer" data-splash-role="officer" data-splash-officer="chris">
+        <div class="sc-avatar sc-av-teal">CB</div>
+        <div class="sc-name">Chris Berg</div>
+        <div class="sc-role">Chief of Staff<br>Matt Gelbman · EDD</div>
+        <span class="sc-badge officer">EDD</span>
+      </button>
+      <!-- Analysts -->
+      <button class="splash-card analyst" data-splash-role="analyst" data-splash-officer="">
+        <div class="sc-avatar sc-av-analyst">LS</div>
+        <div class="sc-name">Lakshmi Sirisha</div>
+        <div class="sc-role">Program Analyst<br>Program Support</div>
+        <span class="sc-badge analyst">Analyst</span>
+      </button>
+      <button class="splash-card analyst" data-splash-role="analyst" data-splash-officer="">
+        <div class="sc-avatar sc-av-analyst">LK</div>
+        <div class="sc-name">Lexie Kitterman</div>
+        <div class="sc-role">Program Analyst<br>Program Support</div>
+        <span class="sc-badge analyst">Analyst</span>
+      </button>
+    </div>
+    <div class="splash-footer">Private &nbsp;&middot;&nbsp; Data saved in this browser only</div>
+  </div>
+</div>
+
+<!-- Person Detail Modal -->
+<div class="pm-overlay" id="person-modal">
+  <div class="pm-box" id="person-modal-box">
+    <!-- filled dynamically -->
+  </div>
+</div>
+
+<div class="shell">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-left">
+      <div class="tb-gem">&#10024;</div>
+      <div>
+        <div class="tb-title">CoS Program Hub</div>
+        <div class="tb-sub">Alex Labeck's Office &nbsp;&middot;&nbsp; Enterprise &amp; AI Technology</div>
+      </div>
+    </div>
+    <div class="tb-actions">
+      <span class="tb-date" id="tb-date"></span>
+      <button class="tb-btn" id="switch-user-btn" title="Switch user view">&#128100; Switch</button>
+      <button class="tb-btn" id="export-btn">&#11015; Export</button>
+      <button class="tb-btn theme-btn" id="theme-btn" title="Toggle theme">&#9790;</button>
+    </div>
+  </header>
+
+  <!-- ROLE SELECTOR -->
+  <div class="role-bar">
+    <span class="role-label">View as</span>
+    <button class="role-chip active" data-role="alex">&#127775; Alex (All Pillars)</button>
+    <button class="role-chip" data-role="alice">&#128100; Alice (Team Lead)</button>
+    <button class="role-chip" data-role="officer">&#127775; CoS Officer</button>
+    <button class="role-chip" data-role="analyst">&#128202; Analyst</button>
+    <div class="role-spacer"></div>
+    <select class="add-select" id="officer-select" style="display:none;font-size:11px;">
+      <option value="erin">Erin Albert — Roger / DA&amp;O</option>
+      <option value="halley">Halley Ramminger — Andy / SoST</option>
+      <option value="aimee">Aimee Hartman — Dan / CIO</option>
+      <option value="chris">Chris Berg — Matt / EDD</option>
+    </select>
+  </div>
+
+  <div class="content">
+    <!-- TAB BAR -->
+    <div class="tab-bar" id="tab-bar">
+      <button class="tab-btn active" data-tab="home">&#127968; Home</button>
+      <button class="tab-btn" data-tab="team">&#128101; Team <span class="tab-count" id="tc-team">6</span></button>
+      <button class="tab-btn" data-tab="actions">&#9889; Actions <span class="tab-count" id="tc-actions">0</span></button>
+      <button class="tab-btn" data-tab="budget">&#128176; Budget <span class="tab-count" id="tc-budget">0%</span></button>
+      <button class="tab-btn" data-tab="program">&#127919; Program</button>
+    </div>
+
+    <!-- HOME PANEL -->
+    <div class="panel active" id="panel-home">
+      <div class="hero">
+        <div>
+          <div class="hero-eyebrow" id="hero-eyebrow">CHIEF OF STAFF PROGRAM &middot; ALEX'S OFFICE</div>
+          <div class="hero-name" id="hero-name">Good morning, team</div>
+          <div class="hero-date-sub" id="hero-date-sub"></div>
+          <p class="hero-tagline" id="hero-tagline">Cross-pillar CoS command center — actions, budget, team, and program priorities in one view.</p>
+        </div>
+        <div class="hero-kpis">
+          <div class="hkpi"><div class="hkpi-val bloom" id="hkv-actions">—</div><div class="hkpi-label">Open Actions</div></div>
+          <div class="hkpi"><div class="hkpi-val amber" id="hkv-budget">—</div><div class="hkpi-label">Budget Used</div></div>
+          <div class="hkpi"><div class="hkpi-val green" id="hkv-team">7</div><div class="hkpi-label">Team Members</div></div>
+        </div>
+      </div>
+
+      <div class="kpi-row" id="home-kpi-row"></div>
+      <div id="home-budget-section"></div>
+      <div id="home-actions-list"></div>
+
+      <div class="page-footer" id="home-footer">Private · Data saved in this browser only · CoS Program Hub for Alex Labeck's Office</div>
+    </div>
+
+    <!-- TEAM PANEL -->
+    <div class="panel" id="panel-team">
+      <div class="sec-hd">
+        <span class="sec-title">&#128101; CoS Team</span>
+        <span class="sec-pill">6 members</span>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="team-grid" id="team-grid"></div>
+    </div>
+
+    <!-- ACTIONS PANEL -->
+    <div class="panel" id="panel-actions">
+      <div class="sec-hd">
+        <span class="sec-title">&#9889; Program Actions</span>
+        <span class="sec-pill sec-pill-bloom" id="pill-open-actions">0 open</span>
+        <div class="sec-rule"></div>
+        <div class="sec-actions">
+          <button class="tb-btn" id="clear-done-btn">Clear Done</button>
+          <button class="add-btn" id="toggle-add-btn">+ Add</button>
+        </div>
+      </div>
+      <div class="add-row" id="add-row">
+        <input type="text" class="add-input" id="ai-text" placeholder="Add action item…">
+        <select class="add-select" id="ai-priority">
+          <option value="critical">Critical</option><option value="high">High</option>
+          <option value="medium" selected>Medium</option><option value="low">Low</option>
+        </select>
+        <input type="text" class="add-input" id="ai-owner" placeholder="Owner…" style="max-width:130px;">
+        <select class="add-select" id="ai-source">
+          <option value="">Source</option>
+          <option value="Alex">Alex</option><option value="Alice">Alice</option>
+          <option value="Roger">Roger</option><option value="Program">Program</option>
+          <option value="Leadership">Leadership</option><option value="Other">Other</option>
+        </select>
+        <button class="add-btn" id="add-action-btn">Add</button>
+      </div>
+      <div class="ai-list" id="actions-list"></div>
+    </div>
+
+    <!-- BUDGET PANEL -->
+    <div class="panel" id="panel-budget">
+      <div class="sec-hd">
+        <span class="sec-title">&#128176; Budget Tracking</span>
+        <span class="sec-pill sec-pill-amber">FY27</span>
+        <div class="sec-rule"></div>
+        <div class="sec-actions">
+          <button class="add-btn" id="add-cat-btn">+ Add Category</button>
+        </div>
+      </div>
+      <div class="budget-kpi-row">
+        <div class="bk bk-violet"><div class="bk-label">Total Budget</div><div class="bk-val" id="bk-total">$0</div><div class="bk-sub">Across all categories</div></div>
+        <div class="bk bk-amber"><div class="bk-label">Total Spent</div><div class="bk-val" id="bk-spent">$0</div><div class="bk-sub">Actual to date</div></div>
+        <div class="bk bk-green"><div class="bk-label">Remaining</div><div class="bk-val" id="bk-remaining">$0</div><div class="bk-sub" id="bk-pct-sub">0% utilized</div></div>
+      </div>
+      <div class="budget-cats" id="budget-cats"></div>
+    </div>
+
+    <!-- PROGRAM PANEL -->
+    <div class="panel" id="panel-program">
+      <div class="sec-hd"><span class="sec-title">&#127919; Program Priorities</span><div class="sec-rule"></div></div>
+      <div id="program-content"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var IH='inner'+'HTML';
+var SK={actions:'cos-hub-actions',budget:'cos-hub-budget',theme:'cos-hub-theme'};
+function _save(k,d){try{localStorage.setItem(k,JSON.stringify(d));}catch(e){}}
+function _load(k,def){try{var d=JSON.parse(localStorage.getItem(k));return d||def;}catch(e){return def;}}
+function _uid(){return 'id'+Date.now()+Math.random().toString(36).slice(2,7);}
+function _el(tag,cls){var e=document.createElement(tag);if(cls)e.className=cls;return e;}
+function _txt(tag,cls,text){var e=_el(tag,cls);e.textContent=text||'';return e;}
+function _fmt(n){n=n||0;if(n>=1e6)return '$'+(n/1e6).toFixed(1)+'M';if(n>=1e3)return '$'+(n/1e3).toFixed(0)+'K';return '$'+n.toLocaleString();}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ── DATA ── */
+var ALICE={id:'alice',name:'Alice',initials:'AL',role:'Team Lead · CoS Program',pillar:'Alex Labeck — All Pillars',pillarShort:'All Pillars',pillarCls:'sky',avCls:'oc-av-sky',actions:0,budget:0,onTrack:0,isLead:true};
+var OFFICERS=[
+  {id:'erin',   name:'Erin Albert',      initials:'EA',role:'Chief of Staff',pillar:'Roger Williams — DA&O',pillarShort:'DA&O',pillarCls:'violet',avCls:'oc-av-violet',actions:5,budget:72,onTrack:3},
+  {id:'halley', name:'Halley Ramminger', initials:'HR',role:'Chief of Staff',pillar:'Andy White — SoST',   pillarShort:'SoST', pillarCls:'sky',   avCls:'oc-av-sky',   actions:3,budget:58,onTrack:4},
+  {id:'aimee',  name:'Aimee Hartman',    initials:'AH',role:'Chief of Staff',pillar:'Dan Shmitt — CIO',    pillarShort:'CIO',  pillarCls:'bloom', avCls:'oc-av-bloom', actions:6,budget:41,onTrack:2},
+  {id:'chris',  name:'Chris Berg',       initials:'CB',role:'Chief of Staff',pillar:'Matt Gelbman — EDD',  pillarShort:'EDD',  pillarCls:'teal',  avCls:'oc-av-teal',  actions:4,budget:65,onTrack:3}
+];
+var ANALYSTS=[
+  {id:'lakshmi',name:'Lakshmi Sirisha Chikatla',initials:'LS',role:'Program Analyst',pillar:'Program Support',pillarShort:'Analyst',pillarCls:'amber',avCls:'oc-av-amber',actions:2,budget:0,onTrack:2},
+  {id:'lexie',  name:'Lexie Kitterman',         initials:'LK',role:'Program Analyst',pillar:'Program Support',pillarShort:'Analyst',pillarCls:'amber',avCls:'oc-av-amber',actions:1,budget:0,onTrack:1}
+];
+/* Per-officer Pillar Lead expense budget categories */
+var DEF_OFFICER_BUDGETS={
+  erin:[
+    {id:_uid(),name:'T&E — Roger Org',icon:'✈️',budget:0,spent:0},
+    {id:_uid(),name:'Offsite / Events',icon:'🎯',budget:0,spent:0},
+    {id:_uid(),name:'Team Socials',icon:'🎉',budget:0,spent:0},
+    {id:_uid(),name:'Training & Learning',icon:'📚',budget:0,spent:0},
+    {id:_uid(),name:'Misc / Contingency',icon:'🔮',budget:0,spent:0}
+  ],
+  halley:[
+    {id:_uid(),name:'T&E — Andy Org',icon:'✈️',budget:0,spent:0},
+    {id:_uid(),name:'Offsite / Events',icon:'🎯',budget:0,spent:0},
+    {id:_uid(),name:'Team Socials',icon:'🎉',budget:0,spent:0},
+    {id:_uid(),name:'Training & Learning',icon:'📚',budget:0,spent:0},
+    {id:_uid(),name:'Misc / Contingency',icon:'🔮',budget:0,spent:0}
+  ],
+  aimee:[
+    {id:_uid(),name:'T&E — Dan Org',icon:'✈️',budget:0,spent:0},
+    {id:_uid(),name:'Offsite / Events',icon:'🎯',budget:0,spent:0},
+    {id:_uid(),name:'Team Socials',icon:'🎉',budget:0,spent:0},
+    {id:_uid(),name:'Training & Learning',icon:'📚',budget:0,spent:0},
+    {id:_uid(),name:'Misc / Contingency',icon:'🔮',budget:0,spent:0}
+  ],
+  chris:[
+    {id:_uid(),name:'T&E — Matt Org',icon:'✈️',budget:0,spent:0},
+    {id:_uid(),name:'Offsite / Events',icon:'🎯',budget:0,spent:0},
+    {id:_uid(),name:'Team Socials',icon:'🎉',budget:0,spent:0},
+    {id:_uid(),name:'Training & Learning',icon:'📚',budget:0,spent:0},
+    {id:_uid(),name:'Misc / Contingency',icon:'🔮',budget:0,spent:0}
+  ]
+};
+var DEF_ACTIONS=[
+  {id:_uid(),text:'[Sample] Prep cross-pillar readout for Alex — Q2 close summary',priority:'critical',owner:'Erin',source:'Alex',done:false},
+  {id:_uid(),text:'[Sample] Coordinate CoS team standing sync — weekly cadence',priority:'high',owner:'Alice',source:'Program',done:false},
+  {id:_uid(),text:'[Sample] Consolidate all pillar V2MOM status for exec review',priority:'high',owner:'Halley',source:'Alex',done:false},
+  {id:_uid(),text:'[Sample] Track offsites across all four pillars — budget alignment',priority:'medium',owner:'Aimee',source:'Program',done:false},
+  {id:_uid(),text:'[Sample] Draft CoS Program charter for formal adoption ask',priority:'medium',owner:'Chris',source:'Alice',done:false}
+];
+var DEF_BUDGET=[
+  {id:_uid(),name:'T&E — All Pillars',icon:'✈️',budget:0,spent:0},
+  {id:_uid(),name:'Offsites & Events',icon:'🎯',budget:0,spent:0},
+  {id:_uid(),name:'Team Socials',icon:'🎉',budget:0,spent:0},
+  {id:_uid(),name:'Training & Learning',icon:'📚',budget:0,spent:0},
+  {id:_uid(),name:'Program Operations',icon:'⚙️',budget:0,spent:0},
+  {id:_uid(),name:'Misc / Contingency',icon:'🔮',budget:0,spent:0}
+];
+var PROGRAM_PRIORITIES=[
+  {title:'Establish CoS Program Operating Rhythm',owner:'Alice',status:'on-track',progress:65,desc:'Weekly CoS team sync, monthly cross-pillar readout, quarterly exec brief to Alex.'},
+  {title:'FY27 Cross-Pillar Workforce Planning',owner:'Erin',status:'on-track',progress:40,desc:'Coordinating headcount review across all four org pillars for Roger, Andy, Dan, Matt.'},
+  {title:'CoS Team Onboarding & Standards Doc',owner:'Halley',status:'at-risk',progress:25,desc:'Build shared operating standards for new CoS officers. Delayed pending program charter.'},
+  {title:'Annual Program Summit Planning',owner:'Aimee',status:'planned',progress:10,desc:'Planning a joint CoS team offsite for alignment, retrospective, and FY28 priority setting.'},
+  {title:'Executive Operating Cadence — All Pillars',owner:'Chris',status:'on-track',progress:55,desc:'Standardizing MBR/QBR rhythm and exec comms format across all four exec orgs.'}
+];
+
+/* ── STATE ── */
+var SK_OB='cos-hub-officer-budgets';
+var S={
+  actions:_load(SK.actions,DEF_ACTIONS),
+  budget:_load(SK.budget,DEF_BUDGET),
+  officerBudgets:_load(SK_OB,DEF_OFFICER_BUDGETS),
+  role:'alex',
+  officer:'erin'
+};
+
+/* ── THEME ── */
+(function(){
+  var t=localStorage.getItem(SK.theme);
+  if(t==='light') document.body.classList.add('light-mode');
+})();
+document.getElementById('theme-btn').addEventListener('click',function(){
+  var l=document.body.classList.toggle('light-mode');
+  localStorage.setItem(SK.theme,l?'light':'dark');
+  this.textContent=l?'☀':'☽';
+});
+(function(){document.getElementById('theme-btn').textContent=document.body.classList.contains('light-mode')?'☀':'☽';})();
+
+/* ── SWITCH USER ── */
+document.getElementById('switch-user-btn').addEventListener('click',function(){
+  var s=document.getElementById('splash');
+  s.style.display='flex';
+  requestAnimationFrame(function(){s.classList.remove('hidden');});
+});
+
+/* ── DATE ── */
+var _NOW=new Date();
+var _DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var _MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function _dateStr(){return _DAYS[_NOW.getDay()]+', '+_MONTHS[_NOW.getMonth()]+' '+_NOW.getDate()+', '+_NOW.getFullYear();}
+function _greet(){var h=_NOW.getHours();return h<12?'Good morning':'Good afternoon';}
+document.getElementById('tb-date').textContent=_dateStr();
+document.getElementById('hero-date-sub').textContent=_dateStr();
+
+/* ── ROLE SWITCHING ── */
+var ROLE_META={
+  alex:   {eyebrow:'CHIEF OF STAFF PROGRAM · ALL PILLARS',heroClass:'hero-alex',
+    name:_greet()+', Alex',tagline:'Full program view — all four CoS pillars, cross-team actions, budget health, and program priorities.'},
+  alice:  {eyebrow:'TEAM LEAD VIEW · OVERSIGHT',heroClass:'hero-alice',
+    name:_greet()+', Alice',tagline:'Team oversight lens — CoS officer health, cross-pillar actions, and risk flags.'},
+  officer:{eyebrow:'CoS OFFICER VIEW · YOUR PILLAR',heroClass:'hero-officer',
+    name:_greet(),tagline:'Your pillar dashboard — actions, program priorities, and key metrics for your org.'},
+  analyst:{eyebrow:'ANALYST VIEW · PROGRAM SUPPORT',heroClass:'hero-analyst',
+    name:_greet()+', team',tagline:'Program summary — key metrics and open actions across the CoS team.'}
+};
+
+/* role-bar removed — splash is sole entry; no role-chip click handlers needed */
+
+function _applyRole(){
+  var m=ROLE_META[S.role]||ROLE_META.alex;
+  /* hero class */
+  var hero=document.querySelector('.hero');
+  ['hero-alex','hero-alice','hero-officer','hero-analyst'].forEach(function(c){hero.classList.remove(c);});
+  hero.classList.add(m.heroClass);
+  document.getElementById('hero-eyebrow').textContent=m.eyebrow;
+  var nameEl=document.getElementById('hero-name');
+  if(S.role==='officer'){
+    var o=OFFICERS.find(function(x){return x.id===S.officer;})||OFFICERS[0];
+    nameEl.textContent=m.name+', '+o.name.split(' ')[0];
+  } else {
+    nameEl.textContent=m.name;
+  }
+  document.getElementById('hero-tagline').textContent=m.tagline;
+  /* tab visibility */
+  var TABS_BY_ROLE={alex:['home','team','actions','budget','program'],alice:['home','team','actions','budget','program'],officer:['home','actions','budget','program'],analyst:['home','actions']};
+  var allowed=TABS_BY_ROLE[S.role]||TABS_BY_ROLE.alex;
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(function(t){
+    t.style.display=allowed.indexOf(t.dataset.tab)>=0?'':'none';
+  });
+}
+
+/* ── TABS ── */
+var _curTab='home';
+function _switchTab(id){
+  _curTab=id;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===id);});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+id);});
+  if(id==='home') _renderHome();
+  if(id==='team') _renderTeam();
+  if(id==='actions') _renderActions();
+  if(id==='budget') _renderBudget();
+  if(id==='program') _renderProgram();
+}
+document.querySelectorAll('.tab-btn').forEach(function(b){
+  b.addEventListener('click',function(){_switchTab(b.dataset.tab);});
+});
+
+/* ── BADGES ── */
+function _updateBadges(){
+  var open=S.actions.filter(function(a){return !a.done;}).length;
+  document.getElementById('tc-actions').textContent=open;
+  document.getElementById('pill-open-actions').textContent=open+' open';
+  document.getElementById('hkv-actions').textContent=open;
+  var tot=S.budget.reduce(function(s,c){return s+(c.budget||0);},0);
+  var spt=S.budget.reduce(function(s,c){return s+(c.spent||0);},0);
+  var pct=tot>0?Math.round(spt/tot*100):0;
+  document.getElementById('tc-budget').textContent=pct+'%';
+  document.getElementById('hkv-budget').textContent=pct+'%';
+  /* team count: alex/alice see alice + 4 + 2 = 7 */
+  var teamCount=(S.role==='alex'||S.role==='alice')?7:6;
+  var tcTeam=document.getElementById('tc-team');
+  if(tcTeam) tcTeam.textContent=teamCount;
+  var hkvTeam=document.getElementById('hkv-team');
+  if(hkvTeam) hkvTeam.textContent=teamCount;
+}
+
+/* ── HOME ── */
+function _renderHome(){
+  var open=S.actions.filter(function(a){return !a.done;}).length;
+  var tot=S.budget.reduce(function(s,c){return s+(c.budget||0);},0);
+  var spt=S.budget.reduce(function(s,c){return s+(c.spent||0);},0);
+  var pct=tot>0?Math.round(spt/tot*100):0;
+  if(S.role==='alex')     _renderHomeAlex(open,pct,tot,spt);
+  else if(S.role==='alice')   _renderHomeAlice(open,pct,tot,spt);
+  else if(S.role==='officer') _renderHomeOfficer(open,pct);
+  else                        _renderHomeAnalyst(open,pct,tot,spt);
+  _updateBadges();
+}
+
+function _clearHomeZones(){
+  document.getElementById('home-kpi-row')[IH]='';
+  document.getElementById('home-budget-section')[IH]='';
+  document.getElementById('home-actions-list')[IH]='';
+}
+
+function _appendKPI(row,label,val,sub,cls,delay){
+  var card=_el('div','kpi-card '+cls);card.style.animationDelay=delay+'s';
+  card.appendChild(_txt('div','kc-label',label));
+  card.appendChild(_txt('div','kc-val',val));
+  if(sub) card.appendChild(_txt('div','kc-sub',sub));
+  row.appendChild(card);
+}
+
+function _appendActionsStrip(container,limit,showAll){
+  var P_ORDER={critical:0,high:1,medium:2,low:3};
+  var sorted=S.actions.filter(function(a){return !a.done;}).slice()
+    .sort(function(a,b){return (P_ORDER[a.priority]||2)-(P_ORDER[b.priority]||2);}).slice(0,limit||4);
+  if(!sorted.length){
+    var em=_el('div','empty-state');em.textContent='No open actions. All clear!';container.appendChild(em);
+  } else {
+    sorted.forEach(function(item){
+      var row=_el('div','home-action-row');
+      var dot=_el('div','ai-dot '+item.priority);dot.style.flexShrink='0';
+      row.appendChild(dot);row.appendChild(_txt('div','har-text',item.text));
+      if(item.owner) row.appendChild(_txt('span','har-chip',item.owner));
+      if(item.priority==='critical'||item.priority==='high'){
+        var badge=_txt('span','har-chip',item.priority==='critical'?'Critical':'High');
+        badge.style.cssText='background:rgba(244,63,94,0.14);color:var(--tx-bloom);';
+        row.appendChild(badge);
+      }
+      container.appendChild(row);
+    });
+  }
+  if(showAll!==false){
+    var link=_el('span','view-all-link');link.textContent='View All Actions →';
+    link.addEventListener('click',function(){_switchTab('actions');});
+    container.appendChild(link);
+  }
+}
+
+/* ALEX — sees everything: Alice's status + all pillars */
+function _renderHomeAlex(open,pct,tot,spt){
+  _clearHomeZones();
+  var row=document.getElementById('home-kpi-row');
+  var critCount=S.actions.filter(function(a){return !a.done&&a.priority==='critical';}).length;
+  var atRisk=OFFICERS.filter(function(o){return o.budget>=80;}).length;
+  _appendKPI(row,'Open Actions',String(open),critCount>0?critCount+' critical':'Cross-pillar','kc-bloom',0);
+  _appendKPI(row,'Budget Utilized',pct+'%',_fmt(spt)+' of '+_fmt(tot),pct>=80?'kc-amber':'kc-green',0.05);
+  _appendKPI(row,'Team','7','Alice + 4 Officers · 2 Analysts','kc-violet',0.10);
+  _appendKPI(row,'Pillars At Risk',String(atRisk),atRisk>0?'Budget ≥80%':'All healthy',atRisk>0?'kc-amber':'kc-green',0.15);
+
+  var bsec=document.getElementById('home-budget-section');
+
+  /* ── Alice's status row (Alex sees what Alice is working on) ── */
+  var ahd2=_el('div','sec-hd');
+  ahd2.appendChild(_txt('span','sec-title','Alice\'s Status'));
+  ahd2.appendChild(_txt('span','sec-pill sec-pill-amber','Team Lead'));
+  var aliceLink=_txt('span','view-all-link','View Alice\'s Profile →');
+  aliceLink.addEventListener('click',function(){_openPersonModal('alice');});
+  ahd2.appendChild(aliceLink);
+  ahd2.appendChild(_el('div','sec-rule'));
+  bsec.appendChild(ahd2);
+  var aliceCard=_el('div','pc clickable');
+  aliceCard.title='View Alice\'s details';
+  aliceCard.addEventListener('click',function(){_openPersonModal('alice');});
+  aliceCard.style.cssText='display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px;cursor:pointer;';
+  var highPri=S.actions.filter(function(a){return !a.done&&(a.priority==='critical'||a.priority==='high');}).length;
+  var aliceItems=[
+    {label:'High/Critical',val:String(highPri),color:'var(--tx-bloom)'},
+    {label:'Total Open',val:String(open),color:'var(--tx-violet)'},
+    {label:'Officers Tracked',val:'4',color:'var(--tx-sky)'},
+    {label:'Program Status',val:'Active',color:'var(--tx-green)'}
+  ];
+  aliceItems.forEach(function(ai){
+    var st=_el('div','ohc-stat');st.style.cssText='flex:1;min-width:90px;';
+    var sv=_txt('div','ohc-stat-val',ai.val);sv.style.color=ai.color;
+    st.appendChild(sv);st.appendChild(_txt('div','ohc-stat-lbl',ai.label));
+    aliceCard.appendChild(st);
+  });
+  /* Alice's top action */
+  var aliceNote=_el('div','');
+  aliceNote.style.cssText='flex-basis:100%;font-size:11px;color:var(--ink-muted);padding:10px 12px;background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);border-radius:8px;margin-top:4px;';
+  aliceNote.textContent='Alice is actively tracking '+open+' open program actions across all 4 CoS pillars — '+highPri+' flagged high/critical priority.';
+  aliceCard.appendChild(aliceNote);
+  bsec.appendChild(aliceCard);
+
+  /* ── Risk strip ── */
+  var strip=_el('div','risk-strip');
+  [{cls:open>3?'red':'green',icon:open>3?'⚠':'✓',text:open+' open actions'},
+   {cls:atRisk>0?'amber':'green',icon:atRisk>0?'⚡':'✓',text:atRisk+' pillar'+(atRisk!==1?'s':'')+' at budget risk'},
+   {cls:'green',icon:'●',text:'4 CoS Officers active'},
+   {cls:'green',icon:'●',text:'Program rhythm active'}
+  ].forEach(function(r){
+    var chip=_el('div','risk-chip '+r.cls);chip.textContent=r.icon+' '+r.text;strip.appendChild(chip);
+  });
+  bsec.appendChild(strip);
+
+  /* ── Pillar health grid ── */
+  var phd=_el('div','sec-hd');phd.appendChild(_txt('span','sec-title','Pillar Health Overview'));phd.appendChild(_el('div','sec-rule'));
+  bsec.appendChild(phd);
+  var COLORS=['var(--tx-violet)','var(--tx-sky)','var(--tx-bloom)','var(--tx-teal)'];
+  var grid=_el('div','pillar-grid');
+  OFFICERS.forEach(function(o,i){
+    var pc=_el('div','pc clickable');
+    pc.title='View '+o.name.split(' ')[0]+'\'s details';
+    pc.addEventListener('click',(function(id){return function(){_openPersonModal(id);};})(o.id));
+    var top=_el('div','pc-top');
+    var av=_el('div','pc-av '+o.avCls);av.textContent=o.initials;top.appendChild(av);
+    var info=_el('div','pc-info');
+    info.appendChild(_txt('div','pc-name',o.name.split(' ')[0]+' '+o.name.split(' ')[1]));
+    info.appendChild(_txt('div','pc-pillar',o.pillarShort));
+    top.appendChild(info);pc.appendChild(top);
+    var health=_el('div','pc-health-row');
+    [{label:'Budget',pct:o.budget,color:o.budget>=80?'var(--tx-amber)':'var(--tx-green)'},
+     {label:'Actions',pct:Math.min(100,o.actions*15),color:o.actions>4?'var(--tx-bloom)':'var(--tx-violet)'},
+     {label:'On Track',pct:o.onTrack>0?(o.onTrack/Math.max(1,o.actions)*100):100,color:COLORS[i]}
+    ].forEach(function(r){
+      var hr=_el('div','pc-hrow');
+      hr.appendChild(_txt('div','pc-hlabel',r.label));
+      var tr=_el('div','pc-bar-track');var fl=_el('div','pc-bar-fill');
+      fl.style.width=Math.min(100,Math.max(0,r.pct))+'%';fl.style.background=r.color;
+      tr.appendChild(fl);hr.appendChild(tr);
+      hr.appendChild(_txt('div','pc-hval',Math.round(r.pct)+'%'));
+      health.appendChild(hr);
+    });
+    pc.appendChild(health);grid.appendChild(pc);
+  });
+  bsec.appendChild(grid);
+
+  /* ── Top open actions ── */
+  var ac=document.getElementById('home-actions-list');
+  var ahd=_el('div','sec-hd');ahd.appendChild(_txt('span','sec-title','Top Open Actions'));
+  ahd.appendChild(_txt('span','sec-pill sec-pill-bloom',open+' open'));ahd.appendChild(_el('div','sec-rule'));
+  ac.appendChild(ahd);
+  _appendActionsStrip(ac,5,true);
+}
+
+/* ALICE — officer-style card view, team lead lens */
+function _renderHomeAlice(open,pct,tot,spt){
+  _clearHomeZones();
+  var row=document.getElementById('home-kpi-row');
+  var highPri=S.actions.filter(function(a){return !a.done&&(a.priority==='critical'||a.priority==='high');}).length;
+  var atRisk=OFFICERS.filter(function(o){return o.budget>=80;}).length;
+  _appendKPI(row,'Open Actions',String(open),highPri+' high/critical','kc-bloom',0);
+  _appendKPI(row,'Budget Pace',pct+'%',_fmt(spt)+' spent',pct>=80?'kc-amber':'kc-green',0.05);
+  _appendKPI(row,'Officers Tracked','4','DA&O · SoST · CIO · EDD','kc-violet',0.10);
+  _appendKPI(row,'At Risk',String(atRisk),atRisk>0?'Pillar budget ≥80%':'All pillars healthy',atRisk>0?'kc-amber':'kc-green',0.15);
+
+  var bsec=document.getElementById('home-budget-section');
+
+  /* Alice's own scope card — mirrors officer-home-card style */
+  var ohc=_el('div','officer-home-card');
+  var ohct=_txt('div','ohc-title','Alice · All Pillars Oversight');ohc.appendChild(ohct);
+  var stats=_el('div','ohc-stats');
+  [{val:String(open),lbl:'Open Actions',color:open>5?'var(--tx-bloom)':'var(--tx-violet)'},
+   {val:'4',lbl:'Officers Tracked',color:'var(--tx-sky)'},
+   {val:String(OFFICERS.filter(function(o){return o.budget<80;}).length)+'/4',lbl:'On Budget',color:'var(--tx-green)'}
+  ].forEach(function(s){
+    var st=_el('div','ohc-stat');
+    var sv=_txt('div','ohc-stat-val',s.val);sv.style.color=s.color;
+    st.appendChild(sv);st.appendChild(_txt('div','ohc-stat-lbl',s.lbl));stats.appendChild(st);
+  });
+  ohc.appendChild(stats);
+  var aliceNote=_txt('div','','Overseeing all 4 CoS pillars — '+highPri+' action'+(highPri!==1?'s':'')+' flagged high/critical priority across the program.');
+  aliceNote.style.cssText='font-size:11px;color:var(--ink-muted);margin-top:8px;line-height:1.55;';
+  ohc.appendChild(aliceNote);
+  bsec.appendChild(ohc);
+
+  /* Pillar health grid — same as Alex's but Alice-scoped */
+  var phd=_el('div','sec-hd');phd.appendChild(_txt('span','sec-title','Officer Pillar Health'));phd.appendChild(_el('div','sec-rule'));
+  bsec.appendChild(phd);
+  var COLORS=['var(--tx-violet)','var(--tx-sky)','var(--tx-bloom)','var(--tx-teal)'];
+  var grid=_el('div','pillar-grid');
+  OFFICERS.forEach(function(o,i){
+    var pc=_el('div','pc clickable');
+    pc.title='View '+o.name.split(' ')[0]+'\'s details';
+    pc.addEventListener('click',(function(id){return function(){_openPersonModal(id);};})(o.id));
+    var top=_el('div','pc-top');
+    var av=_el('div','pc-av '+o.avCls);av.textContent=o.initials;top.appendChild(av);
+    var info=_el('div','pc-info');
+    info.appendChild(_txt('div','pc-name',o.name.split(' ')[0]+' '+o.name.split(' ')[1]));
+    info.appendChild(_txt('div','pc-pillar',o.pillarShort));
+    top.appendChild(info);pc.appendChild(top);
+    var health=_el('div','pc-health-row');
+    [{label:'Budget',pct:o.budget,color:o.budget>=80?'var(--tx-amber)':'var(--tx-green)'},
+     {label:'Actions',pct:Math.min(100,o.actions*15),color:o.actions>4?'var(--tx-bloom)':'var(--tx-violet)'},
+     {label:'On Track',pct:o.onTrack>0?(o.onTrack/Math.max(1,o.actions)*100):100,color:COLORS[i]}
+    ].forEach(function(r){
+      var hr=_el('div','pc-hrow');
+      hr.appendChild(_txt('div','pc-hlabel',r.label));
+      var tr=_el('div','pc-bar-track');var fl=_el('div','pc-bar-fill');
+      fl.style.width=Math.min(100,Math.max(0,r.pct))+'%';fl.style.background=r.color;
+      tr.appendChild(fl);hr.appendChild(tr);
+      hr.appendChild(_txt('div','pc-hval',Math.round(r.pct)+'%'));
+      health.appendChild(hr);
+    });
+    pc.appendChild(health);grid.appendChild(pc);
+  });
+  bsec.appendChild(grid);
+
+  /* Top actions strip */
+  var ahd=_el('div','sec-hd');ahd.appendChild(_txt('span','sec-title','Priority Actions'));
+  ahd.appendChild(_txt('span','sec-pill sec-pill-bloom',open+' open'));ahd.appendChild(_el('div','sec-rule'));
+  var ac=document.getElementById('home-actions-list');ac.appendChild(ahd);
+  _appendActionsStrip(ac,4,true);
+}
+
+/* OFFICER — pillar-specific view */
+function _renderHomeOfficer(open,pct){
+  _clearHomeZones();
+  var o=OFFICERS.find(function(x){return x.id===S.officer;})||OFFICERS[0];
+  var row=document.getElementById('home-kpi-row');
+  _appendKPI(row,'My Actions',String(o.actions),'Assigned to you','kc-bloom',0);
+  _appendKPI(row,'Budget Pace',o.budget+'%','Org spend rate',o.budget>=80?'kc-amber':'kc-green',0.05);
+  _appendKPI(row,'On Track',String(o.onTrack),'Initiatives on schedule','kc-violet',0.10);
+  _appendKPI(row,'My Exec',o.pillar.split(' — ')[0],'Your org: '+o.pillarShort,'kc-green',0.15);
+
+  var bsec=document.getElementById('home-budget-section');
+  var ohc=_el('div','officer-home-card');
+  var ohct=_txt('div','ohc-title',o.name+' · '+o.pillarShort+' Pillar');ohc.appendChild(ohct);
+  var stats=_el('div','ohc-stats');
+  [{val:String(o.actions),lbl:'Open Actions'},{val:o.budget+'%',lbl:'Budget Used'},{val:String(o.onTrack),lbl:'On Track'}]
+    .forEach(function(s){
+      var st=_el('div','ohc-stat');
+      var sv=_txt('div','ohc-stat-val',s.val);
+      sv.style.color=s.lbl==='Budget Used'&&o.budget>=80?'var(--tx-amber)':'var(--tx-violet)';
+      st.appendChild(sv);st.appendChild(_txt('div','ohc-stat-lbl',s.lbl));stats.appendChild(st);
+    });
+  ohc.appendChild(stats);
+
+  var pl=_txt('div','','Exec: '+o.pillar);pl.style.cssText='font-size:11px;color:var(--ink-muted);margin-top:4px;';
+  ohc.appendChild(pl);bsec.appendChild(ohc);
+
+  var ahd=_el('div','sec-hd');ahd.appendChild(_txt('span','sec-title','Your Action Items'));
+  ahd.appendChild(_txt('span','sec-pill sec-pill-bloom',open+' program open'));ahd.appendChild(_el('div','sec-rule'));
+  var ac=document.getElementById('home-actions-list');ac.appendChild(ahd);
+  _appendActionsStrip(ac,5,true);
+}
+
+/* ANALYST — summary only */
+function _renderHomeAnalyst(open,pct,tot,spt){
+  _clearHomeZones();
+  var row=document.getElementById('home-kpi-row');
+  _appendKPI(row,'Program Actions',String(open),'Open across all pillars','kc-bloom',0);
+  _appendKPI(row,'Budget Pace',pct+'%',_fmt(spt)+' of '+_fmt(tot),pct>=80?'kc-amber':'kc-green',0.05);
+  _appendKPI(row,'Team Size','6','4 CoS Officers + 2 Analysts','kc-violet',0.10);
+  _appendKPI(row,'Pillars','4','DA&O · SoST · CIO · EDD','kc-green',0.15);
+
+  var bsec=document.getElementById('home-budget-section');
+  var banner=_el('div','analyst-banner');
+  var ic=_el('div','ab-icon');ic.textContent='📊';banner.appendChild(ic);
+  var btxt=_txt('div','','Summary view — you can see program actions and key metrics. Contact Alice or an Officer for detailed pillar data.');
+  banner.appendChild(btxt);bsec.appendChild(banner);
+
+  var ahd=_el('div','sec-hd');ahd.appendChild(_txt('span','sec-title','Open Actions'));
+  ahd.appendChild(_txt('span','sec-pill sec-pill-bloom',open+' open'));ahd.appendChild(_el('div','sec-rule'));
+  var ac=document.getElementById('home-actions-list');ac.appendChild(ahd);
+  _appendActionsStrip(ac,3,false);
+}
+
+/* ── TEAM ── */
+function _renderTeam(){
+  var grid=document.getElementById('team-grid');
+  grid[IH]='';
+  /* Alex sees Alice at top; everyone else sees officers + analysts */
+  var showAlice=(S.role==='alex'||S.role==='alice');
+  var members=[];
+  if(showAlice) members.push(ALICE);
+  members=members.concat(OFFICERS).concat(ANALYSTS);
+  members.forEach(function(m,i){
+    var isAnalyst=m.pillarShort==='Analyst';
+    var isLead=!!m.isLead;
+    var card=_el('div','officer-card clickable'+(isAnalyst?' analyst-card':''));
+    card.style.animationDelay=(i*0.05)+'s';
+    card.addEventListener('click',function(){_openPersonModal(m.id);});
+    var top=_el('div','oc-top');
+    var av=_el('div','oc-avatar '+m.avCls);av.textContent=m.initials;
+    top.appendChild(av);
+    var info=_el('div','oc-info');
+    info.appendChild(_txt('div','oc-name',m.name));
+    info.appendChild(_txt('div','oc-role',m.role));
+    var pillarEl=_txt('div','oc-pillar '+m.pillarCls,m.pillarShort);
+    info.appendChild(pillarEl);
+    top.appendChild(info);
+    card.appendChild(top);
+    if(isLead){
+      var note=_txt('div','kc-sub','Oversees all 4 CoS officers · cross-pillar program lead');
+      note.style.marginTop='8px';note.style.fontSize='11px';card.appendChild(note);
+    } else if(!isAnalyst){
+      var stats=_el('div','oc-stats');
+      [{val:String(m.actions),lbl:'Actions'},{val:m.budget+'%',lbl:'Budget'},{val:String(m.onTrack),lbl:'On Track'}]
+        .forEach(function(s){
+          var st=_el('div','oc-stat');
+          st.appendChild(_txt('div','oc-stat-val',s.val));
+          st.appendChild(_txt('div','oc-stat-lbl',s.lbl));
+          stats.appendChild(st);
+        });
+      card.appendChild(stats);
+    } else {
+      var note2=_txt('div','kc-sub',m.pillar);
+      note2.style.marginTop='8px';note2.style.fontSize='11px';
+      card.appendChild(note2);
+    }
+    grid.appendChild(card);
+  });
+}
+
+/* ── ACTIONS ── */
+var P_ORDER={critical:0,high:1,medium:2,low:3};
+var P_LABELS={critical:'Critical',high:'High',medium:'Medium',low:'Low'};
+
+document.getElementById('toggle-add-btn').addEventListener('click',function(){
+  var row=document.getElementById('add-row');
+  row.classList.toggle('open');
+  this.textContent=row.classList.contains('open')?'— Hide':'+ Add';
+});
+document.getElementById('add-action-btn').addEventListener('click',_addAction);
+document.getElementById('ai-text').addEventListener('keydown',function(e){if(e.key==='Enter')_addAction();});
+document.getElementById('clear-done-btn').addEventListener('click',function(){
+  S.actions=S.actions.filter(function(a){return !a.done;});
+  _save(SK.actions,S.actions);_renderActions();
+});
+
+function _renderActions(){
+  var list=document.getElementById('actions-list');
+  list[IH]='';
+  var items=S.actions.slice().sort(function(a,b){
+    if(a.done!==b.done) return a.done?1:-1;
+    return (P_ORDER[a.priority]||2)-(P_ORDER[b.priority]||2);
+  });
+  var open=items.filter(function(i){return !i.done;}).length;
+  document.getElementById('pill-open-actions').textContent=open+' open';
+  document.getElementById('tc-actions').textContent=open;
+  if(!items.length){list[IH]='<div class="empty-state">No actions yet — click "+ Add".</div>';_updateBadges();return;}
+  items.forEach(function(item){
+    var row=_el('div','ai-item'+(item.done?' done':''));
+    var chk=_el('div','ai-check'+(item.done?' checked':''));
+    if(item.done) chk.textContent='✓';
+    chk.addEventListener('click',(function(id){return function(){_toggleAction(id);};})(item.id));
+    var dot=_el('div','ai-dot '+item.priority);
+    var body=_el('div','ai-body');
+    body.appendChild(_txt('div','ai-label',item.text));
+    var meta=_el('div','ai-meta');
+    if(item.owner) meta.appendChild(_txt('span','ai-chip owner',item.owner));
+    if(item.source) meta.appendChild(_txt('span','ai-chip source','via '+item.source));
+    body.appendChild(meta);
+    var badge=_txt('span','ai-pri '+(item.priority||'medium'),P_LABELS[item.priority]||'Medium');
+    var del=_el('button','ai-del');del.textContent='×';
+    del.addEventListener('click',(function(id){return function(){_deleteAction(id);};})(item.id));
+    row.appendChild(chk);row.appendChild(dot);row.appendChild(body);row.appendChild(badge);row.appendChild(del);
+    list.appendChild(row);
+  });
+  _updateBadges();
+}
+
+function _addAction(){
+  var txt=document.getElementById('ai-text').value.trim();
+  if(!txt) return;
+  S.actions.push({id:_uid(),text:txt,
+    priority:document.getElementById('ai-priority').value,
+    owner:document.getElementById('ai-owner').value.trim(),
+    source:document.getElementById('ai-source').value,
+    done:false});
+  _save(SK.actions,S.actions);
+  document.getElementById('ai-text').value='';
+  document.getElementById('ai-owner').value='';
+  _renderActions();
+}
+function _toggleAction(id){
+  var a=S.actions.find(function(x){return x.id===id;});
+  if(a){a.done=!a.done;_save(SK.actions,S.actions);_renderActions();}
+}
+function _deleteAction(id){
+  S.actions=S.actions.filter(function(a){return a.id!==id;});
+  _save(SK.actions,S.actions);_renderActions();
+}
+
+/* ── BUDGET ── */
+document.getElementById('add-cat-btn').addEventListener('click',function(){
+  document.getElementById('cat-modal').classList.add('open');
+});
+document.getElementById('cat-modal-cancel').addEventListener('click',function(){
+  document.getElementById('cat-modal').classList.remove('open');
+});
+document.getElementById('cat-modal-save').addEventListener('click',_saveCatModal);
+
+var DONUT_COLORS=['#A855F7','#F43F5E','#38BDF8','#34D399','#FBBF24','#E879F9','#2DD4BF','#F97316'];
+
+function _renderDonut(cats){
+  var SIZE=130,CX=65,CY=65,R=48,SW=14;
+  var circ=2*Math.PI*R;
+  var tot=cats.reduce(function(s,c){return s+(c.budget||0);},0);
+  var ns=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  ns.setAttribute('width',SIZE);ns.setAttribute('height',SIZE);ns.setAttribute('viewBox','0 0 '+SIZE+' '+SIZE);
+  ns.setAttribute('role','img');ns.setAttribute('aria-label','Budget allocation donut chart');
+  /* background circle */
+  var bg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  bg.setAttribute('cx',CX);bg.setAttribute('cy',CY);bg.setAttribute('r',R);
+  bg.setAttribute('fill','none');bg.setAttribute('stroke','rgba(255,255,255,0.06)');bg.setAttribute('stroke-width',SW);
+  ns.appendChild(bg);
+  if(tot>0){
+    var offset=0;
+    cats.forEach(function(cat,i){
+      var share=(cat.budget||0)/tot;
+      if(share<=0) return;
+      var dashLen=circ*share;
+      var dashOff=circ*(1-share)-offset*(circ/cats.length*0);
+      var seg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      seg.setAttribute('cx',CX);seg.setAttribute('cy',CY);seg.setAttribute('r',R);
+      seg.setAttribute('fill','none');seg.setAttribute('stroke',DONUT_COLORS[i%DONUT_COLORS.length]);
+      seg.setAttribute('stroke-width',SW);
+      seg.setAttribute('stroke-dasharray',dashLen+' '+circ);
+      seg.setAttribute('stroke-dashoffset',-(offset));
+      seg.setAttribute('stroke-linecap','round');
+      seg.setAttribute('transform','rotate(-90 '+CX+' '+CY+')');
+      seg.style.transition='stroke-dasharray 0.55s cubic-bezier(0.16,1,0.3,1)';
+      ns.appendChild(seg);
+      offset+=dashLen;
+    });
+  } else {
+    var ph=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ph.setAttribute('cx',CX);ph.setAttribute('cy',CY);ph.setAttribute('r',R);
+    ph.setAttribute('fill','none');ph.setAttribute('stroke','rgba(168,85,247,0.22)');ph.setAttribute('stroke-width',SW);
+    ph.setAttribute('stroke-dasharray','60 '+circ);ph.setAttribute('transform','rotate(-90 '+CX+' '+CY+')');
+    ns.appendChild(ph);
+  }
+  /* center label */
+  var pct=tot>0?Math.round(cats.reduce(function(s,c){return s+(c.spent||0);},0)/tot*100):0;
+  var ct=document.createElementNS('http://www.w3.org/2000/svg','text');
+  ct.setAttribute('x',CX);ct.setAttribute('y',CY+1);ct.setAttribute('text-anchor','middle');
+  ct.setAttribute('dominant-baseline','middle');ct.setAttribute('font-size','18');ct.setAttribute('font-weight','900');
+  ct.setAttribute('fill',pct>=80?'#FBBF24':'#C084FC');ct.textContent=pct+'%';
+  ns.appendChild(ct);
+  var cl=document.createElementNS('http://www.w3.org/2000/svg','text');
+  cl.setAttribute('x',CX);cl.setAttribute('y',CY+16);cl.setAttribute('text-anchor','middle');
+  cl.setAttribute('dominant-baseline','middle');cl.setAttribute('font-size','8');
+  cl.setAttribute('fill','rgba(255,255,255,0.45)');cl.textContent='USED';
+  ns.appendChild(cl);
+  return ns;
+}
+
+function _renderBudgetCats(cats,container,editable,saveKey,saveObj){
+  cats.forEach(function(cat){
+    var p=cat.budget>0?Math.round((cat.spent||0)/cat.budget*100):0;
+    var cls=p>=100?'over':p>=80?'warn':'good';
+    var card=_el('div','bc-item');
+    var top=_el('div','bc-top');
+    top.appendChild(_txt('span','bc-icon',cat.icon||'💰'));
+    top.appendChild(_txt('div','bc-name',cat.name));
+    top.appendChild(_txt('span','bc-pct '+cls,(cat.budget>0?p+'%':'—')));
+    card.appendChild(top);
+    var tr=_el('div','bc-track');
+    var fl=_el('div','bc-fill '+cls);fl.style.width=Math.min(p,100)+'%';
+    tr.appendChild(fl);card.appendChild(tr);
+    var bot=_el('div','bc-bottom');
+    bot.appendChild(_txt('span','',_fmt(cat.spent||0)+' spent'));
+    bot.appendChild(_txt('span','',cat.budget>0?_fmt(Math.max(0,(cat.budget||0)-(cat.spent||0)))+' remaining':'No budget set'));
+    card.appendChild(bot);
+    if(editable){
+      var er=_el('div','bc-edit-row');er.id='bce-'+cat.id;
+      var bi=_el('input','bc-input');bi.type='number';bi.value=String(cat.budget||0);bi.placeholder='Budget $';bi.id='bceb-'+cat.id;
+      var si=_el('input','bc-input');si.type='number';si.value=String(cat.spent||0);si.placeholder='Spent $';si.id='bces-'+cat.id;
+      var sv=_txt('button','bc-save-btn','Save');
+      sv.addEventListener('click',(function(cid){return function(){
+        var c=saveObj.find(function(x){return x.id===cid;});
+        if(c){c.budget=parseFloat(document.getElementById('bceb-'+cid).value)||0;c.spent=parseFloat(document.getElementById('bces-'+cid).value)||0;_save(saveKey,saveObj);_renderBudget();}
+      };})(cat.id));
+      var cx=_txt('button','bc-cancel-btn','Cancel');
+      cx.addEventListener('click',(function(cid){return function(){document.getElementById('bce-'+cid).classList.remove('open');};})(cat.id));
+      var dl=_txt('button','bc-del-btn','Delete');
+      dl.addEventListener('click',(function(cid){return function(){
+        var idx=saveObj.findIndex(function(x){return x.id===cid;});
+        if(idx>=0){saveObj.splice(idx,1);_save(saveKey,saveObj);_renderBudget();}
+      };})(cat.id));
+      er.appendChild(bi);er.appendChild(si);er.appendChild(sv);er.appendChild(cx);er.appendChild(dl);
+      card.appendChild(er);
+      var acts=_el('div','bc-actions');
+      var eb=_txt('button','tb-btn','✎ Edit');
+      eb.addEventListener('click',(function(cid){return function(){document.getElementById('bce-'+cid).classList.add('open');};})(cat.id));
+      acts.appendChild(eb);card.appendChild(acts);
+    }
+    container.appendChild(card);
+  });
+}
+
+function _renderOfficerBudgetSection(o,container,editable){
+  var cats=S.officerBudgets[o.id]||[];
+  var obTot=cats.reduce(function(s,c){return s+(c.budget||0);},0);
+  var obSpt=cats.reduce(function(s,c){return s+(c.spent||0);},0);
+  var obPct=obTot>0?Math.round(obSpt/obTot*100):0;
+  /* section header */
+  var hd=_el('div','sec-hd');
+  var av=_el('div','oc-avatar '+o.avCls);av.textContent=o.initials;
+  av.style.cssText='width:28px;height:28px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;';
+  hd.appendChild(av);
+  hd.appendChild(_txt('span','sec-title',o.name.split(' ')[0]+' · '+o.pillarShort));
+  var pctBadge=_txt('span','sec-pill'+(obPct>=80?' sec-pill-amber':obPct===0?'':' sec-pill-green'),obPct+'%');
+  hd.appendChild(pctBadge);hd.appendChild(_el('div','sec-rule'));
+  container.appendChild(hd);
+  /* mini KPI strip */
+  var strip=_el('div','');strip.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;';
+  [{lbl:'Budget',val:_fmt(obTot),color:'var(--tx-violet)'},{lbl:'Spent',val:_fmt(obSpt),color:obPct>=80?'var(--tx-amber)':'var(--tx-green)'},{lbl:'Remaining',val:_fmt(Math.max(0,obTot-obSpt)),color:'var(--tx-sky)'}].forEach(function(k){
+    var kc=_el('div','bk');kc.style.cssText='background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;';
+    var kv=_txt('div','',k.val);kv.style.cssText='font-size:16px;font-weight:900;font-family:var(--mono);color:'+k.color+';';
+    var kl=_txt('div','bk-label',k.lbl);
+    kc.appendChild(kl);kc.appendChild(kv);strip.appendChild(kc);
+  });
+  container.appendChild(strip);
+  /* category grid */
+  var grid=_el('div','budget-cats');grid.style.marginBottom='6px';
+  if(cats.length===0){
+    var em=_txt('div','empty-state',editable?'No categories yet — click "+ Add Category" to set up this pillar\'s expense budget.':'No budget categories set up yet.');
+    grid.appendChild(em);
+  } else {
+    _renderBudgetCats(cats,grid,editable,SK_OB,S.officerBudgets[o.id]);
+  }
+  container.appendChild(grid);
+  if(editable){
+    var addBtn=_el('button','add-btn');addBtn.style.marginBottom='20px';addBtn.textContent='+ Add Category';
+    addBtn.addEventListener('click',function(){
+      if(!S.officerBudgets[o.id]) S.officerBudgets[o.id]=[];
+      S.officerBudgets[o.id].push({id:_uid(),name:'New Category',icon:'💰',budget:0,spent:0});
+      _save(SK_OB,S.officerBudgets);_renderBudget();
+    });
+    container.appendChild(addBtn);
+  }
+}
+
+function _renderBudget(){
+  var container=document.getElementById('budget-cats');
+  container[IH]='';
+
+  if(S.role==='officer'){
+    /* Officer sees ONLY their own pillar budget — no program budget */
+    var o=OFFICERS.find(function(x){return x.id===S.officer;})||OFFICERS[0];
+    /* hide the program KPI strip and add-cat button — not relevant for officer view */
+    document.querySelector('.budget-kpi-row').style.display='none';
+    document.getElementById('add-cat-btn').style.display='none';
+    _renderOfficerBudgetSection(o,container,true);
+  } else {
+    /* Alex & Alice — show all 4 pillar budgets, then program budget below */
+    document.querySelector('.budget-kpi-row').style.display='';
+    document.getElementById('add-cat-btn').style.display=S.role==='alex'?'':'none';
+    var isEdit=(S.role==='alex');
+    /* all 4 officer budgets */
+    var phd=_el('div','sec-hd');phd.appendChild(_txt('span','sec-title','Pillar Lead Expense Budgets'));phd.appendChild(_el('div','sec-rule'));
+    container.appendChild(phd);
+    OFFICERS.forEach(function(o){_renderOfficerBudgetSection(o,container,isEdit);});
+    /* divider */
+    var div=_el('div','sec-hd');div.style.marginTop='8px';
+    div.appendChild(_txt('span','sec-title','Program Budget'));div.appendChild(_txt('span','sec-pill sec-pill-amber','Shared'));div.appendChild(_el('div','sec-rule'));
+    container.appendChild(div);
+    /* program KPI strip values */
+    var tot=S.budget.reduce(function(s,c){return s+(c.budget||0);},0);
+    var spt=S.budget.reduce(function(s,c){return s+(c.spent||0);},0);
+    var pct=tot>0?Math.round(spt/tot*100):0;
+    document.getElementById('bk-total').textContent=_fmt(tot);
+    document.getElementById('bk-spent').textContent=_fmt(spt);
+    document.getElementById('bk-remaining').textContent=_fmt(tot-spt);
+    document.getElementById('bk-pct-sub').textContent=pct+'% utilized';
+    /* donut */
+    if(S.budget.length>0&&tot>0){
+      var dsec=_el('div','donut-section');
+      dsec.appendChild(_renderDonut(S.budget));
+      var leg=_el('div','donut-legend');
+      S.budget.forEach(function(cat,i){
+        var share=tot>0?Math.round((cat.budget||0)/tot*100):0;
+        var dlr=_el('div','dl-row');
+        var dd=_el('div','dl-dot');dd.style.background=DONUT_COLORS[i%DONUT_COLORS.length];
+        dlr.appendChild(dd);dlr.appendChild(_txt('span','dl-label',(cat.icon||'')+' '+cat.name));
+        dlr.appendChild(_txt('span','dl-amt',_fmt(cat.budget||0)));
+        var dpc=_txt('span','dl-pct',share+'%');dpc.style.color=DONUT_COLORS[i%DONUT_COLORS.length];
+        dlr.appendChild(dpc);leg.appendChild(dlr);
+      });
+      dsec.appendChild(leg);container.appendChild(dsec);
+    }
+    _renderBudgetCats(S.budget,container,isEdit,SK.budget,S.budget);
+    /* analyst: read-only, no add button */
+  }
+  _updateBadges();
+}
+function _saveCatModal(){
+  var name=document.getElementById('mc-name').value.trim();
+  if(!name) return;
+  S.budget.push({id:_uid(),name:name,
+    icon:document.getElementById('mc-icon').value.trim()||'💰',
+    budget:parseFloat(document.getElementById('mc-budget').value)||0,
+    spent:parseFloat(document.getElementById('mc-spent').value)||0});
+  _save(SK.budget,S.budget);
+  document.getElementById('cat-modal').classList.remove('open');
+  ['mc-name','mc-icon','mc-budget','mc-spent'].forEach(function(id){document.getElementById(id).value='';});
+  _renderBudget();
+}
+
+/* ── PROGRAM ── */
+function _renderProgram(){
+  var SM={
+    'on-track':{cls:'sec-pill-green',label:'On Track'},
+    'at-risk':{cls:'sec-pill-amber',label:'At Risk'},
+    'blocked':{cls:'sec-pill sec-pill-bloom',label:'Blocked'},
+    'planned':{cls:'sec-pill',label:'Planned'},
+    'complete':{cls:'sec-pill-green',label:'Complete'}
+  };
+  var FILL={'on-track':'var(--green)','at-risk':'var(--amber)','blocked':'var(--red)','planned':'rgba(255,255,255,0.15)','complete':'var(--teal)'};
+  var container=document.getElementById('program-content');
+  container[IH]='';
+  PROGRAM_PRIORITIES.forEach(function(p,i){
+    var sm=SM[p.status]||SM['planned'];
+    var pct=Math.min(100,Math.max(0,p.progress||0));
+    var card=_el('div','home-card');card.style.animationDelay=(i*0.06)+'s';
+    var hd=_el('div','sec-hd');
+    hd.appendChild(_txt('div','sec-title',p.title));
+    hd.appendChild(_txt('span','sec-pill '+sm.cls,sm.label));
+    hd.appendChild(_txt('span','sec-pill',p.owner));
+    card.appendChild(hd);
+    var desc=_txt('p','',p.desc);
+    desc.style.cssText='font-size:12px;color:var(--ink-muted);line-height:1.65;margin-bottom:12px;';
+    card.appendChild(desc);
+    var bar=_el('div','bbar-track');bar.style.height='6px';
+    var fill=_el('div','bbar-fill');fill.style.width=pct+'%';fill.style.background=FILL[p.status]||'var(--violet)';
+    bar.appendChild(fill);card.appendChild(bar);
+    var sub=_txt('div','kc-sub',pct+'% complete');sub.style.marginTop='6px';
+    card.appendChild(sub);
+    container.appendChild(card);
+  });
+}
+
+/* ── PERSON MODAL ── */
+var HERO_BGS={
+  violet:'linear-gradient(135deg,#1a0e40 0%,#2d1d78 50%,#3b1a6e 100%)',
+  sky:   'linear-gradient(135deg,#080e28 0%,#0f2a5e 50%,#1a3d80 100%)',
+  bloom: 'linear-gradient(135deg,#2a0818 0%,#5e1040 50%,#8c1050 100%)',
+  teal:  'linear-gradient(135deg,#071a14 0%,#0a3428 50%,#0d4a38 100%)',
+  amber: 'linear-gradient(135deg,#1a1000 0%,#3a2800 50%,#4a3800 100%)'
+};
+var DONUT_COLORS_PM=['#A855F7','#F43F5E','#38BDF8','#34D399','#FBBF24','#E879F9','#2DD4BF'];
+
+function _allMembers(){return [ALICE].concat(OFFICERS).concat(ANALYSTS);}
+
+function _openPersonModal(id){
+  var m=_allMembers().find(function(x){return x.id===id;});
+  if(!m) return;
+  var canEdit=(S.role==='alex');
+  var canSeeAll=(S.role==='alex'||S.role==='alice');
+  var box=document.getElementById('person-modal-box');
+  box[IH]='';
+
+  /* hero */
+  var bg=HERO_BGS[m.pillarCls]||HERO_BGS.violet;
+  var hero=_el('div','pm-hero');
+  hero.style.background=bg;
+  var inner=_el('div','pm-hero-inner');
+  var av=_el('div','pm-av '+m.avCls);av.textContent=m.initials;
+  var meta=_el('div','pm-meta');
+  meta.appendChild(_txt('div','pm-name',m.name));
+  meta.appendChild(_txt('div','pm-role',m.role));
+  var tags=_el('div','pm-tags');
+  var pt=_txt('span','pm-tag',m.pillarShort);tags.appendChild(pt);
+  if(m.isLead) tags.appendChild(_txt('span','pm-tag','Team Lead'));
+  if(m.pillar&&!m.isLead) tags.appendChild(_txt('span','pm-tag','CoS to '+m.pillar.split(' — ')[0]));
+  meta.appendChild(tags);
+  inner.appendChild(av);inner.appendChild(meta);hero.appendChild(inner);
+  var closeBtn=_el('button','pm-close');closeBtn.textContent='×';
+  closeBtn.addEventListener('click',_closePersonModal);
+  hero.appendChild(closeBtn);
+  box.appendChild(hero);
+
+  var body=_el('div','pm-body');
+
+  /* KPI row — only for officers/analysts with data */
+  if(!m.isLead){
+    var krow=_el('div','pm-kpi-row');
+    var kdata=[];
+    if(m.pillarShort!=='Analyst'){
+      var obCats=(S.officerBudgets[m.id]||[]);
+      var obTot=obCats.reduce(function(s,c){return s+(c.budget||0);},0);
+      var obSpt=obCats.reduce(function(s,c){return s+(c.spent||0);},0);
+      var obPct=obTot>0?Math.round(obSpt/obTot*100):0;
+      kdata=[
+        {val:String(m.actions),lbl:'Actions',color:'var(--tx-bloom)'},
+        {val:obPct+'%',lbl:'Budget Used',color:obPct>=80?'var(--tx-amber)':'var(--tx-green)'},
+        {val:String(m.onTrack)+'/'+String(m.actions),lbl:'On Track',color:'var(--tx-violet)'}
+      ];
+    } else {
+      kdata=[
+        {val:String(m.actions),lbl:'Actions',color:'var(--tx-bloom)'},
+        {val:String(m.onTrack),lbl:'On Track',color:'var(--tx-green)'},
+        {val:'Analyst',lbl:'Role Type',color:'var(--tx-amber)'}
+      ];
+    }
+    kdata.forEach(function(k){
+      var kc=_el('div','pm-kpi');
+      var kv=_txt('div','pm-kpi-val',k.val);kv.style.color=k.color;
+      kc.appendChild(kv);kc.appendChild(_txt('div','pm-kpi-lbl',k.lbl));
+      krow.appendChild(kc);
+    });
+    body.appendChild(krow);
+  }
+
+  /* Pillar lead expense budget — officers only, visible to alex/alice/the officer themselves */
+  var showBudget=!m.isLead&&m.pillarShort!=='Analyst'&&(canSeeAll||(S.role==='officer'&&S.officer===m.id));
+  if(showBudget){
+    var bsec=_el('div','pm-sec');
+    var bst=_el('div','pm-sec-title');bst.textContent='Pillar Lead Expense Budget';
+    bsec.appendChild(bst);
+    var obCats2=(S.officerBudgets[m.id]||[]);
+    var obTot2=obCats2.reduce(function(s,c){return s+(c.budget||0);},0);
+    var obSpt2=obCats2.reduce(function(s,c){return s+(c.spent||0);},0);
+    /* mini KPI strip */
+    var bstrip=_el('div','');
+    bstrip.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;';
+    [{lbl:'Total Budget',val:_fmt(obTot2),color:'var(--tx-violet)'},
+     {lbl:'Spent to Date',val:_fmt(obSpt2),color:obSpt2/Math.max(1,obTot2)>=0.8?'var(--tx-amber)':'var(--tx-green)'},
+     {lbl:'Remaining',val:_fmt(Math.max(0,obTot2-obSpt2)),color:'var(--tx-sky)'}
+    ].forEach(function(k){
+      var kc=_el('div','pm-kpi');
+      var kv=_txt('div','pm-kpi-val',k.val);kv.style.color=k.color;kv.style.fontSize='16px';
+      kc.appendChild(kv);kc.appendChild(_txt('div','pm-kpi-lbl',k.lbl));
+      bstrip.appendChild(kc);
+    });
+    bsec.appendChild(bstrip);
+    /* category bars */
+    obCats2.forEach(function(cat,ci){
+      var p=cat.budget>0?Math.round((cat.spent||0)/cat.budget*100):0;
+      var fcls=p>=100?'var(--red)':p>=80?'var(--amber)':'var(--green)';
+      var bc=_el('div','pm-bcat');
+      var bt=_el('div','pm-bcat-top');
+      bt.appendChild(_txt('span','pm-bcat-icon',cat.icon||'💰'));
+      bt.appendChild(_txt('div','pm-bcat-name',cat.name));
+      var pctEl=_txt('span','pm-bcat-pct',cat.budget>0?p+'%':'—');
+      pctEl.style.color=fcls;bt.appendChild(pctEl);
+      bc.appendChild(bt);
+      var tr=_el('div','pm-bcat-track');
+      var fl=_el('div','pm-bcat-fill');fl.style.width=Math.min(p,100)+'%';fl.style.background=fcls;
+      tr.appendChild(fl);bc.appendChild(tr);
+      var foot=_el('div','pm-bcat-foot');
+      foot.appendChild(_txt('span','',_fmt(cat.spent||0)+' spent'));
+      foot.appendChild(_txt('span','',cat.budget>0?_fmt(Math.max(0,(cat.budget||0)-(cat.spent||0)))+' remaining':'No budget set'));
+      bc.appendChild(foot);
+      if(canEdit){
+        var er=_el('div','pm-bcat-edit');er.id='pmbce-'+m.id+'-'+cat.id;
+        var bl=_txt('span','','Budget $:');bl.style.cssText='font-size:9px;font-weight:700;color:var(--ink-muted);';
+        var bi=_el('input','pm-input');bi.type='number';bi.value=String(cat.budget||0);bi.id='pmbceb-'+m.id+'-'+cat.id;
+        var sl=_txt('span','','Spent $:');sl.style.cssText='font-size:9px;font-weight:700;color:var(--ink-muted);';
+        var si=_el('input','pm-input');si.type='number';si.value=String(cat.spent||0);si.id='pmbces-'+m.id+'-'+cat.id;
+        var sv=_txt('button','pm-save-btn','Save');
+        sv.addEventListener('click',(function(mid,cid){return function(){_saveOfficerBudgetCat(mid,cid);_openPersonModal(mid);};})(m.id,cat.id));
+        er.appendChild(bl);er.appendChild(bi);er.appendChild(sl);er.appendChild(si);er.appendChild(sv);
+        bc.appendChild(er);
+        var eb=_el('button','');
+        eb.style.cssText='background:none;border:1px solid var(--border-soft);border-radius:5px;color:var(--ink-muted);font-size:10px;cursor:pointer;padding:3px 9px;margin-top:6px;font-family:var(--font);';
+        eb.textContent='✎ Edit';
+        eb.addEventListener('click',(function(mid,cid){return function(){document.getElementById('pmbce-'+mid+'-'+cid).classList.toggle('open');};})(m.id,cat.id));
+        bc.appendChild(eb);
+      }
+      bsec.appendChild(bc);
+    });
+    if(canEdit){
+      var addBtn=_el('button','pm-add-budget-btn');
+      addBtn.textContent='+ Add Budget Category';
+      addBtn.addEventListener('click',function(){_addOfficerBudgetCat(m.id);});
+      bsec.appendChild(addBtn);
+    }
+    body.appendChild(bsec);
+  }
+
+  /* Actions assigned to this person */
+  var myActions=S.actions.filter(function(a){return !a.done&&a.owner&&a.owner.toLowerCase().indexOf(m.name.split(' ')[0].toLowerCase())>=0;});
+  if(myActions.length>0||(canSeeAll&&!m.isLead)){
+    var asec=_el('div','pm-sec');
+    var ast=_el('div','pm-sec-title');ast.textContent='Open Actions';asec.appendChild(ast);
+    if(myActions.length>0){
+      myActions.slice(0,5).forEach(function(a){
+        var ar=_el('div','pm-action-row');
+        var dot=_el('div','ai-dot '+a.priority);dot.style.flexShrink='0';
+        ar.appendChild(dot);ar.appendChild(_txt('span','pm-action-text',a.text));
+        var badge=_txt('span','ai-pri '+(a.priority||'medium'),(a.priority||'medium').charAt(0).toUpperCase()+(a.priority||'medium').slice(1));
+        ar.appendChild(badge);asec.appendChild(ar);
+      });
+    } else {
+      asec.appendChild(_txt('div','empty-state','No open actions assigned to this person.'));
+    }
+    body.appendChild(asec);
+  }
+
+  /* Pillar info for leads / analysts */
+  if(m.isLead||m.pillarShort==='Analyst'){
+    var psec=_el('div','pm-sec');
+    var pst=_el('div','pm-sec-title');pst.textContent=m.isLead?'Program Scope':'Support Scope';psec.appendChild(pst);
+    var pinfo=_txt('p','',m.isLead
+      ?'Alice oversees all 4 CoS officers across DA&O, SoST, CIO, and EDD pillars. She monitors cross-pillar actions, risk flags, and program health on behalf of Alex.'
+      :'Program analyst supporting the CoS team with data, reporting, and operational tasks.');
+    pinfo.style.cssText='font-size:12px;color:var(--ink-muted);line-height:1.6;';
+    psec.appendChild(pinfo);body.appendChild(psec);
+  }
+
+  box.appendChild(body);
+  document.getElementById('person-modal').classList.add('open');
+  document.getElementById('person-modal').scrollTop=0;
+}
+
+function _closePersonModal(){
+  document.getElementById('person-modal').classList.remove('open');
+}
+document.getElementById('person-modal').addEventListener('click',function(e){
+  if(e.target===this) _closePersonModal();
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') _closePersonModal();
+});
+
+function _saveOfficerBudgetCat(mid,cid){
+  var cats=S.officerBudgets[mid];if(!cats) return;
+  var cat=cats.find(function(c){return c.id===cid;});if(!cat) return;
+  cat.budget=parseFloat(document.getElementById('pmbceb-'+mid+'-'+cid).value)||0;
+  cat.spent=parseFloat(document.getElementById('pmbces-'+mid+'-'+cid).value)||0;
+  _save(SK_OB,S.officerBudgets);
+}
+function _addOfficerBudgetCat(mid){
+  if(!S.officerBudgets[mid]) S.officerBudgets[mid]=[];
+  S.officerBudgets[mid].push({id:_uid(),name:'New Category',icon:'💰',budget:0,spent:0});
+  _save(SK_OB,S.officerBudgets);
+  _openPersonModal(mid);
+}
+
+/* ── EXPORT ── */
+document.getElementById('export-btn').addEventListener('click',function(){
+  var now=new Date();
+  var lines=['CoS PROGRAM HUB — SNAPSHOT','Alex Labeck\'s Office · Enterprise & AI Technology','Exported: '+now.toLocaleDateString(),''];
+  lines.push('=== ACTION ITEMS ===');
+  S.actions.forEach(function(a){
+    lines.push((a.done?'✓':'○')+' ['+String(a.priority||'').toUpperCase()+'] '+a.text+(a.owner?' | '+a.owner:''));
+  });
+  lines.push('');lines.push('=== BUDGET ===');
+  var tot=S.budget.reduce(function(s,c){return s+(c.budget||0);},0);
+  var spt=S.budget.reduce(function(s,c){return s+(c.spent||0);},0);
+  lines.push('Total: '+_fmt(tot)+' | Spent: '+_fmt(spt)+' | Remaining: '+_fmt(tot-spt));
+  S.budget.forEach(function(c){
+    var p=c.budget>0?Math.round((c.spent||0)/c.budget*100):0;
+    lines.push('  '+c.name+': '+_fmt(c.spent||0)+' / '+_fmt(c.budget||0)+' ('+p+'%)');
+  });
+  lines.push('');lines.push('=== CoS TEAM ===');
+  OFFICERS.forEach(function(o){lines.push('  '+o.name+' · CoS to '+o.pillar);});
+  ANALYSTS.forEach(function(a){lines.push('  '+a.name+' · '+a.role);});
+  var blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  var link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download='CoS_Hub_Snapshot_'+now.toISOString().slice(0,10)+'.txt';
+  link.click();
+});
+
+/* ── SPLASH ── */
+function _enterHub(role,officer){
+  S.role=role||'alex';
+  if(officer) S.officer=officer;
+  _applyRole();_renderHome();_renderActions();_renderBudget();
+  var s=document.getElementById('splash');
+  s.classList.add('hidden');
+  setTimeout(function(){s.style.display='none';},420);
+}
+
+(function(){
+  document.querySelectorAll('[data-splash-role]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var role=btn.dataset.splashRole;
+      var officer=btn.dataset.splashOfficer||'';
+      _enterHub(role,officer||null);
+    });
+  });
+
+  /* always show splash on load — no session persistence, fresh pick each time */
+  _applyRole();_renderHome();_renderActions();_renderBudget();
+})();
+</script>
+</body>
+</html>
