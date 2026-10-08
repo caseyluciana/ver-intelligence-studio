@@ -7,8 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 /* ─────────────────────────────────────────────────────────────────
    DESIGN TOKENS
@@ -1636,7 +1634,7 @@ function downloadEstimate() {
 }
 
 /* ================================================================
-   DOCUMENT PARSING — PDF.js + Mammoth.js
+   DOCUMENT PARSING — zero CDN dependencies
 ================================================================ */
 
 /* Build a flat keyword→role map for matching */
@@ -1802,52 +1800,114 @@ function processExtractedText(text) {
 }
 
 function parsePdf(file) {
-  if (typeof pdfjsLib === 'undefined') {
-    showParseStatus('error', 'PDF library not loaded — check your connection and try again.');
-    return;
-  }
   showParseStatus('parsing', 'Reading PDF…');
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
   var reader = new FileReader();
   reader.onload = function(e) {
-    var typedArray = new Uint8Array(e.target.result);
-    pdfjsLib.getDocument({ data: typedArray }).promise.then(function(pdf) {
-      var pagePromises = [];
-      for (var p = 1; p <= Math.min(pdf.numPages, 20); p++) {
-        pagePromises.push(pdf.getPage(p).then(function(page) {
-          return page.getTextContent().then(function(tc) {
-            return tc.items.map(function(item) { return item.str; }).join(' ');
-          });
-        }));
-      }
-      Promise.all(pagePromises).then(function(pages) {
-        processExtractedText(pages.join('\n'));
+    try {
+      var arr = new Uint8Array(e.target.result);
+      var raw = '';
+      for (var i = 0; i < arr.length; i++) raw += String.fromCharCode(arr[i]);
+      var text = '';
+      var pat = /\(([^)\\]*(?:\\.[^)\\]*)*)\)\s*Tj|\[([^\]]*)\]\s*TJ/g;
+      raw.replace(pat, function(match, g1, g2) {
+        var chunk = (g1 !== undefined) ? g1 : (g2 || '');
+        chunk = chunk
+          .replace(/\\([0-7]{3})/g, function(_, o) { return String.fromCharCode(parseInt(o, 8)); })
+          .replace(/\\[nrt]/g, ' ')
+          .replace(/\\\\/g, '\\').replace(/\\\)/g, ')').replace(/\\\(/g, '(')
+          .replace(/-?[0-9]+/g, ' ');
+        text += chunk + ' ';
+        return match;
       });
-    }).catch(function(err) {
-      showParseStatus('error', 'Could not read PDF: ' + err.message);
-    });
+      text = text.replace(/[^ -~\s]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (text.length < 30) {
+        showParseStatus('error', 'No selectable text found — PDF may be scanned/image-only. Paste scope manually.');
+        return;
+      }
+      processExtractedText(text);
+    } catch(err) {
+      showParseStatus('error', 'Could not parse PDF: ' + err.message);
+    }
   };
   reader.onerror = function() { showParseStatus('error', 'Failed to read file.'); };
   reader.readAsArrayBuffer(file);
 }
 
 function parseDocx(file) {
-  if (typeof mammoth === 'undefined') {
-    showParseStatus('error', 'Word library not loaded — check your connection and try again.');
-    return;
-  }
   showParseStatus('parsing', 'Reading Word document…');
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    mammoth.extractRawText({ arrayBuffer: e.target.result }).then(function(result) {
-      processExtractedText(result.value);
-    }).catch(function(err) {
-      showParseStatus('error', 'Could not read document: ' + err.message);
-    });
-  };
-  reader.onerror = function() { showParseStatus('error', 'Failed to read file.'); };
-  reader.readAsArrayBuffer(file);
+  file.arrayBuffer().then(function(buf) {
+    return unzipDocxAsync(new Uint8Array(buf));
+  }).then(function(text) {
+    if (!text || text.length < 10) {
+      showParseStatus('error', 'Could not extract text from this Word document.');
+      return;
+    }
+    processExtractedText(text);
+  }).catch(function(err) {
+    showParseStatus('error', 'Could not parse document: ' + err.message);
+  });
+}
+
+function unzipDocxAsync(bytes) {
+  return new Promise(function(resolve, reject) {
+    var i = 0;
+    while (i < bytes.length - 30) {
+      if (bytes[i]===0x50 && bytes[i+1]===0x4B && bytes[i+2]===0x03 && bytes[i+3]===0x04) {
+        var method   = bytes[i+8]  | (bytes[i+9]  << 8);
+        var cSize    = bytes[i+18] | (bytes[i+19] << 8) | (bytes[i+20] << 16) | (bytes[i+21] << 24);
+        var nameLen  = bytes[i+26] | (bytes[i+27] << 8);
+        var extraLen = bytes[i+28] | (bytes[i+29] << 8);
+        var nb = bytes.slice(i+30, i+30+nameLen);
+        var name = '';
+        for (var n = 0; n < nb.length; n++) name += String.fromCharCode(nb[n]);
+        var dStart = i + 30 + nameLen + extraLen;
+
+        if (name === 'word/document.xml') {
+          var xmlBytes = bytes.slice(dStart, dStart + cSize);
+          if (method === 0) {
+            var s = '';
+            for (var b = 0; b < xmlBytes.length; b++) s += String.fromCharCode(xmlBytes[b]);
+            resolve(xmlToText(s));
+            return;
+          } else if (method === 8 && typeof DecompressionStream !== 'undefined') {
+            var ds = new DecompressionStream('deflate-raw');
+            var w  = ds.writable.getWriter();
+            var r  = ds.readable.getReader();
+            var parts = [];
+            w.write(xmlBytes); w.close();
+            (function pump() {
+              r.read().then(function(chunk) {
+                if (chunk.done) {
+                  var total = 0;
+                  for (var c = 0; c < parts.length; c++) total += parts[c].length;
+                  var merged = new Uint8Array(total), off = 0;
+                  for (var c = 0; c < parts.length; c++) { merged.set(parts[c], off); off += parts[c].length; }
+                  resolve(xmlToText(new TextDecoder('utf-8',{fatal:false}).decode(merged)));
+                } else {
+                  parts.push(chunk.value); pump();
+                }
+              }).catch(reject);
+            })();
+            return;
+          } else {
+            reject(new Error('Unsupported compression — save as .docx and retry.'));
+            return;
+          }
+        }
+        i = dStart + cSize;
+      } else { i++; }
+    }
+    reject(new Error('word/document.xml not found in ZIP.'));
+  });
+}
+
+function xmlToText(xml) {
+  return xml
+    .replace(/<w:p[ >]/g, '\n<')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+    .replace(/\s+/g,' ').trim();
 }
 
 function handleDocFile(file) {
