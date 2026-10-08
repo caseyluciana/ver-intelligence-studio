@@ -1635,74 +1635,77 @@ function downloadEstimate() {
 
 /* ================================================================
    DOCUMENT PARSING — zero CDN dependencies
+   Wrapped in try-catch so any failure never breaks the core app
 ================================================================ */
 
-/* Build a flat keyword→role map for matching */
-var ROLE_KEYWORDS = (function() {
+var ROLE_KEYWORDS = null;
+
+function initRoleKeywords() {
+  if (ROLE_KEYWORDS) return;
   var map = [];
   var roleNames = Object.keys(RATES);
   for (var i = 0; i < roleNames.length; i++) {
     var r = roleNames[i];
-    var keywords = r.toLowerCase()
-      .replace(/[^a-z0-9 /]/g, ' ')
-      .split(/\s+/)
-      .filter(function(w) { return w.length > 3; });
-    map.push({ role: r, keywords: keywords });
+    var kws = [];
+    var parts = r.toLowerCase().split(/[\s\/\-]+/);
+    for (var p = 0; p < parts.length; p++) {
+      if (parts[p].length > 3) kws.push(parts[p]);
+    }
+    map.push({ role: r, keywords: kws });
   }
-  /* Also index category labels */
   var catKeywords = {
-    'AI/ML & Data':          ['machine learning','artificial intelligence','data science','data engineer','analytics','nlp','llm','model','pipeline','etl','snowflake','warehouse','dbt'],
-    'Cloud & Engineering':   ['cloud','aws','azure','gcp','kubernetes','terraform','devops','infrastructure','security','ci/cd','deployment'],
-    'Contingent Workforce':  ['contingent','contractor','staffing','staff augmentation','cw '],
-    'ERP & Workday':         ['workday','hcm','erp','human capital','finance','fins','integration'],
-    'Managed Services':      ['managed services','help desk','helpdesk','service desk','support','l1','l2','tier 1','tier 2','system admin'],
+    'AI/ML & Data':          ['machine learning','data science','data engineer','analytics','pipeline','snowflake','warehouse'],
+    'Cloud & Engineering':   ['cloud','devops','kubernetes','terraform','infrastructure','deployment'],
+    'Contingent Workforce':  ['contingent','contractor','staffing','augmentation'],
+    'ERP & Workday':         ['workday','erp','human capital','finance','integration'],
+    'Managed Services':      ['managed services','helpdesk','service desk','support','system admin'],
     'Professional Services': ['consulting','strategy','advisory','transformation','assessment'],
-    'Project Management':    ['project manager','scrum','agile','product manager','delivery','sprint','roadmap','governance','pmo'],
-    'Software Engineering':  ['software engineer','full stack','frontend','backend','api','microservice','architect','react','node','java','python'],
-    'Strategic Consulting':  ['vendor manager','vendor management','sourcing','procurement','strategic']
+    'Project Management':    ['project manager','scrum','agile','product manager','delivery','roadmap'],
+    'Software Engineering':  ['software engineer','full stack','frontend','backend','microservice','architect'],
+    'Strategic Consulting':  ['vendor manager','sourcing','procurement','strategic']
   };
-  return { roles: map, cats: catKeywords };
-})();
+  ROLE_KEYWORDS = { roles: map, cats: catKeywords };
+}
 
 function findMatchingRoles(text) {
-  var lower = text.toLowerCase();
-  var scores = {};
+  try {
+    initRoleKeywords();
+    if (!ROLE_KEYWORDS) return [];
+    var lower = text.toLowerCase();
+    var scores = {};
 
-  /* Score each role */
-  for (var i = 0; i < ROLE_KEYWORDS.roles.length; i++) {
-    var entry = ROLE_KEYWORDS.roles[i];
-    var score = 0;
-    for (var k = 0; k < entry.keywords.length; k++) {
-      if (lower.indexOf(entry.keywords[k]) !== -1) score++;
+    for (var i = 0; i < ROLE_KEYWORDS.roles.length; i++) {
+      var entry = ROLE_KEYWORDS.roles[i];
+      var score = 0;
+      for (var k = 0; k < entry.keywords.length; k++) {
+        if (lower.indexOf(entry.keywords[k]) !== -1) score++;
+      }
+      if (score > 0) scores[entry.role] = score;
     }
-    if (score > 0) scores[entry.role] = score;
-  }
 
-  /* Boost via category keywords */
-  var catKeys = Object.keys(ROLE_KEYWORDS.cats);
-  for (var c = 0; c < catKeys.length; c++) {
-    var catLabel = catKeys[c];
-    var catKws = ROLE_KEYWORDS.cats[catLabel];
-    var catHit = false;
-    for (var j = 0; j < catKws.length; j++) {
-      if (lower.indexOf(catKws[j]) !== -1) { catHit = true; break; }
-    }
-    if (catHit) {
-      /* find which category this label maps to */
-      for (var ci = 0; ci < CATEGORIES.length; ci++) {
-        if (CATEGORIES[ci].label === catLabel) {
-          var catRoles = CATEGORIES[ci].roles;
-          for (var ri = 0; ri < catRoles.length; ri++) {
-            scores[catRoles[ri]] = (scores[catRoles[ri]] || 0) + 0.5;
+    var catKeys = Object.keys(ROLE_KEYWORDS.cats);
+    for (var c = 0; c < catKeys.length; c++) {
+      var catLabel = catKeys[c];
+      var catKws = ROLE_KEYWORDS.cats[catLabel];
+      var catHit = false;
+      for (var j = 0; j < catKws.length; j++) {
+        if (lower.indexOf(catKws[j]) !== -1) { catHit = true; break; }
+      }
+      if (catHit) {
+        for (var ci = 0; ci < CATEGORIES.length; ci++) {
+          if (CATEGORIES[ci].label === catLabel) {
+            var catRoles = CATEGORIES[ci].roles;
+            for (var ri = 0; ri < catRoles.length; ri++) {
+              scores[catRoles[ri]] = (scores[catRoles[ri]] || 0) + 0.5;
+            }
           }
         }
       }
     }
-  }
 
-  /* Sort by score, return top 8 */
-  var sorted = Object.keys(scores).sort(function(a, b) { return scores[b] - scores[a]; });
-  return sorted.slice(0, 8);
+    var sorted = Object.keys(scores).sort(function(a, b) { return scores[b] - scores[a]; });
+    return sorted.slice(0, 8);
+  } catch(e) { return []; }
 }
 
 function getCategoryForRole(roleName) {
@@ -1912,15 +1915,18 @@ function xmlToText(xml) {
 
 function handleDocFile(file) {
   if (!file) return;
-  /* Hide previous suggestions */
-  byId('doc-suggestions').classList.remove('visible');
-  var name = file.name.toLowerCase();
-  if (name.endsWith('.pdf')) {
-    parsePdf(file);
-  } else if (name.endsWith('.docx')) {
-    parseDocx(file);
-  } else {
-    showParseStatus('error', 'Only PDF and Word (.docx) files are supported.');
+  try {
+    byId('doc-suggestions').classList.remove('visible');
+    var name = file.name.toLowerCase();
+    if (name.slice(-4) === '.pdf') {
+      parsePdf(file);
+    } else if (name.slice(-5) === '.docx') {
+      parseDocx(file);
+    } else {
+      showParseStatus('error', 'Only PDF and Word (.docx) files are supported.');
+    }
+  } catch(err) {
+    showParseStatus('error', 'Upload error: ' + err.message);
   }
 }
 
@@ -1956,7 +1962,10 @@ document.addEventListener('click', function(ev) {
 /* Document upload wiring */
 var docFileInput = byId('doc-file-input');
 docFileInput.addEventListener('change', function(ev) {
-  handleDocFile(ev.target.files[0]);
+  try {
+    var f = ev.target.files && ev.target.files[0];
+    if (f) handleDocFile(f);
+  } catch(e) { /* never break core app */ }
   ev.target.value = '';
 });
 
