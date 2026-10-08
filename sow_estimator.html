@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SOW Cost Estimator · VER Intelligence Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────────────────────────────── */
+:root {
+  --bg: #06040f;
+  --bg2: #0e0b1e;
+  --violet: #A855F7;
+  --violet-bright: #C084FC;
+  --violet-dim: rgba(168,85,247,0.65);
+  --sky: #38BDF8;
+  --teal: #2DD4BF;
+  --amber: #FBBF24;
+  --green: #34D399;
+  --rose: #F87171;
+  --ink: #f0eeff;
+  --ink-muted: rgba(240,238,255,0.65);
+  --ink-faint: rgba(240,238,255,0.35);
+  --border: rgba(168,85,247,0.18);
+  --border-soft: rgba(168,85,247,0.10);
+  --card: rgba(255,255,255,0.04);
+  --card-hover: rgba(255,255,255,0.07);
+  --surface: rgba(255,255,255,0.035);
+  --mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   RESET & BASE
+───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; scroll-behavior: smooth; }
+body {
+  min-height: 100vh;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(168,85,247,0.13) 0%, transparent 50%),
+    radial-gradient(ellipse at 88% 75%, rgba(56,189,248,0.09) 0%, transparent 48%),
+    radial-gradient(ellipse at 50% 95%, rgba(45,212,191,0.07) 0%, transparent 45%);
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(168,85,247,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168,85,247,0.03) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.scan-line {
+  position: fixed; left: 0; right: 0; height: 200px; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.022) 50%, transparent 100%);
+  animation: scanMove 14s linear infinite; will-change: transform;
+}
+@keyframes scanMove { from { transform: translateY(-200px) } to { transform: translateY(110vh) } }
+@keyframes rise { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(32px) scale(0.97) } to { opacity: 1; transform: translateY(0) scale(1) } }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1) } 50% { opacity:0.4; transform:scale(0.7) } }
+
+/* ─────────────────────────────────────────────────────────────────
+   SHELL & TOPBAR
+───────────────────────────────────────────────────────────────── */
+.shell { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar {
+  position: sticky; top: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 0 clamp(16px, 3vw, 40px); height: 56px;
+  background: rgba(6,4,15,0.90); border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+}
+.tb-left { display: flex; align-items: center; gap: 10px; }
+.tb-gem {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--violet), #6D28D9);
+  display: grid; place-items: center; font-size: 16px;
+  box-shadow: 0 0 16px rgba(168,85,247,0.42);
+}
+.tb-title { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+.tb-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-faint); }
+.tb-sub { font-size: 11px; color: var(--ink-muted); }
+.tb-right { display: flex; align-items: center; gap: 8px; }
+.tb-badge {
+  display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px;
+  background: rgba(168,85,247,0.12); border: 1px solid var(--border);
+  font-size: 10px; font-weight: 700; color: var(--violet-bright);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.tb-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--violet); animation: pulse 2.5s ease-in-out infinite; }
+
+/* ─────────────────────────────────────────────────────────────────
+   HERO
+───────────────────────────────────────────────────────────────── */
+.hero {
+  padding: 32px clamp(16px,3vw,40px) 28px;
+  background: linear-gradient(135deg, #0d0920 0%, #160e35 40%, #1a0e42 65%, #0d0920 100%);
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -80px; right: 80px; width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(168,85,247,0.16), transparent 68%);
+  pointer-events: none;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -60px; left: 30%; width: 420px; height: 240px;
+  background: radial-gradient(ellipse, rgba(56,189,248,0.10), transparent 68%);
+  pointer-events: none;
+}
+.hero-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; }
+.hero-eyebrow {
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--violet-bright); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.hero-eyebrow::before { content: ''; display: block; width: 20px; height: 1px; background: var(--violet); }
+.hero-title {
+  font-size: clamp(22px, 3.5vw, 32px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.15;
+  background: linear-gradient(90deg, #fff 0%, var(--violet-bright) 60%, var(--sky) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 8px;
+}
+.hero-sub { font-size: 13px; color: var(--ink-muted); line-height: 1.65; max-width: 540px; }
+
+/* ─────────────────────────────────────────────────────────────────
+   MAIN
+───────────────────────────────────────────────────────────────── */
+.main { flex: 1; padding: 28px clamp(16px,3vw,40px) 60px; }
+.inner { max-width: 860px; margin: 0 auto; }
+
+#phase-form { animation: rise 0.35s var(--ease) both; }
+#phase-results { display: none; animation: slideUp 0.45s var(--ease) both; }
+
+/* ─────────────────────────────────────────────────────────────────
+   FORM COMPONENTS
+───────────────────────────────────────────────────────────────── */
+.form-section {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; margin-bottom: 16px;
+}
+.form-section-title {
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--violet-bright); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.form-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid.full  { grid-template-columns: 1fr; }
+@media (max-width: 640px) { .form-grid, .form-grid.three { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+input[type="text"], input[type="number"], textarea, select {
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--ink); padding: 10px 13px;
+  outline: none; transition: border-color 0.18s, background 0.18s;
+  width: 100%; appearance: none; -webkit-appearance: none;
+}
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+  border-color: var(--violet); background: rgba(168,85,247,0.07);
+}
+input::placeholder, textarea::placeholder { color: var(--ink-faint); }
+textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+select option { background: #1a1035; color: var(--ink); }
+select optgroup { color: var(--violet-bright); font-size: 11px; font-weight: 700; }
+
+/* ─────────────────────────────────────────────────────────────────
+   ROLE TABLE
+───────────────────────────────────────────────────────────────── */
+.role-table-wrap { overflow-x: auto; }
+.role-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 600px; }
+.role-table th {
+  text-align: left; padding: 8px 10px;
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink-faint); border-bottom: 1px solid var(--border);
+}
+.role-table td { padding: 6px 6px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+.role-table tr:last-child td { border-bottom: none; }
+.role-table tr:hover td { background: var(--card-hover); }
+.role-table td select, .role-table td input { font-size: 12px; padding: 7px 9px; }
+.role-table td:nth-child(1) { min-width: 210px; }
+.role-table td:nth-child(2) { min-width: 130px; }
+.role-table td:nth-child(3) { width: 72px; }
+.role-table td:last-child  { width: 50px; }
+
+.rate-cell { display: flex; flex-direction: column; gap: 3px; }
+.rate-val  { font-family: var(--mono); font-size: 11px; color: var(--sky); }
+.rate-edit-link {
+  font-size: 9px; color: var(--violet-dim); cursor: pointer; text-decoration: underline;
+  background: none; border: none; padding: 0; font-family: inherit;
+}
+.rate-override-row { display: none; margin-top: 3px; align-items: center; gap: 5px; }
+.rate-override-row.visible { display: flex; }
+.rate-override-row input { width: 70px; padding: 4px 7px; font-size: 11px; }
+.custom-badge {
+  font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--amber); background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.25);
+  border-radius: 99px; padding: 1px 6px; display: none;
+}
+.custom-badge.visible { display: inline-block; }
+
+.del-btn {
+  background: none; border: none; cursor: pointer; color: var(--ink-faint);
+  font-size: 18px; padding: 4px 8px; border-radius: 6px; transition: all 0.15s; font-family: inherit;
+}
+.del-btn:hover { background: rgba(248,113,113,0.14); color: var(--rose); }
+
+.add-role-btn {
+  display: flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 8px; margin-top: 12px;
+  border: 1px dashed rgba(168,85,247,0.30); background: transparent;
+  color: var(--violet-dim); font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.18s; font-family: 'Inter', sans-serif;
+}
+.add-role-btn:hover { border-color: var(--violet); color: var(--violet-bright); background: rgba(168,85,247,0.07); }
+
+.role-empty {
+  text-align: center; padding: 28px; color: var(--ink-faint); font-size: 12px; font-style: italic;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   FEES SECTION
+───────────────────────────────────────────────────────────────── */
+.fees-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 640px) { .fees-grid { grid-template-columns: 1fr; } }
+.fee-item  { display: flex; flex-direction: column; gap: 5px; }
+.fee-label { font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.fee-input-row { display: flex; align-items: center; gap: 6px; }
+.fee-input-row input { width: 72px; }
+.fee-pct  { font-size: 12px; color: var(--ink-muted); }
+.fee-desc { font-size: 10px; color: var(--ink-faint); line-height: 1.5; }
+.contingency-info {
+  background: rgba(168,85,247,0.07); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; font-size: 11px; color: var(--ink-muted); line-height: 1.8;
+}
+.contingency-info strong { color: var(--ink); }
+
+/* ─────────────────────────────────────────────────────────────────
+   FORM ERROR
+───────────────────────────────────────────────────────────────── */
+.form-error {
+  display: none; align-items: center; gap: 8px;
+  background: rgba(248,113,113,0.10); border: 1px solid rgba(248,113,113,0.28);
+  border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;
+  font-size: 12px; color: var(--rose); font-weight: 600;
+}
+.form-error.visible { display: flex; }
+
+/* ─────────────────────────────────────────────────────────────────
+   GENERATE BUTTON
+───────────────────────────────────────────────────────────────── */
+.generate-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 15px 24px; border-radius: 12px;
+  background: linear-gradient(135deg, #7c3aed, var(--violet), #6025c4);
+  border: 1px solid rgba(168,85,247,0.40);
+  color: #fff; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 800;
+  cursor: pointer; letter-spacing: -0.01em;
+  box-shadow: 0 8px 32px rgba(168,85,247,0.35);
+  transition: all 0.22s; position: relative; overflow: hidden;
+}
+.generate-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 44px rgba(168,85,247,0.50); }
+.generate-btn:active { transform: translateY(0); }
+
+/* ─────────────────────────────────────────────────────────────────
+   RESULTS
+───────────────────────────────────────────────────────────────── */
+.results-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.results-title { font-size: 20px; font-weight: 900; letter-spacing: -0.02em; }
+.results-meta  { font-size: 12px; color: var(--ink-muted); margin-top: 3px; }
+.back-btn {
+  display: flex; align-items: center; gap: 6px; padding: 8px 14px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--ink-muted);
+  font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all 0.18s; white-space: nowrap;
+}
+.back-btn:hover { color: var(--ink); background: var(--card-hover); }
+
+/* Scenario strip */
+.scenario-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+@media (max-width: 640px) { .scenario-strip { grid-template-columns: 1fr; } }
+
+.scenario-card {
+  border-radius: 14px; padding: 20px 20px 18px;
+  background: var(--card); border: 1px solid var(--border); border-top-width: 3px;
+  position: relative; overflow: hidden; transition: transform 0.20s, box-shadow 0.20s;
+}
+.scenario-card:hover { transform: translateY(-3px); box-shadow: 0 16px 44px rgba(0,0,0,0.35); }
+.scenario-card.low  { border-top-color: var(--sky); }
+.scenario-card.mid  { border-top-color: var(--violet); }
+.scenario-card.high { border-top-color: var(--amber); }
+
+.scenario-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 80px; opacity: 0.06; pointer-events: none;
+}
+.scenario-card.low::before  { background: linear-gradient(180deg, var(--sky),    transparent); }
+.scenario-card.mid::before  { background: linear-gradient(180deg, var(--violet), transparent); }
+.scenario-card.high::before { background: linear-gradient(180deg, var(--amber),  transparent); }
+
+.sc-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 10px; }
+.scenario-card.low  .sc-label { color: var(--sky); }
+.scenario-card.mid  .sc-label { color: var(--violet-bright); }
+.scenario-card.high .sc-label { color: var(--amber); }
+
+.sc-total {
+  font-size: 28px; font-weight: 900; letter-spacing: -0.03em; font-family: var(--mono); line-height: 1; margin-bottom: 12px;
+}
+.scenario-card.low  .sc-total { color: var(--sky); }
+.scenario-card.mid  .sc-total { color: var(--violet-bright); }
+.scenario-card.high .sc-total { color: var(--amber); }
+
+.sc-breakdown { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.sc-line  { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; }
+.sc-line-lbl { color: var(--ink-muted); }
+.sc-line-val { font-family: var(--mono); font-size: 11px; color: var(--ink); font-weight: 600; }
+
+.view-details-btn {
+  width: 100%; padding: 8px; border-radius: 8px; border: 1px solid;
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer;
+  transition: all 0.18s; background: transparent;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.scenario-card.low  .view-details-btn { border-color: rgba(56,189,248,0.35);  color: var(--sky); }
+.scenario-card.mid  .view-details-btn { border-color: rgba(168,85,247,0.35);  color: var(--violet-bright); }
+.scenario-card.high .view-details-btn { border-color: rgba(251,191,36,0.35);  color: var(--amber); }
+.scenario-card.low  .view-details-btn:hover { background: rgba(56,189,248,0.10); }
+.scenario-card.mid  .view-details-btn:hover { background: rgba(168,85,247,0.10); }
+.scenario-card.high .view-details-btn:hover { background: rgba(251,191,36,0.10); }
+
+/* Summary table */
+.results-table-section {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  animation: rise 0.4s var(--ease) both;
+}
+.results-table-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border);
+}
+.results-table-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.10em; color: var(--ink-muted); }
+.results-role-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.results-role-table th {
+  text-align: left; padding: 10px 16px;
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.10em;
+  color: var(--ink-faint); background: rgba(0,0,0,0.15); border-bottom: 1px solid var(--border);
+}
+.results-role-table td { padding: 10px 16px; border-bottom: 1px solid var(--border-soft); font-size: 12px; }
+.results-role-table tr:last-child td { border-bottom: none; }
+.results-role-table tr:hover td { background: var(--card-hover); }
+.right { text-align: right; }
+.mono  { font-family: var(--mono); }
+
+/* ─────────────────────────────────────────────────────────────────
+   MODAL
+───────────────────────────────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(6,4,15,0.82); backdrop-filter: blur(10px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; animation: fadeIn 0.22s ease both; }
+
+.modal {
+  background: #12092c; border: 1px solid rgba(168,85,247,0.28);
+  border-radius: 18px; width: 100%; max-width: 740px; max-height: 90vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  animation: slideUp 0.35s var(--ease) both;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.60);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 18px 22px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.modal-title-block { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.modal-title { font-size: 15px; font-weight: 900; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.modal-badge {
+  display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 99px;
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.10em; width: fit-content;
+}
+.modal-badge.low  { background: rgba(56,189,248,0.15);  color: var(--sky);          border: 1px solid rgba(56,189,248,0.30); }
+.modal-badge.mid  { background: rgba(168,85,247,0.15);  color: var(--violet-bright); border: 1px solid rgba(168,85,247,0.30); }
+.modal-badge.high { background: rgba(251,191,36,0.15);  color: var(--amber);         border: 1px solid rgba(251,191,36,0.30); }
+
+.modal-close {
+  width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--ink-muted);
+  display: grid; place-items: center; font-size: 18px; cursor: pointer;
+  transition: all 0.18s; flex-shrink: 0;
+}
+.modal-close:hover { background: var(--card-hover); color: var(--ink); }
+
+.modal-body { overflow-y: auto; padding: 18px 22px; flex: 1; }
+.modal-body::-webkit-scrollbar { width: 5px; }
+.modal-body::-webkit-scrollbar-track { background: transparent; }
+.modal-body::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.25); border-radius: 99px; }
+
+/* Modal meta block */
+.modal-meta-block {
+  margin-bottom: 16px; padding: 10px 14px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px; font-size: 11px; color: var(--ink-muted); line-height: 1.8;
+}
+.modal-meta-block strong { color: var(--ink); }
+.modal-desc { font-size: 10px; color: var(--ink-faint); margin-top: 4px; }
+
+/* Modal table */
+.modal-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 18px; }
+.modal-table th {
+  text-align: left; padding: 8px 10px;
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.10em;
+  color: var(--ink-faint); background: rgba(0,0,0,0.20); border-bottom: 1px solid var(--border);
+}
+.modal-table td { padding: 9px 10px; border-bottom: 1px solid var(--border-soft); }
+.modal-table tr:last-child td { border-bottom: none; }
+.modal-table tr:hover td { background: rgba(255,255,255,0.03); }
+.modal-table .subtotal-row td { font-weight: 700; color: var(--sky); }
+
+/* Fees in modal */
+.fees-section-title {
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--ink-faint); padding: 12px 0 6px; border-top: 1px solid var(--border); margin-top: 6px;
+}
+.fee-line {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 6px 0; border-bottom: 1px solid var(--border-soft); font-size: 12px;
+}
+.fee-line:last-of-type { border-bottom: none; }
+.fee-line-lbl { color: var(--ink-muted); }
+.fee-line-val { font-family: var(--mono); font-weight: 600; }
+
+/* Grand total bar */
+.grand-total-bar {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 14px 16px; margin-top: 14px; border-radius: 10px;
+  background: rgba(168,85,247,0.10); border: 1px solid rgba(168,85,247,0.25);
+}
+.grand-total-lbl { font-size: 13px; font-weight: 800; color: var(--ink); }
+.grand-total-val { font-size: 26px; font-weight: 900; font-family: var(--mono); letter-spacing: -0.02em; }
+.modal.low  .grand-total-val { color: var(--sky); }
+.modal.mid  .grand-total-val { color: var(--violet-bright); }
+.modal.high .grand-total-val { color: var(--amber); }
+
+.modal-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  padding: 14px 22px; border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.modal-action-btn {
+  display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
+  font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.18s;
+}
+.btn-print    { border: 1px solid var(--border); background: var(--surface); color: var(--ink-muted); }
+.btn-print:hover { background: var(--card-hover); color: var(--ink); }
+.btn-download { border: 1px solid rgba(168,85,247,0.35); background: rgba(168,85,247,0.12); color: var(--violet-bright); }
+.btn-download:hover { background: rgba(168,85,247,0.22); }
+
+/* ─────────────────────────────────────────────────────────────────
+   CHIP CLASSES
+───────────────────────────────────────────────────────────────── */
+.chip { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 99px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+.cv { background: rgba(168,85,247,0.15); color: var(--violet-bright); border: 1px solid rgba(168,85,247,0.28); }
+.cs { background: rgba(56,189,248,0.14);  color: var(--sky);          border: 1px solid rgba(56,189,248,0.28); }
+.ct { background: rgba(45,212,191,0.13);  color: var(--teal);         border: 1px solid rgba(45,212,191,0.28); }
+.ca { background: rgba(251,191,36,0.13);  color: var(--amber);        border: 1px solid rgba(251,191,36,0.28); }
+.cg { background: rgba(52,211,153,0.13);  color: var(--green);        border: 1px solid rgba(52,211,153,0.28); }
+.cb { background: rgba(248,113,113,0.13); color: var(--rose);         border: 1px solid rgba(248,113,113,0.28); }
+
+/* ─────────────────────────────────────────────────────────────────
+   PRINT
+───────────────────────────────────────────────────────────────── */
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  .scan-line, .topbar, .hero, #phase-form, .scenario-strip,
+  .back-btn, .results-table-section { display: none !important; }
+  .modal-overlay { display: block !important; position: static !important; background: none !important; padding: 0 !important; backdrop-filter: none !important; }
+  .modal { max-height: none !important; width: 100% !important; border: none !important; background: #fff !important; color: #111 !important; box-shadow: none !important; border-radius: 0 !important; }
+  .modal-close, .modal-footer { display: none !important; }
+  .modal-table th, .modal-table td { color: #111 !important; border-color: #ddd !important; }
+  .modal-meta-block { background: #f8f8f8 !important; border-color: #ddd !important; }
+  .grand-total-bar { background: #f0f0f0 !important; border-color: #ccc !important; }
+  .grand-total-val, .grand-total-lbl { color: #111 !important; }
+  .fee-line-val { color: #111 !important; }
+  .modal-body { overflow: visible !important; }
+}
+</style>
+</head>
+<body>
+<div class="scan-line"></div>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-left">
+      <div class="tb-gem">📄</div>
+      <span class="tb-title">SOW Cost Estimator</span>
+      <div class="tb-dot"></div>
+      <span class="tb-sub">VER Intelligence Hub</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-badge">
+        <div class="tb-badge-dot"></div>
+        FY27 Tool
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Statement of Work</div>
+      <h1 class="hero-title">SOW Cost Estimator</h1>
+      <p class="hero-sub">Build your statement of work requirements, add roles with quantity and seniority levels, then generate Low / Mid / High cost scenarios with a complete fee-inclusive breakdown.</p>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="inner">
+
+      <!-- ═══════════════════════════════════ PHASE 1: FORM ═══ -->
+      <div id="phase-form">
+
+        <div class="form-error" id="form-error">
+          <span>⚠</span>
+          <span id="form-error-msg">Please fix the errors above before generating.</span>
+        </div>
+
+        <!-- SOW Details -->
+        <div class="form-section">
+          <div class="form-section-title">SOW Details</div>
+          <div class="form-grid full" style="margin-bottom:12px;">
+            <div class="field">
+              <label class="field-label" for="sow-title">SOW Title</label>
+              <input type="text" id="sow-title" placeholder="e.g. Data Platform Modernization — Phase 2" />
+            </div>
+          </div>
+          <div class="form-grid full">
+            <div class="field">
+              <label class="field-label" for="sow-desc">Description / Scope</label>
+              <textarea id="sow-desc" placeholder="Briefly describe the engagement scope, deliverables, and context..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engagement Parameters -->
+        <div class="form-section">
+          <div class="form-section-title">Engagement Parameters</div>
+          <div class="form-grid three">
+            <div class="field">
+              <label class="field-label" for="sow-region">Region</label>
+              <select id="sow-region">
+                <option value="AMER">AMER</option>
+                <option value="APAC">APAC</option>
+                <option value="LATAM">LATAM</option>
+                <option value="EMEA">EMEA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="sow-duration">Duration (weeks)</label>
+              <input type="number" id="sow-duration" value="12" min="1" max="520" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="sow-hours">Hours / week per resource</label>
+              <input type="number" id="sow-hours" value="40" min="1" max="80" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Roles -->
+        <div class="form-section">
+          <div class="form-section-title">Roles &amp; Staffing</div>
+          <div class="role-table-wrap">
+            <table class="role-table" id="role-table">
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Level</th>
+                  <th>Qty</th>
+                  <th>Base Rate ($/hr)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="role-tbody">
+                <tr id="role-empty-row">
+                  <td colspan="5"><div class="role-empty">No roles added yet. Click "Add Role" to begin.</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="add-role-btn" id="add-role-btn" type="button">
+            <span>+</span> Add Role
+          </button>
+        </div>
+
+        <!-- Fees -->
+        <div class="form-section">
+          <div class="form-section-title">Fees &amp; Adjustments</div>
+          <div class="fees-grid">
+            <div class="fee-item">
+              <div class="fee-label">Program Management Fee</div>
+              <div class="fee-input-row">
+                <input type="number" id="fee-pm" value="8" min="0" max="100" step="0.5" />
+                <span class="fee-pct">% of labor</span>
+              </div>
+              <div class="fee-desc">Overhead for project coordination, governance, and reporting.</div>
+            </div>
+            <div class="fee-item">
+              <div class="fee-label">Travel &amp; Expenses</div>
+              <div class="fee-input-row">
+                <input type="number" id="fee-te" value="3" min="0" max="100" step="0.5" />
+                <span class="fee-pct">% of labor</span>
+              </div>
+              <div class="fee-desc">On-site travel, lodging, and incidental expenses.</div>
+            </div>
+            <div class="fee-item">
+              <div class="fee-label">Vendor Margin</div>
+              <div class="fee-input-row">
+                <input type="number" id="fee-margin" value="18" min="0" max="100" step="0.5" />
+                <span class="fee-pct">% of labor</span>
+              </div>
+              <div class="fee-desc">Supplier markup applied to total labor hours billed.</div>
+            </div>
+            <div class="fee-item">
+              <div class="fee-label">Contingency</div>
+              <div class="contingency-info">
+                Locked to scenario:<br>
+                <strong>LOW</strong> — 5%&nbsp;|&nbsp;<strong>MID</strong> — 10%&nbsp;|&nbsp;<strong>HIGH</strong> — 15%<br>
+                <span style="font-size:10px;color:var(--ink-faint);">Applied to (labor + margin + PM + T&amp;E)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="generate-btn" id="generate-btn" type="button">
+          ✦ Generate Cost Estimate
+        </button>
+
+      </div><!-- /phase-form -->
+
+      <!-- ═══════════════════════════════════ PHASE 2: RESULTS ═══ -->
+      <div id="phase-results">
+
+        <div class="results-header">
+          <div>
+            <div class="results-title" id="results-title"></div>
+            <div class="results-meta"  id="results-meta"></div>
+          </div>
+          <button class="back-btn" id="back-btn" type="button">← Edit Estimate</button>
+        </div>
+
+        <div class="scenario-strip">
+          <div class="scenario-card low"  id="sc-low">
+            <div class="sc-label">LOW Scenario</div>
+            <div class="sc-total" id="sc-low-total">—</div>
+            <div class="sc-breakdown" id="sc-low-breakdown"></div>
+            <button class="view-details-btn" data-scenario="low">View Full Breakdown →</button>
+          </div>
+          <div class="scenario-card mid"  id="sc-mid">
+            <div class="sc-label">MID Scenario</div>
+            <div class="sc-total" id="sc-mid-total">—</div>
+            <div class="sc-breakdown" id="sc-mid-breakdown"></div>
+            <button class="view-details-btn" data-scenario="mid">View Full Breakdown →</button>
+          </div>
+          <div class="scenario-card high" id="sc-high">
+            <div class="sc-label">HIGH Scenario</div>
+            <div class="sc-total" id="sc-high-total">—</div>
+            <div class="sc-breakdown" id="sc-high-breakdown"></div>
+            <button class="view-details-btn" data-scenario="high">View Full Breakdown →</button>
+          </div>
+        </div>
+
+        <div class="results-table-section">
+          <div class="results-table-header">
+            <span class="results-table-title">Role Summary — MID Scenario</span>
+          </div>
+          <table class="results-role-table">
+            <thead>
+              <tr>
+                <th>Role</th><th>Level</th>
+                <th>Qty</th><th>Hours</th>
+                <th class="right">Rate (Mid)</th>
+                <th class="right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody id="results-summary-body"></tbody>
+          </table>
+        </div>
+
+      </div><!-- /phase-results -->
+
+    </div>
+  </main>
+</div><!-- /shell -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title-block">
+        <div class="modal-title" id="modal-title"></div>
+        <span class="modal-badge" id="modal-badge"></span>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="modal-action-btn btn-print"    id="modal-print">🖨 Print</button>
+      <button class="modal-action-btn btn-download" id="modal-download">⬇ Download HTML</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   RATE DATA — embedded, no imports
+================================================================ */
+var RATES = {
+  "AI/ML Engineer":          { lo:125,  mid:145,  hi:165  },
+  "Data Analyst":            { lo:75,   mid:85,   hi:95   },
+  "Data Engineer":           { lo:102,  mid:118,  hi:130  },
+  "Data Scientist":          { lo:115,  mid:132,  hi:150  },
+  "Data Architect":          { lo:130,  mid:148,  hi:168  },
+  "BI Developer":            { lo:95,   mid:110,  hi:125  },
+  "Lead Data Engineer":      { lo:140,  mid:158,  hi:178  },
+  "Sr Data Engineer":        { lo:120,  mid:138,  hi:155  },
+  "Sr Data Analyst":         { lo:92,   mid:105,  hi:118  },
+  "Snowflake Engineer":      { lo:118,  mid:135,  hi:155  },
+  "Cloud Architect":         { lo:145,  mid:165,  hi:188  },
+  "Cloud Engineer":          { lo:105,  mid:120,  hi:138  },
+  "Cloud/DevOps Engineer":   { lo:95,   mid:110,  hi:125  },
+  "Cloud/DevOps Lead Engineer":     { lo:118, mid:135, hi:152 },
+  "Cloud Infrastructure Engineer":  { lo:100, mid:115, hi:132 },
+  "Cloud Security Engineer":        { lo:120, mid:138, hi:158 },
+  "Sr Cloud/AI/ML Architect":       { lo:155, mid:178, hi:200 },
+  "CW Software Engineer":    { lo:65,   mid:78,   hi:92   },
+  "CW Business Analyst":     { lo:55,   mid:66,   hi:78   },
+  "CW Project Manager":      { lo:70,   mid:84,   hi:98   },
+  "CW QA Engineer":          { lo:58,   mid:70,   hi:82   },
+  "CW Data Engineer":        { lo:72,   mid:86,   hi:100  },
+  "Workday Functional Consultant":  { lo:120, mid:138, hi:158 },
+  "Workday HCM Consultant":         { lo:125, mid:142, hi:162 },
+  "Workday FINS Consultant":        { lo:130, mid:148, hi:168 },
+  "Workday Integration Consultant": { lo:135, mid:154, hi:175 },
+  "Workday Technical Architect":    { lo:150, mid:170, hi:192 },
+  "Service Desk Analyst L1":  { lo:28,  mid:35,   hi:42   },
+  "Service Desk Analyst L2":  { lo:38,  mid:46,   hi:55   },
+  "Helpdesk Support Level I": { lo:32,  mid:40,   hi:48   },
+  "Helpdesk Support Level II":{ lo:42,  mid:52,   hi:62   },
+  "System Administrator":    { lo:55,   mid:66,   hi:78   },
+  "Sr System Administrator": { lo:72,   mid:85,   hi:98   },
+  "Consultant":              { lo:137,  mid:144,  hi:166  },
+  "Consulting Analyst":      { lo:89,   mid:93,   hi:108  },
+  "Consulting Manager / Program Manager / Consulting Architect": { lo:149, mid:156, hi:180 },
+  "Business & Technology Consulting VP/CTO": { lo:191, mid:197, hi:224 },
+  "Strategy Consultant":     { lo:155,  mid:175,  hi:198  },
+  "Senior Project Manager":  { lo:110,  mid:125,  hi:142  },
+  "Senior Scrum Master":     { lo:100,  mid:115,  hi:130  },
+  "Senior Product Manager":  { lo:115,  mid:132,  hi:150  },
+  "Senior Product Owner":    { lo:105,  mid:120,  hi:138  },
+  "Delivery Manager":        { lo:120,  mid:138,  hi:158  },
+  "Agile Coach":             { lo:136,  mid:143,  hi:155  },
+  "Software Engineer":       { lo:85,   mid:98,   hi:112  },
+  "Sr Software Engineer":    { lo:110,  mid:126,  hi:142  },
+  "Lead Software Engineer":  { lo:125,  mid:143,  hi:162  },
+  "Tech Lead":               { lo:130,  mid:148,  hi:168  },
+  "Solution Architect":      { lo:140,  mid:160,  hi:182  },
+  "Enterprise Architect":    { lo:150,  mid:170,  hi:192  },
+  "Full Stack Engineer":     { lo:95,   mid:110,  hi:125  },
+  "Frontend Engineer":       { lo:88,   mid:102,  hi:118  },
+  "Business Analyst":        { lo:80,   mid:92,   hi:105  },
+  "Senior UI/UX Designer":   { lo:95,   mid:110,  hi:125  },
+  "Senior Vendor Manager":   { lo:105,  mid:120,  hi:138  }
+};
+
+/* Category list for <optgroup> — order determines display order */
+var CATEGORIES = [
+  { label: "AI/ML & Data",        roles: ["AI/ML Engineer","Data Analyst","Data Engineer","Data Scientist","Data Architect","BI Developer","Lead Data Engineer","Sr Data Engineer","Sr Data Analyst","Snowflake Engineer"] },
+  { label: "Cloud & Engineering", roles: ["Cloud Architect","Cloud Engineer","Cloud/DevOps Engineer","Cloud/DevOps Lead Engineer","Cloud Infrastructure Engineer","Cloud Security Engineer","Sr Cloud/AI/ML Architect"] },
+  { label: "Contingent Workforce",roles: ["CW Software Engineer","CW Business Analyst","CW Project Manager","CW QA Engineer","CW Data Engineer"] },
+  { label: "ERP & Workday",       roles: ["Workday Functional Consultant","Workday HCM Consultant","Workday FINS Consultant","Workday Integration Consultant","Workday Technical Architect"] },
+  { label: "Managed Services",    roles: ["Service Desk Analyst L1","Service Desk Analyst L2","Helpdesk Support Level I","Helpdesk Support Level II","System Administrator","Sr System Administrator"] },
+  { label: "Professional Services",roles: ["Consultant","Consulting Analyst","Consulting Manager / Program Manager / Consulting Architect","Business & Technology Consulting VP/CTO","Strategy Consultant"] },
+  { label: "Project Management",  roles: ["Senior Project Manager","Senior Scrum Master","Senior Product Manager","Senior Product Owner","Delivery Manager","Agile Coach"] },
+  { label: "Software Engineering",roles: ["Software Engineer","Sr Software Engineer","Lead Software Engineer","Tech Lead","Solution Architect","Enterprise Architect","Full Stack Engineer","Frontend Engineer","Business Analyst","Senior UI/UX Designer"] },
+  { label: "Strategic Consulting",roles: ["Senior Vendor Manager","Strategy Consultant","Senior Project Manager"] }
+];
+
+/* Levels */
+var LEVELS = [
+  { name: "Entry",     mult: 0.85 },
+  { name: "Mid",       mult: 1.00 },
+  { name: "Senior",    mult: 1.15 },
+  { name: "Lead",      mult: 1.25 },
+  { name: "Principal", mult: 1.40 }
+];
+
+/* Region multipliers */
+var REGION_MULT = { AMER: 1.00, APAC: 0.65, LATAM: 0.55, EMEA: 0.80 };
+
+/* Contingency fractions per scenario */
+var CONTINGENCY_FRAC = { low: 0.05, mid: 0.10, high: 0.15 };
+
+/* Rate tier key */
+var TIER_KEY = { low: "lo", mid: "mid", high: "hi" };
+
+/* ================================================================
+   SAFE DOM HELPERS — all user content goes through textContent
+================================================================ */
+function el(tag, cls) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  return e;
+}
+function txt(text) { return document.createTextNode(String(text)); }
+function byId(id)  { return document.getElementById(id); }
+function getVal(id){ return byId(id).value.trim(); }
+function getNum(id, fallback) {
+  var v = parseFloat(byId(id).value);
+  return isNaN(v) ? fallback : v;
+}
+function fmtDollar(n) {
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+function fmtRate(n) {
+  return '$' + parseFloat(n).toFixed(2);
+}
+
+/* ================================================================
+   BUILD ROLE SELECT (safe DOM)
+================================================================ */
+function buildRoleSelect() {
+  var sel = el('select');
+  var placeholder = el('option');
+  placeholder.value = '';
+  placeholder.appendChild(txt('— Select role —'));
+  sel.appendChild(placeholder);
+
+  var seen = {};
+  for (var c = 0; c < CATEGORIES.length; c++) {
+    var cat = CATEGORIES[c];
+    var grp = el('optgroup');
+    grp.label = cat.label;
+    var added = 0;
+    for (var r = 0; r < cat.roles.length; r++) {
+      var role = cat.roles[r];
+      if (RATES[role] && !seen[cat.label + '|' + role]) {
+        seen[cat.label + '|' + role] = true;
+        var opt = el('option');
+        opt.value = role;
+        opt.appendChild(txt(role));
+        grp.appendChild(opt);
+        added++;
+      }
+    }
+    if (added) sel.appendChild(grp);
+  }
+  return sel;
+}
+
+function buildLevelSelect() {
+  var sel = el('select');
+  for (var i = 0; i < LEVELS.length; i++) {
+    var opt = el('option');
+    opt.value = LEVELS[i].name;
+    opt.appendChild(txt(LEVELS[i].name));
+    sel.appendChild(opt);
+  }
+  // Default to "Mid"
+  sel.value = "Mid";
+  return sel;
+}
+
+/* ================================================================
+   STATE
+================================================================ */
+var rowCounter = 0;
+var currentEstimate = null;
+var currentModalScenario = null;
+
+/* ================================================================
+   ADD ROLE ROW — fully DOM-built, zero innerHTML
+================================================================ */
+function addRoleRow() {
+  rowCounter++;
+  var id = rowCounter;
+  var tbody = byId('role-tbody');
+
+  // Remove empty-state row
+  var emptyRow = byId('role-empty-row');
+  if (emptyRow) emptyRow.parentNode.removeChild(emptyRow);
+
+  var tr = el('tr');
+  tr.id = 'role-row-' + id;
+  tr.dataset.rowId = String(id);
+
+  /* ── Cell 1: Role select ── */
+  var td1 = el('td');
+  var roleSelect = buildRoleSelect();
+  roleSelect.id = 'role-select-' + id;
+  roleSelect.addEventListener('change', function() { updateRateDisplay(id); });
+  td1.appendChild(roleSelect);
+
+  /* ── Cell 2: Level select ── */
+  var td2 = el('td');
+  var levelSelect = buildLevelSelect();
+  levelSelect.id = 'level-select-' + id;
+  levelSelect.addEventListener('change', function() { updateRateDisplay(id); });
+  td2.appendChild(levelSelect);
+
+  /* ── Cell 3: Qty ── */
+  var td3 = el('td');
+  var qtyInput = el('input');
+  qtyInput.type = 'number';
+  qtyInput.id   = 'qty-' + id;
+  qtyInput.value = '1';
+  qtyInput.min   = '1';
+  qtyInput.max   = '999';
+  qtyInput.style.width = '60px';
+  td3.appendChild(qtyInput);
+
+  /* ── Cell 4: Rate display + override ── */
+  var td4 = el('td');
+
+  var rateCell = el('div', 'rate-cell');
+
+  var rateDisplay = el('span', 'rate-val');
+  rateDisplay.id = 'rate-display-' + id;
+  rateDisplay.appendChild(txt('—'));
+  rateCell.appendChild(rateDisplay);
+
+  var editLink = el('button', 'rate-edit-link');
+  editLink.type = 'button';
+  editLink.appendChild(txt('Edit rate'));
+  editLink.addEventListener('click', function() { toggleRateEdit(id); });
+  rateCell.appendChild(editLink);
+
+  var overrideRow = el('div', 'rate-override-row');
+  overrideRow.id = 'rate-override-row-' + id;
+
+  var overrideInput = el('input');
+  overrideInput.type = 'number';
+  overrideInput.id   = 'rate-override-' + id;
+  overrideInput.placeholder = '0';
+  overrideInput.min  = '0';
+  overrideInput.step = '0.5';
+  overrideInput.style.width = '70px';
+  overrideInput.style.padding = '4px 7px';
+  overrideInput.style.fontSize = '11px';
+  overrideInput.addEventListener('input', function() { onRateOverride(id); });
+  overrideRow.appendChild(overrideInput);
+
+  var unitSpan = el('span', 'fee-pct');
+  unitSpan.appendChild(txt('$/hr'));
+  overrideRow.appendChild(unitSpan);
+
+  var customBadge = el('span', 'custom-badge');
+  customBadge.id = 'custom-badge-' + id;
+  customBadge.appendChild(txt('custom'));
+  overrideRow.appendChild(customBadge);
+
+  rateCell.appendChild(overrideRow);
+  td4.appendChild(rateCell);
+
+  /* ── Cell 5: Delete ── */
+  var td5 = el('td');
+  var delBtn = el('button', 'del-btn');
+  delBtn.type = 'button';
+  delBtn.title = 'Remove row';
+  delBtn.appendChild(txt('×'));
+  delBtn.addEventListener('click', function() { deleteRow(id); });
+  td5.appendChild(delBtn);
+
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+  tr.appendChild(td3);
+  tr.appendChild(td4);
+  tr.appendChild(td5);
+  tbody.appendChild(tr);
+
+  updateRateDisplay(id);
+}
+
+function deleteRow(id) {
+  var tr = byId('role-row-' + id);
+  if (tr) tr.parentNode.removeChild(tr);
+
+  var tbody = byId('role-tbody');
+  if (tbody.querySelectorAll('tr[id^="role-row-"]').length === 0) {
+    var emptyTr = el('tr');
+    emptyTr.id = 'role-empty-row';
+    var emptyTd = el('td');
+    emptyTd.setAttribute('colspan', '5');
+    var emptyDiv = el('div', 'role-empty');
+    emptyDiv.appendChild(txt('No roles added yet. Click "Add Role" to begin.'));
+    emptyTd.appendChild(emptyDiv);
+    emptyTr.appendChild(emptyTd);
+    tbody.appendChild(emptyTr);
+  }
+}
+
+function toggleRateEdit(id) {
+  var row = byId('rate-override-row-' + id);
+  if (row) row.classList.toggle('visible');
+}
+
+function onRateOverride(id) {
+  var inp   = byId('rate-override-' + id);
+  var badge = byId('custom-badge-'  + id);
+  var v = parseFloat(inp.value);
+  if (!isNaN(v) && v > 0) {
+    inp.dataset.hasCustom = '1';
+    if (badge) badge.classList.add('visible');
+  } else {
+    delete inp.dataset.hasCustom;
+    if (badge) badge.classList.remove('visible');
+  }
+}
+
+function updateRateDisplay(id) {
+  var roleEl    = byId('role-select-'  + id);
+  var levelEl   = byId('level-select-' + id);
+  var displayEl = byId('rate-display-' + id);
+  var overrideEl = byId('rate-override-' + id);
+
+  if (!roleEl || !levelEl || !displayEl) return;
+
+  var role   = roleEl.value;
+  var level  = levelEl.value;
+  var region = getVal('sow-region') || 'AMER';
+
+  if (!role || !RATES[role]) {
+    while (displayEl.firstChild) displayEl.removeChild(displayEl.firstChild);
+    displayEl.appendChild(txt('—'));
+    return;
+  }
+
+  var base  = RATES[role].mid;
+  var lObj  = null;
+  for (var i = 0; i < LEVELS.length; i++) { if (LEVELS[i].name === level) { lObj = LEVELS[i]; break; } }
+  var lMult = lObj ? lObj.mult : 1.0;
+  var rMult = REGION_MULT[region] || 1.0;
+  var computed = base * lMult * rMult;
+
+  // Pre-fill override only if no custom value set
+  if (overrideEl && !overrideEl.dataset.hasCustom) {
+    overrideEl.value = computed.toFixed(2);
+  }
+
+  while (displayEl.firstChild) displayEl.removeChild(displayEl.firstChild);
+  displayEl.appendChild(txt(fmtRate(computed) + '/hr (mid)'));
+}
+
+/* ================================================================
+   COLLECT ROWS
+================================================================ */
+function collectRows() {
+  var rows   = [];
+  var region = getVal('sow-region') || 'AMER';
+  var tbody  = byId('role-tbody');
+  var trs    = tbody.querySelectorAll('tr[id^="role-row-"]');
+
+  for (var i = 0; i < trs.length; i++) {
+    var rowId = trs[i].dataset.rowId;
+    var roleEl     = byId('role-select-'  + rowId);
+    var levelEl    = byId('level-select-' + rowId);
+    var qtyEl      = byId('qty-'         + rowId);
+    var overrideEl = byId('rate-override-'+ rowId);
+
+    if (!roleEl || !roleEl.value || !RATES[roleEl.value]) continue;
+
+    var role  = roleEl.value;
+    var level = levelEl ? levelEl.value : 'Mid';
+    var qty   = parseFloat(qtyEl ? qtyEl.value : 1) || 1;
+    var lObj  = null;
+    for (var j = 0; j < LEVELS.length; j++) { if (LEVELS[j].name === level) { lObj = LEVELS[j]; break; } }
+    var lMult = lObj ? lObj.mult : 1.0;
+    var rMult = REGION_MULT[region] || 1.0;
+    var rateOverride = null;
+    if (overrideEl && overrideEl.dataset.hasCustom) {
+      var ov = parseFloat(overrideEl.value);
+      if (!isNaN(ov) && ov > 0) rateOverride = ov;
+    }
+
+    rows.push({ role: role, level: level, qty: qty, lMult: lMult, rMult: rMult, baseRates: RATES[role], rateOverride: rateOverride });
+  }
+  return rows;
+}
+
+/* ================================================================
+   CALCULATE SCENARIO
+================================================================ */
+function calcScenario(rows, durationWeeks, hoursPerWeek, pmPct, tePct, marginPct, contingencyFrac, tier) {
+  var labor = 0;
+  var lineItems = [];
+
+  for (var i = 0; i < rows.length; i++) {
+    var row   = rows[i];
+    var hours = row.qty * hoursPerWeek * durationWeeks;
+    var rate;
+    if (row.rateOverride !== null) {
+      rate = row.rateOverride;
+    } else {
+      rate = row.baseRates[tier] * row.lMult * row.rMult;
+    }
+    var subtotal = rate * hours;
+    labor += subtotal;
+    lineItems.push({ role: row.role, level: row.level, qty: row.qty, hours: hours, rate: rate, subtotal: subtotal });
+  }
+
+  var pmFee      = labor * (pmPct     / 100);
+  var teFee      = labor * (tePct     / 100);
+  var margin     = labor * (marginPct / 100);
+  var base       = labor + pmFee + teFee + margin;
+  var contingency = base * contingencyFrac;
+  var grand      = base + contingency;
+
+  return { labor: labor, pmFee: pmFee, teFee: teFee, margin: margin, contingency: contingency, grand: grand, lineItems: lineItems };
+}
+
+/* ================================================================
+   GENERATE
+================================================================ */
+function generateEstimate() {
+  var title     = getVal('sow-title');
+  var errorEl   = byId('form-error');
+  var errorMsg  = byId('form-error-msg');
+
+  errorEl.classList.remove('visible');
+
+  if (!title) {
+    while (errorMsg.firstChild) errorMsg.removeChild(errorMsg.firstChild);
+    errorMsg.appendChild(txt('SOW Title is required before generating an estimate.'));
+    errorEl.classList.add('visible');
+    byId('sow-title').focus();
+    return;
+  }
+
+  var rows = collectRows();
+  if (rows.length === 0) {
+    while (errorMsg.firstChild) errorMsg.removeChild(errorMsg.firstChild);
+    errorMsg.appendChild(txt('Add at least one role before generating an estimate.'));
+    errorEl.classList.add('visible');
+    return;
+  }
+
+  var durationWeeks = getNum('sow-duration', 12);
+  var hoursPerWeek  = getNum('sow-hours',    40);
+  var pmPct         = getNum('fee-pm',        8);
+  var tePct         = getNum('fee-te',        3);
+  var marginPct     = getNum('fee-margin',   18);
+  var region        = getVal('sow-region') || 'AMER';
+  var desc          = byId('sow-desc').value.trim();
+
+  var lowResult  = calcScenario(rows, durationWeeks, hoursPerWeek, pmPct, tePct, marginPct, CONTINGENCY_FRAC.low,  TIER_KEY.low);
+  var midResult  = calcScenario(rows, durationWeeks, hoursPerWeek, pmPct, tePct, marginPct, CONTINGENCY_FRAC.mid,  TIER_KEY.mid);
+  var highResult = calcScenario(rows, durationWeeks, hoursPerWeek, pmPct, tePct, marginPct, CONTINGENCY_FRAC.high, TIER_KEY.high);
+
+  currentEstimate = {
+    title: title, desc: desc, region: region,
+    durationWeeks: durationWeeks, hoursPerWeek: hoursPerWeek,
+    pmPct: pmPct, tePct: tePct, marginPct: marginPct,
+    rows: rows, low: lowResult, mid: midResult, high: highResult
+  };
+
+  renderResults();
+}
+
+/* ================================================================
+   RENDER RESULTS — safe DOM only
+================================================================ */
+function renderResults() {
+  var e = currentEstimate;
+
+  byId('phase-form').style.display    = 'none';
+  byId('phase-results').style.display = 'block';
+
+  /* Results title & meta */
+  var rtEl = byId('results-title');
+  while (rtEl.firstChild) rtEl.removeChild(rtEl.firstChild);
+  rtEl.appendChild(txt(e.title));
+
+  var totalHC = 0;
+  for (var i = 0; i < e.rows.length; i++) totalHC += e.rows[i].qty;
+  var metaText = e.region + ' · ' + e.durationWeeks + ' weeks · ' + e.hoursPerWeek +
+    ' hrs/wk · ' + e.rows.length + ' role type' + (e.rows.length !== 1 ? 's' : '') +
+    ' · ' + totalHC + ' total headcount';
+
+  var rmEl = byId('results-meta');
+  while (rmEl.firstChild) rmEl.removeChild(rmEl.firstChild);
+  rmEl.appendChild(txt(metaText));
+
+  /* Scenario cards */
+  renderScenarioCard('low',  e.low);
+  renderScenarioCard('mid',  e.mid);
+  renderScenarioCard('high', e.high);
+
+  /* Summary table — MID */
+  var tbody = byId('results-summary-body');
+  while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+  for (var i = 0; i < e.mid.lineItems.length; i++) {
+    var li = e.mid.lineItems[i];
+    var tr = el('tr');
+
+    var tdRole = el('td'); tdRole.appendChild(txt(li.role)); tr.appendChild(tdRole);
+
+    var tdLevel = el('td');
+    var chip = el('span', 'chip cv');
+    chip.appendChild(txt(li.level));
+    tdLevel.appendChild(chip);
+    tr.appendChild(tdLevel);
+
+    var tdQty = el('td', 'mono'); tdQty.appendChild(txt(li.qty)); tr.appendChild(tdQty);
+    var tdHrs = el('td', 'mono'); tdHrs.appendChild(txt(li.hours.toLocaleString())); tr.appendChild(tdHrs);
+
+    var tdRate = el('td', 'right mono'); tdRate.appendChild(txt(fmtRate(li.rate))); tr.appendChild(tdRate);
+    var tdSub  = el('td', 'right mono'); tdSub.appendChild(txt(fmtDollar(li.subtotal))); tr.appendChild(tdSub);
+
+    tbody.appendChild(tr);
+  }
+
+  /* Subtotal row */
+  var stTr = el('tr');
+  stTr.style.fontWeight = '700';
+  var stTd = el('td');
+  stTd.setAttribute('colspan', '5');
+  stTd.style.textAlign    = 'right';
+  stTd.style.color        = 'var(--ink-muted)';
+  stTd.style.fontSize     = '11px';
+  stTd.style.textTransform = 'uppercase';
+  stTd.style.letterSpacing = '0.08em';
+  stTd.appendChild(txt('Labor Subtotal'));
+  var stVal = el('td', 'right mono');
+  stVal.style.color = 'var(--sky)';
+  stVal.appendChild(txt(fmtDollar(e.mid.labor)));
+  stTr.appendChild(stTd);
+  stTr.appendChild(stVal);
+  tbody.appendChild(stTr);
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderScenarioCard(scenario, data) {
+  /* Total */
+  var totalEl = byId('sc-' + scenario + '-total');
+  while (totalEl.firstChild) totalEl.removeChild(totalEl.firstChild);
+  totalEl.appendChild(txt(fmtDollar(data.grand)));
+
+  /* Breakdown lines */
+  var bdEl = byId('sc-' + scenario + '-breakdown');
+  while (bdEl.firstChild) bdEl.removeChild(bdEl.firstChild);
+
+  var lines = [
+    ['Labor',           data.labor],
+    ['Vendor Margin',   data.margin],
+    ['PM Fee',          data.pmFee],
+    ['T&E',             data.teFee],
+    ['Contingency',     data.contingency]
+  ];
+
+  for (var i = 0; i < lines.length; i++) {
+    var row = el('div', 'sc-line');
+    var lbl = el('span', 'sc-line-lbl'); lbl.appendChild(txt(lines[i][0])); row.appendChild(lbl);
+    var val = el('span', 'sc-line-val'); val.appendChild(txt(fmtDollar(lines[i][1]))); row.appendChild(val);
+    bdEl.appendChild(row);
+  }
+}
+
+/* ================================================================
+   MODAL — safe DOM
+================================================================ */
+function openModal(scenario) {
+  var e = currentEstimate;
+  if (!e) return;
+  currentModalScenario = scenario;
+  var data = e[scenario];
+
+  /* Set modal class for color theming */
+  var modalBox = byId('modal-box');
+  modalBox.className = 'modal ' + scenario;
+
+  /* Title */
+  var titleEl = byId('modal-title');
+  while (titleEl.firstChild) titleEl.removeChild(titleEl.firstChild);
+  titleEl.appendChild(txt(e.title));
+
+  /* Badge */
+  var badge = byId('modal-badge');
+  badge.className = 'modal-badge ' + scenario;
+  while (badge.firstChild) badge.removeChild(badge.firstChild);
+  badge.appendChild(txt(scenario.toUpperCase() + ' Scenario'));
+
+  /* Body */
+  var body = byId('modal-body');
+  while (body.firstChild) body.removeChild(body.firstChild);
+
+  /* Meta block */
+  var metaBlock = el('div', 'modal-meta-block');
+
+  var metaLine = el('span');
+  var m1 = el('strong'); m1.appendChild(txt('Region:')); metaLine.appendChild(m1);
+  metaLine.appendChild(txt(' ' + e.region + ' · '));
+  var m2 = el('strong'); m2.appendChild(txt('Duration:')); metaLine.appendChild(m2);
+  metaLine.appendChild(txt(' ' + e.durationWeeks + ' wks · '));
+  var m3 = el('strong'); m3.appendChild(txt('Hours/wk:')); metaLine.appendChild(m3);
+  metaLine.appendChild(txt(' ' + e.hoursPerWeek));
+  metaBlock.appendChild(metaLine);
+
+  if (e.desc) {
+    var descEl = el('div', 'modal-desc');
+    descEl.appendChild(txt(e.desc));
+    metaBlock.appendChild(descEl);
+  }
+  body.appendChild(metaBlock);
+
+  /* Line items table */
+  var table = el('table', 'modal-table');
+
+  var thead = el('thead');
+  var hRow  = el('tr');
+  var cols  = ['Role','Level','Qty','Hours','Rate $/hr','Subtotal'];
+  var colAlignRight = [false,false,true,true,true,true];
+  for (var c = 0; c < cols.length; c++) {
+    var th = el('th');
+    if (colAlignRight[c]) th.className = 'right';
+    th.appendChild(txt(cols[c]));
+    hRow.appendChild(th);
+  }
+  thead.appendChild(hRow);
+  table.appendChild(thead);
+
+  var tBody = el('tbody');
+  for (var i = 0; i < data.lineItems.length; i++) {
+    var li = data.lineItems[i];
+    var tr = el('tr');
+    var cells = [
+      { val: li.role,                      right: false, mono: false },
+      { val: li.level,                     right: false, mono: false },
+      { val: li.qty,                       right: true,  mono: true  },
+      { val: li.hours.toLocaleString(),    right: true,  mono: true  },
+      { val: fmtRate(li.rate),             right: true,  mono: true  },
+      { val: fmtDollar(li.subtotal),       right: true,  mono: true  }
+    ];
+    for (var j = 0; j < cells.length; j++) {
+      var td = el('td');
+      var cls = '';
+      if (cells[j].right) cls += 'right ';
+      if (cells[j].mono)  cls += 'mono';
+      if (cls.trim()) td.className = cls.trim();
+      td.appendChild(txt(cells[j].val));
+      tr.appendChild(td);
+    }
+    tBody.appendChild(tr);
+  }
+
+  /* Subtotal row */
+  var stTr = el('tr', 'subtotal-row');
+  var stTd = el('td'); stTd.setAttribute('colspan', '5'); stTd.className = 'right';
+  stTd.style.fontSize = '11px'; stTd.style.textTransform = 'uppercase'; stTd.style.letterSpacing = '0.08em';
+  stTd.appendChild(txt('Labor Subtotal'));
+  var stVal = el('td', 'right mono'); stVal.appendChild(txt(fmtDollar(data.labor)));
+  stTr.appendChild(stTd); stTr.appendChild(stVal);
+  tBody.appendChild(stTr);
+
+  table.appendChild(tBody);
+  body.appendChild(table);
+
+  /* Fees heading */
+  var feesTitle = el('div', 'fees-section-title');
+  feesTitle.appendChild(txt('Fees & Adjustments'));
+  body.appendChild(feesTitle);
+
+  /* Fee lines */
+  var contingencyPct = CONTINGENCY_FRAC[scenario];
+  var feeRows = [
+    ['Vendor Margin (' + e.marginPct + '% of labor)', data.margin],
+    ['Program Management Fee (' + e.pmPct + '% of labor)', data.pmFee],
+    ['Travel & Expenses (' + e.tePct + '% of labor)', data.teFee],
+    ['Contingency (' + (contingencyPct * 100) + '% of subtotal)', data.contingency]
+  ];
+  for (var f = 0; f < feeRows.length; f++) {
+    var fl = el('div', 'fee-line');
+    var flLbl = el('span', 'fee-line-lbl'); flLbl.appendChild(txt(feeRows[f][0]));
+    var flVal = el('span', 'fee-line-val mono'); flVal.appendChild(txt(fmtDollar(feeRows[f][1])));
+    fl.appendChild(flLbl); fl.appendChild(flVal);
+    body.appendChild(fl);
+  }
+
+  /* Grand total */
+  var gtBar = el('div', 'grand-total-bar');
+  var gtLbl = el('span', 'grand-total-lbl'); gtLbl.appendChild(txt('Grand Total'));
+  var gtVal = el('span', 'grand-total-val'); gtVal.appendChild(txt(fmtDollar(data.grand)));
+  gtBar.appendChild(gtLbl); gtBar.appendChild(gtVal);
+  body.appendChild(gtBar);
+
+  byId('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  byId('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ================================================================
+   PRINT
+================================================================ */
+function printModal() {
+  window.print();
+}
+
+/* ================================================================
+   DOWNLOAD HTML — white/clean export, no user data via innerHTML
+================================================================ */
+function downloadEstimate() {
+  if (!currentEstimate || !currentModalScenario) return;
+  var e        = currentEstimate;
+  var scenario = currentModalScenario;
+  var data     = e[scenario];
+  var contingencyPct = CONTINGENCY_FRAC[scenario];
+  var scenarioLabel  = scenario.toUpperCase();
+  var colorMap = { low: '#38BDF8', mid: '#C084FC', high: '#FBBF24' };
+  var accentColor    = colorMap[scenario] || '#C084FC';
+
+  var safeTitle = e.title.replace(/[^a-z0-9]/gi, '_').toLowerCase().replace(/_+/g, '_');
+  var filename  = 'sow_estimate_' + scenario + '_' + safeTitle + '.html';
+
+  /* Build output using DOM on a detached document would be complex —
+     use a string builder with only computed numeric values and explicitly
+     safe text (run through a text-escape function for any user strings). */
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  var lineRowsHtml = '';
+  for (var i = 0; i < data.lineItems.length; i++) {
+    var li = data.lineItems[i];
+    lineRowsHtml +=
+      '<tr><td>' + esc(li.role) + '</td>' +
+      '<td>' + esc(li.level) + '</td>' +
+      '<td style="text-align:right">' + esc(li.qty) + '</td>' +
+      '<td style="text-align:right">' + esc(li.hours.toLocaleString()) + '</td>' +
+      '<td style="text-align:right">' + esc(fmtRate(li.rate)) + '</td>' +
+      '<td style="text-align:right;font-weight:700">' + esc(fmtDollar(li.subtotal)) + '</td></tr>';
+  }
+
+  var descPart = e.desc ? '<br><span style="color:#555;font-size:11px">' + esc(e.desc) + '</span>' : '';
+
+  var dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  var html =
+    '<!DOCTYPE html>\n<html lang="en">\n<head>\n' +
+    '<meta charset="UTF-8">\n' +
+    '<title>SOW Estimate — ' + esc(scenarioLabel) + ' — ' + esc(e.title) + '</title>\n' +
+    '<style>\n' +
+    'body{font-family:Arial,sans-serif;max-width:860px;margin:40px auto;padding:24px;color:#111;background:#fff;}\n' +
+    'h1{font-size:22px;margin-bottom:4px;}\n' +
+    '.badge{display:inline-block;padding:2px 12px;border-radius:99px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.10em;background:' + accentColor + '22;color:' + accentColor + ';border:1px solid ' + accentColor + '55;margin-bottom:16px;}\n' +
+    '.meta{font-size:12px;color:#555;margin-bottom:20px;}\n' +
+    'table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px;}\n' +
+    'th{background:#f0f0f0;text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#555;}\n' +
+    'td{padding:8px 10px;border-bottom:1px solid #eee;}\n' +
+    'tr:last-child td{border-bottom:none;}\n' +
+    '.subtotal{font-weight:700;background:#f8f8f8;}\n' +
+    '.fee-section{margin-top:16px;}\n' +
+    '.fee-section h3{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#888;border-top:1px solid #eee;padding-top:12px;margin-bottom:8px;}\n' +
+    '.fee-line{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px;}\n' +
+    '.grand{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;background:#f5f0ff;border-radius:8px;margin-top:16px;}\n' +
+    '.grand-lbl{font-size:15px;font-weight:800;}\n' +
+    '.grand-val{font-size:28px;font-weight:900;color:' + accentColor + ';}\n' +
+    'footer{margin-top:32px;font-size:10px;color:#bbb;border-top:1px solid #eee;padding-top:12px;}\n' +
+    '</style>\n</head>\n<body>\n' +
+    '<h1>' + esc(e.title) + '</h1>\n' +
+    '<div class="badge">' + esc(scenarioLabel) + ' Scenario</div>\n' +
+    '<div class="meta">Region: ' + esc(e.region) + ' &nbsp;|&nbsp; Duration: ' + esc(e.durationWeeks) + ' weeks &nbsp;|&nbsp; ' + esc(e.hoursPerWeek) + ' hrs/wk per resource' + descPart + '</div>\n' +
+    '<table>\n<thead><tr>' +
+    '<th>Role</th><th>Level</th><th style="text-align:right">Qty</th><th style="text-align:right">Hours</th><th style="text-align:right">Rate ($/hr)</th><th style="text-align:right">Subtotal</th>' +
+    '</tr></thead>\n<tbody>\n' + lineRowsHtml +
+    '<tr class="subtotal"><td colspan="5" style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.08em">Labor Subtotal</td>' +
+    '<td style="text-align:right;font-weight:700">' + esc(fmtDollar(data.labor)) + '</td></tr>\n' +
+    '</tbody>\n</table>\n' +
+    '<div class="fee-section"><h3>Fees &amp; Adjustments</h3>\n' +
+    '<div class="fee-line"><span>Vendor Margin (' + esc(e.marginPct) + '% of labor)</span><span>' + esc(fmtDollar(data.margin)) + '</span></div>\n' +
+    '<div class="fee-line"><span>Program Management Fee (' + esc(e.pmPct) + '% of labor)</span><span>' + esc(fmtDollar(data.pmFee)) + '</span></div>\n' +
+    '<div class="fee-line"><span>Travel &amp; Expenses (' + esc(e.tePct) + '% of labor)</span><span>' + esc(fmtDollar(data.teFee)) + '</span></div>\n' +
+    '<div class="fee-line"><span>Contingency (' + esc(contingencyPct * 100) + '% of subtotal)</span><span>' + esc(fmtDollar(data.contingency)) + '</span></div>\n' +
+    '</div>\n' +
+    '<div class="grand"><span class="grand-lbl">Grand Total</span><span class="grand-val">' + esc(fmtDollar(data.grand)) + '</span></div>\n' +
+    '<footer>Generated by VER Intelligence Hub — SOW Cost Estimator &nbsp;·&nbsp; ' + esc(dateStr) + '</footer>\n' +
+    '</body>\n</html>';
+
+  var blob = new Blob([html], { type: 'text/html' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ================================================================
+   EVENT WIRING
+================================================================ */
+byId('add-role-btn').addEventListener('click', function() { addRoleRow(); });
+byId('generate-btn').addEventListener('click', generateEstimate);
+
+byId('back-btn').addEventListener('click', function() {
+  byId('phase-results').style.display = 'none';
+  byId('phase-form').style.display    = 'block';
+});
+
+byId('modal-close').addEventListener('click', closeModal);
+byId('modal-overlay').addEventListener('click', function(ev) {
+  if (ev.target === this) closeModal();
+});
+
+byId('modal-print').addEventListener('click', printModal);
+byId('modal-download').addEventListener('click', downloadEstimate);
+
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === 'Escape') closeModal();
+});
+
+/* Delegate view-details button clicks */
+document.addEventListener('click', function(ev) {
+  var btn = ev.target.closest ? ev.target.closest('.view-details-btn') : null;
+  if (btn && btn.dataset.scenario) openModal(btn.dataset.scenario);
+});
+
+/* Re-evaluate rate displays on region change */
+byId('sow-region').addEventListener('change', function() {
+  var trs = byId('role-tbody').querySelectorAll('tr[id^="role-row-"]');
+  for (var i = 0; i < trs.length; i++) {
+    updateRateDisplay(trs[i].dataset.rowId);
+  }
+});
+
+/* Bootstrap — one default row so the form feels alive */
+addRoleRow();
+</script>
+</body>
+</html>
