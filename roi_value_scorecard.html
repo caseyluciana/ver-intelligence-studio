@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROI &amp; Value Scorecard — AI Strategy &amp; Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#06040f;--bg2:#0e0b1e;
+  --violet:#A855F7;--violet2:#7c3aed;
+  --sky:#38BDF8;--teal:#2DD4BF;--amber:#FBBF24;--green:#34D399;
+  --ink:#f0eeff;--ink-muted:rgba(240,238,255,0.65);--ink-faint:rgba(240,238,255,0.35);
+  --border:rgba(168,85,247,0.18);--border-soft:rgba(168,85,247,0.10);
+  --card:rgba(255,255,255,0.04);--card-hover:rgba(255,255,255,0.07);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-top:60px;}
+
+/* ── CHROME ── */
+.chrome{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:56px;
+  background:rgba(6,4,15,0.80);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border-soft);}
+.chrome-brand{font-size:12px;font-weight:800;letter-spacing:0.10em;color:var(--violet);text-transform:uppercase;}
+.chrome-right{font-size:12px;font-weight:600;letter-spacing:0.06em;color:var(--ink-faint);text-transform:uppercase;}
+
+/* ── PAGE WRAPPER ── */
+.page{max-width:1040px;margin:0 auto;padding:40px 24px 80px;}
+@media(max-width:600px){.page{padding:28px 16px 64px;}}
+
+/* ── COMMON ELEMENTS ── */
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--violet);margin-bottom:14px;}
+.eyebrow::before{content:'';width:28px;height:1px;background:var(--violet);}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;}
+.cv{background:rgba(168,85,247,0.12);color:#c084fc;border-color:rgba(168,85,247,0.28);}
+.cs{background:rgba(56,189,248,0.10);color:#7dd3fc;border-color:rgba(56,189,248,0.25);}
+.ct{background:rgba(45,212,191,0.10);color:#5eead4;border-color:rgba(45,212,191,0.25);}
+.ca{background:rgba(251,191,36,0.10);color:#fcd34d;border-color:rgba(251,191,36,0.25);}
+.cg{background:rgba(52,211,153,0.10);color:#6ee7b7;border-color:rgba(52,211,153,0.25);}
+.cb{background:rgba(244,63,94,0.10);color:#fb7185;border-color:rgba(244,63,94,0.25);}
+
+/* ── HERO ── */
+.hero{padding:56px 0 44px;
+  background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(168,85,247,0.18) 0%,transparent 65%),
+             radial-gradient(ellipse 50% 40% at 85% 80%,rgba(56,189,248,0.08) 0%,transparent 55%);
+  text-align:center;}
+.hero-h1{font-size:clamp(40px,7vw,72px);font-weight:900;line-height:0.95;letter-spacing:-0.03em;
+  background:linear-gradient(135deg,#ede9ff 0%,#c084fc 35%,#818cf8 65%,#38bdf8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:18px;}
+.hero-sub{font-size:clamp(13px,1.7vw,16px);color:var(--ink-muted);line-height:1.75;max-width:580px;margin:0 auto 28px;}
+.hero-owners{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+.quarter-wrap{display:flex;align-items:center;gap:12px;justify-content:center;}
+.quarter-label{font-size:12px;font-weight:700;color:var(--ink-faint);letter-spacing:0.08em;text-transform:uppercase;}
+.styled-select{appearance:none;-webkit-appearance:none;
+  background:rgba(168,85,247,0.10);
+  border:1px solid rgba(168,85,247,0.32);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+  padding:8px 36px 8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23A855F7' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;}
+.styled-select:focus{outline:none;border-color:rgba(168,85,247,0.60);box-shadow:0 0 0 3px rgba(168,85,247,0.12);}
+.styled-select option{background:#0e0b1e;color:var(--ink);}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden;margin-bottom:36px;}
+@media(max-width:600px){.kpi-strip{grid-template-columns:repeat(2,1fr);}}
+.kpi-cell{background:var(--card);padding:24px 16px;text-align:center;}
+.kpi-n{font-family:'JetBrains Mono',monospace;font-size:clamp(22px,4vw,32px);font-weight:700;line-height:1;color:var(--violet);margin-bottom:8px;}
+.kpi-n.sky{color:var(--sky);}
+.kpi-n.teal{color:var(--teal);}
+.kpi-n.amber{color:var(--amber);}
+.kpi-l{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);line-height:1.4;}
+
+/* ── SECTION LABEL ── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.section-title{font-size:16px;font-weight:800;letter-spacing:-0.01em;}
+
+/* ── INITIATIVE CARDS ── */
+#initiatives-list{display:flex;flex-direction:column;gap:16px;margin-bottom:24px;}
+.init-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden;}
+.init-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,0.35),transparent);}
+.init-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.init-card-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--ink-faint);letter-spacing:0.12em;}
+.remove-btn{background:rgba(244,63,94,0.10);border:1px solid rgba(244,63,94,0.22);color:#fb7185;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;text-transform:uppercase;}
+.remove-btn:hover{background:rgba(244,63,94,0.22);border-color:rgba(244,63,94,0.45);}
+.init-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:580px){.init-grid{grid-template-columns:1fr;}}
+.init-full{grid-column:1/-1;}
+.field-group{display:flex;flex-direction:column;gap:5px;}
+.field-label{font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-faint);}
+.field-input{background:rgba(255,255,255,0.04);border:1px solid rgba(168,85,247,0.14);color:var(--ink);
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+  padding:9px 12px;border-radius:8px;width:100%;
+  transition:border-color 0.2s,background 0.2s;}
+.field-input:focus{outline:none;border-color:rgba(168,85,247,0.45);background:rgba(168,85,247,0.06);}
+.field-input::placeholder{color:var(--ink-faint);}
+textarea.field-input{resize:vertical;min-height:72px;line-height:1.55;}
+select.field-input{appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23A855F7' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;}
+select.field-input option{background:#0e0b1e;}
+.quality-row{display:flex;align-items:center;gap:12px;}
+.quality-slider{flex:1;accent-color:var(--violet);height:4px;cursor:pointer;}
+.quality-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--violet);min-width:28px;text-align:right;}
+
+/* ── ADD BUTTON ── */
+.add-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 28px;border-radius:40px;
+  background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.36);
+  color:var(--ink);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;}
+.add-btn:hover{background:rgba(168,85,247,0.24);border-color:rgba(168,85,247,0.60);}
+
+/* ── NARRATIVE PANEL ── */
+.narrative-panel{background:rgba(168,85,247,0.05);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:28px;margin-bottom:36px;}
+.narrative-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
+.narrative-title{font-size:14px;font-weight:800;letter-spacing:-0.01em;}
+.narrative-body{font-size:14px;color:var(--ink-muted);line-height:1.8;min-height:60px;}
+.narrative-body.placeholder{font-style:italic;color:var(--ink-faint);}
+.gen-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:8px;
+  background:rgba(168,85,247,0.14);border:1px solid rgba(168,85,247,0.36);
+  color:var(--ink);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;text-transform:uppercase;}
+.gen-btn:hover{background:rgba(168,85,247,0.26);border-color:rgba(168,85,247,0.60);}
+
+/* ── EXPORT BUTTONS ── */
+.export-row{display:flex;gap:12px;flex-wrap:wrap;}
+.export-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:8px;
+  background:transparent;border:1px solid rgba(168,85,247,0.36);
+  color:#c084fc;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;text-transform:uppercase;}
+.export-btn:hover{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.60);}
+.copy-confirm{font-size:11px;color:var(--teal);font-weight:600;opacity:0;transition:opacity 0.3s;margin-left:4px;}
+.copy-confirm.show{opacity:1;}
+
+/* ── DIVIDER ── */
+.section-divider{height:1px;background:var(--border-soft);margin:36px 0;}
+
+/* ── PRINT ── */
+@media print{
+  .chrome,.add-btn,.remove-btn,.gen-btn,.export-row,.quarter-wrap{display:none!important;}
+  body{background:#fff;color:#111;padding-top:0;}
+  .init-card,.narrative-panel,.kpi-strip{border:1px solid #ccc;break-inside:avoid;}
+  .hero-h1{-webkit-text-fill-color:#111;color:#111;}
+  .field-input,.styled-select{border:1px solid #ccc;background:#f8f8f8;color:#111;}
+  .kpi-n,.kpi-l,.section-title,.narrative-title,.init-card-num,.field-label{color:#333;}
+  .narrative-body{color:#444;}
+}
+</style>
+</head>
+<body>
+
+<!-- CHROME -->
+<div class="chrome">
+  <div class="chrome-brand">ROI &amp; Value Scorecard</div>
+  <div class="chrome-right">AI Strategy &amp; Ops</div>
+</div>
+
+<div class="page">
+
+  <!-- ═══ HERO ═══ -->
+  <div class="hero">
+    <div class="eyebrow" style="justify-content:center;">AI Strategy &amp; Ops — Quarterly Scorecard</div>
+    <div class="hero-h1">ROI &amp; Value Scorecard</div>
+    <p class="hero-sub">Standardized measurement framework for AI initiative impact across DET. Time saved. Cost avoided. Quality improved. Reported quarterly.</p>
+    <div class="hero-owners">
+      <span class="chip cv">Casey Luciana Candelaria-Logan — Function Lead</span>
+      <span class="chip cs">Judette Platz — Portfolio &amp; Value Management</span>
+    </div>
+    <div class="quarter-wrap">
+      <span class="quarter-label">Reporting Quarter</span>
+      <select class="styled-select" id="quarter-select">
+        <option value="Q1 FY27" selected>Q1 FY27</option>
+        <option value="Q2 FY27">Q2 FY27</option>
+        <option value="Q3 FY27">Q3 FY27</option>
+        <option value="Q4 FY27">Q4 FY27</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ═══ KPI STRIP ═══ -->
+  <div class="kpi-strip" id="kpi-strip">
+    <div class="kpi-cell">
+      <div class="kpi-n" id="kpi-time">0</div>
+      <div class="kpi-l">Total Time Saved<br>(hrs)</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-n sky" id="kpi-cost">$0</div>
+      <div class="kpi-l">Total Cost Avoided<br>($)</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-n teal" id="kpi-count">0</div>
+      <div class="kpi-l">Initiatives<br>Tracked</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-n amber" id="kpi-quality">—</div>
+      <div class="kpi-l">Avg Quality<br>Score</div>
+    </div>
+  </div>
+
+  <!-- ═══ INITIATIVES ═══ -->
+  <div class="section-head">
+    <div class="section-title">AI Initiatives</div>
+  </div>
+
+  <div id="initiatives-list"></div>
+
+  <div style="margin-bottom:36px;">
+    <button class="add-btn" id="add-initiative-btn">+ Add Initiative</button>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══ NARRATIVE ═══ -->
+  <div class="narrative-panel">
+    <div class="narrative-header">
+      <div class="narrative-title">Value Narrative — Exec Summary</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="gen-btn" id="gen-narrative-btn">&#9889; Generate Narrative</button>
+      </div>
+    </div>
+    <div class="narrative-body placeholder" id="narrative-body">Click "Generate Narrative" to auto-generate an executive summary based on your current initiative data.</div>
+  </div>
+
+  <!-- ═══ EXPORT ═══ -->
+  <div class="section-head" style="margin-bottom:16px;">
+    <div class="section-title">Export</div>
+  </div>
+  <div class="export-row">
+    <button class="export-btn" id="export-pdf-btn">&#128461; Export as PDF</button>
+    <button class="export-btn" id="copy-summary-btn">&#128203; Copy Summary<span class="copy-confirm" id="copy-confirm">Copied!</span></button>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── DATA ── */
+  var initiatives = [];
+  var nextId = 1;
+
+  var PILLARS = ['VER', 'Delivery Assurance', 'Enterprise Tech', 'Finance &amp; Ops', 'Other'];
+  var STATUSES = ['Active', 'Pilot', 'Complete'];
+
+  var STATUS_CHIP_CLASS = { 'Active': 'cg', 'Pilot': 'ca', 'Complete': 'cs' };
+
+  /* ── SEED DATA ── */
+  var seeds = [
+    {
+      name: 'VER Intelligence Hub',
+      pillar: 'VER',
+      tool: 'VER Hub',
+      time: 120,
+      cost: 45000,
+      quality: 9,
+      notes: 'Eliminated manual vendor reporting — 3 FTE hours/week recovered across VER team.',
+      status: 'Active'
+    },
+    {
+      name: 'SOW Cost Estimator',
+      pillar: 'VER',
+      tool: 'SOW Estimator',
+      time: 80,
+      cost: 28000,
+      quality: 8,
+      notes: 'Replaces manual benchmark research and rate card lookups for every SOW review.',
+      status: 'Active'
+    },
+    {
+      name: 'TCO Scenario Modeling',
+      pillar: 'Delivery Assurance',
+      tool: 'TCO Calculator',
+      time: 60,
+      cost: 38000,
+      quality: 9,
+      notes: 'Enables data-driven build vs. buy decisions. Used in 4 DA reviews this quarter.',
+      status: 'Active'
+    }
+  ];
+
+  seeds.forEach(function (s) {
+    initiatives.push(Object.assign({ id: nextId++ }, s));
+  });
+
+  /* ── HELPERS ── */
+  function fmt(n) {
+    return Number(n).toLocaleString('en-US');
+  }
+
+  function fmtDollar(n) {
+    return '$' + Number(n).toLocaleString('en-US');
+  }
+
+  function el(tag, attrs, children) {
+    var e = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        if (k === 'class') {
+          e.className = attrs[k];
+        } else if (k === 'style') {
+          e.style.cssText = attrs[k];
+        } else {
+          e.setAttribute(k, attrs[k]);
+        }
+      });
+    }
+    if (children) {
+      children.forEach(function (c) {
+        if (typeof c === 'string') {
+          e.appendChild(document.createTextNode(c));
+        } else if (c) {
+          e.appendChild(c);
+        }
+      });
+    }
+    return e;
+  }
+
+  function makeLabel(text) {
+    var d = el('div', { 'class': 'field-label' });
+    d.textContent = text;
+    return d;
+  }
+
+  function makeGroup(label, inputEl) {
+    return el('div', { 'class': 'field-group' }, [makeLabel(label), inputEl]);
+  }
+
+  function makeInput(type, placeholder, value) {
+    var i = el('input', { 'class': 'field-input', 'type': type, 'placeholder': placeholder || '' });
+    if (value !== undefined && value !== null) i.value = value;
+    return i;
+  }
+
+  function makeSelect(options, selected) {
+    var s = el('select', { 'class': 'field-input' });
+    options.forEach(function (opt) {
+      var o = el('option', { 'value': opt });
+      o.textContent = opt;
+      if (opt === selected) o.selected = true;
+      s.appendChild(o);
+    });
+    return s;
+  }
+
+  function makeTextarea(placeholder, value) {
+    var t = el('textarea', { 'class': 'field-input', 'placeholder': placeholder || '' });
+    if (value) t.value = value;
+    return t;
+  }
+
+  /* ── RENDER ONE CARD ── */
+  function renderCard(init) {
+    var card = el('div', { 'class': 'init-card', 'data-id': init.id });
+
+    /* header row */
+    var numSpan = el('span', { 'class': 'init-card-num' });
+    numSpan.textContent = 'INITIATIVE #' + init.id;
+
+    var removeBtn = el('button', { 'class': 'remove-btn', 'type': 'button' });
+    removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', function () {
+      initiatives = initiatives.filter(function (x) { return x.id !== init.id; });
+      renderAll();
+      updateKPIs();
+    });
+
+    var header = el('div', { 'class': 'init-card-header' }, [numSpan, removeBtn]);
+    card.appendChild(header);
+
+    /* grid */
+    var grid = el('div', { 'class': 'init-grid' });
+
+    /* name */
+    var nameInput = makeInput('text', 'Initiative name', init.name);
+    var nameGroup = makeGroup('Initiative Name', nameInput);
+    nameGroup.className = 'field-group init-full';
+    grid.appendChild(nameGroup);
+
+    /* pillar */
+    var pillarSelect = makeSelect(PILLARS, init.pillar);
+    grid.appendChild(makeGroup('Pillar', pillarSelect));
+
+    /* tool */
+    var toolInput = makeInput('text', 'e.g. VER Hub, TCO Calculator', init.tool);
+    grid.appendChild(makeGroup('AI Tool Used', toolInput));
+
+    /* time */
+    var timeInput = makeInput('number', '0', init.time);
+    timeInput.setAttribute('min', '0');
+    grid.appendChild(makeGroup('Time Saved (hrs/qtr)', timeInput));
+
+    /* cost */
+    var costInput = makeInput('number', '0', init.cost);
+    costInput.setAttribute('min', '0');
+    grid.appendChild(makeGroup('Cost Avoided ($/qtr)', costInput));
+
+    /* quality */
+    var qualitySlider = el('input', {
+      'class': 'quality-slider',
+      'type': 'range',
+      'min': '1',
+      'max': '10',
+      'step': '1',
+      'value': init.quality
+    });
+    var qualityVal = el('span', { 'class': 'quality-val' });
+    qualityVal.textContent = init.quality;
+    qualitySlider.addEventListener('input', function () {
+      qualityVal.textContent = qualitySlider.value;
+      updateKPIs();
+    });
+    var qualityRow = el('div', { 'class': 'quality-row' }, [qualitySlider, qualityVal]);
+    var qualityGroup = el('div', { 'class': 'field-group' }, [makeLabel('Quality Score (1–10)'), qualityRow]);
+    grid.appendChild(qualityGroup);
+
+    /* status */
+    var statusSelect = makeSelect(STATUSES, init.status);
+    grid.appendChild(makeGroup('Status', statusSelect));
+
+    /* notes */
+    var notesTextarea = makeTextarea('Evidence, methodology, impact notes…', init.notes);
+    var notesGroup = makeGroup('Evidence / Notes', notesTextarea);
+    notesGroup.className = 'field-group init-full';
+    grid.appendChild(notesGroup);
+
+    card.appendChild(grid);
+
+    /* live update listeners */
+    [nameInput, pillarSelect, toolInput, timeInput, costInput, statusSelect, notesTextarea].forEach(function (inp) {
+      inp.addEventListener('input', function () { updateKPIs(); });
+      inp.addEventListener('change', function () { updateKPIs(); });
+    });
+
+    /* stash refs for KPI reads */
+    card._refs = {
+      name: nameInput,
+      pillar: pillarSelect,
+      tool: toolInput,
+      time: timeInput,
+      cost: costInput,
+      quality: qualitySlider,
+      status: statusSelect,
+      notes: notesTextarea
+    };
+
+    return card;
+  }
+
+  /* ── RENDER ALL CARDS ── */
+  var listEl = document.getElementById('initiatives-list');
+
+  function renderAll() {
+    while (listEl.firstChild) listEl.removeChild(listEl.firstChild);
+    initiatives.forEach(function (init) {
+      listEl.appendChild(renderCard(init));
+    });
+  }
+
+  /* ── READ CARD VALUES FROM DOM ── */
+  function readCards() {
+    var cards = listEl.querySelectorAll('.init-card');
+    var results = [];
+    cards.forEach(function (card) {
+      if (!card._refs) return;
+      results.push({
+        name: card._refs.name.value.trim() || 'Unnamed Initiative',
+        pillar: card._refs.pillar.value,
+        tool: card._refs.tool.value.trim(),
+        time: parseFloat(card._refs.time.value) || 0,
+        cost: parseFloat(card._refs.cost.value) || 0,
+        quality: parseInt(card._refs.quality.value, 10) || 1,
+        status: card._refs.status.value,
+        notes: card._refs.notes.value.trim()
+      });
+    });
+    return results;
+  }
+
+  /* ── UPDATE KPIs ── */
+  function updateKPIs() {
+    var data = readCards();
+    var totalTime = 0;
+    var totalCost = 0;
+    var totalQuality = 0;
+
+    data.forEach(function (d) {
+      totalTime += d.time;
+      totalCost += d.cost;
+      totalQuality += d.quality;
+    });
+
+    var count = data.length;
+    var avgQuality = count > 0 ? (totalQuality / count).toFixed(1) : '—';
+
+    document.getElementById('kpi-time').textContent = fmt(totalTime);
+    document.getElementById('kpi-cost').textContent = fmtDollar(totalCost);
+    document.getElementById('kpi-count').textContent = count;
+    document.getElementById('kpi-quality').textContent = count > 0 ? avgQuality + '/10' : '—';
+  }
+
+  /* ── ADD INITIATIVE ── */
+  document.getElementById('add-initiative-btn').addEventListener('click', function () {
+    var newInit = {
+      id: nextId++,
+      name: '',
+      pillar: 'VER',
+      tool: '',
+      time: 0,
+      cost: 0,
+      quality: 5,
+      notes: '',
+      status: 'Active'
+    };
+    initiatives.push(newInit);
+    listEl.appendChild(renderCard(newInit));
+    updateKPIs();
+    /* scroll new card into view */
+    var cards = listEl.querySelectorAll('.init-card');
+    var last = cards[cards.length - 1];
+    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  /* ── GENERATE NARRATIVE ── */
+  document.getElementById('gen-narrative-btn').addEventListener('click', function () {
+    var data = readCards();
+    var quarter = document.getElementById('quarter-select').value;
+    var narrativeEl = document.getElementById('narrative-body');
+
+    if (data.length === 0) {
+      narrativeEl.className = 'narrative-body placeholder';
+      narrativeEl.textContent = 'No initiatives tracked. Add at least one initiative to generate a narrative.';
+      return;
+    }
+
+    var totalTime = 0;
+    var totalCost = 0;
+    var totalQuality = 0;
+
+    data.forEach(function (d) {
+      totalTime += d.time;
+      totalCost += d.cost;
+      totalQuality += d.quality;
+    });
+
+    var count = data.length;
+    var avgQuality = (totalQuality / count).toFixed(1);
+
+    /* find top initiative by combined score (time + cost) */
+    var top = data.reduce(function (best, d) {
+      return (d.time + d.cost > best.time + best.cost) ? d : best;
+    }, data[0]);
+
+    var activeCount = data.filter(function (d) { return d.status === 'Active'; }).length;
+    var pillarSet = [];
+    data.forEach(function (d) {
+      if (pillarSet.indexOf(d.pillar) === -1) pillarSet.push(d.pillar);
+    });
+    var pillarStr = pillarSet.length === 1 ? pillarSet[0] : pillarSet.slice(0, -1).join(', ') + ' and ' + pillarSet[pillarSet.length - 1];
+
+    var para = document.createElement('p');
+    para.textContent =
+      'In ' + quarter + ', AI Strategy & Ops tracked ' + count + ' AI initiative' + (count !== 1 ? 's' : '') +
+      ' across DET, spanning ' + pillarStr + '. ' +
+      'Collectively, these initiatives recovered ' + fmt(totalTime) + ' hours of team capacity and avoided approximately ' +
+      fmtDollar(totalCost) + ' in operational costs. ' +
+      'Average quality score across all initiatives: ' + avgQuality + '/10. ' +
+      (activeCount > 0 ? activeCount + ' initiative' + (activeCount !== 1 ? 's' : '') + ' remain' + (activeCount === 1 ? 's' : '') + ' active. ' : '') +
+      'Top performing initiative: ' + top.name + ' (' + fmt(top.time) + ' hrs saved, ' + fmtDollar(top.cost) + ' avoided).';
+
+    narrativeEl.className = 'narrative-body';
+    while (narrativeEl.firstChild) narrativeEl.removeChild(narrativeEl.firstChild);
+    narrativeEl.appendChild(para);
+  });
+
+  /* ── EXPORT PDF ── */
+  document.getElementById('export-pdf-btn').addEventListener('click', function () {
+    window.print();
+  });
+
+  /* ── COPY SUMMARY ── */
+  document.getElementById('copy-summary-btn').addEventListener('click', function () {
+    var narrativeEl = document.getElementById('narrative-body');
+    var text = narrativeEl.textContent || '';
+    if (!text || narrativeEl.classList.contains('placeholder')) {
+      text = 'No narrative generated yet. Click "Generate Narrative" first.';
+    }
+    var confirmEl = document.getElementById('copy-confirm');
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () {
+        confirmEl.classList.add('show');
+        setTimeout(function () { confirmEl.classList.remove('show'); }, 2000);
+      });
+    } else {
+      /* fallback */
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+      document.body.removeChild(ta);
+      confirmEl.classList.add('show');
+      setTimeout(function () { confirmEl.classList.remove('show'); }, 2000);
+    }
+  });
+
+  /* ── INIT ── */
+  renderAll();
+  updateKPIs();
+
+})();
+</script>
+</body>
+</html>

@@ -1860,38 +1860,121 @@ function processExtractedText(text) {
   }
 }
 
+function decodePdfStr(s) {
+  return s
+    .replace(/\\([0-7]{3})/g, function(_, o) { return String.fromCharCode(parseInt(o, 8)); })
+    .replace(/\\n/g, ' ').replace(/\\r/g, ' ').replace(/\\t/g, ' ')
+    .replace(/\\\\/g, '\\').replace(/\\\)/g, ')').replace(/\\\(/g, '(');
+}
+
+function extractPdfStreamText(s) {
+  var text = '';
+  s.replace(/\(([^)\\]*(?:\\.[^)\\]*)*)\)\s*Tj/g, function(m, g1) {
+    text += decodePdfStr(g1) + ' '; return m;
+  });
+  s.replace(/\[([^\]]*)\]\s*TJ/g, function(m, inner) {
+    inner.replace(/\(([^)\\]*(?:\\.[^)\\]*)*)\)/g, function(m2, g1) {
+      text += decodePdfStr(g1); return m2;
+    });
+    text += ' '; return m;
+  });
+  return text;
+}
+
+function inflatePdfStream(bytes) {
+  function run(fmt) {
+    return new Promise(function(resolve, reject) {
+      try {
+        var ds = new DecompressionStream(fmt);
+        var w = ds.writable.getWriter();
+        var r = ds.readable.getReader();
+        var chunks = [];
+        (function pump() {
+          r.read().then(function(res) {
+            if (res.done) { resolve(chunks); } else { chunks.push(res.value); pump(); }
+          }, reject);
+        })();
+        w.write(bytes).then(function() { return w.close(); }).catch(reject);
+      } catch(e) { reject(e); }
+    }).then(function(chunks) {
+      var total = 0;
+      for (var i = 0; i < chunks.length; i++) total += chunks[i].length;
+      if (total === 0) throw new Error('empty');
+      var out = new Uint8Array(total), off = 0;
+      for (var i = 0; i < chunks.length; i++) { out.set(chunks[i], off); off += chunks[i].length; }
+      var s = '';
+      for (var i = 0; i < out.length; i++) s += String.fromCharCode(out[i]);
+      return s;
+    });
+  }
+  return run('deflate').catch(function() { return run('deflate-raw'); }).catch(function() { return ''; });
+}
+
 function parsePdf(file) {
   showParseStatus('parsing', 'Reading PDF…');
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      var arr = new Uint8Array(e.target.result);
-      var raw = '';
-      for (var i = 0; i < arr.length; i++) raw += String.fromCharCode(arr[i]);
-      var text = '';
-      var pat = /\(([^)\\]*(?:\\.[^)\\]*)*)\)\s*Tj|\[([^\]]*)\]\s*TJ/g;
-      raw.replace(pat, function(match, g1, g2) {
-        var chunk = (g1 !== undefined) ? g1 : (g2 || '');
-        chunk = chunk
-          .replace(/\\([0-7]{3})/g, function(_, o) { return String.fromCharCode(parseInt(o, 8)); })
-          .replace(/\\[nrt]/g, ' ')
-          .replace(/\\\\/g, '\\').replace(/\\\)/g, ')').replace(/\\\(/g, '(')
-          .replace(/-?[0-9]+/g, ' ');
-        text += chunk + ' ';
-        return match;
-      });
-      text = text.replace(/[^ -~\s]/g, ' ').replace(/\s+/g, ' ').trim();
-      if (text.length < 30) {
+  file.arrayBuffer().then(function(buf) {
+    var arr = new Uint8Array(buf);
+    var raw = '';
+    for (var i = 0; i < arr.length; i++) raw += String.fromCharCode(arr[i]);
+
+    var jobs = [];
+    var pos = 0;
+    while (pos < raw.length) {
+      /* Find next stream\n or stream\r\n */
+      var streamPos = -1, dataStart = -1;
+      for (var k = pos; k < raw.length - 7; k++) {
+        if (raw[k] === 's' && raw.substr(k, 6) === 'stream') {
+          var after = k + 6;
+          if (raw[after] === '\r') after++;
+          if (raw[after] === '\n') { streamPos = k; dataStart = after + 1; break; }
+        }
+      }
+      if (streamPos === -1) break;
+
+      var esIdx = raw.indexOf('endstream', dataStart);
+      if (esIdx === -1) { pos = dataStart + 1; continue; }
+
+      var dataEnd = esIdx;
+      if (raw[dataEnd - 1] === '\n') dataEnd--;
+      if (raw[dataEnd - 1] === '\r') dataEnd--;
+
+      var size = dataEnd - dataStart;
+      if (size > 10 && size < 600 * 1024) {
+        /* Check if this stream already has readable Tj/TJ ops (uncompressed content stream) */
+        var chunk = raw.substring(dataStart, dataEnd);
+        if (/\)\s*Tj|\]\s*TJ/.test(chunk)) {
+          jobs.push(Promise.resolve(extractPdfStreamText(chunk)));
+        } else {
+          /* Try inflate — both zlib and raw deflate */
+          var sliced = arr.slice(dataStart, dataEnd);
+          jobs.push(
+            inflatePdfStream(sliced).then(function(inflated) {
+              return inflated ? extractPdfStreamText(inflated) : '';
+            })
+          );
+        }
+      }
+      pos = esIdx + 9;
+    }
+
+    if (jobs.length === 0) {
+      showParseStatus('error', 'No selectable text found — PDF may be scanned/image-only. Paste scope manually.');
+      return;
+    }
+
+    Promise.all(jobs).then(function(texts) {
+      var all = texts.join(' ').replace(/[^ -~\s]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (all.length < 30) {
         showParseStatus('error', 'No selectable text found — PDF may be scanned/image-only. Paste scope manually.');
         return;
       }
-      processExtractedText(text);
-    } catch(err) {
+      processExtractedText(all);
+    }).catch(function(err) {
       showParseStatus('error', 'Could not parse PDF: ' + err.message);
-    }
-  };
-  reader.onerror = function() { showParseStatus('error', 'Failed to read file.'); };
-  reader.readAsArrayBuffer(file);
+    });
+  }).catch(function(err) {
+    showParseStatus('error', 'Could not parse PDF: ' + err.message);
+  });
 }
 
 function parseDocx(file) {
@@ -1911,52 +1994,71 @@ function parseDocx(file) {
 
 function unzipDocxAsync(bytes) {
   return new Promise(function(resolve, reject) {
-    var i = 0;
-    while (i < bytes.length - 30) {
-      if (bytes[i]===0x50 && bytes[i+1]===0x4B && bytes[i+2]===0x03 && bytes[i+3]===0x04) {
-        var method   = bytes[i+8]  | (bytes[i+9]  << 8);
-        var cSize    = bytes[i+18] | (bytes[i+19] << 8) | (bytes[i+20] << 16) | (bytes[i+21] << 24);
-        var nameLen  = bytes[i+26] | (bytes[i+27] << 8);
-        var extraLen = bytes[i+28] | (bytes[i+29] << 8);
-        var nb = bytes.slice(i+30, i+30+nameLen);
-        var name = '';
-        for (var n = 0; n < nb.length; n++) name += String.fromCharCode(nb[n]);
-        var dStart = i + 30 + nameLen + extraLen;
+    /* Read from the Central Directory — it always has correct sizes even for
+       streaming ZIPs where the local file header has cSize=0 (data descriptor pattern). */
+    var eocd = -1;
+    for (var i = bytes.length - 22; i >= Math.max(0, bytes.length - 65558); i--) {
+      if (bytes[i]===0x50 && bytes[i+1]===0x4B && bytes[i+2]===0x05 && bytes[i+3]===0x06) {
+        eocd = i; break;
+      }
+    }
+    if (eocd === -1) { reject(new Error('Not a valid ZIP/DOCX file.')); return; }
 
-        if (name === 'word/document.xml') {
-          var xmlBytes = bytes.slice(dStart, dStart + cSize);
-          if (method === 0) {
-            var s = '';
-            for (var b = 0; b < xmlBytes.length; b++) s += String.fromCharCode(xmlBytes[b]);
-            resolve(xmlToText(s));
-            return;
-          } else if (method === 8 && typeof DecompressionStream !== 'undefined') {
-            var ds = new DecompressionStream('deflate-raw');
-            var w  = ds.writable.getWriter();
-            var r  = ds.readable.getReader();
-            var parts = [];
-            w.write(xmlBytes); w.close();
-            (function pump() {
-              r.read().then(function(chunk) {
-                if (chunk.done) {
-                  var total = 0;
-                  for (var c = 0; c < parts.length; c++) total += parts[c].length;
-                  var merged = new Uint8Array(total), off = 0;
-                  for (var c = 0; c < parts.length; c++) { merged.set(parts[c], off); off += parts[c].length; }
-                  resolve(xmlToText(new TextDecoder('utf-8',{fatal:false}).decode(merged)));
-                } else {
-                  parts.push(chunk.value); pump();
-                }
-              }).catch(reject);
-            })();
-            return;
-          } else {
-            reject(new Error('Unsupported compression — save as .docx and retry.'));
-            return;
-          }
+    var cdCount  = bytes[eocd+8]  | (bytes[eocd+9]  << 8);
+    var cdOffset = bytes[eocd+16] | (bytes[eocd+17] << 8) | (bytes[eocd+18] << 16) | (bytes[eocd+19] << 24);
+
+    var pos = cdOffset;
+    for (var e = 0; e < cdCount; e++) {
+      if (pos + 46 > bytes.length) break;
+      if (bytes[pos]!==0x50 || bytes[pos+1]!==0x4B || bytes[pos+2]!==0x01 || bytes[pos+3]!==0x02) break;
+
+      var method   = bytes[pos+10] | (bytes[pos+11] << 8);
+      var cSize    = bytes[pos+20] | (bytes[pos+21] << 8) | (bytes[pos+22] << 16) | (bytes[pos+23] << 24);
+      var nameLen  = bytes[pos+28] | (bytes[pos+29] << 8);
+      var extraLen = bytes[pos+30] | (bytes[pos+31] << 8);
+      var cmtLen   = bytes[pos+32] | (bytes[pos+33] << 8);
+      var lhOffset = bytes[pos+42] | (bytes[pos+43] << 8) | (bytes[pos+44] << 16) | (bytes[pos+45] << 24);
+
+      var nb = bytes.slice(pos+46, pos+46+nameLen);
+      var name = '';
+      for (var n = 0; n < nb.length; n++) name += String.fromCharCode(nb[n]);
+
+      if (name === 'word/document.xml') {
+        /* Use local header only to find data start offset; size comes from Central Directory */
+        var lhNameLen  = bytes[lhOffset+26] | (bytes[lhOffset+27] << 8);
+        var lhExtraLen = bytes[lhOffset+28] | (bytes[lhOffset+29] << 8);
+        var dataStart  = lhOffset + 30 + lhNameLen + lhExtraLen;
+        var xmlBytes   = bytes.slice(dataStart, dataStart + cSize);
+
+        if (method === 0) {
+          var s = '';
+          for (var b = 0; b < xmlBytes.length; b++) s += String.fromCharCode(xmlBytes[b]);
+          resolve(xmlToText(s));
+          return;
+        } else if (method === 8 && typeof DecompressionStream !== 'undefined') {
+          var ds = new DecompressionStream('deflate-raw');
+          var w  = ds.writable.getWriter();
+          var r  = ds.readable.getReader();
+          var parts = [];
+          (function pump() {
+            r.read().then(function(chunk) {
+              if (chunk.done) {
+                var total = 0;
+                for (var c = 0; c < parts.length; c++) total += parts[c].length;
+                var merged = new Uint8Array(total), off = 0;
+                for (var c = 0; c < parts.length; c++) { merged.set(parts[c], off); off += parts[c].length; }
+                resolve(xmlToText(new TextDecoder('utf-8',{fatal:false}).decode(merged)));
+              } else { parts.push(chunk.value); pump(); }
+            }).catch(reject);
+          })();
+          w.write(xmlBytes).then(function() { return w.close(); }).catch(reject);
+          return;
+        } else {
+          reject(new Error('Unsupported compression — re-save as .docx and retry.'));
+          return;
         }
-        i = dStart + cSize;
-      } else { i++; }
+      }
+      pos += 46 + nameLen + extraLen + cmtLen;
     }
     reject(new Error('word/document.xml not found in ZIP.'));
   });
@@ -1976,9 +2078,12 @@ function handleDocFile(file) {
   try {
     byId('doc-suggestions').classList.remove('visible');
     var name = file.name.toLowerCase();
-    if (name.slice(-4) === '.pdf') {
+    var mime = (file.type || '').toLowerCase();
+    var isPdf  = name.slice(-4) === '.pdf'  || mime === 'application/pdf';
+    var isDocx = name.slice(-5) === '.docx' || mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    if (isPdf) {
       parsePdf(file);
-    } else if (name.slice(-5) === '.docx') {
+    } else if (isDocx) {
       parseDocx(file);
     } else {
       showParseStatus('error', 'Only PDF and Word (.docx) files are supported.');
@@ -2028,18 +2133,27 @@ docFileInput.addEventListener('change', function(ev) {
 });
 
 var uploadZone = byId('doc-upload-zone');
+uploadZone.addEventListener('dragenter', function(ev) { ev.preventDefault(); ev.stopPropagation(); });
 uploadZone.addEventListener('dragover', function(ev) {
   ev.preventDefault();
+  ev.stopPropagation();
   uploadZone.classList.add('drag-over');
 });
 uploadZone.addEventListener('dragleave', function(ev) {
   if (!uploadZone.contains(ev.relatedTarget)) uploadZone.classList.remove('drag-over');
 });
+var _justDropped = false;
 uploadZone.addEventListener('drop', function(ev) {
   ev.preventDefault();
+  ev.stopPropagation();
+  _justDropped = true;
   uploadZone.classList.remove('drag-over');
   var files = ev.dataTransfer ? ev.dataTransfer.files : null;
   if (files && files[0]) handleDocFile(files[0]);
+});
+/* Label fires a synthetic click after drop — suppress it so the file picker doesn't reopen */
+uploadZone.addEventListener('click', function(ev) {
+  if (_justDropped) { ev.preventDefault(); _justDropped = false; }
 });
 
 byId('doc-sug-dismiss').addEventListener('click', function() {

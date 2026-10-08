@@ -24,6 +24,10 @@ Any literal `</style>`, `</head>`, `</body>`, `</html>`, `</script>` inside a `<
 will be parsed by the browser as real closing tags, truncating the script and killing all event
 listeners. Fix: build HTML output via `createHTMLDocument` + DOM, never string concatenation.
 
-**Why:** Discovered when download function's string-built HTML template silently ended the script block, breaking every button on the page.
+**PDF parser status (in progress):**
+- Drop zone auto-refresh fixed: `_justDropped` flag prevents label's synthetic click from reopening file picker after drag-drop
+- DOCX parser fixed: ZIP Central Directory used for sizes (handles streaming ZIPs where local header cSize=0); write/close properly chained
+- PDF compressed streams: FlateDecode inflate attempted via DecompressionStream('deflate') then 'deflate-raw' fallback; stream walker advances past `endstream` to avoid re-scanning compressed data
+- PDF still not extracting text from dropped files — inflate jobs resolve but text is empty; PDF parsing remains a known open issue for next session
 
 **How to apply:** Any future tool that generates downloadable HTML must use DOM construction, not string templates with literal closing tags.

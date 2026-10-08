@@ -29,3 +29,4 @@
 - [Next Session — Apply Candor Standard to Hub/Portal](project_next_session_candor_standard.md) — Candor is the design lab; apply centered brand/context chips/scoring strip to all hub pages next session
 - [Candor Session Status](project_candor_status.md) — mock interview fully working after hidden!important bug fix; ready to apply standard to hub/portal
 - [AI Strategy & Ops Proposal](project_ai_strategy_ops_proposal.md) — Casey proposing new function in DA&O Org; proposal built as ai_strategy_ops_proposal.html; Judette Platz co-owns ROI; next step: share with Judette then Roger
+- [SOW Cost Estimator](project_sow_estimator.md) — sow_estimator.html; light warm off-white theme; zero-CDN PDF/DOCX upload with role auto-suggest; DOM-built download (never string-template HTML inside script blocks)
