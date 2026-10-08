@@ -4,367 +4,297 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Strategy &amp; Ops — A Proposal for DET</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#06040f;--bg2:#0e0b1e;
-  --violet:#A855F7;
+  --violet:#A855F7;--violet2:#7c3aed;
   --sky:#38BDF8;--teal:#2DD4BF;--amber:#FBBF24;--green:#34D399;
   --ink:#f0eeff;--ink-muted:rgba(240,238,255,0.65);--ink-faint:rgba(240,238,255,0.35);
   --border:rgba(168,85,247,0.18);--border-soft:rgba(168,85,247,0.10);
   --card:rgba(255,255,255,0.04);--card-hover:rgba(255,255,255,0.07);
 }
-html{scroll-behavior:smooth;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden;}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);}
 
-/* ── PROGRESS BAR ── */
-#progress{position:fixed;top:0;left:0;height:2px;z-index:300;background:linear-gradient(90deg,var(--violet),var(--sky),var(--teal));transition:width 0.08s linear;}
-
-/* ── NAV ── */
-.nav{
-  position:fixed;top:2px;left:0;right:0;z-index:200;
-  padding:14px 48px;display:flex;align-items:center;gap:24px;justify-content:space-between;
-  background:rgba(6,4,15,0.88);backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--border-soft);
+/* ── PANELS ── */
+.panel{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 48px 100px;
+  overflow-y:auto;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.55s ease, transform 0.55s ease;
+  transform:translateX(40px);
+  z-index:0;
 }
-.nav-brand{font-size:13px;font-weight:800;letter-spacing:0.08em;color:var(--violet);text-transform:uppercase;white-space:nowrap;}
-.nav-links{display:flex;gap:4px;flex-wrap:wrap;}
-.nav-link{padding:5px 13px;font-size:11px;font-weight:600;border-radius:20px;color:var(--ink-muted);border:1px solid transparent;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
-.nav-link:hover,.nav-link.active{color:var(--violet);background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.28);}
-.nav-tag{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:4px 12px;border-radius:20px;background:rgba(168,85,247,0.12);color:var(--violet);border:1px solid rgba(168,85,247,0.28);white-space:nowrap;}
+.panel.active{opacity:1;pointer-events:all;transform:translateX(0);z-index:2;}
+.panel.exit-left{opacity:0;transform:translateX(-40px);z-index:1;pointer-events:none;}
+.panel.exit-right{opacity:0;transform:translateX(40px);z-index:1;pointer-events:none;}
+.panel.from-left{transform:translateX(-40px);}
+.inner{width:100%;max-width:960px;margin:0 auto;}
+@media(max-width:680px){.panel{padding:70px 20px 90px;}}
 
-/* ── LAYOUT ── */
-section{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:130px 48px 90px;}
-.inner{width:100%;max-width:980px;margin:0 auto;}
-@media(max-width:680px){section{padding:100px 20px 70px;}.nav{padding:12px 20px;}.nav-links{display:none;}}
+/* ── CHROME ── */
+.chrome{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 32px;
+  background:rgba(6,4,15,0.75);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border-soft);}
+.chrome-brand{font-size:12px;font-weight:800;letter-spacing:0.08em;color:var(--violet);text-transform:uppercase;}
+.chrome-counter{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-faint);}
 
-/* ── HERO ── */
-#hero{
-  text-align:center;
-  background:
-    radial-gradient(ellipse 100% 70% at 50% -10%,rgba(168,85,247,0.22) 0%,transparent 65%),
-    radial-gradient(ellipse 60% 40% at 85% 85%,rgba(56,189,248,0.12) 0%,transparent 55%),
-    linear-gradient(180deg,#100c22 0%,var(--bg) 100%);
-}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:20px;margin-bottom:32px;background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.28);font-size:11px;font-weight:700;letter-spacing:0.10em;color:var(--violet);text-transform:uppercase;}
-.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--violet);animation:blink 2s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
-.hero-h1{font-size:clamp(52px,10vw,96px);font-weight:900;line-height:0.95;letter-spacing:-0.03em;background:linear-gradient(135deg,#ede9ff 0%,#c084fc 35%,#818cf8 65%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
-.hero-sub{font-size:clamp(16px,2.5vw,22px);font-weight:300;color:var(--ink-muted);max-width:580px;margin:0 auto 44px;line-height:1.65;}
-.hero-meta{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;font-size:12px;color:var(--ink-faint);}
-.hero-scroll{position:absolute;bottom:44px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--ink-faint);font-size:11px;animation:bob 3s ease-in-out infinite;}
-@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-7px);}}
-.scroll-line{width:1px;height:42px;background:linear-gradient(to bottom,transparent,var(--violet));}
+/* ── NAV ARROWS ── */
+.nav-wrap{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:100;
+  display:flex;align-items:center;gap:16px;}
+.nav-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);
+  background:rgba(168,85,247,0.10);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;
+  transition:background 0.2s,border-color 0.2s;}
+.nav-btn:hover{background:rgba(168,85,247,0.22);border-color:rgba(168,85,247,0.45);}
+.nav-btn:disabled{opacity:0.25;cursor:default;}
+.nav-dots{display:flex;gap:6px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);transition:all 0.25s;cursor:pointer;}
+.dot.on{background:var(--violet);width:22px;border-radius:3px;}
 
-/* ── STATS ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:18px;overflow:hidden;margin-bottom:56px;}
-@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr);}}
-.stat{background:var(--card);padding:28px 20px;text-align:center;}
-.stat-n{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--violet);line-height:1;}
-.stat-l{font-size:11px;color:var(--ink-faint);margin-top:8px;font-weight:500;line-height:1.4;}
+/* ── SWIPE ZONES ── */
+.swipe-left,.swipe-right{position:fixed;top:0;bottom:0;width:60px;z-index:50;cursor:pointer;}
+.swipe-left{left:0;}.swipe-right{right:0;}
 
-/* ── EYEBROW ── */
+/* ── COMMON ELEMENTS ── */
 .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--violet);margin-bottom:14px;}
 .eyebrow::before{content:'';width:28px;height:1px;background:var(--violet);}
-
-.h2{font-size:clamp(34px,5.5vw,58px);font-weight:900;line-height:1.05;letter-spacing:-0.025em;margin-bottom:16px;}
+.h1{font-size:clamp(52px,10vw,96px);font-weight:900;line-height:0.95;letter-spacing:-0.03em;
+  background:linear-gradient(135deg,#ede9ff 0%,#c084fc 35%,#818cf8 65%,#38bdf8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
+.h2{font-size:clamp(32px,5vw,56px);font-weight:900;line-height:1.05;letter-spacing:-0.025em;margin-bottom:16px;}
 .h2 em{font-style:normal;color:var(--violet);}
-.lead{font-size:clamp(14px,1.8vw,17px);color:var(--ink-muted);max-width:640px;line-height:1.75;margin-bottom:52px;}
-
-/* ── CARDS ── */
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:28px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden;transition:background 0.2s,border-color 0.2s;}
-.card:hover{background:var(--card-hover);border-color:rgba(168,85,247,0.32);}
-.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,0.38),transparent);}
-.card-ico{font-size:22px;margin-bottom:12px;}
-.card-t{font-size:14px;font-weight:700;margin-bottom:8px;}
-.card-b{font-size:13px;color:var(--ink-muted);line-height:1.65;}
-
-/* ── PROOF ── */
-.proof{display:flex;align-items:flex-start;gap:16px;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.22);border-radius:14px;padding:20px 24px;margin-bottom:14px;}
-.proof-ico{font-size:20px;flex-shrink:0;margin-top:2px;}
-.proof-txt{font-size:13px;color:var(--ink-muted);line-height:1.6;}
-.proof-txt strong{color:var(--ink);}
+.lead{font-size:clamp(14px,1.8vw,17px);color:var(--ink-muted);line-height:1.75;margin-bottom:40px;max-width:620px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:24px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,0.35),transparent);}
+.card-ico{font-size:20px;margin-bottom:10px;}
+.card-t{font-size:13px;font-weight:700;margin-bottom:7px;}
+.card-b{font-size:12px;color:var(--ink-muted);line-height:1.65;}
+.proof{display:flex;align-items:flex-start;gap:14px;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.20);border-radius:12px;padding:18px 20px;margin-top:18px;}
 .proof.sky{background:rgba(56,189,248,0.05);border-color:rgba(56,189,248,0.20);}
 .proof.teal{background:rgba(45,212,191,0.05);border-color:rgba(45,212,191,0.20);}
-
-/* ── VS ── */
-.vs-wrap{display:grid;grid-template-columns:1fr 48px 1fr;gap:0;align-items:start;margin-bottom:40px;}
-@media(max-width:640px){.vs-wrap{grid-template-columns:1fr;gap:12px;}.vs-mid{display:none!important;}}
-.vs-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;}
-.vs-box.ours{border-color:rgba(168,85,247,0.35);}
-.vs-ttl{font-size:10px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;margin-bottom:14px;color:var(--ink-faint);}
-.vs-ttl.bright{color:var(--violet);}
-.vs-row-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;color:var(--ink-muted);line-height:1.5;}
-.vs-row-item:last-child{border-bottom:none;}
-.vs-mid{display:flex;align-items:center;justify-content:center;padding-top:60px;font-size:12px;font-weight:700;color:var(--ink-faint);}
-
-/* ── CHIPS ── */
-.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 13px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;}
+.proof-ico{font-size:18px;flex-shrink:0;margin-top:2px;}
+.proof-txt{font-size:13px;color:var(--ink-muted);line-height:1.65;}
+.proof-txt strong{color:var(--ink);}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;}
 .cv{background:rgba(168,85,247,0.12);color:#c084fc;border-color:rgba(168,85,247,0.28);}
 .cs{background:rgba(56,189,248,0.10);color:#7dd3fc;border-color:rgba(56,189,248,0.25);}
 .ct{background:rgba(45,212,191,0.10);color:#5eead4;border-color:rgba(45,212,191,0.25);}
 .ca{background:rgba(251,191,36,0.10);color:#fcd34d;border-color:rgba(251,191,36,0.25);}
 .cg{background:rgba(52,211,153,0.10);color:#6ee7b7;border-color:rgba(52,211,153,0.25);}
 .cb{background:rgba(244,63,94,0.10);color:#fb7185;border-color:rgba(244,63,94,0.25);}
-
-/* ── PIPELINE ── */
-.pipeline{display:flex;gap:0;margin:32px 0 28px;align-items:stretch;}
-.pipe-step{flex:1;background:var(--card);border:1px solid var(--border);padding:28px 22px;position:relative;}
-.pipe-step:hover{background:var(--card-hover);}
-.pipe-step:first-child{border-radius:16px 0 0 16px;}
-.pipe-step:last-child{border-radius:0 16px 16px 0;}
+.mandate{border-left:3px solid var(--violet);padding:18px 22px;background:rgba(168,85,247,0.05);border-radius:0 12px 12px 0;margin-bottom:24px;}
+.mandate-q{font-size:15px;font-weight:600;font-style:italic;color:var(--ink-muted);line-height:1.6;margin-bottom:8px;}
+.mandate-attr{font-size:11px;color:var(--ink-faint);}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden;}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr);}}
+.stat{background:var(--card);padding:28px 20px;text-align:center;}
+.stat-n{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--violet);line-height:1;}
+.stat-l{font-size:11px;color:var(--ink-faint);margin-top:8px;font-weight:500;line-height:1.4;}
+.vs-wrap{display:grid;grid-template-columns:1fr 40px 1fr;gap:0;margin-bottom:24px;}
+@media(max-width:640px){.vs-wrap{grid-template-columns:1fr;gap:10px;}.vs-mid{display:none!important;}}
+.vs-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.vs-box.ours{border-color:rgba(168,85,247,0.35);}
+.vs-ttl{font-size:10px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;margin-bottom:12px;color:var(--ink-faint);}
+.vs-ttl.bright{color:var(--violet);}
+.vs-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;color:var(--ink-muted);}
+.vs-row:last-child{border-bottom:none;}
+.vs-mid{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink-faint);}
+.pipeline{display:flex;gap:0;align-items:stretch;}
+.pipe-step{flex:1;background:var(--card);border:1px solid var(--border);padding:22px 18px;position:relative;}
+.pipe-step:first-child{border-radius:14px 0 0 14px;}
+.pipe-step:last-child{border-radius:0 14px 14px 0;}
 .pipe-step:not(:last-child){border-right:none;}
-.pipe-arrow{position:absolute;right:-16px;top:50%;transform:translateY(-50%);z-index:10;width:32px;height:32px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--violet);}
-.ps-num{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;}
-.ps-tool{font-size:20px;font-weight:900;color:var(--ink);margin-bottom:4px;letter-spacing:-0.02em;}
-.ps-phase{font-size:11px;font-weight:700;color:var(--violet);margin-bottom:12px;}
-.ps-body{font-size:12px;color:var(--ink-muted);line-height:1.65;margin-bottom:14px;}
-.ps-chips{display:flex;flex-wrap:wrap;gap:6px;}
-@media(max-width:680px){.pipeline{flex-direction:column;}.pipe-step{border-radius:0!important;border-right:1px solid var(--border)!important;border-bottom:none!important;}.pipe-step:first-child{border-radius:16px 16px 0 0!important;}.pipe-step:last-child{border-radius:0 0 16px 16px!important;border-bottom:1px solid var(--border)!important;}.pipe-arrow{right:50%;bottom:-16px;top:auto;transform:translateX(50%) rotate(90deg);}}
-
-/* ── TEAM ── */
-.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:28px;}
-.tc{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;transition:all 0.2s;}
-.tc:hover{background:var(--card-hover);border-color:rgba(168,85,247,0.35);}
-.tc-av{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;margin:0 auto 14px;border:2px solid;}
+.pipe-arrow{position:absolute;right:-14px;top:50%;transform:translateY(-50%);z-index:5;width:28px;height:28px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--violet);}
+.ps-num{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;}
+.ps-tool{font-size:18px;font-weight:900;color:var(--ink);margin-bottom:4px;letter-spacing:-0.02em;}
+.ps-phase{font-size:11px;font-weight:700;color:var(--violet);margin-bottom:10px;}
+.ps-body{font-size:12px;color:var(--ink-muted);line-height:1.6;margin-bottom:12px;}
+.ps-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px;}
+.tc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;}
+.tc-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;margin:0 auto 12px;border:2px solid;}
 .av-v{background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.45);}
 .av-s{background:rgba(56,189,248,0.15);color:#7dd3fc;border-color:rgba(56,189,248,0.45);}
-.av-t{background:rgba(45,212,191,0.15);color:#5eead4;border-color:rgba(45,212,191,0.45);}
-.tc-name{font-size:14px;font-weight:700;margin-bottom:4px;}
-.tc-role{font-size:11px;color:var(--violet);font-weight:700;margin-bottom:10px;}
-.tc-focus{font-size:12px;color:var(--ink-muted);line-height:1.55;}
-
-/* ── OUTPUTS ── */
-.out-list{list-style:none;padding:0;}
-.out-item{display:flex;align-items:flex-start;gap:16px;padding:18px 0;border-bottom:1px solid var(--border-soft);}
+.av-t{background:rgba(255,255,255,0.05);color:var(--ink-faint);border-color:var(--border);}
+.tc-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.tc-role{font-size:11px;color:var(--violet);font-weight:700;margin-bottom:8px;}
+.tc-focus{font-size:12px;color:var(--ink-muted);line-height:1.5;}
+.out-list{list-style:none;padding:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.out-item{display:grid;grid-template-columns:44px 1fr;border-bottom:1px solid var(--border-soft);}
 .out-item:last-child{border-bottom:none;}
-.out-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--violet);width:30px;height:30px;border-radius:50%;border:1px solid rgba(168,85,247,0.30);background:rgba(168,85,247,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.out-t{font-size:14px;font-weight:700;margin-bottom:5px;}
-.out-d{font-size:13px;color:var(--ink-muted);line-height:1.65;}
-
-/* ── TWO-COL ── */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start;}
-@media(max-width:660px){.two-col{grid-template-columns:1fr;}}
-
-/* ── TIMELINE ── */
-.tl{position:relative;padding-left:32px;margin-bottom:12px;}
-.tl::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:1px;background:var(--border);}
-.tl-item{position:relative;margin-bottom:26px;}
-.tl-dot{position:absolute;left:-33px;top:5px;width:16px;height:16px;border-radius:50%;border:2px solid var(--violet);background:rgba(168,85,247,0.18);}
-.tl-dot.sky{border-color:var(--sky);background:rgba(56,189,248,0.18);}
-.tl-phase{font-size:10px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--violet);margin-bottom:5px;}
+.out-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--violet);padding:16px 0 16px 14px;display:flex;align-items:flex-start;padding-top:18px;}
+.out-body{padding:14px 14px 14px 8px;}
+.out-t{font-size:13px;font-weight:700;margin-bottom:4px;}
+.out-d{font-size:12px;color:var(--ink-muted);line-height:1.6;}
+.ex-card{padding:0!important;overflow:hidden;text-decoration:none;cursor:pointer;}
+.ex-preview{height:80px;width:100%;position:relative;overflow:hidden;}
+.ex-preview::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.025) 0px,rgba(255,255,255,0.025) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(0deg,rgba(255,255,255,0.025) 0px,rgba(255,255,255,0.025) 1px,transparent 1px,transparent 20px);}
+.ex-preview::before{content:'';position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(to top,rgba(10,7,24,0.85),transparent);}
+.ex-body{padding:16px;}
+.tl-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+@media(max-width:600px){.tl-grid{grid-template-columns:1fr;}}
+.tl{padding-left:24px;position:relative;}
+.tl::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:1px;background:var(--border);}
+.tl-item{position:relative;margin-bottom:22px;}
+.tl-dot{position:absolute;left:-25px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--violet);background:rgba(168,85,247,0.15);}
+.tl-dot.sky{border-color:var(--sky);background:rgba(56,189,248,0.15);}
+.tl-phase{font-size:9px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--violet);margin-bottom:3px;}
 .tl-phase.sky{color:var(--sky);}
-.tl-title{font-size:14px;font-weight:700;margin-bottom:6px;}
-.tl-body{font-size:12px;color:var(--ink-muted);line-height:1.7;}
+.tl-title{font-size:13px;font-weight:700;margin-bottom:5px;}
+.tl-body{font-size:12px;color:var(--ink-muted);line-height:1.65;}
 .tl-body li{margin-bottom:2px;}
-
-/* ── MANDATE ── */
-.mandate{border-left:3px solid var(--violet);padding:20px 24px;background:rgba(168,85,247,0.05);border-radius:0 12px 12px 0;margin-bottom:28px;}
-.mandate-q{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.4;}
-.mandate-body{font-size:14px;color:var(--ink-muted);line-height:1.7;}
-
-.div{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:36px 0;}
-
-/* ── THE ASK ── */
-.ask{background:linear-gradient(135deg,rgba(168,85,247,0.09) 0%,rgba(56,189,248,0.06) 100%);border:1px solid rgba(168,85,247,0.32);border-radius:22px;padding:56px 48px;text-align:center;}
-@media(max-width:600px){.ask{padding:36px 24px;}}
-.ask-h{font-size:clamp(30px,5vw,52px);font-weight:900;letter-spacing:-0.025em;line-height:1.1;margin-bottom:18px;}
+.ask{background:linear-gradient(135deg,rgba(168,85,247,0.09) 0%,rgba(56,189,248,0.06) 100%);border:1px solid rgba(168,85,247,0.32);border-radius:20px;padding:48px 44px;text-align:center;}
+@media(max-width:600px){.ask{padding:32px 20px;}}
+.ask-h{font-size:clamp(28px,5vw,48px);font-weight:900;letter-spacing:-0.025em;line-height:1.1;margin-bottom:16px;}
 .ask-h span{background:linear-gradient(135deg,#c084fc,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.ask-body{font-size:16px;color:var(--ink-muted);max-width:560px;margin:0 auto 32px;line-height:1.75;}
-.ask-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;}
-.ask-footnote{font-size:11px;color:var(--ink-faint);font-style:italic;line-height:1.6;}
-
-footer{text-align:center;padding:64px 40px;border-top:1px solid var(--border-soft);font-size:12px;color:var(--ink-faint);}
-footer .logo{font-size:22px;font-weight:900;color:var(--ink);letter-spacing:-0.02em;margin-bottom:10px;}
-footer .stamp{margin-top:14px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(168,85,247,0.45);}
-
-/* ── EXHIBIT CARDS ── */
-.ex-card{padding:0!important;}
-.ex-preview{height:90px;width:100%;position:relative;overflow:hidden;flex-shrink:0;}
-.ex-preview::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0px,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 32px),repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0px,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 22px);}
-.ex-preview::before{content:'';position:absolute;bottom:0;left:0;right:0;height:32px;background:linear-gradient(to top,rgba(10,7,24,0.9),transparent);}
-
-/* ── FADE IN ── */
-.fi{opacity:0;transform:translateY(22px);transition:opacity 0.65s ease,transform 0.65s ease;}
-.fi.on{opacity:1;transform:translateY(0);}
-.fi.d1{transition-delay:0.08s;}.fi.d2{transition-delay:0.16s;}.fi.d3{transition-delay:0.24s;}
+.ask-body{font-size:15px;color:var(--ink-muted);max-width:520px;margin:0 auto 24px;line-height:1.75;}
+.ask-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;}
+.ask-fn{font-size:11px;color:var(--ink-faint);font-style:italic;line-height:1.65;}
+/* HERO BG */
+.panel-hero{background:radial-gradient(ellipse 100% 70% at 50% -10%,rgba(168,85,247,0.22) 0%,transparent 65%),radial-gradient(ellipse 60% 40% at 85% 85%,rgba(56,189,248,0.12) 0%,transparent 55%),linear-gradient(180deg,#100c22 0%,var(--bg) 100%);}
+.panel-alt{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%);}
+/* BEGIN BTN */
+.begin-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:40px;background:rgba(168,85,247,0.14);border:1px solid rgba(168,85,247,0.40);color:var(--ink);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;margin-top:8px;}
+.begin-btn:hover{background:rgba(168,85,247,0.26);border-color:rgba(168,85,247,0.65);}
+/* panel-level bg badge */
+.p-num{position:absolute;top:80px;right:48px;font-family:'JetBrains Mono',monospace;font-size:80px;font-weight:900;color:rgba(168,85,247,0.05);line-height:1;pointer-events:none;user-select:none;}
+@media(max-width:680px){.p-num{display:none;}}
 </style>
 </head>
 <body>
 
-<div id="progress" style="width:0%"></div>
+<!-- CHROME BAR -->
+<div class="chrome">
+  <div class="chrome-brand">AI Strategy &amp; Ops</div>
+  <div class="chrome-counter" id="counter">01 / 11</div>
+</div>
 
-<nav class="nav">
-  <div class="nav-brand">AI Strategy &amp; Ops</div>
-  <div class="nav-links">
-    <a class="nav-link" href="#alignment">Mandate</a>
-    <a class="nav-link" href="#gap">The Gap</a>
-    <a class="nav-link" href="#function">The Function</a>
-    <a class="nav-link" href="#team">The Team</a>
-    <a class="nav-link" href="#philosophy">Build Philosophy</a>
-    <a class="nav-link" href="#delivers">Delivers</a>
-    <a class="nav-link" href="#exhibits">Exhibits</a>
-    <a class="nav-link" href="#success">Success</a>
-    <a class="nav-link" href="#ask">The Ask</a>
+<!-- BOTTOM NAV -->
+<div class="nav-wrap">
+  <button class="nav-btn" id="btn-prev" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="nav-dots" id="dots"></div>
+  <button class="nav-btn" id="btn-next" onclick="go(1)">&#8594;</button>
+</div>
+
+<!-- ═══════════════════════════════════════ PANEL 0 — HERO -->
+<div class="panel panel-hero active" id="p0">
+  <div class="inner" style="text-align:center;">
+    <div class="eyebrow" style="justify-content:center;">Proposal — DA&amp;O Org</div>
+    <div class="h1">AI Strategy<br>&amp; Ops</div>
+    <p class="lead" style="margin:0 auto 32px;text-align:center;">The dedicated operational layer for AI execution, accountability,<br>and value proof across DET.</p>
+    <button class="begin-btn" onclick="go(1)">Begin &#8594;</button>
   </div>
-</nav>
+</div>
 
-<!-- HERO -->
-<section id="hero">
-  <div class="inner" style="max-width:820px;">
-    <div class="fi">
-      <div class="hero-h1">AI Strategy<br>&amp; Ops</div>
-      <div class="hero-sub">A new function to own the execution, accountability,<br>and value proof of AI across DET.</div>
-    </div>
-    <div class="hero-scroll"><div class="scroll-line"></div>Scroll to explore</div>
-  </div>
-</section>
-
-<!-- STAT STRIP -->
-<section style="min-height:auto;padding:0 48px 80px;background:linear-gradient(180deg,#100c22 0%,var(--bg) 100%);">
+<!-- ═══════════════════════════════════════ PANEL 1 — STATS -->
+<div class="panel" id="p1">
   <div class="inner">
-    <div class="stats fi">
-      <div class="stat"><div class="stat-n" id="sn1">4</div><div class="stat-l">DET pillars operating independently on AI today</div></div>
-      <div class="stat"><div class="stat-n" id="sn2">0</div><div class="stat-l">Dedicated AI Ops functions across DET right now</div></div>
-      <div class="stat"><div class="stat-n" id="sn3">100%</div><div class="stat-l">Of DET managers now asked to know &amp; optimize their AI spend</div></div>
-      <div class="stat"><div class="stat-n" id="sn4">0</div><div class="stat-l">Centralized owners of use case governance &amp; spend accountability</div></div>
+    <div class="eyebrow">The Situation</div>
+    <h2 class="h2" style="margin-bottom:36px;">Where DET stands <em>right now.</em></h2>
+    <div class="stats">
+      <div class="stat"><div class="stat-n">9</div><div class="stat-l">DET technology pillars operating independently on AI today</div></div>
+      <div class="stat"><div class="stat-n">0</div><div class="stat-l">Dedicated AI Ops functions across DET right now</div></div>
+      <div class="stat"><div class="stat-n">100%</div><div class="stat-l">Of DET managers now asked to know &amp; optimize AI spend</div></div>
+      <div class="stat"><div class="stat-n">0</div><div class="stat-l">Centralized owners of use case governance &amp; spend</div></div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- LEADERSHIP ALIGNMENT -->
-<section id="alignment" style="min-height:auto;padding:70px 48px;">
-  <div class="inner">
-    <div class="eyebrow fi">Leadership Mandate</div>
-    <h2 class="h2 fi d1" style="font-size:clamp(28px,4vw,44px);margin-bottom:28px;">This function is the<br><em>structural answer.</em></h2>
-
-    <div class="mandate fi d1" style="margin-bottom:20px;">
-      <div class="mandate-q" style="font-size:15px;font-style:italic;font-weight:600;color:var(--ink-muted);line-height:1.6;">"The question isn't how many tokens we use, it's what we get for them. Token spend should be as accountable as any other resource we put into a project: people, contractors, software."</div>
-      <div class="mandate-body" style="margin-top:10px;font-size:12px;color:var(--ink-faint);">— Joe Inzerillo, Enterprise &amp; AI Technology President</div>
+<!-- ═══════════════════════════════════════ PANEL 2 — MANDATE -->
+<div class="panel panel-alt" id="p2">
+  <div class="inner" style="position:relative;">
+    <div class="eyebrow">Leadership Mandate</div>
+    <h2 class="h2" style="max-width:560px;">This function is the<br><em>structural answer.</em></h2>
+    <div class="mandate">
+      <div class="mandate-q">"The question isn't how many tokens we use, it's what we get for them. Token spend should be as accountable as any other resource we put into a project: people, contractors, software."</div>
+      <div class="mandate-attr">— Joe Inzerillo, Enterprise &amp; AI Technology President</div>
     </div>
-
-    <div class="grid fi d2" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:20px;">
-      <div class="card">
-        <div class="card-ico">&#127919;</div>
-        <div class="card-t">"Right tool for the right job"</div>
-        <div class="card-b">Our build philosophy already lives this. Gemini/GPT for ideation, Claude Code for execution, Codex for QA — every model doing exactly what it does best. We don't just say this. We model it.</div>
-      </div>
-      <div class="card">
-        <div class="card-ico">&#128200;</div>
-        <div class="card-t">"Know what your teams are spending"</div>
-        <div class="card-b">AI Strategy &amp; Ops owns the spend and token tracking layer for DET — real-time consumption visibility, cost-per-use-case, budget envelopes by pillar. Managers get dashboards, not surprises.</div>
-      </div>
-      <div class="card">
-        <div class="card-ico">&#128101;</div>
-        <div class="card-t">"We're Customer Zero"</div>
-        <div class="card-b">Every tool this function builds is a shareable proof point for the rest of the company. The VER Intelligence Hub, the CoS platform, the build methodology — all of it is Customer Zero in action, ready to scale.</div>
-      </div>
-      <div class="card">
-        <div class="card-ico">&#128269;</div>
-        <div class="card-t">"What are we getting for them?"</div>
-        <div class="card-b">That's the exact question our ROI &amp; Value Scorecard Framework answers — with data, not assumptions. Time saved, cost avoided, quality improved, decisions accelerated. Quantified, tracked, and reported quarterly.</div>
-      </div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr));">
+      <div class="card"><div class="card-ico">&#127919;</div><div class="card-t">"Right tool for the right job"</div><div class="card-b">Our build philosophy already lives this. Gemini/GPT → Claude Code → Codex. Every model doing exactly what it does best.</div></div>
+      <div class="card"><div class="card-ico">&#128200;</div><div class="card-t">"Know what your teams are spending"</div><div class="card-b">AI Strategy &amp; Ops owns the spend and token tracking layer — real-time visibility, cost-per-use-case, budget envelopes by pillar.</div></div>
+      <div class="card"><div class="card-ico">&#128101;</div><div class="card-t">"We're Customer Zero"</div><div class="card-b">Every tool this function builds is a shareable proof point for the rest of the company. VER Hub, CoS platform — all Customer Zero, ready to scale.</div></div>
+      <div class="card"><div class="card-ico">&#128269;</div><div class="card-t">"What are we getting for them?"</div><div class="card-b">That's exactly what our ROI &amp; Value Scorecard answers — time saved, cost avoided, quality improved. Quantified and reported quarterly.</div></div>
     </div>
-
-    <div class="proof fi d3">
-      <div class="proof-ico">&#9889;</div>
-      <div class="proof-txt"><strong>AI Strategy &amp; Ops isn't a response to this mandate — it's the infrastructure that makes the mandate executable.</strong> Without a function that owns use case governance, spend accountability, and value proof, individual managers are left to self-report with no shared framework and no common standard. This function changes that for all of DET.</div>
-    </div>
+    <div class="proof"><div class="proof-ico">&#9889;</div><div class="proof-txt"><strong>AI Strategy &amp; Ops isn't a response to this mandate — it's the infrastructure that makes the mandate executable.</strong></div></div>
   </div>
-</section>
+</div>
 
-<!-- THE GAP -->
-<section id="gap">
-  <div class="inner">
-    <div class="eyebrow fi">01 — The Problem</div>
-    <h2 class="h2 fi d1">DET is adopting AI.<br><em>Nobody owns it.</em></h2>
-    <p class="lead fi d2">The tools are here. The enthusiasm is real. But across four pillars, AI adoption is happening without a shared accountability structure, a value framework, or a function that asks the hardest questions.</p>
-
-    <div class="grid fi d1">
-      <div class="card"><div class="card-ico">&#127919;</div><div class="card-t">No use case governance</div><div class="card-b">Teams are picking AI use cases opportunistically, not strategically. There's no function filtering signal from noise or validating that the right problems are being solved.</div></div>
-      <div class="card"><div class="card-ico">&#128202;</div><div class="card-t">No value accountability</div><div class="card-b">Leadership is being asked to show AI ROI with no centralized tracking, no baseline metrics, and no common framework for measuring what "working" actually means.</div></div>
-      <div class="card"><div class="card-ico">&#128260;</div><div class="card-t">Pillars stuck in process</div><div class="card-b">Individual orgs are re-solving the same problems and navigating the same friction — without a shared operating model to learn from or build on.</div></div>
-      <div class="card"><div class="card-ico">&#127959;</div><div class="card-t">Builds without owners</div><div class="card-b">AI-powered tools get built, shipped, and quietly abandoned. No function owns ongoing quality, maintenance, documentation, or iteration.</div></div>
-      <div class="card"><div class="card-ico">&#128176;</div><div class="card-t">No spend visibility</div><div class="card-b">Token costs, API consumption, and AI licensing spend are scattered across orgs with no centralized view. Nobody can answer "how much are we spending on AI and is it worth it?" with confidence.</div></div>
-      <div class="card"><div class="card-ico">&#128101;</div><div class="card-t">Vendor &amp; tool sprawl</div><div class="card-b">AI tools and licenses are being acquired pillar by pillar with no consolidated registry, no renewal governance, and no one asking whether the org is paying for the same capability twice.</div></div>
+<!-- ═══════════════════════════════════════ PANEL 3 — THE GAP -->
+<div class="panel" id="p3">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">01</div>
+    <div class="eyebrow">01 — The Problem</div>
+    <h2 class="h2">DET is adopting AI.<br><em>Nobody owns it.</em></h2>
+    <p class="lead" style="margin-bottom:24px;">Across nine technology pillars, AI adoption is happening without a shared accountability structure, a value framework, or a function that asks the hardest questions.</p>
+    <div class="grid">
+      <div class="card"><div class="card-ico">&#127919;</div><div class="card-t">No use case governance</div><div class="card-b">Teams are picking AI use cases opportunistically, not strategically.</div></div>
+      <div class="card"><div class="card-ico">&#128202;</div><div class="card-t">No value accountability</div><div class="card-b">No centralized tracking, no baseline metrics, no common framework for measuring what "working" means.</div></div>
+      <div class="card"><div class="card-ico">&#128260;</div><div class="card-t">Pillars stuck in process</div><div class="card-b">Individual orgs re-solving the same problems without a shared operating model to learn from.</div></div>
+      <div class="card"><div class="card-ico">&#127959;</div><div class="card-t">Builds without owners</div><div class="card-b">AI-powered tools get built, shipped, and quietly abandoned. No ongoing quality, maintenance, or iteration.</div></div>
+      <div class="card"><div class="card-ico">&#128176;</div><div class="card-t">No spend visibility</div><div class="card-b">Token costs and AI licensing spend scattered across orgs. Nobody can answer "is it worth it?" with confidence.</div></div>
+      <div class="card"><div class="card-ico">&#128101;</div><div class="card-t">Vendor &amp; tool sprawl</div><div class="card-b">AI tools acquired pillar by pillar — no consolidated registry, no renewal governance, no consolidation view.</div></div>
     </div>
-
-    <div class="proof fi d2">
-      <div class="proof-ico">&#128161;</div>
-      <div class="proof-txt"><strong>T&amp;E does awareness and enablement — and does it well.</strong> AMAs, peer learning series, the enablement cohorts. That's the knowing layer. What's missing is the doing layer — the space between "we know AI exists" and "we can prove it's working."</div>
-    </div>
+    <div class="proof"><div class="proof-ico">&#128161;</div><div class="proof-txt"><strong>T&amp;E does awareness and enablement — and does it well.</strong> What's missing is the doing layer — the space between "we know AI exists" and "we can prove it's working."</div></div>
   </div>
-</section>
+</div>
 
-<!-- THE FUNCTION -->
-<section id="function" style="background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%);">
-  <div class="inner">
-    <div class="eyebrow fi">02 — The Function</div>
-    <h2 class="h2 fi d1">Not enablement.<br><em>Execution.</em></h2>
-    <p class="lead fi d2">AI Strategy &amp; Ops is the operational accountability layer for AI across DET. We own the doing — the build, the proof, the documentation, the value case. We complement T&amp;E; we don't compete with it.</p>
-
-    <div class="vs-wrap fi d1">
+<!-- ═══════════════════════════════════════ PANEL 4 — THE FUNCTION -->
+<div class="panel panel-alt" id="p4">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">02</div>
+    <div class="eyebrow">02 — The Function</div>
+    <h2 class="h2">Not enablement.<br><em>Execution.</em></h2>
+    <p class="lead" style="margin-bottom:20px;">AI Strategy &amp; Ops is the operational accountability layer for AI across DET. We complement T&amp;E; we don't compete with it.</p>
+    <div class="vs-wrap">
       <div class="vs-box">
         <div class="vs-ttl">T&amp;E — Transformation &amp; Enablement</div>
-        <div class="vs-row-item"><span>&#127891;</span>&nbsp;AMAs and speaker series</div>
-        <div class="vs-row-item"><span>&#129309;</span>&nbsp;Peer-led learning programs</div>
-        <div class="vs-row-item"><span>&#128226;</span>&nbsp;AI awareness and adoption culture</div>
-        <div class="vs-row-item"><span>&#127807;</span>&nbsp;Enablement series and cohorts</div>
-        <div class="vs-row-item"><span>&#128506;</span>&nbsp;AI literacy across the org</div>
+        <div class="vs-row"><span>&#127891;</span>&nbsp;AMAs and speaker series</div>
+        <div class="vs-row"><span>&#129309;</span>&nbsp;Peer-led learning programs</div>
+        <div class="vs-row"><span>&#128226;</span>&nbsp;AI awareness and adoption culture</div>
+        <div class="vs-row"><span>&#127807;</span>&nbsp;Enablement series and cohorts</div>
+        <div class="vs-row"><span>&#128506;</span>&nbsp;AI literacy across the org</div>
       </div>
       <div class="vs-mid">vs</div>
       <div class="vs-box ours">
         <div class="vs-ttl bright">AI Strategy &amp; Ops — What We Own</div>
-        <div class="vs-row-item"><span>&#127919;</span>&nbsp;Use case selection and prioritization</div>
-        <div class="vs-row-item"><span>&#127959;</span>&nbsp;Build execution and tool ownership</div>
-        <div class="vs-row-item"><span>&#128200;</span>&nbsp;ROI measurement and value proof</div>
-        <div class="vs-row-item"><span>&#128196;</span>&nbsp;Documentation and operating standards</div>
-        <div class="vs-row-item"><span>&#128269;</span>&nbsp;Quality, maintenance, iteration</div>
-        <div class="vs-row-item"><span>&#128176;</span>&nbsp;AI spend, token, and budget governance</div>
-        <div class="vs-row-item"><span>&#128101;</span>&nbsp;Vendor, licensing, and tool decisions</div>
+        <div class="vs-row"><span>&#127919;</span>&nbsp;Use case selection and prioritization</div>
+        <div class="vs-row"><span>&#127959;</span>&nbsp;Build execution and tool ownership</div>
+        <div class="vs-row"><span>&#128200;</span>&nbsp;ROI measurement and value proof</div>
+        <div class="vs-row"><span>&#128196;</span>&nbsp;Documentation and operating standards</div>
+        <div class="vs-row"><span>&#128176;</span>&nbsp;AI spend, token, and budget governance</div>
+        <div class="vs-row"><span>&#128101;</span>&nbsp;Vendor, licensing, and tool decisions</div>
       </div>
     </div>
-
-    <div class="mandate fi d2">
-      <div class="mandate-q">"Is our AI investment actually working?"</div>
-      <div class="mandate-body">That's the question every exec is being asked. AI Strategy &amp; Ops exists to answer it — with proof, not assumptions. We identify the right use cases, build or oversee the build, document what works, quantify the value, and make the case for continued investment. So the org isn't guessing.</div>
-    </div>
-
-    <div class="div fi"></div>
-
-    <div class="two-col fi d1">
-      <div>
-        <div class="card-t" style="font-size:15px;margin-bottom:14px;">Scope &amp; Home</div>
-        <div style="display:flex;flex-direction:column;gap:9px;">
-          <div><span class="chip cv">&#128205; Home: the DA&amp;O Org (DA&amp;O)</span></div>
-          <div><span class="chip cs">&#127758; Scope: DET-wide from day one</span></div>
-          <div><span class="chip ct">&#128279; Adjacent to T&amp;E, not competitive</span></div>
-          <div><span class="chip cg">&#128640; Scales to full org as proof points land</span></div>
-        </div>
-      </div>
-      <div>
-        <div class="card-t" style="font-size:15px;margin-bottom:14px;">What this is not</div>
-        <div class="card-b" style="font-size:13px;line-height:1.8;">Not another enablement series. Not a center of excellence that advises and disappears. Not an innovation lab with no accountability. This is an operational function — with deliverables, owners, and a quarterly readout to Roger on what we built and what it proved.</div>
-      </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="chip cv">&#128205; Home: DA&amp;O Org</span>
+      <span class="chip cs">&#127758; Scope: DET-wide</span>
+      <span class="chip ct">&#128279; Adjacent to T&amp;E</span>
+      <span class="chip cg">&#128640; Scales to full org</span>
     </div>
   </div>
-</section>
+</div>
 
-<!-- THE TEAM -->
-<section id="team">
-  <div class="inner">
-    <div class="eyebrow fi">03 — The Team</div>
-    <h2 class="h2 fi d1">Small, sharp,<br><em>accountable.</em></h2>
-    <p class="lead fi d2">This isn't a committee. It's a function with clear roles, delivery expectations, and skin in the game. Every role is accountable for output — not just alignment.</p>
-
-    <div class="team-grid fi d1">
+<!-- ═══════════════════════════════════════ PANEL 5 — THE TEAM -->
+<div class="panel" id="p5">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">03</div>
+    <div class="eyebrow">03 — The Team</div>
+    <h2 class="h2">Small, sharp,<br><em>accountable.</em></h2>
+    <p class="lead" style="margin-bottom:28px;">Not a committee. A dedicated team with clear roles, delivery expectations, and skin in the game.</p>
+    <div class="team-grid">
       <div class="tc">
         <div class="tc-av av-v">CL</div>
         <div class="tc-name">Casey Luciana Candelaria-Logan</div>
         <div class="tc-role">AI Strategy &amp; Ops Lead</div>
-        <div class="tc-focus">Function lead. Use case strategy, build direction, exec narrative, AI operating model for DET. Co-owns ROI and value proof with Judette Platz. Active builder — ships production tools, not just strategy.</div>
+        <div class="tc-focus">Function lead. Use case strategy, build direction, exec narrative, AI operating model. Co-owns ROI with Judette Platz. Active builder — ships production tools, not just strategy.</div>
       </div>
       <div class="tc">
         <div class="tc-av av-s">J</div>
@@ -374,258 +304,141 @@ footer .stamp{margin-top:14px;font-size:10px;letter-spacing:0.08em;text-transfor
       </div>
       <div class="tc">
         <div class="tc-av av-t">&#9881;</div>
-        <div class="tc-name">Build &amp; Maintenance</div>
+        <div class="tc-name">Build &amp; Maintenance Team</div>
         <div class="tc-role">AI Build Team (2–3 people)</div>
         <div class="tc-focus">Execution layer. Build, iterate, document, and maintain AI-powered tools and workflows across DET pillars.</div>
       </div>
     </div>
-
-    <div class="proof fi d2">
-      <div class="proof-ico">&#127942;</div>
-      <div class="proof-txt"><strong>The VER Intelligence Hub is the model.</strong> A full AI-powered operational platform — built, iterated, and shipped to exec-level audiences — already in front of Joe. That's not a prototype. That's the playbook for everything this function will produce.</div>
-    </div>
+    <div class="proof"><div class="proof-ico">&#127942;</div><div class="proof-txt"><strong>The VER Intelligence Hub is the model.</strong> A full AI-powered operational platform — built, iterated, and shipped to exec-level audiences — already in front of org leadership. That's the playbook.</div></div>
   </div>
-</section>
+</div>
 
-<!-- BUILD PHILOSOPHY -->
-<section id="philosophy" style="background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%);">
-  <div class="inner">
-    <div class="eyebrow fi">04 — Build Philosophy</div>
-    <h2 class="h2 fi d1">The methodology that<br><em>earned the room.</em></h2>
-    <p class="lead fi d2">Not "we use AI tools." A deliberate, orchestrated multi-model pipeline — each AI doing exactly what it does best. This is what AI Ops in practice looks like, and it's already proven in production.</p>
-
-    <div class="pipeline fi d1">
+<!-- ═══════════════════════════════════════ PANEL 6 — PHILOSOPHY -->
+<div class="panel panel-alt" id="p6">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">04</div>
+    <div class="eyebrow">04 — Build Philosophy</div>
+    <h2 class="h2">The methodology that<br><em>earned the room.</em></h2>
+    <p class="lead" style="margin-bottom:24px;">A deliberate, orchestrated multi-model pipeline — each AI doing exactly what it does best.</p>
+    <div class="pipeline">
       <div class="pipe-step">
         <div class="ps-num">Stage 01</div>
         <div class="ps-tool">Gemini / GPT</div>
         <div class="ps-phase">Ideate &amp; Strategize</div>
-        <div class="ps-body">Wide-aperture ideation. Framework exploration, research synthesis, competitive context. Best for breadth, creative divergence, and early-stage "what should we even be thinking about."</div>
-        <div class="ps-chips">
-          <span class="chip ca">Brainstorm</span>
-          <span class="chip ca">Research</span>
-          <span class="chip ca">Frameworks</span>
-        </div>
+        <div class="ps-body">Wide-aperture ideation. Framework exploration, research synthesis, competitive context. Best for breadth and creative divergence.</div>
+        <div class="ps-chips"><span class="chip ca">Brainstorm</span><span class="chip ca">Research</span></div>
         <div class="pipe-arrow">&#8594;</div>
       </div>
       <div class="pipe-step">
         <div class="ps-num">Stage 02</div>
         <div class="ps-tool">Claude Code</div>
         <div class="ps-phase">Execute &amp; Build</div>
-        <div class="ps-body">Precision execution. Agentic, production-quality builds with full context retention, deep iteration cycles, and the judgment to know when a solution is actually done. Best for shipping real things that hold.</div>
-        <div class="ps-chips">
-          <span class="chip cv">Build</span>
-          <span class="chip cv">Iterate</span>
-          <span class="chip cv">Ship</span>
-        </div>
+        <div class="ps-body">Precision execution. Agentic, production-quality builds with full context retention and the judgment to know when a solution is actually done.</div>
+        <div class="ps-chips"><span class="chip cv">Build</span><span class="chip cv">Ship</span></div>
         <div class="pipe-arrow">&#8594;</div>
       </div>
       <div class="pipe-step">
         <div class="ps-num">Stage 03</div>
         <div class="ps-tool">Codex</div>
         <div class="ps-phase">QA &amp; Quality Test</div>
-        <div class="ps-body">Validation and quality assurance. Test generation, regression analysis, code review, edge case coverage. Ensures what was built holds under real conditions before it touches anyone's workflow.</div>
-        <div class="ps-chips">
-          <span class="chip ct">QA</span>
-          <span class="chip ct">Test</span>
-          <span class="chip ct">Validate</span>
-        </div>
+        <div class="ps-body">Validation and quality assurance. Test generation, regression analysis, edge case coverage. Ensures what was built holds under real conditions.</div>
+        <div class="ps-chips"><span class="chip ct">QA</span><span class="chip ct">Validate</span></div>
       </div>
     </div>
-
-    <div class="proof fi d2">
-      <div class="proof-ico">&#9889;</div>
-      <div class="proof-txt"><strong>This methodology generated org president-level visibility</strong> — not because of the tools, but because of the intentionality behind how they're used. Each model has a specific job. The output is production-quality, documented, and reproducible. That's the difference between "using AI" and running AI Ops. Roger knows the story firsthand.</div>
-    </div>
-
-    <div class="proof teal fi d3">
-      <div class="proof-ico">&#127919;</div>
-      <div class="proof-txt"><strong>Why this matters for the function:</strong> AI Strategy &amp; Ops doesn't just recommend this methodology — we model it, document it, and help other DET teams adopt it. We become the org's living proof of concept for what rigorous, high-output AI execution actually looks like.</div>
-    </div>
+    <div class="proof" style="margin-top:20px;"><div class="proof-ico">&#9889;</div><div class="proof-txt"><strong>This methodology generated org president-level visibility</strong> — not because of the tools, but because of the intentionality. Each model has a specific job. The output is production-quality, documented, and reproducible. Roger knows the story firsthand.</div></div>
   </div>
-</section>
+</div>
 
-<!-- WHAT WE DELIVER -->
-<section id="delivers">
-  <div class="inner">
-    <div class="eyebrow fi">05 — Outputs</div>
-    <h2 class="h2 fi d1">Concrete deliverables.<br><em>Not slide decks.</em></h2>
-    <p class="lead fi d2">Every function must answer "what did you make?" Here's ours. Most of it already exists or is in active development — this proposal formalizes the mandate behind work that's already happening.</p>
-
-    <ul class="out-list fi d1">
-      <li class="out-item">
-        <div class="out-num">01</div>
-        <div><div class="out-t">AI Use Case Library</div><div class="out-d">A living, curated repository of validated AI use cases across DET — what works, what doesn't, what's worth pursuing, and why. The org's single source of truth for "should we build this?"</div></div>
-      </li>
-      <li class="out-item">
-        <div class="out-num">02</div>
-        <div><div class="out-t">ROI &amp; Value Scorecard Framework <span class="chip cv" style="font-size:10px;padding:2px 9px;margin-left:6px;">Casey &amp; Judette Platz</span></div><div class="out-d">Standardized methodology for measuring AI initiative impact — time saved, cost avoided, quality improved, decisions accelerated. Co-owned and co-maintained by Casey Luciana and Judette Platz. Directly answers the question leadership is asked every quarter.</div></div>
-      </li>
-      <li class="out-item">
-        <div class="out-num">03</div>
-        <div><div class="out-t">Build Documentation Standard</div><div class="out-d">Every AI tool built under this function is documented — what it does, how it was built, who owns it, how it's maintained, and how it's measured. No more abandoned builds or tribal knowledge walking out the door.</div></div>
-      </li>
-      <li class="out-item">
-        <div class="out-num">04</div>
-        <div><div class="out-t">DET AI Operating Model</div><div class="out-d">A repeatable playbook for how DET ideates, selects, builds, and validates AI initiatives. Reduces per-pillar friction, creates shared language, and makes every org faster at doing this well.</div></div>
-      </li>
-      <li class="out-item">
-        <div class="out-num">05</div>
-        <div><div class="out-t">Executive Intelligence Layer</div><div class="out-d">AI-powered tools and dashboards that give leadership real-time visibility into team performance, budget, vendor intelligence, and workforce dynamics. The VER Intelligence Hub is example one.</div></div>
-      </li>
-      <li class="out-item">
-        <div class="out-num">06</div>
-        <div><div class="out-t">AI Investment Decision Framework</div><div class="out-d">A clear, repeatable process for evaluating and approving AI investments — right size, right use, right timing. Prevents org money being spent on tools without a defensible value case attached.</div></div>
-      </li>
-      <li class="out-item">
-        <div class="out-num">07</div>
-        <div><div class="out-t">AI Spend &amp; Token Tracking Dashboard</div><div class="out-d">Real-time visibility into API consumption, cost-per-use-case, and model spend across DET. Budget envelopes by pillar with spend thresholds and reforecast cadence. Nobody is running blind on AI costs on our watch.</div></div>
-      </li>
-      <li class="out-item">
-        <div class="out-num">08</div>
-        <div><div class="out-t">Budget Envelope Governance</div><div class="out-d">Defined AI budget allocations per pillar with guardrails, approval thresholds, and a reforecast rhythm tied to Roger's quarterly readout. Spend stays visible, accountable, and justified.</div></div>
-      </li>
-      <li class="out-item">
-        <div class="out-num">09</div>
-        <div><div class="out-t">AI Vendor &amp; Licensing Registry</div><div class="out-d">Centralized registry of every AI tool, vendor contract, and license in use across DET — renewal dates, cost, utilization, and compliance status. Consolidation opportunities surfaced proactively. No surprise renewals, no duplicate spend. This is where AI Ops meets VER's vendor intelligence capability.</div></div>
-      </li>
+<!-- ═══════════════════════════════════════ PANEL 7 — OUTPUTS -->
+<div class="panel" id="p7">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">05</div>
+    <div class="eyebrow">05 — Outputs</div>
+    <h2 class="h2" style="margin-bottom:8px;">Concrete deliverables.<br><em>Not slide decks.</em></h2>
+    <p class="lead" style="margin-bottom:20px;font-size:14px;">Most of this already exists or is in active development. This proposal formalizes the mandate.</p>
+    <ul class="out-list">
+      <li class="out-item"><div class="out-num">01</div><div class="out-body"><div class="out-t">AI Use Case Library</div><div class="out-d">Living repo of validated AI use cases across DET — what works, what doesn't, what's worth pursuing.</div></div></li>
+      <li class="out-item"><div class="out-num">02</div><div class="out-body"><div class="out-t">ROI &amp; Value Scorecard Framework <span class="chip cv" style="font-size:10px;padding:2px 8px;margin-left:4px;">Casey &amp; Judette Platz</span></div><div class="out-d">Standardized methodology for measuring AI initiative impact. Co-owned by Casey Luciana and Judette Platz.</div></div></li>
+      <li class="out-item"><div class="out-num">03</div><div class="out-body"><div class="out-t">Build Documentation Standard</div><div class="out-d">Every AI tool built under this function is documented — what it does, who owns it, how it's measured.</div></div></li>
+      <li class="out-item"><div class="out-num">04</div><div class="out-body"><div class="out-t">DET AI Operating Model</div><div class="out-d">Repeatable playbook for how DET ideates, selects, builds, and validates AI initiatives.</div></div></li>
+      <li class="out-item"><div class="out-num">05</div><div class="out-body"><div class="out-t">Executive Intelligence Layer</div><div class="out-d">AI-powered tools giving leadership real-time visibility into performance, budget, and vendor intelligence.</div></div></li>
+      <li class="out-item"><div class="out-num">06</div><div class="out-body"><div class="out-t">AI Investment Decision Framework</div><div class="out-d">Clear process for evaluating AI investments — right size, right use, right timing. No spend without a value case.</div></div></li>
+      <li class="out-item"><div class="out-num">07</div><div class="out-body"><div class="out-t">AI Spend &amp; Token Tracking Dashboard</div><div class="out-d">Real-time API consumption, cost-per-use-case, and model spend across DET. Nobody runs blind on AI costs.</div></div></li>
+      <li class="out-item"><div class="out-num">08</div><div class="out-body"><div class="out-t">Budget Envelope Governance</div><div class="out-d">Defined AI budget allocations per pillar with guardrails and reforecast rhythm tied to Roger's quarterly readout.</div></div></li>
+      <li class="out-item"><div class="out-num">09</div><div class="out-body"><div class="out-t">AI Vendor &amp; Licensing Registry</div><div class="out-d">Centralized registry of every AI tool, vendor contract, and license — renewal dates, cost, utilization. No surprise renewals, no duplicate spend.</div></div></li>
     </ul>
   </div>
-</section>
+</div>
 
-<!-- EXHIBITS -->
-<section id="exhibits">
-  <div class="inner">
-    <div class="eyebrow fi">06 — Proof of Work</div>
-    <h2 class="h2 fi d1">This isn't theoretical.<br><em>It's already built.</em></h2>
-    <p class="lead fi d2">Every exhibit below is a live, production-quality tool built using the exact methodology described in this proposal. The function exists — it just needs a name and a mandate.</p>
-
-    <div class="grid fi d1" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
-      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;padding:0;overflow:hidden;">
+<!-- ═══════════════════════════════════════ PANEL 8 — EXHIBITS -->
+<div class="panel panel-alt" id="p8">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">06</div>
+    <div class="eyebrow">06 — Proof of Work</div>
+    <h2 class="h2" style="margin-bottom:8px;">This isn't theoretical.<br><em>It's already built.</em></h2>
+    <p class="lead" style="margin-bottom:20px;font-size:14px;">Every exhibit below is live, production-quality, built with the exact methodology in this proposal. The function exists — it just needs a name.</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));">
+      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio" target="_blank" rel="noopener" style="color:inherit;">
         <div class="ex-preview" style="background:linear-gradient(135deg,#1a0e40,#2d1d78,#0f2a5e);"></div>
-        <div style="padding:20px;">
-          <div class="ex-label"><span class="chip cv" style="font-size:10px;padding:2px 9px;">Hub</span></div>
-          <div class="card-t" style="margin-top:10px;">VER Intelligence Hub</div>
-          <div class="card-b">Full multi-role AI-powered operational platform. Vendor intelligence, renewals, governance, TCO, team portals, CoS command center. Exec-ready and already in front of org leadership.</div>
-          <div style="margin-top:14px;"><span class="chip cs">&#128279; View on GitHub</span></div>
-        </div>
+        <div class="ex-body"><span class="chip cv" style="font-size:10px;padding:2px 8px;">Hub</span><div class="card-t" style="margin-top:8px;">VER Intelligence Hub</div><div class="card-b">Full multi-role AI-powered operational platform. Exec-ready, already in front of org leadership.</div><div style="margin-top:10px;"><span class="chip cs" style="font-size:10px;">&#128279; GitHub</span></div></div>
       </a>
-      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/portal_home.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;padding:0;overflow:hidden;">
+      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/portal_home.html" target="_blank" rel="noopener" style="color:inherit;">
         <div class="ex-preview" style="background:linear-gradient(135deg,#071a14,#0a3428,#0f2a5e);"></div>
-        <div style="padding:20px;">
-          <div class="ex-label"><span class="chip ct" style="font-size:10px;padding:2px 9px;">Portal</span></div>
-          <div class="card-t" style="margin-top:10px;">Vendor Portal</div>
-          <div class="card-b">Full supplier-facing portal — vendor registration, intake, rate benchmarks, risk assessment, and survey tools. Closes the loop between vendor intelligence and supplier engagement.</div>
-          <div style="margin-top:14px;"><span class="chip cs">&#128279; View on GitHub</span></div>
-        </div>
+        <div class="ex-body"><span class="chip ct" style="font-size:10px;padding:2px 8px;">Portal</span><div class="card-t" style="margin-top:8px;">Vendor Portal</div><div class="card-b">Supplier-facing portal — vendor registration, intake, rate benchmarks, risk assessment.</div><div style="margin-top:10px;"><span class="chip cs" style="font-size:10px;">&#128279; GitHub</span></div></div>
       </a>
-      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/tco_standalone.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;padding:0;overflow:hidden;">
+      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/tco_standalone.html" target="_blank" rel="noopener" style="color:inherit;">
         <div class="ex-preview" style="background:linear-gradient(135deg,#1a1000,#3a2800,#2d1d78);"></div>
-        <div style="padding:20px;">
-          <div class="ex-label"><span class="chip ca" style="font-size:10px;padding:2px 9px;">Finance</span></div>
-          <div class="card-t" style="margin-top:10px;">TCO Calculator</div>
-          <div class="card-b">Total Cost of Ownership engine with scenario modeling, FTE vs. CW comparison, budget variance tracking, and exportable exec summaries. Standalone and hub-integrated.</div>
-          <div style="margin-top:14px;"><span class="chip cs">&#128279; View on GitHub</span></div>
-        </div>
+        <div class="ex-body"><span class="chip ca" style="font-size:10px;padding:2px 8px;">Finance</span><div class="card-t" style="margin-top:8px;">TCO Calculator</div><div class="card-b">Total Cost of Ownership engine with scenario modeling and exportable exec summaries.</div><div style="margin-top:10px;"><span class="chip cs" style="font-size:10px;">&#128279; GitHub</span></div></div>
       </a>
-      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/team_portal.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;padding:0;overflow:hidden;">
+      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/team_portal.html" target="_blank" rel="noopener" style="color:inherit;">
         <div class="ex-preview" style="background:linear-gradient(135deg,#08162a,#0f2a5e,#1a0e40);"></div>
-        <div style="padding:20px;">
-          <div class="ex-label"><span class="chip cs" style="font-size:10px;padding:2px 9px;">Team</span></div>
-          <div class="card-t" style="margin-top:10px;">VER Team Portal</div>
-          <div class="card-b">Internal team command center — daily briefing, intake queue, vendor actions, governance tracker, and team performance layer. Built for how the team actually operates.</div>
-          <div style="margin-top:14px;"><span class="chip cs">&#128279; View on GitHub</span></div>
-        </div>
+        <div class="ex-body"><span class="chip cs" style="font-size:10px;padding:2px 8px;">Team</span><div class="card-t" style="margin-top:8px;">VER Team Portal</div><div class="card-b">Internal command center — daily briefing, intake queue, governance tracker.</div><div style="margin-top:10px;"><span class="chip cs" style="font-size:10px;">&#128279; GitHub</span></div></div>
       </a>
-      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/page_cinematic_generator_v2.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;padding:0;overflow:hidden;">
+      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/page_cinematic_generator_v2.html" target="_blank" rel="noopener" style="color:inherit;">
         <div class="ex-preview" style="background:linear-gradient(135deg,#2a0818,#5e1040,#1a0e40);"></div>
-        <div style="padding:20px;">
-          <div class="ex-label"><span class="chip cb" style="font-size:10px;padding:2px 9px;">Generator</span></div>
-          <div class="card-t" style="margin-top:10px;">Cinematic Generator V2</div>
-          <div class="card-b">AI-powered meeting content generator — MBR, QBR, offsite, exec formats. Produces cinematic-quality briefing packages from structured inputs. Standalone module, no build step required.</div>
-          <div style="margin-top:14px;"><span class="chip cs">&#128279; View on GitHub</span></div>
-        </div>
+        <div class="ex-body"><span class="chip cb" style="font-size:10px;padding:2px 8px;">Generator</span><div class="card-t" style="margin-top:8px;">Cinematic Generator V2</div><div class="card-b">AI-powered meeting content generator — MBR, QBR, offsite, exec formats. Standalone, no build step.</div><div style="margin-top:10px;"><span class="chip cs" style="font-size:10px;">&#128279; GitHub</span></div></div>
       </a>
-      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/te_dashboard.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;padding:0;overflow:hidden;">
+      <a class="card ex-card" href="https://github.com/caseyluciana/ver-intelligence-studio/blob/main/te_dashboard.html" target="_blank" rel="noopener" style="color:inherit;">
         <div class="ex-preview" style="background:linear-gradient(135deg,#071a14,#0a3428,#2a0818);"></div>
-        <div style="padding:20px;">
-          <div class="ex-label"><span class="chip cg" style="font-size:10px;padding:2px 9px;">Dashboard</span></div>
-          <div class="card-t" style="margin-top:10px;">T&amp;E Dashboard</div>
-          <div class="card-b">Travel &amp; expense intelligence dashboard with spend analysis, vendor breakdown, trend tracking, and budget pacing. Surfaces anomalies and cost optimization opportunities across the org.</div>
-          <div style="margin-top:14px;"><span class="chip cs">&#128279; View on GitHub</span></div>
-        </div>
+        <div class="ex-body"><span class="chip cg" style="font-size:10px;padding:2px 8px;">Dashboard</span><div class="card-t" style="margin-top:8px;">T&amp;E Dashboard</div><div class="card-b">Travel &amp; expense intelligence with spend analysis, trend tracking, and budget pacing.</div><div style="margin-top:10px;"><span class="chip cs" style="font-size:10px;">&#128279; GitHub</span></div></div>
       </a>
     </div>
-
-    <div class="proof teal fi d2">
-      <div class="proof-ico">&#128161;</div>
-      <div class="proof-txt"><strong>The builder never stops building.</strong> AI Strategy &amp; Ops isn't a function that commissions work and reviews decks. The lead builds alongside the team — which means the function's credibility is demonstrated continuously, not just claimed once.</div>
-    </div>
   </div>
-</section>
+</div>
 
-<!-- SUCCESS MARKERS -->
-<section id="success" style="background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%);">
-  <div class="inner">
-    <div class="eyebrow fi">07 — What Success Looks Like</div>
-    <h2 class="h2 fi d1">Clear markers.<br><em>No ambiguity.</em></h2>
-    <p class="lead fi d2">We're not asking for a blank check. Here's exactly what this function will deliver, and when — with a quarterly readout to Roger to hold us to it.</p>
-
-    <div class="two-col fi d1">
+<!-- ═══════════════════════════════════════ PANEL 9 — SUCCESS -->
+<div class="panel" id="p9">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">07</div>
+    <div class="eyebrow">07 — What Success Looks Like</div>
+    <h2 class="h2">Clear markers.<br><em>No ambiguity.</em></h2>
+    <p class="lead" style="margin-bottom:24px;">We're not asking for a blank check. Here's exactly what this function delivers — with a quarterly readout to Roger to hold us to it.</p>
+    <div class="tl-grid">
       <div>
-        <div style="margin-bottom:20px;"><span class="chip cv">6 Months</span></div>
+        <div style="margin-bottom:16px;"><span class="chip cv">6 Months</span></div>
         <div class="tl">
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div class="tl-phase">Function Established</div>
-            <div class="tl-title">Roles, scope, mandate formalized</div>
-            <div class="tl-body"><ul><li>Team in place, responsibilities clear</li><li>First use case intake process live</li><li>AI Operating Model v1 drafted</li></ul></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div class="tl-phase">First Deliverables</div>
-            <div class="tl-title">3+ validated use cases shipped</div>
-            <div class="tl-body"><ul><li>ROI scorecard framework live</li><li>Build documentation standard in use</li><li>First exec intelligence tool deployed</li></ul></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div class="tl-phase">First Proof Point</div>
-            <div class="tl-title">Quantifiable value documented</div>
-            <div class="tl-body"><ul><li>At least one measured ROI pilot</li><li>Presented to Roger and leadership</li><li>Story ready for Joe-level audience</li></ul></div>
-          </div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-phase">Foundation</div><div class="tl-title">Roles, scope, mandate formalized</div><div class="tl-body"><ul><li>Team in place, responsibilities clear</li><li>First use case intake process live</li><li>AI Operating Model v1 drafted</li></ul></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-phase">First Deliverables</div><div class="tl-title">3+ validated use cases shipped</div><div class="tl-body"><ul><li>ROI scorecard framework live</li><li>Build documentation standard in use</li><li>First exec intelligence tool deployed</li></ul></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-phase">First Proof Point</div><div class="tl-title">Quantifiable value documented</div><div class="tl-body"><ul><li>At least one measured ROI pilot</li><li>Presented to Roger and leadership</li><li>Story ready for Joe-level audience</li></ul></div></div>
         </div>
       </div>
       <div>
-        <div style="margin-bottom:20px;"><span class="chip cs">12 Months</span></div>
+        <div style="margin-bottom:16px;"><span class="chip cs">12 Months</span></div>
         <div class="tl">
-          <div class="tl-item">
-            <div class="tl-dot sky"></div>
-            <div class="tl-phase sky">DET-Wide Footprint</div>
-            <div class="tl-title">Function serving all four pillars</div>
-            <div class="tl-body"><ul><li>Use case library: 10+ validated entries</li><li>Each pillar has an active AI initiative</li><li>Operating model adopted org-wide</li></ul></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot sky"></div>
-            <div class="tl-phase sky">Executive Narrative</div>
-            <div class="tl-title">Leadership can tell the AI story</div>
-            <div class="tl-body"><ul><li>ROI dashboard live and in active use</li><li>Quarter-over-quarter value trend visible</li><li>Joe-ready AI investment narrative built</li></ul></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot sky"></div>
-            <div class="tl-phase sky">Scale Signal</div>
-            <div class="tl-title">Case for broader org adoption</div>
-            <div class="tl-body"><ul><li>Model documented for replication</li><li>Proposal for expansion beyond DET</li><li>Function becomes the org standard</li></ul></div>
-          </div>
+          <div class="tl-item"><div class="tl-dot sky"></div><div class="tl-phase sky">DET-Wide Footprint</div><div class="tl-title">Function serving all nine pillars</div><div class="tl-body"><ul><li>Use case library: 10+ validated entries</li><li>Each pillar has an active AI initiative</li><li>Operating model adopted org-wide</li></ul></div></div>
+          <div class="tl-item"><div class="tl-dot sky"></div><div class="tl-phase sky">Executive Narrative</div><div class="tl-title">Leadership can tell the AI story</div><div class="tl-body"><ul><li>ROI dashboard live and in active use</li><li>Quarter-over-quarter value trend visible</li><li>Joe-ready AI investment narrative built</li></ul></div></div>
+          <div class="tl-item"><div class="tl-dot sky"></div><div class="tl-phase sky">Scale Signal</div><div class="tl-title">Case for broader org adoption</div><div class="tl-body"><ul><li>Model documented for replication</li><li>Proposal for expansion beyond DET</li><li>Function becomes the org standard</li></ul></div></div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- THE ASK -->
-<section id="ask">
+<!-- ═══════════════════════════════════════ PANEL 10 — THE ASK -->
+<div class="panel panel-alt" id="p10">
   <div class="inner">
-    <div class="eyebrow fi">08 — The Ask</div>
-    <div class="ask fi d1">
+    <div class="eyebrow">08 — The Ask</div>
+    <div class="ask">
       <div class="ask-h">Formalize <span>AI Strategy &amp; Ops</span><br>as a function in the DA&amp;O Org.</div>
       <div class="ask-body">We're not asking to build something from scratch. We're asking to put a name, a mandate, and a team behind work that's already happening — so DET can own its AI story, not just participate in it.</div>
       <div class="ask-chips">
@@ -638,51 +451,105 @@ footer .stamp{margin-top:14px;font-size:10px;letter-spacing:0.08em;text-transfor
         <span class="chip cs">&#10003; 90-day sprint to first proof point</span>
         <span class="chip ct">&#10003; Quarterly readout to Roger</span>
       </div>
-      <div class="ask-footnote">
+      <div class="ask-fn">
         This proposal was built using the AI Strategy &amp; Ops methodology described within.<br>
         The VER Intelligence Hub is Exhibit A. This document is Exhibit B.<br>
         Both exist because someone was already doing this work — it just needed a function name.
       </div>
     </div>
   </div>
-</section>
-
-<footer>
-  <div class="logo">AI Strategy &amp; Ops</div>
-  <div>Delivery Assurance &amp; Ops &middot; DET</div>
-  <div class="stamp">Built with the methodology we are proposing to scale</div>
-</footer>
+</div>
 
 <script>
 (function(){
-  /* scroll progress */
-  window.addEventListener('scroll', function(){
-    var d = document.documentElement;
-    var pct = d.scrollTop / (d.scrollHeight - d.clientHeight) * 100;
-    document.getElementById('progress').style.width = pct + '%';
+  var panels = document.querySelectorAll('.panel');
+  var total = panels.length;
+  var current = 0;
+  var busy = false;
+
+  /* build dots */
+  var dotsEl = document.getElementById('dots');
+  for(var i=0;i<total;i++){
+    var d=document.createElement('div');
+    d.className='dot'+(i===0?' on':'');
+    d.setAttribute('data-i',i);
+    d.addEventListener('click',dotClick);
+    dotsEl.appendChild(d);
+  }
+
+  function dotClick(){ go(parseInt(this.getAttribute('data-i'))-current); }
+
+  function updateChrome(){
+    var n=(current+1<10?'0':'')+(current+1);
+    var t=(total<10?'0':'')+total;
+    document.getElementById('counter').textContent=n+' / '+t;
+    document.getElementById('btn-prev').disabled=(current===0);
+    document.getElementById('btn-next').disabled=(current===total-1);
+    var dots=dotsEl.querySelectorAll('.dot');
+    dots.forEach(function(d,i){d.classList.toggle('on',i===current);});
+  }
+
+  function go(dir){
+    var next=current+dir;
+    if(busy||next<0||next>=total)return;
+    busy=true;
+    var leaving=panels[current];
+    var entering=panels[next];
+    var exitCls=dir>0?'exit-left':'exit-right';
+    var enterStartCls=dir>0?'from-left':'';
+
+    if(enterStartCls) entering.classList.add(enterStartCls);
+    entering.style.opacity='0';
+    entering.style.transform=dir>0?'translateX(40px)':'translateX(-40px)';
+    entering.style.transition='none';
+    entering.style.pointerEvents='none';
+    entering.classList.add('active');
+
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        leaving.style.transition='opacity 0.5s ease,transform 0.5s ease';
+        leaving.style.opacity='0';
+        leaving.style.transform=dir>0?'translateX(-40px)':'translateX(40px)';
+
+        entering.style.transition='opacity 0.5s ease,transform 0.5s ease';
+        entering.style.opacity='1';
+        entering.style.transform='translateX(0)';
+        entering.style.pointerEvents='all';
+        entering.classList.remove('from-left');
+
+        current=next;
+        updateChrome();
+
+        setTimeout(function(){
+          leaving.classList.remove('active');
+          leaving.style.opacity='';
+          leaving.style.transform='';
+          leaving.style.transition='';
+          leaving.style.pointerEvents='';
+          entering.style.transition='';
+          busy=false;
+        },520);
+      });
+    });
+  }
+
+  /* keyboard */
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ')go(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
   });
 
-  /* fade-in observer */
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting) entry.target.classList.add('on');
-    });
-  }, {threshold: 0.10});
-  document.querySelectorAll('.fi').forEach(function(el){ io.observe(el); });
+  /* swipe */
+  var tx=0;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>50)go(dx<0?1:-1);
+  },{passive:true});
 
-  /* active nav */
-  var secs = document.querySelectorAll('section[id]');
-  var links = document.querySelectorAll('.nav-link');
-  window.addEventListener('scroll', function(){
-    var y = window.scrollY + 130;
-    secs.forEach(function(s){
-      if(s.offsetTop <= y && s.offsetTop + s.offsetHeight > y){
-        links.forEach(function(l){
-          l.classList.toggle('active', l.getAttribute('href') === '#' + s.id);
-        });
-      }
-    });
-  });
+  /* expose go for inline onclick */
+  window.go=go;
+  updateChrome();
 })();
 </script>
 </body>
