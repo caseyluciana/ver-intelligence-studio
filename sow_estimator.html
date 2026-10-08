@@ -502,14 +502,12 @@ select optgroup { color: var(--violet-bright); font-size: 11px; font-weight: 700
   border: 2px dashed rgba(109,40,217,0.28); border-radius: 12px;
   padding: 22px 20px; text-align: center; cursor: pointer;
   transition: all 0.20s; background: rgba(109,40,217,0.025);
-  position: relative;
 }
 .doc-upload-zone:hover, .doc-upload-zone.drag-over {
   border-color: var(--violet-bright); background: rgba(109,40,217,0.06);
 }
 .doc-upload-zone input[type="file"] {
-  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  padding: 0; border: none; background: none;
+  display: none;
 }
 .doc-upload-icon { font-size: 28px; margin-bottom: 8px; line-height: 1; }
 .doc-upload-title {
@@ -1896,17 +1894,22 @@ document.addEventListener('click', function(ev) {
 });
 
 /* Document upload wiring */
-byId('doc-file-input').addEventListener('change', function(ev) {
+var docFileInput = byId('doc-file-input');
+docFileInput.addEventListener('change', function(ev) {
   handleDocFile(ev.target.files[0]);
+  ev.target.value = '';
 });
 
 var uploadZone = byId('doc-upload-zone');
+uploadZone.addEventListener('click', function() {
+  docFileInput.click();
+});
 uploadZone.addEventListener('dragover', function(ev) {
   ev.preventDefault();
   uploadZone.classList.add('drag-over');
 });
-uploadZone.addEventListener('dragleave', function() {
-  uploadZone.classList.remove('drag-over');
+uploadZone.addEventListener('dragleave', function(ev) {
+  if (!uploadZone.contains(ev.relatedTarget)) uploadZone.classList.remove('drag-over');
 });
 uploadZone.addEventListener('drop', function(ev) {
   ev.preventDefault();
