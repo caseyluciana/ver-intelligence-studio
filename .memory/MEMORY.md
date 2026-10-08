@@ -28,3 +28,4 @@
 - [Bash Permissions — How to pre-approve](feedback_bash_permissions.md) — Casey wants bash auto-approved; set via .claude/settings.json or VS Code Claude Code settings
 - [Next Session — Apply Candor Standard to Hub/Portal](project_next_session_candor_standard.md) — Candor is the design lab; apply centered brand/context chips/scoring strip to all hub pages next session
 - [Candor Session Status](project_candor_status.md) — mock interview fully working after hidden!important bug fix; ready to apply standard to hub/portal
+- [AI Strategy & Ops Proposal](project_ai_strategy_ops_proposal.md) — Casey proposing new function in DA&O Org; proposal built as ai_strategy_ops_proposal.html; Judette Platz co-owns ROI; next step: share with Judette then Roger
