@@ -651,12 +651,12 @@ select optgroup { color: var(--violet-bright); font-size: 11px; font-weight: 700
           <!-- Document Upload -->
           <div class="field">
             <label class="field-label">Import from Document <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink-faint);font-size:9px;"> — PDF or Word, auto-parses roles</span></label>
-            <div class="doc-upload-zone" id="doc-upload-zone">
-              <input type="file" id="doc-file-input" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+            <label class="doc-upload-zone" id="doc-upload-zone" for="doc-file-input">
               <div class="doc-upload-icon">📄</div>
               <div class="doc-upload-title">Drop a PDF or Word file here</div>
               <div class="doc-upload-sub">or <em>click to browse</em> — text will populate the scope field and suggest matching roles</div>
-            </div>
+            </label>
+            <input type="file" id="doc-file-input" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" />
             <div class="doc-parse-status" id="doc-parse-status">
               <div class="parse-spinner" id="parse-spinner" style="display:none;"></div>
               <span id="doc-parse-msg"></span>
@@ -1901,9 +1901,6 @@ docFileInput.addEventListener('change', function(ev) {
 });
 
 var uploadZone = byId('doc-upload-zone');
-uploadZone.addEventListener('click', function() {
-  docFileInput.click();
-});
 uploadZone.addEventListener('dragover', function(ev) {
   ev.preventDefault();
   uploadZone.classList.add('drag-over');
