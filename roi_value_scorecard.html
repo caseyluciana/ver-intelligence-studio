@@ -689,13 +689,13 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
     <div class="field-group"><label class="field-label" for="f-name">Initiative Name</label><input type="text" id="f-name" class="field-input" placeholder="e.g. VER Intelligence Hub"></div>
     <div class="field-group"><label class="field-label" for="f-pillar">Pillar</label><select id="f-pillar" class="field-input"><option>DA&amp;O</option><option>Engineering</option><option>IT</option><option>SF on SF</option><option>Data</option><option>Digital Mktg</option><option>Agentic</option><option>CDO</option><option>Emerging</option></select></div>
     <div class="field-group"><label class="field-label" for="f-tool">AI Tool Used</label><input type="text" id="f-tool" class="field-input" placeholder="e.g. VER Hub, Claude Code"></div>
-    <div class="field-group"><label class="field-label" for="f-time">Time Saved (hrs/qtr)</label><input type="number" id="f-time" class="field-input" placeholder="0" min="0"></div>
+    <div class="field-group"><label class="field-label" for="f-time">Time Saved (hrs/qtr) <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-faint);font-size:10px;">— auto from simulator</span></label><input type="number" id="f-time" class="field-input" placeholder="auto" min="0"></div>
     <div class="field-group"><label class="field-label" for="f-cost">Cost Avoided ($/qtr)</label><input type="number" id="f-cost" class="field-input" placeholder="0" min="0"></div>
     <div class="sim-section">
       <div class="sim-section-title">True Cost Simulator</div>
       <div class="sim-row">
         <div class="field-group" style="margin:0"><label class="field-label" for="f-ai-hrs">AI Build Hours</label><input type="number" id="f-ai-hrs" class="field-input" placeholder="e.g. 40" min="0"></div>
-        <div class="field-group" style="margin:0"><label class="field-label" for="f-complexity">Complexity</label><select id="f-complexity" class="field-input"><option value="1.5">Simple (1.5x)</option><option value="2.5" selected>Moderate (2.5x)</option><option value="4">Complex (4x)</option><option value="6">Enterprise (6x)</option></select></div>
+        <div class="field-group" style="margin:0"><label class="field-label" for="f-complexity">Complexity</label><select id="f-complexity" class="field-input"><option value="" disabled selected>— select complexity —</option><option value="1.5">Simple (1.5x)</option><option value="2.5">Moderate (2.5x)</option><option value="4">Complex (4x)</option><option value="6">Enterprise (6x)</option></select></div>
       </div>
       <div class="field-group" style="margin:0 0 10px"><label class="field-label" for="f-build-type">Pre-AI Build Route</label><select id="f-build-type" class="field-input"><option value="fte">Internal FTE (150/hr)</option><option value="contractor">Contractor (200/hr)</option><option value="sow">Vendor SOW (250/hr +20%)</option></select></div>
       <div class="sim-result">
@@ -902,26 +902,25 @@ function openDrawer(id){
       document.getElementById('f-name').value=ini.name||'';
       document.getElementById('f-pillar').value=ini.pillar||'DA&O';
       document.getElementById('f-tool').value=ini.tool||'';
-      document.getElementById('f-time').value=ini.time||'';
-      document.getElementById('f-cost').value=ini.cost||'';
-
       document.getElementById('f-status').value=ini.status||'Active';
       document.getElementById('f-notes').value=ini.notes||'';
       document.getElementById('f-ai-hrs').value=ini.aiHrs||'';
-      document.getElementById('f-complexity').value=ini.complexity||'2.5';
+      document.getElementById('f-complexity').value=ini.complexity||'';
       document.getElementById('f-build-type').value=ini.buildType||'fte';
-      var _cf=document.getElementById('f-cost');if(_cf)_cf._manuallySet=!!(ini.aiHrs);
+      var _cf=document.getElementById('f-cost');if(_cf){_cf._manuallySet=!!(ini.aiHrs);_cf.value=ini.cost||'';}
+      var _tf=document.getElementById('f-time');if(_tf){_tf._manuallySet=!!(ini.time);_tf.value=ini.time||'';}
       updateSimPreview();
     }
   } else {
     document.getElementById('f-name').value='';document.getElementById('f-pillar').value='DA&O';
     document.getElementById('f-ai-hrs').value='';
-    document.getElementById('f-complexity').value='2.5';
+    document.getElementById('f-complexity').value='';
     document.getElementById('f-build-type').value='fte';
-    var _cfr=document.getElementById('f-cost');if(_cfr)_cfr._manuallySet=false;
+    var _cfr=document.getElementById('f-cost');if(_cfr){_cfr._manuallySet=false;_cfr.value='';}
+    var _tfr=document.getElementById('f-time');if(_tfr){_tfr._manuallySet=false;_tfr.value='';}
     updateSimPreview();
-    document.getElementById('f-tool').value='';document.getElementById('f-time').value='';
-    document.getElementById('f-cost').value='';document.getElementById('f-status').value='Active';
+    document.getElementById('f-tool').value='';
+    document.getElementById('f-status').value='Active';
     document.getElementById('f-notes').value='';
   }
   document.getElementById('drawer').classList.add('open');
@@ -1023,15 +1022,16 @@ function simCalc(ah,cx,bt){
 }
 function updateSimPreview(){
   var h=parseFloat(document.getElementById('f-ai-hrs').value)||0;
-  var cx=document.getElementById('f-complexity').value||'2.5';
+  var cx=document.getElementById('f-complexity').value||'';
   var bt=document.getElementById('f-build-type').value||'fte';
   var eB=document.getElementById('sp-before'),eA=document.getElementById('sp-after'),eD=document.getElementById('sp-delta');
-  if(!h){if(eB)eB.textContent='--';if(eA)eA.textContent='--';if(eD)eD.textContent='--';return;}
+  if(!h||!cx){if(eB)eB.textContent='--';if(eA)eA.textContent='--';if(eD)eD.textContent='--';return;}
   var r=simCalc(h,cx,bt);
   if(eB)eB.textContent=fmtD(r.preCost);
   if(eA)eA.textContent=fmtD(r.afterCost);
   if(eD)eD.textContent=fmtD(r.delta);
   var cf=document.getElementById('f-cost');if(cf&&!cf._manuallySet)cf.value=r.delta||'';
+  var ft=document.getElementById('f-time');if(ft&&!ft._manuallySet)ft.value=Math.max(0,r.preHrs-h)||'';
 }
 function saveDrawer(){
   var name=document.getElementById('f-name').value.trim();
@@ -1100,6 +1100,7 @@ document.getElementById('f-ai-hrs').addEventListener('input',updateSimPreview);
 document.getElementById('f-complexity').addEventListener('change',updateSimPreview);
 document.getElementById('f-build-type').addEventListener('change',updateSimPreview);
 document.getElementById('f-cost').addEventListener('input',function(){this._manuallySet=true;});
+document.getElementById('f-time').addEventListener('input',function(){this._manuallySet=true;});
 
 document.getElementById('btn-generate').addEventListener('click',generateNarrative);
 document.getElementById('btn-copy').addEventListener('click',function(){
