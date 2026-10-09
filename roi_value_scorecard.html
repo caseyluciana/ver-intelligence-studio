@@ -460,6 +460,54 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
   .kpi-num,.kpi-card.violet .kpi-num,.kpi-card.sky .kpi-num,
   .kpi-card.teal .kpi-num,.kpi-card.amber .kpi-num{color:#333;}
 }
+
+/* ── True Cost Simulator ── */
+.sim-section{background:rgba(168,85,247,0.06);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:6px;}
+.sim-section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--violet);margin-bottom:12px;}
+.sim-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.sim-result{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-soft);}
+.sim-res-item{text-align:center;background:var(--card);border-radius:10px;padding:10px 6px;}
+.sim-res-num{font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--violet);}
+.sim-res-lbl{font-size:10px;color:var(--ink-muted);margin-top:2px;}
+.sim-res-item.highlight .sim-res-num{color:var(--green);}
+/* ── Before/After breakdown in imodal ── */
+.imodal-sim{margin:16px 0;background:var(--card);border:1px solid var(--border-soft);border-radius:14px;overflow:hidden;}
+.imodal-sim-head{display:grid;grid-template-columns:1fr 1fr 1fr;background:rgba(168,85,247,0.10);padding:8px 12px;gap:8px;}
+.imodal-sim-col{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted);text-align:center;}
+.imodal-sim-col:first-child{text-align:left;}
+.imodal-sim-row{display:grid;grid-template-columns:1fr 1fr 1fr;padding:8px 12px;gap:8px;border-top:1px solid var(--border-soft);}
+.imodal-sim-label{font-size:12px;color:var(--ink-muted);}
+.imodal-sim-val{font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;text-align:center;color:var(--ink);}
+.imodal-sim-val.before{color:var(--amber);}
+.imodal-sim-val.after{color:var(--sky);}
+.imodal-sim-val.delta{color:var(--green);font-weight:800;}
+.imodal-sim-footer{padding:10px 12px;background:rgba(52,211,153,0.07);display:flex;justify-content:space-between;align-items:center;}
+.imodal-sim-compression{font-size:11px;color:var(--green);font-weight:700;}
+.imodal-sim-note{font-size:10px;color:var(--ink-faint);}
+/* ── Overview before/after + bench strip ── */
+.before-after-panel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px;}
+.ba-card{background:var(--card);border:1px solid var(--border-soft);border-radius:14px;padding:16px;text-align:center;}
+.ba-card-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;}
+.ba-card-num{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.ba-card-num.before{color:var(--amber);}
+.ba-card-num.after{color:var(--sky);}
+.ba-card-num.delta{color:var(--green);}
+.ba-card-sub{font-size:11px;color:var(--ink-muted);margin-top:4px;}
+.bench-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.bstrip-card{background:var(--card);border:1px solid var(--border-soft);border-radius:14px;padding:14px;}
+.bstrip-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;}
+.bstrip-rows{display:flex;flex-direction:column;gap:7px;}
+.bstrip-row{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.bstrip-who{font-size:11px;color:var(--ink-muted);min-width:64px;}
+.bstrip-bar-bg{flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;}
+.bstrip-bar-fill{height:5px;border-radius:3px;transition:width .8s ease;}
+.bstrip-num{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:36px;text-align:right;}
+.bstrip-num.us{color:var(--violet);}
+[data-theme="light"] .bstrip-bar-bg{background:rgba(0,0,0,0.10);}
+[data-theme="light"] .sim-section{background:rgba(109,40,217,0.05);}
+[data-theme="light"] .imodal-sim{background:rgba(109,40,217,0.04);}
+[data-theme="light"] .imodal-sim-head{background:rgba(109,40,217,0.08);}
+[data-theme="light"] .imodal-sim-footer{background:rgba(52,211,153,0.08);}
 </style>
 </head>
 <body>
@@ -498,7 +546,6 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
 
   <div class="tab-nav" role="tablist">
     <button class="tab-btn active" data-tab="overview" role="tab">Overview</button>
-    <button class="tab-btn" data-tab="benchmarks" role="tab">Benchmarks</button>
     <button class="tab-btn" data-tab="initiatives" role="tab">Initiatives</button>
     <button class="tab-btn" data-tab="narrative" role="tab">Narrative</button>
   </div>
@@ -555,181 +602,19 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
     </div>
   </div>
 
+  <div class="sec-title" style="margin-top:28px;">Before vs. After AI</div>
+  <div class="before-after-panel">
+    <div class="ba-card"><div class="ba-card-label">Pre-AI Equivalent Cost</div><div class="ba-card-num before" id="ba-before">--</div><div class="ba-card-sub">estimated manual build cost</div></div>
+    <div class="ba-card"><div class="ba-card-label">AI-Assisted Actual Cost</div><div class="ba-card-num after" id="ba-after">--</div><div class="ba-card-sub">hours x blended rate</div></div>
+    <div class="ba-card"><div class="ba-card-label">Total Value Created</div><div class="ba-card-num delta" id="ba-delta">--</div><div class="ba-card-sub">the real ROI argument</div></div>
+  </div>
+  <div class="sec-title" style="margin-top:28px;">vs. Industry Benchmark</div>
+  <div class="bench-strip">
+    <div class="bstrip-card"><div class="bstrip-label">Capacity Recovery Rate</div><div class="bstrip-rows"><div class="bstrip-row"><span class="bstrip-who">Us</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" id="bsc-cap-us" style="background:var(--violet);width:0%"></div></div><span class="bstrip-num us" id="bsn-cap-us">0%</span></div><div class="bstrip-row"><span class="bstrip-who">Tech avg</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" style="background:var(--ink-faint);width:38%"></div></div><span class="bstrip-num">38%</span></div><div class="bstrip-row"><span class="bstrip-who">Top 10%</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" style="background:var(--sky);width:62%"></div></div><span class="bstrip-num">62%</span></div></div></div>
+    <div class="bstrip-card"><div class="bstrip-label">ROI Multiplier</div><div class="bstrip-rows"><div class="bstrip-row"><span class="bstrip-who">Us</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" id="bsc-roi-us" style="background:var(--violet);width:0%"></div></div><span class="bstrip-num us" id="bsn-roi-us">--</span></div><div class="bstrip-row"><span class="bstrip-who">SF standard</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" style="background:var(--ink-faint);width:35%"></div></div><span class="bstrip-num">3.5x</span></div><div class="bstrip-row"><span class="bstrip-who">Top 10%</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" style="background:var(--sky);width:70%"></div></div><span class="bstrip-num">7x</span></div></div></div>
+    <div class="bstrip-card"><div class="bstrip-label">Time Compression</div><div class="bstrip-rows"><div class="bstrip-row"><span class="bstrip-who">Us</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" id="bsc-comp-us" style="background:var(--violet);width:0%"></div></div><span class="bstrip-num us" id="bsn-comp-us">--</span></div><div class="bstrip-row"><span class="bstrip-who">Industry avg</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" style="background:var(--ink-faint);width:30%"></div></div><span class="bstrip-num">3x</span></div><div class="bstrip-row"><span class="bstrip-who">Top 10%</span><div class="bstrip-bar-bg"><div class="bstrip-bar-fill" style="background:var(--sky);width:50%"></div></div><span class="bstrip-num">5x</span></div></div></div>
+  </div>
   </div><!-- /tab-overview -->
-
-  <div class="tab-panel" id="tab-benchmarks">
-  <div class="sec-title">vs. Industry Baseline</div>
-  <div class="bench-section">
-    <div class="bench-grid">
-
-      <div class="bench-card bc-violet">
-        <div class="bench-label">Capacity Recovery Rate</div>
-        <div class="bench-row">
-          <div class="bench-your">
-            <div class="bench-your-num" id="bench-capacity-num" style="color:#A855F7;">—</div>
-            <div class="bench-your-lbl">Your rate</div>
-          </div>
-          <div class="bench-vs">
-            <div class="bench-vs-num">12%</div>
-            <div class="bench-vs-lbl">Industry avg</div>
-          </div>
-        </div>
-        <div class="bench-delta up" id="bench-capacity-delta">↑ Calculating…</div>
-        <div class="bench-sub">AI-enabled teams recover <strong>15–20%</strong> more capacity than manual-process peers. Your scorecard tracks this ratio live.</div>
-        <div class="bench-source">Source: McKinsey Digital, The State of AI in 2024</div>
-      </div>
-
-      <div class="bench-card bc-sky">
-        <div class="bench-label">Cost-per-Insight Avoided</div>
-        <div class="bench-row">
-          <div class="bench-your">
-            <div class="bench-your-num" id="bench-cpi-num" style="color:#38BDF8;">—</div>
-            <div class="bench-your-lbl">Your avg / hr</div>
-          </div>
-          <div class="bench-vs">
-            <div class="bench-vs-num">$180</div>
-            <div class="bench-vs-lbl">Manual fully-loaded</div>
-          </div>
-        </div>
-        <div class="bench-delta up" id="bench-cpi-delta">↑ Calculating…</div>
-        <div class="bench-sub">Manual vendor/spend analysis runs <strong>$160–$200/hr</strong> fully-loaded. AI-assisted workflows drive this toward near-zero marginal cost per cycle.</div>
-        <div class="bench-source">Source: Gartner Peer Insights, Vendor Management Ops 2024</div>
-      </div>
-
-      <div class="bench-card bc-teal">
-        <div class="bench-label">Time-to-Insight Delta</div>
-        <div class="bench-bar-row" style="margin-bottom:12px;">
-          <div class="bench-bar-item">
-            <div class="bench-bar-name">Traditional</div>
-            <div class="bench-bar-bg"><div class="bench-bar-fill" style="width:100%;background:rgba(168,85,247,0.30);"></div></div>
-            <div class="bench-bar-val">3–5 days</div>
-          </div>
-          <div class="bench-bar-item">
-            <div class="bench-bar-name">AI-Assisted</div>
-            <div class="bench-bar-bg"><div class="bench-bar-fill" id="tti-bar" style="width:0%;background:linear-gradient(90deg,#2DD4BF,#38BDF8);transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1);"></div></div>
-            <div class="bench-bar-val">Same day</div>
-          </div>
-        </div>
-        <div class="bench-delta up">↑ 4–5× faster cycle</div>
-        <div class="bench-sub">Traditional BI &amp; reporting cycles average <strong>3–5 business days</strong>. AI-assisted pipelines close the loop same-day, enabling real-time decisions at exec reviews.</div>
-        <div class="bench-source">Source: Forrester, AI-Augmented Analytics Wave 2024</div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="sec-title">Value at Scale</div>
-  <div class="scale-section">
-    <div class="scale-strip" id="scale-strip">
-      <div class="scale-card sc-1">
-        <div class="scale-multiplier">If adopted by</div>
-        <div class="scale-teams">5</div>
-        <div class="scale-label">teams across DA&amp;O</div>
-        <div class="scale-metrics" id="scale-5"></div>
-      </div>
-      <div class="scale-card sc-2">
-        <div class="scale-multiplier">If adopted by</div>
-        <div class="scale-teams">20</div>
-        <div class="scale-label">teams across DET</div>
-        <div class="scale-metrics" id="scale-20"></div>
-      </div>
-      <div class="scale-card sc-3">
-        <div class="scale-multiplier">If adopted</div>
-        <div class="scale-teams">Org</div>
-        <div class="scale-label">wide — full enterprise</div>
-        <div class="scale-metrics" id="scale-org"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sec-title">Efficiency at Any Scale</div>
-  <div class="btech-section">
-
-    <p class="btech-intro">The most meaningful comparison isn't raw spend — it's <strong>efficiency ratios</strong>: how much value you extract per hour invested, per dollar allocated, per tool shipped. On those terms, this team holds its own against any org on the planet.</p>
-
-    <div class="btech-anchor">
-      <div class="btech-anchor-icon">☁️</div>
-      <div class="btech-anchor-body">
-        <div class="btech-anchor-label">Home Field Benchmark — Salesforce Published Standard</div>
-        <div class="btech-anchor-title">Salesforce reports that its AI platform delivers an average <strong>$3.50 return per $1 invested</strong> in AI-assisted workflows — across enterprise customers.</div>
-        <div class="btech-anchor-text">That's the bar Salesforce sets for its customers. This function — an internal team of practitioners — is operating against that same standard, with tooling built from scratch in days, not quarters. The ROI Multiplier on this scorecard tracks exactly that ratio, live, from your own data. <strong>We are not just using Salesforce AI. We are the proof point.</strong></div>
-      </div>
-    </div>
-
-    <div class="btech-grid">
-
-      <div class="btech-card">
-        <div class="btech-co"><span class="btech-co-badge ms">Microsoft</span><span class="btech-co-name">Copilot ROI Study</span></div>
-        <div class="btech-metric-name">Time Saved per Knowledge Worker</div>
-        <div class="btech-metric-val">14 hrs</div>
-        <div class="btech-metric-desc">Microsoft's 2024 Copilot Impact Study found knowledge workers save an average of 14 hours per month — roughly <strong>10% of capacity</strong>.</div>
-        <div class="btech-source-line">Source: Microsoft Work Trend Index, 2024</div>
-      </div>
-
-      <div class="btech-card">
-        <div class="btech-co"><span class="btech-co-badge goog">Google</span><span class="btech-co-name">Workspace AI Report</span></div>
-        <div class="btech-metric-name">Avg. Time-to-Draft Reduction</div>
-        <div class="btech-metric-val">40%</div>
-        <div class="btech-metric-desc">Google Workspace AI reduces first-draft creation time by 40% across document, email, and analysis tasks for enterprise users.</div>
-        <div class="btech-source-line">Source: Google Workspace AI Impact Report, 2024</div>
-      </div>
-
-      <div class="btech-card">
-        <div class="btech-co"><span class="btech-co-badge meta">Meta</span><span class="btech-co-name">Internal AI Tooling</span></div>
-        <div class="btech-metric-name">Eng. Productivity Lift (AI-assisted)</div>
-        <div class="btech-metric-val">35%</div>
-        <div class="btech-metric-desc">Meta's internal AI coding and ops tooling delivered a 35% productivity lift for knowledge workers — cited in their 2024 earnings call efficiency narrative.</div>
-        <div class="btech-source-line">Source: Meta Q3 2024 Earnings, Efficiency Commentary</div>
-      </div>
-
-      <div class="btech-card">
-        <div class="btech-co"><span class="btech-co-badge amz">Amazon</span><span class="btech-co-name">AWS Bedrock Case Studies</span></div>
-        <div class="btech-metric-name">Avg. Deploy-to-Value Timeline</div>
-        <div class="btech-metric-val">6–18 mo</div>
-        <div class="btech-metric-desc">Enterprise AI deployments on AWS Bedrock average 6–18 months from project start to production value. Internal complexity and governance are the primary drag.</div>
-        <div class="btech-source-line">Source: AWS Bedrock Customer Impact, 2024</div>
-      </div>
-
-      <div class="btech-card">
-        <div class="btech-co"><span class="btech-co-badge sf">Salesforce</span><span class="btech-co-name">Agentforce ROI Data</span></div>
-        <div class="btech-metric-name">Avg. Case Deflection Rate</div>
-        <div class="btech-metric-val">$3.50x</div>
-        <div class="btech-metric-desc">Salesforce Agentforce customers report an average $3.50 return per $1 invested, with top performers exceeding $8x when AI is deeply embedded in ops workflows.</div>
-        <div class="btech-source-line">Source: Salesforce State of AI Report, 2024</div>
-      </div>
-
-      <div class="btech-card">
-        <div class="btech-co"><span class="btech-co-badge ms">McKinsey</span><span class="btech-co-name">Global AI Survey</span></div>
-        <div class="btech-metric-name">Orgs Capturing Meaningful AI Value</div>
-        <div class="btech-metric-val">27%</div>
-        <div class="btech-metric-desc">Only 27% of organizations report capturing meaningful, measurable value from AI investments. The rest are still in pilot mode or haven't connected AI to business outcomes.</div>
-        <div class="btech-source-line">Source: McKinsey State of AI, 2024</div>
-      </div>
-
-    </div>
-
-    <div class="sec-title" style="margin-top:8px;">Where We Stand</div>
-    <div class="btech-our-row" id="btech-our-row">
-      <div class="btech-our-card">
-        <div class="btech-our-label">Deploy-to-Value Timeline</div>
-        <div class="btech-our-val">Days</div>
-        <div class="btech-our-sub">vs. 6–18 months enterprise avg<br>Tools ship in weekends, not quarters</div>
-      </div>
-      <div class="btech-our-card">
-        <div class="btech-our-label">ROI vs. Salesforce Standard</div>
-        <div class="btech-our-val" id="btech-our-roi">—</div>
-        <div class="btech-our-sub">vs. $3.50x Salesforce published avg<br>Live from your scorecard data</div>
-      </div>
-      <div class="btech-our-card">
-        <div class="btech-our-label">Value Capture Status</div>
-        <div class="btech-our-val">Top 27%</div>
-        <div class="btech-our-sub">We're measuring, reporting &amp; acting<br>Most orgs are still in pilot mode</div>
-      </div>
-    </div>
-
-  </div>
-
-  </div><!-- /tab-benchmarks -->
 
   <div class="tab-panel" id="tab-initiatives">
   <div class="sec-title">Active Initiatives</div>
@@ -806,6 +691,19 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
     <div class="field-group"><label class="field-label" for="f-tool">AI Tool Used</label><input type="text" id="f-tool" class="field-input" placeholder="e.g. VER Hub, Claude Code"></div>
     <div class="field-group"><label class="field-label" for="f-time">Time Saved (hrs/qtr)</label><input type="number" id="f-time" class="field-input" placeholder="0" min="0"></div>
     <div class="field-group"><label class="field-label" for="f-cost">Cost Avoided ($/qtr)</label><input type="number" id="f-cost" class="field-input" placeholder="0" min="0"></div>
+    <div class="sim-section">
+      <div class="sim-section-title">True Cost Simulator</div>
+      <div class="sim-row">
+        <div class="field-group" style="margin:0"><label class="field-label" for="f-ai-hrs">AI Build Hours</label><input type="number" id="f-ai-hrs" class="field-input" placeholder="e.g. 40" min="0"></div>
+        <div class="field-group" style="margin:0"><label class="field-label" for="f-complexity">Complexity</label><select id="f-complexity" class="field-input"><option value="1.5">Simple (1.5x)</option><option value="2.5" selected>Moderate (2.5x)</option><option value="4">Complex (4x)</option><option value="6">Enterprise (6x)</option></select></div>
+      </div>
+      <div class="field-group" style="margin:0 0 10px"><label class="field-label" for="f-build-type">Pre-AI Build Route</label><select id="f-build-type" class="field-input"><option value="fte">Internal FTE (150/hr)</option><option value="contractor">Contractor (200/hr)</option><option value="sow">Vendor SOW (250/hr +20%)</option></select></div>
+      <div class="sim-result">
+        <div class="sim-res-item"><div class="sim-res-num" id="sp-before">--</div><div class="sim-res-lbl">Pre-AI Cost</div></div>
+        <div class="sim-res-item"><div class="sim-res-num" id="sp-after">--</div><div class="sim-res-lbl">AI Cost</div></div>
+        <div class="sim-res-item highlight"><div class="sim-res-num" id="sp-delta">--</div><div class="sim-res-lbl">Cost Avoided</div></div>
+      </div>
+    </div>
     <div class="field-group"><label class="field-label" for="f-status">Status</label><select id="f-status" class="field-input"><option>Active</option><option>Pilot</option><option>Complete</option></select></div>
     <div class="field-group"><label class="field-label" for="f-notes">Evidence / Notes</label><textarea id="f-notes" class="field-input" placeholder="What was measured? What does success look like?"></textarea></div>
   </div>
@@ -832,6 +730,7 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
 </script>
 <script>
 (function(){
+function fmtD(n){return n?'
 var PILLAR_COLORS={'DA&O':'#dc2626','Engineering':'#2563eb','IT':'#d97706','SF on SF':'#0f766e','Data':'#059669','Digital Mktg':'#7c3aed','Agentic':'#0891b2','CDO':'#be123c','Emerging':'#ca8a04'};
 var STATUS_CLASS={'Active':'cg','Pilot':'ca','Complete':'cs'};
 var nextId=1,editingId=null;
@@ -839,16 +738,16 @@ var donutChart=null,barChart=null;
 var prevKpis={time:0,cost:0,count:0,quality:0};
 
 // Salesforce FY: Feb 1 – Jan 31. FY27: Q1=Feb–Apr, Q2=May–Jul, Q3=Aug–Oct, Q4=Nov–Jan.
-var SEED_VERSION=2;
+var SEED_VERSION=3;
 var SEED_Q2=[
-  {id:1,name:'VER Intelligence Hub',pillar:'DA&O',tool:'VER Hub',time:120,cost:45000,quality:9,status:'Complete',notes:'Eliminated manual vendor reporting — 3 FTE hours/week recovered across DA&O. Launched Q2 FY27.'},
-  {id:3,name:'TCO Scenario Modeling',pillar:'Engineering',tool:'TCO Calculator',time:60,cost:38000,quality:9,status:'Complete',notes:'Enables data-driven build vs. buy decisions. Used in 4 engineering reviews. Launched Q2 FY27.'},
-  {id:4,name:'Vendor Portal Intake',pillar:'DA&O',tool:'Vendor Portal',time:95,cost:31500,quality:9,status:'Complete',notes:'Automated vendor intake and risk scoring — previously 4 hrs manual per submission. Launched Q2 FY27.'}
+  {id:1,name:'VER Intelligence Hub',pillar:'DA&O',tool:'VER Hub',time:120,cost:45000,quality:9,status:'Complete',aiHrs:80,complexity:'4',buildType:'contractor',sim:{preHrs:320,preCost:64000,afterCost:12000,delta:52000,mult:4},notes:'Eliminated manual vendor reporting — 3 FTE hours/week recovered across DA&O. Launched Q2 FY27.'},
+  {id:3,name:'TCO Scenario Modeling',pillar:'Engineering',tool:'TCO Calculator',time:60,cost:38000,quality:9,status:'Complete',aiHrs:50,complexity:'2.5',buildType:'contractor',sim:{preHrs:125,preCost:25000,afterCost:7500,delta:17500,mult:2.5},notes:'Enables data-driven build vs. buy decisions. Used in 4 engineering reviews. Launched Q2 FY27.'},
+  {id:4,name:'Vendor Portal Intake',pillar:'DA&O',tool:'Vendor Portal',time:95,cost:31500,quality:9,status:'Complete',aiHrs:60,complexity:'2.5',buildType:'sow',sim:{preHrs:150,preCost:45000,afterCost:9000,delta:36000,mult:2.5},notes:'Automated vendor intake and risk scoring — previously 4 hrs manual per submission. Launched Q2 FY27.'}
 ];
 var SEED_Q3=[
-  {id:1,name:'SOW Cost Estimator',pillar:'DA&O',tool:'SOW Estimator',time:80,cost:28000,quality:8,status:'Active',notes:'Replaces manual benchmark research and rate card lookups for every SOW review. Launched Q3 FY27.'},
-  {id:2,name:'AI Spend Tracking Dashboard',pillar:'Data',tool:'Custom Build',time:45,cost:22000,quality:8,status:'Active',notes:'Real-time token consumption and cost-per-use-case visibility across DET pillars.'},
-  {id:3,name:'ROI & Value Scorecard',pillar:'DA&O',tool:'This Tool',time:30,cost:18000,quality:9,status:'Active',notes:'Standardized quarterly AI impact reporting framework. Built and deployed Q3 FY27.'}
+  {id:1,name:'SOW Cost Estimator',pillar:'DA&O',tool:'SOW Estimator',time:80,cost:28000,quality:8,status:'Active',aiHrs:45,complexity:'2.5',buildType:'contractor',sim:{preHrs:112,preCost:22500,afterCost:6750,delta:15750,mult:2.5},notes:'Replaces manual benchmark research and rate card lookups for every SOW review. Launched Q3 FY27.'},
+  {id:2,name:'AI Spend Tracking Dashboard',pillar:'Data',tool:'Custom Build',time:45,cost:22000,quality:8,status:'Active',aiHrs:30,complexity:'2.5',buildType:'fte',sim:{preHrs:75,preCost:11250,afterCost:4500,delta:6750,mult:2.5},notes:'Real-time token consumption and cost-per-use-case visibility across DET pillars.'},
+  {id:3,name:'ROI & Value Scorecard',pillar:'DA&O',tool:'This Tool',time:30,cost:18000,quality:9,status:'Active',aiHrs:25,complexity:'4',buildType:'sow',sim:{preHrs:100,preCost:30000,afterCost:3750,delta:26250,mult:4},notes:'Standardized quarterly AI impact reporting framework. Built and deployed Q3 FY27.'}
 ];
 
 function qtrKey(qtr){return 'scorecard-initiatives-'+qtr.replace(/\s+/g,'-');}
@@ -1008,9 +907,19 @@ function openDrawer(id){
 
       document.getElementById('f-status').value=ini.status||'Active';
       document.getElementById('f-notes').value=ini.notes||'';
+      document.getElementById('f-ai-hrs').value=ini.aiHrs||'';
+      document.getElementById('f-complexity').value=ini.complexity||'2.5';
+      document.getElementById('f-build-type').value=ini.buildType||'fte';
+      var _cf=document.getElementById('f-cost');if(_cf)_cf._manuallySet=!!(ini.aiHrs);
+      updateSimPreview();
     }
   } else {
     document.getElementById('f-name').value='';document.getElementById('f-pillar').value='DA&O';
+    document.getElementById('f-ai-hrs').value='';
+    document.getElementById('f-complexity').value='2.5';
+    document.getElementById('f-build-type').value='fte';
+    var _cfr=document.getElementById('f-cost');if(_cfr)_cfr._manuallySet=false;
+    updateSimPreview();
     document.getElementById('f-tool').value='';document.getElementById('f-time').value='';
     document.getElementById('f-cost').value='';document.getElementById('f-status').value='Active';
     document.getElementById('f-notes').value='';
@@ -1059,6 +968,37 @@ function openIModal(id){
     +'<div class="imodal-q-text"><div class="imodal-q-label">Impact Score</div><div class="imodal-q-sub">Auto-calculated: 70% ROI ratio (vs. .50x Salesforce standard) + 30% capacity volume. 10 = exceptional ROI + high volume.</div></div>';
   setTimeout(function(){var f=document.getElementById('imodal-q-fill');if(f)f.style.strokeDashoffset=offset;},50);
   document.getElementById('imodal-notes').textContent=ini.notes||'No notes recorded.';
+  var _os=document.getElementById('imodal-sim-table');
+  if(_os)_os.parentNode.removeChild(_os);
+  var _iq=document.getElementById('imodal-quality');
+  if(ini.sim&&ini.sim.preCost>0&&_iq){
+    var CLBL={'1.5':'Simple','2.5':'Moderate','4':'Complex','6':'Enterprise'};
+    var RLBL={fte:'150/hr (FTE)',contractor:'200/hr (Contractor)',sow:'250/hr+20% (SOW)'};
+    var _st=document.createElement('div');_st.id='imodal-sim-table';_st.className='imodal-sim';
+    var _sh=document.createElement('div');_sh.className='imodal-sim-head';
+    ['Metric','Pre-AI','With AI'].forEach(function(t){var c=document.createElement('div');c.className='imodal-sim-col';c.textContent=t;_sh.appendChild(c);});
+    _st.appendChild(_sh);
+    [[' Build Hours',ini.sim.preHrs+'h',(ini.aiHrs||0)+'h'],
+     [' Blended Rate',RLBL[ini.buildType]||'150/hr','150/hr (FTE)'],
+     [' Total Cost',fmtD(ini.sim.preCost),fmtD(ini.sim.afterCost)]
+    ].forEach(function(r){
+      var row=document.createElement('div');row.className='imodal-sim-row';
+      [['imodal-sim-label',r[0]],['imodal-sim-val before',r[1]],['imodal-sim-val after',r[2]]].forEach(function(c){
+        var d=document.createElement('div');d.className=c[0];d.textContent=c[1];row.appendChild(d);
+      });
+      _st.appendChild(row);
+    });
+    var _dr=document.createElement('div');_dr.className='imodal-sim-row';
+    [['imodal-sim-label',' Cost Avoided'],['imodal-sim-val',''],['imodal-sim-val delta',fmtD(ini.sim.delta)]].forEach(function(c){
+      var d=document.createElement('div');d.className=c[0];d.textContent=c[1];_dr.appendChild(d);
+    });
+    _st.appendChild(_dr);
+    var _ft=document.createElement('div');_ft.className='imodal-sim-footer';
+    var _cs=document.createElement('span');_cs.className='imodal-sim-compression';_cs.textContent=ini.sim.mult+'x faster with AI';
+    var _ns=document.createElement('span');_ns.className='imodal-sim-note';_ns.textContent='Complexity: '+(CLBL[String(parseFloat(ini.complexity))]||'Moderate');
+    _ft.appendChild(_cs);_ft.appendChild(_ns);_st.appendChild(_ft);
+    _iq.parentNode.insertBefore(_st,_iq.nextSibling);
+  }
   document.getElementById('imodal-edit').onclick=function(){closeIModal();openDrawer(id);};
   document.getElementById('imodal-overlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1066,6 +1006,27 @@ function openIModal(id){
 function closeIModal(){
   document.getElementById('imodal-overlay').classList.remove('open');
   document.body.style.overflow='';
+}
+var SIM_RATES={fte:150,contractor:200,sow:250};
+var SIM_SOW_OH=1.20;
+function simCalc(ah,cx,bt){
+  var m=parseFloat(cx)||2.5,r=SIM_RATES[bt]||150;
+  var ph=Math.round(ah*m);
+  var pc=Math.round(bt==='sow'?ph*r*SIM_SOW_OH:ph*r);
+  var ac=Math.round(ah*SIM_RATES.fte);
+  return {preHrs:ph,preCost:pc,afterCost:ac,delta:Math.max(0,pc-ac),mult:m};
+}
+function updateSimPreview(){
+  var h=parseFloat(document.getElementById('f-ai-hrs').value)||0;
+  var cx=document.getElementById('f-complexity').value||'2.5';
+  var bt=document.getElementById('f-build-type').value||'fte';
+  var eB=document.getElementById('sp-before'),eA=document.getElementById('sp-after'),eD=document.getElementById('sp-delta');
+  if(!h){if(eB)eB.textContent='--';if(eA)eA.textContent='--';if(eD)eD.textContent='--';return;}
+  var r=simCalc(h,cx,bt);
+  if(eB)eB.textContent=fmtD(r.preCost);
+  if(eA)eA.textContent=fmtD(r.afterCost);
+  if(eD)eD.textContent=fmtD(r.delta);
+  var cf=document.getElementById('f-cost');if(cf&&!cf._manuallySet)cf.value=r.delta||'';
 }
 function saveDrawer(){
   var name=document.getElementById('f-name').value.trim();
@@ -1075,6 +1036,10 @@ function saveDrawer(){
     tool:document.getElementById('f-tool').value.trim(),
     time:parseFloat(document.getElementById('f-time').value)||0,
     cost:parseFloat(document.getElementById('f-cost').value)||0,
+    aiHrs:parseFloat(document.getElementById('f-ai-hrs').value)||0,
+    complexity:document.getElementById('f-complexity').value||'2.5',
+    buildType:document.getElementById('f-build-type').value||'fte',
+    sim:(function(){var ah=parseFloat(document.getElementById('f-ai-hrs').value)||0;return ah>0?simCalc(ah,document.getElementById('f-complexity').value,document.getElementById('f-build-type').value):null;}()),
     quality:autoScore({time:parseFloat(document.getElementById('f-time').value)||0,cost:parseFloat(document.getElementById('f-cost').value)||0}),
     status:document.getElementById('f-status').value,
     notes:document.getElementById('f-notes').value.trim()};
@@ -1126,6 +1091,10 @@ document.getElementById('drawer-close').addEventListener('click',closeDrawer);
 document.getElementById('drawer-overlay').addEventListener('click',closeDrawer);
 document.getElementById('btn-cancel').addEventListener('click',closeDrawer);
 document.getElementById('btn-save').addEventListener('click',saveDrawer);
+document.getElementById('f-ai-hrs').addEventListener('input',updateSimPreview);
+document.getElementById('f-complexity').addEventListener('change',updateSimPreview);
+document.getElementById('f-build-type').addEventListener('change',updateSimPreview);
+document.getElementById('f-cost').addEventListener('input',function(){this._manuallySet=true;});
 
 document.getElementById('btn-generate').addEventListener('click',generateNarrative);
 document.getElementById('btn-copy').addEventListener('click',function(){
@@ -1261,6 +1230,637 @@ function updateOverview(){
   var top=initiatives.length?initiatives.slice().sort(function(a,b){
     return ((b.time||0)+(b.cost||0)/1000)-((a.time||0)+(a.cost||0)/1000);
   })[0]:null;
+  var _tPre=initiatives.reduce(function(s,i){return s+(i.sim?i.sim.preCost:0);},0);
+  var _tAft=initiatives.reduce(function(s,i){return s+(i.sim?i.sim.afterCost:0);},0);
+  var _tDlt=initiatives.reduce(function(s,i){return s+(i.sim?i.sim.delta:0);},0);
+  var _hs=initiatives.some(function(i){return i.sim&&i.sim.preCost>0;});
+  var _eBef=document.getElementById('ba-before');
+  var _eAft=document.getElementById('ba-after');
+  var _eDlt=document.getElementById('ba-delta');
+  if(_eBef)_eBef.textContent=_hs?fmtD(_tPre):'--';
+  if(_eAft)_eAft.textContent=_hs?fmtD(_tAft):'--';
+  if(_eDlt)_eDlt.textContent=_hs?fmtD(_tDlt):'--';
+  var _tt2=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
+  var _tc2=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
+  var _cap=_tt2>0?Math.round(_tt2/(_tt2+2000)*100):0;
+  var _roi=_tt2>0&&_tc2>0?parseFloat((_tc2/(_tt2*150)).toFixed(1)):0;
+  var _sit=initiatives.filter(function(i){return i.sim&&i.complexity;});
+  var _cmp=_sit.length>0?parseFloat((_sit.reduce(function(s,i){return s+parseFloat(i.complexity||2.5);},0)/_sit.length).toFixed(1)):0;
+  var _el;
+  _el=document.getElementById('bsc-cap-us');if(_el)_el.style.width=Math.min(_cap,100)+'%';
+  _el=document.getElementById('bsn-cap-us');if(_el)_el.textContent=_cap+'%';
+  _el=document.getElementById('bsc-roi-us');if(_el)_el.style.width=Math.min(_roi/10*100,100)+'%';
+  _el=document.getElementById('bsn-roi-us');if(_el)_el.textContent=_roi>0?_roi+'x':'--';
+  _el=document.getElementById('bsc-comp-us');if(_el)_el.style.width=Math.min(_cmp/6*100,100)+'%';
+  _el=document.getElementById('bsn-comp-us');if(_el)_el.textContent=_cmp>0?_cmp+'x':'--';
+  var nm=document.getElementById('spotlight-name');
+  var ss=document.getElementById('spotlight-stats');
+  if(top){
+    nm.textContent=top.name;
+    ss.innerHTML='';
+    function mkStat(n,l){var d=document.createElement('div');d.className='spotlight-stat';
+      var dn=document.createElement('div');dn.className='spotlight-stat-n';dn.textContent=n;
+      var dl=document.createElement('div');dl.className='spotlight-stat-l';dl.textContent=l;
+      d.appendChild(dn);d.appendChild(dl);return d;}
+    ss.appendChild(mkStat((top.time||0).toLocaleString()+' hrs','Time Saved'));
+    ss.appendChild(mkStat('$'+(top.cost||0).toLocaleString(),'Cost Avoided'));
+    ss.appendChild(mkStat(autoScore(top).toFixed(1)+'/10','Impact Score'));
+    // Color the spotlight card border top to match pillar
+    var pc=PILLAR_COLORS[top.pillar]||'#A855F7';
+    document.getElementById('spotlight-card').style.setProperty('--sp-color',pc);
+  } else {
+    nm.innerHTML='<span style="font-size:13px;font-style:italic;color:var(--ink-faint);">Add initiatives to see top performer</span>';
+    ss.innerHTML='';
+  }
+  // Health ratio bars
+  var counts={Active:0,Pilot:0,Complete:0};
+  initiatives.forEach(function(i){if(counts[i.status]!==undefined)counts[i.status]++;});
+  var total=initiatives.length||1;
+  setTimeout(function(){
+    document.getElementById('ratio-active-bar').style.width=Math.round(counts.Active/total*100)+'%';
+    document.getElementById('ratio-pilot-bar').style.width=Math.round(counts.Pilot/total*100)+'%';
+    document.getElementById('ratio-complete-bar').style.width=Math.round(counts.Complete/total*100)+'%';
+  },50);
+  document.getElementById('ratio-active-val').textContent=counts.Active;
+  document.getElementById('ratio-pilot-val').textContent=counts.Pilot;
+  document.getElementById('ratio-complete-val').textContent=counts.Complete;
+  // Quality ring
+  var aq=initiatives.length?initiatives.reduce(function(s,i){return s+autoScore(i);},0)/initiatives.length:0;
+  var circ=131.9,offset=circ*(1-aq/10);
+  document.getElementById('ratio-q-center').textContent=aq?aq.toFixed(1):'—';
+  setTimeout(function(){var f=document.getElementById('ratio-q-fill');if(f)f.style.strokeDashoffset=offset;},100);
+}
+
+// Quarter-aware persistence
+function persistNow(){
+  saveQtr(document.getElementById('qtr-select').value||document.getElementById('qtr-select').options[document.getElementById('qtr-select').selectedIndex].text);
+}
+(function(){
+  var sel=document.getElementById('qtr-select');
+  var _prevQtr=null;
+  // Restore last-used quarter
+  var lastQtr=localStorage.getItem('scorecard-last-qtr')||'Q3 FY27';
+  for(var i=0;i<sel.options.length;i++){if(sel.options[i].text===lastQtr){sel.selectedIndex=i;break;}}
+  initiatives=loadQtr(sel.options[sel.selectedIndex].text);
+  _prevQtr=sel.options[sel.selectedIndex].text;
+
+  // Capture the current quarter before it changes
+  sel.addEventListener('mousedown',function(){_prevQtr=sel.options[sel.selectedIndex].text;});
+  sel.addEventListener('keydown',function(){_prevQtr=sel.options[sel.selectedIndex].text;});
+
+  sel.addEventListener('change',function(){
+    if(_prevQtr)saveQtr(_prevQtr);
+    var newQtr=sel.options[sel.selectedIndex].text;
+    _prevQtr=newQtr;
+    localStorage.setItem('scorecard-last-qtr',newQtr);
+    initiatives=loadQtr(newQtr);
+    prevKpis={time:0,cost:0,count:0,quality:0};
+    renderGrid();updateKPIs();
+    var box=document.getElementById('narrative-text');
+    box.innerHTML='<span class="narrative-placeholder">Click "Generate Narrative" to produce an exec-ready summary from your initiative data.</span>';
+    document.getElementById('btn-copy').style.display='none';
+  });
+})();
+
+initCharts();renderGrid();updateKPIs();
+
+// Theme toggle
+var _themBtn=document.getElementById('theme-toggle');
+var _htmlEl=document.documentElement;
+var _saved=localStorage.getItem('scorecard-theme')||'dark';
+if(_saved==='light'){_htmlEl.setAttribute('data-theme','light');_themBtn.textContent='☀️';}
+_themBtn.addEventListener('click',function(){
+  var isLight=_htmlEl.getAttribute('data-theme')==='light';
+  if(isLight){_htmlEl.removeAttribute('data-theme');_themBtn.innerHTML='&#9790;';localStorage.setItem('scorecard-theme','dark');}
+  else{_htmlEl.setAttribute('data-theme','light');_themBtn.textContent='☀️';localStorage.setItem('scorecard-theme','light');}
+});
+})();
+</script>
+</body>
+</html>
++Math.round(n).toLocaleString():'--';}
+var PILLAR_COLORS={'DA&O':'#dc2626','Engineering':'#2563eb','IT':'#d97706','SF on SF':'#0f766e','Data':'#059669','Digital Mktg':'#7c3aed','Agentic':'#0891b2','CDO':'#be123c','Emerging':'#ca8a04'};
+var STATUS_CLASS={'Active':'cg','Pilot':'ca','Complete':'cs'};
+var nextId=1,editingId=null;
+var donutChart=null,barChart=null;
+var prevKpis={time:0,cost:0,count:0,quality:0};
+
+// Salesforce FY: Feb 1 – Jan 31. FY27: Q1=Feb–Apr, Q2=May–Jul, Q3=Aug–Oct, Q4=Nov–Jan.
+var SEED_VERSION=3;
+var SEED_Q2=[
+  {id:1,name:'VER Intelligence Hub',pillar:'DA&O',tool:'VER Hub',time:120,cost:45000,quality:9,status:'Complete',aiHrs:80,complexity:'4',buildType:'contractor',sim:{preHrs:320,preCost:64000,afterCost:12000,delta:52000,mult:4},notes:'Eliminated manual vendor reporting — 3 FTE hours/week recovered across DA&O. Launched Q2 FY27.'},
+  {id:3,name:'TCO Scenario Modeling',pillar:'Engineering',tool:'TCO Calculator',time:60,cost:38000,quality:9,status:'Complete',aiHrs:50,complexity:'2.5',buildType:'contractor',sim:{preHrs:125,preCost:25000,afterCost:7500,delta:17500,mult:2.5},notes:'Enables data-driven build vs. buy decisions. Used in 4 engineering reviews. Launched Q2 FY27.'},
+  {id:4,name:'Vendor Portal Intake',pillar:'DA&O',tool:'Vendor Portal',time:95,cost:31500,quality:9,status:'Complete',aiHrs:60,complexity:'2.5',buildType:'sow',sim:{preHrs:150,preCost:45000,afterCost:9000,delta:36000,mult:2.5},notes:'Automated vendor intake and risk scoring — previously 4 hrs manual per submission. Launched Q2 FY27.'}
+];
+var SEED_Q3=[
+  {id:1,name:'SOW Cost Estimator',pillar:'DA&O',tool:'SOW Estimator',time:80,cost:28000,quality:8,status:'Active',aiHrs:45,complexity:'2.5',buildType:'contractor',sim:{preHrs:112,preCost:22500,afterCost:6750,delta:15750,mult:2.5},notes:'Replaces manual benchmark research and rate card lookups for every SOW review. Launched Q3 FY27.'},
+  {id:2,name:'AI Spend Tracking Dashboard',pillar:'Data',tool:'Custom Build',time:45,cost:22000,quality:8,status:'Active',aiHrs:30,complexity:'2.5',buildType:'fte',sim:{preHrs:75,preCost:11250,afterCost:4500,delta:6750,mult:2.5},notes:'Real-time token consumption and cost-per-use-case visibility across DET pillars.'},
+  {id:3,name:'ROI & Value Scorecard',pillar:'DA&O',tool:'This Tool',time:30,cost:18000,quality:9,status:'Active',aiHrs:25,complexity:'4',buildType:'sow',sim:{preHrs:100,preCost:30000,afterCost:3750,delta:26250,mult:4},notes:'Standardized quarterly AI impact reporting framework. Built and deployed Q3 FY27.'}
+];
+
+function qtrKey(qtr){return 'scorecard-initiatives-'+qtr.replace(/\s+/g,'-');}
+function loadQtr(qtr){
+  try{
+    var raw=localStorage.getItem(qtrKey(qtr));
+    if(raw){var p=JSON.parse(raw);var d=p&&p.v>=SEED_VERSION?p.items:(Array.isArray(p)?null:null);if(d&&d.length>0){nextId=Math.max.apply(null,d.map(function(i){return i.id||0;}))+1;return d;}}
+  }catch(e){}
+  if(qtr==='Q2 FY27'){nextId=4;return SEED_Q2.map(function(i){return Object.assign({},i);});}
+  if(qtr==='Q3 FY27'){nextId=4;return SEED_Q3.map(function(i){return Object.assign({},i);})};
+  nextId=1;return [];
+}
+function saveQtr(qtr){
+  try{localStorage.setItem(qtrKey(qtr),JSON.stringify({v:SEED_VERSION,items:initiatives}));}catch(e){}
+}
+var initiatives=loadQtr('Q3 FY27');
+
+function autoScore(ini){
+  // Impact Score: 70% ROI component + 30% volume component
+  // ROI: cost/(time*150) normalized to Salesforce 3.5x standard (3.5x = 7pts max)
+  // Volume: hrs recovered, 100hrs = 3pts max
+  var roi=(ini.time>0&&ini.cost>0)?ini.cost/(ini.time*150):0;
+  var roiPts=Math.min(roi/3.5*7,7);
+  var volPts=Math.min((ini.time||0)/100*3,3);
+  return Math.max(1,Math.min(10,Math.round((roiPts+volPts)*10)/10));
+}
+function initCharts(){
+  var dCtx=document.getElementById('donut-chart').getContext('2d');
+  donutChart=new Chart(dCtx,{type:'doughnut',
+    data:{labels:[],datasets:[{data:[],backgroundColor:[],borderWidth:3,borderColor:'transparent',hoverOffset:18,offset:4}]},
+    options:{cutout:'70%',
+      animation:{animateRotate:true,animateScale:true,duration:900,easing:'easeOutBack'},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return ' '+c.label+': '+c.parsed+' hrs';}}}},
+      responsive:true,maintainAspectRatio:true}});
+  var bCtx=document.getElementById('bar-chart').getContext('2d');
+  barChart=new Chart(bCtx,{type:'bar',
+    data:{labels:[],datasets:[{data:[],backgroundColor:[],borderRadius:6,borderWidth:0}]},
+    options:{indexAxis:'y',animation:{duration:700,easing:'easeOutQuart'},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+c.parsed.x.toLocaleString();}}}},
+      scales:{
+        x:{grid:{color:'rgba(168,85,247,0.08)'},ticks:{color:function(){return getComputedStyle(document.documentElement).getPropertyValue('--ink-faint').trim()||'rgba(240,238,255,0.35)';},font:{size:10},callback:function(v){return v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v;}},border:{display:false}},
+        y:{grid:{display:false},ticks:{color:function(){return getComputedStyle(document.documentElement).getPropertyValue('--ink-muted').trim()||'rgba(240,238,255,0.55)';},font:{size:11}},border:{display:false}}
+      },responsive:true,maintainAspectRatio:false}});
+}
+
+function updateCharts(){
+  var pt={};
+  initiatives.forEach(function(i){pt[i.pillar]=(pt[i.pillar]||0)+(i.time||0);});
+  var pL=Object.keys(pt),pD=pL.map(function(p){return pt[p];}),pC=pL.map(function(p){return PILLAR_COLORS[p]||'#A855F7';});
+  donutChart.data.labels=pL;donutChart.data.datasets[0].data=pD;donutChart.data.datasets[0].backgroundColor=pC;
+  donutChart.data.datasets[0].borderColor=pC.map(function(){return 'transparent';});
+  donutChart.update();
+  var tot=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
+  document.getElementById('donut-total').textContent=tot;
+  var leg=document.getElementById('donut-legend');leg.innerHTML='';
+  pL.forEach(function(p,idx){
+    var item=document.createElement('div');item.className='legend-item';
+    var dot=document.createElement('div');dot.className='legend-dot';dot.style.background=pC[idx];
+    var nm=document.createElement('span');nm.className='legend-name';nm.textContent=p;
+    var vl=document.createElement('span');vl.className='legend-val';vl.textContent=pD[idx]+' hrs';
+    item.appendChild(dot);item.appendChild(nm);item.appendChild(vl);leg.appendChild(item);
+  });
+  var sorted=initiatives.slice().sort(function(a,b){return(b.cost||0)-(a.cost||0);}).slice(0,8);
+  var bCtx=document.getElementById('bar-chart').getContext('2d');
+  var grad=bCtx.createLinearGradient(0,0,500,0);
+  grad.addColorStop(0,'rgba(168,85,247,0.85)');grad.addColorStop(1,'rgba(56,189,248,0.70)');
+  barChart.data.labels=sorted.map(function(i){return i.name.length>24?i.name.slice(0,24)+'…':i.name;});
+  barChart.data.datasets[0].data=sorted.map(function(i){return i.cost||0;});
+  barChart.data.datasets[0].backgroundColor=grad;
+  barChart.update();
+}
+
+function animateCounter(el,from,to,fmt,dur){
+  var start=null;
+  (function step(ts){if(!start)start=ts;var p=Math.min((ts-start)/dur,1),e=1-Math.pow(1-p,3);
+    el.textContent=fmt(Math.round(from+(to-from)*e));if(p<1)requestAnimationFrame(step);
+  })(performance.now());
+}
+
+function updateKPIs(){
+  var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
+  var tc=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
+  var ct=initiatives.length;
+  var aq=ct?(initiatives.reduce(function(s,i){return s+autoScore(i);},0)/ct):0;
+  animateCounter(document.getElementById('kpi-time'),prevKpis.time,tt,function(v){return v.toLocaleString()+' hrs';},600);
+  animateCounter(document.getElementById('kpi-cost'),prevKpis.cost,tc,function(v){return '$'+v.toLocaleString();},600);
+  animateCounter(document.getElementById('kpi-count'),prevKpis.count,ct,function(v){return v+'';},600);
+  animateCounter(document.getElementById('kpi-quality'),prevKpis.quality,Math.round(aq*10),function(v){return (v/10).toFixed(1)+'/10';},600);
+  prevKpis={time:tt,cost:tc,count:ct,quality:Math.round(aq*10)};
+  // ROI: cost avoided / (avg $150/hr * hours invested). If no data show —
+  var roiEl=document.getElementById('kpi-roi');
+  if(tt>0&&tc>0){var roi=(tc/(tt*150));animateCounter(roiEl,0,Math.round(roi*10),function(v){return '$'+(v/10).toFixed(1)+'x';},600);}
+  else{roiEl.textContent='—';}
+  updateOverview();updateStatusBar();updateBenchmarks();updateScale();updateBtechOur();updateCharts();
+}
+
+function updateStatusBar(){
+  var counts={Active:0,Pilot:0,Complete:0};
+  initiatives.forEach(function(i){if(counts[i.status]!==undefined)counts[i.status]++;});
+  var bar=document.getElementById('status-bar');
+  bar.innerHTML='<span class="status-pill sp-active"><span class="status-pill-count">'+counts.Active+'</span> Active</span>'
+    +'<span class="status-pill sp-pilot"><span class="status-pill-count">'+counts.Pilot+'</span> Pilot</span>'
+    +'<span class="status-pill sp-complete"><span class="status-pill-count">'+counts.Complete+'</span> Complete</span>';
+}
+
+function hexToRgb(hex){var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return r+','+g+','+b;}
+
+function renderGrid(){
+  var grid=document.getElementById('init-grid');grid.innerHTML='';
+  initiatives.forEach(function(ini){
+    var card=document.createElement('div');card.className='init-card';
+    var top=document.createElement('div');top.className='init-card-top';
+    var nm=document.createElement('div');nm.className='init-name';nm.textContent=ini.name;
+    var del=document.createElement('button');del.type='button';del.className='init-del';del.textContent='×';del.title='Remove';
+    del.addEventListener('click',function(e){e.stopPropagation();
+      if(confirm('Remove "'+ini.name+'"?')){initiatives=initiatives.filter(function(x){return x.id!==ini.id;});renderGrid();updateKPIs();persistNow();}
+    });
+    top.appendChild(nm);top.appendChild(del);card.appendChild(top);
+    var chips=document.createElement('div');chips.className='init-chips';
+    var pc=PILLAR_COLORS[ini.pillar]||'#A855F7',rgb=hexToRgb(pc);
+    var pch=document.createElement('span');pch.className='chip';
+    pch.style.cssText='font-size:10px;padding:2px 8px;background:rgba('+rgb+',0.12);color:'+pc+';border-color:rgba('+rgb+',0.30);';
+    pch.textContent=ini.pillar;
+    var sch=document.createElement('span');sch.className='chip '+(STATUS_CLASS[ini.status]||'ct');
+    sch.style.cssText='font-size:10px;padding:2px 8px;';sch.textContent=ini.status;
+    chips.appendChild(pch);chips.appendChild(sch);card.appendChild(chips);
+    var stats=document.createElement('div');stats.className='init-stats';
+    function makeStat(n,l){var s=document.createElement('div');s.className='init-stat';
+      var sn=document.createElement('div');sn.className='init-stat-n';sn.textContent=n;
+      var sl=document.createElement('div');sl.className='init-stat-l';sl.textContent=l;
+      s.appendChild(sn);s.appendChild(sl);return s;}
+    stats.appendChild(makeStat((ini.time||0).toLocaleString()+' hrs','Time Saved'));
+    stats.appendChild(makeStat('$'+(ini.cost||0).toLocaleString(),'Cost Avoided'));
+    card.appendChild(stats);
+    var qarc=document.createElement('div');qarc.className='quality-arc';
+    var qbg=document.createElement('div');qbg.className='quality-bar-bg';
+    var qfill=document.createElement('div');qfill.className='quality-bar-fill';
+    qfill.style.width=((ini.quality||0)/10*100)+'%';qbg.appendChild(qfill);
+    var ql=document.createElement('div');ql.className='quality-lbl';ql.textContent=autoScore(ini).toFixed(1)+'/10';
+    qarc.appendChild(qbg);qarc.appendChild(ql);card.appendChild(qarc);
+    card.addEventListener('click',function(e){if(e.target===del||del.contains(e.target))return;openIModal(ini.id);});
+    grid.appendChild(card);
+  });
+}
+
+function openDrawer(id){
+  editingId=id||null;
+  document.getElementById('drawer-title').textContent=editingId?'Edit Initiative':'New Initiative';
+  if(editingId){
+    var ini=initiatives.find(function(x){return x.id===editingId;});
+    if(ini){
+      document.getElementById('f-name').value=ini.name||'';
+      document.getElementById('f-pillar').value=ini.pillar||'DA&O';
+      document.getElementById('f-tool').value=ini.tool||'';
+      document.getElementById('f-time').value=ini.time||'';
+      document.getElementById('f-cost').value=ini.cost||'';
+
+      document.getElementById('f-status').value=ini.status||'Active';
+      document.getElementById('f-notes').value=ini.notes||'';
+      document.getElementById('f-ai-hrs').value=ini.aiHrs||'';
+      document.getElementById('f-complexity').value=ini.complexity||'2.5';
+      document.getElementById('f-build-type').value=ini.buildType||'fte';
+      var _cf=document.getElementById('f-cost');if(_cf)_cf._manuallySet=!!(ini.aiHrs);
+      updateSimPreview();
+    }
+  } else {
+    document.getElementById('f-name').value='';document.getElementById('f-pillar').value='DA&O';
+    document.getElementById('f-ai-hrs').value='';
+    document.getElementById('f-complexity').value='2.5';
+    document.getElementById('f-build-type').value='fte';
+    var _cfr=document.getElementById('f-cost');if(_cfr)_cfr._manuallySet=false;
+    updateSimPreview();
+    document.getElementById('f-tool').value='';document.getElementById('f-time').value='';
+    document.getElementById('f-cost').value='';document.getElementById('f-status').value='Active';
+    document.getElementById('f-notes').value='';
+  }
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.getElementById('f-name').focus();
+}
+
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow='';editingId=null;
+}
+
+function openIModal(id){
+  var ini=initiatives.find(function(x){return x.id===id;});
+  if(!ini)return;
+  var pc=PILLAR_COLORS[ini.pillar]||'#A855F7',rgb=hexToRgb(pc);
+  document.getElementById('imodal-band').style.background=pc;
+  document.getElementById('imodal-title').textContent=ini.name;
+  var chips=document.getElementById('imodal-chips');chips.innerHTML='';
+  var pch=document.createElement('span');pch.className='chip';
+  pch.style.cssText='font-size:11px;padding:4px 12px;background:rgba('+rgb+',0.12);color:'+pc+';border-color:rgba('+rgb+',0.30);';
+  pch.textContent=ini.pillar;chips.appendChild(pch);
+  var sch=document.createElement('span');sch.className='chip '+(STATUS_CLASS[ini.status]||'ct');
+  sch.style.cssText='font-size:11px;padding:4px 12px;';sch.textContent=ini.status;chips.appendChild(sch);
+  if(ini.tool){var tch=document.createElement('span');tch.className='chip';
+    tch.style.cssText='font-size:11px;padding:4px 12px;background:rgba(255,255,255,0.04);color:var(--ink-muted);border-color:var(--border);';
+    tch.textContent=ini.tool;chips.appendChild(tch);}
+  var kpis=document.getElementById('imodal-kpis');kpis.innerHTML='';
+  function mkKpi(n,l){var d=document.createElement('div');d.className='imodal-kpi';
+    var dn=document.createElement('div');dn.className='imodal-kpi-n';dn.textContent=n;
+    var dl=document.createElement('div');dl.className='imodal-kpi-l';dl.textContent=l;
+    d.appendChild(dn);d.appendChild(dl);return d;}
+  kpis.appendChild(mkKpi((ini.time||0).toLocaleString()+' hrs','Time Saved'));
+  kpis.appendChild(mkKpi('$'+(ini.cost||0).toLocaleString(),'Cost Avoided'));
+  var roi=(ini.time>0&&ini.cost>0)?(ini.cost/(ini.time*150)).toFixed(1)+'x':'—';
+  kpis.appendChild(mkKpi(roi,'ROI Multiplier'));
+  var qtrLabel=document.getElementById('qtr-select')?document.getElementById('qtr-select').value:'This Quarter';
+  kpis.appendChild(mkKpi(qtrLabel,'Quarter'));
+  var q=autoScore(ini),circ=Math.PI*2*27,offset=circ*(1-q/10);
+  var qDiv=document.getElementById('imodal-quality');
+  qDiv.innerHTML='<div class="imodal-q-ring"><svg viewBox="0 0 64 64"><circle class="q-track" cx="32" cy="32" r="27" stroke-dasharray="'+circ+'" stroke-dashoffset="0"/><circle class="q-fill" id="imodal-q-fill" cx="32" cy="32" r="27" stroke-dasharray="'+circ+'" stroke-dashoffset="'+circ+'"/></svg><div class="imodal-q-center">'+q+'</div></div>'
+    +'<div class="imodal-q-text"><div class="imodal-q-label">Impact Score</div><div class="imodal-q-sub">Auto-calculated: 70% ROI ratio (vs. .50x Salesforce standard) + 30% capacity volume. 10 = exceptional ROI + high volume.</div></div>';
+  setTimeout(function(){var f=document.getElementById('imodal-q-fill');if(f)f.style.strokeDashoffset=offset;},50);
+  document.getElementById('imodal-notes').textContent=ini.notes||'No notes recorded.';
+  var _os=document.getElementById('imodal-sim-table');
+  if(_os)_os.parentNode.removeChild(_os);
+  var _iq=document.getElementById('imodal-quality');
+  if(ini.sim&&ini.sim.preCost>0&&_iq){
+    var CLBL={'1.5':'Simple','2.5':'Moderate','4':'Complex','6':'Enterprise'};
+    var RLBL={fte:'150/hr (FTE)',contractor:'200/hr (Contractor)',sow:'250/hr+20% (SOW)'};
+    var _st=document.createElement('div');_st.id='imodal-sim-table';_st.className='imodal-sim';
+    var _sh=document.createElement('div');_sh.className='imodal-sim-head';
+    ['Metric','Pre-AI','With AI'].forEach(function(t){var c=document.createElement('div');c.className='imodal-sim-col';c.textContent=t;_sh.appendChild(c);});
+    _st.appendChild(_sh);
+    [[' Build Hours',ini.sim.preHrs+'h',(ini.aiHrs||0)+'h'],
+     [' Blended Rate',RLBL[ini.buildType]||'150/hr','150/hr (FTE)'],
+     [' Total Cost',fmtD(ini.sim.preCost),fmtD(ini.sim.afterCost)]
+    ].forEach(function(r){
+      var row=document.createElement('div');row.className='imodal-sim-row';
+      [['imodal-sim-label',r[0]],['imodal-sim-val before',r[1]],['imodal-sim-val after',r[2]]].forEach(function(c){
+        var d=document.createElement('div');d.className=c[0];d.textContent=c[1];row.appendChild(d);
+      });
+      _st.appendChild(row);
+    });
+    var _dr=document.createElement('div');_dr.className='imodal-sim-row';
+    [['imodal-sim-label',' Cost Avoided'],['imodal-sim-val',''],['imodal-sim-val delta',fmtD(ini.sim.delta)]].forEach(function(c){
+      var d=document.createElement('div');d.className=c[0];d.textContent=c[1];_dr.appendChild(d);
+    });
+    _st.appendChild(_dr);
+    var _ft=document.createElement('div');_ft.className='imodal-sim-footer';
+    var _cs=document.createElement('span');_cs.className='imodal-sim-compression';_cs.textContent=ini.sim.mult+'x faster with AI';
+    var _ns=document.createElement('span');_ns.className='imodal-sim-note';_ns.textContent='Complexity: '+(CLBL[String(parseFloat(ini.complexity))]||'Moderate');
+    _ft.appendChild(_cs);_ft.appendChild(_ns);_st.appendChild(_ft);
+    _iq.parentNode.insertBefore(_st,_iq.nextSibling);
+  }
+  document.getElementById('imodal-edit').onclick=function(){closeIModal();openDrawer(id);};
+  document.getElementById('imodal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeIModal(){
+  document.getElementById('imodal-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+var SIM_RATES={fte:150,contractor:200,sow:250};
+var SIM_SOW_OH=1.20;
+function simCalc(ah,cx,bt){
+  var m=parseFloat(cx)||2.5,r=SIM_RATES[bt]||150;
+  var ph=Math.round(ah*m);
+  var pc=Math.round(bt==='sow'?ph*r*SIM_SOW_OH:ph*r);
+  var ac=Math.round(ah*SIM_RATES.fte);
+  return {preHrs:ph,preCost:pc,afterCost:ac,delta:Math.max(0,pc-ac),mult:m};
+}
+function updateSimPreview(){
+  var h=parseFloat(document.getElementById('f-ai-hrs').value)||0;
+  var cx=document.getElementById('f-complexity').value||'2.5';
+  var bt=document.getElementById('f-build-type').value||'fte';
+  var eB=document.getElementById('sp-before'),eA=document.getElementById('sp-after'),eD=document.getElementById('sp-delta');
+  if(!h){if(eB)eB.textContent='--';if(eA)eA.textContent='--';if(eD)eD.textContent='--';return;}
+  var r=simCalc(h,cx,bt);
+  if(eB)eB.textContent=fmtD(r.preCost);
+  if(eA)eA.textContent=fmtD(r.afterCost);
+  if(eD)eD.textContent=fmtD(r.delta);
+  var cf=document.getElementById('f-cost');if(cf&&!cf._manuallySet)cf.value=r.delta||'';
+}
+function saveDrawer(){
+  var name=document.getElementById('f-name').value.trim();
+  if(!name){document.getElementById('f-name').focus();return;}
+  var obj={id:editingId||nextId++,
+    name:name,pillar:document.getElementById('f-pillar').value,
+    tool:document.getElementById('f-tool').value.trim(),
+    time:parseFloat(document.getElementById('f-time').value)||0,
+    cost:parseFloat(document.getElementById('f-cost').value)||0,
+    aiHrs:parseFloat(document.getElementById('f-ai-hrs').value)||0,
+    complexity:document.getElementById('f-complexity').value||'2.5',
+    buildType:document.getElementById('f-build-type').value||'fte',
+    sim:(function(){var ah=parseFloat(document.getElementById('f-ai-hrs').value)||0;return ah>0?simCalc(ah,document.getElementById('f-complexity').value,document.getElementById('f-build-type').value):null;}()),
+    quality:autoScore({time:parseFloat(document.getElementById('f-time').value)||0,cost:parseFloat(document.getElementById('f-cost').value)||0}),
+    status:document.getElementById('f-status').value,
+    notes:document.getElementById('f-notes').value.trim()};
+  if(editingId){var idx=initiatives.findIndex(function(x){return x.id===editingId;});if(idx!==-1)initiatives[idx]=obj;}
+  else initiatives.push(obj);
+  closeDrawer();renderGrid();updateKPIs();persistNow();
+}
+
+function generateNarrative(){
+  var qtr=document.getElementById('qtr-select').value;
+  var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
+  var tc=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
+  var ct=initiatives.length;
+  var aq=ct?(initiatives.reduce(function(s,i){return s+autoScore(i);},0)/ct).toFixed(1):'—';
+  var pillars=[];initiatives.forEach(function(i){if(pillars.indexOf(i.pillar)===-1)pillars.push(i.pillar);});
+  var active=initiatives.filter(function(i){return i.status==='Active';}).length;
+  var top=initiatives.slice().sort(function(a,b){return((b.time||0)+(b.cost||0)/1000)-((a.time||0)+(a.cost||0)/1000);})[0];
+  var box=document.getElementById('narrative-text');box.innerHTML='';
+  function span(txt,bold){var s=document.createElement('span');s.textContent=txt;if(bold)s.style.cssText='color:var(--ink);font-weight:600;';return s;}
+  [['In ',false],[qtr,true],[', AI Strategy & Ops tracked ',false],[ct+' AI initiative'+(ct!==1?'s':''),true],[' across ',false],[pillars.join(', '),true],['. Collectively these initiatives recovered ',false],[tt.toLocaleString()+' hours',true],[' of team capacity and avoided approximately ',false],['$'+tc.toLocaleString(),true],[' in costs. ',false],[active+' initiative'+(active!==1?'s':''),true],[' remain active this quarter. Average impact score: ',false],[aq+'/10',true],['. Top performing initiative: ',false],[top?top.name:'—',true],[top?' ('+( top.time||0).toLocaleString()+' hrs, $'+(top.cost||0).toLocaleString()+' avoided).':'.',false]
+  ].forEach(function(p){box.appendChild(span(p[0],p[1]));});
+  document.getElementById('btn-copy').style.display='';
+}
+
+function downloadHtml(){
+  var doc=document.implementation.createHTMLDocument('ROI & Value Scorecard');
+  var mt=doc.createElement('meta');mt.setAttribute('charset','UTF-8');doc.head.appendChild(mt);
+  var ti=doc.createElement('title');ti.textContent='ROI & Value Scorecard — AI Strategy & Ops';doc.head.appendChild(ti);
+  var st=doc.createElement('style');st.textContent='body{font-family:sans-serif;padding:32px;color:#333;}h1{margin-bottom:8px;}table{width:100%;border-collapse:collapse;margin-top:24px;}th{text-align:left;padding:8px 12px;border-bottom:2px solid #ddd;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:#777;}td{padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;}';
+  doc.head.appendChild(st);
+  var h1=doc.createElement('h1');h1.textContent='ROI & Value Scorecard — '+document.getElementById('qtr-select').value;doc.body.appendChild(h1);
+  var p=doc.createElement('p');p.textContent='AI Strategy & Ops — DET Quarterly Scorecard';p.style.cssText='color:#666;margin-bottom:4px;font-size:13px;';doc.body.appendChild(p);
+  var tbl=doc.createElement('table');
+  var thead=doc.createElement('thead');var hr=doc.createElement('tr');
+  ['Initiative','Pillar','Tool','Time Saved','Cost Avoided','Impact Score','Status','Notes'].forEach(function(h){var th=doc.createElement('th');th.textContent=h;hr.appendChild(th);});
+  thead.appendChild(hr);tbl.appendChild(thead);
+  var tbody=doc.createElement('tbody');
+  initiatives.forEach(function(i){var tr=doc.createElement('tr');
+    [i.name,i.pillar,i.tool||'—',(i.time||0)+' hrs','$'+(i.cost||0).toLocaleString(),autoScore(i).toFixed(1)+'/10',i.status,i.notes||''].forEach(function(v){var td=doc.createElement('td');td.textContent=v;tr.appendChild(td);});
+    tbody.appendChild(tr);});
+  tbl.appendChild(tbody);doc.body.appendChild(tbl);
+  var html='<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
+  var blob=new Blob([html],{type:'text/html'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='roi-value-scorecard.html';a.click();URL.revokeObjectURL(a.href);
+}
+
+document.getElementById('btn-add').addEventListener('click',function(){openDrawer(null);});
+document.getElementById('drawer-close').addEventListener('click',closeDrawer);
+document.getElementById('drawer-overlay').addEventListener('click',closeDrawer);
+document.getElementById('btn-cancel').addEventListener('click',closeDrawer);
+document.getElementById('btn-save').addEventListener('click',saveDrawer);
+document.getElementById('f-ai-hrs').addEventListener('input',updateSimPreview);
+document.getElementById('f-complexity').addEventListener('change',updateSimPreview);
+document.getElementById('f-build-type').addEventListener('change',updateSimPreview);
+document.getElementById('f-cost').addEventListener('input',function(){this._manuallySet=true;});
+
+document.getElementById('btn-generate').addEventListener('click',generateNarrative);
+document.getElementById('btn-copy').addEventListener('click',function(){
+  var text=document.getElementById('narrative-text').textContent,btn=this;
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){btn.textContent='Copied!';btn.style.color='#2DD4BF';setTimeout(function(){btn.textContent='Copy';btn.style.color='';},2000);});}
+});
+document.getElementById('btn-print').addEventListener('click',function(){window.print();});
+document.getElementById('btn-download').addEventListener('click',downloadHtml);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeDrawer();closeIModal();}});
+document.getElementById('imodal-close').addEventListener('click',closeIModal);
+document.getElementById('imodal-overlay').addEventListener('click',function(e){if(e.target===this)closeIModal();});
+
+function updateBenchmarks(){
+  var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
+  var tc=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
+  // Capacity recovery: (hrs saved / (hrs saved + 2000 assumed baseline)) * 100
+  var capEl=document.getElementById('bench-capacity-num');
+  var capDelta=document.getElementById('bench-capacity-delta');
+  if(tt>0){
+    var capRate=Math.min(Math.round(tt/(tt+1800)*100),99);
+    capEl.textContent=capRate+'%';
+    var delta=capRate-12;
+    capDelta.textContent=(delta>=0?'↑ +':' ')+delta+'pp vs. industry avg';
+    capDelta.className='bench-delta '+(delta>=0?'up':'');
+  }else{capEl.textContent='—';capDelta.textContent='↑ Add initiatives to calculate';}
+  // Cost-per-insight: cost / hrs = effective rate per hr avoided
+  var cpiEl=document.getElementById('bench-cpi-num');
+  var cpiDelta=document.getElementById('bench-cpi-delta');
+  if(tt>0&&tc>0){
+    var eff=Math.round(tc/tt);
+    cpiEl.textContent='$'+eff;
+    var saved=180-eff;
+    if(saved>0){cpiDelta.textContent='↑ $'+saved+'/hr below manual baseline';cpiDelta.className='bench-delta up';}
+    else{cpiDelta.textContent='At or above manual baseline';cpiDelta.className='bench-delta';}
+  }else{cpiEl.textContent='—';cpiDelta.textContent='↑ Add initiatives to calculate';}
+  // TTI bar animation
+  setTimeout(function(){var b=document.getElementById('tti-bar');if(b)b.style.width='18%';},400);
+}
+
+function updateScale(){
+  var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
+  var tc=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
+  var ct=initiatives.length||1;
+  function fmt(n){if(n>=1000000)return '$'+(n/1000000).toFixed(1)+'M';if(n>=1000)return '$'+(n/1000).toFixed(0)+'K';return '$'+n;}
+  function fmtH(n){if(n>=1000)return (n/1000).toFixed(1)+'K hrs';return n+' hrs';}
+  function renderScale(id,mult,roi){
+    var el=document.getElementById(id);if(!el)return;
+    el.innerHTML='';
+    function row(l,v){var d=document.createElement('div');d.className='scale-metric';
+      var dl=document.createElement('span');dl.className='scale-metric-l';dl.textContent=l;
+      var dv=document.createElement('span');dv.className='scale-metric-v';dv.textContent=v;
+      d.appendChild(dl);d.appendChild(dv);el.appendChild(d);}
+    row('Time Recovered',fmtH(tt*mult));
+    row('Cost Avoided',fmt(tc*mult));
+    row('Est. Initiatives',(ct*mult)+'');
+    row('Projected ROI',roi);
+  }
+  var baseRoi=(tt>0&&tc>0)?(tc/(tt*150)).toFixed(1)+'x':'—';
+  renderScale('scale-5',5,baseRoi+' / team');
+  renderScale('scale-20',20,baseRoi+' / team');
+  renderScale('scale-org',75,baseRoi+' / team');
+}
+
+(function initTicker(){
+  var signals=[
+    {icon:'⚡',tag:'Speed Win',quote:'SOW rate review that took 4 hours reduced to under 20 minutes. Every. Single. Time.',source:'SOW Cost Estimator — DA&O Ops'},
+    {icon:'🎯',tag:'Accuracy',quote:'Manual vendor benchmarking carried a 15–20% error rate. AI-assisted scoring: consistent, auditable, defensible.',source:'VER Intelligence Hub — Vendor Scoring'},
+    {icon:'💡',tag:'Decision Quality',quote:'TCO analysis that required 3 stakeholder meetings and a spreadsheet now takes one conversation and a link.',source:'TCO Scenario Modeling — Engineering'},
+    {icon:'📊',tag:'Exec Readiness',quote:'Quarterly vendor reporting went from a 2-day preparation cycle to a real-time dashboard. Zero lag between data and decisions.',source:'VER Hub — Quarterly Reporting'},
+    {icon:'🚀',tag:'Compounding ROI',quote:'The first tool was built in a weekend. We now have 7 production tools. Each one compounds the value of the last.',source:'AI Strategy & Ops — Portfolio'},
+    {icon:'🤝',tag:'Stakeholder Trust',quote:'When leadership asks for vendor intelligence, we respond same-day. That credibility is not just efficiency — it is influence.',source:'DA&O Leadership Engagement'},
+    {icon:'🔬',tag:'Customer Zero',quote:'Every tool this function builds is a proof point for the rest of the company. We are not just users of AI — we are the template.',source:'AI Strategy & Ops — Mission'},
+    {icon:'📈',tag:'Scale Signal',quote:'If these tools were deployed across just 5 teams in DET, the capacity recovery alone exceeds a full FTE annually.',source:'Value at Scale — Projection Model'}
+  ];
+  var cur=0;
+  var dotsCont=document.getElementById('ticker-dots');
+  signals.forEach(function(_,i){var d=document.createElement('div');d.className='ticker-dot'+(i===0?' active':'');dotsCont.appendChild(d);});
+  function show(idx){
+    var s=signals[idx];
+    var q=document.getElementById('ticker-quote'),src=document.getElementById('ticker-source');
+    var icon=document.getElementById('ticker-icon'),tag=document.getElementById('ticker-tag');
+    q.classList.remove('visible');src.classList.remove('visible');
+    setTimeout(function(){
+      icon.textContent=s.icon;tag.textContent=s.tag;q.textContent=s.quote;src.textContent=s.source;
+      q.classList.add('visible');src.classList.add('visible');
+    },300);
+    document.querySelectorAll('.ticker-dot').forEach(function(d,i){d.classList.toggle('active',i===idx);});
+  }
+  show(0);
+  setInterval(function(){cur=(cur+1)%signals.length;show(cur);},5000);
+  document.getElementById('ticker-dots').addEventListener('click',function(e){
+    var dots=Array.from(document.querySelectorAll('.ticker-dot'));
+    var idx=dots.indexOf(e.target);if(idx>=0){cur=idx;show(cur);}
+  });
+})();
+
+function updateBtechOur(){
+  var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
+  var tc=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
+  var el=document.getElementById('btech-our-roi');
+  if(!el)return;
+  if(tt>0&&tc>0){
+    var roi=tc/(tt*150);
+    el.textContent='$'+roi.toFixed(1)+'x';
+    el.style.color=roi>=3.5?'#2DD4BF':'#A855F7';
+  } else {
+    el.textContent='—';
+  }
+}
+
+// Tab navigation
+(function(){
+  var btns=document.querySelectorAll('.tab-btn');
+  var panels=document.querySelectorAll('.tab-panel');
+  btns.forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var target=this.getAttribute('data-tab');
+      btns.forEach(function(b){b.classList.remove('active');});
+      panels.forEach(function(p){p.classList.remove('active');});
+      this.classList.add('active');
+      var panel=document.getElementById('tab-'+target);
+      if(panel){panel.classList.add('active');}
+      // Re-render charts when overview tab becomes active (canvas needs visible parent)
+      if(target==='overview'){
+        setTimeout(function(){if(typeof donutChart!=='undefined'&&donutChart)donutChart.resize();if(typeof barChart!=='undefined'&&barChart)barChart.resize();},50);
+      }
+    });
+  });
+})();
+
+function updateOverview(){
+  // Spotlight: top performer by combined score (time + cost/1000)
+  var top=initiatives.length?initiatives.slice().sort(function(a,b){
+    return ((b.time||0)+(b.cost||0)/1000)-((a.time||0)+(a.cost||0)/1000);
+  })[0]:null;
+  var _tPre=initiatives.reduce(function(s,i){return s+(i.sim?i.sim.preCost:0);},0);
+  var _tAft=initiatives.reduce(function(s,i){return s+(i.sim?i.sim.afterCost:0);},0);
+  var _tDlt=initiatives.reduce(function(s,i){return s+(i.sim?i.sim.delta:0);},0);
+  var _hs=initiatives.some(function(i){return i.sim&&i.sim.preCost>0;});
+  var _eBef=document.getElementById('ba-before');
+  var _eAft=document.getElementById('ba-after');
+  var _eDlt=document.getElementById('ba-delta');
+  if(_eBef)_eBef.textContent=_hs?fmtD(_tPre):'--';
+  if(_eAft)_eAft.textContent=_hs?fmtD(_tAft):'--';
+  if(_eDlt)_eDlt.textContent=_hs?fmtD(_tDlt):'--';
+  var _tt2=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
+  var _tc2=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
+  var _cap=_tt2>0?Math.round(_tt2/(_tt2+2000)*100):0;
+  var _roi=_tt2>0&&_tc2>0?parseFloat((_tc2/(_tt2*150)).toFixed(1)):0;
+  var _sit=initiatives.filter(function(i){return i.sim&&i.complexity;});
+  var _cmp=_sit.length>0?parseFloat((_sit.reduce(function(s,i){return s+parseFloat(i.complexity||2.5);},0)/_sit.length).toFixed(1)):0;
+  var _el;
+  _el=document.getElementById('bsc-cap-us');if(_el)_el.style.width=Math.min(_cap,100)+'%';
+  _el=document.getElementById('bsn-cap-us');if(_el)_el.textContent=_cap+'%';
+  _el=document.getElementById('bsc-roi-us');if(_el)_el.style.width=Math.min(_roi/10*100,100)+'%';
+  _el=document.getElementById('bsn-roi-us');if(_el)_el.textContent=_roi>0?_roi+'x':'--';
+  _el=document.getElementById('bsc-comp-us');if(_el)_el.style.width=Math.min(_cmp/6*100,100)+'%';
+  _el=document.getElementById('bsn-comp-us');if(_el)_el.textContent=_cmp>0?_cmp+'x':'--';
   var nm=document.getElementById('spotlight-name');
   var ss=document.getElementById('spotlight-stats');
   if(top){
