@@ -700,8 +700,8 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
       <div class="field-group" style="margin:0 0 10px"><label class="field-label" for="f-build-type">Pre-AI Build Route</label><select id="f-build-type" class="field-input"><option value="fte">Internal FTE (150/hr)</option><option value="contractor">Contractor (200/hr)</option><option value="sow">Vendor SOW (250/hr +20%)</option></select></div>
       <div class="sim-result">
         <div class="sim-res-item"><div class="sim-res-num" id="sp-before">--</div><div class="sim-res-lbl">Pre-AI Cost</div></div>
-        <div class="sim-res-item"><div class="sim-res-num" id="sp-after">--</div><div class="sim-res-lbl">AI Cost</div></div>
-        <div class="sim-res-item highlight"><div class="sim-res-num" id="sp-delta">--</div><div class="sim-res-lbl">Cost Avoided</div></div>
+        <div class="sim-res-item"><div class="sim-res-num" id="sp-after">--</div><div class="sim-res-lbl">AI Cost (incl. tokens)</div></div>
+        <div class="sim-res-item highlight"><div class="sim-res-num" id="sp-delta">--</div><div class="sim-res-lbl">Net Savings</div></div>
       </div>
     </div>
     <div class="field-group"><label class="field-label" for="f-status">Status</label><select id="f-status" class="field-input"><option>Active</option><option>Pilot</option><option>Complete</option></select></div>
@@ -738,16 +738,16 @@ var donutChart=null,barChart=null;
 var prevKpis={time:0,cost:0,count:0,quality:0};
 
 // Salesforce FY: Feb 1 – Jan 31. FY27: Q1=Feb–Apr, Q2=May–Jul, Q3=Aug–Oct, Q4=Nov–Jan.
-var SEED_VERSION=3;
+var SEED_VERSION=4;
 var SEED_Q2=[
-  {id:1,name:'VER Intelligence Hub',pillar:'DA&O',tool:'VER Hub',time:120,cost:45000,quality:9,status:'Complete',aiHrs:80,complexity:'4',buildType:'contractor',sim:{preHrs:320,preCost:64000,afterCost:12000,delta:52000,mult:4},notes:'Eliminated manual vendor reporting — 3 FTE hours/week recovered across DA&O. Launched Q2 FY27.'},
-  {id:3,name:'TCO Scenario Modeling',pillar:'Engineering',tool:'TCO Calculator',time:60,cost:38000,quality:9,status:'Complete',aiHrs:50,complexity:'2.5',buildType:'contractor',sim:{preHrs:125,preCost:25000,afterCost:7500,delta:17500,mult:2.5},notes:'Enables data-driven build vs. buy decisions. Used in 4 engineering reviews. Launched Q2 FY27.'},
-  {id:4,name:'Vendor Portal Intake',pillar:'DA&O',tool:'Vendor Portal',time:95,cost:31500,quality:9,status:'Complete',aiHrs:60,complexity:'2.5',buildType:'sow',sim:{preHrs:150,preCost:45000,afterCost:9000,delta:36000,mult:2.5},notes:'Automated vendor intake and risk scoring — previously 4 hrs manual per submission. Launched Q2 FY27.'}
+  {id:1,name:'VER Intelligence Hub',pillar:'DA&O',tool:'VER Hub',time:120,cost:45000,quality:9,status:'Complete',aiHrs:80,complexity:'4',buildType:'contractor',sim:{preHrs:320,preCost:64000,laborCost:12000,tokenCost:400,afterCost:12400,delta:51600,mult:4},notes:'Eliminated manual vendor reporting — 3 FTE hours/week recovered across DA&O. Launched Q2 FY27.'},
+  {id:3,name:'TCO Scenario Modeling',pillar:'Engineering',tool:'TCO Calculator',time:60,cost:38000,quality:9,status:'Complete',aiHrs:50,complexity:'2.5',buildType:'contractor',sim:{preHrs:125,preCost:25000,laborCost:7500,tokenCost:250,afterCost:7750,delta:17250,mult:2.5},notes:'Enables data-driven build vs. buy decisions. Used in 4 engineering reviews. Launched Q2 FY27.'},
+  {id:4,name:'Vendor Portal Intake',pillar:'DA&O',tool:'Vendor Portal',time:95,cost:31500,quality:9,status:'Complete',aiHrs:60,complexity:'2.5',buildType:'sow',sim:{preHrs:150,preCost:45000,laborCost:9000,tokenCost:300,afterCost:9300,delta:35700,mult:2.5},notes:'Automated vendor intake and risk scoring — previously 4 hrs manual per submission. Launched Q2 FY27.'}
 ];
 var SEED_Q3=[
-  {id:1,name:'SOW Cost Estimator',pillar:'DA&O',tool:'SOW Estimator',time:80,cost:28000,quality:8,status:'Active',aiHrs:45,complexity:'2.5',buildType:'contractor',sim:{preHrs:112,preCost:22500,afterCost:6750,delta:15750,mult:2.5},notes:'Replaces manual benchmark research and rate card lookups for every SOW review. Launched Q3 FY27.'},
-  {id:2,name:'AI Spend Tracking Dashboard',pillar:'Data',tool:'Custom Build',time:45,cost:22000,quality:8,status:'Active',aiHrs:30,complexity:'2.5',buildType:'fte',sim:{preHrs:75,preCost:11250,afterCost:4500,delta:6750,mult:2.5},notes:'Real-time token consumption and cost-per-use-case visibility across DET pillars.'},
-  {id:3,name:'ROI & Value Scorecard',pillar:'DA&O',tool:'This Tool',time:30,cost:18000,quality:9,status:'Active',aiHrs:25,complexity:'4',buildType:'sow',sim:{preHrs:100,preCost:30000,afterCost:3750,delta:26250,mult:4},notes:'Standardized quarterly AI impact reporting framework. Built and deployed Q3 FY27.'}
+  {id:1,name:'SOW Cost Estimator',pillar:'DA&O',tool:'SOW Estimator',time:80,cost:28000,quality:8,status:'Active',aiHrs:45,complexity:'2.5',buildType:'contractor',sim:{preHrs:112,preCost:22500,laborCost:6750,tokenCost:225,afterCost:6975,delta:15525,mult:2.5},notes:'Replaces manual benchmark research and rate card lookups for every SOW review. Launched Q3 FY27.'},
+  {id:2,name:'AI Spend Tracking Dashboard',pillar:'Data',tool:'Custom Build',time:45,cost:22000,quality:8,status:'Active',aiHrs:30,complexity:'2.5',buildType:'fte',sim:{preHrs:75,preCost:11250,laborCost:4500,tokenCost:150,afterCost:4650,delta:6600,mult:2.5},notes:'Real-time token consumption and cost-per-use-case visibility across DET pillars.'},
+  {id:3,name:'ROI & Value Scorecard',pillar:'DA&O',tool:'This Tool',time:30,cost:18000,quality:9,status:'Active',aiHrs:25,complexity:'4',buildType:'sow',sim:{preHrs:100,preCost:30000,laborCost:3750,tokenCost:125,afterCost:3875,delta:26125,mult:4},notes:'Standardized quarterly AI impact reporting framework. Built and deployed Q3 FY27.'}
 ];
 
 function qtrKey(qtr){return 'scorecard-initiatives-'+qtr.replace(/\s+/g,'-');}
@@ -980,6 +980,8 @@ function openIModal(id){
     _st.appendChild(_sh);
     [[' Build Hours',ini.sim.preHrs+'h',(ini.aiHrs||0)+'h'],
      [' Blended Rate',RLBL[ini.buildType]||'150/hr','150/hr (FTE)'],
+     [' Labor Cost',fmtD(ini.sim.preCost),fmtD(ini.sim.laborCost||ini.sim.afterCost)],
+     [' AI Token Cost','—',fmtD(ini.sim.tokenCost||0)],
      [' Total Cost',fmtD(ini.sim.preCost),fmtD(ini.sim.afterCost)]
     ].forEach(function(r){
       var row=document.createElement('div');row.className='imodal-sim-row';
@@ -995,7 +997,7 @@ function openIModal(id){
     _st.appendChild(_dr);
     var _ft=document.createElement('div');_ft.className='imodal-sim-footer';
     var _cs=document.createElement('span');_cs.className='imodal-sim-compression';_cs.textContent=ini.sim.mult+'x faster with AI';
-    var _ns=document.createElement('span');_ns.className='imodal-sim-note';_ns.textContent='Complexity: '+(CLBL[String(parseFloat(ini.complexity))]||'Moderate');
+    var _ns=document.createElement('span');_ns.className='imodal-sim-note';_ns.textContent='Complexity: '+(CLBL[String(parseFloat(ini.complexity))]||'Moderate')+' · AI tokens @ $5/hr (VER avg)';
     _ft.appendChild(_cs);_ft.appendChild(_ns);_st.appendChild(_ft);
     _iq.parentNode.insertBefore(_st,_iq.nextSibling);
   }
@@ -1009,12 +1011,15 @@ function closeIModal(){
 }
 var SIM_RATES={fte:150,contractor:200,sow:250};
 var SIM_SOW_OH=1.20;
+var TOKEN_RATE_PER_HR=5; // ~$3.23/hr from AI Cost Monitor (Anthropic Claude, VER team); rounded up to $5 as conservative estimate
 function simCalc(ah,cx,bt){
   var m=parseFloat(cx)||2.5,r=SIM_RATES[bt]||150;
   var ph=Math.round(ah*m);
   var pc=Math.round(bt==='sow'?ph*r*SIM_SOW_OH:ph*r);
-  var ac=Math.round(ah*SIM_RATES.fte);
-  return {preHrs:ph,preCost:pc,afterCost:ac,delta:Math.max(0,pc-ac),mult:m};
+  var labor=Math.round(ah*SIM_RATES.fte);
+  var tokens=Math.round(ah*TOKEN_RATE_PER_HR);
+  var ac=labor+tokens;
+  return {preHrs:ph,preCost:pc,laborCost:labor,tokenCost:tokens,afterCost:ac,delta:Math.max(0,pc-ac),mult:m};
 }
 function updateSimPreview(){
   var h=parseFloat(document.getElementById('f-ai-hrs').value)||0;
