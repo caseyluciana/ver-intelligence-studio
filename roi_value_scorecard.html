@@ -492,7 +492,7 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
     <div class="kpi-card violet"><div class="kpi-num" id="kpi-time">0</div><div class="kpi-label">Total Time Saved</div><div class="kpi-sub">hrs this quarter</div></div>
     <div class="kpi-card sky"><div class="kpi-num" id="kpi-cost">$0</div><div class="kpi-label">Cost Avoided</div><div class="kpi-sub">this quarter</div></div>
     <div class="kpi-card teal"><div class="kpi-num" id="kpi-count">0</div><div class="kpi-label">Initiatives Tracked</div><div class="kpi-sub">across DET pillars</div></div>
-    <div class="kpi-card amber"><div class="kpi-num" id="kpi-quality">—</div><div class="kpi-label">Avg Quality Score</div><div class="kpi-sub">out of 10</div></div>
+    <div class="kpi-card amber"><div class="kpi-num" id="kpi-quality">—</div><div class="kpi-label">Avg Impact Score</div><div class="kpi-sub">out of 10</div></div>
     <div class="kpi-card rose"><div class="kpi-num" id="kpi-roi">—</div><div class="kpi-label">ROI Multiplier</div><div class="kpi-sub">return per $1 invested</div></div>
   </div>
 
@@ -530,8 +530,8 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
           <div class="ratio-q-center" id="ratio-q-center">—</div>
         </div>
         <div class="ratio-q-text">
-          <div class="ratio-q-label">Avg Quality Score</div>
-          <div class="ratio-q-sub">Self-assessed impact rating across all active initiatives</div>
+          <div class="ratio-q-label">Avg Impact Score</div>
+          <div class="ratio-q-sub">Auto-calculated from ROI ratio and hours recovered — no guesswork</div>
         </div>
       </div>
     </div>
@@ -806,10 +806,6 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
     <div class="field-group"><label class="field-label" for="f-tool">AI Tool Used</label><input type="text" id="f-tool" class="field-input" placeholder="e.g. VER Hub, Claude Code"></div>
     <div class="field-group"><label class="field-label" for="f-time">Time Saved (hrs/qtr)</label><input type="number" id="f-time" class="field-input" placeholder="0" min="0"></div>
     <div class="field-group"><label class="field-label" for="f-cost">Cost Avoided ($/qtr)</label><input type="number" id="f-cost" class="field-input" placeholder="0" min="0"></div>
-    <div class="field-group">
-      <label class="field-label">Quality Score (1–10)</label>
-      <div class="q-row"><input type="range" id="f-quality" class="q-slider" min="1" max="10" value="8"><span class="q-val" id="f-quality-val">8</span></div>
-    </div>
     <div class="field-group"><label class="field-label" for="f-status">Status</label><select id="f-status" class="field-input"><option>Active</option><option>Pilot</option><option>Complete</option></select></div>
     <div class="field-group"><label class="field-label" for="f-notes">Evidence / Notes</label><textarea id="f-notes" class="field-input" placeholder="What was measured? What does success look like?"></textarea></div>
   </div>
@@ -869,6 +865,15 @@ function saveQtr(qtr){
 }
 var initiatives=loadQtr('Q3 FY27');
 
+function autoScore(ini){
+  // Impact Score: 70% ROI component + 30% volume component
+  // ROI: cost/(time*150) normalized to Salesforce 3.5x standard (3.5x = 7pts max)
+  // Volume: hrs recovered, 100hrs = 3pts max
+  var roi=(ini.time>0&&ini.cost>0)?ini.cost/(ini.time*150):0;
+  var roiPts=Math.min(roi/3.5*7,7);
+  var volPts=Math.min((ini.time||0)/100*3,3);
+  return Math.max(1,Math.min(10,Math.round((roiPts+volPts)*10)/10));
+}
 function initCharts(){
   var dCtx=document.getElementById('donut-chart').getContext('2d');
   donutChart=new Chart(dCtx,{type:'doughnut',
@@ -926,7 +931,7 @@ function updateKPIs(){
   var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
   var tc=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
   var ct=initiatives.length;
-  var aq=ct?(initiatives.reduce(function(s,i){return s+(i.quality||0);},0)/ct):0;
+  var aq=ct?(initiatives.reduce(function(s,i){return s+autoScore(i);},0)/ct):0;
   animateCounter(document.getElementById('kpi-time'),prevKpis.time,tt,function(v){return v.toLocaleString()+' hrs';},600);
   animateCounter(document.getElementById('kpi-cost'),prevKpis.cost,tc,function(v){return '$'+v.toLocaleString();},600);
   animateCounter(document.getElementById('kpi-count'),prevKpis.count,ct,function(v){return v+'';},600);
@@ -981,7 +986,7 @@ function renderGrid(){
     var qbg=document.createElement('div');qbg.className='quality-bar-bg';
     var qfill=document.createElement('div');qfill.className='quality-bar-fill';
     qfill.style.width=((ini.quality||0)/10*100)+'%';qbg.appendChild(qfill);
-    var ql=document.createElement('div');ql.className='quality-lbl';ql.textContent=(ini.quality||0)+'/10';
+    var ql=document.createElement('div');ql.className='quality-lbl';ql.textContent=autoScore(ini).toFixed(1)+'/10';
     qarc.appendChild(qbg);qarc.appendChild(ql);card.appendChild(qarc);
     card.addEventListener('click',function(e){if(e.target===del||del.contains(e.target))return;openIModal(ini.id);});
     grid.appendChild(card);
@@ -999,16 +1004,14 @@ function openDrawer(id){
       document.getElementById('f-tool').value=ini.tool||'';
       document.getElementById('f-time').value=ini.time||'';
       document.getElementById('f-cost').value=ini.cost||'';
-      document.getElementById('f-quality').value=ini.quality||8;
-      document.getElementById('f-quality-val').textContent=ini.quality||8;
+
       document.getElementById('f-status').value=ini.status||'Active';
       document.getElementById('f-notes').value=ini.notes||'';
     }
   } else {
     document.getElementById('f-name').value='';document.getElementById('f-pillar').value='DA&O';
     document.getElementById('f-tool').value='';document.getElementById('f-time').value='';
-    document.getElementById('f-cost').value='';document.getElementById('f-quality').value=8;
-    document.getElementById('f-quality-val').textContent='8';document.getElementById('f-status').value='Active';
+    document.getElementById('f-cost').value='';document.getElementById('f-status').value='Active';
     document.getElementById('f-notes').value='';
   }
   document.getElementById('drawer').classList.add('open');
@@ -1049,10 +1052,10 @@ function openIModal(id){
   kpis.appendChild(mkKpi(roi,'ROI Multiplier'));
   var qtrLabel=document.getElementById('qtr-select')?document.getElementById('qtr-select').value:'This Quarter';
   kpis.appendChild(mkKpi(qtrLabel,'Quarter'));
-  var q=ini.quality||0,circ=Math.PI*2*27,offset=circ*(1-q/10);
+  var q=autoScore(ini),circ=Math.PI*2*27,offset=circ*(1-q/10);
   var qDiv=document.getElementById('imodal-quality');
   qDiv.innerHTML='<div class="imodal-q-ring"><svg viewBox="0 0 64 64"><circle class="q-track" cx="32" cy="32" r="27" stroke-dasharray="'+circ+'" stroke-dashoffset="0"/><circle class="q-fill" id="imodal-q-fill" cx="32" cy="32" r="27" stroke-dasharray="'+circ+'" stroke-dashoffset="'+circ+'"/></svg><div class="imodal-q-center">'+q+'</div></div>'
-    +'<div class="imodal-q-text"><div class="imodal-q-label">Quality Score</div><div class="imodal-q-sub">Self-assessed impact quality rating. 10 = transformative, 7–9 = significant, 4–6 = moderate, 1–3 = early / limited.</div></div>';
+    +'<div class="imodal-q-text"><div class="imodal-q-label">Impact Score</div><div class="imodal-q-sub">Auto-calculated: 70% ROI ratio (vs. .50x Salesforce standard) + 30% capacity volume. 10 = exceptional ROI + high volume.</div></div>';
   setTimeout(function(){var f=document.getElementById('imodal-q-fill');if(f)f.style.strokeDashoffset=offset;},50);
   document.getElementById('imodal-notes').textContent=ini.notes||'No notes recorded.';
   document.getElementById('imodal-edit').onclick=function(){closeIModal();openDrawer(id);};
@@ -1071,7 +1074,7 @@ function saveDrawer(){
     tool:document.getElementById('f-tool').value.trim(),
     time:parseFloat(document.getElementById('f-time').value)||0,
     cost:parseFloat(document.getElementById('f-cost').value)||0,
-    quality:parseInt(document.getElementById('f-quality').value,10)||8,
+    quality:autoScore({time:parseFloat(document.getElementById('f-time').value)||0,cost:parseFloat(document.getElementById('f-cost').value)||0}),
     status:document.getElementById('f-status').value,
     notes:document.getElementById('f-notes').value.trim()};
   if(editingId){var idx=initiatives.findIndex(function(x){return x.id===editingId;});if(idx!==-1)initiatives[idx]=obj;}
@@ -1084,13 +1087,13 @@ function generateNarrative(){
   var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
   var tc=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
   var ct=initiatives.length;
-  var aq=ct?(initiatives.reduce(function(s,i){return s+(i.quality||0);},0)/ct).toFixed(1):'—';
+  var aq=ct?(initiatives.reduce(function(s,i){return s+autoScore(i);},0)/ct).toFixed(1):'—';
   var pillars=[];initiatives.forEach(function(i){if(pillars.indexOf(i.pillar)===-1)pillars.push(i.pillar);});
   var active=initiatives.filter(function(i){return i.status==='Active';}).length;
   var top=initiatives.slice().sort(function(a,b){return((b.time||0)+(b.cost||0)/1000)-((a.time||0)+(a.cost||0)/1000);})[0];
   var box=document.getElementById('narrative-text');box.innerHTML='';
   function span(txt,bold){var s=document.createElement('span');s.textContent=txt;if(bold)s.style.cssText='color:var(--ink);font-weight:600;';return s;}
-  [['In ',false],[qtr,true],[', AI Strategy & Ops tracked ',false],[ct+' AI initiative'+(ct!==1?'s':''),true],[' across ',false],[pillars.join(', '),true],['. Collectively these initiatives recovered ',false],[tt.toLocaleString()+' hours',true],[' of team capacity and avoided approximately ',false],['$'+tc.toLocaleString(),true],[' in costs. ',false],[active+' initiative'+(active!==1?'s':''),true],[' remain active this quarter. Average quality score: ',false],[aq+'/10',true],['. Top performing initiative: ',false],[top?top.name:'—',true],[top?' ('+( top.time||0).toLocaleString()+' hrs, $'+(top.cost||0).toLocaleString()+' avoided).':'.',false]
+  [['In ',false],[qtr,true],[', AI Strategy & Ops tracked ',false],[ct+' AI initiative'+(ct!==1?'s':''),true],[' across ',false],[pillars.join(', '),true],['. Collectively these initiatives recovered ',false],[tt.toLocaleString()+' hours',true],[' of team capacity and avoided approximately ',false],['$'+tc.toLocaleString(),true],[' in costs. ',false],[active+' initiative'+(active!==1?'s':''),true],[' remain active this quarter. Average impact score: ',false],[aq+'/10',true],['. Top performing initiative: ',false],[top?top.name:'—',true],[top?' ('+( top.time||0).toLocaleString()+' hrs, $'+(top.cost||0).toLocaleString()+' avoided).':'.',false]
   ].forEach(function(p){box.appendChild(span(p[0],p[1]));});
   document.getElementById('btn-copy').style.display='';
 }
@@ -1105,11 +1108,11 @@ function downloadHtml(){
   var p=doc.createElement('p');p.textContent='AI Strategy & Ops — DET Quarterly Scorecard';p.style.cssText='color:#666;margin-bottom:4px;font-size:13px;';doc.body.appendChild(p);
   var tbl=doc.createElement('table');
   var thead=doc.createElement('thead');var hr=doc.createElement('tr');
-  ['Initiative','Pillar','Tool','Time Saved','Cost Avoided','Quality','Status','Notes'].forEach(function(h){var th=doc.createElement('th');th.textContent=h;hr.appendChild(th);});
+  ['Initiative','Pillar','Tool','Time Saved','Cost Avoided','Impact Score','Status','Notes'].forEach(function(h){var th=doc.createElement('th');th.textContent=h;hr.appendChild(th);});
   thead.appendChild(hr);tbl.appendChild(thead);
   var tbody=doc.createElement('tbody');
   initiatives.forEach(function(i){var tr=doc.createElement('tr');
-    [i.name,i.pillar,i.tool||'—',(i.time||0)+' hrs','$'+(i.cost||0).toLocaleString(),(i.quality||0)+'/10',i.status,i.notes||''].forEach(function(v){var td=doc.createElement('td');td.textContent=v;tr.appendChild(td);});
+    [i.name,i.pillar,i.tool||'—',(i.time||0)+' hrs','$'+(i.cost||0).toLocaleString(),autoScore(i).toFixed(1)+'/10',i.status,i.notes||''].forEach(function(v){var td=doc.createElement('td');td.textContent=v;tr.appendChild(td);});
     tbody.appendChild(tr);});
   tbl.appendChild(tbody);doc.body.appendChild(tbl);
   var html='<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
@@ -1122,7 +1125,7 @@ document.getElementById('drawer-close').addEventListener('click',closeDrawer);
 document.getElementById('drawer-overlay').addEventListener('click',closeDrawer);
 document.getElementById('btn-cancel').addEventListener('click',closeDrawer);
 document.getElementById('btn-save').addEventListener('click',saveDrawer);
-document.getElementById('f-quality').addEventListener('input',function(){document.getElementById('f-quality-val').textContent=this.value;});
+
 document.getElementById('btn-generate').addEventListener('click',generateNarrative);
 document.getElementById('btn-copy').addEventListener('click',function(){
   var text=document.getElementById('narrative-text').textContent,btn=this;
@@ -1268,7 +1271,7 @@ function updateOverview(){
       d.appendChild(dn);d.appendChild(dl);return d;}
     ss.appendChild(mkStat((top.time||0).toLocaleString()+' hrs','Time Saved'));
     ss.appendChild(mkStat('$'+(top.cost||0).toLocaleString(),'Cost Avoided'));
-    ss.appendChild(mkStat((top.quality||0)+'/10','Quality'));
+    ss.appendChild(mkStat(autoScore(top).toFixed(1)+'/10','Impact Score'));
     // Color the spotlight card border top to match pillar
     var pc=PILLAR_COLORS[top.pillar]||'#A855F7';
     document.getElementById('spotlight-card').style.setProperty('--sp-color',pc);
@@ -1289,7 +1292,7 @@ function updateOverview(){
   document.getElementById('ratio-pilot-val').textContent=counts.Pilot;
   document.getElementById('ratio-complete-val').textContent=counts.Complete;
   // Quality ring
-  var aq=initiatives.length?initiatives.reduce(function(s,i){return s+(i.quality||0);},0)/initiatives.length:0;
+  var aq=initiatives.length?initiatives.reduce(function(s,i){return s+autoScore(i);},0)/initiatives.length:0;
   var circ=131.9,offset=circ*(1-aq/10);
   document.getElementById('ratio-q-center').textContent=aq?aq.toFixed(1):'—';
   setTimeout(function(){var f=document.getElementById('ratio-q-fill');if(f)f.style.strokeDashoffset=offset;},100);
