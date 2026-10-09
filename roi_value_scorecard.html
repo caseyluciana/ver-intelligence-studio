@@ -1107,32 +1107,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeDrawer
 document.getElementById('imodal-close').addEventListener('click',closeIModal);
 document.getElementById('imodal-overlay').addEventListener('click',function(e){if(e.target===this)closeIModal();});
 
-function updateBenchmarks(){
-  var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
-  var tc=initiatives.reduce(function(s,i){return s+(i.cost||0);},0);
-  // Capacity recovery: (hrs saved / (hrs saved + 2000 assumed baseline)) * 100
-  var capEl=document.getElementById('bench-capacity-num');
-  var capDelta=document.getElementById('bench-capacity-delta');
-  if(tt>0){
-    var capRate=Math.min(Math.round(tt/(tt+1800)*100),99);
-    capEl.textContent=capRate+'%';
-    var delta=capRate-12;
-    capDelta.textContent=(delta>=0?'↑ +':' ')+delta+'pp vs. industry avg';
-    capDelta.className='bench-delta '+(delta>=0?'up':'');
-  }else{capEl.textContent='—';capDelta.textContent='↑ Add initiatives to calculate';}
-  // Cost-per-insight: cost / hrs = effective rate per hr avoided
-  var cpiEl=document.getElementById('bench-cpi-num');
-  var cpiDelta=document.getElementById('bench-cpi-delta');
-  if(tt>0&&tc>0){
-    var eff=Math.round(tc/tt);
-    cpiEl.textContent='$'+eff;
-    var saved=180-eff;
-    if(saved>0){cpiDelta.textContent='↑ $'+saved+'/hr below manual baseline';cpiDelta.className='bench-delta up';}
-    else{cpiDelta.textContent='At or above manual baseline';cpiDelta.className='bench-delta';}
-  }else{cpiEl.textContent='—';cpiDelta.textContent='↑ Add initiatives to calculate';}
-  // TTI bar animation
-  setTimeout(function(){var b=document.getElementById('tti-bar');if(b)b.style.width='18%';},400);
-}
+function updateBenchmarks(){}
 
 function updateScale(){
   var tt=initiatives.reduce(function(s,i){return s+(i.time||0);},0);
