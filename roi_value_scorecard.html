@@ -839,6 +839,7 @@ var donutChart=null,barChart=null;
 var prevKpis={time:0,cost:0,count:0,quality:0};
 
 // Salesforce FY: Feb 1 – Jan 31. FY27: Q1=Feb–Apr, Q2=May–Jul, Q3=Aug–Oct, Q4=Nov–Jan.
+var SEED_VERSION=2;
 var SEED_Q2=[
   {id:1,name:'VER Intelligence Hub',pillar:'DA&O',tool:'VER Hub',time:120,cost:45000,quality:9,status:'Complete',notes:'Eliminated manual vendor reporting — 3 FTE hours/week recovered across DA&O. Launched Q2 FY27.'},
   {id:3,name:'TCO Scenario Modeling',pillar:'Engineering',tool:'TCO Calculator',time:60,cost:38000,quality:9,status:'Complete',notes:'Enables data-driven build vs. buy decisions. Used in 4 engineering reviews. Launched Q2 FY27.'},
@@ -854,14 +855,14 @@ function qtrKey(qtr){return 'scorecard-initiatives-'+qtr.replace(/\s+/g,'-');}
 function loadQtr(qtr){
   try{
     var raw=localStorage.getItem(qtrKey(qtr));
-    if(raw){var d=JSON.parse(raw);if(Array.isArray(d)&&d.length>0){nextId=Math.max.apply(null,d.map(function(i){return i.id||0;}))+1;return d;}}
+    if(raw){var p=JSON.parse(raw);var d=p&&p.v>=SEED_VERSION?p.items:(Array.isArray(p)?null:null);if(d&&d.length>0){nextId=Math.max.apply(null,d.map(function(i){return i.id||0;}))+1;return d;}}
   }catch(e){}
   if(qtr==='Q2 FY27'){nextId=4;return SEED_Q2.map(function(i){return Object.assign({},i);});}
   if(qtr==='Q3 FY27'){nextId=4;return SEED_Q3.map(function(i){return Object.assign({},i);})};
   nextId=1;return [];
 }
 function saveQtr(qtr){
-  try{localStorage.setItem(qtrKey(qtr),JSON.stringify(initiatives));}catch(e){}
+  try{localStorage.setItem(qtrKey(qtr),JSON.stringify({v:SEED_VERSION,items:initiatives}));}catch(e){}
 }
 var initiatives=loadQtr('Q3 FY27');
 
