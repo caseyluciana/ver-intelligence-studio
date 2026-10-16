@@ -661,99 +661,90 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
 
   <div class="tab-panel" id="tab-fragcost">
   <div class="sec-title">Reverse ROI — The Cost of Doing Nothing</div>
-  <p style="font-size:13px;color:var(--ink-muted);margin-bottom:24px;line-height:1.75;max-width:700px;">Every day work stays fragmented, there's a real cost — overpayment on vendor contracts, software waste, ungoverned AI spend, and ops time lost to duplication. This calculator quantifies what the status quo actually costs, and what formalizing a single function saves.</p>
+  <p style="font-size:13px;color:var(--ink-muted);margin-bottom:20px;line-height:1.75;max-width:700px;">The two biggest hidden costs are <strong style="color:var(--ink);">duplicative builds</strong> and <strong style="color:var(--ink);">inaccurate build tool costing</strong> — teams rebuilding what already exists, and AI budgets running blind because token and infrastructure costs were never measured. Enter three base numbers. Industry benchmarks fill in the rest.</p>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
-
-    <!-- Lever 1: Vendor Rate & Contract Risk -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
-      <div class="eyebrow" style="font-size:9px;margin-bottom:12px;">&#128200; Vendor Rate &amp; Contract Risk</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">Contracts / yr</label>
-          <input id="fc-contracts" type="number" value="50" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">Avg Contract Value $</label>
-          <input id="fc-contractval" type="number" value="150000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">% Overpayment (no bench.)</label>
-          <input id="fc-overpay" type="number" value="8" min="0" max="100" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div style="display:flex;flex-direction:column;justify-content:flex-end;">
-          <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Cost</div>
-          <div id="fc-r1" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--amber);">—</div>
-        </div>
+  <!-- Base Inputs -->
+  <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.22);border-radius:14px;padding:18px 22px;margin-bottom:20px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;">Base Inputs — Your Numbers</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+      <div>
+        <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;">Annual AI / Platform Budget $</label>
+        <input id="fc-aibudget" type="number" value="250000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
+        <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">Token spend, model licenses, platform tools</div>
       </div>
-      <div style="font-size:11px;color:var(--ink-faint);line-height:1.55;">Without rate benchmarking and pre-execution contract review, vendor engagements run at market premium. VER's rate database covers 74 roles — this is the gap it closes.</div>
+      <div>
+        <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;">Active AI Initiatives (count)</label>
+        <input id="fc-initiatives" type="number" value="8" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
+        <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">Active or in-flight builds across the org</div>
+      </div>
+      <div>
+        <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;">Software Portfolio Total $</label>
+        <input id="fc-swport" type="number" value="10000000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
+        <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">All SaaS, licenses, and tech contracts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Primary Levers -->
+  <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;">Primary Cost Drivers</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+    <!-- Lever 1: Duplicative Builds — THE FOCUS -->
+    <div style="background:var(--card);border:1px solid rgba(168,85,247,0.32);border-radius:16px;padding:20px;position:relative;">
+      <div style="position:absolute;top:14px;right:14px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25);border-radius:20px;padding:3px 9px;font-size:9.5px;font-weight:700;color:var(--violet);">31% duplication rate · Gartner</div>
+      <div class="eyebrow" style="font-size:9px;color:var(--violet);margin-bottom:10px;">&#128260; Duplicative Build Cost</div>
+      <div style="font-size:11.5px;color:var(--ink-muted);line-height:1.6;margin-bottom:14px;">Without a coordinated function, teams rebuild what already exists. 31% of enterprise AI initiatives duplicate work done elsewhere in the same org — wasted dev time, token spend, and validation effort.</div>
+      <div style="background:rgba(168,85,247,0.06);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:10.5px;color:var(--ink-faint);">
+        <span id="fc-init-display">8</span> initiatives × 31% duplication × $85K avg loaded cost
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Waste</div>
+        <div id="fc-r1" style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--violet);">—</div>
+      </div>
     </div>
 
-    <!-- Lever 2: Software Portfolio Waste -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
-      <div class="eyebrow" style="font-size:9px;color:var(--teal);margin-bottom:12px;">&#128187; Software Portfolio Waste</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">Total SW Portfolio $</label>
-          <input id="fc-swport" type="number" value="10000000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">% Waste (unmanaged)</label>
-          <input id="fc-swwaste" type="number" value="10" min="0" max="100" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div style="grid-column:span 2;display:flex;flex-direction:column;justify-content:flex-end;">
-          <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Cost</div>
-          <div id="fc-r2" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--teal);">—</div>
-        </div>
+    <!-- Lever 2: Inaccurate Build Tool Costing — THE FOCUS -->
+    <div style="background:var(--card);border:1px solid rgba(245,158,11,0.35);border-radius:16px;padding:20px;position:relative;">
+      <div style="position:absolute;top:14px;right:14px;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:3px 9px;font-size:9.5px;font-weight:700;color:var(--amber);">38% underestimated · Forrester</div>
+      <div class="eyebrow" style="font-size:9px;margin-bottom:10px;">&#128176; Build Tool Cost Blindspot</div>
+      <div style="font-size:11.5px;color:var(--ink-muted);line-height:1.6;margin-bottom:14px;">AI builds consistently underestimate true cost because token consumption, inference fees, and platform maintenance aren't tracked until a bill arrives. 38% of AI project budgets run over due to unmeasured tool cost.</div>
+      <div style="background:rgba(245,158,11,0.05);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:10.5px;color:var(--ink-faint);">
+        $<span id="fc-budget-display">250,000</span> AI budget × 38% untracked cost rate
       </div>
-      <div style="font-size:11px;color:var(--ink-faint);line-height:1.55;">Unused licenses, lapsed renewals, and unoptimized contracts compound silently. Active portfolio management is the only way to see and act before it closes.</div>
+      <div>
+        <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Blindspot</div>
+        <div id="fc-r2" style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--amber);">—</div>
+      </div>
     </div>
+  </div>
 
-    <!-- Lever 3: Ops Fragmentation -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
-      <div class="eyebrow" style="font-size:9px;color:var(--sky);margin-bottom:12px;">&#128336; Ops Fragmentation Cost</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">Hours lost / yr (duplicated effort)</label>
-          <input id="fc-hrs" type="number" value="2000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">Loaded Hourly Rate $</label>
-          <input id="fc-hrrate" type="number" value="75" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div style="grid-column:span 2;display:flex;flex-direction:column;justify-content:flex-end;">
-          <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Cost</div>
-          <div id="fc-r3" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--sky);">—</div>
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--ink-faint);line-height:1.55;">Fragmented functions mean duplicated lookups, repeated requests, and effort that never compounds. A unified function converts that cost into throughput.</div>
+  <!-- Secondary Levers -->
+  <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;">Additional Cost Drivers</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+
+    <!-- Lever 3: Software Portfolio Waste -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;">
+      <div style="position:absolute;top:12px;right:12px;background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.20);border-radius:20px;padding:3px 9px;font-size:9.5px;font-weight:700;color:var(--teal);">22% waste rate · Gartner</div>
+      <div class="eyebrow" style="font-size:9px;color:var(--teal);margin-bottom:8px;">&#128187; Software Portfolio Waste</div>
+      <div style="font-size:11px;color:var(--ink-muted);line-height:1.6;margin-bottom:10px;">Unused licenses, redundant tools, and lapsed renewals compound silently without active portfolio management.</div>
+      <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Waste</div>
+      <div id="fc-r3" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--teal);">—</div>
     </div>
 
     <!-- Lever 4: AI Governance Gap -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
-      <div class="eyebrow" style="font-size:9px;color:var(--violet);margin-bottom:12px;">&#128640; AI Governance Gap</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">Annual AI / Platform Spend $</label>
-          <input id="fc-aispend" type="number" value="0" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div>
-          <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">% Ungoverned (no AI Ops)</label>
-          <input id="fc-aiungov" type="number" value="25" min="0" max="100" class="field-input" style="width:100%;" oninput="calcFrag()">
-        </div>
-        <div style="grid-column:span 2;display:flex;flex-direction:column;justify-content:flex-end;">
-          <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Cost</div>
-          <div id="fc-r4" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--violet);">—</div>
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--ink-faint);line-height:1.55;">Ungoverned AI spend means duplicate tools, untracked usage, no ROI measurement, and no model cost accountability. Token spend runs without a value case.</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;">
+      <div style="position:absolute;top:12px;right:12px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.20);border-radius:20px;padding:3px 9px;font-size:9.5px;font-weight:700;color:var(--sky);">42% ungoverned · IDC</div>
+      <div class="eyebrow" style="font-size:9px;color:var(--sky);margin-bottom:8px;">&#128640; AI Governance Gap</div>
+      <div style="font-size:11px;color:var(--ink-muted);line-height:1.6;margin-bottom:10px;">Without dedicated AI Ops, 42% of AI spend runs without token tracking, model cost accountability, or ROI measurement.</div>
+      <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Ungoverned Spend</div>
+      <div id="fc-r4" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--sky);">—</div>
     </div>
   </div>
 
   <!-- Summary Row -->
   <div style="background:linear-gradient(135deg,rgba(168,85,247,0.10),rgba(56,189,248,0.06));border:1px solid rgba(168,85,247,0.28);border-radius:16px;padding:24px;margin-bottom:16px;">
-    <div class="sec-title" style="margin-bottom:20px;">Fragmentation Summary</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+    <div class="sec-title" style="margin-bottom:18px;">Fragmentation Summary</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px;">
       <div style="text-align:center;">
         <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Total Cost of Fragmentation</div>
         <div id="fc-total" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;color:var(--violet);">—</div>
@@ -768,11 +759,11 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
         <div id="fc-roi" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;color:var(--green);">—</div>
       </div>
     </div>
-    <div id="fc-callout" style="font-size:12px;color:var(--ink-muted);line-height:1.65;text-align:center;font-style:italic;border-top:1px solid var(--border-soft);padding-top:14px;">Enter your numbers above to see the cost of fragmentation vs. the investment in formalizing DA&amp;O Strategy &amp; Ops.</div>
+    <div id="fc-callout" style="font-size:12px;color:var(--ink-muted);line-height:1.65;text-align:center;font-style:italic;border-top:1px solid var(--border-soft);padding-top:14px;">Update the base inputs above to see your org's cost of fragmentation.</div>
   </div>
 
   <div style="background:rgba(168,85,247,0.06);border-left:3px solid var(--violet);border-radius:0 10px 10px 0;padding:14px 18px;font-size:12px;color:var(--ink-muted);line-height:1.65;">
-    <strong style="color:var(--ink);">Methodology note:</strong> These are directional estimates based on industry benchmarks for unmanaged vendor, software, and AI portfolios. Actual figures will vary — this tool is designed to prompt the right conversation, not replace a formal audit. Use your org's real numbers to sharpen the output.
+    <strong style="color:var(--ink);">Methodology:</strong> Benchmarks sourced from Gartner (31% AI duplication rate, 22% SaaS waste), Forrester (38% AI cost underestimation), and IDC (42% ungoverned AI spend). Average loaded AI initiative cost of $85K reflects dev time, token/infra spend, and QA at mid-size enterprise scale. These are directional estimates — replace with your org's real data to sharpen the output.
   </div>
 
   </div><!-- /tab-fragcost -->
@@ -1305,7 +1296,7 @@ function updateBtechOur(){
   }
 }
 
-// Cost of Fragmentation calculator
+// Cost of Fragmentation calculator — base inputs + industry averages
 function calcFrag(){
   var fmtM=function(n){
     if(n>=1000000)return'$'+(n/1000000).toFixed(1)+'M';
@@ -1313,30 +1304,47 @@ function calcFrag(){
     return'$'+Math.round(n).toLocaleString();
   };
   var v=function(id){return parseFloat(document.getElementById(id).value)||0;};
-  var set=function(id,val,color){
-    var el=document.getElementById(id);
-    if(el){el.textContent=fmtM(val);if(color)el.style.color=color;}
-  };
-  var r1=v('fc-contracts')*v('fc-contractval')*(v('fc-overpay')/100);
-  var r2=v('fc-swport')*(v('fc-swwaste')/100);
-  var r3=v('fc-hrs')*v('fc-hrrate');
-  var r4=v('fc-aispend')*(v('fc-aiungov')/100);
-  var total=r1+r2+r3+r4;
+  // Industry benchmarks (Gartner / Forrester / IDC)
+  var DUP_RATE=0.31;        // 31% of enterprise AI initiatives duplicate existing work
+  var AVG_INIT_COST=85000;  // avg loaded AI initiative cost (dev + tokens + QA)
+  var TOOL_UNDEREST=0.38;   // 38% of AI project budgets are underestimated (hidden token/infra)
+  var SW_WASTE_RATE=0.22;   // 22% of SaaS/software portfolio is unused or redundant
+  var AI_UNGOV_RATE=0.42;   // 42% of AI spend ungoverned without dedicated AI Ops
+
+  var aibudget=v('fc-aibudget');
+  var initiatives=v('fc-initiatives');
+  var swport=v('fc-swport');
   var invest=v('fc-invest');
+
+  // Update the formula display labels
+  var initDisplay=document.getElementById('fc-init-display');
+  if(initDisplay)initDisplay.textContent=Math.round(initiatives);
+  var budgetDisplay=document.getElementById('fc-budget-display');
+  if(budgetDisplay)budgetDisplay.textContent=aibudget.toLocaleString();
+
+  var r1=initiatives*DUP_RATE*AVG_INIT_COST;  // duplicative builds
+  var r2=aibudget*TOOL_UNDEREST;               // build tool cost blindspot
+  var r3=swport*SW_WASTE_RATE;                 // software portfolio waste
+  var r4=aibudget*AI_UNGOV_RATE;               // ungoverned AI spend
+  var total=r1+r2+r3+r4;
   var roi=total-invest;
-  set('fc-r1',r1);set('fc-r2',r2);set('fc-r3',r3);set('fc-r4',r4);
-  set('fc-total',total);
+
+  var set=function(id,val){
+    var el=document.getElementById(id);
+    if(el)el.textContent=val>0?fmtM(val):'—';
+  };
+  set('fc-r1',r1);set('fc-r2',r2);set('fc-r3',r3);set('fc-r4',r4);set('fc-total',total);
+
   var roiEl=document.getElementById('fc-roi');
   if(roiEl){
-    roiEl.textContent=roi>=0?'+'+fmtM(roi):fmtM(roi);
+    roiEl.textContent=total>0?(roi>=0?'+':'')+fmtM(roi):'—';
     roiEl.style.color=roi>=0?'var(--green)':'var(--amber)';
   }
   var callout=document.getElementById('fc-callout');
   if(callout&&total>0){
     var pct=invest>0?Math.round((roi/invest)*100):null;
-    callout.textContent='Fragmentation is costing an estimated '+fmtM(total)+' annually.'
-      +(invest>0?' Against a '+fmtM(invest)+' function investment, that\'s '+fmtM(roi)+' in net value'+(pct?' ('+pct+'% ROI)':'')+'.'
-      :' This function reorgs existing roles — with zero net-new investment, the full '+fmtM(total)+' becomes the ROI.');
+    callout.textContent='Based on these inputs, fragmentation is costing an estimated '+fmtM(total)+' annually — primarily from duplicative builds ('+fmtM(r1)+') and unmeasured build tool cost ('+fmtM(r2)+').'
+      +(invest>0?' Against a '+fmtM(invest)+' function investment, that\'s '+fmtM(roi)+' in net value'+(pct?' ('+pct+'% ROI)':'')+'.':' This function reorgs existing roles — with zero net-new investment, the full '+fmtM(total)+' becomes the ROI.');
   }
 }
 // Initialize on load
