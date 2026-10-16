@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DA&amp;O Strategy &amp; Ops — A Structural Proposal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#070509;--bg2:#0e0b14;
+  --amber:#F59E0B;--amber2:#d97706;
+  --teal:#2DD4BF;--violet:#A855F7;--green:#34D399;--sky:#38BDF8;
+  --ink:#fff8eb;--ink-muted:rgba(255,248,235,0.65);--ink-faint:rgba(255,248,235,0.35);
+  --border:rgba(245,158,11,0.18);--border-soft:rgba(245,158,11,0.10);
+  --card:rgba(255,255,255,0.04);
+}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);}
+
+.panel{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 48px 100px;
+  overflow-y:auto;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.55s ease,transform 0.55s ease;
+  transform:translateX(40px);
+  z-index:0;
+}
+.panel.active{opacity:1;pointer-events:all;transform:translateX(0);z-index:2;}
+.panel.from-left{transform:translateX(-40px);}
+.inner{width:100%;max-width:960px;margin:0 auto;}
+@media(max-width:680px){.panel{padding:70px 20px 90px;}}
+
+.chrome{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 32px;
+  background:rgba(7,5,9,0.80);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border-soft);}
+.chrome-brand{font-size:12px;font-weight:800;letter-spacing:0.08em;color:var(--amber);text-transform:uppercase;}
+.chrome-counter{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-faint);}
+
+.nav-wrap{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:100;
+  display:flex;align-items:center;gap:16px;}
+.nav-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);
+  background:rgba(245,158,11,0.10);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;transition:background 0.2s,border-color 0.2s;}
+.nav-btn:hover{background:rgba(245,158,11,0.22);border-color:rgba(245,158,11,0.45);}
+.nav-btn:disabled{opacity:0.25;cursor:default;}
+.nav-dots{display:flex;gap:6px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);transition:all 0.25s;cursor:pointer;}
+.dot.on{background:var(--amber);width:22px;border-radius:3px;}
+
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;}
+.eyebrow::before{content:'';width:28px;height:1px;background:var(--amber);}
+.eyebrow.teal{color:var(--teal);}
+.eyebrow.teal::before{background:var(--teal);}
+.eyebrow.violet{color:var(--violet);}
+.eyebrow.violet::before{background:var(--violet);}
+.h1{font-size:clamp(52px,10vw,88px);font-weight:900;line-height:0.95;letter-spacing:-0.03em;
+  background:linear-gradient(135deg,#fff8eb 0%,#fcd34d 35%,#f59e0b 65%,#2dd4bf 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
+.h2{font-size:clamp(30px,5vw,52px);font-weight:900;line-height:1.05;letter-spacing:-0.025em;margin-bottom:16px;}
+.h2 em{font-style:normal;color:var(--amber);}
+.lead{font-size:clamp(14px,1.8vw,17px);color:var(--ink-muted);line-height:1.75;margin-bottom:36px;max-width:620px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:20px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.35),transparent);}
+.card-ico{font-size:20px;margin-bottom:10px;}
+.card-t{font-size:13px;font-weight:700;margin-bottom:6px;}
+.card-b{font-size:12px;color:var(--ink-muted);line-height:1.65;}
+.card.teal-border{border-color:rgba(45,212,191,0.22);}
+.card.teal-border::after{background:linear-gradient(90deg,transparent,rgba(45,212,191,0.30),transparent);}
+.card.violet-border{border-color:rgba(168,85,247,0.22);}
+.card.violet-border::after{background:linear-gradient(90deg,transparent,rgba(168,85,247,0.30),transparent);}
+.proof{display:flex;align-items:flex-start;gap:14px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.20);border-radius:12px;padding:18px 20px;margin-top:16px;}
+.proof.teal{background:rgba(45,212,191,0.05);border-color:rgba(45,212,191,0.20);}
+.proof.violet{background:rgba(168,85,247,0.05);border-color:rgba(168,85,247,0.20);}
+.proof-ico{font-size:18px;flex-shrink:0;margin-top:2px;}
+.proof-txt{font-size:13px;color:var(--ink-muted);line-height:1.65;}
+.proof-txt strong{color:var(--ink);}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;}
+.ca{background:rgba(245,158,11,0.12);color:#fcd34d;border-color:rgba(245,158,11,0.28);}
+.ct{background:rgba(45,212,191,0.10);color:#5eead4;border-color:rgba(45,212,191,0.25);}
+.cv{background:rgba(168,85,247,0.10);color:#c084fc;border-color:rgba(168,85,247,0.25);}
+.cg{background:rgba(52,211,153,0.10);color:#6ee7b7;border-color:rgba(52,211,153,0.25);}
+.cs{background:rgba(56,189,248,0.10);color:#7dd3fc;border-color:rgba(56,189,248,0.25);}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr);}}
+.stat{background:var(--card);padding:26px 18px;text-align:center;}
+.stat-n{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;color:var(--amber);line-height:1;}
+.stat-n.teal{color:var(--teal);}
+.stat-n.violet{color:var(--violet);}
+.stat-l{font-size:11px;color:var(--ink-faint);margin-top:8px;font-weight:500;line-height:1.4;}
+
+.pillar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+@media(max-width:680px){.pillar-grid{grid-template-columns:1fr;}}
+.pillar{border-radius:16px;padding:24px;position:relative;}
+.pillar-amber{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.22);}
+.pillar-teal{background:rgba(45,212,191,0.06);border:1px solid rgba(45,212,191,0.20);}
+.pillar-violet{background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.20);}
+.pillar-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;}
+.pillar-label.amber{color:var(--amber);}
+.pillar-label.teal{color:var(--teal);}
+.pillar-label.violet{color:var(--violet);}
+.pillar-name{font-size:17px;font-weight:800;margin-bottom:10px;letter-spacing:-0.01em;}
+.pillar-stat{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;line-height:1;margin-bottom:8px;}
+.pillar-stat.amber{color:var(--amber);}
+.pillar-stat.teal{color:var(--teal);}
+.pillar-stat.violet{color:var(--violet);}
+.pillar-desc{font-size:12px;color:var(--ink-muted);line-height:1.6;}
+
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.tc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;}
+.tc-av{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;margin:0 auto 12px;border:2px solid;}
+.av-a{background:rgba(245,158,11,0.15);color:#fcd34d;border-color:rgba(245,158,11,0.45);}
+.av-t{background:rgba(45,212,191,0.15);color:#5eead4;border-color:rgba(45,212,191,0.45);}
+.av-v{background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.45);}
+.av-f{background:rgba(255,255,255,0.05);color:var(--ink-faint);border-color:var(--border);}
+.tc-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.tc-role{font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;}
+.tc-focus{font-size:12px;color:var(--ink-muted);line-height:1.5;}
+
+.p-num{position:absolute;top:80px;right:48px;font-family:'JetBrains Mono',monospace;font-size:80px;font-weight:900;color:rgba(245,158,11,0.05);line-height:1;pointer-events:none;user-select:none;}
+@media(max-width:680px){.p-num{display:none;}}
+
+@media print{
+  @page{margin:14mm 16mm 14mm;}
+  html,body{height:auto;overflow:visible;font-size:11px;}
+  .panel{position:relative;opacity:1!important;transform:none!important;pointer-events:all;
+    display:block!important;page-break-after:always;break-after:page;
+    height:auto;min-height:0;padding:32px 40px 28px;background:white!important;}
+  .panel:last-child{page-break-after:avoid;break-after:avoid;}
+  .panel-hero,.panel-alt{background:white!important;}
+  .chrome,.nav-wrap{display:none!important;}
+  .p-num{display:none!important;}
+  body,html{color:#1a1a1a!important;}
+  .inner{max-width:100%!important;}
+  .grid{grid-template-columns:repeat(3,1fr)!important;gap:10px!important;}
+  .pillar-grid{grid-template-columns:repeat(3,1fr)!important;gap:10px!important;}
+  .stats{grid-template-columns:repeat(4,1fr)!important;}
+  .team-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}
+  .card{padding:14px!important;}
+  .card-t{font-size:11px!important;}
+  .card-b{font-size:10.5px!important;}
+  .proof{padding:12px 16px!important;}
+  .proof-txt{font-size:11px!important;}
+  .h1{font-size:38px!important;line-height:1.1!important;}
+  .h2{font-size:22px!important;line-height:1.2!important;margin-bottom:10px!important;}
+  .lead{font-size:12px!important;margin-bottom:14px!important;}
+  .eyebrow{font-size:10px!important;margin-bottom:8px!important;}
+  .ask{padding:24px 28px!important;}
+  .ask-h{font-size:20px!important;}
+  .ask-body{font-size:11px!important;}
+  .chip{font-size:9.5px!important;padding:3px 9px!important;}
+  .stat-n{font-size:26px!important;}
+  .pillar-stat{font-size:22px!important;}
+  .pillar-name{font-size:13px!important;}
+  .pillar-desc{font-size:10.5px!important;}
+  .pillar{padding:14px!important;}
+  .org-chart{transform:none!important;}
+  .org-node{padding:10px 14px!important;}
+  .org-node-name{font-size:11px!important;}
+  .org-node-sub{font-size:9px!important;}
+  .org-sub-node{padding:7px 10px!important;}
+  .org-sub-name{font-size:9.5px!important;}
+  .tc{padding:14px!important;}
+  .tc-name{font-size:11px!important;}
+  .tc-focus{font-size:10.5px!important;}
+  .h1{background:none!important;-webkit-text-fill-color:#92400e!important;}
+  .h2{color:#1a1a1a!important;}
+  .h2 em,.eyebrow{color:#b45309!important;}
+  .eyebrow::before{background:#b45309!important;}
+  .eyebrow.teal{color:#0d9488!important;}
+  .eyebrow.teal::before{background:#0d9488!important;}
+  .eyebrow.violet{color:#6d28d9!important;}
+  .eyebrow.violet::before{background:#6d28d9!important;}
+  .lead,.card-b,.proof-txt,.tc-focus,.ask-body,.ask-fn,.org-node-sub,.pillar-desc,.ls-signal,.stat-l{color:#374151!important;}
+  .card-t,.tc-name,.org-node-name,.ls-name,.proof-txt strong{color:#111827!important;}
+  .stat-n{color:#b45309!important;}
+  .stat-n.teal{color:#0d9488!important;}
+  .stat-n.violet{color:#6d28d9!important;}
+  .pillar-stat.amber{color:#b45309!important;}
+  .pillar-stat.teal{color:#0d9488!important;}
+  .pillar-stat.violet{color:#6d28d9!important;}
+  .card{background:#f9fafb!important;border-color:#e5e7eb!important;}
+  .card::after{display:none!important;}
+  .card.teal-border{border-color:#a7f3d0!important;}
+  .card.violet-border{border-color:#ddd6fe!important;}
+  .proof{background:#fffbeb!important;border-color:#f59e0b!important;}
+  .proof.teal{background:#f0fdfa!important;border-color:#2dd4bf!important;}
+  .proof.violet{background:#faf5ff!important;border-color:#a855f7!important;}
+  .org-node{background:#f9fafb!important;border-color:#e5e7eb!important;}
+  .org-node.root{background:#fffbeb!important;border-color:#f59e0b!important;}
+  .org-node.lead{background:#fffbeb!important;border-color:#f59e0b!important;}
+  .pn-amber{background:#fffbeb!important;border-color:#fcd34d!important;}
+  .pn-teal{background:#f0fdfa!important;border-color:#6ee7b7!important;}
+  .pn-violet{background:#faf5ff!important;border-color:#ddd6fe!important;}
+  .org-line,.org-branch-line{background:#d1d5db!important;}
+  .org-children::before,.org-sub-wrap::before,.org-sub-wrap::after{background:#d1d5db!important;}
+  .pillar-amber{background:#fffbeb!important;border-color:#fcd34d!important;}
+  .pillar-teal{background:#f0fdfa!important;border-color:#6ee7b7!important;}
+  .pillar-violet{background:#faf5ff!important;border-color:#ddd6fe!important;}
+  .stats{background:#e5e7eb!important;}
+  .stat{background:#f9fafb!important;}
+  .tc{background:#f9fafb!important;border-color:#e5e7eb!important;}
+  .ask{background:#fffbeb!important;border-color:#f59e0b!important;}
+  .ask-h{color:#1a1a1a!important;}
+  .ask-h span{background:none!important;-webkit-text-fill-color:#b45309!important;}
+  .chip{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .ls-table th{background:#f3f4f6!important;color:#6b7280!important;}
+  .ls-table td{border-color:#e5e7eb!important;}
+  .ls-ttl,.ls-chip{color:#6b7280!important;}
+  .begin-btn{display:none!important;}
+  .tc-role{color:#b45309!important;}
+  .org-node-lbl{color:#b45309!important;}
+  .org-node-lbl.teal{color:#0d9488!important;}
+  .org-node-lbl.violet{color:#6d28d9!important;}
+}
+
+.ask{background:linear-gradient(135deg,rgba(245,158,11,0.08) 0%,rgba(45,212,191,0.06) 100%);border:1px solid rgba(245,158,11,0.30);border-radius:20px;padding:44px 40px;text-align:center;}
+@media(max-width:600px){.ask{padding:28px 18px;}}
+.ask-h{font-size:clamp(22px,4vw,38px);font-weight:900;letter-spacing:-0.025em;line-height:1.15;margin-bottom:16px;}
+.ask-h span{background:linear-gradient(135deg,#fcd34d,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.ask-body{font-size:14px;color:var(--ink-muted);max-width:520px;margin:0 auto 22px;line-height:1.75;}
+.ask-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:22px;}
+.ask-fn{font-size:11px;color:var(--ink-faint);font-style:italic;line-height:1.75;}
+
+.panel-hero{background:radial-gradient(ellipse 100% 70% at 50% -10%,rgba(245,158,11,0.16) 0%,transparent 65%),radial-gradient(ellipse 60% 40% at 85% 85%,rgba(45,212,191,0.09) 0%,transparent 55%),linear-gradient(180deg,#180f00 0%,var(--bg) 100%);}
+.panel-alt{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%);}
+.begin-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:40px;background:rgba(245,158,11,0.13);border:1px solid rgba(245,158,11,0.38);color:var(--ink);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;margin-top:8px;}
+.begin-btn:hover{background:rgba(245,158,11,0.24);border-color:rgba(245,158,11,0.60);}
+
+/* org chart */
+.org-wrap{display:flex;flex-direction:column;align-items:center;margin-top:12px;}
+.org-node{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 20px;text-align:center;}
+.org-node.root{background:rgba(245,158,11,0.09);border-color:rgba(245,158,11,0.32);}
+.org-node.lead{background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.26);min-width:270px;}
+.org-node-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--amber);margin-bottom:3px;}
+.org-node-lbl.teal{color:var(--teal);}
+.org-node-lbl.violet{color:var(--violet);}
+.org-node-name{font-size:14px;font-weight:700;}
+.org-node-sub{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+.org-line{width:1px;height:26px;background:rgba(245,158,11,0.22);margin:0 auto;}
+.org-children{display:flex;gap:12px;justify-content:center;position:relative;}
+.org-children::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:rgba(245,158,11,0.22);}
+.org-branch{display:flex;flex-direction:column;align-items:center;}
+.org-branch-line{width:1px;height:26px;background:rgba(245,158,11,0.22);}
+.pn-amber{background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.20);}
+.pn-teal{background:rgba(45,212,191,0.05);border-color:rgba(45,212,191,0.18);}
+.pn-violet{background:rgba(168,85,247,0.05);border-color:rgba(168,85,247,0.18);}
+.org-sub-wrap{display:flex;gap:6px;justify-content:center;position:relative;margin-top:14px;}
+.org-sub-wrap::before{content:'';position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:1px;height:14px;background:rgba(245,158,11,0.20);}
+.org-sub-wrap::after{content:'';position:absolute;top:0;left:24%;right:24%;height:1px;background:rgba(245,158,11,0.16);}
+.org-sub-branch{display:flex;flex-direction:column;align-items:center;}
+.org-sub-line{width:1px;height:16px;background:rgba(245,158,11,0.18);}
+.org-sub-node{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px 10px;text-align:center;min-width:100px;max-width:128px;}
+.org-sub-node.sub-amber{border-color:rgba(245,158,11,0.14);}
+.org-sub-node.sub-teal{border-color:rgba(45,212,191,0.13);}
+.org-sub-node.sub-violet{border-color:rgba(168,85,247,0.13);}
+.org-sub-name{font-size:10px;font-weight:600;color:var(--ink-faint);line-height:1.45;}
+
+/* light mode */
+[data-theme="light"]{
+  --bg:#fdf8ee;--bg2:#fff8e4;
+  --ink:#1a1003;--ink-muted:rgba(26,16,3,0.68);--ink-faint:rgba(26,16,3,0.42);
+  --border:rgba(180,83,9,0.22);--border-soft:rgba(180,83,9,0.13);
+  --card:rgba(180,83,9,0.04);
+}
+[data-theme="light"] body{background:var(--bg);}
+[data-theme="light"] .panel{background:var(--bg)!important;}
+[data-theme="light"] .panel-alt{background:var(--bg2)!important;}
+[data-theme="light"] .panel-hero{background:radial-gradient(ellipse 100% 70% at 50% -10%,rgba(245,158,11,0.22) 0%,transparent 65%),var(--bg)!important;}
+[data-theme="light"] .chrome{background:rgba(253,248,238,0.92)!important;border-bottom-color:rgba(180,83,9,0.15)!important;}
+[data-theme="light"] .chrome-brand{color:#b45309!important;}
+[data-theme="light"] .chrome-counter{color:rgba(26,16,3,0.42)!important;}
+[data-theme="light"] .h1{background:none!important;-webkit-text-fill-color:#92400e!important;}
+[data-theme="light"] .h2{color:var(--ink)!important;}
+[data-theme="light"] .h2 em{color:#b45309!important;}
+[data-theme="light"] .eyebrow{color:#b45309!important;}
+[data-theme="light"] .eyebrow::before{background:#b45309!important;}
+[data-theme="light"] .eyebrow.teal{color:#0d9488!important;}
+[data-theme="light"] .eyebrow.teal::before{background:#0d9488!important;}
+[data-theme="light"] .eyebrow.violet{color:#6d28d9!important;}
+[data-theme="light"] .eyebrow.violet::before{background:#6d28d9!important;}
+[data-theme="light"] .lead{color:rgba(26,16,3,0.70)!important;}
+[data-theme="light"] .card{background:#fff!important;border-color:rgba(180,83,9,0.12)!important;}
+[data-theme="light"] .card-b{color:rgba(26,16,3,0.65)!important;}
+[data-theme="light"] .card-t{color:#1a1003!important;}
+[data-theme="light"] .card.teal-border{border-color:rgba(20,184,166,0.30)!important;}
+[data-theme="light"] .card.violet-border{border-color:rgba(139,92,246,0.28)!important;}
+[data-theme="light"] .proof{background:#fffbeb!important;border-color:rgba(245,158,11,0.40)!important;}
+[data-theme="light"] .proof.teal{background:#f0fdfa!important;border-color:rgba(45,212,191,0.40)!important;}
+[data-theme="light"] .proof.violet{background:#faf5ff!important;border-color:rgba(168,85,247,0.35)!important;}
+[data-theme="light"] .proof-txt{color:rgba(26,16,3,0.68)!important;}
+[data-theme="light"] .proof-txt strong{color:#1a1003!important;}
+[data-theme="light"] .stats{background:rgba(180,83,9,0.06)!important;}
+[data-theme="light"] .stat{background:#fff!important;}
+[data-theme="light"] .stat-n{color:#92400e!important;}
+[data-theme="light"] .stat-n.teal{color:#0f766e!important;}
+[data-theme="light"] .stat-n.violet{color:#6d28d9!important;}
+[data-theme="light"] .stat-l{color:rgba(26,16,3,0.58)!important;}
+[data-theme="light"] .pillar-amber{background:#fffbeb!important;border-color:#fcd34d!important;}
+[data-theme="light"] .pillar-teal{background:#f0fdfa!important;border-color:#6ee7b7!important;}
+[data-theme="light"] .pillar-violet{background:#faf5ff!important;border-color:#ddd6fe!important;}
+[data-theme="light"] .pillar-stat.amber{color:#b45309!important;}
+[data-theme="light"] .pillar-stat.teal{color:#0f766e!important;}
+[data-theme="light"] .pillar-stat.violet{color:#6d28d9!important;}
+[data-theme="light"] .pillar-desc{color:rgba(26,16,3,0.65)!important;}
+[data-theme="light"] .tc{background:#fff!important;border-color:rgba(180,83,9,0.12)!important;}
+[data-theme="light"] .tc-focus{color:rgba(26,16,3,0.65)!important;}
+[data-theme="light"] .tc-name{color:#1a1003!important;}
+[data-theme="light"] .org-node{background:#fff!important;border-color:rgba(180,83,9,0.16)!important;}
+[data-theme="light"] .org-node.root{background:#fffbeb!important;border-color:rgba(245,158,11,0.50)!important;}
+[data-theme="light"] .org-node.lead{background:#fffbeb!important;border-color:rgba(245,158,11,0.42)!important;}
+[data-theme="light"] .org-node-name{color:#1a1003!important;}
+[data-theme="light"] .org-node-sub{color:rgba(26,16,3,0.42)!important;}
+[data-theme="light"] .pn-amber{background:#fffbeb!important;border-color:rgba(245,158,11,0.30)!important;}
+[data-theme="light"] .pn-teal{background:#f0fdfa!important;border-color:rgba(45,212,191,0.30)!important;}
+[data-theme="light"] .pn-violet{background:#faf5ff!important;border-color:rgba(168,85,247,0.25)!important;}
+[data-theme="light"] .org-sub-node{background:rgba(255,255,255,0.6)!important;border-color:rgba(180,83,9,0.10)!important;}
+[data-theme="light"] .org-sub-name{color:rgba(26,16,3,0.52)!important;}
+[data-theme="light"] .org-line,[data-theme="light"] .org-branch-line{background:rgba(180,83,9,0.22)!important;}
+[data-theme="light"] .org-children::before,[data-theme="light"] .org-sub-wrap::before,[data-theme="light"] .org-sub-wrap::after{background:rgba(180,83,9,0.20)!important;}
+[data-theme="light"] .ask{background:#fffbeb!important;border-color:rgba(245,158,11,0.40)!important;}
+[data-theme="light"] .ask-h{color:#1a1003!important;}
+[data-theme="light"] .ask-body{color:rgba(26,16,3,0.68)!important;}
+[data-theme="light"] .ask-fn{color:rgba(26,16,3,0.48)!important;}
+[data-theme="light"] .nav-btn{background:rgba(180,83,9,0.08)!important;border-color:rgba(180,83,9,0.22)!important;color:#1a1003!important;}
+[data-theme="light"] .nav-btn:hover{background:rgba(180,83,9,0.18)!important;}
+[data-theme="light"] .dot{background:rgba(180,83,9,0.25)!important;}
+[data-theme="light"] .dot.on{background:#b45309!important;}
+[data-theme="light"] .p-num{color:rgba(180,83,9,0.04)!important;}
+
+/* chrome buttons */
+.theme-btn{background:none;border:1px solid var(--border);color:var(--ink-faint);
+  font-size:14px;width:30px;height:30px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.theme-btn:hover{border-color:var(--amber);color:var(--ink);}
+.print-btn{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.28);
+  color:var(--ink-muted);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;
+  height:30px;padding:0 12px;border-radius:20px;cursor:pointer;letter-spacing:0.06em;
+  text-transform:uppercase;transition:all 0.2s;}
+.print-btn:hover{background:rgba(245,158,11,0.22);color:var(--ink);}
+@media print{.theme-btn,.print-btn{display:none!important;}}
+
+/* leadership table */
+.ls-table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;}
+.ls-table th{font-size:10px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink-faint);padding:10px 14px;text-align:left;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(245,158,11,0.10);}
+.ls-table td{font-size:12px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:top;}
+.ls-table tr:last-child td{border-bottom:none;}
+.ls-name{font-weight:700;color:var(--ink);margin-bottom:2px;}
+.ls-ttl{font-size:11px;color:var(--ink-faint);}
+.ls-signal{color:var(--ink-muted);line-height:1.5;}
+.ls-chip{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="chrome">
+  <div class="chrome-brand">DA&amp;O Strategy &amp; Ops</div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="chrome-counter" id="counter">01 / 11</div>
+    <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark">&#9728;</button>
+    <button class="print-btn" onclick="window.print()" title="Save as PDF">&#8595; PDF</button>
+  </div>
+</div>
+
+<div class="nav-wrap">
+  <button class="nav-btn" id="btn-prev" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="nav-dots" id="dots"></div>
+  <button class="nav-btn" id="btn-next" onclick="go(1)">&#8594;</button>
+</div>
+
+<!-- ══════════════════════════════════════ P0 — HERO -->
+<div class="panel panel-hero active" id="p0">
+  <div class="inner" style="text-align:center;">
+    <div class="eyebrow" style="justify-content:center;">Structural Proposal — DA&amp;O Org</div>
+    <div class="h1">DA&amp;O Strategy<br>&amp; Ops</div>
+    <p class="lead" style="margin:0 auto 28px;text-align:center;">Three operational pillars. One function. Already running.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;">
+      <span class="chip cv">&#9679; AI Ops</span>
+      <span class="chip ct">&#9679; Fin Intel</span>
+      <span class="chip ca">&#9679; VER Ops</span>
+    </div>
+    <button class="begin-btn" onclick="go(1)">Begin &#8594;</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P1 — THE REALITY -->
+<div class="panel" id="p1">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">01</div>
+    <div class="eyebrow">The Reality</div>
+    <h2 class="h2">Three pillars.<br><em>Already operating.</em></h2>
+    <div class="pillar-grid">
+      <div class="pillar pillar-amber">
+        <div class="pillar-label amber">VER Ops</div>
+        <div class="pillar-name">Vendor &amp; Engagement</div>
+        <div class="pillar-stat amber">$3M+</div>
+        <div class="pillar-desc">Cost avoidance tracked. Rate benchmarking, SOW review, supplier intelligence, pre-execution contract review — active and in use by stakeholders today.</div>
+      </div>
+      <div class="pillar pillar-teal">
+        <div class="pillar-label teal">FinOps</div>
+        <div class="pillar-name">Cost Intelligence &amp; Ops</div>
+        <div class="pillar-stat teal">$68M</div>
+        <div class="pillar-desc">Total cost intelligence across software, vendor, and technology spend. TCO modeling, budget forecasting, license optimization, and cost avoidance — active across the full portfolio.</div>
+      </div>
+      <div class="pillar pillar-violet">
+        <div class="pillar-label violet">AI Ops</div>
+        <div class="pillar-name">Platform &amp; Governance</div>
+        <div class="pillar-stat violet">32</div>
+        <div class="pillar-desc">AI-powered modules built and deployed. Platform development, ROI measurement, AI spend governance, build methodology — all running in production.</div>
+      </div>
+    </div>
+    <div class="proof"><div class="proof-ico">&#128161;</div><div class="proof-txt"><strong>This function already exists. It just doesn't have a name.</strong> The work, the tools, the stakeholder relationships, the value proof — all active. This proposal is formalization, not creation.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P2 — FY27 IMPACT -->
+<div class="panel panel-alt" id="p2">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">02</div>
+    <div class="eyebrow">FY27 Impact</div>
+    <h2 class="h2">The numbers<br><em>already exist.</em></h2>
+    <div class="stats">
+      <div class="stat"><div class="stat-n teal">$68M</div><div class="stat-l">Software &amp; license portfolio under FinOps management</div></div>
+      <div class="stat"><div class="stat-n">$3M+</div><div class="stat-l">Vendor &amp; contract cost avoidance documented by VER Ops</div></div>
+      <div class="stat"><div class="stat-n violet">$10.2M</div><div class="stat-l">Identified savings in active pipeline</div></div>
+      <div class="stat"><div class="stat-n">$64M</div><div class="stat-l">Software renewal horizon managed through Q4 FY27</div></div>
+    </div>
+    <div class="proof"><div class="proof-ico">&#127942;</div><div class="proof-txt"><strong>These aren't projections.</strong> VER Ops is producing real cost avoidance on active contracts. FinOps is tracking real software spend. AI Ops has 32 production tools running across stakeholder workflows right now.</div></div>
+    <div class="proof teal"><div class="proof-ico">&#128200;</div><div class="proof-txt"><strong>Formalizing this function converts reactive work into a managed portfolio</strong> — with ownership, reporting cadence, and a clear executive narrative for the full org to carry.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P3 — VER OPS -->
+<div class="panel" id="p3">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">03</div>
+    <div class="eyebrow">Pillar 01 — VER Ops</div>
+    <h2 class="h2">Vendor intelligence,<br><em>SOW &amp; engagement review.</em></h2>
+    <div class="grid">
+      <div class="card"><div class="card-ico">&#127760;</div><div class="card-t">Vendor Intelligence Platform</div><div class="card-b">Multi-role hub for vendor performance data, engagement history, risk profiles, and tier management across AMER preferred suppliers.</div></div>
+      <div class="card"><div class="card-ico">&#128200;</div><div class="card-t">Rate Benchmarking</div><div class="card-b">Live market rate analysis against 74 role benchmarks. Flags overpayment, validates SOW pricing, supports negotiation with real data.</div></div>
+      <div class="card"><div class="card-ico">&#128196;</div><div class="card-t">Contract Review &amp; Renewal Oversight</div><div class="card-b">Full renewal horizon through Q4 FY27. VER reviews for SLA placement, KPI alignment, and value-to-work before execution. No surprise renewals, no lapses.</div></div>
+      <div class="card"><div class="card-ico">&#128178;</div><div class="card-t">SOW Cost Estimation</div><div class="card-b">58+ role SOW estimator with region and level multipliers. PDF/DOCX upload with role auto-suggest. Exportable scope summaries for exec review.</div></div>
+      <div class="card"><div class="card-ico">&#127941;</div><div class="card-t">Preferred Supplier Program</div><div class="card-b">16 AMER Tier 1 suppliers actively managed. Qualification criteria, performance tiers, scorecard framework, and compliance tracking in place.</div></div>
+      <div class="card"><div class="card-ico">&#128101;</div><div class="card-t">Stakeholder Intelligence</div><div class="card-b">Intake from internal stakeholders — demand planning, resource requests, engagement tracking, relationship intelligence across DA&amp;O.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P4 — FINOPS -->
+<div class="panel panel-alt" id="p4">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">04</div>
+    <div class="eyebrow teal">Pillar 02 — Financial Intelligence</div>
+    <h2 class="h2">Cost intelligence<br><em style="color:var(--teal);">across every dollar.</em></h2>
+    <div class="grid">
+      <div class="card teal-border"><div class="card-ico">&#128187;</div><div class="card-t">Software &amp; Technology Portfolio</div><div class="card-b">$68M portfolio actively managed. Every tool, every contract, renewal dates, utilization, cost-per-seat — consolidated and tracked. No surprises, no lapses.</div></div>
+      <div class="card teal-border"><div class="card-ico">&#128200;</div><div class="card-t">TCO &amp; Cost Modeling</div><div class="card-b">Total Cost of Ownership analysis for vendor and technology decisions. Scenario modeling, make-vs-buy inputs, and exec-ready summaries that inform the right call.</div></div>
+      <div class="card teal-border"><div class="card-ico">&#128202;</div><div class="card-t">Budget &amp; Forecast Intelligence</div><div class="card-b">Forward-looking spend modeling across vendor, software, and technology. Renewal pacing, annual commitment tracking, and reforecast cadence for leadership visibility.</div></div>
+      <div class="card teal-border"><div class="card-ico">&#127919;</div><div class="card-t">Cost Avoidance &amp; Optimization</div><div class="card-b">Proactive savings identification across the full spend footprint — vendor costs, licensing, technology investments — before commitment, not after.</div></div>
+      <div class="card teal-border"><div class="card-ico">&#128101;</div><div class="card-t">Demand Planning &amp; HC Intelligence</div><div class="card-b">Workforce cost modeling tied to the 70/30 FTE/CW policy mandate. Headcount forecasting, capacity vs. demand visibility, and cost risk flags — before the ask hits finance.</div></div>
+      <div class="card teal-border"><div class="card-ico">&#128201;</div><div class="card-t">Vendor Cost Intelligence</div><div class="card-b">Spend-to-value analysis across the vendor portfolio. Cost-per-outcome tracking, rate vs. market benchmarking, and supplier cost trend visibility that connects VER Ops to the full financial picture.</div></div>
+    </div>
+    <div class="proof teal"><div class="proof-ico">&#9889;</div><div class="proof-txt"><strong>$64M in software renewals</strong> hit in Q3–Q4 FY27. This pillar owns the runway to model, negotiate, and right-size before those deals close — and that window is open now.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P5 — AI OPS -->
+<div class="panel" id="p5">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">05</div>
+    <div class="eyebrow violet">Pillar 03 — AI Ops</div>
+    <h2 class="h2">Platform, governance,<br><em style="color:var(--violet);">value proof.</em></h2>
+    <div class="grid">
+      <div class="card violet-border"><div class="card-ico">&#128640;</div><div class="card-t">Platform Development</div><div class="card-b">32 AI-powered modules in production. Multi-model methodology: Gemini/GPT for ideation, Claude Code for execution, Codex for QA. Static-first, zero build-step architecture.</div></div>
+      <div class="card violet-border"><div class="card-ico">&#128201;</div><div class="card-t">ROI &amp; Value Measurement</div><div class="card-b">Standardized scorecard framework for AI initiative impact. Time saved, cost avoided, quality improved — quantified and reported quarterly. Developed cross-functionally with DA&amp;O Portfolio Management.</div></div>
+      <div class="card violet-border"><div class="card-ico">&#128176;</div><div class="card-t">AI Spend Governance</div><div class="card-b">Token tracking, model cost visibility, budget envelopes by initiative. Nobody runs blind on AI costs — every spend tied to a use case and a value case.</div></div>
+      <div class="card violet-border"><div class="card-ico">&#128218;</div><div class="card-t">Build Methodology</div><div class="card-b">Documented, repeatable AI build standard. Use case intake, selection criteria, build execution, QA, documentation, and maintenance. DA&amp;O is Customer Zero.</div></div>
+      <div class="card violet-border"><div class="card-ico">&#128274;</div><div class="card-t">Platform Governance</div><div class="card-b">Access standards, model selection policy, responsible AI guardrails, and security compliance across every deployed module. Governance isn't an afterthought — it's the architecture layer.</div></div>
+      <div class="card violet-border"><div class="card-ico">&#128200;</div><div class="card-t">Value Proof &amp; Reporting</div><div class="card-b">Quarterly value proof publishing — time saved, cost avoided, quality improved — per initiative and in aggregate. Stakeholder-ready readouts that turn AI adoption into an org-level story.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P6 — THE PLATFORM -->
+<div class="panel panel-alt" id="p6">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">06</div>
+    <div class="eyebrow">The Platform</div>
+    <h2 class="h2">Built — tools live.<br><em>Function: soon to be formally deployed.</em></h2>
+    <div class="stats">
+      <div class="stat"><div class="stat-n">32</div><div class="stat-l">AI-powered modules in production</div></div>
+      <div class="stat"><div class="stat-n teal">74</div><div class="stat-l">Role benchmarks in the rate database</div></div>
+      <div class="stat"><div class="stat-n violet">231+</div><div class="stat-l">Commits in version-controlled studio repo</div></div>
+      <div class="stat"><div class="stat-n">5.6MB</div><div class="stat-l">Production codebase — zero framework, zero build step</div></div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="card-ico">&#127759;</div><div class="card-t">VER Intelligence Hub</div><div class="card-b">Multi-role command center — exec snapshot, renewal horizon, governance queue, TCO calculator. Exec-ready, already in front of org leadership.</div></div>
+      <div class="card"><div class="card-ico">&#128196;</div><div class="card-t">SOW Cost Estimator</div><div class="card-b">58+ roles, region &amp; level multipliers, PDF/DOCX role auto-suggest. Used by VER team on live SOW reviews. No build step.</div></div>
+      <div class="card"><div class="card-ico">&#128201;</div><div class="card-t">ROI &amp; Value Scorecard</div><div class="card-b">Standardized AI initiative scorecard. True cost simulation, time saved tracker, cost avoidance, quarterly reporting format.</div></div>
+      <div class="card"><div class="card-ico">&#127775;</div><div class="card-t">Cinematic Generator V2</div><div class="card-b">AI-powered meeting content generator — MBR, QBR, offsite, exec formats. Used internally, shareable externally as a standalone module.</div></div>
+      <div class="card"><div class="card-ico">&#128202;</div><div class="card-t">Rate Benchmark Intelligence</div><div class="card-b">74-role live rate database covering AMER markets. Market benchmarking, overpayment detection, SOW validation support. The data layer behind every rate conversation in VER.</div></div>
+      <div class="card"><div class="card-ico">&#128101;</div><div class="card-t">Demand Planning &amp; HC Intelligence</div><div class="card-b">Workforce demand tool with 70/30 FTE/CW policy ceiling enforcement, risk flag modeling, and capacity-to-demand visibility. Headcount planning that connects to financial intelligence.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P7 — THE OPERATING MODEL -->
+<div class="panel" id="p7">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">07</div>
+    <div class="eyebrow">The Operating Model</div>
+    <h2 class="h2">Built on a model<br><em>already trusted.</em></h2>
+    <p class="lead" style="margin-bottom:20px;font-size:14px;">DA&amp;O Strategy &amp; Ops runs like a Rapid Innovation Squad — small team, real Business Leader, named accountability, and a mandate that cuts across reporting lines.</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr));">
+      <div class="card"><div class="card-ico">&#128101;</div><div class="card-t">Real Business Leader. Not a Proxy.</div><div class="card-b">The RIS non-negotiable: a Business Leader with deep conviction and dedicated weekly capacity. This function has one — with full ownership, not an added hat.</div></div>
+      <div class="card"><div class="card-ico">&#9889;</div><div class="card-t">Small &amp; Flat</div><div class="card-b">2–3 active builders plus a Business Leader who makes decisions. No councils, no hand-off queues. Add layers, lose speed — so we don't.</div></div>
+      <div class="card"><div class="card-ico">&#128279;</div><div class="card-t">Cuts Across Reporting Lines</div><div class="card-b">Like any effective squad, this function serves DA&amp;O and DET regardless of where the work lands on an org chart. The squad is one team, wherever its members report.</div></div>
+      <div class="card"><div class="card-ico">&#127919;</div><div class="card-t">Focus &amp; Accountability Built In</div><div class="card-b">Quarterly cadence, ROI scorecard, named deliverables per pillar. Accountability isn't added on top — it's the operating constraint from day one.</div></div>
+    </div>
+    <div class="proof" style="border-color:rgba(245,158,11,0.38);"><div class="proof-ico">&#9889;</div><div class="proof-txt"><strong>"The question isn't how many tokens we use — it's what we get for them. Token spend should be as accountable as any other resource: people, contractors, software."</strong><br><span style="font-size:11px;color:var(--ink-faint);font-style:italic;">— Joe I. · President, Enterprise &amp; AI Technology</span><br><br>That mandate needs infrastructure to execute. The multi-model build methodology and token optimization approach built inside this function generated org-level visibility — and that signal came from results, not a pitch.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P8 — THE TEAM -->
+<div class="panel panel-alt" id="p8">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">08</div>
+    <div class="eyebrow">The Team</div>
+    <h2 class="h2">A team already running.<br><em>A function ready to be named.</em></h2>
+    <div class="team-grid">
+      <div class="tc">
+        <div class="tc-av av-a">CL</div>
+        <div class="tc-name">Casey Luciana</div>
+        <div class="tc-role">DA&amp;O Strategy &amp; Ops — Function Lead</div>
+        <div class="tc-focus">Leads the full three-pillar portfolio. Sets direction, builds the platform, owns the exec narrative. 32 modules in production, $3M+ cost avoidance documented. Active builder and functional lead simultaneously.</div>
+      </div>
+      <div class="tc">
+        <div class="tc-av av-v">VER</div>
+        <div class="tc-name">VER Ops Team</div>
+        <div class="tc-role">Operational Backbone — All Pillars</div>
+        <div class="tc-focus">Already here, already contributing across all three pillars — not siloed. Vendor intelligence, stakeholder coordination, pre-execution contract review, rate validation, financial data support, and platform engagement. One team, full portfolio coverage.</div>
+      </div>
+      <div class="tc">
+        <div class="tc-av" style="background:rgba(45,212,191,0.10);color:#5eead4;border:2px solid rgba(45,212,191,0.35);width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;margin:0 auto 12px;">$&#8764;</div>
+        <div class="tc-name">Financial Intelligence</div>
+        <div class="tc-role" style="color:var(--teal);">Cost &amp; Portfolio Management — Already Active</div>
+        <div class="tc-focus">Already here, already owned. $68M software portfolio actively managed, TCO modeling running, vendor cost intelligence live, cost avoidance tracked at $3M+. Financial Intelligence isn't adjacent to this function — it has been running inside it from the start.</div>
+      </div>
+      <div class="tc">
+        <div class="tc-av" style="background:rgba(45,212,191,0.10);color:#5eead4;border:2px solid rgba(45,212,191,0.35);width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;margin:0 auto 12px;">&#8596;</div>
+        <div class="tc-name">Cross-Functional Reach</div>
+        <div class="tc-role" style="color:var(--teal);">Not a Single Partner — An Operating Model</div>
+        <div class="tc-focus">This function interfaces across Joe's full org, Finance, ES, Procurement, and Sourcing. No single named partner owns the relationship — this function does. Cross-org collaboration structured through intake, reporting, and shared accountability.</div>
+      </div>
+    </div>
+    <div class="proof"><div class="proof-ico">&#127942;</div><div class="proof-txt"><strong>VER Ops, Financial Intelligence, and AI Ops have all been running under this function — without a formal name.</strong> The team exists. The track record exists. This proposal gives both the structure they've already earned.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P9 — THE STRUCTURE -->
+<div class="panel" id="p9">
+  <div class="inner" style="position:relative;">
+    <div class="p-num">09</div>
+    <div class="eyebrow">The Structure</div>
+    <h2 class="h2">A clear line.<br><em>Direct accountability.</em></h2>
+    <div class="org-wrap">
+      <div class="org-node root" style="min-width:210px;">
+        <div class="org-node-lbl">SVP, Delivery Assurance &amp; Ops</div>
+        <div class="org-node-name">Roger</div>
+        <div class="org-node-sub">DA&amp;O Org Executive Sponsor</div>
+      </div>
+      <div class="org-line"></div>
+      <div class="org-node lead">
+        <div class="org-node-lbl">DA&amp;O Sub-Pillar · Function Lead</div>
+        <div class="org-node-name">DA&amp;O Strategy &amp; Ops</div>
+        <div class="org-node-sub">Casey Luciana · sits within DA&amp;O, serves DA&amp;O + DET</div>
+      </div>
+      <div class="org-line"></div>
+      <div class="org-children">
+        <div class="org-branch">
+          <div class="org-branch-line"></div>
+          <div class="org-node pn-amber" style="min-width:140px;">
+            <div class="org-node-lbl">Pillar 01</div>
+            <div class="org-node-name" style="font-size:13px;">VER Ops</div>
+            <div class="org-node-sub">Vendor &amp; Contract</div>
+          </div>
+          <div class="org-sub-wrap">
+            <div class="org-sub-branch">
+              <div class="org-sub-line"></div>
+              <div class="org-sub-node sub-amber"><div class="org-sub-name">Vendor Intelligence<br>&amp; Governance</div></div>
+            </div>
+            <div class="org-sub-branch">
+              <div class="org-sub-line"></div>
+              <div class="org-sub-node sub-amber"><div class="org-sub-name">SOW Review &amp;<br>Estimation</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="org-branch">
+          <div class="org-branch-line"></div>
+          <div class="org-node pn-teal" style="min-width:140px;">
+            <div class="org-node-lbl teal">Pillar 02</div>
+            <div class="org-node-name" style="font-size:13px;">Fin Intel</div>
+            <div class="org-node-sub">Cost Intelligence</div>
+          </div>
+          <div class="org-sub-wrap">
+            <div class="org-sub-branch">
+              <div class="org-sub-line"></div>
+              <div class="org-sub-node sub-teal"><div class="org-sub-name">Software &amp; Tech<br>Portfolio</div></div>
+            </div>
+            <div class="org-sub-branch">
+              <div class="org-sub-line"></div>
+              <div class="org-sub-node sub-teal"><div class="org-sub-name">Cost Modeling<br>&amp; Avoidance</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="org-branch">
+          <div class="org-branch-line"></div>
+          <div class="org-node pn-violet" style="min-width:140px;">
+            <div class="org-node-lbl violet">Pillar 03</div>
+            <div class="org-node-name" style="font-size:13px;">AI Ops</div>
+            <div class="org-node-sub">Platform &amp; Governance</div>
+          </div>
+          <div class="org-sub-wrap">
+            <div class="org-sub-branch">
+              <div class="org-sub-line"></div>
+              <div class="org-sub-node sub-violet"><div class="org-sub-name">Platform Maintenance<br>&amp; Support</div></div>
+            </div>
+            <div class="org-sub-branch">
+              <div class="org-sub-line"></div>
+              <div class="org-sub-node sub-violet"><div class="org-sub-name">ROI &amp; Spend<br>Governance</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="proof" style="margin-top:24px;"><div class="proof-ico">&#128205;</div><div class="proof-txt"><strong>Home: DA&amp;O Org. Scope: DET-wide.</strong> This function sits within DA&amp;O, reports through the SVP chain, and serves the full DA&amp;O and DET portfolio — not just VER.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ P10 — THE ASK -->
+<div class="panel panel-alt" id="p10">
+  <div class="inner">
+    <div class="eyebrow">The Ask</div>
+    <div class="ask">
+      <div class="ask-h">Formalize <span>DA&amp;O Strategy &amp; Ops</span><br>as the function it already is.</div>
+      <div class="ask-body">The work exists. The team exists. The results exist. This proposal puts a name, a mandate, and a reporting structure behind what's already running — so the org can own it, scale it, and tell the story.</div>
+      <div class="ask-chips">
+        <span class="chip ca">&#10003; Function: DA&amp;O Strategy &amp; Ops</span>
+        <span class="chip cv">&#10003; Three pillars: AI Ops / Fin Intel / VER Ops</span>
+        <span class="chip ct">&#10003; Function Lead: Casey Luciana</span>
+        <span class="chip ca">&#10003; Scope: DET-wide</span>
+        <span class="chip ct">&#10003; Co-owned ROI framework</span>
+        <span class="chip cv">&#10003; Quarterly readout to DA&amp;O SVP</span>
+        <span class="chip cg">&#10003; Org-level exec visibility already earned</span>
+        <span class="chip cs">&#10003; Runs like a RIS — small, flat, accountable</span>
+      </div>
+      <div class="ask-fn">
+        This function has been operating since May 8, 2026.<br>
+        $3M+ in cost avoidance. $68M in software managed. 32 AI modules in production.<br>
+        The only thing missing is a name on the org chart.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var panels=document.querySelectorAll('.panel');
+  var total=panels.length;
+  var current=0;
+  var busy=false;
+  var dotsEl=document.getElementById('dots');
+  for(var i=0;i<total;i++){
+    var d=document.createElement('div');
+    d.className='dot'+(i===0?' on':'');
+    d.setAttribute('data-i',String(i));
+    d.addEventListener('click',function(){go(parseInt(this.getAttribute('data-i'))-current);});
+    dotsEl.appendChild(d);
+  }
+  function updateChrome(){
+    var n=(current+1<10?'0':'')+(current+1);
+    var t=(total<10?'0':'')+total;
+    document.getElementById('counter').textContent=n+' / '+t;
+    document.getElementById('btn-prev').disabled=(current===0);
+    document.getElementById('btn-next').disabled=(current===total-1);
+    dotsEl.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('on',i===current);});
+  }
+  function go(dir){
+    var next=current+dir;
+    if(busy||next<0||next>=total)return;
+    busy=true;
+    var leaving=panels[current];
+    var entering=panels[next];
+    entering.style.opacity='0';
+    entering.style.transform=dir>0?'translateX(40px)':'translateX(-40px)';
+    entering.style.transition='none';
+    entering.style.pointerEvents='none';
+    entering.classList.add('active');
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        leaving.style.transition='opacity 0.5s ease,transform 0.5s ease';
+        leaving.style.opacity='0';
+        leaving.style.transform=dir>0?'translateX(-40px)':'translateX(40px)';
+        entering.style.transition='opacity 0.5s ease,transform 0.5s ease';
+        entering.style.opacity='1';
+        entering.style.transform='translateX(0)';
+        entering.style.pointerEvents='all';
+        current=next;
+        updateChrome();
+        setTimeout(function(){
+          leaving.classList.remove('active');
+          leaving.style.cssText='';
+          entering.style.transition='';
+          busy=false;
+        },520);
+      });
+    });
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ')go(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+  });
+  var tx=0;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>50)go(dx<0?1:-1);
+  },{passive:true});
+  window.go=go;
+  updateChrome();
+})();
+
+function toggleTheme(){
+  var h=document.documentElement;
+  var isLight=h.getAttribute('data-theme')==='light';
+  if(isLight){h.removeAttribute('data-theme');}else{h.setAttribute('data-theme','light');}
+  document.getElementById('theme-toggle').textContent=isLight?'☀':'☾';
+  try{localStorage.setItem('dao-proposal-theme',isLight?'dark':'light');}catch(e){}
+}
+(function(){
+  try{
+    var s=localStorage.getItem('dao-proposal-theme');
+    if(s==='light'){
+      document.documentElement.setAttribute('data-theme','light');
+      var btn=document.getElementById('theme-toggle');
+      if(btn)btn.textContent='☾';
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
