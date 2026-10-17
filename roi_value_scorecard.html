@@ -541,6 +541,10 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
 
 @keyframes card-stagger{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 .init-card-entering{animation:card-stagger 0.30s cubic-bezier(0.22,1,0.36,1) both;}
+.dup-pill{background:rgba(255,255,255,0.04);border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:5px 14px;font-size:10.5px;color:var(--ink-muted);cursor:pointer;transition:all 0.18s ease;white-space:nowrap;font-family:inherit;}
+.dup-pill:hover{border-color:rgba(245,158,11,0.55);color:var(--ink);background:rgba(245,158,11,0.08);}
+.dup-pill.dup-pill-active{background:rgba(245,158,11,0.13);border-color:var(--amber);color:var(--amber);font-weight:600;}
+.dup-pill.dup-pill-danger.dup-pill-active{background:rgba(239,68,68,0.12);border-color:#ef4444;color:#ef4444;}
 </style>
 </head>
 <body>
@@ -716,6 +720,22 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
         <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">Loaded dev time, token spend, QA per build</div>
       </div>
     </div>
+    <!-- Duplication Rate Tier Picker -->
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(245,158,11,0.18);">
+      <div style="font-size:10px;color:var(--ink-faint);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Duplication Rate — Choose Your Org Reality</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="dup-rate-pills">
+        <button class="dup-pill dup-pill-active" data-rate="0.31" data-label="31%" data-source="Gartner Baseline" onclick="setDupRate(this)">
+          <strong>31%</strong> <span style="font-size:9px;margin-left:4px;opacity:0.75;">Industry Baseline</span>
+        </button>
+        <button class="dup-pill" data-rate="0.52" data-label="52%" data-source="Large Enterprise" onclick="setDupRate(this)">
+          <strong>52%</strong> <span style="font-size:9px;margin-left:4px;opacity:0.75;">Large Enterprise</span>
+        </button>
+        <button class="dup-pill dup-pill-danger" data-rate="0.67" data-label="67%" data-source="Hyperscale AI Org" onclick="setDupRate(this)">
+          <strong>67%</strong> <span style="font-size:9px;margin-left:4px;opacity:0.75;">Hyperscale AI Org</span>
+        </button>
+      </div>
+      <div style="font-size:9.5px;color:var(--ink-faint);margin-top:7px;line-height:1.5;">31% = formally tracked initiatives (Gartner) &nbsp;·&nbsp; 52% = large org with active AI adoption &nbsp;·&nbsp; 67% = 90K+ employees, decentralized builds, shadow AI everywhere</div>
+    </div>
   </div>
 
   <!-- Primary Levers -->
@@ -724,11 +744,11 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
 
     <!-- Lever 1: Duplicative Builds — THE FOCUS -->
     <div style="background:var(--card);border:1px solid rgba(168,85,247,0.32);border-radius:16px;padding:20px;position:relative;">
-      <div style="position:absolute;top:14px;right:14px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25);border-radius:20px;padding:3px 9px;font-size:9.5px;font-weight:700;color:var(--violet);">31% duplication rate · Gartner</div>
+      <div id="fc-dup-badge" style="position:absolute;top:14px;right:14px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25);border-radius:20px;padding:3px 9px;font-size:9.5px;font-weight:700;color:var(--violet);">31% duplication rate · Gartner Baseline</div>
       <div class="eyebrow" style="font-size:9px;color:var(--violet);margin-bottom:10px;">&#128260; Duplicative Build Cost</div>
-      <div style="font-size:11.5px;color:var(--ink-muted);line-height:1.6;margin-bottom:14px;">Without a coordinated function, teams rebuild what already exists. 31% of enterprise AI initiatives duplicate work done elsewhere in the same org — wasted dev time, token spend, and validation effort.</div>
+      <div style="font-size:11.5px;color:var(--ink-muted);line-height:1.6;margin-bottom:14px;">Without a coordinated function, teams rebuild what already exists. <span id="fc-dup-desc-pct">31</span>% of AI initiatives in your org tier duplicate work done elsewhere — wasted dev time, token spend, and validation effort with nothing shared.</div>
       <div style="background:rgba(168,85,247,0.06);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:10.5px;color:var(--ink-faint);">
-        <span id="fc-init-display">8</span> initiatives × 31% duplication × $<span id="fc-avgcost-display">85,000</span> avg loaded cost
+        <span id="fc-init-display">15</span> initiatives × <span id="fc-dup-formula-pct">31</span>% duplication × $<span id="fc-avgcost-display">120,000</span> avg loaded cost
       </div>
       <div>
         <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Waste</div>
@@ -796,7 +816,7 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
   </div>
 
   <div style="background:rgba(168,85,247,0.06);border-left:3px solid var(--violet);border-radius:0 10px 10px 0;padding:14px 18px;font-size:12px;color:var(--ink-muted);line-height:1.65;">
-    <strong style="color:var(--ink);">Methodology:</strong> Benchmarks sourced from Gartner (31% AI duplication rate), Forrester (38% AI cost underestimation), IDC (42% ungoverned AI spend), and PMI (25% annual maintenance carry). Default initiative build cost of $120K reflects loaded dev time, token/infra spend, and QA at enterprise scale — replace with your org's actual figure for a sharper read.
+    <strong style="color:var(--ink);">Methodology:</strong> Benchmarks sourced from Gartner (31% AI duplication rate for formally tracked initiatives), Forrester (38% AI cost underestimation), IDC (42% ungoverned AI spend), and PMI (25% annual maintenance carry). Duplication rate tiers: 31% = industry baseline (Gartner, formally tracked); 52% = large enterprise with high AI adoption and partial shadow IT; 67% = hyperscale orgs (90K+ employees, decentralized AI builds, significant shadow AI). Default initiative build cost of $120K reflects loaded dev time, token/infra spend, and QA at enterprise scale — replace with your org's actual figure for a sharper read.
   </div>
 
   </div><!-- /tab-fragcost -->
@@ -1350,6 +1370,27 @@ function updateBtechOur(){
   }
 }
 
+// Duplication rate state — default to industry baseline, updatable via tier pills
+window._DUP_RATE=0.31;
+window._DUP_LABEL='31%';
+window._DUP_SOURCE='Gartner Baseline';
+
+window.setDupRate=function(btn){
+  document.querySelectorAll('.dup-pill').forEach(function(p){p.classList.remove('dup-pill-active');});
+  btn.classList.add('dup-pill-active');
+  window._DUP_RATE=parseFloat(btn.dataset.rate);
+  window._DUP_LABEL=btn.dataset.label;
+  window._DUP_SOURCE=btn.dataset.source;
+  // update badge and dynamic description/formula spans
+  var badge=document.getElementById('fc-dup-badge');
+  if(badge)badge.textContent=window._DUP_LABEL+' duplication rate · '+window._DUP_SOURCE;
+  var descPct=document.getElementById('fc-dup-desc-pct');
+  if(descPct)descPct.textContent=Math.round(window._DUP_RATE*100);
+  var formulaPct=document.getElementById('fc-dup-formula-pct');
+  if(formulaPct)formulaPct.textContent=Math.round(window._DUP_RATE*100);
+  calcFrag();
+};
+
 // Cost of Fragmentation calculator — exposed on window so oninput attrs can reach it
 window.calcFrag=function(){
   var fmtM=function(n){
@@ -1359,7 +1400,7 @@ window.calcFrag=function(){
   };
   var v=function(id){return parseFloat(document.getElementById(id).value)||0;};
   // Industry benchmarks (Gartner / Forrester / IDC / PMI)
-  var DUP_RATE=0.31;        // 31% of enterprise AI initiatives duplicate existing work
+  var DUP_RATE=window._DUP_RATE||0.31; // set by tier pill; default = Gartner 31%
   var TOOL_UNDEREST=0.38;   // 38% of AI project budgets are underestimated (hidden token/infra)
   var CARRY_RATE=0.25;      // 25% of build cost per year in maintenance carry (PMI)
   var AI_UNGOV_RATE=0.42;   // 42% of AI spend ungoverned without dedicated AI Ops
@@ -1409,8 +1450,10 @@ window.calcFrag=function(){
   var callout=document.getElementById('fc-callout');
   if(callout&&total>0){
     var pct=invest>0?Math.round((roi/invest)*100):null;
+    var dupPct=Math.round(DUP_RATE*100);
     var dupCount=Math.max(1,Math.round(initiatives*DUP_RATE));
-    callout.textContent='Across your '+Math.round(initiatives)+' active AI initiatives, roughly '+dupCount+' are rebuilding work that already exists somewhere in your org — wasting '+fmtM(r1)+' in direct build cost and '+fmtM(r3)+' in ongoing maintenance carry. Add '+fmtM(r2)+' in unmeasured tool cost and '+fmtM(r4)+' in ungoverned AI spend, and the total annual loss reaches '+fmtM(total)+'.'
+    var tierNote=window._DUP_SOURCE?'('+window._DUP_SOURCE+' tier, '+dupPct+'% duplication rate)':'('+dupPct+'% duplication rate)';
+    callout.textContent='At the '+tierNote+' benchmark, roughly '+dupCount+' of your '+Math.round(initiatives)+' active AI initiatives are rebuilding work that already exists somewhere in your org — wasting '+fmtM(r1)+' in direct build cost and '+fmtM(r3)+' in ongoing maintenance carry. Add '+fmtM(r2)+' in unmeasured tool cost and '+fmtM(r4)+' in ungoverned AI spend, and the total annual loss reaches '+fmtM(total)+'.'
       +(invest>0?' Against a '+fmtM(invest)+' function investment, that\'s '+fmtM(roi)+' in recoverable value'+(pct?' ('+pct+'% ROI)':'')+'.':' Formalizing this function costs nothing net-new — the full '+fmtM(total)+' becomes the ROI.');
   }
 };
