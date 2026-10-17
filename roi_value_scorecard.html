@@ -545,6 +545,21 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
 .dup-pill:hover{border-color:rgba(245,158,11,0.55);color:var(--ink);background:rgba(245,158,11,0.08);}
 .dup-pill.dup-pill-active{background:rgba(245,158,11,0.13);border-color:var(--amber);color:var(--amber);font-weight:600;}
 .dup-pill.dup-pill-danger.dup-pill-active{background:rgba(239,68,68,0.12);border-color:#ef4444;color:#ef4444;}
+.print-header{display:none;}
+.export-pdf-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.35);border-radius:10px;color:var(--violet);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.18s ease;font-family:inherit;letter-spacing:0.04em;}
+.export-pdf-btn:hover{background:rgba(168,85,247,0.20);border-color:var(--violet);}
+@media print {
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .chrome,.tab-nav,.hero,.imodal-overlay,.drawer,.drawer-overlay,
+  #tab-overview,#tab-initiatives,#tab-narrative,
+  .print-hide,.export-pdf-btn{display:none!important;}
+  body,html{margin:0;padding:0;}
+  .main{max-width:100%;padding:0 24px;}
+  .tab-panel#tab-fragcost{display:block!important;animation:none!important;}
+  .print-header{display:block!important;padding:0 0 20px;border-bottom:2px solid rgba(168,85,247,0.30);margin-bottom:24px;}
+  .print-header-title{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .print-header-sub{font-size:12px;color:var(--ink-muted);}
+}
 </style>
 </head>
 <body>
@@ -697,11 +712,18 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
   </div><!-- /tab-narrative -->
 
   <div class="tab-panel" id="tab-fragcost">
+
+  <!-- Print header — hidden on screen, visible on print -->
+  <div class="print-header">
+    <div class="print-header-title">Cost of Fragmentation Report — AI Strategy &amp; Ops</div>
+    <div class="print-header-sub" id="print-header-meta">Generated on <span id="print-date"></span> &nbsp;·&nbsp; Duplication rate tier: <span id="print-tier">31% · Gartner Baseline</span></div>
+  </div>
+
   <div class="sec-title">Reverse ROI — The Cost of Doing Nothing</div>
   <p style="font-size:13px;color:var(--ink-muted);margin-bottom:20px;line-height:1.75;">The two biggest hidden costs are <strong style="color:var(--ink);">duplicative builds</strong> and <strong style="color:var(--ink);">inaccurate build tool costing</strong> — teams rebuilding what already exists, and AI budgets running blind because token and infrastructure costs were never measured. Enter three base numbers. Industry benchmarks fill in the rest.</p>
 
   <!-- Base Inputs -->
-  <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.22);border-radius:14px;padding:18px 22px;margin-bottom:20px;">
+  <div class="print-hide" style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.22);border-radius:14px;padding:18px 22px;margin-bottom:20px;">
     <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;">Base Inputs — Your Numbers</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
       <div>
@@ -817,6 +839,13 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
 
   <div style="background:rgba(168,85,247,0.06);border-left:3px solid var(--violet);border-radius:0 10px 10px 0;padding:14px 18px;font-size:12px;color:var(--ink-muted);line-height:1.65;">
     <strong style="color:var(--ink);">Methodology:</strong> Benchmarks sourced from Gartner (31% AI duplication rate for formally tracked initiatives), Forrester (38% AI cost underestimation), IDC (42% ungoverned AI spend), and PMI (25% annual maintenance carry). Duplication rate tiers: 31% = industry baseline (Gartner, formally tracked); 52% = large enterprise with high AI adoption and partial shadow IT; 67% = hyperscale orgs (90K+ employees, decentralized AI builds, significant shadow AI). Default initiative build cost of $120K reflects loaded dev time, token/infra spend, and QA at enterprise scale — replace with your org's actual figure for a sharper read.
+  </div>
+
+  <div class="print-hide" style="text-align:right;margin-top:18px;">
+    <button class="export-pdf-btn" onclick="exportFragPDF()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      Export PDF
+    </button>
   </div>
 
   </div><!-- /tab-fragcost -->
@@ -1164,6 +1193,42 @@ function openIModal(id){
     _ft.appendChild(_cs);_ft.appendChild(_ns);_st.appendChild(_ft);
     _iq.parentNode.insertBefore(_st,_iq.nextSibling);
   }
+  // Fragmentation Risk tile — uses active DUP_RATE tier from Cost of Fragmentation tab
+  var _ofr=document.getElementById('imodal-frag-risk');
+  if(_ofr)_ofr.parentNode.removeChild(_ofr);
+  var _dupRate=window._DUP_RATE||0.31;
+  var _dupSource=window._DUP_SOURCE||'Gartner Baseline';
+  var _dupPct=Math.round(_dupRate*100);
+  var _buildCost=(ini.sim&&ini.sim.afterCost>0)
+    ?ini.sim.afterCost
+    :(parseFloat((document.getElementById('fc-avgcost')||{}).value)||120000);
+  var _shadowCost=Math.round(_buildCost*_dupRate);
+  var _shadowCarry=Math.round(_shadowCost*0.25);
+  var _shadowTotal=_shadowCost+_shadowCarry;
+  var _fmtK=function(n){return n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(0)+'K':'$'+n.toLocaleString();};
+  var _bcLabel=(_buildCost/1000).toFixed(0)+'K';
+  var _fr=document.createElement('div');_fr.id='imodal-frag-risk';
+  _fr.style.cssText='margin-top:18px;background:linear-gradient(135deg,rgba(239,68,68,0.07),rgba(245,158,11,0.04));border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:16px 18px;';
+  _fr.innerHTML=
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
+    +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:#ef4444;">&#9888; Fragmentation Risk</div>'
+    +'<div style="font-size:9px;font-weight:700;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.22);border-radius:12px;padding:2px 9px;">'+_dupPct+'% · '+_dupSource+'</div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--ink-muted);line-height:1.6;margin-bottom:12px;">At the <strong style="color:var(--ink);">'+_dupSource+'</strong> tier, there\'s a <strong style="color:#ef4444;">'+_dupPct+'%</strong> probability a version of this build already exists somewhere else in your org — never discovered, never shared.</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">'
+    +'<div style="background:rgba(239,68,68,0.07);border-radius:10px;padding:10px;text-align:center;">'
+    +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:800;color:#ef4444;">'+_fmtK(_shadowCost)+'</div>'
+    +'<div style="font-size:9px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;">Shadow Build</div></div>'
+    +'<div style="background:rgba(245,158,11,0.06);border-radius:10px;padding:10px;text-align:center;">'
+    +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:800;color:var(--amber);">'+_fmtK(_shadowCarry)+'</div>'
+    +'<div style="font-size:9px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;">Annual Carry</div></div>'
+    +'<div style="background:rgba(239,68,68,0.09);border:1px solid rgba(239,68,68,0.20);border-radius:10px;padding:10px;text-align:center;">'
+    +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:800;color:#ef4444;">'+_fmtK(_shadowTotal)+'</div>'
+    +'<div style="font-size:9px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;">Total Risk</div></div>'
+    +'</div>'
+    +'<div style="font-size:9.5px;color:var(--ink-faint);line-height:1.5;">Based on $'+_bcLabel+' avg build cost'+(ini.sim&&ini.sim.afterCost>0?' (this initiative\'s actual AI build cost)':' (org avg from Cost of Fragmentation tab)')+'. Switch duplication tiers on that tab to update.</div>';
+  document.getElementById('imodal-notes').parentNode.appendChild(_fr);
+
   document.getElementById('imodal-edit').onclick=function(){closeIModal();openDrawer(id);};
   document.getElementById('imodal-overlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1389,6 +1454,22 @@ window.setDupRate=function(btn){
   var formulaPct=document.getElementById('fc-dup-formula-pct');
   if(formulaPct)formulaPct.textContent=Math.round(window._DUP_RATE*100);
   calcFrag();
+};
+
+window.exportFragPDF=function(){
+  // ensure fragcost tab is active
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  var fragBtn=document.querySelector('[data-tab="fragcost"]');
+  var fragPanel=document.getElementById('tab-fragcost');
+  if(fragBtn)fragBtn.classList.add('active');
+  if(fragPanel)fragPanel.classList.add('active');
+  // populate print header meta
+  var pd=document.getElementById('print-date');
+  if(pd)pd.textContent=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var pt=document.getElementById('print-tier');
+  if(pt)pt.textContent=(window._DUP_LABEL||'31%')+' · '+(window._DUP_SOURCE||'Gartner Baseline');
+  window.print();
 };
 
 // Cost of Fragmentation calculator — exposed on window so oninput attrs can reach it
