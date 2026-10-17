@@ -1193,40 +1193,71 @@ function openIModal(id){
     _ft.appendChild(_cs);_ft.appendChild(_ns);_st.appendChild(_ft);
     _iq.parentNode.insertBefore(_st,_iq.nextSibling);
   }
-  // Fragmentation Risk tile — uses active DUP_RATE tier from Cost of Fragmentation tab
+  // Fragmentation Risk tile — calibrated per build pattern, anchored to active tier
   var _ofr=document.getElementById('imodal-frag-risk');
   if(_ofr)_ofr.parentNode.removeChild(_ofr);
-  var _dupRate=window._DUP_RATE||0.31;
+  var _tierRate=window._DUP_RATE||0.31;
   var _dupSource=window._DUP_SOURCE||'Gartner Baseline';
-  var _dupPct=Math.round(_dupRate*100);
+  // Classify build pattern from initiative name + tool + notes
+  var _txt=((ini.name||'')+' '+(ini.tool||'')+' '+(ini.notes||'')).toLowerCase();
+  var _highKw=['chief of staff','cos bot',' cos ','meeting summar','meeting notes','standup','stand-up','slack bot','slackbot','email draft','email assist','briefing','daily digest','recap','personal assistant','chatbot','chat bot','ai assistant','meeting assistant','ai scribe','notetaker','note taker','scheduler','calendar assist'];
+  var _lowKw=['ver hub','ver intelligence','intelligence hub','sow estimator','sow cost','demand plan','governance queue','vendor portal','supplier portal','vendor intelligence','rate bench','benchmarks','vendor engag','tier 1','vendor scorecard','workforce plan'];
+  var _isHigh=_highKw.some(function(k){return _txt.indexOf(k)!==-1;});
+  var _isLow=_lowKw.some(function(k){return _txt.indexOf(k)!==-1;});
+  var _patternLabel,_patternDesc,_mult;
+  if(_isHigh){
+    _patternLabel='Commodity AI Pattern';
+    _patternDesc='Meeting tools, personal assistants, Slack bots — independently rebuilt by virtually every team at scale.';
+    _mult=1.55;
+  } else if(_isLow){
+    _patternLabel='Specialized Build';
+    _patternDesc='Custom intelligence platform with org-specific logic — lower exact-duplicate risk, though component-level overlap still exists.';
+    _mult=0.40;
+  } else {
+    _patternLabel='Standard Enterprise Pattern';
+    _patternDesc='Dashboards, trackers, and reporting tools — common enough to expect parallel builds across teams.';
+    _mult=1.0;
+  }
+  var _calibratedRate=Math.min(0.95,Math.max(0.05,_tierRate*_mult));
+  var _calibratedPct=Math.round(_calibratedRate*100);
   var _buildCost=(ini.sim&&ini.sim.afterCost>0)
     ?ini.sim.afterCost
     :(parseFloat((document.getElementById('fc-avgcost')||{}).value)||120000);
-  var _shadowCost=Math.round(_buildCost*_dupRate);
+  var _shadowCost=Math.round(_buildCost*_calibratedRate);
   var _shadowCarry=Math.round(_shadowCost*0.25);
   var _shadowTotal=_shadowCost+_shadowCarry;
   var _fmtK=function(n){return n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(0)+'K':'$'+n.toLocaleString();};
   var _bcLabel=(_buildCost/1000).toFixed(0)+'K';
+  // Color shifts: commodity = full red alarm; specialized = amber caution; standard = red-amber
+  var _accentColor=_isHigh?'#ef4444':(_isLow?'var(--amber)':'#ef4444');
+  var _bgGrad=_isLow
+    ?'linear-gradient(135deg,rgba(245,158,11,0.07),rgba(168,85,247,0.03))'
+    :'linear-gradient(135deg,rgba(239,68,68,0.07),rgba(245,158,11,0.04))';
+  var _borderColor=_isLow?'rgba(245,158,11,0.28)':'rgba(239,68,68,0.25)';
   var _fr=document.createElement('div');_fr.id='imodal-frag-risk';
-  _fr.style.cssText='margin-top:18px;background:linear-gradient(135deg,rgba(239,68,68,0.07),rgba(245,158,11,0.04));border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:16px 18px;';
+  _fr.style.cssText='margin-top:18px;background:'+_bgGrad+';border:1px solid '+_borderColor+';border-radius:14px;padding:16px 18px;';
   _fr.innerHTML=
-    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
-    +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:#ef4444;">&#9888; Fragmentation Risk</div>'
-    +'<div style="font-size:9px;font-weight:700;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.22);border-radius:12px;padding:2px 9px;">'+_dupPct+'% · '+_dupSource+'</div>'
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+    +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:'+_accentColor+';">&#9888; Fragmentation Risk</div>'
+    +'<div style="font-size:9px;font-weight:700;color:'+_accentColor+';opacity:0.8;background:rgba(239,68,68,0.09);border:1px solid rgba(239,68,68,0.20);border-radius:12px;padding:2px 9px;">'+_calibratedPct+'% calibrated</div>'
     +'</div>'
-    +'<div style="font-size:11px;color:var(--ink-muted);line-height:1.6;margin-bottom:12px;">At the <strong style="color:var(--ink);">'+_dupSource+'</strong> tier, there\'s a <strong style="color:#ef4444;">'+_dupPct+'%</strong> probability a version of this build already exists somewhere else in your org — never discovered, never shared.</div>'
+    +'<div style="display:flex;align-items:center;gap:7px;margin-bottom:9px;">'
+    +'<div style="font-size:10px;font-weight:700;color:var(--ink);background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:10px;padding:3px 10px;">'+_patternLabel+'</div>'
+    +'<div style="font-size:9.5px;color:var(--ink-faint);">anchored to '+_dupSource+' ('+Math.round(_tierRate*100)+'%)</div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--ink-muted);line-height:1.6;margin-bottom:12px;">'+_patternDesc+' Calibrated duplication probability: <strong style="color:'+_accentColor+';">'+_calibratedPct+'%</strong>.</div>'
     +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">'
     +'<div style="background:rgba(239,68,68,0.07);border-radius:10px;padding:10px;text-align:center;">'
-    +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:800;color:#ef4444;">'+_fmtK(_shadowCost)+'</div>'
+    +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:800;color:'+_accentColor+';">'+_fmtK(_shadowCost)+'</div>'
     +'<div style="font-size:9px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;">Shadow Build</div></div>'
     +'<div style="background:rgba(245,158,11,0.06);border-radius:10px;padding:10px;text-align:center;">'
     +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:800;color:var(--amber);">'+_fmtK(_shadowCarry)+'</div>'
     +'<div style="font-size:9px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;">Annual Carry</div></div>'
     +'<div style="background:rgba(239,68,68,0.09);border:1px solid rgba(239,68,68,0.20);border-radius:10px;padding:10px;text-align:center;">'
-    +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:800;color:#ef4444;">'+_fmtK(_shadowTotal)+'</div>'
+    +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:800;color:'+_accentColor+';">'+_fmtK(_shadowTotal)+'</div>'
     +'<div style="font-size:9px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;">Total Risk</div></div>'
     +'</div>'
-    +'<div style="font-size:9.5px;color:var(--ink-faint);line-height:1.5;">Based on $'+_bcLabel+' avg build cost'+(ini.sim&&ini.sim.afterCost>0?' (this initiative\'s actual AI build cost)':' (org avg from Cost of Fragmentation tab)')+'. Switch duplication tiers on that tab to update.</div>';
+    +'<div style="font-size:9.5px;color:var(--ink-faint);line-height:1.5;">Based on $'+_bcLabel+' build cost'+(ini.sim&&ini.sim.afterCost>0?' (this initiative\'s actual AI cost)':' (org avg from Cost of Fragmentation tab)')+'. Pattern classification uses initiative name, tool, and notes. Switch duplication tiers on Cost of Fragmentation to update the anchor rate.</div>';
   document.getElementById('imodal-notes').parentNode.appendChild(_fr);
 
   document.getElementById('imodal-edit').onclick=function(){closeIModal();openDrawer(id);};
