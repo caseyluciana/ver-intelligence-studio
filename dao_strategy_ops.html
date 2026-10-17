@@ -152,7 +152,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   .team-grid{grid-template-columns:repeat(3,1fr)!important;gap:8px!important;}
   .card{padding:11px 13px!important;}
   .card-t{font-size:10.5px!important;}
-  .card-b{font-size:10px!important;line-height:1.55!important;}
+  /* Hide card descriptions in print so 6-card panels are compact enough to pair */
+  .card-b{display:none!important;}
   .proof{padding:10px 14px!important;margin-top:10px!important;}
   .proof-txt{font-size:10.5px!important;}
   /* Gradient headline — darker amber→teal, print-safe */
@@ -200,6 +201,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   .proof.violet{background:#faf5ff!important;border-color:#a855f7!important;}
   .proof.emerald{background:#f0fdf4!important;border-color:#34d399!important;}
   .org-chart{transform:none!important;}
+  /* Scale entire org chart to prevent overflow — 4 branches × sub-nodes exceed page width */
+  .org-wrap{zoom:0.78!important;}
   .org-node{background:#f9fafb!important;border-color:#e5e7eb!important;padding:10px 14px!important;}
   .org-node.root{background:#fffbeb!important;border-color:#f59e0b!important;}
   .org-node.lead{background:#fffbeb!important;border-color:#f59e0b!important;}
@@ -212,8 +215,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   .pn-teal{background:#f0fdfa!important;border-color:#6ee7b7!important;}
   .pn-violet{background:#faf5ff!important;border-color:#ddd6fe!important;}
   .pn-emerald{background:#f0fdf4!important;border-color:#a7f3d0!important;}
-  .org-sub-node{padding:7px 10px!important;}
-  .org-sub-name{font-size:9.5px!important;}
+  .org-sub-node{padding:5px 7px!important;min-width:60px!important;max-width:90px!important;}
+  .org-sub-name{font-size:9px!important;}
+  .org-sub-wrap{gap:4px!important;}
+  .org-children{gap:8px!important;}
   .org-line,.org-branch-line{background:#d1d5db!important;}
   .org-children::before,.org-sub-wrap::before,.org-sub-wrap::after{background:#d1d5db!important;}
   .tc{background:#f9fafb!important;border-color:#e5e7eb!important;padding:14px!important;}
@@ -530,7 +535,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 <div class="panel" id="p3">
   <div class="inner" style="position:relative;">
     <div class="p-num">03</div>
-    <div class="eyebrow">Pillar 04 — VER Ops</div>
+    <div class="eyebrow">Pillar 01 — VER Ops</div>
     <h2 class="h2">Vendor intelligence,<br><em>SOW &amp; engagement review.</em></h2>
     <div class="grid">
       <div class="card"><div class="card-ico">&#127760;</div><div class="card-t">Vendor Intelligence Platform</div><div class="card-b">Multi-role hub for vendor performance data, engagement history, risk profiles, and tier management across AMER preferred suppliers.</div></div>
@@ -547,7 +552,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 <div class="panel panel-alt" id="p4">
   <div class="inner" style="position:relative;">
     <div class="p-num">04</div>
-    <div class="eyebrow teal">Pillar 03 — Financial Intelligence</div>
+    <div class="eyebrow teal">Pillar 02 — Financial Intelligence</div>
     <h2 class="h2">Cost intelligence<br><em style="color:var(--teal);">across every dollar.</em></h2>
     <div class="grid">
       <div class="card teal-border"><div class="card-ico">&#128187;</div><div class="card-t">Software &amp; Technology Portfolio</div><div class="card-b">$68M portfolio actively managed. Every tool, every contract, renewal dates, utilization, cost-per-seat — consolidated and tracked. No surprises, no lapses.</div></div>
@@ -566,7 +571,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 <div class="panel" id="p5">
   <div class="inner" style="position:relative;">
     <div class="p-num">05</div>
-    <div class="eyebrow violet">Pillar 01 — AI Ops — The Value Add</div>
+    <div class="eyebrow violet">Pillar 03 — AI Ops — The Value Add</div>
     <h2 class="h2">Platform, governance,<br><em style="color:var(--violet);">value proof.</em></h2>
     <div class="grid">
       <div class="card violet-border"><div class="card-ico">&#128640;</div><div class="card-t">Platform Development</div><div class="card-b">32 AI-powered modules in production. Multi-model methodology: Gemini/GPT for ideation, Claude Code for execution, Codex for QA. Static-first, zero build-step architecture.</div></div>
@@ -582,7 +587,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 <!-- ══════════════════════════════════════ NEW — DA&O STRATEGY PILLAR -->
 <div class="panel panel-alt" id="dao-strat">
   <div class="inner" style="position:relative;">
-    <div class="eyebrow emerald">Pillar 02 — DA&amp;O Strategy</div>
+    <div class="eyebrow emerald">Pillar 04 — DA&amp;O Strategy</div>
     <h2 class="h2">Portfolio monitoring.<br><em style="color:var(--green);">Strategic execution.</em></h2>
     <div class="grid">
       <div class="card emerald-border"><div class="card-ico">&#128194;</div><div class="card-t">DA&amp;O Portfolio Monitoring</div><div class="card-b">Initiative status, budget health, milestone tracking — consolidated into one strategic intelligence layer for Roger's org. The executive view of what's running, what's at risk, and what's next.</div></div>
@@ -721,7 +726,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div class="org-branch">
           <div class="org-branch-line"></div>
           <div class="org-node pn-violet" style="min-width:120px;">
-            <div class="org-node-lbl violet">Pillar 01</div>
+            <div class="org-node-lbl violet">Pillar 03</div>
             <div class="org-node-name" style="font-size:12px;">AI Ops</div>
             <div class="org-node-sub">Platform &amp; Governance</div>
           </div>
@@ -739,7 +744,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div class="org-branch">
           <div class="org-branch-line"></div>
           <div class="org-node pn-emerald" style="min-width:120px;">
-            <div class="org-node-lbl" style="color:var(--green);">Pillar 02</div>
+            <div class="org-node-lbl" style="color:var(--green);">Pillar 04</div>
             <div class="org-node-name" style="font-size:12px;">DA&amp;O Strategy</div>
             <div class="org-node-sub">Portfolio &amp; Execution</div>
           </div>
@@ -757,7 +762,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div class="org-branch">
           <div class="org-branch-line"></div>
           <div class="org-node pn-teal" style="min-width:120px;">
-            <div class="org-node-lbl teal">Pillar 03</div>
+            <div class="org-node-lbl teal">Pillar 02</div>
             <div class="org-node-name" style="font-size:12px;">Fin Intel</div>
             <div class="org-node-sub">Cost Intelligence</div>
           </div>
@@ -775,7 +780,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div class="org-branch">
           <div class="org-branch-line"></div>
           <div class="org-node pn-amber" style="min-width:120px;">
-            <div class="org-node-lbl">Pillar 04</div>
+            <div class="org-node-lbl">Pillar 01</div>
             <div class="org-node-name" style="font-size:12px;">VER Ops</div>
             <div class="org-node-sub">Vendor &amp; Engagement</div>
           </div>
