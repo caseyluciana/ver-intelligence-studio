@@ -33,3 +33,4 @@
 - [AI Strategy & Ops Proposal](project_ai_strategy_ops_proposal.md) — Casey proposing new function in DA&O Org; proposal built as ai_strategy_ops_proposal.html; Judette Platz co-owns ROI; next step: share with Judette then Roger
 - [SOW Cost Estimator](project_sow_estimator.md) — sow_estimator.html; light warm off-white theme; zero-CDN PDF/DOCX upload with role auto-suggest; DOM-built download (never string-template HTML inside script blocks)
 - [ROI Scorecard — True Cost Simulator](project_roi_scorecard_simulator.md) — TOKEN_RATE_PER_HR=$5/hr baked in; complexity requires pick; Time Saved auto-fills from preHrs-aiHrs; SEED_VERSION=4
+- [Internal Docs Style — Slack Canvas](feedback_internal_docs_style.md) — no letterhead/sig blocks; use context chips + icon section headers; conversational first-person; prints clean
