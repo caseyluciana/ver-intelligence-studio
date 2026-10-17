@@ -669,17 +669,17 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
       <div>
         <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;">Annual AI / Platform Budget $</label>
-        <input id="fc-aibudget" type="number" value="250000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
+        <input id="fc-aibudget" type="number" value="800000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
         <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">Token spend, model licenses, platform tools</div>
       </div>
       <div>
         <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;">Active AI Initiatives (count)</label>
-        <input id="fc-initiatives" type="number" value="8" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
+        <input id="fc-initiatives" type="number" value="15" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
         <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">Active or in-flight builds across the org</div>
       </div>
       <div>
         <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;">Avg Initiative Build Cost $</label>
-        <input id="fc-avgcost" type="number" value="85000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
+        <input id="fc-avgcost" type="number" value="120000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
         <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">Loaded dev time, token spend, QA per build</div>
       </div>
     </div>
@@ -742,12 +742,12 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
   </div>
 
   <!-- Summary Row -->
-  <div style="background:linear-gradient(135deg,rgba(168,85,247,0.10),rgba(56,189,248,0.06));border:1px solid rgba(168,85,247,0.28);border-radius:16px;padding:24px;margin-bottom:16px;">
+  <div style="background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(245,158,11,0.05));border:1px solid rgba(239,68,68,0.30);border-radius:16px;padding:24px;margin-bottom:16px;">
     <div class="sec-title" style="margin-bottom:18px;">Fragmentation Summary</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px;">
       <div style="text-align:center;">
-        <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Total Cost of Fragmentation</div>
-        <div id="fc-total" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;color:var(--violet);">—</div>
+        <div style="font-size:10px;color:#ef4444;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;font-weight:700;">&#9660; Annual Loss to Fragmentation</div>
+        <div id="fc-total" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;color:#ef4444;">—</div>
       </div>
       <div style="text-align:center;">
         <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Function Investment (net new)</div>
@@ -1344,8 +1344,9 @@ window.calcFrag=function(){
   var callout=document.getElementById('fc-callout');
   if(callout&&total>0){
     var pct=invest>0?Math.round((roi/invest)*100):null;
-    callout.textContent='Based on these inputs, fragmentation is costing an estimated '+fmtM(total)+' annually — primarily from duplicative builds ('+fmtM(r1)+') and unmeasured build tool cost ('+fmtM(r2)+').'
-      +(invest>0?' Against a '+fmtM(invest)+' function investment, that\'s '+fmtM(roi)+' in net value'+(pct?' ('+pct+'% ROI)':'')+'.':' This function reorgs existing roles — with zero net-new investment, the full '+fmtM(total)+' becomes the ROI.');
+    var dupCount=Math.max(1,Math.round(initiatives*DUP_RATE));
+    callout.textContent='Across your '+Math.round(initiatives)+' active AI initiatives, roughly '+dupCount+' are rebuilding work that already exists somewhere in your org — wasting '+fmtM(r1)+' in direct build cost and '+fmtM(r3)+' in ongoing maintenance carry. Add '+fmtM(r2)+' in unmeasured tool cost and '+fmtM(r4)+' in ungoverned AI spend, and the total annual loss reaches '+fmtM(total)+'.'
+      +(invest>0?' Against a '+fmtM(invest)+' function investment, that\'s '+fmtM(roi)+' in recoverable value'+(pct?' ('+pct+'% ROI)':'')+'.':' Formalizing this function costs nothing net-new — the full '+fmtM(total)+' becomes the ROI.');
   }
 };
 // Initialize on load
