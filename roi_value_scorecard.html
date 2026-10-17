@@ -678,9 +678,9 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
         <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">Active or in-flight builds across the org</div>
       </div>
       <div>
-        <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;">Software Portfolio Total $</label>
-        <input id="fc-swport" type="number" value="10000000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
-        <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">All SaaS, licenses, and tech contracts</div>
+        <label style="font-size:10px;color:var(--ink-faint);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;">Avg Initiative Build Cost $</label>
+        <input id="fc-avgcost" type="number" value="85000" min="0" class="field-input" style="width:100%;" oninput="calcFrag()">
+        <div style="font-size:9.5px;color:var(--ink-faint);margin-top:4px;">Loaded dev time, token spend, QA per build</div>
       </div>
     </div>
   </div>
@@ -695,7 +695,7 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
       <div class="eyebrow" style="font-size:9px;color:var(--violet);margin-bottom:10px;">&#128260; Duplicative Build Cost</div>
       <div style="font-size:11.5px;color:var(--ink-muted);line-height:1.6;margin-bottom:14px;">Without a coordinated function, teams rebuild what already exists. 31% of enterprise AI initiatives duplicate work done elsewhere in the same org — wasted dev time, token spend, and validation effort.</div>
       <div style="background:rgba(168,85,247,0.06);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:10.5px;color:var(--ink-faint);">
-        <span id="fc-init-display">8</span> initiatives × 31% duplication × $85K avg loaded cost
+        <span id="fc-init-display">8</span> initiatives × 31% duplication × $<span id="fc-avgcost-display">85,000</span> avg loaded cost
       </div>
       <div>
         <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Waste</div>
@@ -722,12 +722,12 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
   <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;">Additional Cost Drivers</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
 
-    <!-- Lever 3: Software Portfolio Waste -->
+    <!-- Lever 3: Maintenance Drag -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;">
-      <div style="position:absolute;top:12px;right:12px;background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.20);border-radius:20px;padding:3px 9px;font-size:9.5px;font-weight:700;color:var(--teal);">22% waste rate · Gartner</div>
-      <div class="eyebrow" style="font-size:9px;color:var(--teal);margin-bottom:8px;">&#128187; Software Portfolio Waste</div>
-      <div style="font-size:11px;color:var(--ink-muted);line-height:1.6;margin-bottom:10px;">Unused licenses, redundant tools, and lapsed renewals compound silently without active portfolio management.</div>
-      <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Estimated Waste</div>
+      <div style="position:absolute;top:12px;right:12px;background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.20);border-radius:20px;padding:3px 9px;font-size:9.5px;font-weight:700;color:var(--teal);">25% annual carry · PMI</div>
+      <div class="eyebrow" style="font-size:9px;color:var(--teal);margin-bottom:8px;">&#128257; Maintenance Drag</div>
+      <div style="font-size:11px;color:var(--ink-muted);line-height:1.6;margin-bottom:10px;">Duplicate builds that aren't caught don't disappear — they get maintained. Each one accrues ~25% of its original build cost annually in upkeep, patching, and model drift correction.</div>
+      <div style="font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Annual Carry Cost</div>
       <div id="fc-r3" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--teal);">—</div>
     </div>
 
@@ -763,7 +763,7 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
   </div>
 
   <div style="background:rgba(168,85,247,0.06);border-left:3px solid var(--violet);border-radius:0 10px 10px 0;padding:14px 18px;font-size:12px;color:var(--ink-muted);line-height:1.65;">
-    <strong style="color:var(--ink);">Methodology:</strong> Benchmarks sourced from Gartner (31% AI duplication rate, 22% SaaS waste), Forrester (38% AI cost underestimation), and IDC (42% ungoverned AI spend). Average loaded AI initiative cost of $85K reflects dev time, token/infra spend, and QA at mid-size enterprise scale. These are directional estimates — replace with your org's real data to sharpen the output.
+    <strong style="color:var(--ink);">Methodology:</strong> Benchmarks sourced from Gartner (31% AI duplication rate), Forrester (38% AI cost underestimation), IDC (42% ungoverned AI spend), and PMI (25% annual maintenance carry). Default initiative build cost of $85K reflects loaded dev time, token/infra spend, and QA at mid-size enterprise scale — replace with your org's actual figure for a sharper read.
   </div>
 
   </div><!-- /tab-fragcost -->
@@ -1304,16 +1304,15 @@ window.calcFrag=function(){
     return'$'+Math.round(n).toLocaleString();
   };
   var v=function(id){return parseFloat(document.getElementById(id).value)||0;};
-  // Industry benchmarks (Gartner / Forrester / IDC)
+  // Industry benchmarks (Gartner / Forrester / IDC / PMI)
   var DUP_RATE=0.31;        // 31% of enterprise AI initiatives duplicate existing work
-  var AVG_INIT_COST=85000;  // avg loaded AI initiative cost (dev + tokens + QA)
   var TOOL_UNDEREST=0.38;   // 38% of AI project budgets are underestimated (hidden token/infra)
-  var SW_WASTE_RATE=0.22;   // 22% of SaaS/software portfolio is unused or redundant
+  var CARRY_RATE=0.25;      // 25% of build cost per year in maintenance carry (PMI)
   var AI_UNGOV_RATE=0.42;   // 42% of AI spend ungoverned without dedicated AI Ops
 
   var aibudget=v('fc-aibudget');
   var initiatives=v('fc-initiatives');
-  var swport=v('fc-swport');
+  var avgInitCost=v('fc-avgcost');
   var invest=v('fc-invest');
 
   // Update the formula display labels
@@ -1321,10 +1320,12 @@ window.calcFrag=function(){
   if(initDisplay)initDisplay.textContent=Math.round(initiatives);
   var budgetDisplay=document.getElementById('fc-budget-display');
   if(budgetDisplay)budgetDisplay.textContent=aibudget.toLocaleString();
+  var avgCostDisplay=document.getElementById('fc-avgcost-display');
+  if(avgCostDisplay)avgCostDisplay.textContent=avgInitCost.toLocaleString();
 
-  var r1=initiatives*DUP_RATE*AVG_INIT_COST;  // duplicative builds
+  var r1=initiatives*DUP_RATE*avgInitCost;     // duplicative builds (org's actual cost)
   var r2=aibudget*TOOL_UNDEREST;               // build tool cost blindspot
-  var r3=swport*SW_WASTE_RATE;                 // software portfolio waste
+  var r3=initiatives*DUP_RATE*avgInitCost*CARRY_RATE; // annual maintenance drag on duplicate builds
   var r4=aibudget*AI_UNGOV_RATE;               // ungoverned AI spend
   var total=r1+r2+r3+r4;
   var roi=total-invest;
