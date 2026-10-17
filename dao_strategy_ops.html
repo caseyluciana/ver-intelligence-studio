@@ -127,101 +127,107 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 
 @media print{
   @page{margin:14mm 16mm 14mm;}
-  html,body{height:auto;overflow:visible;font-size:11px;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{height:auto;overflow:visible;font-size:11px;background:#fff!important;color:#1a1a1a!important;}
   .panel{position:relative;opacity:1!important;transform:none!important;pointer-events:all;
     display:block!important;page-break-after:always;break-after:page;
-    height:auto;min-height:0;padding:32px 40px 28px;background:white!important;}
+    height:auto;min-height:0;padding:32px 40px 28px;background:#fff!important;}
   .panel:last-child{page-break-after:avoid;break-after:avoid;}
-  .panel-hero,.panel-alt{background:white!important;}
+  /* Hero gets a warm amber wash — the cover page should feel like a cover */
+  .panel-hero{background:linear-gradient(150deg,#fffbeb 0%,#fff 65%)!important;}
+  /* Alt panels get a barely-there warm tint to distinguish from primary panels */
+  .panel-alt{background:#fafaf7!important;}
   .chrome,.nav-wrap{display:none!important;}
   .p-num{display:none!important;}
-  body,html{color:#1a1a1a!important;}
   .inner{max-width:100%!important;}
+  /* 6-card pillar grids → 3 columns; 4-card grids override below */
   .grid{grid-template-columns:repeat(3,1fr)!important;gap:10px!important;}
-  .pillar-grid{grid-template-columns:repeat(3,1fr)!important;gap:10px!important;}
+  .grid-4col{grid-template-columns:repeat(4,1fr)!important;}
+  .grid-4col>.card{padding:12px 14px!important;}
+  .pillar-grid{grid-template-columns:repeat(2,1fr)!important;gap:12px!important;}
   .stats{grid-template-columns:repeat(4,1fr)!important;}
-  .team-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}
+  .team-grid{grid-template-columns:repeat(3,1fr)!important;gap:10px!important;}
   .card{padding:14px!important;}
   .card-t{font-size:11px!important;}
   .card-b{font-size:10.5px!important;}
   .proof{padding:12px 16px!important;}
   .proof-txt{font-size:11px!important;}
-  .h1{font-size:38px!important;line-height:1.1!important;}
-  .h2{font-size:22px!important;line-height:1.2!important;margin-bottom:10px!important;}
-  .lead{font-size:12px!important;margin-bottom:14px!important;}
-  .eyebrow{font-size:10px!important;margin-bottom:8px!important;}
-  .ask{padding:24px 28px!important;}
-  .ask-h{font-size:20px!important;}
-  .ask-body{font-size:11px!important;}
-  .chip{font-size:9.5px!important;padding:3px 9px!important;}
-  .stat-n{font-size:26px!important;}
-  .pillar-stat{font-size:22px!important;}
-  .pillar-name{font-size:13px!important;}
-  .pillar-desc{font-size:10.5px!important;}
-  .pillar{padding:14px!important;}
-  .org-chart{transform:none!important;}
-  .org-node{padding:10px 14px!important;}
-  .org-node-name{font-size:11px!important;}
-  .org-node-sub{font-size:9px!important;}
-  .org-sub-node{padding:7px 10px!important;}
-  .org-sub-name{font-size:9.5px!important;}
-  .tc{padding:14px!important;}
-  .tc-name{font-size:11px!important;}
-  .tc-focus{font-size:10.5px!important;}
-  .h1{background:none!important;-webkit-text-fill-color:#92400e!important;}
-  .h2{color:#1a1a1a!important;}
+  /* Gradient headline — darker amber→teal, print-safe */
+  .h1{
+    font-size:38px!important;line-height:1.1!important;
+    background:linear-gradient(135deg,#92400e 0%,#b45309 38%,#d97706 62%,#0f766e 100%)!important;
+    -webkit-background-clip:text!important;background-clip:text!important;
+    -webkit-text-fill-color:transparent!important;
+  }
+  .h2{font-size:22px!important;line-height:1.2!important;margin-bottom:10px!important;color:#1a1a1a!important;}
   .h2 em,.eyebrow{color:#b45309!important;}
   .eyebrow::before{background:#b45309!important;}
   .eyebrow.teal{color:#0d9488!important;}
   .eyebrow.teal::before{background:#0d9488!important;}
   .eyebrow.violet{color:#6d28d9!important;}
   .eyebrow.violet::before{background:#6d28d9!important;}
+  .eyebrow.emerald{color:#059669!important;}
+  .eyebrow.emerald::before{background:#059669!important;}
+  .eyebrow{font-size:10px!important;margin-bottom:8px!important;}
+  .lead{font-size:12px!important;margin-bottom:14px!important;}
   .lead,.card-b,.proof-txt,.tc-focus,.ask-body,.ask-fn,.org-node-sub,.pillar-desc,.ls-signal,.stat-l{color:#374151!important;}
   .card-t,.tc-name,.org-node-name,.ls-name,.proof-txt strong{color:#111827!important;}
-  .stat-n{color:#b45309!important;}
+  .stat-n{font-size:26px!important;color:#b45309!important;}
   .stat-n.teal{color:#0d9488!important;}
   .stat-n.violet{color:#6d28d9!important;}
+  .pillar-stat{font-size:22px!important;}
   .pillar-stat.amber{color:#b45309!important;}
   .pillar-stat.teal{color:#0d9488!important;}
   .pillar-stat.violet{color:#6d28d9!important;}
+  .pillar-stat.emerald{color:#059669!important;}
+  .pillar-name{font-size:13px!important;}
+  .pillar-desc{font-size:10.5px!important;}
+  .pillar{padding:14px!important;}
+  .pillar-amber{background:#fffbeb!important;border-color:#fcd34d!important;}
+  .pillar-teal{background:#f0fdfa!important;border-color:#6ee7b7!important;}
+  .pillar-violet{background:#faf5ff!important;border-color:#ddd6fe!important;}
+  .pillar-emerald{background:#f0fdf4!important;border-color:#a7f3d0!important;}
   .card{background:#f9fafb!important;border-color:#e5e7eb!important;}
   .card::after{display:none!important;}
-  .card.teal-border{border-color:#a7f3d0!important;}
-  .card.violet-border{border-color:#ddd6fe!important;}
+  .card.teal-border{background:#f0fffe!important;border-color:#a7f3d0!important;}
+  .card.violet-border{background:#faf5ff!important;border-color:#ddd6fe!important;}
+  .card.emerald-border{background:#f0fdf4!important;border-color:#a7f3d0!important;}
   .proof{background:#fffbeb!important;border-color:#f59e0b!important;}
   .proof.teal{background:#f0fdfa!important;border-color:#2dd4bf!important;}
   .proof.violet{background:#faf5ff!important;border-color:#a855f7!important;}
-  .org-node{background:#f9fafb!important;border-color:#e5e7eb!important;}
+  .proof.emerald{background:#f0fdf4!important;border-color:#34d399!important;}
+  .org-chart{transform:none!important;}
+  .org-node{background:#f9fafb!important;border-color:#e5e7eb!important;padding:10px 14px!important;}
   .org-node.root{background:#fffbeb!important;border-color:#f59e0b!important;}
   .org-node.lead{background:#fffbeb!important;border-color:#f59e0b!important;}
+  .org-node-name{font-size:11px!important;}
+  .org-node-sub{font-size:9px!important;}
+  .org-node-lbl{color:#b45309!important;}
+  .org-node-lbl.teal{color:#0d9488!important;}
+  .org-node-lbl.violet{color:#6d28d9!important;}
   .pn-amber{background:#fffbeb!important;border-color:#fcd34d!important;}
   .pn-teal{background:#f0fdfa!important;border-color:#6ee7b7!important;}
   .pn-violet{background:#faf5ff!important;border-color:#ddd6fe!important;}
   .pn-emerald{background:#f0fdf4!important;border-color:#a7f3d0!important;}
-  .pillar-emerald{background:#f0fdf4!important;border-color:#a7f3d0!important;}
-  .pillar-stat.emerald{color:#059669!important;}
-  .card.emerald-border{border-color:#a7f3d0!important;}
-  .proof.emerald{background:#f0fdf4!important;border-color:#34d399!important;}
+  .org-sub-node{padding:7px 10px!important;}
+  .org-sub-name{font-size:9.5px!important;}
   .org-line,.org-branch-line{background:#d1d5db!important;}
   .org-children::before,.org-sub-wrap::before,.org-sub-wrap::after{background:#d1d5db!important;}
-  .pillar-amber{background:#fffbeb!important;border-color:#fcd34d!important;}
-  .pillar-teal{background:#f0fdfa!important;border-color:#6ee7b7!important;}
-  .pillar-violet{background:#faf5ff!important;border-color:#ddd6fe!important;}
+  .tc{background:#f9fafb!important;border-color:#e5e7eb!important;padding:14px!important;}
+  .tc-name{font-size:11px!important;}
+  .tc-focus{font-size:10.5px!important;}
+  .tc-role{color:#b45309!important;}
   .stats{background:#e5e7eb!important;}
   .stat{background:#f9fafb!important;}
-  .tc{background:#f9fafb!important;border-color:#e5e7eb!important;}
-  .ask{background:#fffbeb!important;border-color:#f59e0b!important;}
-  .ask-h{color:#1a1a1a!important;}
+  .ask{background:#fffbeb!important;border-color:#f59e0b!important;padding:24px 28px!important;}
+  .ask-h{font-size:20px!important;color:#1a1a1a!important;}
   .ask-h span{background:none!important;-webkit-text-fill-color:#b45309!important;}
-  .chip{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .ask-body{font-size:11px!important;}
+  .chip{font-size:9.5px!important;padding:3px 9px!important;}
   .ls-table th{background:#f3f4f6!important;color:#6b7280!important;}
   .ls-table td{border-color:#e5e7eb!important;}
   .ls-ttl,.ls-chip{color:#6b7280!important;}
   .begin-btn{display:none!important;}
-  .tc-role{color:#b45309!important;}
-  .org-node-lbl{color:#b45309!important;}
-  .org-node-lbl.teal{color:#0d9488!important;}
-  .org-node-lbl.violet{color:#6d28d9!important;}
 }
 
 .ask{background:linear-gradient(135deg,rgba(245,158,11,0.08) 0%,rgba(45,212,191,0.06) 100%);border:1px solid rgba(245,158,11,0.30);border-radius:20px;padding:44px 40px;text-align:center;}
@@ -469,7 +475,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   <div class="inner" style="position:relative;">
     <div class="eyebrow">The Mandate</div>
     <h2 class="h2">Not a trend.<br><em>A leadership directive.</em></h2>
-    <div class="grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="grid grid-4col" style="grid-template-columns:repeat(4,1fr);">
       <div class="card"><div class="card-ico">&#127919;</div><div class="card-t">"Right tool for the right job"</div><div class="card-b">Our build philosophy already lives this. Gemini/GPT → Claude Code → Codex. Every model doing exactly what it does best — documented, repeatable, and production-ready.</div></div>
       <div class="card"><div class="card-ico">&#128200;</div><div class="card-t">"Know what your teams are spending"</div><div class="card-b">DA&amp;O Strategy &amp; Ops owns the spend and token tracking layer — real-time visibility, cost-per-use-case, budget envelopes by pillar. Nobody runs blind on AI costs.</div></div>
       <div class="card"><div class="card-ico">&#128101;</div><div class="card-t">"We're Customer Zero"</div><div class="card-b">Every tool this function builds is a shareable proof point for the rest of the company. VER Hub, Vendor Portal, TCO Calculator, Team Portal, Cinematic Generator, SOW Estimator — all Customer Zero, ready to scale.</div></div>
@@ -649,7 +655,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
     <div class="eyebrow">The Operating Model</div>
     <h2 class="h2">Built on a model<br><em>already trusted.</em></h2>
     <p class="lead" style="margin-bottom:20px;font-size:14px;">DA&amp;O Strategy &amp; Ops runs like a Rapid Innovation Squad — small team, real Business Leader, named accountability, and a mandate that cuts across reporting lines.</p>
-    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr));">
+    <div class="grid grid-4col" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr));">
       <div class="card"><div class="card-ico">&#128101;</div><div class="card-t">Real Business Leader. Not a Proxy.</div><div class="card-b">The RIS non-negotiable: a Business Leader with deep conviction and dedicated weekly capacity. This function has one — with full ownership, not an added hat.</div></div>
       <div class="card"><div class="card-ico">&#9889;</div><div class="card-t">Small &amp; Flat</div><div class="card-b">2–3 active builders plus a Business Leader who makes decisions. No councils, no hand-off queues. Add layers, lose speed — so we don't.</div></div>
       <div class="card"><div class="card-ico">&#128279;</div><div class="card-t">Cuts Across Reporting Lines</div><div class="card-b">Like any effective squad, this function serves DA&amp;O and DET regardless of where the work lands on an org chart. The squad is one team, wherever its members report.</div></div>
