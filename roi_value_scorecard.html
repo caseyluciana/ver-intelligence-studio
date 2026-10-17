@@ -661,7 +661,7 @@ input[type="number"].field-input::-webkit-outer-spin-button{-webkit-appearance:n
 
   <div class="tab-panel" id="tab-fragcost">
   <div class="sec-title">Reverse ROI — The Cost of Doing Nothing</div>
-  <p style="font-size:13px;color:var(--ink-muted);margin-bottom:20px;line-height:1.75;max-width:700px;">The two biggest hidden costs are <strong style="color:var(--ink);">duplicative builds</strong> and <strong style="color:var(--ink);">inaccurate build tool costing</strong> — teams rebuilding what already exists, and AI budgets running blind because token and infrastructure costs were never measured. Enter three base numbers. Industry benchmarks fill in the rest.</p>
+  <p style="font-size:13px;color:var(--ink-muted);margin-bottom:20px;line-height:1.75;">The two biggest hidden costs are <strong style="color:var(--ink);">duplicative builds</strong> and <strong style="color:var(--ink);">inaccurate build tool costing</strong> — teams rebuilding what already exists, and AI budgets running blind because token and infrastructure costs were never measured. Enter three base numbers. Industry benchmarks fill in the rest.</p>
 
   <!-- Base Inputs -->
   <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.22);border-radius:14px;padding:18px 22px;margin-bottom:20px;">
@@ -1347,8 +1347,8 @@ function calcFrag(){
       +(invest>0?' Against a '+fmtM(invest)+' function investment, that\'s '+fmtM(roi)+' in net value'+(pct?' ('+pct+'% ROI)':'')+'.':' This function reorgs existing roles — with zero net-new investment, the full '+fmtM(total)+' becomes the ROI.');
   }
 }
-// Initialize on load
-document.addEventListener('DOMContentLoaded',function(){calcFrag();});
+// Initialize on load — inline script runs after DOM is parsed, so call directly
+calcFrag();
 
 // Tab navigation
 (function(){
@@ -1366,6 +1366,7 @@ document.addEventListener('DOMContentLoaded',function(){calcFrag();});
       if(target==='overview'){
         setTimeout(function(){if(typeof donutChart!=='undefined'&&donutChart)donutChart.resize();if(typeof barChart!=='undefined'&&barChart)barChart.resize();},50);
       }
+      if(target==='fragcost'){calcFrag();}
     });
   });
 })();
