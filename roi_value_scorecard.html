@@ -1296,8 +1296,8 @@ function updateBtechOur(){
   }
 }
 
-// Cost of Fragmentation calculator — base inputs + industry averages
-function calcFrag(){
+// Cost of Fragmentation calculator — exposed on window so oninput attrs can reach it
+window.calcFrag=function(){
   var fmtM=function(n){
     if(n>=1000000)return'$'+(n/1000000).toFixed(1)+'M';
     if(n>=1000)return'$'+(n/1000).toFixed(0)+'K';
@@ -1346,8 +1346,8 @@ function calcFrag(){
     callout.textContent='Based on these inputs, fragmentation is costing an estimated '+fmtM(total)+' annually — primarily from duplicative builds ('+fmtM(r1)+') and unmeasured build tool cost ('+fmtM(r2)+').'
       +(invest>0?' Against a '+fmtM(invest)+' function investment, that\'s '+fmtM(roi)+' in net value'+(pct?' ('+pct+'% ROI)':'')+'.':' This function reorgs existing roles — with zero net-new investment, the full '+fmtM(total)+' becomes the ROI.');
   }
-}
-// Initialize on load — inline script runs after DOM is parsed, so call directly
+};
+// Initialize on load
 calcFrag();
 
 // Tab navigation
