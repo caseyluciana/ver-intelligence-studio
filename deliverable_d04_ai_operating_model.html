@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D04 — DET AI Operating Model</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#fdf9f3;
+  --ink:#1a0e00;
+  --ink-muted:#4a3728;
+  --ink-faint:#8a7060;
+  --amber:#b45309;
+  --amber-bg:rgba(180,83,9,0.05);
+  --border:rgba(180,83,9,0.14);
+  --border-soft:rgba(180,83,9,0.07);
+  --violet:#6d28d9;
+  --violet-bg:rgba(109,40,217,0.05);
+  --violet-border:rgba(109,40,217,0.14);
+  --teal:#0f766e;
+  --teal-bg:rgba(15,118,110,0.05);
+  --teal-border:rgba(15,118,110,0.14);
+}
+html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7;min-height:100%;}
+.page{max-width:700px;margin:0 auto;padding:52px 40px 72px;}
+
+/* ── Deliverable badge ─────────────────── */
+.d-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:700;letter-spacing:0.10em;
+  color:var(--amber);background:var(--amber-bg);
+  border:1px solid var(--border);border-radius:6px;
+  padding:4px 10px;margin-bottom:14px;
+}
+.d-badge .d-num{font-size:13px;font-weight:700;}
+
+/* ── Context chips ─────────────────────── */
+.chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.03em;border:1px solid var(--border);background:var(--amber-bg);color:var(--amber);}
+.chip.neutral{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.09);color:var(--ink-faint);}
+.chip.violet{background:var(--violet-bg);border-color:var(--violet-border);color:var(--violet);}
+
+/* ── Title ─────────────────────────────── */
+.title{font-size:clamp(26px,5vw,40px);font-weight:900;line-height:1.15;letter-spacing:-0.025em;color:var(--ink);margin-bottom:6px;}
+.title em{font-style:normal;color:var(--amber);}
+.subtitle{font-size:13.5px;color:var(--ink-faint);margin-bottom:36px;line-height:1.65;max-width:560px;}
+
+/* ── Divider ───────────────────────────── */
+.divider{height:1px;background:var(--border-soft);margin:28px 0;}
+
+/* ── Section ───────────────────────────── */
+.sec{margin-bottom:28px;}
+.sec-head{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.sec-head .ico{font-size:13px;line-height:1;}
+.sec p{font-size:14px;line-height:1.80;color:var(--ink-muted);margin-bottom:8px;}
+.sec p:last-child{margin-bottom:0;}
+.sec p strong{color:var(--ink);font-weight:700;}
+
+/* ── Component rows ────────────────────── */
+.comp-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.comp{display:flex;align-items:flex-start;gap:14px;padding:13px 16px;border-radius:10px;border:1px solid var(--border-soft);background:var(--amber-bg);}
+.comp.violet{background:var(--violet-bg);border-color:var(--violet-border);}
+.comp.teal{background:var(--teal-bg);border-color:var(--teal-border);}
+.comp-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--amber);letter-spacing:0.06em;white-space:nowrap;padding-top:2px;min-width:32px;}
+.comp-num.violet{color:var(--violet);}
+.comp-num.teal{color:var(--teal);}
+.comp-body{font-size:13px;line-height:1.65;color:var(--ink-muted);}
+.comp-body strong{color:var(--ink);font-weight:700;display:block;margin-bottom:2px;}
+
+/* ── Stat row ──────────────────────────── */
+.stat-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin:14px 0;
+}
+.stat-cell{background:var(--bg);padding:14px 12px;text-align:center;}
+.stat-n{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--amber);line-height:1;}
+.stat-l{font-size:10px;color:var(--ink-faint);margin-top:5px;line-height:1.4;font-weight:500;}
+
+/* ── Output row ────────────────────────── */
+.out-row{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.out{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:8px;border:1px solid var(--border-soft);background:rgba(0,0,0,0.02);}
+.out-ico{font-size:15px;line-height:1;padding-top:2px;flex-shrink:0;}
+.out-body{font-size:13px;line-height:1.65;color:var(--ink-muted);}
+.out-body strong{color:var(--ink);font-weight:700;}
+
+/* ── Timeline strip ────────────────────── */
+.timeline{display:flex;gap:0;margin-top:10px;}
+.tl-step{flex:1;padding:10px 14px;border:1px solid var(--border-soft);background:var(--amber-bg);position:relative;}
+.tl-step:first-child{border-radius:8px 0 0 8px;}
+.tl-step:last-child{border-radius:0 8px 8px 0;}
+.tl-step:not(:last-child){border-right:none;}
+.tl-step.active{background:rgba(180,83,9,0.09);border-color:var(--border);}
+.tl-q{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.10em;color:var(--amber);margin-bottom:3px;}
+.tl-label{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.tl-sub{font-size:11px;color:var(--ink-faint);line-height:1.5;}
+@media(max-width:560px){.timeline{flex-direction:column;}.tl-step{border-radius:0!important;border-bottom:none!important;border-right:1px solid var(--border-soft)!important;}.tl-step:last-child{border-bottom:1px solid var(--border-soft)!important;}}
+
+/* ── Callout box ───────────────────────── */
+.callout{margin-top:14px;padding:16px 20px;border-radius:10px;border:1px solid var(--border);border-left:3px solid var(--amber);background:var(--amber-bg);}
+.callout p{font-size:13.5px;line-height:1.78;color:var(--ink-muted);margin-bottom:6px;}
+.callout p:last-child{margin-bottom:0;}
+.callout p strong{color:var(--ink);font-weight:700;}
+
+/* ── Footer ────────────────────────────── */
+.foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--border-soft);font-size:11px;color:var(--ink-faint);line-height:1.65;}
+.foot strong{color:var(--ink-muted);}
+
+/* ── Print ─────────────────────────────── */
+@media print{
+  @page{margin:0.75in 0.9in;size:letter portrait;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{background:#fff!important;}
+  .page{padding:0;max-width:100%;}
+  .title{font-size:28px!important;}
+  .subtitle{margin-bottom:20px!important;}
+  .divider{margin:18px 0!important;}
+  .sec{margin-bottom:18px!important;}
+  .sec p{font-size:12px!important;line-height:1.72!important;}
+  .comp-body{font-size:11.5px!important;}
+  .tl-label{font-size:10.5px!important;}
+  .tl-sub{font-size:10px!important;}
+  .callout p{font-size:12px!important;}
+  .foot{margin-top:20px!important;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Deliverable badge -->
+  <div class="d-badge"><span class="d-num">D04</span> DET AI Operating Model</div>
+
+  <!-- Context chips -->
+  <div class="chips">
+    <span class="chip">AI Strategy &amp; Ops</span>
+    <span class="chip neutral">DA&amp;O · DET-Wide</span>
+    <span class="chip violet">Strategic</span>
+    <span class="chip neutral">Deliverable Spec</span>
+  </div>
+
+  <!-- Title -->
+  <div class="title">How DET adopts AI.<br><em>Deliberately.</em></div>
+  <div class="subtitle">A shared framework for AI decision-making, governance, and accountability across DET — from individual use case choices to org-wide spend and risk visibility.</div>
+
+  <div class="divider"></div>
+
+  <!-- The problem -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">📍</span> The problem it solves</div>
+    <p>Right now, AI adoption across DET runs as a collection of individual experiments — each team making its own build vs. buy decisions, using different tools, measuring success differently, and carrying risk that no one has a full view of. There's no shared language for what "AI-ready" means, no standard for how we evaluate a new tool, and no single place to see what's running, what it's costing, and what it's returning.</p>
+    <p><strong>The DET AI Operating Model creates that shared foundation.</strong> It's not a bureaucratic review layer — it's the infrastructure that makes AI adoption in this org consistent, measurable, and defensible.</p>
+  </div>
+
+  <!-- What the model covers -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">🏗️</span> What the model covers</div>
+    <p>Five components, each answering a specific governance question:</p>
+    <div class="comp-list">
+      <div class="comp">
+        <div class="comp-num">01</div>
+        <div class="comp-body"><strong>AI Readiness Tiers</strong>How mature is each team's AI capability right now? Tier 1 (exploratory) through Tier 4 (production-scale, measured). Tiers determine what support, review, and autonomy a team gets.</div>
+      </div>
+      <div class="comp violet">
+        <div class="comp-num violet">02</div>
+        <div class="comp-body"><strong>Build / Buy / Configure Decision Framework</strong>A repeatable model for the "which tool" conversation — total cost, build risk, dependency risk, customization ceiling. Prevents both over-building and over-subscribing.</div>
+      </div>
+      <div class="comp teal">
+        <div class="comp-num teal">03</div>
+        <div class="comp-body"><strong>Governance Layer</strong>Approval thresholds by spend and risk tier. Security and privacy review gates. New vendor eval checkpoints that route through AI Strategy &amp; Ops before a license hits procurement.</div>
+      </div>
+      <div class="comp">
+        <div class="comp-num">04</div>
+        <div class="comp-body"><strong>Accountability Structure</strong>For every active AI use case: a named owner, a spend envelope, a quality bar, a risk classification. One row in the registry (D09) per use case — one person accountable per row.</div>
+      </div>
+      <div class="comp violet">
+        <div class="comp-num violet">05</div>
+        <div class="comp-body"><strong>Value Measurement Standard</strong>Standardized ROI methodology that ties every use case to at least one of: time saved, cost avoided, quality improved. Quarterly rollup feeds the executive readout. Powered by the ROI &amp; Value Scorecard (D02).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What it produces -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">📊</span> What it produces</div>
+
+    <div class="stat-row">
+      <div class="stat-cell"><div class="stat-n">1</div><div class="stat-l">source of truth for DET AI health</div></div>
+      <div class="stat-cell"><div class="stat-n">Q</div><div class="stat-l">quarterly exec readout to Roger &amp; Joe</div></div>
+      <div class="stat-cell"><div class="stat-n">0</div><div class="stat-l">new AI surprise costs or untracked risks</div></div>
+    </div>
+
+    <div class="out-row">
+      <div class="out"><div class="out-ico">📋</div><div class="out-body"><strong>DET AI Health Score</strong> — A single quarterly scorecard showing AI adoption maturity, value realized, and risk exposure across all active DET use cases.</div></div>
+      <div class="out"><div class="out-ico">🔍</div><div class="out-body"><strong>Use Case Registry Rollup</strong> — Feeds from D01 (AI Use Case Library) and D09 (Vendor &amp; Licensing Registry) into a consolidated view of what's running and what it's worth.</div></div>
+      <div class="out"><div class="out-ico">⚡</div><div class="out-body"><strong>New Tool Intake Pipeline</strong> — Standardized eval path for any team considering a new AI tool — from initial assessment to procurement gate — with a documented decision and rationale on file.</div></div>
+    </div>
+  </div>
+
+  <!-- How it connects -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">🔗</span> How it connects to the other deliverables</div>
+    <div class="callout">
+      <p>The operating model is the <strong>governing layer</strong>. It doesn't operate standalone — it reads from D01 (what use cases are active), D02 (what value are they generating), D09 (what vendors and licenses are in play), and surfaces that combined picture as the DET AI Health Score.</p>
+      <p>Think of D04 as the policy layer that makes all the other deliverables add up to something Joe and Roger can act on — not just a collection of outputs, but a managed portfolio.</p>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">📅</span> Build timeline</div>
+    <div class="timeline">
+      <div class="tl-step active">
+        <div class="tl-q">Q4 FY27</div>
+        <div class="tl-label">V1 Draft</div>
+        <div class="tl-sub">Framework components, readiness tiers, governance thresholds documented</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-q">Q1 FY28</div>
+        <div class="tl-label">Cross-functional review</div>
+        <div class="tl-sub">Align with security, procurement, and DET leadership; incorporate feedback</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-q">Q2 FY28</div>
+        <div class="tl-label">Adopted &amp; live</div>
+        <div class="tl-sub">First quarterly Health Score issued; use case registry seeded; intake pipeline open</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="foot">
+    <strong>Owner:</strong> Casey Luciana Candelaria-Logan · AI Strategy &amp; Ops, DA&amp;O · Enterprise &amp; AI Technology<br>
+    Part of the AI Strategy &amp; Ops deliverable suite — see also D01 (AI Use Case Library), D02 (ROI &amp; Value Scorecard), D09 (AI Vendor &amp; Licensing Registry).
+  </div>
+
+</div>
+</body>
+</html>
