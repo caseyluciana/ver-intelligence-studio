@@ -30,7 +30,9 @@
 - [Bash Permissions — How to pre-approve](feedback_bash_permissions.md) — Casey wants bash auto-approved; set via .claude/settings.json or VS Code Claude Code settings
 - [Next Session — Apply Candor Standard to Hub/Portal](project_next_session_candor_standard.md) — Candor is the design lab; apply centered brand/context chips/scoring strip to all hub pages next session
 - [Candor Session Status](project_candor_status.md) — mock interview fully working after hidden!important bug fix; ready to apply standard to hub/portal
-- [AI Strategy & Ops Proposal](project_ai_strategy_ops_proposal.md) — Casey proposing new function in DA&O Org; proposal built as ai_strategy_ops_proposal.html; Judette Platz co-owns ROI; next step: share with Judette then Roger
+- [AI Strategy & Ops Proposal](project_ai_strategy_ops_proposal.md) — READY TO SEND TO ROGER; Roger said at Gartner (Oct 2026) he can make the case; proposal centered on Casey as sole lead; "Next Step" framing (formalization not ask)
+- [Session Narrative 2026-10-27](session_narrative_2026-10-27.md) — full context of Oct 27 sessions; cleared session details; Roger/Gartner context; emotional check-in; backup locations
+- [No Large Files in Chat](feedback_no_large_files_in_chat.md) — never paste large files into chat; give path instead; 723MB session freeze on Oct 27 is why
 - [SOW Cost Estimator](project_sow_estimator.md) — sow_estimator.html; light warm off-white theme; zero-CDN PDF/DOCX upload with role auto-suggest; DOM-built download (never string-template HTML inside script blocks)
 - [ROI Scorecard — True Cost Simulator](project_roi_scorecard_simulator.md) — TOKEN_RATE_PER_HR=$5/hr baked in; complexity requires pick; Time Saved auto-fills from preHrs-aiHrs; SEED_VERSION=4
 - [Internal Docs Style — Slack Canvas](feedback_internal_docs_style.md) — no letterhead/sig blocks; use context chips + icon section headers; conversational first-person; prints clean
