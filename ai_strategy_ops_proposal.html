@@ -216,9 +216,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 
 <!-- BOTTOM NAV -->
 <div class="nav-wrap">
-  <button class="nav-btn" id="btn-prev" onclick="go(-1)" disabled>&#8592;</button>
+  <button class="nav-btn" id="btn-prev" onclick="go(-1);if(playing)scheduleNext();" disabled>&#8592;</button>
+  <button class="nav-btn" id="btn-play" onclick="togglePlay()" title="Play / Pause" style="font-size:11px;">&#9654;</button>
   <div class="nav-dots" id="dots"></div>
-  <button class="nav-btn" id="btn-next" onclick="go(1)">&#8594;</button>
+  <button class="nav-btn" id="btn-next" onclick="go(1);if(playing)scheduleNext();">&#8594;</button>
 </div>
 
 <!-- ═══════════════════════════════════════ PANEL 0 — HERO -->
@@ -227,7 +228,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
     <div class="eyebrow" style="justify-content:center;">Proposal — DA&amp;O Org</div>
     <div class="h1">AI Strategy<br>&amp; Ops</div>
     <p class="lead" style="margin:0 auto 32px;text-align:center;">DA&amp;O's operational layer for AI execution, accountability, and value proof —<br>built in-house, designed to scale.</p>
-    <button class="begin-btn" onclick="go(1)">Begin &#8594;</button>
+    <button class="begin-btn" id="btn-begin" onclick="beginPlay()">Begin &#9654;</button>
   </div>
 </div>
 
@@ -610,9 +611,49 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 
   /* keyboard */
   document.addEventListener('keydown',function(e){
-    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ')go(1);
-    if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){go(1);if(playing)scheduleNext();}
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp'){go(-1);if(playing)scheduleNext();}
+    if(e.key==='p'||e.key==='P')togglePlay();
   });
+
+  /* ── AUTO-PLAY ─────────────────────── */
+  var playing=false,timer=null,DWELL=9000;
+
+  function beginPlay(){
+    if(current===0)go(1);
+    setTimeout(function(){
+      playing=true;
+      document.getElementById('btn-play').textContent='⏸';
+      scheduleNext();
+    },560);
+  }
+
+  function scheduleNext(){
+    clearTimeout(timer);
+    timer=setTimeout(function tick(){
+      if(!playing)return;
+      if(current>=total-1){stopPlay();return;}
+      if(busy){timer=setTimeout(tick,150);return;}
+      go(1);
+      timer=setTimeout(tick,DWELL);
+    },DWELL);
+  }
+
+  function stopPlay(){
+    playing=false;
+    clearTimeout(timer);
+    var pb=document.getElementById('btn-play');
+    if(pb)pb.textContent='▶';
+  }
+
+  function togglePlay(){
+    if(playing)stopPlay();
+    else{
+      playing=true;
+      document.getElementById('btn-play').textContent='⏸';
+      scheduleNext();
+    }
+  }
 
   /* swipe */
   var tx=0;
