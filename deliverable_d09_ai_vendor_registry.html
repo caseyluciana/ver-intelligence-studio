@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D09 — AI Vendor &amp; Licensing Registry</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#fdf9f3;
+  --ink:#1a0e00;
+  --ink-muted:#4a3728;
+  --ink-faint:#8a7060;
+  --amber:#b45309;
+  --amber-bg:rgba(180,83,9,0.05);
+  --border:rgba(180,83,9,0.14);
+  --border-soft:rgba(180,83,9,0.07);
+  --violet:#6d28d9;
+  --violet-bg:rgba(109,40,217,0.05);
+  --violet-border:rgba(109,40,217,0.14);
+  --teal:#0f766e;
+  --teal-bg:rgba(15,118,110,0.05);
+  --teal-border:rgba(15,118,110,0.14);
+  --green:#166534;
+  --green-bg:rgba(22,101,52,0.06);
+  --green-border:rgba(22,101,52,0.16);
+  --red:#991b1b;
+  --red-bg:rgba(153,27,27,0.05);
+  --red-border:rgba(153,27,27,0.18);
+  --yellow:#92400e;
+  --yellow-bg:rgba(146,64,14,0.06);
+  --yellow-border:rgba(146,64,14,0.18);
+}
+html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7;min-height:100%;}
+.page{max-width:700px;margin:0 auto;padding:52px 40px 72px;}
+
+/* ── Deliverable badge ─────────────────── */
+.d-badge{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.10em;color:var(--amber);background:var(--amber-bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;margin-bottom:14px;}
+.d-badge .d-num{font-size:13px;font-weight:700;}
+
+/* ── Context chips ─────────────────────── */
+.chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.03em;border:1px solid var(--border);background:var(--amber-bg);color:var(--amber);}
+.chip.neutral{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.09);color:var(--ink-faint);}
+.chip.red{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+
+/* ── Title ─────────────────────────────── */
+.title{font-size:clamp(26px,5vw,40px);font-weight:900;line-height:1.15;letter-spacing:-0.025em;color:var(--ink);margin-bottom:6px;}
+.title em{font-style:normal;color:var(--amber);}
+.subtitle{font-size:13.5px;color:var(--ink-faint);margin-bottom:36px;line-height:1.65;max-width:560px;}
+
+/* ── Divider ───────────────────────────── */
+.divider{height:1px;background:var(--border-soft);margin:28px 0;}
+
+/* ── Section ───────────────────────────── */
+.sec{margin-bottom:28px;}
+.sec-head{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.sec-head .ico{font-size:13px;line-height:1;}
+.sec p{font-size:14px;line-height:1.80;color:var(--ink-muted);margin-bottom:8px;}
+.sec p:last-child{margin-bottom:0;}
+.sec p strong{color:var(--ink);font-weight:700;}
+
+/* ── Stat row ──────────────────────────── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin:14px 0;}
+.stat-cell{background:var(--bg);padding:14px 10px;text-align:center;}
+.stat-n{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--amber);line-height:1;}
+.stat-n.red{color:var(--red);}
+.stat-n.green{color:var(--green);}
+.stat-l{font-size:10px;color:var(--ink-faint);margin-top:5px;line-height:1.4;font-weight:500;}
+
+/* ── Registry table ────────────────────── */
+.reg-table{width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-top:10px;}
+.reg-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:var(--amber-bg);border-bottom:1px solid var(--border);}
+.reg-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-bottom:1px solid var(--border-soft);}
+.reg-row:last-child{border-bottom:none;}
+.reg-row.risk-high{background:rgba(153,27,27,0.025);}
+.reg-cell{padding:9px 12px;font-size:11.5px;line-height:1.5;}
+.reg-head .reg-cell{font-size:9px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--amber);padding:8px 12px;}
+.tool-name{font-weight:700;color:var(--ink);}
+.cat-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.05em;padding:2px 7px;border-radius:10px;}
+.ct-llm{background:var(--violet-bg);color:var(--violet);border:1px solid var(--violet-border);}
+.ct-code{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border);}
+.ct-prod{background:var(--amber-bg);color:var(--amber);border:1px solid var(--border);}
+.ct-data{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.risk-pill{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;}
+.rp-low{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.rp-med{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border);}
+.rp-high{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.gov-pill{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;}
+.gp-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.gp-pending{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border);}
+.gp-none{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.sub-txt{font-size:10.5px;color:var(--ink-faint);margin-top:2px;}
+@media(max-width:580px){
+  .reg-head,.reg-row{grid-template-columns:1fr;}
+  .reg-head .reg-cell:not(:first-child){display:none;}
+}
+
+/* ── Entry fields ──────────────────────── */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+@media(max-width:500px){.field-grid{grid-template-columns:1fr;}}
+.field{padding:10px 14px;border-radius:8px;border:1px solid var(--border-soft);background:var(--amber-bg);}
+.field-label{font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:3px;}
+.field-val{font-size:12px;color:var(--ink-muted);line-height:1.5;}
+
+/* ── Callout ───────────────────────────── */
+.callout{margin-top:14px;padding:16px 20px;border-radius:10px;border:1px solid var(--border);border-left:3px solid var(--amber);background:var(--amber-bg);}
+.callout p{font-size:13.5px;line-height:1.78;color:var(--ink-muted);margin-bottom:6px;}
+.callout p:last-child{margin-bottom:0;}
+.callout p strong{color:var(--ink);font-weight:700;}
+.callout.red-left{border-left-color:var(--red);background:var(--red-bg);border-color:var(--red-border);}
+.callout.red-left p{color:var(--ink-muted);}
+
+/* ── Output row ────────────────────────── */
+.out-row{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.out{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:8px;border:1px solid var(--border-soft);background:rgba(0,0,0,0.02);}
+.out-ico{font-size:15px;line-height:1;padding-top:2px;flex-shrink:0;}
+.out-body{font-size:13px;line-height:1.65;color:var(--ink-muted);}
+.out-body strong{color:var(--ink);font-weight:700;}
+
+/* ── Timeline strip ────────────────────── */
+.timeline{display:flex;gap:0;margin-top:10px;}
+.tl-step{flex:1;padding:10px 14px;border:1px solid var(--border-soft);background:var(--amber-bg);position:relative;}
+.tl-step:first-child{border-radius:8px 0 0 8px;}
+.tl-step:last-child{border-radius:0 8px 8px 0;}
+.tl-step:not(:last-child){border-right:none;}
+.tl-step.active{background:rgba(180,83,9,0.09);border-color:var(--border);}
+.tl-q{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.10em;color:var(--amber);margin-bottom:3px;}
+.tl-label{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.tl-sub{font-size:11px;color:var(--ink-faint);line-height:1.5;}
+@media(max-width:560px){.timeline{flex-direction:column;}.tl-step{border-radius:0!important;border-bottom:none!important;border-right:1px solid var(--border-soft)!important;}.tl-step:last-child{border-bottom:1px solid var(--border-soft)!important;}}
+
+/* ── Footer ───────────────────────────── */
+.foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--border-soft);font-size:11px;color:var(--ink-faint);line-height:1.65;}
+.foot strong{color:var(--ink-muted);}
+
+/* ── Print header ──────────────────────── */
+.print-header{display:none;}
+
+/* ── Print ─────────────────────────────── */
+@media print{
+  @page{margin:0.65in 0.85in;size:letter portrait;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{background:var(--bg)!important;}
+  .page{padding:0;max-width:100%;}
+  .print-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:20px;border-bottom:2px solid var(--amber);}
+  .ph-brand{font-size:9px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);}
+  .ph-meta{font-size:9px;font-weight:500;color:var(--ink-faint);}
+  .d-badge{margin-bottom:10px!important;}
+  .chips{margin-bottom:12px!important;}
+  .title{font-size:26px!important;margin-bottom:4px!important;}
+  .subtitle{font-size:12px!important;margin-bottom:20px!important;}
+  .divider{margin:14px 0!important;}
+  .sec{margin-bottom:14px!important;}
+  .sec-head{margin-bottom:7px!important;}
+  .sec p{font-size:11.5px!important;line-height:1.68!important;margin-bottom:5px!important;}
+  .stat-row{margin:8px 0!important;}
+  .stat-cell{padding:10px 8px!important;}
+  .stat-n{font-size:16px!important;}
+  .stat-l{font-size:9px!important;}
+  .reg-cell{padding:7px 10px!important;font-size:10.5px!important;}
+  .reg-head .reg-cell{padding:6px 10px!important;}
+  .field-grid{gap:5px!important;}
+  .field{padding:7px 10px!important;}
+  .field-val{font-size:11px!important;}
+  .callout{padding:10px 14px!important;}
+  .callout p{font-size:11px!important;}
+  .out-row{gap:4px!important;}
+  .out{padding:7px 10px!important;}
+  .out-body{font-size:11px!important;}
+  .timeline{gap:0!important;}
+  .tl-step{padding:8px 10px!important;}
+  .tl-q{font-size:8px!important;}
+  .tl-label{font-size:10px!important;}
+  .tl-sub{font-size:9.5px!important;}
+  .foot{margin-top:16px!important;padding-top:10px!important;font-size:10px!important;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Print-only branded header -->
+  <div class="print-header">
+    <div class="ph-brand">AI Strategy &amp; Ops · DA&amp;O · Enterprise &amp; AI Technology</div>
+    <div class="ph-meta">D09 — AI Vendor &amp; Licensing Registry · Q4 FY27</div>
+  </div>
+
+  <!-- Deliverable badge -->
+  <div class="d-badge"><span class="d-num">D09</span> AI Vendor &amp; Licensing Registry</div>
+
+  <!-- Context chips -->
+  <div class="chips">
+    <span class="chip">AI Strategy &amp; Ops</span>
+    <span class="chip neutral">DA&amp;O · Portable to DET</span>
+    <span class="chip red">Risk &amp; Compliance</span>
+    <span class="chip neutral">Deliverable Spec</span>
+  </div>
+
+  <!-- Title -->
+  <div class="title">Every AI tool.<br>Every dollar. <em>Every risk.</em></div>
+  <div class="subtitle">DA&amp;O's authoritative registry of AI vendors, tools, and licenses — what's in play, what it costs, when it renews, and whether it's been reviewed. The view that turns invisible spend into a managed portfolio.</div>
+
+  <div class="divider"></div>
+
+  <!-- Why it exists -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">📍</span> The problem it solves</div>
+    <p>AI spend in most orgs is invisible. Tools get expensed individually, subscriptions auto-renew on credit cards, and no one has a consolidated view of what's running, what it's costing, or whether it ever went through a security review. By the time finance asks the question, it's already a problem.</p>
+    <p>The bigger risk is the <strong>tools no one is watching.</strong> A team that signed up for an AI platform two years ago, gave it access to sensitive vendor data, and never filed a review — that's not a theoretical gap. It's a live compliance exposure. The registry makes those entries visible before they become incidents.</p>
+    <div class="callout red-left" style="margin-top:14px;">
+      <p><strong>The "no review filed" row in the registry below is intentional.</strong> That's what this deliverable exists to surface. Every executive who sees it knows immediately why a registry matters — and why it has to be maintained by a function with a mandate, not managed ad-hoc.</p>
+    </div>
+  </div>
+
+  <!-- What's in it now -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">📊</span> What's being tracked</div>
+    <div class="stat-row">
+      <div class="stat-cell"><div class="stat-n">12+</div><div class="stat-l">AI tools & platforms identified across DA&O</div></div>
+      <div class="stat-cell"><div class="stat-n red">3</div><div class="stat-l">entries with no governance review on file</div></div>
+      <div class="stat-cell"><div class="stat-n green">Q</div><div class="stat-l">quarterly refresh + 90-day renewal alerts</div></div>
+      <div class="stat-cell"><div class="stat-n">$0</div><div class="stat-l">surprise renewals once the registry is live</div></div>
+    </div>
+    <p>Sample entries from the registry — showing the full range from reviewed to untracked:</p>
+    <div class="reg-table">
+      <div class="reg-head">
+        <div class="reg-cell">Tool / Vendor</div>
+        <div class="reg-cell">Category</div>
+        <div class="reg-cell">Risk</div>
+        <div class="reg-cell">Gov. Status</div>
+      </div>
+      <div class="reg-row">
+        <div class="reg-cell"><div class="tool-name">Claude / Claude Code</div><div class="sub-txt">Anthropic · AI Strategy &amp; Ops</div></div>
+        <div class="reg-cell"><span class="cat-tag ct-llm">LLM Platform</span></div>
+        <div class="reg-cell"><span class="risk-pill rp-low">● Low</span></div>
+        <div class="reg-cell"><span class="gov-pill gp-ok">✓ Reviewed</span></div>
+      </div>
+      <div class="reg-row">
+        <div class="reg-cell"><div class="tool-name">GitHub Copilot</div><div class="sub-txt">Microsoft · Engineering</div></div>
+        <div class="reg-cell"><span class="cat-tag ct-code">Code Intel</span></div>
+        <div class="reg-cell"><span class="risk-pill rp-low">● Low</span></div>
+        <div class="reg-cell"><span class="gov-pill gp-ok">✓ Reviewed</span></div>
+      </div>
+      <div class="reg-row">
+        <div class="reg-cell"><div class="tool-name">Gemini for Workspace</div><div class="sub-txt">Google · DA&amp;O / BT</div></div>
+        <div class="reg-cell"><span class="cat-tag ct-prod">Productivity</span></div>
+        <div class="reg-cell"><span class="risk-pill rp-low">● Low</span></div>
+        <div class="reg-cell"><span class="gov-pill gp-ok">✓ Reviewed</span></div>
+      </div>
+      <div class="reg-row">
+        <div class="reg-cell"><div class="tool-name">Notion AI</div><div class="sub-txt">Notion Labs · Multiple teams</div></div>
+        <div class="reg-cell"><span class="cat-tag ct-prod">Productivity</span></div>
+        <div class="reg-cell"><span class="risk-pill rp-med">◑ Medium</span></div>
+        <div class="reg-cell"><span class="gov-pill gp-pending">⚠ Pending</span></div>
+      </div>
+      <div class="reg-row risk-high">
+        <div class="reg-cell"><div class="tool-name">OpenAI / ChatGPT</div><div class="sub-txt">OpenAI · Ad hoc · various owners</div></div>
+        <div class="reg-cell"><span class="cat-tag ct-llm">LLM Platform</span></div>
+        <div class="reg-cell"><span class="risk-pill rp-high">▲ High</span></div>
+        <div class="reg-cell"><span class="gov-pill gp-none">✗ No Review Filed</span></div>
+      </div>
+      <div class="reg-row risk-high">
+        <div class="reg-cell"><div class="tool-name">Perplexity AI</div><div class="sub-txt">Perplexity · Various teams</div></div>
+        <div class="reg-cell"><span class="cat-tag ct-data">Research</span></div>
+        <div class="reg-cell"><span class="risk-pill rp-high">▲ High</span></div>
+        <div class="reg-cell"><span class="gov-pill gp-none">✗ No Review Filed</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What each entry contains -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">🏗️</span> What each entry contains</div>
+    <p>Eight fields per tool — everything needed for a spend, risk, and renewal decision. No detective work required.</p>
+    <div class="field-grid">
+      <div class="field"><div class="field-label">Vendor / Tool</div><div class="field-val">Full name, vendor, and team using it.</div></div>
+      <div class="field"><div class="field-label">Category</div><div class="field-val">LLM Platform · Code Intelligence · Productivity · Research &amp; Data</div></div>
+      <div class="field"><div class="field-label">License Type</div><div class="field-val">Enterprise / Team / Individual / API usage-based</div></div>
+      <div class="field"><div class="field-label">Est. Annual Cost</div><div class="field-val">Total cost across all seats/instances — normalized to annual.</div></div>
+      <div class="field"><div class="field-label">Renewal Date</div><div class="field-val">Hard renewal date with 90/60/30-day alert flags.</div></div>
+      <div class="field"><div class="field-label">Owner</div><div class="field-val">Named person — one owner per entry, no "TBD."</div></div>
+      <div class="field"><div class="field-label">Risk Tier</div><div class="field-val">Low / Medium / High — based on data access, DLP controls, sensitivity.</div></div>
+      <div class="field"><div class="field-label">Governance Status</div><div class="field-val">Reviewed ✓ · Pending Review ⚠ · No Review Filed ✗</div></div>
+    </div>
+  </div>
+
+  <!-- Governance gate -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">🔐</span> How tools enter the registry</div>
+    <div class="callout">
+      <p>New AI tools must route through the AI Strategy &amp; Ops intake process (D04 Governance Layer) before they receive a registry entry — and before they receive budget approval. No review on file means no entry. No entry means no sanctioned use.</p>
+      <p>This is the mechanism that stops the "no review filed" rows from multiplying. Any tool already in use without a review gets a remediation window — 30 days to file a retroactive review or sunset the tool from DA&amp;O workflows.</p>
+    </div>
+  </div>
+
+  <!-- What it produces -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">📊</span> What it produces</div>
+    <div class="out-row">
+      <div class="out"><div class="out-ico">💰</div><div class="out-body"><strong>Total AI Spend Visibility</strong> — Consolidated view of all AI licensing costs across DA&amp;O. First time this number has existed in one place. Feeds directly into the executive readout and budget planning cycles.</div></div>
+      <div class="out"><div class="out-ico">📅</div><div class="out-body"><strong>Renewal Calendar</strong> — Every contract renewal flagged 90, 60, and 30 days out. No more auto-renewal surprises. Proactive decisions replace reactive scrambles.</div></div>
+      <div class="out"><div class="out-ico">🛡️</div><div class="out-body"><strong>Risk Exposure Dashboard</strong> — How many active tools have no review on file, what data they access, and what the remediation path is. The number that makes security and legal pay attention.</div></div>
+    </div>
+  </div>
+
+  <!-- How it connects -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">🔗</span> How it connects to the other deliverables</div>
+    <div class="callout">
+      <p>D09 is the <strong>source of record</strong> for vendor-level intelligence that feeds D04 (the Operating Model). The Build/Buy/Configure framework (D04 Component 02) reads from the registry before recommending a new tool — if we're already paying for something that covers the use case, that's the answer, not a new vendor. D01 (Use Case Library) links to registry entries so every use case has a named tool and cost on file.</p>
+      <p>Think of D09 as the financial and risk layer — it's what turns the operating model from a framework into a managed spend portfolio that Roger can bring to Joe with real numbers.</p>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="sec">
+    <div class="sec-head"><span class="ico">📅</span> Build timeline</div>
+    <div class="timeline">
+      <div class="tl-step active">
+        <div class="tl-q">Q4 FY27</div>
+        <div class="tl-label">Initial seed</div>
+        <div class="tl-sub">All known DA&amp;O AI tools catalogued; risk tiers assigned; "no review" entries flagged</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-q">Q1 FY28</div>
+        <div class="tl-label">Remediation cycle</div>
+        <div class="tl-sub">All "no review filed" entries resolved — reviewed and accepted or sunset from DA&amp;O use</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-q">Q2 FY28</div>
+        <div class="tl-label">Live &amp; alerting</div>
+        <div class="tl-sub">Renewal alerts active; intake gate enforced for new tools; registry open for DET-wide adoption</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="foot">
+    <strong>Owner:</strong> Casey Luciana Candelaria-Logan · AI Strategy &amp; Ops, DA&amp;O · Enterprise &amp; AI Technology<br>
+    Part of the AI Strategy &amp; Ops deliverable suite — see also D01 (AI Use Case Library), D04 (DA&amp;O AI Operating Model), D02 (ROI &amp; Value Scorecard).
+  </div>
+
+</div>
+</body>
+</html>
