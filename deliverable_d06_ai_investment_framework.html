@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D06 — AI Investment Decision Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#fdf9f3;
+  --ink:#1a0e00;
+  --ink-muted:#4a3728;
+  --ink-faint:#8a7060;
+  --amber:#b45309;
+  --amber-bg:rgba(180,83,9,0.05);
+  --border:rgba(180,83,9,0.14);
+  --border-soft:rgba(180,83,9,0.07);
+  --violet:#6d28d9;
+  --violet-bg:rgba(109,40,217,0.05);
+  --violet-border:rgba(109,40,217,0.14);
+  --teal:#0f766e;
+  --teal-bg:rgba(15,118,110,0.05);
+  --teal-border:rgba(15,118,110,0.14);
+  --green:#166534;
+  --green-bg:rgba(22,101,52,0.06);
+  --green-border:rgba(22,101,52,0.16);
+  --red:#991b1b;
+  --red-bg:rgba(153,27,27,0.05);
+  --red-border:rgba(153,27,27,0.18);
+}
+html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7;min-height:100%;}
+.page{max-width:700px;margin:0 auto;padding:52px 40px 72px;}
+
+/* ── Badge ─────────────────────────────── */
+.d-badge{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.10em;color:var(--amber);background:var(--amber-bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;margin-bottom:14px;}
+.d-badge .d-num{font-size:13px;font-weight:700;}
+
+/* ── Chips ─────────────────────────────── */
+.chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.03em;border:1px solid var(--border);background:var(--amber-bg);color:var(--amber);}
+.chip.neutral{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.09);color:var(--ink-faint);}
+.chip.violet{background:var(--violet-bg);border-color:var(--violet-border);color:var(--violet);}
+
+/* ── Title ─────────────────────────────── */
+.title{font-size:clamp(26px,5vw,40px);font-weight:900;line-height:1.15;letter-spacing:-0.025em;color:var(--ink);margin-bottom:6px;}
+.title em{font-style:normal;color:var(--amber);}
+.subtitle{font-size:13.5px;color:var(--ink-faint);margin-bottom:36px;line-height:1.65;max-width:560px;}
+
+/* ── Divider ───────────────────────────── */
+.divider{height:1px;background:var(--border-soft);margin:28px 0;}
+
+/* ── Section ───────────────────────────── */
+.sec{margin-bottom:28px;}
+.sec-head{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.sec p{font-size:14px;line-height:1.80;color:var(--ink-muted);margin-bottom:8px;}
+.sec p:last-child{margin-bottom:0;}
+.sec p strong{color:var(--ink);font-weight:700;}
+
+/* ── Stat row ──────────────────────────── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin:14px 0;}
+.stat-cell{background:var(--bg);padding:14px 10px;text-align:center;}
+.stat-n{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--amber);line-height:1;}
+.stat-l{font-size:10px;color:var(--ink-faint);margin-top:5px;line-height:1.4;font-weight:500;}
+
+/* ── Decision gates ────────────────────── */
+.gate-list{display:flex;flex-direction:column;gap:0;margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+.gate{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border-soft);}
+.gate:last-child{border-bottom:none;}
+.gate-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--amber);background:var(--amber-bg);padding:16px 18px;border-right:1px solid var(--border-soft);min-width:52px;display:flex;align-items:flex-start;padding-top:18px;letter-spacing:0.06em;}
+.gate-body{padding:14px 18px;flex:1;}
+.gate-q{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.gate-desc{font-size:12.5px;color:var(--ink-muted);line-height:1.65;}
+.gate-ref{display:inline-flex;align-items:center;gap:5px;margin-top:7px;font-size:10px;font-weight:700;color:var(--ink-faint);background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.07);border-radius:20px;padding:2px 10px;}
+.gate-ref.amber{color:var(--amber);background:var(--amber-bg);border-color:var(--border);}
+.gate-ref.violet{color:var(--violet);background:var(--violet-bg);border-color:var(--violet-border);}
+.gate-ref.teal{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-border);}
+
+/* ── Pass / return banner ──────────────── */
+.gate-outcome{display:flex;gap:8px;margin-top:10px;}
+.go-pass{flex:1;padding:10px 14px;border-radius:8px;background:var(--green-bg);border:1px solid var(--green-border);font-size:12px;color:var(--green);font-weight:600;}
+.go-fail{flex:1;padding:10px 14px;border-radius:8px;background:var(--red-bg);border:1px solid var(--red-border);font-size:12px;color:var(--red);font-weight:600;}
+.go-label{font-size:9px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;margin-bottom:3px;opacity:0.7;}
+.go-text{font-size:12px;font-weight:500;line-height:1.5;}
+
+/* ── Envelope tiers ────────────────────── */
+.tier-table{width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-top:10px;}
+.tier-head{display:grid;grid-template-columns:1fr 1.2fr 1.8fr;background:var(--amber-bg);border-bottom:1px solid var(--border);}
+.tier-row{display:grid;grid-template-columns:1fr 1.2fr 1.8fr;border-bottom:1px solid var(--border-soft);}
+.tier-row:last-child{border-bottom:none;}
+.tier-cell{padding:12px 14px;font-size:12px;line-height:1.55;}
+.tier-head .tier-cell{font-size:9px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--amber);padding:9px 14px;}
+.tier-name{font-weight:700;color:var(--ink);font-size:13px;display:block;margin-bottom:2px;}
+.tier-range{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber);font-weight:600;}
+.auth-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;margin-bottom:4px;}
+.ap-self{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.ap-aiops{background:var(--amber-bg);color:var(--amber);border:1px solid var(--border);}
+.ap-exec{background:var(--violet-bg);color:var(--violet);border:1px solid var(--violet-border);}
+.req-list{font-size:11px;color:var(--ink-muted);line-height:1.65;}
+@media(max-width:540px){
+  .tier-head,.tier-row{grid-template-columns:1fr;}
+  .tier-head .tier-cell:not(:first-child){display:none;}
+}
+
+/* ── Callout ───────────────────────────── */
+.callout{margin-top:14px;padding:16px 20px;border-radius:10px;border:1px solid var(--border);border-left:3px solid var(--amber);background:var(--amber-bg);}
+.callout p{font-size:13.5px;line-height:1.78;color:var(--ink-muted);margin-bottom:6px;}
+.callout p:last-child{margin-bottom:0;}
+.callout p strong{color:var(--ink);font-weight:700;}
+
+/* ── Timeline ──────────────────────────── */
+.timeline{display:flex;gap:0;margin-top:10px;}
+.tl-step{flex:1;padding:10px 14px;border:1px solid var(--border-soft);background:var(--amber-bg);}
+.tl-step:first-child{border-radius:8px 0 0 8px;}
+.tl-step:last-child{border-radius:0 8px 8px 0;}
+.tl-step:not(:last-child){border-right:none;}
+.tl-step.active{background:rgba(180,83,9,0.09);border-color:var(--border);}
+.tl-q{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.10em;color:var(--amber);margin-bottom:3px;}
+.tl-label{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.tl-sub{font-size:11px;color:var(--ink-faint);line-height:1.5;}
+@media(max-width:560px){.timeline{flex-direction:column;}.tl-step{border-radius:0!important;border-bottom:none!important;border-right:1px solid var(--border-soft)!important;}.tl-step:last-child{border-bottom:1px solid var(--border-soft)!important;}}
+
+/* ── Footer ───────────────────────────── */
+.foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--border-soft);font-size:11px;color:var(--ink-faint);line-height:1.65;}
+.foot strong{color:var(--ink-muted);}
+
+/* ── Print header ──────────────────────── */
+.print-header{display:none;}
+
+/* ── Print ─────────────────────────────── */
+@media print{
+  @page{margin:0.65in 0.85in;size:letter portrait;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{background:var(--bg)!important;}
+  .page{padding:0;max-width:100%;}
+  .print-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:20px;border-bottom:2px solid var(--amber);}
+  .ph-brand{font-size:9px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);}
+  .ph-meta{font-size:9px;font-weight:500;color:var(--ink-faint);}
+  .d-badge{margin-bottom:10px!important;}
+  .chips{margin-bottom:12px!important;}
+  .title{font-size:26px!important;margin-bottom:4px!important;}
+  .subtitle{font-size:12px!important;margin-bottom:20px!important;}
+  .divider{margin:14px 0!important;}
+  .sec{margin-bottom:14px!important;}
+  .sec-head{margin-bottom:7px!important;}
+  .sec p{font-size:11.5px!important;line-height:1.68!important;margin-bottom:5px!important;}
+  .stat-row{margin:8px 0!important;}
+  .stat-cell{padding:10px 8px!important;}
+  .stat-n{font-size:16px!important;}
+  .stat-l{font-size:9px!important;}
+  .gate-num{padding:12px 14px!important;padding-top:14px!important;}
+  .gate-body{padding:10px 14px!important;}
+  .gate-q{font-size:12px!important;}
+  .gate-desc{font-size:11px!important;}
+  .gate-outcome{margin-top:6px!important;}
+  .go-pass,.go-fail{padding:7px 10px!important;}
+  .go-text{font-size:11px!important;}
+  .tier-cell{padding:8px 10px!important;font-size:11px!important;}
+  .tier-head .tier-cell{padding:7px 10px!important;}
+  .callout{padding:10px 14px!important;margin-top:8px!important;}
+  .callout p{font-size:11px!important;line-height:1.65!important;}
+  .timeline{gap:0!important;}
+  .tl-step{padding:8px 10px!important;}
+  .tl-q{font-size:8px!important;}
+  .tl-label{font-size:10px!important;}
+  .tl-sub{font-size:9.5px!important;}
+  .foot{margin-top:16px!important;padding-top:10px!important;font-size:10px!important;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Print-only branded header -->
+  <div class="print-header">
+    <div class="ph-brand">AI Strategy &amp; Ops · DA&amp;O · Enterprise &amp; AI Technology</div>
+    <div class="ph-meta">D06 — AI Investment Decision Framework · Q4 FY27</div>
+  </div>
+
+  <!-- Badge -->
+  <div class="d-badge"><span class="d-num">D06</span> AI Investment Decision Framework</div>
+
+  <!-- Chips -->
+  <div class="chips">
+    <span class="chip">AI Strategy &amp; Ops</span>
+    <span class="chip neutral">DA&amp;O · Portable to DET</span>
+    <span class="chip violet">Governance</span>
+    <span class="chip neutral">Deliverable Spec</span>
+  </div>
+
+  <!-- Title -->
+  <div class="title">How we decide.<br><em>How we stay bounded.</em></div>
+  <div class="subtitle">DA&amp;O's framework for evaluating AI investments before they're approved — four decision gates, three spend tiers, and one rule: no AI investment moves forward without a named owner and a value case on file.</div>
+
+  <div class="divider"></div>
+
+  <!-- The problem -->
+  <div class="sec">
+    <div class="sec-head"><span>📍</span> The problem it solves</div>
+    <p>Right now, AI investments in DA&amp;O get approved the way most technology decisions do — through a combination of enthusiasm, urgency, and whoever has budget authority that week. There's no standard gate. No criteria. No way to compare "should we build this?" against "do we already pay for something that does this?" The result is duplicated spend, abandoned tools, and no way to answer the basic question: <strong>was it worth it?</strong></p>
+    <p>The Investment Decision Framework puts a structure around that conversation — without making it bureaucratic. Four questions. Three spend tiers. Clear authority at each level. Every approved investment has a value case and a named owner before a single dollar is spent.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="sec">
+    <div class="sec-head"><span>📊</span> What it enforces</div>
+    <div class="stat-row">
+      <div class="stat-cell"><div class="stat-n">4</div><div class="stat-l">decision gates before any investment is approved</div></div>
+      <div class="stat-cell"><div class="stat-n">3</div><div class="stat-l">spend tiers with clear approval authority</div></div>
+      <div class="stat-cell"><div class="stat-n">0</div><div class="stat-l">approved investments without a named owner</div></div>
+      <div class="stat-cell"><div class="stat-n">1</div><div class="stat-l">source of truth — every decision on record in D01</div></div>
+    </div>
+  </div>
+
+  <!-- Decision gates -->
+  <div class="sec">
+    <div class="sec-head"><span>🚦</span> The four decision gates</div>
+    <p>Every proposed AI investment — build, buy, or configure — passes through these four gates in order. Any gate that fails sends the initiative back for refinement, not rejection. The framework is designed to sharpen ideas, not kill them.</p>
+    <div class="gate-list">
+      <div class="gate">
+        <div class="gate-num">G1</div>
+        <div class="gate-body">
+          <div class="gate-q">Is there a measurable use case?</div>
+          <div class="gate-desc">Can we define what "working" looks like in 90 days? What changes, who benefits, and how do we know it worked? A use case without a success definition is a project, not an investment.</div>
+          <div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;"><span class="gate-ref amber">↗ Check D01 for similar use cases first</span></div>
+        </div>
+      </div>
+      <div class="gate">
+        <div class="gate-num">G2</div>
+        <div class="gate-body">
+          <div class="gate-q">Build, buy, or configure — and why?</div>
+          <div class="gate-desc">Has this been solved in the market? Are we already paying for a tool that covers it? The answer to those questions before a budget conversation — not after — is the Build/Buy/Configure decision framework from D04.</div>
+          <div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;"><span class="gate-ref teal">↗ Check D09 registry before choosing</span><span class="gate-ref violet">↗ Apply D04 Component 02</span></div>
+        </div>
+      </div>
+      <div class="gate">
+        <div class="gate-num">G3</div>
+        <div class="gate-body">
+          <div class="gate-q">What's the minimum value case for 90 days?</div>
+          <div class="gate-desc">Not a three-year projection — a 90-day proof point. What does this need to deliver by the first quarterly review to justify continued investment? Time saved, cost avoided, or quality improved — with a number attached.</div>
+          <div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;"><span class="gate-ref amber">↗ Use D02 ROI methodology to quantify</span></div>
+        </div>
+      </div>
+      <div class="gate">
+        <div class="gate-num">G4</div>
+        <div class="gate-body">
+          <div class="gate-q">Who owns it — and owns the outcome?</div>
+          <div class="gate-desc">One named person. Not "the team," not "AI Strategy &amp; Ops." A specific individual who is accountable for the build, the quality bar, and the quarterly value readout. No owner, no approval.</div>
+          <div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;"><span class="gate-ref amber">↗ Owner name goes in D01 + D09 entries</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="gate-outcome">
+      <div class="go-pass"><div class="go-label">All 4 pass</div><div class="go-text">Investment enters the backlog with a scoped build plan and 90-day value target. Owner confirmed. Registry entry created.</div></div>
+      <div class="go-fail"><div class="go-label">Any gate fails</div><div class="go-text">Returns to the proposer with the specific gap identified. Not a rejection — a sharpen. Re-submit when ready.</div></div>
+    </div>
+  </div>
+
+  <!-- Budget envelope tiers -->
+  <div class="sec">
+    <div class="sec-head"><span>💰</span> Budget envelope governance</div>
+    <p>Not every AI investment needs the same level of review. The envelope tiers set clear approval authority based on cost — so teams can move fast on small bets while larger commitments get the scrutiny they deserve.</p>
+    <div class="tier-table">
+      <div class="tier-head">
+        <div class="tier-cell">Tier</div>
+        <div class="tier-cell">Approval Authority</div>
+        <div class="tier-cell">Requirements</div>
+      </div>
+      <div class="tier-row">
+        <div class="tier-cell">
+          <span class="tier-name">Tier 1 — Self-Service</span>
+          <span class="tier-range">&lt; $500 / mo</span>
+        </div>
+        <div class="tier-cell"><span class="auth-pill ap-self">✓ Team-level</span><div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">No formal review required. Move and log it.</div></div>
+        <div class="tier-cell req-list">Log entry in D09 registry within 30 days · Named owner required · No security exceptions</div>
+      </div>
+      <div class="tier-row">
+        <div class="tier-cell">
+          <span class="tier-name">Tier 2 — Reviewed</span>
+          <span class="tier-range">$500 – $5K / mo</span>
+        </div>
+        <div class="tier-cell"><span class="auth-pill ap-aiops">✓ AI Strategy &amp; Ops</span><div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">Sign-off before procurement.</div></div>
+        <div class="tier-cell req-list">All 4 decision gates cleared · D02 value case documented · Build/Buy/Configure analysis on file · D09 entry before first payment</div>
+      </div>
+      <div class="tier-row">
+        <div class="tier-cell">
+          <span class="tier-name">Tier 3 — Executive Gate</span>
+          <span class="tier-range">&gt; $5K / mo</span>
+        </div>
+        <div class="tier-cell"><span class="auth-pill ap-exec">✓ Roger + Leadership</span><div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">Full business case required.</div></div>
+        <div class="tier-cell req-list">All Tier 2 requirements · 12-month ROI projection · Security &amp; privacy review complete · Risk classification documented · Executive one-pager prepared</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:12px;">
+      <p><strong>Note on thresholds:</strong> The $500/$5K figures above are proposed starting points — final values are set with Roger and DA&amp;O finance. The framework logic (self-serve → reviewed → exec gate) is what matters; the exact dollar amounts are adjusted to match org spend norms and budget cycle cadence.</p>
+    </div>
+  </div>
+
+  <!-- How it connects -->
+  <div class="sec">
+    <div class="sec-head"><span>🔗</span> How it connects to the other deliverables</div>
+    <div class="callout">
+      <p>The Investment Decision Framework is the <strong>front door</strong> for the entire operating model. Every new use case that enters D01 passed through G1–G4. Every vendor or tool that enters D09 cleared G2. Every value measurement in D02 is anchored to the G3 target set at the time of approval. And D04 (the Operating Model) is what gives this framework its authority — it's not a checklist someone ignores, it's the governance layer that Roger and leadership have explicitly endorsed.</p>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="sec">
+    <div class="sec-head"><span>📅</span> Build timeline</div>
+    <div class="timeline">
+      <div class="tl-step active">
+        <div class="tl-q">Q4 FY27</div>
+        <div class="tl-label">Framework drafted</div>
+        <div class="tl-sub">Gates, tiers, and thresholds documented; retroactive review of active investments</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-q">Q1 FY28</div>
+        <div class="tl-label">Threshold calibration</div>
+        <div class="tl-sub">Validate spend tiers with Roger and DA&amp;O finance; align with procurement policy</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-q">Q2 FY28</div>
+        <div class="tl-label">Enforced &amp; live</div>
+        <div class="tl-sub">All new AI investments route through the framework; no exceptions without documented rationale</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="foot">
+    <strong>Owner:</strong> Casey Luciana Candelaria-Logan · AI Strategy &amp; Ops, DA&amp;O · Enterprise &amp; AI Technology<br>
+    Part of the AI Strategy &amp; Ops deliverable suite — see also D01 (AI Use Case Library), D04 (DA&amp;O AI Operating Model), D09 (AI Vendor &amp; Licensing Registry).
+  </div>
+
+</div>
+</body>
+</html>
