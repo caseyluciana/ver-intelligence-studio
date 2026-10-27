@@ -216,10 +216,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 
 <!-- BOTTOM NAV -->
 <div class="nav-wrap">
-  <button class="nav-btn" id="btn-prev" onclick="go(-1);if(playing)scheduleNext();" disabled>&#8592;</button>
+  <button class="nav-btn" id="btn-prev" onclick="navGo(-1)" disabled>&#8592;</button>
   <button class="nav-btn" id="btn-play" onclick="togglePlay()" title="Play / Pause" style="font-size:11px;">&#9654;</button>
   <div class="nav-dots" id="dots"></div>
-  <button class="nav-btn" id="btn-next" onclick="go(1);if(playing)scheduleNext();">&#8594;</button>
+  <button class="nav-btn" id="btn-next" onclick="navGo(1)">&#8594;</button>
 </div>
 
 <!-- ═══════════════════════════════════════ PANEL 0 — HERO -->
@@ -663,8 +663,14 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
     if(Math.abs(dx)>50)go(dx<0?1:-1);
   },{passive:true});
 
-  /* expose go for inline onclick */
+  /* nav wrapper — go + reset play timer, safe to call from onclick */
+  function navGo(dir){ go(dir); if(playing) scheduleNext(); }
+
+  /* expose to global for inline onclick attrs */
   window.go=go;
+  window.navGo=navGo;
+  window.beginPlay=beginPlay;
+  window.togglePlay=togglePlay;
   updateChrome();
 })();
 </script>
