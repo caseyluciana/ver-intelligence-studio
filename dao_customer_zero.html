@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DA&O — Customer Zero Enablement</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -72,6 +73,10 @@ html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);f
 .note{margin-top:24px;font-size:12px;color:var(--ink-faint);line-height:1.7;padding:12px 16px;border-radius:10px;background:var(--amber-bg);border:1px solid var(--border-soft);}
 .note strong{color:var(--ink-muted);}
 
+.dl-btn{display:inline-flex;align-items:center;gap:8px;margin-bottom:28px;padding:10px 20px;border-radius:10px;background:var(--amber);color:#fff;font-size:12px;font-weight:700;letter-spacing:0.04em;border:none;cursor:pointer;transition:opacity 0.15s;}
+.dl-btn:hover{opacity:0.88;}
+.dl-btn svg{width:14px;height:14px;fill:#fff;flex-shrink:0;}
+
 @media print{
   @page{margin:0.75in 0.9in;size:letter portrait;}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
@@ -83,6 +88,11 @@ html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);f
 </head>
 <body>
 <div class="page">
+
+  <button class="dl-btn" onclick="downloadPPTX()">
+    <svg viewBox="0 0 16 16"><path d="M8 12l-4-4h2.5V2h3v6H12L8 12zm-5 2h10v-1.5H3V14z"/></svg>
+    Download as PowerPoint
+  </button>
 
   <div class="chips">
     <span class="chip">DA&amp;O</span>
@@ -143,5 +153,95 @@ html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);f
   </div>
 
 </div>
+<script>
+function downloadPPTX(){
+  var pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_WIDE';
+
+  var BG    = 'FDF9F3';
+  var INK   = '1A0E00';
+  var MUTED = '4A3728';
+  var FAINT = '8A7060';
+  var AMB   = 'B45309';
+  var AMBBG = 'FBE8C8';
+  var VIO   = '7C3AED';
+  var VIOBG = 'EDE9FE';
+
+  var slide = pptx.addSlide();
+  slide.background = {color: BG};
+
+  /* context chips */
+  slide.addText('DA&O  ·  Roger\'s Org  ·  Customer Zero Enablement', {
+    x:0.5, y:0.28, w:12, h:0.28,
+    fontSize:8, bold:true, color:AMB, align:'left', charSpacing:1.5
+  });
+
+  /* title */
+  slide.addText('The Foundation Layer', {
+    x:0.5, y:0.62, w:12, h:0.55,
+    fontSize:22, bold:true, color:INK, align:'left'
+  });
+  slide.addText("DA&O's Role in the C0 Story", {
+    x:0.5, y:1.1, w:12, h:0.38,
+    fontSize:13, color:AMB, align:'left'
+  });
+
+  /* top box — customer zero */
+  slide.addShape(pptx.ShapeType.roundRect, {
+    x:0.5, y:1.65, w:12.33, h:1.15,
+    fill:{color:VIOBG}, line:{color:VIO, width:1.5}, rectRadius:0.08
+  });
+  slide.addText('CUSTOMER ZERO EXECUTION', {
+    x:0.5, y:1.72, w:12.33, h:0.26,
+    fontSize:8, bold:true, color:VIO, align:'center', charSpacing:2
+  });
+  slide.addText('DET Pillars — Externally Facing', {
+    x:0.5, y:1.98, w:12.33, h:0.32,
+    fontSize:13, bold:true, color:INK, align:'center'
+  });
+  slide.addText('Products · Engineering · T&E · Customer-facing orgs', {
+    x:0.5, y:2.3, w:12.33, h:0.26,
+    fontSize:10, color:VIO, align:'center'
+  });
+
+  /* connector label */
+  slide.addText('▲  enabled by  ▲', {
+    x:4.5, y:2.88, w:4.33, h:0.3,
+    fontSize:9, bold:true, color:FAINT, align:'center', charSpacing:1
+  });
+
+  /* bottom box — DA&O */
+  slide.addShape(pptx.ShapeType.roundRect, {
+    x:0.5, y:3.25, w:12.33, h:1.22,
+    fill:{color:AMBBG}, line:{color:AMB, width:1.5}, rectRadius:0.08
+  });
+  slide.addText('INTERNAL ENABLEMENT', {
+    x:0.5, y:3.32, w:12.33, h:0.26,
+    fontSize:8, bold:true, color:AMB, align:'center', charSpacing:2
+  });
+  slide.addText('DA&O — Delivery Assurance & Operations', {
+    x:0.5, y:3.58, w:12.33, h:0.32,
+    fontSize:13, bold:true, color:INK, align:'center'
+  });
+  slide.addText('Vendor · M&A · Programs · Portfolio · Ecosystem · Reliability', {
+    x:0.5, y:3.9, w:12.33, h:0.26,
+    fontSize:10, color:AMB, align:'center'
+  });
+
+  /* body copy */
+  slide.addText('DA&O doesn\'t sit in the Customer Zero spotlight — it builds and maintains the foundation that makes Customer Zero execution possible. Vendor relationships managed, programs coordinated, portfolios prioritized, M&A integrations absorbed without disruption, ecosystems kept operational. When DET executes Customer Zero effectively, DA&O is part of what made that possible.', {
+    x:0.5, y:4.62, w:12.33, h:0.82,
+    fontSize:11, color:MUTED, align:'left', paraSpaceAfter:4
+  });
+
+  /* closer quote */
+  slide.addText('"We keep the wheel turning on the inside so they can push things outside."', {
+    x:0.5, y:5.52, w:12.33, h:0.44,
+    fontSize:12, italic:true, bold:true, color:AMB, align:'center'
+  });
+
+  pptx.writeFile({fileName:'DAO_Customer_Zero_Enablement.pptx'});
+}
+</script>
 </body>
 </html>
