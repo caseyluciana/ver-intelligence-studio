@@ -3,377 +3,480 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VER &mdash; The Intelligence Layer</title>
+<title>The Cross-Pillar Intelligence Layer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0a0806;
-  --surface:#141008;
-  --card:#1c160d;
-  --card2:#221b10;
-  --ink:#fdf9f3;
-  --ink-muted:#c4a882;
-  --ink-faint:#6b5030;
-  --amber:#d97706;
-  --amber-light:#fbbf24;
-  --amber-bg:rgba(217,119,6,0.08);
-  --amber-border:rgba(217,119,6,0.22);
-  --amber-glow:rgba(217,119,6,0.15);
-  --violet:#a78bfa;
-  --violet-bg:rgba(167,139,250,0.08);
-  --violet-border:rgba(167,139,250,0.22);
-  --teal:#22d3ee;
-  --teal-bg:rgba(34,211,238,0.08);
-  --teal-border:rgba(34,211,238,0.22);
-  --border:rgba(217,119,6,0.14);
-  --border-soft:rgba(217,119,6,0.07);
+  --bg:#0a0806;--surface:#141008;--card:#1c160d;
+  --ink:#fdf9f3;--ink-muted:#c4a882;--ink-faint:#6b5030;
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.08);--amber-border:rgba(217,119,6,0.22);
+  --violet:#a78bfa;--violet-bg:rgba(167,139,250,0.08);--violet-border:rgba(167,139,250,0.22);
+  --teal:#22d3ee;--teal-bg:rgba(34,211,238,0.08);--teal-border:rgba(34,211,238,0.22);
+  --border-soft:rgba(217,119,6,0.08);
 }
-html{scroll-behavior:smooth;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7;overflow-x:hidden;}
+html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);height:100%;overflow:hidden;}
 
-/* ── SCENES ── */
+/* STAGE */
+#stage{position:fixed;top:0;left:0;right:0;bottom:64px;overflow:hidden;}
+
+/* SCENES */
 .scene{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:80px 48px;
-  position:relative;
-  overflow:hidden;
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:52px 48px 24px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.65s ease;
+  overflow-y:auto;
 }
-.scene-inner{
-  width:100%;
-  max-width:900px;
-  position:relative;
-  z-index:1;
-}
+.scene.active{opacity:1;pointer-events:auto;}
+
+.scene-1{background:radial-gradient(ellipse 80% 70% at 40% 50%,rgba(217,119,6,0.10) 0%,transparent 65%),var(--bg);}
+.scene-2{background:radial-gradient(ellipse 60% 80% at 50% 35%,rgba(217,119,6,0.07) 0%,transparent 65%),var(--bg);}
+.scene-3{background:radial-gradient(ellipse 70% 60% at 60% 50%,rgba(167,139,250,0.06) 0%,transparent 65%),var(--bg);}
+.scene-4{background:radial-gradient(ellipse 80% 60% at 40% 60%,rgba(217,119,6,0.06) 0%,transparent 65%),var(--bg);}
+.scene-5{background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(167,139,250,0.07) 0%,transparent 65%),var(--bg);}
+.scene-6{background:radial-gradient(ellipse 90% 80% at 50% 50%,rgba(217,119,6,0.12) 0%,transparent 60%),var(--bg);}
+
+.scene-inner{width:100%;max-width:900px;}
 .scene-inner.center{text-align:center;display:flex;flex-direction:column;align-items:center;}
 
-/* glow backdrops per scene */
-.scene-1::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 40% 50%,rgba(217,119,6,0.10) 0%,transparent 65%);pointer-events:none;}
-.scene-2::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 40%,rgba(217,119,6,0.07) 0%,transparent 65%);pointer-events:none;}
-.scene-3::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 60% 50%,rgba(167,139,250,0.06) 0%,transparent 65%);pointer-events:none;}
-.scene-4::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 40% 60%,rgba(217,119,6,0.06) 0%,transparent 65%);pointer-events:none;}
-.scene-5::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(167,139,250,0.07) 0%,transparent 65%);pointer-events:none;}
-.scene-6::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 80% at 50% 50%,rgba(217,119,6,0.12) 0%,transparent 60%);pointer-events:none;}
-
-.scene-divider{height:1px;background:var(--border-soft);width:100%;}
-
-/* ── TYPOGRAPHY ── */
-.eyebrow{font-size:10px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:var(--amber);margin-bottom:16px;}
-.hero-title{font-size:clamp(44px,7vw,72px);font-weight:900;line-height:1.03;letter-spacing:-0.035em;color:var(--ink);margin-bottom:20px;}
+/* TYPE */
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;}
+.hero-title{font-size:clamp(40px,6.5vw,66px);font-weight:900;line-height:1.04;letter-spacing:-0.035em;color:var(--ink);margin-bottom:18px;}
 .hero-title em{font-style:normal;color:var(--amber);}
-.hero-sub{font-size:17px;line-height:1.75;color:var(--ink-muted);max-width:560px;}
-.scene-inner.center .hero-sub{text-align:center;}
-
-.sec-title{font-size:clamp(26px,4vw,38px);font-weight:900;line-height:1.1;letter-spacing:-0.025em;color:var(--ink);margin-bottom:10px;}
+.hero-sub{font-size:16px;line-height:1.75;color:var(--ink-muted);max-width:540px;}
+.sec-title{font-size:clamp(24px,3.8vw,36px);font-weight:900;line-height:1.1;letter-spacing:-0.025em;color:var(--ink);margin-bottom:8px;}
 .sec-title em{font-style:normal;color:var(--amber);}
-.sec-sub{font-size:14px;color:var(--ink-muted);max-width:520px;line-height:1.75;margin-bottom:40px;}
+.sec-sub{font-size:13.5px;color:var(--ink-muted);max-width:520px;line-height:1.75;margin-bottom:28px;}
 
-/* ── CHIPS ── */
-.chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+/* CHIPS */
+.chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
 .scene-inner.center .chips{justify-content:center;}
-.chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:1px solid var(--amber-border);background:var(--amber-bg);color:var(--amber);}
+.chip{display:inline-flex;align-items:center;padding:4px 11px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:1px solid var(--amber-border);background:var(--amber-bg);color:var(--amber);}
 .chip.neutral{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.09);color:var(--ink-faint);text-transform:none;letter-spacing:0.02em;}
 .chip.violet{background:var(--violet-bg);border-color:var(--violet-border);color:var(--violet);}
-.chip.teal{background:var(--teal-bg);border-color:var(--teal-border);color:var(--teal);}
 
-/* ── DIAGRAM ── */
-.diagram-wrap{display:flex;flex-direction:column;gap:0;width:100%;margin-top:8px;}
-.tier{border-radius:16px;padding:24px 28px;position:relative;}
+/* DIAGRAM */
+.diagram-wrap{display:flex;flex-direction:column;gap:0;width:100%;}
+.tier{border-radius:14px;padding:18px 22px;position:relative;}
 .tier-ppm{background:var(--card);border:1px solid rgba(255,255,255,0.07);}
 .tier-ver{background:var(--amber-bg);border:1.5px solid var(--amber-border);}
-.tier-ver::before{content:'';position:absolute;inset:0;border-radius:14px;background:radial-gradient(ellipse 80% 100% at 50% 0%,rgba(217,119,6,0.08) 0%,transparent 70%);pointer-events:none;}
 .tier-ai{background:var(--violet-bg);border:1.5px solid var(--violet-border);}
-.tier-tag{font-size:9px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;}
+.tier-tag{font-size:8.5px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:6px;}
 .tier-ppm .tier-tag{color:var(--ink-faint);}
 .tier-ver .tier-tag{color:var(--amber);}
 .tier-ai .tier-tag{color:var(--violet);}
-.tier-name{font-size:16px;font-weight:800;letter-spacing:-0.01em;margin-bottom:10px;color:var(--ink);}
-.pillar-row,.intel-row,.ai-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
-.pillar-chip{padding:4px 11px;border-radius:7px;font-size:11px;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);}
-.intel-chip{padding:4px 12px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(217,119,6,0.10);border:1px solid var(--amber-border);color:var(--amber);}
-.ai-chip{padding:4px 12px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(167,139,250,0.10);border:1px solid var(--violet-border);color:var(--violet);}
-.tier-desc{font-size:12.5px;color:var(--ink-faint);line-height:1.65;}
+.tier-name{font-size:14px;font-weight:800;letter-spacing:-0.01em;margin-bottom:8px;color:var(--ink);}
+.pillar-row,.intel-row,.ai-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.pillar-chip{padding:3px 10px;border-radius:6px;font-size:10.5px;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);}
+.intel-chip{padding:3px 11px;border-radius:6px;font-size:10.5px;font-weight:700;background:rgba(217,119,6,0.10);border:1px solid var(--amber-border);color:var(--amber);}
+.ai-chip{padding:3px 11px;border-radius:6px;font-size:10.5px;font-weight:700;background:rgba(167,139,250,0.10);border:1px solid var(--violet-border);color:var(--violet);}
+.tier-desc{font-size:11.5px;color:var(--ink-faint);line-height:1.6;}
 .tier-ver .tier-desc{color:var(--ink-muted);}
-.connector{display:flex;flex-direction:column;align-items:center;padding:5px 0;}
-.conn-line{width:1.5px;height:20px;}
-.conn-line.down{background:linear-gradient(to bottom,rgba(255,255,255,0.07),var(--amber-border));}
+.connector{display:flex;flex-direction:column;align-items:center;padding:4px 0;}
+.conn-line{width:1.5px;height:16px;}
+.conn-line.down{background:linear-gradient(to bottom,rgba(255,255,255,0.06),var(--amber-border));}
 .conn-line.up{background:linear-gradient(to bottom,var(--amber-border),var(--violet-border));}
 .conn-arr{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;}
 .conn-arr.amber{border-top:7px solid var(--amber-border);}
 .conn-arr.violet{border-top:7px solid var(--violet-border);}
-.conn-label{font-size:9px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink-faint);padding:4px 12px;border-radius:20px;border:1px solid var(--border-soft);background:var(--surface);white-space:nowrap;margin:2px 0;}
+.conn-label{font-size:8.5px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink-faint);padding:3px 11px;border-radius:20px;border:1px solid var(--border-soft);background:var(--surface);white-space:nowrap;margin:2px 0;}
 
-/* ── WHAT VER DOES GRID ── */
-.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;}
-@media(max-width:640px){.quad-grid{grid-template-columns:1fr;}}
-.quad-card{padding:24px 26px;border-radius:14px;background:var(--card);border:1px solid var(--border-soft);}
-.quad-icon{font-size:22px;margin-bottom:10px;}
-.quad-head{font-size:11.5px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;}
-.quad-card p{font-size:13px;line-height:1.80;color:var(--ink-muted);}
+/* QUAD GRID */
+.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;}
+.quad-card{padding:20px 22px;border-radius:14px;background:var(--card);border:1px solid var(--border-soft);}
+.quad-icon{font-size:20px;margin-bottom:8px;}
+.quad-head{font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+.quad-card p{font-size:13px;line-height:1.75;color:var(--ink-muted);}
 .quad-card p strong{color:var(--ink);font-weight:700;}
 
-/* ── ROADMAP GRID ── */
-.roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;}
-@media(max-width:700px){.roadmap-grid{grid-template-columns:1fr 1fr;}}
-@media(max-width:480px){.roadmap-grid{grid-template-columns:1fr;}}
-.roadmap-card{padding:20px 22px;border-radius:14px;background:var(--card);border:1px solid var(--border-soft);border-left:3px solid var(--amber);}
-.roadmap-head{font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--amber);margin-bottom:7px;}
-.roadmap-card p{font-size:13px;color:var(--ink-muted);line-height:1.68;}
+/* ROADMAP GRID */
+.roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;}
+.roadmap-card{padding:18px 20px;border-radius:13px;background:var(--card);border:1px solid var(--border-soft);border-left:3px solid var(--amber);}
+.roadmap-head{font-size:10.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+.roadmap-card p{font-size:12.5px;color:var(--ink-muted);line-height:1.65;}
 
-/* ── ARC ── */
-.arc-wrap{width:100%;display:flex;flex-direction:column;gap:0;padding:32px 36px;border-radius:18px;background:var(--violet-bg);border:1.5px solid var(--violet-border);position:relative;overflow:hidden;}
-.arc-wrap::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,0.07) 0%,transparent 70%);pointer-events:none;}
-.arc-step{display:flex;align-items:flex-start;gap:18px;position:relative;}
-.arc-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;}
+/* ARC */
+.arc-wrap{width:100%;padding:28px 32px;border-radius:18px;background:var(--violet-bg);border:1.5px solid var(--violet-border);position:relative;overflow:hidden;}
+.arc-wrap::before{content:'';position:absolute;top:-50px;right:-50px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,0.07) 0%,transparent 70%);pointer-events:none;}
+.arc-step{display:flex;align-items:flex-start;gap:16px;}
+.arc-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;}
 .arc-dot.amber{background:var(--amber-bg);border:1.5px solid var(--amber-border);color:var(--amber);}
 .arc-dot.violet{background:var(--violet-bg);border:1.5px solid var(--violet-border);color:var(--violet);}
 .arc-dot.teal{background:var(--teal-bg);border:1.5px solid var(--teal-border);color:var(--teal);}
-.arc-body-head{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
-.arc-body-text{font-size:13px;color:var(--ink-muted);line-height:1.70;}
-.arc-spine{width:1.5px;height:24px;background:var(--violet-border);margin-left:14px;}
+.arc-body-head{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px;}
+.arc-body-text{font-size:12.5px;color:var(--ink-muted);line-height:1.65;}
+.arc-spine{width:1.5px;height:18px;background:var(--violet-border);margin-left:13px;}
 
-/* ── CLOSING STATEMENT ── */
-.statement-wrap{
-  width:100%;
-  max-width:760px;
-  padding:48px 52px;
-  border-radius:22px;
-  background:linear-gradient(135deg,var(--amber-bg) 0%,rgba(217,119,6,0.03) 100%);
-  border:1.5px solid var(--amber-border);
-  position:relative;
-  overflow:hidden;
-}
-.statement-wrap::before{
-  content:'\201C';
-  position:absolute;
-  top:-30px;left:28px;
-  font-size:180px;font-weight:900;
-  color:var(--amber);opacity:0.05;
-  line-height:1;pointer-events:none;
-}
-.statement-eyebrow{font-size:9.5px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:var(--amber);margin-bottom:18px;}
-.statement-text{font-size:clamp(16px,2.4vw,21px);line-height:1.80;color:var(--ink);font-style:italic;font-weight:500;position:relative;}
+/* STATEMENT */
+.statement-wrap{width:100%;max-width:740px;padding:44px 50px;border-radius:22px;background:linear-gradient(135deg,var(--amber-bg) 0%,rgba(217,119,6,0.03) 100%);border:1.5px solid var(--amber-border);position:relative;overflow:hidden;}
+.statement-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:var(--amber);margin-bottom:16px;}
+.statement-text{font-size:clamp(15px,2.2vw,20px);line-height:1.80;color:var(--ink);font-style:italic;font-weight:500;position:relative;}
 
-@media print{
-  @page{margin:0.5in;size:letter portrait;}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-  html,body{background:#fff!important;color:#111!important;}
-  .scene{min-height:auto;padding:40px 32px;}
+/* PROGRESS BAR */
+#progress-bar{
+  position:fixed;top:0;left:0;height:2px;
+  background:var(--amber);
+  transition:width 0.3s ease;
+  z-index:100;
+}
+
+/* CONTROLS */
+#controls{
+  position:fixed;bottom:0;left:0;right:0;height:64px;
+  background:rgba(10,8,6,0.96);
+  border-top:1px solid rgba(217,119,6,0.10);
+  display:flex;align-items:center;justify-content:center;
+  gap:0;z-index:99;
+  backdrop-filter:blur(8px);
+}
+.ctrl-group{display:flex;align-items:center;gap:6px;padding:0 20px;}
+.ctrl-sep{width:1px;height:24px;background:rgba(217,119,6,0.12);}
+
+#dots{display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(217,119,6,0.20);border:none;cursor:pointer;padding:0;transition:all 0.2s ease;}
+.dot.active{background:var(--amber);transform:scale(1.3);}
+.dot:hover{background:rgba(217,119,6,0.55);}
+
+.ctrl-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(217,119,6,0.08);border:1px solid var(--amber-border);
+  color:var(--amber);font-size:13px;cursor:pointer;
+  transition:all 0.15s ease;
+}
+.ctrl-btn:hover{background:rgba(217,119,6,0.18);}
+#play-btn{width:40px;height:40px;font-size:15px;}
+
+#counter{font-size:11px;font-weight:700;color:var(--ink-faint);letter-spacing:0.08em;min-width:36px;text-align:center;}
+
+.speed-btn{
+  padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;
+  letter-spacing:0.06em;text-transform:uppercase;
+  background:transparent;border:1px solid rgba(217,119,6,0.15);
+  color:var(--ink-faint);cursor:pointer;transition:all 0.15s ease;
+}
+.speed-btn.active{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.speed-btn:hover{border-color:var(--amber-border);}
+
+@media(max-width:600px){
+  .quad-grid{grid-template-columns:1fr;}
+  .roadmap-grid{grid-template-columns:1fr 1fr;}
+  .ctrl-group.speed-group{display:none;}
 }
 </style>
 </head>
 <body>
 
-<!-- SCENE 1 — HERO -->
-<section class="scene scene-1">
-  <div class="scene-inner center">
-    <div class="chips">
-      <span class="chip">Cross-Pillar Intelligence</span>
-      <span class="chip neutral">DA&amp;O &middot; VER</span>
-      <span class="chip neutral">FY28</span>
-      <span class="chip violet">AI Strategy &amp; Ops</span>
-    </div>
-    <div class="eyebrow">Delivery Assurance &amp; Operations &middot; FY28 Vision</div>
-    <h1 class="hero-title">The <em>Cross-Pillar</em><br>Intelligence Layer</h1>
-    <p class="hero-sub">One function spanning every pillar. Not a sub-function of portfolio management &mdash; a different kind of function entirely. This is what the intelligence layer does, and where it&rsquo;s headed.</p>
-  </div>
-</section>
+<div id="progress-bar" style="width:0%"></div>
 
-<div class="scene-divider"></div>
+<!-- STAGE -->
+<div id="stage">
 
-<!-- SCENE 2 — DIAGRAM -->
-<section class="scene scene-2">
-  <div class="scene-inner">
-    <div class="eyebrow">The Ecosystem</div>
-    <h2 class="sec-title">Where <em>VER Lives</em> in the Full Picture</h2>
-    <p class="sec-sub">Three distinct layers. Different accountability. Different shape. Each one enabling the next.</p>
-
-    <div class="diagram-wrap">
-
-      <div class="tier tier-ppm">
-        <div class="tier-tag">Portfolio Management Layer</div>
-        <div class="tier-name">DA&amp;O Pillars &mdash; PPM-Owned</div>
-        <div class="pillar-row">
-          <span class="pillar-chip">NNAOV</span>
-          <span class="pillar-chip">Events App</span>
-          <span class="pillar-chip">NQE</span>
-          <span class="pillar-chip">PLG</span>
-          <span class="pillar-chip">Linear</span>
-          <span class="pillar-chip">Agentic Delivery</span>
-          <span class="pillar-chip">SRO / SRE</span>
-          <span class="pillar-chip">Incident Automation</span>
-          <span class="pillar-chip">M&amp;A Integrations</span>
-        </div>
-        <div class="tier-desc">Each pillar owns its roadmap, timelines, and delivery accountability. Engagements are approved and on the PPM roadmap before VER is activated.</div>
+  <!-- SCENE 1 — HERO -->
+  <div class="scene scene-1">
+    <div class="scene-inner center">
+      <div class="chips">
+        <span class="chip">Cross-Pillar Intelligence</span>
+        <span class="chip neutral">DA&amp;O &middot; VER</span>
+        <span class="chip neutral">FY28</span>
+        <span class="chip violet">AI Strategy &amp; Ops</span>
       </div>
-
-      <div class="connector">
-        <div class="conn-line down"></div>
-        <div class="conn-label">Engagements activated on the roadmap &middot; Intelligence flows back</div>
-        <div class="conn-arr amber"></div>
-      </div>
-
-      <div class="tier tier-ver">
-        <div class="tier-tag">Cross-Pillar Intelligence Layer</div>
-        <div class="tier-name">Cross-Pillar Intelligence &mdash; DA&amp;O</div>
-        <div class="intel-row">
-          <span class="intel-chip">TCO Analysis</span>
-          <span class="intel-chip">Vendor Risk</span>
-          <span class="intel-chip">FinOps Intelligence</span>
-          <span class="intel-chip">Renewal Horizon</span>
-          <span class="intel-chip">SOW Validation</span>
-          <span class="intel-chip">Governance</span>
-        </div>
-        <div class="tier-desc">One function. Every pillar. Cross-Pillar Intelligence doesn&rsquo;t own delivery &mdash; it owns the intelligence that makes delivery smarter. Advisory by design, horizontal by scope.</div>
-      </div>
-
-      <div class="connector">
-        <div class="conn-line up"></div>
-        <div class="conn-label">Methodology formalized &middot; Scales beyond VER</div>
-        <div class="conn-arr violet"></div>
-      </div>
-
-      <div class="tier tier-ai">
-        <div class="tier-tag">AI Strategy &amp; Operations &mdash; The Next Layer</div>
-        <div class="tier-name">Formalizing the Methodology at Scale</div>
-        <div class="ai-row">
-          <span class="ai-chip">AI-Enabled Decision Intelligence</span>
-          <span class="ai-chip">Org-Wide Operating Model</span>
-          <span class="ai-chip">DA&amp;O &rarr; DET &rarr; Beyond</span>
-        </div>
-        <div class="tier-desc">What VER built organically &mdash; the methodology for AI-enabled intelligence that turns complexity into decision-ready outputs &mdash; formalized as a scalable operating model for the full org.</div>
-      </div>
-
+      <div class="eyebrow">Delivery Assurance &amp; Operations &middot; FY28 Vision</div>
+      <h1 class="hero-title">The <em>Cross-Pillar</em><br>Intelligence Layer</h1>
+      <p class="hero-sub">One function spanning every pillar. Not a sub-function of portfolio management &mdash; a different kind of function entirely. This is what the intelligence layer does, and where it&rsquo;s headed.</p>
     </div>
   </div>
-</section>
 
-<div class="scene-divider"></div>
-
-<!-- SCENE 3 — WHAT VER DOES -->
-<section class="scene scene-3">
-  <div class="scene-inner">
-    <div class="eyebrow">The Function</div>
-    <h2 class="sec-title">What Cross-Pillar Intelligence <em>Actually Does</em></h2>
-    <p class="sec-sub">The distinction isn&rsquo;t about scope &mdash; it&rsquo;s about accountability structure. Different axis entirely.</p>
-
-    <div class="quad-grid">
-      <div class="quad-card">
-        <div class="quad-icon">&#x1F3D7;&#xFE0F;</div>
-        <div class="quad-head">PPMs Own</div>
-        <p>Roadmaps, timelines, delivery. <strong>Column-oriented</strong> &mdash; each PPM is accountable to one pillar, top to bottom.</p>
-      </div>
-      <div class="quad-card">
-        <div class="quad-icon">&#x1F50E;</div>
-        <div class="quad-head">VER Owns</div>
-        <p>Intelligence types &mdash; across every pillar simultaneously. <strong>Row-oriented</strong> &mdash; TCO, risk, FinOps, governance delivered horizontally.</p>
-      </div>
-      <div class="quad-card">
-        <div class="quad-icon">&#x23F1;&#xFE0F;</div>
-        <div class="quad-head">When PPMs Act</div>
-        <p>After approval. PPMs build plans and <strong>execute against committed roadmaps</strong>. Their accountability begins at approval.</p>
-      </div>
-      <div class="quad-card">
-        <div class="quad-icon">&#x26A1;</div>
-        <div class="quad-head">When VER Acts</div>
-        <p>Before decisions lock. VER intelligence is <strong>upstream of commitment</strong> &mdash; shaping the decision before the plan is built.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="scene-divider"></div>
-
-<!-- SCENE 4 — FY28 ROADMAP -->
-<section class="scene scene-4">
-  <div class="scene-inner">
-    <div class="eyebrow">FY28 Intelligence Roadmap</div>
-    <h2 class="sec-title">What Cross-Pillar Intelligence <em>Builds</em> Next Fiscal</h2>
-    <p class="sec-sub">The tooling infrastructure is proven. FY28 is the year it scales from proof of concept to org-wide practice.</p>
-
-    <div class="roadmap-grid">
-      <div class="roadmap-card">
-        <div class="roadmap-head">Renewal Horizon</div>
-        <p>Proactive multi-year modeling for all major contracts coming due. No surprises at renewal time &mdash; every pillar informed early.</p>
-      </div>
-      <div class="roadmap-card">
-        <div class="roadmap-head">TCO at Intake</div>
-        <p>Total cost of ownership analysis before any engagement is scoped. Tool is live &mdash; FY28 is about adoption across all pillars.</p>
-      </div>
-      <div class="roadmap-card">
-        <div class="roadmap-head">SOW Intelligence</div>
-        <p>Role-level cost validation for statements of work before they hit the PPM roadmap. Upstream of planning by design.</p>
-      </div>
-      <div class="roadmap-card">
-        <div class="roadmap-head">Governance Cadence</div>
-        <p>Quarterly review across all active vendor relationships. Risk surfaced early &mdash; never reactively.</p>
-      </div>
-      <div class="roadmap-card">
-        <div class="roadmap-head">Stakeholder Intake</div>
-        <p>Structured intelligence requests from all pillars. VER becomes a standing resource, not an ad hoc one.</p>
-      </div>
-      <div class="roadmap-card">
-        <div class="roadmap-head">Cross-Pillar FinOps</div>
-        <p>Spend pattern visibility no single PPM has. Overlap, redundancy, and opportunity surfaced across the full portfolio.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="scene-divider"></div>
-
-<!-- SCENE 5 — THE ARC -->
-<section class="scene scene-5">
-  <div class="scene-inner">
-    <div class="eyebrow">The Bigger Picture</div>
-    <h2 class="sec-title">VER Built It.<br><em>Now We Scale It.</em></h2>
-    <p class="sec-sub">The methodology didn&rsquo;t come from a top-down mandate. It came from the work. That&rsquo;s what makes it real &mdash; and exactly why it scales.</p>
-
-    <div class="arc-wrap">
-      <div class="arc-step">
-        <div class="arc-dot amber">1</div>
-        <div>
-          <div class="arc-body-head">VER &mdash; The Proof</div>
-          <p class="arc-body-text">Built organically inside DA&amp;O. TCO modeling, vendor intelligence, FinOps analysis &mdash; all AI-enabled, all proven in front of leadership. Not a pitch. A live tool with a track record.</p>
+  <!-- SCENE 2 — DIAGRAM -->
+  <div class="scene scene-2">
+    <div class="scene-inner">
+      <div class="eyebrow">The Ecosystem</div>
+      <h2 class="sec-title">Where <em>This Layer Lives</em></h2>
+      <p class="sec-sub">Three distinct tiers. Different accountability. Different shape. Each one enabling the next.</p>
+      <div class="diagram-wrap">
+        <div class="tier tier-ppm">
+          <div class="tier-tag">Portfolio Management Layer</div>
+          <div class="tier-name">DA&amp;O Pillars &mdash; PPM-Owned</div>
+          <div class="pillar-row">
+            <span class="pillar-chip">NNAOV</span><span class="pillar-chip">Events App</span><span class="pillar-chip">NQE</span><span class="pillar-chip">PLG</span><span class="pillar-chip">Linear</span><span class="pillar-chip">Agentic Delivery</span><span class="pillar-chip">SRO / SRE</span><span class="pillar-chip">Incident Automation</span><span class="pillar-chip">M&amp;A Integrations</span>
+          </div>
+          <div class="tier-desc">Each pillar owns its roadmap, timelines, and delivery accountability. Engagements are approved before Cross-Pillar Intelligence is activated.</div>
         </div>
-      </div>
-      <div class="arc-spine"></div>
-      <div class="arc-step">
-        <div class="arc-dot violet">2</div>
-        <div>
-          <div class="arc-body-head">Cross-Pillar Intelligence Lead &mdash; The Bridge</div>
-          <p class="arc-body-text">The role that takes VER&rsquo;s methodology and makes it available across the full DA&amp;O portfolio. Not a new function &mdash; a formalized version of what&rsquo;s already running.</p>
+        <div class="connector">
+          <div class="conn-line down"></div>
+          <div class="conn-label">Engagements activated on the roadmap &middot; Intelligence flows back</div>
+          <div class="conn-arr amber"></div>
         </div>
-      </div>
-      <div class="arc-spine"></div>
-      <div class="arc-step">
-        <div class="arc-dot teal">3</div>
-        <div>
-          <div class="arc-body-head">AI Strategy &amp; Operations &mdash; The Scale</div>
-          <p class="arc-body-text">The operating model that brings AI-enabled decision intelligence to the full org. DA&amp;O first. DET next. The methodology is already here &mdash; this formalizes it at scale.</p>
+        <div class="tier tier-ver">
+          <div class="tier-tag">Cross-Pillar Intelligence Layer</div>
+          <div class="tier-name">Cross-Pillar Intelligence &mdash; DA&amp;O</div>
+          <div class="intel-row">
+            <span class="intel-chip">TCO Analysis</span><span class="intel-chip">Vendor Risk</span><span class="intel-chip">FinOps Intelligence</span><span class="intel-chip">Renewal Horizon</span><span class="intel-chip">SOW Validation</span><span class="intel-chip">Governance</span>
+          </div>
+          <div class="tier-desc">One function. Every pillar. Doesn&rsquo;t own delivery &mdash; owns the intelligence that makes delivery smarter. Advisory by design, horizontal by scope.</div>
+        </div>
+        <div class="connector">
+          <div class="conn-line up"></div>
+          <div class="conn-label">Methodology formalized &middot; Scales beyond VER</div>
+          <div class="conn-arr violet"></div>
+        </div>
+        <div class="tier tier-ai">
+          <div class="tier-tag">AI Strategy &amp; Operations &mdash; The Next Layer</div>
+          <div class="tier-name">Formalizing the Methodology at Scale</div>
+          <div class="ai-row">
+            <span class="ai-chip">AI-Enabled Decision Intelligence</span><span class="ai-chip">Org-Wide Operating Model</span><span class="ai-chip">DA&amp;O &rarr; DET &rarr; Beyond</span>
+          </div>
+          <div class="tier-desc">What VER built organically &mdash; formalized as a scalable operating model for the full org.</div>
         </div>
       </div>
     </div>
   </div>
-</section>
 
-<div class="scene-divider"></div>
-
-<!-- SCENE 6 — THE STATEMENT -->
-<section class="scene scene-6">
-  <div class="scene-inner center">
-    <div class="statement-wrap">
-      <div class="statement-eyebrow">The VER Position</div>
-      <div class="statement-text">
-        &ldquo;Cross-Pillar Intelligence doesn&rsquo;t own delivery &mdash; it owns the intelligence that makes delivery smarter. One function. Every pillar. Activated after the roadmap is set, present before the decision is made. Not a sub-function of portfolio management. A different kind of function entirely &mdash; and VER proved it&rsquo;s possible.&rdquo;
+  <!-- SCENE 3 — WHAT THIS LAYER DOES -->
+  <div class="scene scene-3">
+    <div class="scene-inner">
+      <div class="eyebrow">The Function</div>
+      <h2 class="sec-title">What Cross-Pillar Intelligence <em>Actually Does</em></h2>
+      <p class="sec-sub">Not about scope &mdash; about accountability structure. Different axis entirely.</p>
+      <div class="quad-grid">
+        <div class="quad-card">
+          <div class="quad-icon">&#x1F3D7;&#xFE0F;</div>
+          <div class="quad-head">PPMs Own</div>
+          <p>Roadmaps, timelines, delivery. <strong>Column-oriented</strong> &mdash; each PPM is accountable to one pillar, top to bottom.</p>
+        </div>
+        <div class="quad-card">
+          <div class="quad-icon">&#x1F50E;</div>
+          <div class="quad-head">This Layer Owns</div>
+          <p>Intelligence types across every pillar simultaneously. <strong>Row-oriented</strong> &mdash; TCO, risk, FinOps, governance delivered horizontally.</p>
+        </div>
+        <div class="quad-card">
+          <div class="quad-icon">&#x23F1;&#xFE0F;</div>
+          <div class="quad-head">When PPMs Act</div>
+          <p>After approval. PPMs build plans and <strong>execute against committed roadmaps</strong>. Their accountability begins at approval.</p>
+        </div>
+        <div class="quad-card">
+          <div class="quad-icon">&#x26A1;</div>
+          <div class="quad-head">When This Layer Acts</div>
+          <p>Before decisions lock. Intelligence is <strong>upstream of commitment</strong> &mdash; shaping the decision before the plan is built.</p>
+        </div>
       </div>
     </div>
   </div>
-</section>
 
+  <!-- SCENE 4 — FY28 ROADMAP -->
+  <div class="scene scene-4">
+    <div class="scene-inner">
+      <div class="eyebrow">FY28 Intelligence Roadmap</div>
+      <h2 class="sec-title">What Cross-Pillar Intelligence <em>Builds</em> Next Fiscal</h2>
+      <p class="sec-sub">The tooling infrastructure is operational. FY28 is about making it easy to reach &mdash; so any pillar can pull on it when they need it.</p>
+      <div class="roadmap-grid">
+        <div class="roadmap-card">
+          <div class="roadmap-head">Renewal Horizon</div>
+          <p>Multi-year contract modeling available before renewal decisions lock. The signal is there when any pillar needs it &mdash; not after it&rsquo;s too late to act.</p>
+        </div>
+        <div class="roadmap-card">
+          <div class="roadmap-head">TCO Intelligence</div>
+          <p>Total cost of ownership analysis available before engagements are scoped. The tool is live &mdash; ready when any pillar wants to reach for it.</p>
+        </div>
+        <div class="roadmap-card">
+          <div class="roadmap-head">SOW Intelligence</div>
+          <p>Role-level cost analysis available before engagements are planned. Upstream by design &mdash; there for any pillar that wants it early.</p>
+        </div>
+        <div class="roadmap-card">
+          <div class="roadmap-head">Governance Support</div>
+          <p>Regular vendor relationship review available on cadence or on request. Risk visible early &mdash; so it doesn&rsquo;t have to surface reactively.</p>
+        </div>
+        <div class="roadmap-card">
+          <div class="roadmap-head">Stakeholder Intake</div>
+          <p>A standing intelligence resource, not an ad hoc one. Any pillar can bring a question &mdash; we&rsquo;re here to answer it.</p>
+        </div>
+        <div class="roadmap-card">
+          <div class="roadmap-head">Cross-Pillar FinOps</div>
+          <p>Spend pattern visibility no single pillar has on its own. Available to the full portfolio &mdash; overlap and opportunity surfaced when it&rsquo;s useful.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 5 — THE ARC -->
+  <div class="scene scene-5">
+    <div class="scene-inner">
+      <div class="eyebrow">The Origin Story</div>
+      <h2 class="sec-title">The Foundation<br><em>Is Already Running.</em></h2>
+      <p class="sec-sub">The methodology didn&rsquo;t come from a top-down mandate. It came from the work &mdash; organically, inside DA&amp;O. That&rsquo;s what makes it extensible.</p>
+      <div class="arc-wrap">
+        <div class="arc-step">
+          <div class="arc-dot amber">1</div>
+          <div>
+            <div class="arc-body-head">VER &mdash; The Proof</div>
+            <p class="arc-body-text">Built organically inside DA&amp;O. TCO modeling, vendor intelligence, FinOps analysis &mdash; all AI-enabled, all operational. The work started quietly. It&rsquo;s been running ever since.</p>
+          </div>
+        </div>
+        <div class="arc-spine"></div>
+        <div class="arc-step">
+          <div class="arc-dot violet">2</div>
+          <div>
+            <div class="arc-body-head">Cross-Pillar Intelligence Lead &mdash; The Bridge</div>
+            <p class="arc-body-text">The role that takes VER&rsquo;s methodology and makes it available across the full DA&amp;O portfolio. Not a new function &mdash; a formalized version of what&rsquo;s already running.</p>
+          </div>
+        </div>
+        <div class="arc-spine"></div>
+        <div class="arc-step">
+          <div class="arc-dot teal">3</div>
+          <div>
+            <div class="arc-body-head">AI Strategy &amp; Operations &mdash; The Scale</div>
+            <p class="arc-body-text">The operating model that brings AI-enabled decision intelligence to the full org. DA&amp;O first. DET next. The methodology is already here &mdash; this formalizes it at scale.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 6 — CLOSING STATEMENT -->
+  <div class="scene scene-6">
+    <div class="scene-inner center">
+      <div class="statement-wrap">
+        <div class="statement-eyebrow">The Position</div>
+        <div class="statement-text">
+          &ldquo;Cross-Pillar Intelligence doesn&rsquo;t own delivery &mdash; it owns the intelligence that makes delivery smarter. One function. Every pillar. Present before the decision is made, activated once the roadmap is set. Not a sub-function of portfolio management. A different kind of function entirely &mdash; and it&rsquo;s already here.&rdquo;
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /stage -->
+
+<!-- CONTROLS -->
+<div id="controls">
+  <div class="ctrl-group">
+    <div id="dots"></div>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <button class="ctrl-btn" id="prev-btn" title="Previous" aria-label="Previous scene">&#9664;</button>
+    <button class="ctrl-btn" id="play-btn" title="Pause" aria-label="Pause">&#9646;&#9646;</button>
+    <button class="ctrl-btn" id="next-btn" title="Next" aria-label="Next scene">&#9654;</button>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <span id="counter">1 / 6</span>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group speed-group">
+    <button class="speed-btn" data-speed="slow">Slow</button>
+    <button class="speed-btn active" data-speed="normal">Normal</button>
+    <button class="speed-btn" data-speed="fast">Fast</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var scenes, current, playing, speeds, currentSpeed, timer;
+  scenes       = [];
+  current      = 0;
+  playing      = true;
+  speeds       = { slow: 9000, normal: 5500, fast: 3000 };
+  currentSpeed = 'normal';
+  timer        = null;
+
+  function init(){
+    scenes = Array.from(document.querySelectorAll('.scene'));
+    buildDots();
+    goTo(0);
+    startAutoPlay();
+    document.getElementById('play-btn').addEventListener('click', togglePlay);
+    document.getElementById('next-btn').addEventListener('click', function(){ goTo(current + 1); });
+    document.getElementById('prev-btn').addEventListener('click', function(){ goTo(current - 1); });
+    document.querySelectorAll('.speed-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){ setSpeed(btn.dataset.speed); });
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ goTo(current + 1); }
+      else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ goTo(current - 1); }
+      else if(e.key === ' '){ e.preventDefault(); togglePlay(); }
+    });
+  }
+
+  function buildDots(){
+    var container = document.getElementById('dots');
+    while(container.firstChild){ container.removeChild(container.firstChild); }
+    scenes.forEach(function(_, i){
+      var d = document.createElement('button');
+      d.className = 'dot';
+      d.setAttribute('aria-label', 'Go to scene ' + (i + 1));
+      d.addEventListener('click', (function(idx){ return function(){ goTo(idx); }; })(i));
+      container.appendChild(d);
+    });
+  }
+
+  function goTo(n){
+    if(n < 0){ n = scenes.length - 1; }
+    if(n >= scenes.length){ n = 0; }
+    scenes[current].classList.remove('active');
+    current = n;
+    scenes[current].classList.add('active');
+    updateDots();
+    updateCounter();
+    updateProgress();
+    if(playing){ resetTimer(); }
+  }
+
+  function updateDots(){
+    document.querySelectorAll('.dot').forEach(function(d, i){
+      d.classList.toggle('active', i === current);
+    });
+  }
+
+  function updateCounter(){
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + scenes.length;
+  }
+
+  function updateProgress(){
+    var pct = ((current + 1) / scenes.length) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  }
+
+  function togglePlay(){
+    playing = !playing;
+    var btn = document.getElementById('play-btn');
+    if(playing){
+      btn.textContent = '‖';
+      btn.setAttribute('title', 'Pause');
+      btn.setAttribute('aria-label', 'Pause');
+      startAutoPlay();
+    } else {
+      btn.textContent = '►';
+      btn.setAttribute('title', 'Play');
+      btn.setAttribute('aria-label', 'Play');
+      clearInterval(timer);
+    }
+  }
+
+  function startAutoPlay(){
+    clearInterval(timer);
+    timer = setInterval(function(){ goTo(current + 1); }, speeds[currentSpeed]);
+  }
+
+  function resetTimer(){
+    if(playing){ startAutoPlay(); }
+  }
+
+  function setSpeed(s){
+    currentSpeed = s;
+    document.querySelectorAll('.speed-btn').forEach(function(b){
+      b.classList.toggle('active', b.dataset.speed === s);
+    });
+    if(playing){ startAutoPlay(); }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
 </body>
 </html>
