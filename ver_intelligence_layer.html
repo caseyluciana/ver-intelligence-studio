@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VER — The Intelligence Layer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0c0a07;--surface:#161109;--card:#1f1710;--ink:#fdf9f3;--ink-muted:#c4a882;--ink-faint:#7a6045;
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.08);--amber-border:rgba(217,119,6,0.22);
+  --violet:#a78bfa;--violet-bg:rgba(167,139,250,0.08);--violet-border:rgba(167,139,250,0.20);
+  --teal:#22d3ee;--teal-bg:rgba(34,211,238,0.08);--teal-border:rgba(34,211,238,0.20);
+  --border:rgba(217,119,6,0.15);--border-soft:rgba(217,119,6,0.08);
+}
+html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7;min-height:100%;}
+.hero{padding:80px 40px 72px;max-width:860px;margin:0 auto;position:relative;}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 70% 60% at 30% 40%,rgba(217,119,6,0.07) 0%,transparent 70%);pointer-events:none;}
+.chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+.chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:10.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:1px solid var(--amber-border);background:var(--amber-bg);color:var(--amber);}
+.chip.neutral{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.10);color:var(--ink-faint);text-transform:none;letter-spacing:0.02em;font-weight:600;}
+.chip.violet{background:var(--violet-bg);border-color:var(--violet-border);color:var(--violet);}
+.hero-eyebrow{font-size:10px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:16px;}
+.hero-title{font-size:clamp(36px,6vw,58px);font-weight:900;line-height:1.05;letter-spacing:-0.03em;color:var(--ink);margin-bottom:18px;}
+.hero-title em{font-style:normal;color:var(--amber);}
+.hero-sub{font-size:16px;line-height:1.75;color:var(--ink-muted);max-width:560px;}
+.section{padding:64px 40px;max-width:860px;margin:0 auto;}
+.section-eyebrow{font-size:10px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;}
+.section-title{font-size:clamp(22px,3.5vw,30px);font-weight:900;letter-spacing:-0.02em;color:var(--ink);margin-bottom:8px;line-height:1.2;}
+.section-title em{font-style:normal;color:var(--amber);}
+.section-sub{font-size:14px;color:var(--ink-muted);margin-bottom:40px;max-width:520px;line-height:1.75;}
+.divider{height:1px;background:var(--border-soft);max-width:860px;margin:0 auto;}
+.diagram-wrap{display:flex;flex-direction:column;gap:0;margin-top:8px;}
+.tier{border-radius:16px;padding:28px 32px;position:relative;}
+.tier-ppm{background:var(--card);border:1px solid rgba(255,255,255,0.07);}
+.tier-ver{background:var(--amber-bg);border:1.5px solid var(--amber-border);}
+.tier-ver::before{content:'';position:absolute;inset:0;border-radius:14px;background:radial-gradient(ellipse 80% 100% at 50% 0%,rgba(217,119,6,0.06) 0%,transparent 70%);pointer-events:none;}
+.tier-ai{background:var(--violet-bg);border:1.5px solid var(--violet-border);}
+.tier-tag{font-size:9px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:10px;}
+.tier-ppm .tier-tag{color:var(--ink-faint);}
+.tier-ver .tier-tag{color:var(--amber);}
+.tier-ai .tier-tag{color:var(--violet);}
+.tier-name{font-size:17px;font-weight:800;letter-spacing:-0.01em;margin-bottom:10px;color:var(--ink);}
+.pillar-row,.intel-row,.ai-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.pillar-chip{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);color:var(--ink-muted);}
+.intel-chip{padding:5px 13px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(217,119,6,0.10);border:1px solid var(--amber-border);color:var(--amber);}
+.ai-chip{padding:5px 13px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(167,139,250,0.10);border:1px solid var(--violet-border);color:var(--violet);}
+.tier-desc{font-size:13px;color:var(--ink-faint);line-height:1.7;margin-top:4px;}
+.tier-ver .tier-desc{color:var(--ink-muted);}
+.connector{display:flex;flex-direction:column;align-items:center;padding:6px 0;}
+.conn-line{width:1.5px;height:24px;}
+.conn-line.down{background:linear-gradient(to bottom,rgba(255,255,255,0.08),var(--amber-border));}
+.conn-line.up{background:linear-gradient(to bottom,var(--amber-border),var(--violet-border));}
+.conn-arrow-down{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--amber-border);}
+.conn-arrow-down.violet{border-top-color:var(--violet-border);}
+.conn-label{font-size:9.5px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink-faint);padding:5px 14px;border-radius:20px;border:1px solid var(--border-soft);background:var(--surface);white-space:nowrap;margin:2px 0;}
+.body-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px;}
+@media(max-width:600px){.body-grid{grid-template-columns:1fr;}}
+.body-card{padding:22px 24px;border-radius:14px;background:var(--card);border:1px solid var(--border-soft);}
+.body-card-icon{font-size:20px;margin-bottom:10px;}
+.body-card-head{font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+.body-card p{font-size:13px;line-height:1.80;color:var(--ink-muted);}
+.body-card p strong{color:var(--ink);font-weight:700;}
+.roadmap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:8px;}
+.roadmap-item{padding:20px 22px;border-radius:14px;background:var(--card);border:1px solid var(--border-soft);border-left:3px solid var(--amber);}
+.roadmap-item .ri-head{font-size:12px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+.roadmap-item p{font-size:13px;color:var(--ink-muted);line-height:1.70;}
+.ai-card{margin-top:8px;padding:32px 36px;border-radius:18px;background:var(--violet-bg);border:1.5px solid var(--violet-border);position:relative;overflow:hidden;}
+.ai-card::before{content:'';position:absolute;top:-40px;right:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,0.08) 0%,transparent 70%);pointer-events:none;}
+.arc-row{display:flex;flex-direction:column;gap:12px;}
+.arc-step{display:flex;align-items:flex-start;gap:16px;}
+.arc-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:2px;}
+.arc-dot.amber{background:var(--amber-bg);border:1.5px solid var(--amber-border);color:var(--amber);}
+.arc-dot.violet{background:var(--violet-bg);border:1.5px solid var(--violet-border);color:var(--violet);}
+.arc-dot.teal{background:var(--teal-bg);border:1.5px solid var(--teal-border);color:var(--teal);}
+.arc-step-head{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px;}
+.arc-step-body p{font-size:13px;color:var(--ink-muted);line-height:1.70;}
+.arc-connector{width:1.5px;height:20px;background:var(--violet-border);margin-left:13px;}
+.statement-section{margin:0 40px 72px;max-width:860px;}
+.statement-block{padding:40px 44px;border-radius:20px;background:linear-gradient(135deg,var(--amber-bg) 0%,rgba(217,119,6,0.04) 100%);border:1.5px solid var(--amber-border);position:relative;overflow:hidden;}
+.statement-eyebrow{font-size:9.5px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:16px;}
+.statement-text{font-size:clamp(15px,2.2vw,18px);line-height:1.80;color:var(--ink);font-style:italic;font-weight:500;}
+@media print{@page{margin:0.75in 0.9in;size:letter portrait;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}html,body{background:#fff!important;color:#111!important;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="chips">
+    <span class="chip">VER</span>
+    <span class="chip neutral">DA&amp;O &middot; Roger&rsquo;s Org</span>
+    <span class="chip neutral">FY28</span>
+    <span class="chip violet">AI Strategy &amp; Ops</span>
+  </div>
+  <div class="hero-eyebrow">Vendor Engagement &amp; Reliability</div>
+  <h1 class="hero-title">The <em>Intelligence</em> Layer</h1>
+  <p class="hero-sub">One function spanning every pillar. Not a sub-function of portfolio management &mdash; a different kind of function entirely. This is what VER actually does, and where it&rsquo;s headed.</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="section">
+  <div class="section-eyebrow">The Ecosystem</div>
+  <h2 class="section-title">Where <em>VER Lives</em> in the Full Picture</h2>
+  <p class="section-sub">Three distinct layers. Different accountability. Different shape. Each one enabling the next.</p>
+
+  <div class="diagram-wrap">
+
+    <div class="tier tier-ppm">
+      <div class="tier-tag">Portfolio Management Layer</div>
+      <div class="tier-name">DA&amp;O Pillars &mdash; PPM-Owned</div>
+      <div class="pillar-row">
+        <span class="pillar-chip">NNAOV</span>
+        <span class="pillar-chip">Events App</span>
+        <span class="pillar-chip">NQE</span>
+        <span class="pillar-chip">PLG</span>
+        <span class="pillar-chip">Linear</span>
+        <span class="pillar-chip">Agentic Delivery</span>
+        <span class="pillar-chip">SRO / SRE</span>
+        <span class="pillar-chip">Incident Automation</span>
+        <span class="pillar-chip">M&amp;A Integrations</span>
+      </div>
+      <div class="tier-desc">Each pillar owns its roadmap, timelines, and delivery accountability. Engagements are approved and on the PPM roadmap before VER is activated.</div>
+    </div>
+
+    <div class="connector">
+      <div class="conn-line down"></div>
+      <div class="conn-label">Engagements activated on the roadmap &middot; Intelligence flows back</div>
+      <div class="conn-arrow-down"></div>
+    </div>
+
+    <div class="tier tier-ver">
+      <div class="tier-tag">VER Intelligence Layer &mdash; Cross-Pillar</div>
+      <div class="tier-name">Vendor Engagement &amp; Reliability</div>
+      <div class="intel-row">
+        <span class="intel-chip">TCO Analysis</span>
+        <span class="intel-chip">Vendor Risk</span>
+        <span class="intel-chip">FinOps Intelligence</span>
+        <span class="intel-chip">Renewal Horizon</span>
+        <span class="intel-chip">SOW Validation</span>
+        <span class="intel-chip">Governance</span>
+      </div>
+      <div class="tier-desc">One function. Every pillar. VER doesn&rsquo;t own delivery &mdash; it owns the intelligence that makes delivery smarter. No timelines, no engagement authority, no spend accountability. Advisory by design, cross-pillar by scope.</div>
+    </div>
+
+    <div class="connector">
+      <div class="conn-line up"></div>
+      <div class="conn-label">Methodology formalized &middot; Scales beyond VER</div>
+      <div class="conn-arrow-down violet"></div>
+    </div>
+
+    <div class="tier tier-ai">
+      <div class="tier-tag">AI Strategy &amp; Operations &mdash; The Next Layer</div>
+      <div class="tier-name">Formalizing the Methodology at Scale</div>
+      <div class="ai-row">
+        <span class="ai-chip">AI-Enabled Decision Intelligence</span>
+        <span class="ai-chip">Org-Wide Operating Model</span>
+        <span class="ai-chip">DA&amp;O &rarr; DET &rarr; Beyond</span>
+      </div>
+      <div class="tier-desc">What VER built organically &mdash; the methodology for AI-enabled intelligence that turns complexity into decision-ready outputs &mdash; formalized as a scalable operating model for the full org.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="section">
+  <div class="section-eyebrow">The Function</div>
+  <h2 class="section-title">What VER Actually <em>Does</em></h2>
+  <p class="section-sub">The distinction isn&rsquo;t about scope &mdash; it&rsquo;s about accountability structure. Different axis entirely.</p>
+
+  <div class="body-grid">
+    <div class="body-card">
+      <div class="body-card-icon">&#x1F3D7;&#xFE0F;</div>
+      <div class="body-card-head">PPMs Own</div>
+      <p>Roadmaps, timelines, delivery. <strong>Column-oriented</strong> &mdash; each PPM is accountable to one pillar, top to bottom.</p>
+    </div>
+    <div class="body-card">
+      <div class="body-card-icon">&#x1F50E;</div>
+      <div class="body-card-head">VER Owns</div>
+      <p>Intelligence types &mdash; across every pillar simultaneously. <strong>Row-oriented</strong> &mdash; TCO, risk, FinOps, governance delivered horizontally.</p>
+    </div>
+    <div class="body-card">
+      <div class="body-card-icon">&#x23F1;&#xFE0F;</div>
+      <div class="body-card-head">When PPMs Act</div>
+      <p>After approval. PPMs build plans and <strong>execute against committed roadmaps</strong>. Their accountability begins at approval.</p>
+    </div>
+    <div class="body-card">
+      <div class="body-card-icon">&#x26A1;</div>
+      <div class="body-card-head">When VER Acts</div>
+      <p>Before decisions lock. VER intelligence is <strong>upstream of commitment</strong> &mdash; shaping the decision before the plan is built.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="section">
+  <div class="section-eyebrow">FY28 Intelligence Roadmap</div>
+  <h2 class="section-title">What VER <em>Builds</em> Next Fiscal</h2>
+  <p class="section-sub">The tooling infrastructure is proven. FY28 is the year it scales from proof of concept to org-wide practice.</p>
+
+  <div class="roadmap-grid">
+    <div class="roadmap-item">
+      <div class="ri-head">Renewal Horizon</div>
+      <p>Proactive multi-year modeling for all major contracts coming due. No surprises at renewal time &mdash; every pillar informed early.</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="ri-head">TCO at Intake</div>
+      <p>Total cost of ownership analysis before any new engagement is scoped. Tool is live &mdash; FY28 is about adoption across all pillars.</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="ri-head">SOW Intelligence</div>
+      <p>Role-level cost validation for statements of work before they hit the PPM roadmap. Upstream of planning by design.</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="ri-head">Governance Cadence</div>
+      <p>Quarterly review across all active vendor relationships. Risk surfaced early &mdash; never reactively.</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="ri-head">Stakeholder Intake</div>
+      <p>Structured intelligence requests from all pillars. VER becomes a standing resource, not an ad hoc one.</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="ri-head">Cross-Pillar FinOps</div>
+      <p>Spend pattern visibility no single PPM has. Overlap, redundancy, and opportunity surfaced across the full portfolio.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="section">
+  <div class="section-eyebrow">The Bigger Picture</div>
+  <h2 class="section-title">VER as the <em>Proof of Concept</em></h2>
+  <p class="section-sub">The methodology didn&rsquo;t come from a top-down mandate. It came from the work. That&rsquo;s what makes it real &mdash; and scalable.</p>
+
+  <div class="ai-card">
+    <div class="arc-row">
+      <div class="arc-step">
+        <div class="arc-dot amber">1</div>
+        <div class="arc-step-body">
+          <div class="arc-step-head">VER &mdash; The Proof</div>
+          <p>Built organically inside DA&amp;O. TCO modeling, vendor intelligence, FinOps analysis &mdash; all AI-enabled, all proven in front of leadership. Not a pitch. A live tool with a track record.</p>
+        </div>
+      </div>
+      <div class="arc-connector"></div>
+      <div class="arc-step">
+        <div class="arc-dot violet">2</div>
+        <div class="arc-step-body">
+          <div class="arc-step-head">Cross-Pillar Intelligence Lead &mdash; The Bridge</div>
+          <p>The role that takes VER&rsquo;s methodology and makes it available across the full DA&amp;O portfolio. Not a new function &mdash; a formalized version of what&rsquo;s already running.</p>
+        </div>
+      </div>
+      <div class="arc-connector"></div>
+      <div class="arc-step">
+        <div class="arc-dot teal">3</div>
+        <div class="arc-step-body">
+          <div class="arc-step-head">AI Strategy &amp; Operations &mdash; The Scale</div>
+          <p>The operating model that brings AI-enabled decision intelligence to the full org. DA&amp;O first. DET next. The methodology is already here &mdash; this formalizes it at scale.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="statement-section">
+  <div class="statement-block">
+    <div class="statement-eyebrow">The VER Position</div>
+    <div class="statement-text">
+      &ldquo;VER doesn&rsquo;t own delivery &mdash; it owns the intelligence that makes delivery smarter. One function. Every pillar. Activated after the roadmap is set, present before the decision is made. Not a sub-function of portfolio management. A different kind of function entirely &mdash; and the proof of concept for what comes next.&rdquo;
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
