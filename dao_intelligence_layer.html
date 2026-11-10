@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intelligence Command Center — VER</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080705;
+  --surface:#0f0d0a;
+  --surface-2:#141108;
+  --surface-3:#1c1810;
+  --border:rgba(255,255,255,0.07);
+  --border-soft:rgba(255,255,255,0.04);
+  --text:#ede5d8;
+  --text-muted:#9a8e7f;
+  --text-faint:#524840;
+  --amber:#d97706;
+  --amber-bright:#f59e0b;
+  --amber-bg:rgba(217,119,6,0.09);
+  --amber-border:rgba(217,119,6,0.22);
+  --violet:#a78bfa;
+  --violet-bg:rgba(167,139,250,0.08);
+  --violet-border:rgba(167,139,250,0.22);
+  --teal:#22d3ee;
+  --teal-bg:rgba(34,211,238,0.07);
+  --teal-border:rgba(34,211,238,0.22);
+  --red:#ef4444;
+  --red-bg:rgba(239,68,68,0.09);
+  --red-border:rgba(239,68,68,0.25);
+  --green:#10b981;
+  --green-bg:rgba(16,185,129,0.08);
+  --green-border:rgba(16,185,129,0.2);
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;}
+
+/* grid bg texture */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+
+/* ---- HEADER ---- */
+#hdr{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:14px;
+  padding:0 20px;height:54px;
+  background:rgba(8,7,5,0.92);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
+}
+.hdr-icon{
+  width:30px;height:30px;border-radius:7px;flex-shrink:0;
+  background:var(--amber-bg);border:1px solid var(--amber-border);
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.hdr-name{font-size:13px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:var(--text);}
+.hdr-sub{font-size:10px;color:var(--text-muted);letter-spacing:0.03em;margin-top:1px;}
+.hdr-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;}
+.live-wrap{display:flex;align-items:center;gap:6px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+@keyframes pulse-live{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,0.5);}60%{box-shadow:0 0 0 5px rgba(16,185,129,0);}}
+.live-dot{animation:pulse-live 2.4s ease-out infinite;}
+.live-label{font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--green);}
+#clock{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-faint);letter-spacing:0.04em;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.hdr-tag{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:3px 9px;border-radius:5px;border:1px solid;}
+.hdr-tag.amber{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.hdr-tag.red{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+
+/* ---- MAIN ---- */
+#main{padding:20px;position:relative;z-index:1;}
+
+/* ---- STATS STRIP ---- */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.stat-card{
+  padding:16px 18px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+}
+.stat-lbl{font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:5px;}
+.stat-val{font-size:28px;font-weight:900;letter-spacing:-0.03em;line-height:1;font-family:'JetBrains Mono',monospace;}
+.stat-val.amber{color:var(--amber);}
+.stat-val.red{color:var(--red);}
+.stat-val.teal{color:var(--teal);}
+.stat-sub{font-size:10px;color:var(--text-muted);margin-top:4px;}
+
+/* ---- FILTER BAR ---- */
+.filter-bar{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  padding:12px 16px;margin-bottom:20px;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+}
+.filter-lbl{font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);margin-right:2px;}
+.fpill{
+  cursor:pointer;padding:4px 11px;border-radius:16px;
+  border:1px solid var(--border);background:transparent;
+  color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.03em;
+  transition:all 0.12s;user-select:none;
+}
+.fpill:hover{background:var(--surface-3);color:var(--text);border-color:rgba(255,255,255,0.12);}
+.fpill.active{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+
+/* ---- TIER SECTION ---- */
+.tier-sec{margin-bottom:28px;}
+.tier-hdr{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+.tier-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:5px;
+  font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;
+}
+.tier-badge.critical{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.tier-badge.caution{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
+.tier-badge.watch{background:var(--teal-bg);border:1px solid var(--teal-border);color:var(--teal);}
+.tier-bdot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.tier-cnt{font-size:10px;color:var(--text-faint);}
+.tier-line{flex:1;height:1px;background:var(--border);}
+
+/* ---- SIGNAL GRID ---- */
+.signal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:1100px){.signal-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.signal-grid{grid-template-columns:1fr;}}
+
+/* ---- SIGNAL CARD ---- */
+.sc{
+  border-radius:11px;background:var(--surface);
+  border:1px solid var(--border);
+  padding:15px;position:relative;overflow:hidden;
+  transition:transform 0.14s,border-color 0.14s;
+}
+.sc::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 10% 10%,rgba(255,255,255,0.025),transparent 55%);
+  opacity:0;transition:opacity 0.18s;
+}
+.sc:hover{transform:translateY(-2px);}
+.sc:hover::after{opacity:1;}
+
+.sc.tier-critical{border-color:rgba(239,68,68,0.28);}
+.sc.tier-caution{border-color:rgba(217,119,6,0.22);}
+.sc.tier-watch{border-color:rgba(34,211,238,0.18);}
+
+@keyframes crit-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}
+  50%{box-shadow:0 0 20px 0 rgba(239,68,68,0.12);}
+}
+.sc.tier-critical{animation:crit-pulse 3.5s ease-in-out infinite;}
+
+.sc-tier-badge{
+  position:absolute;top:13px;right:13px;
+  font-size:8px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
+  padding:2px 6px;border-radius:4px;
+}
+.tier-critical .sc-tier-badge{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.tier-caution .sc-tier-badge{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
+.tier-watch .sc-tier-badge{background:var(--teal-bg);border:1px solid var(--teal-border);color:var(--teal);}
+
+.sc-vendor{font-size:15px;font-weight:800;color:var(--text);padding-right:64px;margin-bottom:2px;}
+.sc-category{font-size:11px;color:var(--text-muted);margin-bottom:9px;}
+
+.sc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px;}
+.sc-tag{font-size:9px;font-weight:700;letter-spacing:0.05em;padding:2px 7px;border-radius:4px;}
+.sc-tag.pillar{color:var(--violet);background:var(--violet-bg);border:1px solid var(--violet-border);}
+.sc-tag.countdown{font-family:'JetBrains Mono',monospace;}
+.sc-tag.cdown-critical{color:var(--red);background:var(--red-bg);border:1px solid var(--red-border);}
+.sc-tag.cdown-caution{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-border);}
+.sc-tag.cdown-watch{color:var(--teal);background:var(--teal-bg);border:1px solid var(--teal-border);}
+.sc-tag.cdown-past{color:var(--text-faint);background:transparent;border:1px solid var(--border);}
+
+.sc-alert{
+  font-size:11.5px;color:var(--text-muted);line-height:1.65;
+  margin-bottom:12px;padding:9px 11px;
+  background:var(--surface-2);border-radius:7px;border:1px solid var(--border-soft);
+}
+
+.sc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:11px;}
+.sc-stat{text-align:center;padding:7px 4px;background:var(--surface-2);border-radius:6px;}
+.sc-stat-lbl{font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:3px;}
+.sc-stat-val{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.sc-stat-val.amber{color:var(--amber);}
+.sc-stat-val.red{color:var(--red);}
+.sc-stat-val.teal{color:var(--teal);}
+.sc-stat-val.muted{color:var(--text-muted);}
+
+.sc-risk-wrap{margin-bottom:10px;}
+.sc-risk-lbl{display:flex;justify-content:space-between;font-size:9px;color:var(--text-faint);margin-bottom:4px;}
+.sc-risk-track{height:3px;border-radius:2px;background:var(--surface-3);}
+.sc-risk-fill{height:100%;border-radius:2px;transition:width 1.1s cubic-bezier(0.4,0,0.2,1);}
+.sc-risk-fill.low{background:var(--green);}
+.sc-risk-fill.mid{background:var(--amber);}
+.sc-risk-fill.high{background:var(--red);}
+
+.sc-action{
+  font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+  padding-top:9px;border-top:1px solid var(--border);
+}
+.tier-critical .sc-action{color:var(--red);}
+.tier-caution .sc-action{color:var(--amber-bright);}
+.tier-watch .sc-action{color:var(--teal);}
+
+/* ---- PANELS ROW ---- */
+.panels-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;}
+@media(max-width:820px){.panels-row{grid-template-columns:1fr;}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px 20px;}
+.panel-ttl{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:16px;display:flex;align-items:center;gap:7px;}
+.panel-icon{font-size:12px;}
+
+/* Spend panel */
+.spend-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.spend-row:last-child{margin-bottom:0;}
+.spend-name{font-size:11px;font-weight:600;color:var(--text);width:100px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.spend-track{flex:1;height:5px;border-radius:3px;background:var(--surface-3);}
+.spend-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--amber),var(--amber-bright));transition:width 1.3s cubic-bezier(0.4,0,0.2,1);}
+.spend-amt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);width:46px;text-align:right;flex-shrink:0;}
+.spend-drift{font-size:9px;font-weight:700;width:36px;text-align:right;flex-shrink:0;}
+.drift-up{color:var(--red);}
+.drift-dn{color:var(--green);}
+.drift-fl{color:var(--text-faint);}
+
+/* Renewal timeline */
+.renewal-wrap{margin-top:6px;}
+.rt-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
+.rt-track{position:relative;height:3px;background:var(--surface-3);border-radius:2px;margin-bottom:18px;}
+.rt-dot{position:absolute;top:-4px;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;cursor:pointer;transition:transform 0.14s;}
+.rt-dot:hover{transform:translateX(-50%) scale(1.5);}
+.rt-dot.critical{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,0.6);}
+.rt-dot.caution{background:var(--amber);box-shadow:0 0 6px rgba(217,119,6,0.5);}
+.rt-dot.watch{background:var(--teal);box-shadow:0 0 5px rgba(34,211,238,0.4);}
+.rt-list{display:flex;flex-direction:column;gap:6px;}
+.rt-item{display:flex;align-items:center;gap:8px;font-size:10px;}
+.rt-item-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.rt-item-name{color:var(--text);font-weight:600;flex:1;}
+.rt-item-days{font-family:'JetBrains Mono',monospace;color:var(--text-muted);}
+.rt-item-tier{font-size:8px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:1px 5px;border-radius:3px;}
+.rt-item-tier.critical{color:var(--red);background:var(--red-bg);border:1px solid var(--red-border);}
+.rt-item-tier.caution{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-border);}
+.rt-item-tier.watch{color:var(--teal);background:var(--teal-bg);border:1px solid var(--teal-border);}
+
+/* hidden */
+.sc.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div class="hdr-icon">⬡</div>
+  <div>
+    <div class="hdr-name">Intelligence Command Center</div>
+    <div class="hdr-sub">VER &middot; DA&amp;O &middot; DET Cross-Pillar</div>
+  </div>
+  <div class="hdr-sep"></div>
+  <div class="live-wrap">
+    <span class="live-dot"></span>
+    <span class="live-label">Live</span>
+  </div>
+  <div id="clock"></div>
+  <div class="hdr-right">
+    <span class="hdr-tag amber">FY27 Q3</span>
+    <span class="hdr-tag red" id="hdr-critical-tag">2 Critical</span>
+  </div>
+</div>
+
+<div id="main">
+
+  <div class="stats-strip">
+    <div class="stat-card">
+      <div class="stat-lbl">Portfolio Spend</div>
+      <div class="stat-val amber">$122.6M</div>
+      <div class="stat-sub">Active vendor portfolio &middot; FY27</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Active Signals</div>
+      <div class="stat-val" id="stat-signals">9</div>
+      <div class="stat-sub">Across all DET pillars</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Critical Alerts</div>
+      <div class="stat-val red" id="stat-critical">2</div>
+      <div class="stat-sub">Renewal window active</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Renewals &lt; 90 Days</div>
+      <div class="stat-val teal" id="stat-renewals">5</div>
+      <div class="stat-sub" id="stat-nearest">Nearest: Workday</div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-lbl">Pillar</span>
+    <span class="fpill active" data-pillar="ALL">All DET</span>
+    <span class="fpill" data-pillar="DS">DS</span>
+    <span class="fpill" data-pillar="DAO">DA&amp;O</span>
+    <span class="fpill" data-pillar="DMT">DMT</span>
+    <span class="fpill" data-pillar="ET">ET</span>
+    <span class="fpill" data-pillar="EDD">EDD</span>
+    <span class="fpill" data-pillar="ES">ES</span>
+    <span class="fpill" data-pillar="IT">IT</span>
+    <span class="fpill" data-pillar="OFFICE">Office EAIT</span>
+    <span class="fpill" data-pillar="SFONSF">SF on SF</span>
+  </div>
+
+  <div id="signals-root"></div>
+
+  <div class="panels-row">
+    <div class="panel">
+      <div class="panel-ttl"><span class="panel-icon">◈</span> Spend Intelligence &mdash; Portfolio Leaders</div>
+      <div id="spend-panel"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-ttl"><span class="panel-icon">◷</span> Renewal Horizon &mdash; Next 180 Days</div>
+      <div class="renewal-wrap">
+        <div class="rt-labels">
+          <span>Now</span><span>60d</span><span>120d</span><span>180d</span>
+        </div>
+        <div class="rt-track" id="rt-track"></div>
+        <div class="rt-list" id="rt-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---- DATA ---- */
+var TODAY = new Date();
+TODAY.setHours(0,0,0,0);
+
+function days(renewalStr){
+  var d = new Date(renewalStr);
+  d.setHours(0,0,0,0);
+  return Math.round((d - TODAY) / 86400000);
+}
+
+var SIGNALS = [
+  {
+    id:'workday', tier:'critical',
+    vendor:'Workday', category:'Software / SaaS',
+    spend:'$23.7M', spendRaw:23.7,
+    renewal:'2026-11-30',
+    pillars:['ES'],
+    riskScore:38, concentrationRisk:90,
+    alert:'Highest concentration risk in portfolio — mission-critical HCM and Financials. No viable backup. Negotiation leverage diminishes with each passing day past this window.',
+    actionTag:'Escalate — Negotiations Due Now'
+  },
+  {
+    id:'servicenow', tier:'critical',
+    vendor:'ServiceNow', category:'Software / SaaS',
+    spend:'$0.9M', spendRaw:0.9,
+    renewal:'2026-12-01',
+    pillars:['IT'],
+    riskScore:22, concentrationRisk:35,
+    alert:'ITSM and workflow automation supporting all DET operations. PO must execute before Dec 1 — no gap in coverage acceptable.',
+    actionTag:'PO Execution Required'
+  },
+  {
+    id:'tech-mahindra', tier:'caution',
+    vendor:'Tech Mahindra', category:'Professional Services',
+    spend:'$6.5M', spendRaw:6.5,
+    renewal:'2027-04-30',
+    pillars:['IT','EDD'],
+    riskScore:52, concentrationRisk:50,
+    alert:'3 SLA metrics below target on Techforce Service Desk. VER advisory monitoring active. Elevated delivery risk at 68 — weekly check-in cadence recommended.',
+    actionTag:'Active SLA Review'
+  },
+  {
+    id:'deloitte', tier:'caution',
+    vendor:'Deloitte', category:'Professional Services',
+    spend:'$9.1M', spendRaw:9.1,
+    renewal:'2026-12-31',
+    pillars:['DAO'],
+    riskScore:31, concentrationRisk:40,
+    alert:'Multi-service engagement: HR Consulting, Payroll Advisory, Tax, and M&A. Renewal Dec 31. Scope baseline confirmation needed before term closes.',
+    actionTag:'Scope Review Before Dec 31'
+  },
+  {
+    id:'ibm', tier:'caution',
+    vendor:'IBM', category:'Professional Services',
+    spend:'$14.3M', spendRaw:14.3,
+    renewal:'2026-08-01',
+    pillars:['ET'],
+    riskScore:43, concentrationRisk:55,
+    alert:'Renewal term passed Aug 1 — active review with Procurement. Enterprise application, data services, and video streaming platform all in scope.',
+    actionTag:'Active Procurement Review'
+  },
+  {
+    id:'bcg', tier:'caution',
+    vendor:'BCG', category:'Professional Services',
+    spend:'$6.0M', spendRaw:6.0,
+    renewal:'2026-06-30',
+    pillars:['DAO'],
+    riskScore:47, concentrationRisk:30,
+    alert:'Renewal term passed Jun 30. Delivery risk at 70 — highest in active monitoring queue. VER Director engaged with business owner. SOW scope under evaluation.',
+    actionTag:'Director Escalation Active'
+  },
+  {
+    id:'google-cloud', tier:'watch',
+    vendor:'Google Cloud', category:'Cloud & Managed Services',
+    spend:'$14.0M', spendRaw:14.0,
+    renewal:'2027-01-15',
+    pillars:['ET'],
+    riskScore:30, concentrationRisk:65,
+    alert:'GCP and Workspace nominal. Gemini AI usage growing across DET engineering. Reassess scope and usage baseline before Jan renewal.',
+    actionTag:'Renewal Prep — Jan 2027'
+  },
+  {
+    id:'cognizant', tier:'watch',
+    vendor:'Cognizant', category:'Professional Services',
+    spend:'$9.5M', spendRaw:9.5,
+    renewal:'2027-02-14',
+    pillars:['ES','DAO'],
+    riskScore:31, concentrationRisk:60,
+    alert:'ES Yr3 is final contract year — FY28 decision required. FINS Yr2 active. Both engagements at or above SLA. Begin FY28 planning cycle.',
+    actionTag:'FY28 Planning Required'
+  },
+  {
+    id:'okta', tier:'watch',
+    vendor:'Okta', category:'Software / SaaS',
+    spend:'$0.8M', spendRaw:0.8,
+    renewal:'2026-11-30',
+    pillars:['IT'],
+    riskScore:22, concentrationRisk:40,
+    alert:'FY27 renewal approved at $1.27M. PO execution confirmation pending. SSO and MFA for all DET workforce — confirm coverage before Nov 30.',
+    actionTag:'Confirm PO Execution'
+  }
+];
+
+/* ---- TIER CONFIG ---- */
+var TIER_ORDER = ['critical','caution','watch'];
+var TIER_LABEL = {critical:'Critical',caution:'Caution',watch:'Watch'};
+
+/* ---- COUNTDOWN HELPERS ---- */
+function cdownClass(d){
+  if(d < 0) return 'cdown-past';
+  if(d <= 30) return 'cdown-critical';
+  if(d <= 90) return 'cdown-caution';
+  return 'cdown-watch';
+}
+function cdownText(d){
+  if(d < 0) return Math.abs(d)+'d overdue';
+  return d+'d';
+}
+function riskFillClass(score){
+  if(score >= 45) return 'high';
+  if(score >= 30) return 'mid';
+  return 'low';
+}
+function statValClass(d){
+  if(d < 0) return 'muted';
+  if(d <= 30) return 'red';
+  if(d <= 90) return 'amber';
+  return 'muted';
+}
+
+/* ---- BUILD CARD ---- */
+function buildCard(sig){
+  var d = days(sig.renewal);
+  var card = document.createElement('article');
+  card.className = 'sc tier-' + sig.tier;
+  card.dataset.pillars = sig.pillars.join(',');
+
+  /* tier badge */
+  var tb = document.createElement('span');
+  tb.className = 'sc-tier-badge';
+  tb.textContent = TIER_LABEL[sig.tier];
+  card.appendChild(tb);
+
+  /* vendor */
+  var vn = document.createElement('div');
+  vn.className = 'sc-vendor';
+  vn.textContent = sig.vendor;
+  card.appendChild(vn);
+
+  /* category */
+  var vc = document.createElement('div');
+  vc.className = 'sc-category';
+  vc.textContent = sig.category;
+  card.appendChild(vc);
+
+  /* tags */
+  var tags = document.createElement('div');
+  tags.className = 'sc-tags';
+  sig.pillars.forEach(function(p){
+    var t = document.createElement('span');
+    t.className = 'sc-tag pillar';
+    t.textContent = p;
+    tags.appendChild(t);
+  });
+  var cd = document.createElement('span');
+  cd.className = 'sc-tag countdown ' + cdownClass(d);
+  cd.textContent = cdownText(d);
+  tags.appendChild(cd);
+  card.appendChild(tags);
+
+  /* alert */
+  var al = document.createElement('div');
+  al.className = 'sc-alert';
+  al.textContent = sig.alert;
+  card.appendChild(al);
+
+  /* stats */
+  var stats = document.createElement('div');
+  stats.className = 'sc-stats';
+  var renewalLabel = d < 0 ? 'Past Due' : (d <= 60 ? d+'d' : new Date(sig.renewal).toLocaleDateString('en-US',{month:'short',year:'2-digit'}));
+  [{lbl:'Spend',val:sig.spend,cls:'amber'},{lbl:'Risk Score',val:sig.riskScore,cls:sig.riskScore>=45?'red':sig.riskScore>=30?'amber':'teal'},{lbl:'Renewal',val:renewalLabel,cls:statValClass(d)}].forEach(function(s){
+    var wrap = document.createElement('div');
+    wrap.className = 'sc-stat';
+    var l = document.createElement('div');
+    l.className = 'sc-stat-lbl';
+    l.textContent = s.lbl;
+    var v = document.createElement('div');
+    v.className = 'sc-stat-val ' + s.cls;
+    v.textContent = s.val;
+    wrap.appendChild(l);
+    wrap.appendChild(v);
+    stats.appendChild(wrap);
+  });
+  card.appendChild(stats);
+
+  /* risk bar */
+  var rw = document.createElement('div');
+  rw.className = 'sc-risk-wrap';
+  var rl = document.createElement('div');
+  rl.className = 'sc-risk-lbl';
+  var rlt = document.createElement('span');
+  rlt.textContent = 'Intelligence Score';
+  var rlv = document.createElement('span');
+  rlv.textContent = sig.riskScore + ' / 100';
+  rl.appendChild(rlt);
+  rl.appendChild(rlv);
+  var rt = document.createElement('div');
+  rt.className = 'sc-risk-track';
+  var rf = document.createElement('div');
+  rf.className = 'sc-risk-fill ' + riskFillClass(sig.riskScore);
+  rf.style.width = '0%';
+  rt.appendChild(rf);
+  rw.appendChild(rl);
+  rw.appendChild(rt);
+  card.appendChild(rw);
+  setTimeout(function(){ rf.style.width = sig.riskScore + '%'; }, 120);
+
+  /* action */
+  var ac = document.createElement('div');
+  ac.className = 'sc-action';
+  ac.textContent = '→ ' + sig.actionTag;
+  card.appendChild(ac);
+
+  return card;
+}
+
+/* ---- RENDER SIGNAL SECTIONS ---- */
+var root = document.getElementById('signals-root');
+TIER_ORDER.forEach(function(tier){
+  var tierSigs = SIGNALS.filter(function(s){ return s.tier === tier; });
+  if(!tierSigs.length) return;
+
+  var sec = document.createElement('div');
+  sec.className = 'tier-sec';
+  sec.dataset.tier = tier;
+
+  var hdr = document.createElement('div');
+  hdr.className = 'tier-hdr';
+
+  var badge = document.createElement('div');
+  badge.className = 'tier-badge ' + tier;
+  var bdot = document.createElement('span');
+  bdot.className = 'tier-bdot';
+  var blbl = document.createElement('span');
+  blbl.textContent = TIER_LABEL[tier];
+  badge.appendChild(bdot);
+  badge.appendChild(blbl);
+
+  var cnt = document.createElement('span');
+  cnt.className = 'tier-cnt';
+  cnt.textContent = tierSigs.length + ' signal' + (tierSigs.length !== 1 ? 's' : '');
+
+  var line = document.createElement('div');
+  line.className = 'tier-line';
+
+  hdr.appendChild(badge);
+  hdr.appendChild(cnt);
+  hdr.appendChild(line);
+  sec.appendChild(hdr);
+
+  var grid = document.createElement('div');
+  grid.className = 'signal-grid';
+  tierSigs.forEach(function(s){ grid.appendChild(buildCard(s)); });
+  sec.appendChild(grid);
+
+  root.appendChild(sec);
+});
+
+/* ---- PILLAR FILTER ---- */
+var fpills = document.querySelectorAll('.fpill');
+fpills.forEach(function(pill){
+  pill.addEventListener('click', function(){
+    fpills.forEach(function(p){ p.classList.remove('active'); });
+    pill.classList.add('active');
+    var pillar = pill.dataset.pillar;
+    var cards = document.querySelectorAll('.sc');
+    cards.forEach(function(card){
+      var ps = card.dataset.pillars.split(',');
+      card.classList.toggle('hidden', pillar !== 'ALL' && ps.indexOf(pillar) === -1);
+    });
+    document.querySelectorAll('.tier-sec').forEach(function(sec){
+      sec.style.display = sec.querySelectorAll('.sc:not(.hidden)').length ? '' : 'none';
+    });
+  });
+});
+
+/* ---- SPEND PANEL ---- */
+var spendPanel = document.getElementById('spend-panel');
+var TOP_SPEND = [
+  {name:'Workday',      amt:23.7, drift:'+2.1%', dc:'drift-up'},
+  {name:'NTT Data',     amt:22.8, drift:'—',   dc:'drift-fl'},
+  {name:'AWS',          amt:17.2, drift:'+8.3%', dc:'drift-up'},
+  {name:'IBM',          amt:14.3, drift:'-1.2%', dc:'drift-dn'},
+  {name:'Google Cloud', amt:14.0, drift:'+5.7%', dc:'drift-up'},
+  {name:'JLL',          amt:12.1, drift:'—',   dc:'drift-fl'}
+];
+var maxAmt = TOP_SPEND[0].amt;
+TOP_SPEND.forEach(function(item){
+  var row = document.createElement('div');
+  row.className = 'spend-row';
+
+  var nm = document.createElement('div');
+  nm.className = 'spend-name';
+  nm.textContent = item.name;
+
+  var trk = document.createElement('div');
+  trk.className = 'spend-track';
+  var fill = document.createElement('div');
+  fill.className = 'spend-fill';
+  fill.style.width = '0%';
+  trk.appendChild(fill);
+
+  var amt = document.createElement('div');
+  amt.className = 'spend-amt';
+  amt.textContent = '$' + item.amt + 'M';
+
+  var drift = document.createElement('div');
+  drift.className = 'spend-drift ' + item.dc;
+  drift.textContent = item.drift;
+
+  row.appendChild(nm);
+  row.appendChild(trk);
+  row.appendChild(amt);
+  row.appendChild(drift);
+  spendPanel.appendChild(row);
+
+  setTimeout(function(){
+    fill.style.width = Math.round((item.amt / maxAmt) * 100) + '%';
+  }, 250);
+});
+
+/* ---- RENEWAL TIMELINE ---- */
+var rtTrack = document.getElementById('rt-track');
+var rtList = document.getElementById('rt-list');
+var HORIZON = 180;
+
+var renewals = SIGNALS
+  .map(function(s){ return {vendor:s.vendor, tier:s.tier, d:days(s.renewal)}; })
+  .filter(function(r){ return r.d >= 0 && r.d <= HORIZON; })
+  .sort(function(a,b){ return a.d - b.d; });
+
+renewals.forEach(function(r){
+  var pct = (r.d / HORIZON) * 100;
+
+  var dot = document.createElement('div');
+  dot.className = 'rt-dot ' + r.tier;
+  dot.style.left = pct + '%';
+  dot.title = r.vendor + ' — ' + r.d + 'd';
+  rtTrack.appendChild(dot);
+
+  var item = document.createElement('div');
+  item.className = 'rt-item';
+
+  var idot = document.createElement('div');
+  idot.className = 'rt-item-dot';
+  idot.style.background = r.tier === 'critical' ? 'var(--red)' : r.tier === 'caution' ? 'var(--amber)' : 'var(--teal)';
+
+  var iname = document.createElement('div');
+  iname.className = 'rt-item-name';
+  iname.textContent = r.vendor;
+
+  var idays = document.createElement('div');
+  idays.className = 'rt-item-days';
+  idays.textContent = r.d + 'd';
+
+  var itier = document.createElement('div');
+  itier.className = 'rt-item-tier ' + r.tier;
+  itier.textContent = r.tier.toUpperCase();
+
+  item.appendChild(idot);
+  item.appendChild(iname);
+  item.appendChild(idays);
+  item.appendChild(itier);
+  rtList.appendChild(item);
+});
+
+/* ---- LIVE CLOCK ---- */
+var clockEl = document.getElementById('clock');
+function tick(){
+  if(!clockEl) return;
+  clockEl.textContent = new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(tick, 1000);
+tick();
+
+})();
+</script>
+</body>
+</html>
