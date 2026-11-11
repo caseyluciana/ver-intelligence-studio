@@ -159,9 +159,12 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .tl-edge-lbl{font-family:'Inter',sans-serif;font-size:8px;fill:var(--text-faint);}
 .tl-total-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;fill:var(--amber);}
 
-/* INTEL SIDE PANEL — impact left, tools right */
-.intel-side-panel{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:36px;align-items:start;}
-@media(max-width:800px){.intel-side-panel{grid-template-columns:1fr;}}
+/* MAIN THREE-COLUMN SANDWICH LAYOUT */
+.main-layout{display:grid;grid-template-columns:220px 1fr 220px;gap:28px;align-items:start;margin-bottom:0;}
+@media(max-width:1100px){.main-layout{grid-template-columns:180px 1fr 180px;gap:20px;}}
+@media(max-width:800px){.main-layout{grid-template-columns:1fr;}}
+.sidebar-left,.sidebar-right{position:sticky;top:68px;}
+.center-col{min-width:0;}
 .intel-col-hd{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
 .intel-col-hd-label{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);}
 .intel-col-hd-sub{font-size:10px;color:var(--text-faint);}
@@ -189,23 +192,18 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .tool-card-h-tag{font-size:8px;font-weight:700;letter-spacing:.08em;padding:2px 6px;border-radius:3px;background:var(--ai-bg);border:1px solid var(--ai-border);color:var(--ai);}
 .tool-card-h-arrow{font-size:11px;color:var(--ai);opacity:.7;}
 
-/* QUERY */
-.query-wrap{background:var(--surface);border:1px solid var(--ai-border);border-radius:14px;padding:20px 22px;}
-.query-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
-.query-icon{width:26px;height:26px;border-radius:6px;background:var(--ai-bg);border:1px solid var(--ai-border);display:flex;align-items:center;justify-content:center;font-size:12px;}
-.query-title{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ai);}
-.query-row{display:flex;gap:10px;margin-bottom:12px;}
-#q-input{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .15s;}
-#q-input::placeholder{color:var(--text-faint);}
-#q-input:focus{border-color:var(--ai-border);}
-#q-btn{background:var(--ai-bg);border:1px solid var(--ai-border);border-radius:8px;color:var(--ai);font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer;transition:background .15s;white-space:nowrap;}
-#q-btn:hover{background:var(--violet-bg);}
-.query-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
-.q-chip{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:10px;font-weight:600;padding:4px 10px;cursor:pointer;transition:border-color .15s,color .15s;}
-.q-chip:hover{border-color:var(--ai-border);color:var(--ai);}
-#q-out{display:none;background:var(--surface-2);border:1px solid var(--ai-border);border-radius:9px;padding:14px 16px;font-size:13px;line-height:1.75;color:var(--text-muted);}
-#q-out.visible{display:block;}
-#q-out strong{color:var(--text);}
+/* INTELLIGENCE BRIEFS */
+.briefs-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:36px;}
+.briefs-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
+.briefs-title{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
+.briefs-note{font-size:10px;color:var(--text-faint);line-height:1.5;max-width:340px;text-align:right;}
+.briefs-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;margin-top:14px;}
+.b-chip{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:10px;font-weight:600;padding:5px 11px;cursor:pointer;transition:border-color .15s,color .15s,background .15s;}
+.b-chip:hover{border-color:var(--ai-border);color:var(--ai);}
+.b-chip.active{background:var(--ai-bg);border-color:var(--ai-border);color:var(--ai);}
+#b-out{display:none;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:16px 18px;font-size:13px;line-height:1.85;color:var(--text-muted);}
+#b-out.visible{display:block;}
+#b-out strong{color:var(--text);}
 
 /* ── MODAL — CENTER + FLIP ─────────────────── */
 #modal-overlay{
@@ -404,9 +402,9 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
     </div>
   </div>
 
-  <div class="intel-side-panel">
+  <div class="main-layout">
 
-    <div>
+    <div class="sidebar-left">
       <div class="intel-col-hd">
         <span class="intel-col-hd-label">VER Q3 FY27 Impact</span>
         <span class="intel-col-hd-sub">$118.5M portfolio under active coverage</span>
@@ -447,7 +445,41 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
       </div>
     </div>
 
-    <div>
+    <div class="center-col">
+
+  <div class="sec-hd">
+    <div class="sec-hd-left">
+      <span class="sec-hd-label">AI Intelligence Signals</span>
+      <span class="sec-hd-count">5 active</span>
+    </div>
+    <span class="sec-hd-meta">Click any signal to open intelligence brief</span>
+  </div>
+  <div class="pillar-filter" id="pillar-filter"></div>
+  <div class="tiles-grid" id="tiles-grid"></div>
+
+  <div class="timeline-wrap">
+    <div class="sec-hd">
+      <div class="sec-hd-left">
+        <span class="sec-hd-label">Renewal Horizon</span>
+        <span class="sec-hd-count">6 contracts · $55.4M</span>
+      </div>
+      <span class="sec-hd-meta">Next 180 days</span>
+    </div>
+    <svg id="tl-svg" viewBox="0 0 700 100" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="briefs-wrap">
+    <div class="briefs-head">
+      <span class="briefs-title">&#x1F4DA; Intelligence Briefs</span>
+      <span class="briefs-note">Pre-built briefings on common portfolio questions &mdash; updated each quarter. AI query coming in a future release.</span>
+    </div>
+    <div class="briefs-chips" id="q-chips"></div>
+    <div id="b-out"></div>
+  </div>
+
+    </div><!-- /center-col -->
+
+    <div class="sidebar-right">
       <div class="intel-col-hd">
         <span class="intel-col-hd-label">Intelligence Tools</span>
         <span class="intel-col-hd-sub">6 deployed &middot; quick access</span>
@@ -486,43 +518,9 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
           </div>
         </a>
       </div>
-    </div>
+    </div><!-- /sidebar-right -->
 
-  </div>
-
-  <div class="sec-hd">
-    <div class="sec-hd-left">
-      <span class="sec-hd-label">AI Intelligence Signals</span>
-      <span class="sec-hd-count">5 active</span>
-    </div>
-    <span class="sec-hd-meta">Click any signal to open intelligence brief</span>
-  </div>
-  <div class="pillar-filter" id="pillar-filter"></div>
-  <div class="tiles-grid" id="tiles-grid"></div>
-
-  <div class="timeline-wrap">
-    <div class="sec-hd">
-      <div class="sec-hd-left">
-        <span class="sec-hd-label">Renewal Horizon</span>
-        <span class="sec-hd-count">6 contracts · $55.4M</span>
-      </div>
-      <span class="sec-hd-meta">Next 180 days</span>
-    </div>
-    <svg id="tl-svg" viewBox="0 0 700 100" xmlns="http://www.w3.org/2000/svg"></svg>
-  </div>
-
-  <div class="query-wrap">
-    <div class="query-head">
-      <div class="query-icon">&#x1F9E0;</div>
-      <div class="query-title">Portfolio Query Interface</div>
-    </div>
-    <div class="query-row">
-      <input type="text" id="q-input" placeholder="Ask the intelligence layer anything about this portfolio…"/>
-      <button id="q-btn">&#x25B6; Run</button>
-    </div>
-    <div class="query-chips" id="q-chips"></div>
-    <div id="q-out"></div>
-  </div>
+  </div><!-- /main-layout -->
 
 </div>
 
@@ -871,30 +869,25 @@ setTimeout(function(){
   document.getElementById('db-ps').style.width='39.8%';
 },300);
 
-/* ── QUERY ──────────────────────────────────── */
+/* ── INTELLIGENCE BRIEFS ────────────────────── */
 (function(){
   var chips=document.getElementById('q-chips');
+  var activeBtn=null;
   Q_SUGGESTIONS.forEach(function(q){
-    var btn=el('button','q-chip');
+    var btn=el('button','b-chip');
     btn.textContent=q.label;
     btn.addEventListener('click',function(){
-      document.getElementById('q-input').value=q.label;
-      showAnswer(q.key);
+      if(activeBtn)activeBtn.classList.remove('active');
+      btn.classList.add('active');
+      activeBtn=btn;
+      showBrief(q.key);
     });
     chips.appendChild(btn);
   });
-  document.getElementById('q-btn').addEventListener('click',function(){
-    var val=document.getElementById('q-input').value.trim().toLowerCase();
-    var matched=null;
-    Q_SUGGESTIONS.forEach(function(q){if(val.indexOf(q.label.toLowerCase().split(' ')[0])>-1)matched=q.key;});
-    if(!matched)Object.keys(Q_RESPONSES).forEach(function(k){if(val.indexOf(k)>-1)matched=k;});
-    showAnswer(matched||'closeoutlook');
-  });
-  document.getElementById('q-input').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('q-btn').click();});
 })();
 
-function showAnswer(key){
-  var out=document.getElementById('q-out');
+function showBrief(key){
+  var out=document.getElementById('b-out');
   var resp=Q_RESPONSES[key]||Q_RESPONSES.closeoutlook;
   while(out.firstChild)out.removeChild(out.firstChild);
   richText(resp,out);
