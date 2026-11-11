@@ -175,10 +175,14 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 }
 #modal-overlay.open{opacity:1;pointer-events:all;}
 #modal-panel{
-  width:min(660px,94vw);max-height:88vh;overflow-y:auto;
+  width:min(940px,96vw);max-height:82vh;overflow-y:auto;
   background:var(--surface);border:1px solid var(--border);border-radius:18px;
   position:relative;
+  transition:box-shadow .35s ease,border-color .35s ease;
 }
+#modal-panel.glow-critical{border-color:rgba(239,68,68,.35);box-shadow:0 0 0 1px rgba(239,68,68,.1),0 0 70px rgba(239,68,68,.22),0 30px 90px rgba(0,0,0,.55);}
+#modal-panel.glow-elevated{border-color:rgba(217,119,6,.35);box-shadow:0 0 0 1px rgba(217,119,6,.1),0 0 70px rgba(217,119,6,.22),0 30px 90px rgba(0,0,0,.55);}
+#modal-panel.glow-monitor{border-color:rgba(34,211,238,.35);box-shadow:0 0 0 1px rgba(34,211,238,.1),0 0 70px rgba(34,211,238,.22),0 30px 90px rgba(0,0,0,.55);}
 #modal-panel.flip-in{animation:flip-reveal .65s cubic-bezier(0.34,1.4,0.64,1) forwards;}
 #modal-panel.flip-out{animation:flip-hide .32s cubic-bezier(0.4,0,0.8,0.8) forwards;}
 @keyframes flip-reveal{
@@ -192,10 +196,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 }
 
 /* MODAL CONTENT */
-.modal-accent{height:4px;flex-shrink:0;border-radius:18px 18px 0 0;}
-.modal-accent.critical{background:linear-gradient(90deg,var(--red),#f87171);}
-.modal-accent.elevated{background:linear-gradient(90deg,var(--amber),var(--amber-bright));}
-.modal-accent.monitor{background:linear-gradient(90deg,var(--teal),#67e8f9);}
+.modal-accent{display:none;}
 .modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);position:relative;}
 .modal-close{position:absolute;top:14px;right:16px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;transition:color .15s,border-color .15s;}
 .modal-close:hover{color:var(--text);border-color:var(--text-muted);}
@@ -208,7 +209,10 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .modal-impact{font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
 
 /* MODAL HERO METRIC */
-.modal-hero{padding:22px 24px 18px;background:var(--surface-2);border-bottom:1px solid var(--border);text-align:center;}
+.modal-hero{padding:22px 24px 18px;border-bottom:1px solid var(--border);text-align:center;}
+.modal-hero.critical{background:linear-gradient(180deg,rgba(239,68,68,.07) 0%,var(--surface-2) 100%);}
+.modal-hero.elevated{background:linear-gradient(180deg,rgba(217,119,6,.07) 0%,var(--surface-2) 100%);}
+.modal-hero.monitor{background:linear-gradient(180deg,rgba(34,211,238,.07) 0%,var(--surface-2) 100%);}
 .modal-hero-num{font-family:'JetBrains Mono',monospace;font-size:48px;font-weight:700;line-height:1;letter-spacing:-.02em;margin-bottom:6px;}
 .modal-hero-num.critical{color:var(--red);}
 .modal-hero-num.elevated{color:var(--amber);}
@@ -216,6 +220,9 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 
 /* MODAL BODY */
 .modal-body{padding:18px 22px 22px;}
+.modal-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:4px;}
+@media(max-width:600px){.modal-body-grid{grid-template-columns:1fr;}}
+.modal-body-col{display:flex;flex-direction:column;}
 .modal-sec-label{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;margin-top:20px;}
 .modal-sec-label:first-child{margin-top:0;}
 .modal-analysis{font-size:13px;line-height:1.85;color:var(--text-muted);}
@@ -725,22 +732,31 @@ var mHeroLbl=document.getElementById('m-hero-lbl');
 var mBody=document.getElementById('m-body');
 
 function openModal(sig){
-  mAccent.className='modal-accent '+sig.tier;
+  // header
   mTier.className='modal-tier '+sig.tier;
   mTier.textContent=sig.tier.charAt(0).toUpperCase()+sig.tier.slice(1);
   mType.textContent=sig.type;
   mHeadline.textContent=sig.headline;
   mImpact.textContent=sig.impact;
+
+  // hero — tinted bg
+  document.getElementById('m-hero').className='modal-hero '+sig.tier;
   mHeroNum.className='modal-hero-num '+(sig.heroNumCls||'');
   mHeroNum.textContent=sig.heroNum;
   mHeroLbl.textContent=sig.heroLbl;
 
   while(mBody.firstChild)mBody.removeChild(mBody.firstChild);
 
-  var lbl1=el('div','modal-sec-label');lbl1.textContent='AI Analysis';mBody.appendChild(lbl1);
-  var analysis=el('p','modal-analysis');richText(sig.analysis,analysis);mBody.appendChild(analysis);
+  // 2-column: analysis (left) + evidence (right)
+  var grid=el('div','modal-body-grid');
 
-  var lbl2=el('div','modal-sec-label');lbl2.textContent='Evidence';mBody.appendChild(lbl2);
+  var leftCol=el('div','modal-body-col');
+  var lbl1=el('div','modal-sec-label');lbl1.textContent='AI Analysis';
+  var analysis=el('p','modal-analysis');richText(sig.analysis,analysis);
+  leftCol.appendChild(lbl1);leftCol.appendChild(analysis);
+
+  var rightCol=el('div','modal-body-col');
+  var lbl2=el('div','modal-sec-label');lbl2.textContent='Evidence';
   var tbl=el('div','modal-ev-table');
   var hdr=el('div','modal-ev-row hd');
   ['Vendor / Asset','Amount','Status'].forEach(function(h){
@@ -756,8 +772,12 @@ function openModal(sig){
     row.appendChild(c1);row.appendChild(c2);row.appendChild(c3);
     tbl.appendChild(row);
   });
-  mBody.appendChild(tbl);
+  rightCol.appendChild(lbl2);rightCol.appendChild(tbl);
 
+  grid.appendChild(leftCol);grid.appendChild(rightCol);
+  mBody.appendChild(grid);
+
+  // actions — full width
   var lbl3=el('div','modal-sec-label');lbl3.textContent='Recommended Actions';mBody.appendChild(lbl3);
   sig.actions.forEach(function(act,i){
     var item=el('div','modal-action-item');
@@ -773,6 +793,10 @@ function openModal(sig){
     mBody.appendChild(item);
   });
 
+  // glow
+  panel.classList.remove('glow-critical','glow-elevated','glow-monitor');
+  panel.classList.add('glow-'+sig.tier);
+
   overlay.classList.add('open');
   panel.classList.remove('flip-out');
   panel.classList.add('flip-in');
@@ -785,7 +809,7 @@ function closeModal(){
   panel.classList.add('flip-out');
   setTimeout(function(){
     overlay.classList.remove('open');
-    panel.classList.remove('flip-out');
+    panel.classList.remove('flip-out','glow-critical','glow-elevated','glow-monitor');
     document.body.style.overflow='';
   },320);
 }
