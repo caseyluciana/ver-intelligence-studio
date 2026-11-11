@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Portfolio Intelligence — VER · DA&amp;O</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#060504;--surface:#0d0b09;--surface-2:#131009;--surface-3:#1e1810;
+  --border:rgba(255,255,255,0.07);--border-soft:rgba(255,255,255,0.04);
+  --text:#ede5d8;--text-muted:#9a8e7f;--text-faint:#524840;
+  --amber:#d97706;--amber-bright:#f59e0b;
+  --amber-bg:rgba(217,119,6,0.09);--amber-border:rgba(217,119,6,0.22);
+  --violet:#a78bfa;--violet-bg:rgba(167,139,250,0.08);--violet-border:rgba(167,139,250,0.22);
+  --teal:#22d3ee;--teal-bg:rgba(34,211,238,0.07);--teal-border:rgba(34,211,238,0.22);
+  --red:#ef4444;--red-bg:rgba(239,68,68,0.09);--red-border:rgba(239,68,68,0.25);
+  --green:#10b981;--green-bg:rgba(16,185,129,0.08);--green-border:rgba(16,185,129,0.2);
+  --ai:#a78bfa;--ai-bg:rgba(167,139,250,0.07);--ai-border:rgba(167,139,250,0.18);
+}
+[data-theme="light"]{
+  --bg:#f3f4f7;--surface:#ffffff;--surface-2:#eaecf2;--surface-3:#dde0ea;
+  --border:rgba(0,0,0,0.09);--border-soft:rgba(0,0,0,0.05);
+  --text:#12131a;--text-muted:#4a4b62;--text-faint:#8e8fa8;
+  --amber:#b45309;--amber-bright:#d97706;
+  --amber-bg:rgba(180,83,9,0.07);--amber-border:rgba(180,83,9,0.18);
+  --violet:#7c3aed;--violet-bg:rgba(124,58,237,0.07);--violet-border:rgba(124,58,237,0.18);
+  --teal:#0d9488;--teal-bg:rgba(13,148,136,0.07);--teal-border:rgba(13,148,136,0.2);
+  --red:#dc2626;--red-bg:rgba(220,38,38,0.06);--red-border:rgba(220,38,38,0.18);
+  --green:#059669;--green-bg:rgba(5,150,105,0.07);--green-border:rgba(5,150,105,0.2);
+  --ai:#7c3aed;--ai-bg:rgba(124,58,237,0.06);--ai-border:rgba(124,58,237,0.16);
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;transition:background .25s,color .25s;}
+[data-theme="dark"] body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.010) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.010) 1px,transparent 1px);background-size:32px 32px;}
+
+/* HEADER */
+#hdr{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:0 24px;height:56px;background:rgba(6,5,4,.94);border-bottom:1px solid var(--border);backdrop-filter:blur(14px);transition:background .25s;}
+[data-theme="light"] #hdr{background:rgba(245,246,248,.96);}
+.hdr-icon{width:32px;height:32px;border-radius:7px;flex-shrink:0;background:var(--ai-bg);border:1px solid var(--ai-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--ai);}
+.hdr-name{font-size:13px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
+.hdr-sub{font-size:10px;color:var(--text-muted);letter-spacing:.03em;margin-top:1px;}
+.hdr-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;}
+.scan-wrap{display:flex;align-items:center;gap:6px;}
+.scan-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse-g 2.4s ease-out infinite;}
+@keyframes pulse-g{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.5);}60%{box-shadow:0 0 0 6px rgba(16,185,129,0);}}
+.scan-text{font-size:10px;color:var(--text-muted);}
+.scan-text b{color:var(--text);font-weight:600;}
+#clock{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint);}
+.hdr-spacer{flex:1;}
+.btn-theme{margin-left:4px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:11px;padding:5px 10px;cursor:pointer;transition:border-color .15s,color .15s;}
+.btn-theme:hover{color:var(--text);border-color:var(--text-muted);}
+
+/* MAIN */
+#wrap{position:relative;z-index:1;max-width:1560px;margin:0 auto;padding:32px 48px 80px;}
+@media(max-width:700px){#wrap{padding:20px 18px 60px;}}
+
+/* HERO ROW */
+.hero-row{display:grid;grid-template-columns:260px 1fr 260px;gap:20px;align-items:center;margin-bottom:32px;}
+@media(max-width:900px){.hero-row{grid-template-columns:1fr 1fr;}.hero-gauge{grid-column:1/-1;order:-1;}}
+@media(max-width:560px){.hero-row{grid-template-columns:1fr;}}
+
+/* LEFT: PORTFOLIO METRICS */
+.hero-metrics{display:flex;flex-direction:column;gap:0;}
+.metric-row{display:flex;flex-direction:column;gap:2px;padding:14px 0;border-bottom:1px solid var(--border-soft);}
+.metric-row:first-child{padding-top:0;}
+.metric-row:last-child{border-bottom:none;padding-bottom:0;}
+.metric-label{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--text-faint);}
+.metric-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;color:var(--text);line-height:1.1;}
+.metric-val.amber{color:var(--amber);}
+.metric-val.violet{color:var(--violet);}
+.metric-sub{font-size:10px;color:var(--text-muted);margin-top:2px;}
+
+/* CENTER: GAUGE */
+.hero-gauge{display:flex;flex-direction:column;align-items:center;gap:8px;}
+#gauge{width:100%;max-width:280px;height:auto;overflow:visible;}
+.gauge-track{fill:none;stroke:var(--surface-3);stroke-width:14;stroke-linecap:round;}
+.gauge-fill{fill:none;stroke-width:14;stroke-linecap:round;}
+.gauge-over{fill:none;stroke:var(--red);stroke-width:14;stroke-linecap:round;}
+.gauge-text-main{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;fill:var(--text);text-anchor:middle;}
+.gauge-text-label{font-family:'Inter',sans-serif;font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;fill:var(--text-faint);text-anchor:middle;}
+.gauge-text-edge{font-family:'JetBrains Mono',monospace;font-size:7.5px;fill:var(--text-faint);text-anchor:middle;}
+.gauge-tick{stroke:var(--red);stroke-width:2;}
+.gauge-tick-lbl{font-family:'Inter',sans-serif;font-size:7px;font-weight:700;fill:var(--red);}
+.gauge-marker-lbl{font-family:'Inter',sans-serif;font-size:7px;fill:var(--text-faint);}
+.gauge-overage-badge{display:flex;align-items:center;gap:6px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:6px;padding:4px 10px;}
+.gauge-overage-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red);}
+.gauge-overage-txt{font-size:10px;color:var(--text-muted);}
+
+/* RIGHT: DRIFT MINI */
+.hero-drift{display:flex;flex-direction:column;gap:12px;}
+.drift-hd{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--text-faint);margin-bottom:4px;}
+.drift-row{display:flex;flex-direction:column;gap:4px;}
+.drift-meta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.drift-cat{font-size:11px;font-weight:600;color:var(--text-muted);}
+.drift-amt{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:var(--text);}
+.drift-dir{font-size:10px;font-weight:700;}
+.drift-dir.up{color:var(--red);}
+.drift-dir.flat{color:var(--text-faint);}
+.drift-track{height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;}
+.drift-bar{height:100%;border-radius:3px;width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+.drift-bar.es{background:linear-gradient(90deg,var(--amber),var(--amber-bright));}
+.drift-bar.ci{background:linear-gradient(90deg,var(--violet),#c4b5fd);}
+.drift-bar.cw{background:linear-gradient(90deg,var(--teal),#67e8f9);}
+.drift-bar.ps{background:linear-gradient(90deg,var(--green),#34d399);}
+
+/* SECTION HEADERS */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-hd-left{display:flex;align-items:center;gap:10px;}
+.sec-hd-label{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);}
+.sec-hd-count{font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--text-faint);}
+.sec-hd-meta{font-size:10px;color:var(--text-faint);}
+
+/* SIGNAL TILES */
+.tiles-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:36px;}
+@media(max-width:860px){.tiles-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:540px){.tiles-grid{grid-template-columns:repeat(2,1fr);}}
+.sig-tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 14px 12px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;overflow:hidden;position:relative;display:flex;flex-direction:column;gap:6px;}
+.sig-tile:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.35);}
+.sig-tile.critical{border-color:rgba(239,68,68,.3);}
+.sig-tile.elevated{border-color:rgba(217,119,6,.3);box-shadow:0 0 0 1px rgba(217,119,6,.12),0 0 20px rgba(217,119,6,.14);}
+@keyframes tile-pulse{
+  0%,100%{box-shadow:0 0 0 1px rgba(239,68,68,.22),0 0 16px rgba(239,68,68,.14);}
+  50%{box-shadow:0 0 0 1px rgba(239,68,68,.38),0 0 32px rgba(239,68,68,.28);}
+}
+.sig-tile.critical{animation:tile-pulse 3.2s ease-in-out infinite;}
+.tile-type{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-top:4px;}
+.tile-type.critical{color:var(--red);}
+.tile-type.elevated{color:var(--amber);}
+.tile-num{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;line-height:1;color:var(--text);}
+.tile-num.red{color:var(--red);}
+.tile-num.amber{color:var(--amber);}
+.tile-hint{font-size:10px;color:var(--text-muted);line-height:1.4;flex:1;}
+.tile-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px;}
+.tile-conf{font-size:9px;font-weight:700;letter-spacing:.08em;padding:2px 6px;border-radius:4px;}
+.tile-conf.high{background:var(--red-bg);color:var(--red);}
+.tile-conf.med{background:var(--amber-bg);color:var(--amber);}
+.tile-view{font-size:10px;font-weight:700;color:var(--ai);letter-spacing:.03em;}
+.tile-pillars{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.tile-pillar{font-size:8px;font-weight:700;letter-spacing:.06em;padding:2px 5px;border-radius:3px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-faint);}
+.tile-pillar.active{background:var(--ai-bg);border-color:var(--ai-border);color:var(--ai);}
+
+/* PILLAR FILTER */
+.pillar-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.pillar-filter-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);}
+.pf-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:10px;font-weight:700;padding:4px 11px;cursor:pointer;transition:all .15s;letter-spacing:.04em;}
+.pf-btn:hover{border-color:var(--ai-border);color:var(--ai);}
+.pf-btn.active{background:var(--ai-bg);border-color:var(--ai-border);color:var(--ai);}
+.sig-tile.dimmed{opacity:.35;filter:saturate(0.3);}
+
+/* TIMELINE */
+.timeline-wrap{margin-bottom:36px;}
+#tl-svg{width:100%;height:auto;overflow:visible;}
+.tl-track{stroke:var(--surface-3);stroke-width:2;fill:none;}
+.tl-now-line{stroke:var(--text-muted);stroke-width:1;stroke-dasharray:3 3;}
+.tl-label{font-family:'Inter',sans-serif;font-size:9.5px;font-weight:700;fill:var(--text-muted);}
+.tl-amount{font-family:'JetBrains Mono',monospace;font-size:8.5px;fill:var(--text-faint);}
+.tl-dot{transition:r .15s;}
+.tl-edge-lbl{font-family:'Inter',sans-serif;font-size:8px;fill:var(--text-faint);}
+.tl-total-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;fill:var(--amber);}
+
+/* QUERY */
+.query-wrap{background:var(--surface);border:1px solid var(--ai-border);border-radius:14px;padding:20px 22px;}
+.query-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.query-icon{width:26px;height:26px;border-radius:6px;background:var(--ai-bg);border:1px solid var(--ai-border);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.query-title{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ai);}
+.query-row{display:flex;gap:10px;margin-bottom:12px;}
+#q-input{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .15s;}
+#q-input::placeholder{color:var(--text-faint);}
+#q-input:focus{border-color:var(--ai-border);}
+#q-btn{background:var(--ai-bg);border:1px solid var(--ai-border);border-radius:8px;color:var(--ai);font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer;transition:background .15s;white-space:nowrap;}
+#q-btn:hover{background:var(--violet-bg);}
+.query-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.q-chip{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:10px;font-weight:600;padding:4px 10px;cursor:pointer;transition:border-color .15s,color .15s;}
+.q-chip:hover{border-color:var(--ai-border);color:var(--ai);}
+#q-out{display:none;background:var(--surface-2);border:1px solid var(--ai-border);border-radius:9px;padding:14px 16px;font-size:13px;line-height:1.75;color:var(--text-muted);}
+#q-out.visible{display:block;}
+#q-out strong{color:var(--text);}
+
+/* ── MODAL — CENTER + FLIP ─────────────────── */
+#modal-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+#modal-overlay.open{opacity:1;pointer-events:all;}
+#modal-panel{
+  width:min(1120px,97vw);max-height:84vh;overflow-y:auto;
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  position:relative;
+  transition:box-shadow .35s ease,border-color .35s ease;
+}
+#modal-panel.glow-critical{box-shadow:0 0 80px rgba(239,68,68,.28),0 0 24px rgba(239,68,68,.18),0 32px 100px rgba(0,0,0,.5);}
+#modal-panel.glow-elevated{box-shadow:0 0 80px rgba(217,119,6,.28),0 0 24px rgba(217,119,6,.18),0 32px 100px rgba(0,0,0,.5);}
+#modal-panel.glow-monitor{box-shadow:0 0 80px rgba(34,211,238,.28),0 0 24px rgba(34,211,238,.18),0 32px 100px rgba(0,0,0,.5);}
+#modal-panel.flip-in{animation:flip-reveal .65s cubic-bezier(0.34,1.4,0.64,1) forwards;}
+#modal-panel.flip-out{animation:flip-hide .32s cubic-bezier(0.4,0,0.8,0.8) forwards;}
+@keyframes flip-reveal{
+  0%{transform:perspective(1000px) rotateY(-360deg) scale(0.65);opacity:0;}
+  55%{opacity:1;}
+  100%{transform:perspective(1000px) rotateY(0deg) scale(1);opacity:1;}
+}
+@keyframes flip-hide{
+  0%{transform:perspective(1000px) rotateY(0deg) scale(1);opacity:1;}
+  100%{transform:perspective(1000px) rotateY(180deg) scale(0.7);opacity:0;}
+}
+
+/* MODAL CONTENT */
+.modal-accent{display:none;}
+.modal-header{padding:20px 30px 16px;border-bottom:1px solid var(--border);position:relative;}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;transition:color .15s,border-color .15s;}
+.modal-close:hover{color:var(--text);border-color:var(--text-muted);}
+.modal-tier{display:inline-flex;align-items:center;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:4px;margin-bottom:8px;}
+.modal-tier.critical{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.modal-tier.elevated{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);}
+.modal-tier.monitor{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border);}
+.modal-type{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;}
+.modal-headline{font-size:15px;font-weight:800;line-height:1.35;color:var(--text);margin-bottom:5px;}
+.modal-impact{font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
+
+/* MODAL HERO METRIC */
+.modal-hero{padding:22px 24px 18px;border-bottom:1px solid var(--border);text-align:center;}
+.modal-hero.critical{background:linear-gradient(180deg,rgba(239,68,68,.07) 0%,var(--surface-2) 100%);}
+.modal-hero.elevated{background:linear-gradient(180deg,rgba(217,119,6,.07) 0%,var(--surface-2) 100%);}
+.modal-hero.monitor{background:linear-gradient(180deg,rgba(34,211,238,.07) 0%,var(--surface-2) 100%);}
+.modal-hero-num{font-family:'JetBrains Mono',monospace;font-size:48px;font-weight:700;line-height:1;letter-spacing:-.02em;margin-bottom:6px;}
+.modal-hero-num.critical{color:var(--red);}
+.modal-hero-num.elevated{color:var(--amber);}
+.modal-hero-lbl{font-size:11px;color:var(--text-muted);letter-spacing:.06em;font-weight:600;}
+
+/* MODAL BODY */
+.modal-body{padding:20px 30px 28px;}
+.modal-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:4px;}
+@media(max-width:600px){.modal-body-grid{grid-template-columns:1fr;}}
+.modal-body-col{display:flex;flex-direction:column;}
+.modal-sec-label{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;margin-top:20px;}
+.modal-sec-label:first-child{margin-top:0;}
+.modal-analysis{font-size:13px;line-height:1.85;color:var(--text-muted);text-align:left;}
+.modal-analysis strong{color:var(--text);}
+
+/* EVIDENCE TABLE */
+.modal-ev-table{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.modal-ev-row{display:grid;grid-template-columns:1fr 82px 120px;border-bottom:1px solid var(--border-soft);}
+.modal-ev-row:last-child{border-bottom:none;}
+.modal-ev-row.hd{background:var(--surface-2);}
+.modal-ev-cell{padding:9px 8px;font-size:11px;color:var(--text-muted);text-align:left;}
+.modal-ev-cell:first-child{padding-left:12px;}
+.modal-ev-cell.hd-cell{font-size:9px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;color:var(--text-faint);}
+.modal-ev-cell.mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);white-space:nowrap;}
+.modal-ev-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:800;letter-spacing:.06em;margin-left:5px;background:var(--surface-2);color:var(--text-faint);}
+.ev-red{color:var(--red)!important;}
+.ev-amber{color:var(--amber)!important;}
+.ev-teal{color:var(--teal)!important;}
+
+/* ACTION ITEMS */
+.modal-action-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border-soft);}
+.modal-action-item:last-child{border-bottom:none;}
+.modal-action-num{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;margin-top:1px;}
+.modal-action-num.urgent{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.modal-action-num.important{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
+.modal-action-num.plan{background:var(--teal-bg);border:1px solid var(--teal-border);color:var(--teal);}
+.modal-action-right{flex:1;display:flex;flex-direction:column;gap:5px;}
+.modal-action-priority{font-size:8px;font-weight:800;letter-spacing:.10em;padding:2px 7px;border-radius:3px;display:inline-block;align-self:flex-start;}
+.modal-action-priority.urgent{background:var(--red-bg);color:var(--red);}
+.modal-action-priority.important{background:var(--amber-bg);color:var(--amber);}
+.modal-action-priority.plan{background:var(--teal-bg);color:var(--teal);}
+.modal-action-text{font-size:12px;line-height:1.65;color:var(--text-muted);}
+.modal-action-text strong{color:var(--text);}
+.modal-action-footer{display:flex;align-items:center;gap:8px;margin-top:2px;}
+.modal-action-owner{padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:var(--ai-bg);border:1px solid var(--ai-border);color:var(--ai);}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <div class="hdr-icon">AI</div>
+  <div>
+    <div class="hdr-name">AI Portfolio Intelligence</div>
+    <div class="hdr-sub">VER · DA&amp;O · FY27</div>
+  </div>
+  <div class="hdr-sep"></div>
+  <div class="scan-wrap">
+    <div class="scan-dot"></div>
+    <div class="scan-text">Live scan &mdash; <b id="scan-lbl">portfolio · 5 signals active</b></div>
+  </div>
+  <div class="hdr-spacer"></div>
+  <div id="clock"></div>
+  <button class="btn-theme" id="theme-btn" title="Toggle theme">&#9790;</button>
+</header>
+
+<div id="wrap">
+
+  <div class="hero-row">
+    <div class="hero-metrics">
+      <div class="metric-row">
+        <div class="metric-label">Portfolio Under Management</div>
+        <div class="metric-val" id="m-pum">$0</div>
+        <div class="metric-sub">projected FY27 close</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label">Approved Envelope</div>
+        <div class="metric-val" id="m-env">$0</div>
+        <div class="metric-sub">FY27 board-approved</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label">Q4 Renewal Exposure</div>
+        <div class="metric-val amber" id="m-ren">$0</div>
+        <div class="metric-sub">6 contracts · 90-day window</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label">Active AI Signals</div>
+        <div class="metric-val violet" id="m-sig">0</div>
+        <div class="metric-sub">3 critical · 2 elevated</div>
+      </div>
+    </div>
+
+    <div class="hero-gauge">
+      <svg id="gauge" viewBox="-27 0 295 130" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gg" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:var(--green)"/>
+            <stop offset="72%" style="stop-color:var(--amber-bright)"/>
+          </linearGradient>
+        </defs>
+        <path class="gauge-track" d="M30,110 A90,90 0 0,1 210,110"/>
+        <path id="g-fill" class="gauge-fill" d="M30,110 A90,90 0 0,1 210,110" stroke="url(#gg)"/>
+        <path id="g-over" class="gauge-over" d="M208.43,93.24 A90,90 0 0,1 210,110" stroke-linecap="round" opacity="0"/>
+        <line class="gauge-tick" x1="205" y1="94.5" x2="222" y2="90"/>
+        <line stroke="var(--text-faint)" stroke-width="0.75" x1="222" y1="90" x2="228" y2="90" opacity="0.6"/>
+        <text class="gauge-text-main" x="120" y="76" id="g-main">$0</text>
+        <text class="gauge-text-label" x="120" y="90">projected close</text>
+        <text class="gauge-text-edge" x="30" y="122">$0</text>
+        <text class="gauge-text-edge" x="210" y="122">$125.9M</text>
+        <text class="gauge-tick-lbl" x="230" y="88" text-anchor="start">$118.5M</text>
+        <text class="gauge-marker-lbl" x="230" y="96" text-anchor="start">approved</text>
+      </svg>
+      <div class="gauge-overage-badge">
+        <span class="gauge-overage-val">+$7.4M</span>
+        <span class="gauge-overage-txt">projected over envelope</span>
+      </div>
+    </div>
+
+    <div class="hero-drift">
+      <div class="drift-hd">YTD Spend by Category</div>
+      <div class="drift-row">
+        <div class="drift-meta">
+          <span class="drift-cat">Enterprise Software</span>
+          <span class="drift-amt">$52.3M <span class="drift-dir up">&#8593;4.2%</span></span>
+        </div>
+        <div class="drift-track"><div class="drift-bar es" id="db-es"></div></div>
+      </div>
+      <div class="drift-row">
+        <div class="drift-meta">
+          <span class="drift-cat">Cloud Infrastructure</span>
+          <span class="drift-amt">$28.7M <span class="drift-dir up">&#8593;12.8%</span></span>
+        </div>
+        <div class="drift-track"><div class="drift-bar ci" id="db-ci"></div></div>
+      </div>
+      <div class="drift-row">
+        <div class="drift-meta">
+          <span class="drift-cat">Contingent Workforce</span>
+          <span class="drift-amt">$24.1M <span class="drift-dir flat">&#8212; 0.3%</span></span>
+        </div>
+        <div class="drift-track"><div class="drift-bar cw" id="db-cw"></div></div>
+      </div>
+      <div class="drift-row">
+        <div class="drift-meta">
+          <span class="drift-cat">Professional Services</span>
+          <span class="drift-amt">$20.8M <span class="drift-dir up">&#8593;2.1%</span></span>
+        </div>
+        <div class="drift-track"><div class="drift-bar ps" id="db-ps"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hd">
+    <div class="sec-hd-left">
+      <span class="sec-hd-label">AI Intelligence Signals</span>
+      <span class="sec-hd-count">5 active</span>
+    </div>
+    <span class="sec-hd-meta">Click any signal to open intelligence brief</span>
+  </div>
+  <div class="pillar-filter" id="pillar-filter"></div>
+  <div class="tiles-grid" id="tiles-grid"></div>
+
+  <div class="timeline-wrap">
+    <div class="sec-hd">
+      <div class="sec-hd-left">
+        <span class="sec-hd-label">Renewal Horizon</span>
+        <span class="sec-hd-count">6 contracts · $55.4M</span>
+      </div>
+      <span class="sec-hd-meta">Next 180 days</span>
+    </div>
+    <svg id="tl-svg" viewBox="0 0 700 100" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="query-wrap">
+    <div class="query-head">
+      <div class="query-icon">&#x1F9E0;</div>
+      <div class="query-title">Portfolio Query Interface</div>
+    </div>
+    <div class="query-row">
+      <input type="text" id="q-input" placeholder="Ask the intelligence layer anything about this portfolio…"/>
+      <button id="q-btn">&#x25B6; Run</button>
+    </div>
+    <div class="query-chips" id="q-chips"></div>
+    <div id="q-out"></div>
+  </div>
+
+</div>
+
+<div id="modal-overlay">
+  <div id="modal-panel">
+    <div class="modal-accent" id="m-accent"></div>
+    <div class="modal-header">
+      <button class="modal-close" id="m-close">&#x2715;</button>
+      <div class="modal-tier" id="m-tier"></div>
+      <div class="modal-type" id="m-type"></div>
+      <div class="modal-headline" id="m-headline"></div>
+      <div class="modal-impact" id="m-impact"></div>
+    </div>
+    <div class="modal-hero" id="m-hero">
+      <div class="modal-hero-num" id="m-hero-num"></div>
+      <div class="modal-hero-lbl" id="m-hero-lbl"></div>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+  </div>
+</div>
+
+<script>
+(function(){'use strict';
+
+function el(tag,cls,attrs){
+  var e=document.createElement(tag);
+  if(cls)e.className=cls;
+  if(attrs)Object.keys(attrs).forEach(function(k){e.setAttribute(k,attrs[k]);});
+  return e;
+}
+function richText(str,container){
+  str.split('**').forEach(function(part,i){
+    if(!part)return;
+    if(i%2===1){var b=document.createElement('strong');b.textContent=part;container.appendChild(b);}
+    else container.appendChild(document.createTextNode(part));
+  });
+}
+function countUp(elId,end,prefix,suffix,decimals,dur){
+  var e=document.getElementById(elId);if(!e)return;
+  var start=performance.now();
+  (function tick(now){
+    var t=Math.min((now-start)/dur,1);
+    var ease=1-Math.pow(1-t,3);
+    var val=end*ease;
+    e.textContent=prefix+(decimals?val.toFixed(decimals):Math.floor(val))+suffix;
+    if(t<1)requestAnimationFrame(tick);
+  })(start);
+}
+
+/* ── SIGNALS DATA ───────────────────────────── */
+var SIGNALS=[
+  {
+    tier:'critical',type:'Q4 Renewal Concentration',
+    headline:'$49.2M renewing across 6 contracts in a 90-day window',
+    impact:'90-day window · 2.8x Q4 historical baseline · 5 pillars affected',
+    tileNum:'$49.2M',tileNumCls:'red',tileHint:'6 contracts · 90-day window',
+    pillars:['ES','IT','ET','DA&O'],
+    conf:'HIGH',confCls:'high',
+    heroNum:'$49.2M',heroNumCls:'critical',heroLbl:'total renewal exposure in 90-day window',
+    analysis:'**The portfolio is carrying an abnormal renewal concentration risk entering Q4.** $49.2M in active contracts are approaching renewal inside a 90-day window — 2.8x the historical Q4 baseline. This is not a sequencing issue. It reflects multi-year contract stacking across ES, IT, ET, and DA&O pillars that converged without a coordinated renewal calendar. The most acute exposure is Workday ($23.7M, expires Nov 30), which is 20 days out with no signed extension on record. A missed or delayed renewal here triggers a service continuity gap for HR Systems across the enterprise. The remainder of the cluster compounds through January.',
+    evidence:[
+      {label:'Workday',badge:'ES',primary:'$23.7M',secondary:'20d',secCls:'ev-red'},
+      {label:'Cornerstone',badge:'ET',primary:'$4.4M',secondary:'31d',secCls:'ev-amber'},
+      {label:'ServiceNow',badge:'IT',primary:'$8.5M',secondary:'66d',secCls:'ev-teal'},
+      {label:'Workato',badge:'DA&O',primary:'$5.3M',secondary:'73d',secCls:'ev-teal'},
+      {label:'Snowflake',badge:'DA&O',primary:'$7.3M',secondary:'110d',secCls:'ev-teal'},
+      {label:'SF Training',badge:'ET',primary:'$6.2M',secondary:'125d',secCls:'ev-teal'}
+    ],
+    actions:[
+      {text:'**Immediate escalation:** coordinate renewal calendar across **ES, IT, ET, DA&O** — weekly cadence through Jan 15',owner:'VER',priority:'urgent'},
+      {text:'Escalate **Workday** renewal to ES PPM and Legal — execute extension or contingency within 10 days',owner:'ES',priority:'urgent'},
+      {text:'Review **Cornerstone** extension terms — evaluate multi-year lock-in vs. annual renewal optionality',owner:'ET',priority:'important'},
+      {text:'Build FY28 renewal distribution model — target max $18M in any rolling 90-day window',owner:'VER',priority:'plan'}
+    ]
+  },
+  {
+    tier:'critical',type:'Cloud Spend Trajectory',
+    headline:'Cloud infrastructure running $3.9M over YTD model with Q4 acceleration',
+    impact:'YTD overage · +12.8% vs. plan · Q4 run rate unsustainable',
+    tileNum:'+$3.9M',tileNumCls:'red',tileHint:'YTD overage · Q4 acceleration',
+    pillars:['DA&O','AI Ops'],
+    conf:'HIGH',confCls:'high',
+    heroNum:'+$3.9M',heroNumCls:'critical',heroLbl:'YTD cloud spend overage vs. approved model',
+    analysis:'**Cloud infrastructure spend is tracking 12.8% above the FY27 YTD model with a Q4 acceleration pattern that suggests the full-year variance will exceed $6M.** The primary driver is compute-on-demand consumption in the DA&O and AI workloads — both scoped under pre-production estimates that did not account for inference scaling. Secondary driver is storage egress charges from data platform migrations that extended beyond the original timeline. The signal is compounded by the absence of a cloud cost governance mechanism: spend is reviewed monthly but not gated at provisioning. At current trajectory, cloud infrastructure will close FY27 between $32.6M and $34.1M against a $28.7M approved envelope.',
+    evidence:[
+      {label:'Compute (AI/DA&O)',badge:'Cloud',primary:'+$2.1M',secondary:'vs. plan',secCls:'ev-red'},
+      {label:'Storage Egress',badge:'Cloud',primary:'+$0.9M',secondary:'migration ext.',secCls:'ev-amber'},
+      {label:'Reserved Utilization',badge:'Cloud',primary:'67%',secondary:'–3 pts',secCls:'ev-amber'},
+      {label:'On-Demand Ratio',badge:'Cloud',primary:'38%',secondary:'target 20%',secCls:'ev-red'}
+    ],
+    actions:[
+      {text:'Implement **monthly spend gates** at provisioning — require VER sign-off above $50K cloud commits',owner:'VER',priority:'urgent'},
+      {text:'Review **on-demand to reserved** ratio — 38% on-demand is 19 pts above target; immediate right-sizing opportunity',owner:'DA&O',priority:'important'},
+      {text:'Validate **inference scaling assumptions** in FY28 AI budget model — prior estimates were pre-production only',owner:'AI Ops',priority:'important'},
+      {text:'Negotiate **EDP extension** with AWS — current discount tier expires Feb 2027',owner:'VER',priority:'plan'}
+    ]
+  },
+  {
+    tier:'critical',type:'Platform Concentration Risk',
+    headline:'Workday SLA expires in 20 days with no signed extension on record',
+    impact:'Nov 30 expiry · $23.7M at risk · HR Systems continuity exposure',
+    tileNum:'20 days',tileNumCls:'red',tileHint:'Workday SLA expiry · $23.7M',
+    pillars:['ES'],
+    conf:'HIGH',confCls:'high',
+    heroNum:'20 days',heroNumCls:'critical',heroLbl:'until Workday SLA expires — no extension on record',
+    analysis:'**Workday is the single highest-risk renewal in the portfolio.** At $23.7M — 19% of the full Q4 renewal cluster — it is the largest single contract expiring in the 90-day window. The SLA expires November 30, 2026. As of today, no signed extension is on record and no contingency plan has been documented by the ES pillar. A lapse in the Workday SLA creates direct HR Systems continuity risk: payroll, talent management, and workforce analytics are all Workday-dependent processes with no documented fallback. The concentration signal here is structural — enterprise HR is running 100% on a single platform, which is appropriate operationally but makes the renewal a binary event from a risk perspective.',
+    evidence:[
+      {label:'SLA Expiry',badge:'ES',primary:'Nov 30',secondary:'20d',secCls:'ev-red'},
+      {label:'Contract Value',badge:'ES',primary:'$23.7M',secondary:'annual',secCls:'ev-red'},
+      {label:'Dependent Systems',badge:'ES',primary:'7',secondary:'HR critical',secCls:'ev-amber'},
+      {label:'Extension Status',badge:'Legal',primary:'Not Signed',secondary:'no record',secCls:'ev-red'}
+    ],
+    actions:[
+      {text:'**Immediate escalation to ES PPM and Legal** — require status update within 48 hours',owner:'VER',priority:'urgent'},
+      {text:'Document **service continuity plan** for a Workday lapse scenario — HR, Payroll, Talent tracks',owner:'ES',priority:'urgent'},
+      {text:'Initiate **renewal negotiation** — evaluate 3-year lock with pricing protection vs. annual flexibility',owner:'Legal',priority:'important'},
+      {text:'Flag to **DA&O leadership** as a portfolio risk event — update FY27 risk register',owner:'VER',priority:'important'}
+    ]
+  },
+  {
+    tier:'elevated',type:'Governance Exposure',
+    headline:'$20.3M in active engagements showing governance review gaps',
+    impact:'4 vendors · Missing SLA documentation · Review cycle overdue >90d',
+    tileNum:'$20.3M',tileNumCls:'amber',tileHint:'governance review gaps · 4 vendors',
+    pillars:['DA&O','IT'],
+    conf:'MED',confCls:'med',
+    heroNum:'$20.3M',heroNumCls:'elevated',heroLbl:'in vendor engagements with open governance gaps',
+    analysis:'**Four active vendor engagements totaling $20.3M are flagged for governance review gaps.** The signal is elevated — not critical — because no immediate service disruption risk is present, but the absence of current SLA documentation and overdue review cycles creates legal and audit exposure. Two of the four engagements have not had a formal governance review in over 90 days. One lacks a current SOW on file. This pattern typically precedes either a renewal surprise (terms assumed to be static when they are not) or a compliance flag during an internal audit. The portfolio governance model was designed to catch exactly this — the signal is working correctly.',
+    evidence:[
+      {label:'Tableau (SF)',badge:'DA&O',primary:'$6.8M',secondary:'>90d review',secCls:'ev-amber'},
+      {label:'MuleSoft',badge:'IT',primary:'$5.5M',secondary:'No SOW',secCls:'ev-red'},
+      {label:'Informatica',badge:'DA&O',primary:'$4.9M',secondary:'>90d review',secCls:'ev-amber'},
+      {label:'Boomi',badge:'IT',primary:'$3.1M',secondary:'Review due',secCls:'ev-amber'}
+    ],
+    actions:[
+      {text:'Schedule **governance reviews** for Tableau and Informatica — complete within 3 weeks',owner:'VER',priority:'important'},
+      {text:'Obtain **current SOW for MuleSoft** — escalate to IT PPM if unavailable from vendor',owner:'IT',priority:'urgent'},
+      {text:'Reset **90-day review cadence** for all DA&O platform tools — automate calendar triggers',owner:'VER',priority:'plan'},
+      {text:'Audit **full portfolio** for SOW currency — identify any additional engagements missing documentation',owner:'VER',priority:'plan'}
+    ]
+  },
+  {
+    tier:'elevated',type:'FY27 Close Trajectory',
+    headline:'Portfolio projects $125.9M close against $118.5M approved envelope',
+    impact:'+$7.4M variance · 6.2% over envelope · Board visibility required',
+    tileNum:'+$7.4M',tileNumCls:'amber',tileHint:'vs. approved envelope · 6.2% over',
+    pillars:['ES','IT','ET','DA&O','AI Ops'],
+    conf:'HIGH',confCls:'high',
+    heroNum:'+$7.4M',heroNumCls:'elevated',heroLbl:'projected over FY27 approved envelope — board visibility required',
+    analysis:'**The FY27 portfolio is tracking to close $7.4M over the board-approved envelope.** The variance is driven by three primary contributors: cloud spend acceleration (+$3.9M), Q4 renewal pricing adjustments (+$2.1M variance vs. prior-year renewal baselines), and two unplanned professional services engagements approved under pillar discretionary budgets (+$1.4M). The signal is elevated because the trajectory is directionally clear and there is still runway to intervene — but the window for meaningful course correction closes at end of November. After that, Q4 commitments will have largely locked in. This is a visibility and governance issue as much as a spend issue: the $7.4M represents decisions made across pillars without a cross-portfolio view of cumulative envelope impact.',
+    evidence:[
+      {label:'Cloud Acceleration',badge:'Cloud',primary:'+$3.9M',secondary:'vs. model',secCls:'ev-red'},
+      {label:'Renewal Pricing',badge:'Portfolio',primary:'+$2.1M',secondary:'Q4 contracts',secCls:'ev-amber'},
+      {label:'Unplanned PS',badge:'Multi',primary:'+$1.4M',secondary:'discretionary',secCls:'ev-amber'},
+      {label:'Approved Envelope',badge:'Board',primary:'$118.5M',secondary:'FY27',secCls:''}
+    ],
+    actions:[
+      {text:'Prepare **board visibility memo** — $7.4M variance summary with root cause and mitigation options',owner:'VER',priority:'urgent'},
+      {text:'Evaluate **Q4 deferral candidates** — identify $2-3M in deferrable spend with minimal delivery impact',owner:'DA&O',priority:'important'},
+      {text:'Update **FY28 envelope model** — cloud and renewal growth rates need recalibration',owner:'VER',priority:'plan'},
+      {text:'Establish **cross-portfolio budget alert** — trigger VER review when pillar discretionary exceeds $500K',owner:'VER',priority:'plan'}
+    ]
+  }
+];
+
+var Q_SUGGESTIONS=[
+  {label:'What is the highest-risk renewal?',key:'highesrisk'},
+  {label:'Cloud spend forecast',key:'cloudforecast'},
+  {label:'FY27 close outlook',key:'closeoutlook'},
+  {label:'Governance gaps summary',key:'govgaps'},
+  {label:'Q4 risk summary',key:'q4risk'},
+  {label:'Where can we reduce spend?',key:'reduce'}
+];
+var Q_RESPONSES={
+  highesrisk:'**Workday ($23.7M)** is the highest-risk renewal in the portfolio. The SLA expires November 30 — 20 days from today — with no signed extension on record. A lapse creates direct HR Systems continuity exposure across payroll, talent management, and workforce analytics. This is a critical signal requiring immediate escalation to ES PPM and Legal.',
+  cloudforecast:'**Cloud infrastructure is tracking to close FY27 between $32.6M and $34.1M**, against an approved envelope of $28.7M. The primary variance drivers are AI/DA&O compute-on-demand (+$2.1M) and storage egress from extended data migrations (+$0.9M). At current trajectory, full-year variance is $3.9M–$5.4M. Intervention window closes end of November.',
+  closeoutlook:'**FY27 is projected to close at $125.9M against a $118.5M approved envelope — a $7.4M overage (6.2%).** The three primary contributors are cloud acceleration (+$3.9M), Q4 renewal pricing adjustments (+$2.1M), and unplanned professional services (+$1.4M). Meaningful course correction requires action before November 30. A board visibility memo is recommended.',
+  govgaps:'**Four active engagements ($20.3M) have governance review gaps.** MuleSoft ($5.5M) is missing a current SOW. Tableau and Informatica (combined $11.7M) are more than 90 days overdue for formal review. Boomi ($3.1M) has a review due within the next 2 weeks. Elevated exposure but no immediate service risk — governance action required within 3 weeks.',
+  q4risk:'**Q4 presents three converging risk vectors.** First: $49.2M in renewals clustering in a 90-day window (2.8x historical baseline). Second: cloud spend acceleration entering the highest-consumption quarter. Third: FY27 envelope overage hardening as Q4 commitments lock in. The Workday expiry (Nov 30) is the immediate action item. The cloud and envelope signals require executive visibility before November end.',
+  reduce:'**Three reduction opportunities are visible in the current portfolio.** (1) Cloud reserved-to-on-demand ratio is 19 points above target — right-sizing on-demand workloads is a $1.5M–$2.0M opportunity. (2) Two Q4 professional services engagements ($1.4M) are categorized as discretionary and could be deferred to FY28 with minimal delivery impact. (3) The MuleSoft SOW gap may reveal pricing leverage — re-negotiation opportunity at renewal if terms are not currently locked.'
+};
+
+/* ── CLOCK ──────────────────────────────────── */
+function updateClock(){
+  var d=new Date();
+  var clk=document.getElementById('clock');
+  if(clk)clk.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+}
+setInterval(updateClock,1000);updateClock();
+
+/* ── THEME ──────────────────────────────────── */
+document.getElementById('theme-btn').addEventListener('click',function(){
+  var html=document.documentElement;
+  html.setAttribute('data-theme',html.getAttribute('data-theme')==='dark'?'light':'dark');
+});
+
+/* ── BUILD SIGNAL TILES + PILLAR FILTER ─────── */
+(function(){
+  var grid=document.getElementById('tiles-grid');
+  var filterStrip=document.getElementById('pillar-filter');
+  var ALL_PILLARS=['ES','IT','ET','DA&O','AI Ops'];
+  var activePillar=null;
+
+  // collect tiles for filter
+  var tileEls=[];
+
+  SIGNALS.forEach(function(sig,idx){
+    var tile=el('div','sig-tile '+sig.tier);
+    tile.setAttribute('data-idx',idx);
+    tile.setAttribute('data-pillars',(sig.pillars||[]).join(','));
+    var ttype=el('div','tile-type '+sig.tier);ttype.textContent=sig.type;
+    var tnum=el('div','tile-num '+(sig.tileNumCls||''));tnum.textContent=sig.tileNum;
+    var thint=el('div','tile-hint');thint.textContent=sig.tileHint;
+    // pillar tags
+    var tp=el('div','tile-pillars');
+    (sig.pillars||[]).forEach(function(p){
+      var tag=el('span','tile-pillar');tag.textContent=p;tp.appendChild(tag);
+    });
+    var tfoot=el('div','tile-footer');
+    var tconf=el('div','tile-conf '+sig.confCls);tconf.textContent=sig.conf;
+    var tview=el('div','tile-view');tview.textContent='View brief →';
+    tfoot.appendChild(tconf);tfoot.appendChild(tview);
+    tile.appendChild(ttype);tile.appendChild(tnum);tile.appendChild(thint);tile.appendChild(tp);tile.appendChild(tfoot);
+    grid.appendChild(tile);
+    tileEls.push(tile);
+  });
+
+  // build filter strip
+  var lbl=el('span','pillar-filter-lbl');lbl.textContent='Pillar';filterStrip.appendChild(lbl);
+  ALL_PILLARS.forEach(function(p){
+    var btn=el('button','pf-btn');btn.textContent=p;
+    btn.addEventListener('click',function(){
+      if(activePillar===p){
+        activePillar=null;
+        btn.classList.remove('active');
+        tileEls.forEach(function(t){t.classList.remove('dimmed');});
+        // reset all tags
+        filterStrip.querySelectorAll('.pf-btn').forEach(function(b){b.classList.remove('active');});
+        tileEls.forEach(function(t){t.querySelectorAll('.tile-pillar').forEach(function(tag){tag.classList.remove('active');});});
+      } else {
+        activePillar=p;
+        filterStrip.querySelectorAll('.pf-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        tileEls.forEach(function(t){
+          var ps=t.getAttribute('data-pillars').split(',');
+          var hit=ps.indexOf(p)>-1;
+          t.classList.toggle('dimmed',!hit);
+          t.querySelectorAll('.tile-pillar').forEach(function(tag){
+            tag.classList.toggle('active',tag.textContent===p);
+          });
+        });
+      }
+    });
+    filterStrip.appendChild(btn);
+  });
+
+  grid.addEventListener('click',function(e){
+    var t=e.target.closest('.sig-tile');
+    if(!t)return;
+    var idx=parseInt(t.getAttribute('data-idx'),10);
+    if(!isNaN(idx))openModal(SIGNALS[idx]);
+  });
+})();
+
+/* ── BUILD TIMELINE ─────────────────────────── */
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var svg=document.getElementById('tl-svg');
+  var LPAD=50,RPAD=50,TW=700-LPAD-RPAD,TY=55;
+
+  function mk(tag,attrs){
+    var e=document.createElementNS(NS,tag);
+    Object.keys(attrs).forEach(function(k){e.setAttribute(k,attrs[k]);});
+    return e;
+  }
+  function txt(s,x,y,cls,anchor){
+    var e=mk('text',{x:x,y:y,'text-anchor':anchor||'middle','class':cls});
+    e.textContent=s;return e;
+  }
+
+  svg.appendChild(mk('line',{x1:LPAD,y1:TY,x2:700-RPAD,y2:TY,'class':'tl-track','stroke-width':'2'}));
+  svg.appendChild(mk('line',{x1:LPAD,y1:TY-18,x2:LPAD,y2:TY+10,'class':'tl-now-line'}));
+  svg.appendChild(txt('NOW',LPAD,TY-22,'tl-edge-lbl','middle'));
+  svg.appendChild(txt('+180d',700-RPAD,TY-22,'tl-edge-lbl','middle'));
+
+  var renewals=[
+    {v:'Workday',a:'$23.7M',d:20,c:'#ef4444',above:true},
+    {v:'Cornerstone',a:'$4.4M',d:31,c:'#d97706',above:false},
+    {v:'ServiceNow',a:'$8.5M',d:66,c:'#22d3ee',above:true},
+    {v:'Workato',a:'$5.3M',d:73,c:'#22d3ee',above:false},
+    {v:'Snowflake',a:'$7.3M',d:110,c:'#22d3ee',above:true},
+    {v:'SF Training',a:'$6.2M',d:125,c:'#22d3ee',above:false}
+  ];
+
+  renewals.forEach(function(r){
+    var x=LPAD+(r.d/180)*TW;
+    var above=r.above;
+    var connY=above?TY-8:TY+8;
+    var lblY=above?TY-20:TY+22;
+    var amtY=above?TY-10:TY+32;
+    svg.appendChild(mk('line',{x1:x,y1:TY,x2:x,y2:connY,stroke:r.c,'stroke-width':'1','stroke-dasharray':'2 2','opacity':'0.6'}));
+    svg.appendChild(mk('circle',{cx:x,cy:TY,r:'6',fill:r.c,'class':'tl-dot'}));
+    svg.appendChild(txt(r.v,x,lblY,'tl-label','middle'));
+    svg.appendChild(txt(r.a+' · '+r.d+'d',x,amtY,'tl-amount','middle'));
+  });
+
+})();
+
+/* ── GAUGE ANIMATION ────────────────────────── */
+(function(){
+  var arcLen=Math.PI*90;
+  var envPct=118.5/125.9;
+  var envLen=arcLen*envPct;
+  var fill=document.getElementById('g-fill');
+  var over=document.getElementById('g-over');
+  fill.style.strokeDasharray=arcLen+' '+arcLen;
+  fill.style.strokeDashoffset=arcLen;
+  setTimeout(function(){
+    fill.style.transition='stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)';
+    fill.style.strokeDashoffset=(arcLen-envLen).toFixed(2);
+    setTimeout(function(){
+      over.style.transition='opacity 0.6s ease';
+      over.style.opacity='1';
+    },1450);
+  },350);
+})();
+
+/* ── COUNTER ANIMATIONS ─────────────────────── */
+setTimeout(function(){
+  countUp('m-pum',125.9,'$','M',1,1600);
+  countUp('m-env',118.5,'$','M',1,1400);
+  countUp('m-ren',49.2,'$','M',1,1300);
+  countUp('m-sig',5,'','',0,900);
+  countUp('g-main',125.9,'$','M',1,1600);
+},200);
+
+/* ── DRIFT BARS ─────────────────────────────── */
+setTimeout(function(){
+  document.getElementById('db-es').style.width='100%';
+  document.getElementById('db-ci').style.width='54.9%';
+  document.getElementById('db-cw').style.width='46.1%';
+  document.getElementById('db-ps').style.width='39.8%';
+},300);
+
+/* ── QUERY ──────────────────────────────────── */
+(function(){
+  var chips=document.getElementById('q-chips');
+  Q_SUGGESTIONS.forEach(function(q){
+    var btn=el('button','q-chip');
+    btn.textContent=q.label;
+    btn.addEventListener('click',function(){
+      document.getElementById('q-input').value=q.label;
+      showAnswer(q.key);
+    });
+    chips.appendChild(btn);
+  });
+  document.getElementById('q-btn').addEventListener('click',function(){
+    var val=document.getElementById('q-input').value.trim().toLowerCase();
+    var matched=null;
+    Q_SUGGESTIONS.forEach(function(q){if(val.indexOf(q.label.toLowerCase().split(' ')[0])>-1)matched=q.key;});
+    if(!matched)Object.keys(Q_RESPONSES).forEach(function(k){if(val.indexOf(k)>-1)matched=k;});
+    showAnswer(matched||'closeoutlook');
+  });
+  document.getElementById('q-input').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('q-btn').click();});
+})();
+
+function showAnswer(key){
+  var out=document.getElementById('q-out');
+  var resp=Q_RESPONSES[key]||Q_RESPONSES.closeoutlook;
+  while(out.firstChild)out.removeChild(out.firstChild);
+  richText(resp,out);
+  out.className='visible';
+}
+
+/* ── MODAL ──────────────────────────────────── */
+var overlay=document.getElementById('modal-overlay');
+var panel=document.getElementById('modal-panel');
+var mAccent=document.getElementById('m-accent');
+var mTier=document.getElementById('m-tier');
+var mType=document.getElementById('m-type');
+var mHeadline=document.getElementById('m-headline');
+var mImpact=document.getElementById('m-impact');
+var mHeroNum=document.getElementById('m-hero-num');
+var mHeroLbl=document.getElementById('m-hero-lbl');
+var mBody=document.getElementById('m-body');
+
+function openModal(sig){
+  // header
+  mTier.className='modal-tier '+sig.tier;
+  mTier.textContent=sig.tier.charAt(0).toUpperCase()+sig.tier.slice(1);
+  mType.textContent=sig.type;
+  mHeadline.textContent=sig.headline;
+  mImpact.textContent=sig.impact;
+
+  // hero — tinted bg
+  document.getElementById('m-hero').className='modal-hero '+sig.tier;
+  mHeroNum.className='modal-hero-num '+(sig.heroNumCls||'');
+  mHeroNum.textContent=sig.heroNum;
+  mHeroLbl.textContent=sig.heroLbl;
+
+  while(mBody.firstChild)mBody.removeChild(mBody.firstChild);
+
+  // 2-column: analysis (left) + evidence (right)
+  var grid=el('div','modal-body-grid');
+
+  var leftCol=el('div','modal-body-col');
+  var lbl1=el('div','modal-sec-label');lbl1.textContent='AI Analysis';
+  var analysis=el('p','modal-analysis');richText(sig.analysis,analysis);
+  leftCol.appendChild(lbl1);leftCol.appendChild(analysis);
+
+  var rightCol=el('div','modal-body-col');
+  var lbl2=el('div','modal-sec-label');lbl2.textContent='Evidence';
+  var tbl=el('div','modal-ev-table');
+  var hdr=el('div','modal-ev-row hd');
+  ['Vendor / Asset','Amount','Status'].forEach(function(h){
+    var c=el('div','modal-ev-cell hd-cell');c.textContent=h;hdr.appendChild(c);
+  });
+  tbl.appendChild(hdr);
+  sig.evidence.forEach(function(ev){
+    var row=el('div','modal-ev-row');
+    var c1=el('div','modal-ev-cell');c1.appendChild(document.createTextNode(ev.label));
+    var badge=el('span','modal-ev-badge');badge.textContent=ev.badge;c1.appendChild(badge);
+    var c2=el('div','modal-ev-cell mono');c2.textContent=ev.primary;
+    var c3=el('div','modal-ev-cell mono '+(ev.secCls||''));c3.textContent=ev.secondary;
+    row.appendChild(c1);row.appendChild(c2);row.appendChild(c3);
+    tbl.appendChild(row);
+  });
+  rightCol.appendChild(lbl2);rightCol.appendChild(tbl);
+
+  grid.appendChild(leftCol);grid.appendChild(rightCol);
+  mBody.appendChild(grid);
+
+  // actions — full width
+  var lbl3=el('div','modal-sec-label');lbl3.textContent='Recommended Actions';mBody.appendChild(lbl3);
+  sig.actions.forEach(function(act,i){
+    var item=el('div','modal-action-item');
+    var num=el('div','modal-action-num '+(act.priority||'plan'));num.textContent=i+1;
+    var right=el('div','modal-action-right');
+    var pri=el('div','modal-action-priority '+(act.priority||'plan'));pri.textContent=(act.priority||'plan').toUpperCase();
+    var txt=el('p','modal-action-text');richText(act.text,txt);
+    var footer=el('div','modal-action-footer');
+    var owner=el('div','modal-action-owner');owner.textContent=act.owner;
+    footer.appendChild(owner);
+    right.appendChild(pri);right.appendChild(txt);right.appendChild(footer);
+    item.appendChild(num);item.appendChild(right);
+    mBody.appendChild(item);
+  });
+
+  // glow
+  panel.classList.remove('glow-critical','glow-elevated','glow-monitor');
+  panel.classList.add('glow-'+sig.tier);
+
+  overlay.classList.add('open');
+  panel.classList.remove('flip-out');
+  panel.classList.add('flip-in');
+  document.body.style.overflow='hidden';
+  panel.scrollTop=0;
+}
+
+function closeModal(){
+  panel.classList.remove('flip-in');
+  panel.classList.add('flip-out');
+  setTimeout(function(){
+    overlay.classList.remove('open');
+    panel.classList.remove('flip-out','glow-critical','glow-elevated','glow-monitor');
+    document.body.style.overflow='';
+  },320);
+}
+
+document.getElementById('m-close').addEventListener('click',closeModal);
+overlay.addEventListener('click',function(e){if(e.target===overlay)closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
+})();
+</script>
+</body>
+</html>
