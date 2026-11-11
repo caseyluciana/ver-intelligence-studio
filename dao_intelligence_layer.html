@@ -20,9 +20,9 @@
   --ai:#a78bfa;--ai-bg:rgba(167,139,250,0.07);--ai-border:rgba(167,139,250,0.18);
 }
 [data-theme="light"]{
-  --bg:#fdf9f3;--surface:#ffffff;--surface-2:#f5f0e8;--surface-3:#ede5d4;
-  --border:rgba(0,0,0,0.08);--border-soft:rgba(0,0,0,0.04);
-  --text:#1a0e00;--text-muted:#5a4a38;--text-faint:#9a8878;
+  --bg:#f5f6f8;--surface:#ffffff;--surface-2:#eef0f3;--surface-3:#e4e7ec;
+  --border:rgba(0,0,0,0.09);--border-soft:rgba(0,0,0,0.05);
+  --text:#1a1a2e;--text-muted:#52526e;--text-faint:#9a9ab0;
   --amber:#b45309;--amber-bright:#d97706;
   --amber-bg:rgba(180,83,9,0.07);--amber-border:rgba(180,83,9,0.18);
   --violet:#7c3aed;--violet-bg:rgba(124,58,237,0.07);--violet-border:rgba(124,58,237,0.18);
@@ -36,7 +36,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 
 /* HEADER */
 #hdr{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:0 24px;height:56px;background:rgba(6,5,4,.94);border-bottom:1px solid var(--border);backdrop-filter:blur(14px);transition:background .25s;}
-[data-theme="light"] #hdr{background:rgba(253,249,243,.95);}
+[data-theme="light"] #hdr{background:rgba(245,246,248,.96);}
 .hdr-icon{width:32px;height:32px;border-radius:7px;flex-shrink:0;background:var(--ai-bg);border:1px solid var(--ai-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--ai);}
 .hdr-name{font-size:13px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
 .hdr-sub{font-size:10px;color:var(--text-muted);letter-spacing:.03em;margin-top:1px;}
@@ -66,7 +66,6 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .metric-row:last-child{border-bottom:none;padding-bottom:0;}
 .metric-label{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--text-faint);}
 .metric-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;color:var(--text);line-height:1.1;}
-.metric-val.red{color:var(--red);}
 .metric-val.amber{color:var(--amber);}
 .metric-val.violet{color:var(--violet);}
 .metric-sub{font-size:10px;color:var(--text-muted);margin-top:2px;}
@@ -75,8 +74,8 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .hero-gauge{display:flex;flex-direction:column;align-items:center;gap:8px;}
 #gauge{width:100%;max-width:280px;height:auto;overflow:visible;}
 .gauge-track{fill:none;stroke:var(--surface-3);stroke-width:14;stroke-linecap:round;}
-.gauge-fill{fill:none;stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1);}
-.gauge-over{fill:none;stroke:var(--red);stroke-width:14;stroke-linecap:butt;transition:opacity .5s ease;}
+.gauge-fill{fill:none;stroke-width:14;stroke-linecap:round;}
+.gauge-over{fill:none;stroke:var(--red);stroke-width:14;stroke-linecap:round;}
 .gauge-text-main{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;fill:var(--text);text-anchor:middle;}
 .gauge-text-label{font-family:'Inter',sans-serif;font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;fill:var(--text-faint);text-anchor:middle;}
 .gauge-text-edge{font-family:'JetBrains Mono',monospace;font-size:7.5px;fill:var(--text-faint);text-anchor:middle;}
@@ -138,7 +137,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .tile-conf.med{background:var(--amber-bg);color:var(--amber);}
 .tile-view{font-size:10px;font-weight:700;color:var(--ai);letter-spacing:.03em;}
 
-/* RENEWAL TIMELINE */
+/* TIMELINE */
 .timeline-wrap{margin-bottom:36px;}
 #tl-svg{width:100%;height:auto;overflow:visible;}
 .tl-track{stroke:var(--surface-3);stroke-width:2;fill:none;}
@@ -167,47 +166,90 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 #q-out.visible{display:block;}
 #q-out strong{color:var(--text);}
 
-/* MODAL */
-#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;}
+/* ── MODAL — CENTER + FLIP ─────────────────── */
+#modal-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
 #modal-overlay.open{opacity:1;pointer-events:all;}
-#modal-panel{position:fixed;top:0;right:0;bottom:0;width:min(540px,100vw);background:var(--surface);border-left:1px solid var(--border);z-index:201;overflow-y:auto;transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
-#modal-panel.open{transform:translateX(0);}
-.modal-accent{height:4px;flex-shrink:0;}
-.modal-accent.critical{background:var(--red);}
-.modal-accent.elevated{background:var(--amber);}
-.modal-accent.monitor{background:var(--teal);}
-.modal-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);}
+#modal-panel{
+  width:min(660px,94vw);max-height:88vh;overflow-y:auto;
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  position:relative;
+}
+#modal-panel.flip-in{animation:flip-reveal .65s cubic-bezier(0.34,1.4,0.64,1) forwards;}
+#modal-panel.flip-out{animation:flip-hide .32s cubic-bezier(0.4,0,0.8,0.8) forwards;}
+@keyframes flip-reveal{
+  0%{transform:perspective(1000px) rotateY(-360deg) scale(0.65);opacity:0;}
+  55%{opacity:1;}
+  100%{transform:perspective(1000px) rotateY(0deg) scale(1);opacity:1;}
+}
+@keyframes flip-hide{
+  0%{transform:perspective(1000px) rotateY(0deg) scale(1);opacity:1;}
+  100%{transform:perspective(1000px) rotateY(180deg) scale(0.7);opacity:0;}
+}
+
+/* MODAL CONTENT */
+.modal-accent{height:4px;flex-shrink:0;border-radius:18px 18px 0 0;}
+.modal-accent.critical{background:linear-gradient(90deg,var(--red),#f87171);}
+.modal-accent.elevated{background:linear-gradient(90deg,var(--amber),var(--amber-bright));}
+.modal-accent.monitor{background:linear-gradient(90deg,var(--teal),#67e8f9);}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);position:relative;}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;transition:color .15s,border-color .15s;}
+.modal-close:hover{color:var(--text);border-color:var(--text-muted);}
 .modal-tier{display:inline-flex;align-items:center;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:4px;margin-bottom:8px;}
 .modal-tier.critical{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
 .modal-tier.elevated{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);}
 .modal-tier.monitor{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border);}
-.modal-type{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
-.modal-headline{font-size:16px;font-weight:800;line-height:1.3;color:var(--text);margin-bottom:6px;}
+.modal-type{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;}
+.modal-headline{font-size:15px;font-weight:800;line-height:1.35;color:var(--text);margin-bottom:5px;}
 .modal-impact{font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
-.modal-close{position:absolute;top:16px;right:18px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;transition:color .15s,border-color .15s;}
-.modal-close:hover{color:var(--text);border-color:var(--text-muted);}
-.modal-body{padding:20px 22px;}
-.modal-sec-label{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;margin-top:22px;}
+
+/* MODAL HERO METRIC */
+.modal-hero{padding:22px 24px 18px;background:var(--surface-2);border-bottom:1px solid var(--border);text-align:center;}
+.modal-hero-num{font-family:'JetBrains Mono',monospace;font-size:48px;font-weight:700;line-height:1;letter-spacing:-.02em;margin-bottom:6px;}
+.modal-hero-num.critical{color:var(--red);}
+.modal-hero-num.elevated{color:var(--amber);}
+.modal-hero-lbl{font-size:11px;color:var(--text-muted);letter-spacing:.06em;font-weight:600;}
+
+/* MODAL BODY */
+.modal-body{padding:18px 22px 22px;}
+.modal-sec-label{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;margin-top:20px;}
 .modal-sec-label:first-child{margin-top:0;}
-.modal-analysis{font-size:13px;line-height:1.8;color:var(--text-muted);}
+.modal-analysis{font-size:13px;line-height:1.85;color:var(--text-muted);}
 .modal-analysis strong{color:var(--text);}
-.modal-ev-table{width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+
+/* EVIDENCE TABLE */
+.modal-ev-table{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .modal-ev-row{display:grid;grid-template-columns:1fr 80px 80px;border-bottom:1px solid var(--border-soft);}
 .modal-ev-row:last-child{border-bottom:none;}
 .modal-ev-row.hd{background:var(--surface-2);}
-.modal-ev-cell{padding:8px 12px;font-size:11px;color:var(--text-muted);}
+.modal-ev-cell{padding:9px 12px;font-size:11px;color:var(--text-muted);}
 .modal-ev-cell.hd-cell{font-size:9px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;color:var(--text-faint);}
 .modal-ev-cell.mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);}
-.modal-ev-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:3px;font-size:8.5px;font-weight:800;letter-spacing:.06em;margin-left:5px;background:var(--surface-2);color:var(--text-faint);}
+.modal-ev-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:800;letter-spacing:.06em;margin-left:5px;background:var(--surface-2);color:var(--text-faint);}
 .ev-red{color:var(--red)!important;}
 .ev-amber{color:var(--amber)!important;}
 .ev-teal{color:var(--teal)!important;}
-.modal-action-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);}
+
+/* ACTION ITEMS */
+.modal-action-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border-soft);}
 .modal-action-item:last-child{border-bottom:none;}
-.modal-action-num{width:20px;height:20px;border-radius:50%;background:var(--ai-bg);border:1px solid var(--ai-border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--ai);margin-top:1px;}
-.modal-action-text{font-size:12px;line-height:1.65;color:var(--text-muted);flex:1;}
+.modal-action-num{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;margin-top:1px;}
+.modal-action-num.urgent{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.modal-action-num.important{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
+.modal-action-num.plan{background:var(--teal-bg);border:1px solid var(--teal-border);color:var(--teal);}
+.modal-action-right{flex:1;display:flex;flex-direction:column;gap:5px;}
+.modal-action-priority{font-size:8px;font-weight:800;letter-spacing:.10em;padding:2px 7px;border-radius:3px;display:inline-block;align-self:flex-start;}
+.modal-action-priority.urgent{background:var(--red-bg);color:var(--red);}
+.modal-action-priority.important{background:var(--amber-bg);color:var(--amber);}
+.modal-action-priority.plan{background:var(--teal-bg);color:var(--teal);}
+.modal-action-text{font-size:12px;line-height:1.65;color:var(--text-muted);}
 .modal-action-text strong{color:var(--text);}
-.modal-action-owner{flex-shrink:0;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:var(--ai-bg);border:1px solid var(--ai-border);color:var(--ai);margin-top:2px;}
+.modal-action-footer{display:flex;align-items:center;gap:8px;margin-top:2px;}
+.modal-action-owner{padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:var(--ai-bg);border:1px solid var(--ai-border);color:var(--ai);}
 </style>
 </head>
 <body>
@@ -230,10 +272,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 
 <div id="wrap">
 
-  <!-- HERO ROW -->
   <div class="hero-row">
-
-    <!-- LEFT: PORTFOLIO METRICS -->
     <div class="hero-metrics">
       <div class="metric-row">
         <div class="metric-label">Portfolio Under Management</div>
@@ -257,7 +296,6 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
       </div>
     </div>
 
-    <!-- CENTER: SVG GAUGE -->
     <div class="hero-gauge">
       <svg id="gauge" viewBox="0 0 240 130" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -266,20 +304,14 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
             <stop offset="72%" style="stop-color:var(--amber-bright)"/>
           </linearGradient>
         </defs>
-        <!-- Track -->
-        <path class="gauge-track" d="M30,110 A90,90 0 0,0 210,110"/>
-        <!-- Envelope fill (animated) -->
-        <path id="g-fill" class="gauge-fill" d="M30,110 A90,90 0 0,0 210,110" stroke="url(#gg)"/>
-        <!-- Overage fill (red) — pre-computed arc from 94.1% position to end -->
-        <path id="g-over" class="gauge-over" d="M208.43,93.24 A90,90 0 0,0 210,110" stroke-linecap="round" opacity="0"/>
-        <!-- Approved envelope tick mark at ~94.1% -->
+        <path class="gauge-track" d="M30,110 A90,90 0 0,1 210,110"/>
+        <path id="g-fill" class="gauge-fill" d="M30,110 A90,90 0 0,1 210,110" stroke="url(#gg)"/>
+        <path id="g-over" class="gauge-over" d="M208.43,93.24 A90,90 0 0,1 210,110" stroke-linecap="round" opacity="0"/>
         <line class="gauge-tick" x1="201" y1="95.2" x2="215.8" y2="92.3"/>
-        <!-- Labels -->
         <text class="gauge-text-main" x="120" y="76" id="g-main">$0</text>
         <text class="gauge-text-label" x="120" y="90">projected close</text>
         <text class="gauge-text-edge" x="30" y="122">$0</text>
         <text class="gauge-text-edge" x="210" y="122">$125.9M</text>
-        <!-- Approved label near tick -->
         <text class="gauge-tick-lbl" x="199" y="86" text-anchor="end">$118.5M</text>
         <text class="gauge-marker-lbl" x="199" y="96" text-anchor="end">approved</text>
       </svg>
@@ -289,7 +321,6 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
       </div>
     </div>
 
-    <!-- RIGHT: SPEND DRIFT MINI -->
     <div class="hero-drift">
       <div class="drift-hd">YTD Spend by Category</div>
       <div class="drift-row">
@@ -321,20 +352,17 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
         <div class="drift-track"><div class="drift-bar ps" id="db-ps"></div></div>
       </div>
     </div>
+  </div>
 
-  </div><!-- /hero-row -->
-
-  <!-- SIGNAL TILES -->
   <div class="sec-hd">
     <div class="sec-hd-left">
       <span class="sec-hd-label">AI Intelligence Signals</span>
       <span class="sec-hd-count">5 active</span>
     </div>
-    <span class="sec-hd-meta">Click any signal to view full intelligence brief</span>
+    <span class="sec-hd-meta">Click any signal to open intelligence brief</span>
   </div>
   <div class="tiles-grid" id="tiles-grid"></div>
 
-  <!-- RENEWAL TIMELINE -->
   <div class="timeline-wrap">
     <div class="sec-hd">
       <div class="sec-hd-left">
@@ -346,7 +374,6 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
     <svg id="tl-svg" viewBox="0 0 700 110" xmlns="http://www.w3.org/2000/svg"></svg>
   </div>
 
-  <!-- QUERY -->
   <div class="query-wrap">
     <div class="query-head">
       <div class="query-icon">&#x1F9E0;</div>
@@ -360,33 +387,35 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
     <div id="q-out"></div>
   </div>
 
-</div><!-- /wrap -->
+</div>
 
-<!-- MODAL -->
-<div id="modal-overlay"></div>
-<div id="modal-panel">
-  <div class="modal-accent" id="m-accent"></div>
-  <div class="modal-header">
-    <button class="modal-close" id="m-close">&#x2715;</button>
-    <div class="modal-tier" id="m-tier"></div>
-    <div class="modal-type" id="m-type"></div>
-    <div class="modal-headline" id="m-headline"></div>
-    <div class="modal-impact" id="m-impact"></div>
+<div id="modal-overlay">
+  <div id="modal-panel">
+    <div class="modal-accent" id="m-accent"></div>
+    <div class="modal-header">
+      <button class="modal-close" id="m-close">&#x2715;</button>
+      <div class="modal-tier" id="m-tier"></div>
+      <div class="modal-type" id="m-type"></div>
+      <div class="modal-headline" id="m-headline"></div>
+      <div class="modal-impact" id="m-impact"></div>
+    </div>
+    <div class="modal-hero" id="m-hero">
+      <div class="modal-hero-num" id="m-hero-num"></div>
+      <div class="modal-hero-lbl" id="m-hero-lbl"></div>
+    </div>
+    <div class="modal-body" id="m-body"></div>
   </div>
-  <div class="modal-body" id="m-body"></div>
 </div>
 
 <script>
 (function(){'use strict';
 
-/* ── UTILITIES ──────────────────────────────── */
 function el(tag,cls,attrs){
   var e=document.createElement(tag);
   if(cls)e.className=cls;
   if(attrs)Object.keys(attrs).forEach(function(k){e.setAttribute(k,attrs[k]);});
   return e;
 }
-function tx(str){return document.createTextNode(str);}
 function richText(str,container){
   str.split('**').forEach(function(part,i){
     if(!part)return;
@@ -394,11 +423,8 @@ function richText(str,container){
     else container.appendChild(document.createTextNode(part));
   });
 }
-
-/* ── COUNTER ANIMATION ──────────────────────── */
 function countUp(elId,end,prefix,suffix,decimals,dur){
-  var e=document.getElementById(elId);
-  if(!e)return;
+  var e=document.getElementById(elId);if(!e)return;
   var start=performance.now();
   (function tick(now){
     var t=Math.min((now-start)/dur,1);
@@ -417,6 +443,7 @@ var SIGNALS=[
     impact:'90-day window · 2.8x Q4 historical baseline · 5 pillars affected',
     tileNum:'$49.2M',tileNumCls:'red',tileHint:'6 contracts · 90-day window',
     conf:'HIGH',confCls:'high',
+    heroNum:'$49.2M',heroNumCls:'critical',heroLbl:'total renewal exposure in 90-day window',
     analysis:'**The portfolio is carrying an abnormal renewal concentration risk entering Q4.** $49.2M in active contracts are approaching renewal inside a 90-day window — 2.8x the historical Q4 baseline. This is not a sequencing issue. It reflects multi-year contract stacking across ES, IT, ET, and DA&O pillars that converged without a coordinated renewal calendar. The most acute exposure is Workday ($23.7M, expires Nov 30), which is 20 days out with no signed extension on record. A missed or delayed renewal here triggers a service continuity gap for HR Systems across the enterprise. The remainder of the cluster compounds through January.',
     evidence:[
       {label:'Workday',badge:'ES',primary:'$23.7M',secondary:'20d',secCls:'ev-red'},
@@ -427,30 +454,31 @@ var SIGNALS=[
       {label:'SF Training',badge:'ET',primary:'$6.2M',secondary:'125d',secCls:'ev-teal'}
     ],
     actions:[
-      {text:'Coordinate renewal calendar across **ES, IT, ET, DA&O** — weekly cadence through Jan 15',owner:'VER'},
-      {text:'Escalate **Workday** renewal to ES PPM and Legal — execute extension or contingency within 10 days',owner:'ES'},
-      {text:'Review **Cornerstone** extension terms — evaluate multi-year lock-in vs. annual renewal optionality',owner:'ET'},
-      {text:'Build FY28 renewal distribution model — target max $18M in any rolling 90-day window',owner:'VER'}
+      {text:'**Immediate escalation:** coordinate renewal calendar across **ES, IT, ET, DA&O** — weekly cadence through Jan 15',owner:'VER',priority:'urgent'},
+      {text:'Escalate **Workday** renewal to ES PPM and Legal — execute extension or contingency within 10 days',owner:'ES',priority:'urgent'},
+      {text:'Review **Cornerstone** extension terms — evaluate multi-year lock-in vs. annual renewal optionality',owner:'ET',priority:'important'},
+      {text:'Build FY28 renewal distribution model — target max $18M in any rolling 90-day window',owner:'VER',priority:'plan'}
     ]
   },
   {
     tier:'critical',type:'Cloud Spend Trajectory',
     headline:'Cloud infrastructure running $3.9M over YTD model with Q4 acceleration',
-    impact:'YTD overage · +12.8% vs. plan · Q4 run rate unsustainable at current pace',
+    impact:'YTD overage · +12.8% vs. plan · Q4 run rate unsustainable',
     tileNum:'+$3.9M',tileNumCls:'red',tileHint:'YTD overage · Q4 acceleration',
     conf:'HIGH',confCls:'high',
-    analysis:'**Cloud infrastructure spend is tracking 12.8% above the FY27 YTD model with a Q4 acceleration pattern that suggests the full-year variance will exceed $6M.** The primary driver is compute-on-demand consumption in the DA&O and AI workloads — both of which were scoped under pre-production estimates that did not account for inference scaling. Secondary driver is storage egress charges from data platform migrations that extended beyond the original timeline. The signal is compounded by the absence of a cloud cost governance mechanism: spend is reviewed monthly but not gated at provisioning. At current trajectory, cloud infrastructure will close FY27 between $32.6M and $34.1M against a $28.7M approved envelope.',
+    heroNum:'+$3.9M',heroNumCls:'critical',heroLbl:'YTD cloud spend overage vs. approved model',
+    analysis:'**Cloud infrastructure spend is tracking 12.8% above the FY27 YTD model with a Q4 acceleration pattern that suggests the full-year variance will exceed $6M.** The primary driver is compute-on-demand consumption in the DA&O and AI workloads — both scoped under pre-production estimates that did not account for inference scaling. Secondary driver is storage egress charges from data platform migrations that extended beyond the original timeline. The signal is compounded by the absence of a cloud cost governance mechanism: spend is reviewed monthly but not gated at provisioning. At current trajectory, cloud infrastructure will close FY27 between $32.6M and $34.1M against a $28.7M approved envelope.',
     evidence:[
       {label:'Compute (AI/DA&O)',badge:'Cloud',primary:'+$2.1M',secondary:'vs. plan',secCls:'ev-red'},
-      {label:'Storage Egress',badge:'Cloud',primary:'+$0.9M',secondary:'migration',secCls:'ev-amber'},
+      {label:'Storage Egress',badge:'Cloud',primary:'+$0.9M',secondary:'migration ext.',secCls:'ev-amber'},
       {label:'Reserved Utilization',badge:'Cloud',primary:'67%',secondary:'–3 pts',secCls:'ev-amber'},
       {label:'On-Demand Ratio',badge:'Cloud',primary:'38%',secondary:'target 20%',secCls:'ev-red'}
     ],
     actions:[
-      {text:'Implement **monthly spend gates** at provisioning — require VER sign-off above $50K cloud commits',owner:'VER'},
-      {text:'Review **on-demand to reserved** ratio — 38% on-demand is 19 pts above target; immediate right-sizing opportunity',owner:'DA&O'},
-      {text:'Validate **inference scaling assumptions** in FY28 AI budget model — prior estimates were pre-production only',owner:'AI Ops'},
-      {text:'Negotiate **EDP (Enterprise Discount Program)** extension with AWS — current discount tier expires Feb 2027',owner:'VER'}
+      {text:'Implement **monthly spend gates** at provisioning — require VER sign-off above $50K cloud commits',owner:'VER',priority:'urgent'},
+      {text:'Review **on-demand to reserved** ratio — 38% on-demand is 19 pts above target; immediate right-sizing opportunity',owner:'DA&O',priority:'important'},
+      {text:'Validate **inference scaling assumptions** in FY28 AI budget model — prior estimates were pre-production only',owner:'AI Ops',priority:'important'},
+      {text:'Negotiate **EDP extension** with AWS — current discount tier expires Feb 2027',owner:'VER',priority:'plan'}
     ]
   },
   {
@@ -459,6 +487,7 @@ var SIGNALS=[
     impact:'Nov 30 expiry · $23.7M at risk · HR Systems continuity exposure',
     tileNum:'20 days',tileNumCls:'red',tileHint:'Workday SLA expiry · $23.7M',
     conf:'HIGH',confCls:'high',
+    heroNum:'20 days',heroNumCls:'critical',heroLbl:'until Workday SLA expires — no extension on record',
     analysis:'**Workday is the single highest-risk renewal in the portfolio.** At $23.7M — 19% of the full Q4 renewal cluster — it is the largest single contract expiring in the 90-day window. The SLA expires November 30, 2026. As of today, no signed extension is on record and no contingency plan has been documented by the ES pillar. A lapse in the Workday SLA creates direct HR Systems continuity risk: payroll, talent management, and workforce analytics are all Workday-dependent processes with no documented fallback. The concentration signal here is structural — enterprise HR is running 100% on a single platform, which is appropriate operationally but makes the renewal a binary event from a risk perspective.',
     evidence:[
       {label:'SLA Expiry',badge:'ES',primary:'Nov 30',secondary:'20d',secCls:'ev-red'},
@@ -467,10 +496,10 @@ var SIGNALS=[
       {label:'Extension Status',badge:'Legal',primary:'Not Signed',secondary:'no record',secCls:'ev-red'}
     ],
     actions:[
-      {text:'**Immediate escalation to ES PPM and Legal** — require status update within 48 hours',owner:'VER'},
-      {text:'Document **service continuity plan** for a Workday lapse scenario — HR, Payroll, Talent tracks',owner:'ES'},
-      {text:'Initiate **renewal negotiation** — evaluate 3-year lock with pricing protection vs. annual flexibility',owner:'Legal'},
-      {text:'Flag to **DA&O leadership** as a portfolio risk event — update FY27 risk register',owner:'VER'}
+      {text:'**Immediate escalation to ES PPM and Legal** — require status update within 48 hours',owner:'VER',priority:'urgent'},
+      {text:'Document **service continuity plan** for a Workday lapse scenario — HR, Payroll, Talent tracks',owner:'ES',priority:'urgent'},
+      {text:'Initiate **renewal negotiation** — evaluate 3-year lock with pricing protection vs. annual flexibility',owner:'Legal',priority:'important'},
+      {text:'Flag to **DA&O leadership** as a portfolio risk event — update FY27 risk register',owner:'VER',priority:'important'}
     ]
   },
   {
@@ -479,18 +508,19 @@ var SIGNALS=[
     impact:'4 vendors · Missing SLA documentation · Review cycle overdue >90d',
     tileNum:'$20.3M',tileNumCls:'amber',tileHint:'governance review gaps · 4 vendors',
     conf:'MED',confCls:'med',
+    heroNum:'$20.3M',heroNumCls:'elevated',heroLbl:'in vendor engagements with open governance gaps',
     analysis:'**Four active vendor engagements totaling $20.3M are flagged for governance review gaps.** The signal is elevated — not critical — because no immediate service disruption risk is present, but the absence of current SLA documentation and overdue review cycles creates legal and audit exposure. Two of the four engagements have not had a formal governance review in over 90 days. One lacks a current SOW on file. This pattern typically precedes either a renewal surprise (terms assumed to be static when they are not) or a compliance flag during an internal audit. The portfolio governance model was designed to catch exactly this — the signal is working correctly.',
     evidence:[
-      {label:'Tableau (SF)',badge:'DA&O',primary:'$6.8M',secondary:'>90d',secCls:'ev-amber'},
+      {label:'Tableau (SF)',badge:'DA&O',primary:'$6.8M',secondary:'>90d review',secCls:'ev-amber'},
       {label:'MuleSoft',badge:'IT',primary:'$5.5M',secondary:'No SOW',secCls:'ev-red'},
-      {label:'Informatica',badge:'DA&O',primary:'$4.9M',secondary:'>90d',secCls:'ev-amber'},
+      {label:'Informatica',badge:'DA&O',primary:'$4.9M',secondary:'>90d review',secCls:'ev-amber'},
       {label:'Boomi',badge:'IT',primary:'$3.1M',secondary:'Review due',secCls:'ev-amber'}
     ],
     actions:[
-      {text:'Schedule **governance reviews** for Tableau and Informatica — complete within 3 weeks',owner:'VER'},
-      {text:'Obtain **current SOW for MuleSoft** — escalate to IT PPM if unavailable from vendor',owner:'IT'},
-      {text:'Reset **90-day review cadence** for all DA&O platform tools — automate calendar triggers',owner:'VER'},
-      {text:'Audit **full portfolio** for SOW currency — identify any additional engagements missing documentation',owner:'VER'}
+      {text:'Schedule **governance reviews** for Tableau and Informatica — complete within 3 weeks',owner:'VER',priority:'important'},
+      {text:'Obtain **current SOW for MuleSoft** — escalate to IT PPM if unavailable from vendor',owner:'IT',priority:'urgent'},
+      {text:'Reset **90-day review cadence** for all DA&O platform tools — automate calendar triggers',owner:'VER',priority:'plan'},
+      {text:'Audit **full portfolio** for SOW currency — identify any additional engagements missing documentation',owner:'VER',priority:'plan'}
     ]
   },
   {
@@ -499,7 +529,8 @@ var SIGNALS=[
     impact:'+$7.4M variance · 6.2% over envelope · Board visibility required',
     tileNum:'+$7.4M',tileNumCls:'amber',tileHint:'vs. approved envelope · 6.2% over',
     conf:'HIGH',confCls:'high',
-    analysis:'**The FY27 portfolio is tracking to close $7.4M over the board-approved envelope.** The variance is driven by three primary contributors: cloud spend acceleration (+$3.9M), Q4 renewal pricing adjustments (+$2.1M variance vs. prior-year renewal baselines), and two unplanned professional services engagements approved under pillar discretionary budgets (+$1.4M). The signal is elevated because the trajectory is directionally clear and there is still runway to intervene — but the window for meaningful course correction closes at end of November. After that, Q4 commitments will have largely locked in. This is a visibility and governance issue as much as a spend issue: the $7.4M represents decisions that were made across pillars without a cross-portfolio view of cumulative envelope impact.',
+    heroNum:'+$7.4M',heroNumCls:'elevated',heroLbl:'projected over FY27 approved envelope — board visibility required',
+    analysis:'**The FY27 portfolio is tracking to close $7.4M over the board-approved envelope.** The variance is driven by three primary contributors: cloud spend acceleration (+$3.9M), Q4 renewal pricing adjustments (+$2.1M variance vs. prior-year renewal baselines), and two unplanned professional services engagements approved under pillar discretionary budgets (+$1.4M). The signal is elevated because the trajectory is directionally clear and there is still runway to intervene — but the window for meaningful course correction closes at end of November. After that, Q4 commitments will have largely locked in. This is a visibility and governance issue as much as a spend issue: the $7.4M represents decisions made across pillars without a cross-portfolio view of cumulative envelope impact.',
     evidence:[
       {label:'Cloud Acceleration',badge:'Cloud',primary:'+$3.9M',secondary:'vs. model',secCls:'ev-red'},
       {label:'Renewal Pricing',badge:'Portfolio',primary:'+$2.1M',secondary:'Q4 contracts',secCls:'ev-amber'},
@@ -507,15 +538,14 @@ var SIGNALS=[
       {label:'Approved Envelope',badge:'Board',primary:'$118.5M',secondary:'FY27',secCls:''}
     ],
     actions:[
-      {text:'Prepare **board visibility memo** — $7.4M variance summary with root cause and mitigation options',owner:'VER'},
-      {text:'Evaluate **Q4 deferral candidates** — identify $2-3M in deferrable spend with minimal delivery impact',owner:'DA&O'},
-      {text:'Update **FY28 envelope model** — cloud and renewal growth rates need recalibration',owner:'VER'},
-      {text:'Establish **cross-portfolio budget alert** — trigger VER review when pillar discretionary exceeds $500K',owner:'VER'}
+      {text:'Prepare **board visibility memo** — $7.4M variance summary with root cause and mitigation options',owner:'VER',priority:'urgent'},
+      {text:'Evaluate **Q4 deferral candidates** — identify $2-3M in deferrable spend with minimal delivery impact',owner:'DA&O',priority:'important'},
+      {text:'Update **FY28 envelope model** — cloud and renewal growth rates need recalibration',owner:'VER',priority:'plan'},
+      {text:'Establish **cross-portfolio budget alert** — trigger VER review when pillar discretionary exceeds $500K',owner:'VER',priority:'plan'}
     ]
   }
 ];
 
-/* ── QUERY SUGGESTIONS ──────────────────────── */
 var Q_SUGGESTIONS=[
   {label:'What is the highest-risk renewal?',key:'highesrisk'},
   {label:'Cloud spend forecast',key:'cloudforecast'},
@@ -536,23 +566,19 @@ var Q_RESPONSES={
 /* ── CLOCK ──────────────────────────────────── */
 function updateClock(){
   var d=new Date();
-  var h=String(d.getHours()).padStart(2,'0');
-  var m=String(d.getMinutes()).padStart(2,'0');
-  var s=String(d.getSeconds()).padStart(2,'0');
   var clk=document.getElementById('clock');
-  if(clk)clk.textContent=h+':'+m+':'+s;
+  if(clk)clk.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
 }
-setInterval(updateClock,1000);
-updateClock();
+setInterval(updateClock,1000);updateClock();
 
-/* ── THEME TOGGLE ───────────────────────────── */
+/* ── THEME ──────────────────────────────────── */
 document.getElementById('theme-btn').addEventListener('click',function(){
   var html=document.documentElement;
   html.setAttribute('data-theme',html.getAttribute('data-theme')==='dark'?'light':'dark');
 });
 
 /* ── BUILD SIGNAL TILES ─────────────────────── */
-(function buildTiles(){
+(function(){
   var grid=document.getElementById('tiles-grid');
   SIGNALS.forEach(function(sig,idx){
     var tile=el('div','sig-tile '+sig.tier);
@@ -575,82 +601,60 @@ document.getElementById('theme-btn').addEventListener('click',function(){
   });
 })();
 
-/* ── BUILD RENEWAL TIMELINE ─────────────────── */
-(function buildTimeline(){
-  var SVG_NS='http://www.w3.org/2000/svg';
+/* ── BUILD TIMELINE ─────────────────────────── */
+(function(){
+  var NS='http://www.w3.org/2000/svg';
   var svg=document.getElementById('tl-svg');
-  var VW=700,VH=110;
-  var LPAD=50,RPAD=50;
-  var TRACK_W=VW-LPAD-RPAD;
-  var TY=55;
+  var LPAD=50,RPAD=50,TW=700-LPAD-RPAD,TY=55;
 
-  function mkSVG(tag,attrs){
-    var e=document.createElementNS(SVG_NS,tag);
+  function mk(tag,attrs){
+    var e=document.createElementNS(NS,tag);
     Object.keys(attrs).forEach(function(k){e.setAttribute(k,attrs[k]);});
     return e;
   }
-  function svgText(txt,x,y,cls,anchor){
-    var e=mkSVG('text',{x:x,y:y,'text-anchor':anchor||'middle','class':cls});
-    e.textContent=txt;
-    return e;
+  function txt(s,x,y,cls,anchor){
+    var e=mk('text',{x:x,y:y,'text-anchor':anchor||'middle','class':cls});
+    e.textContent=s;return e;
   }
 
-  // track line
-  svg.appendChild(mkSVG('line',{x1:LPAD,y1:TY,x2:VW-RPAD,y2:TY,'class':'tl-track','stroke-width':'2'}));
-
-  // NOW marker
-  svg.appendChild(mkSVG('line',{x1:LPAD,y1:TY-18,x2:LPAD,y2:TY+10,'class':'tl-now-line'}));
-  svg.appendChild(svgText('NOW',LPAD,TY-22,'tl-edge-lbl','middle'));
-
-  // +180d marker
-  svg.appendChild(svgText('+180d',VW-RPAD,TY-22,'tl-edge-lbl','middle'));
+  svg.appendChild(mk('line',{x1:LPAD,y1:TY,x2:700-RPAD,y2:TY,'class':'tl-track','stroke-width':'2'}));
+  svg.appendChild(mk('line',{x1:LPAD,y1:TY-18,x2:LPAD,y2:TY+10,'class':'tl-now-line'}));
+  svg.appendChild(txt('NOW',LPAD,TY-22,'tl-edge-lbl','middle'));
+  svg.appendChild(txt('+180d',700-RPAD,TY-22,'tl-edge-lbl','middle'));
 
   var renewals=[
-    {vendor:'Workday',amt:'$23.7M',days:20,color:'#ef4444',badge:'ES',above:true},
-    {vendor:'Cornerstone',amt:'$4.4M',days:31,color:'#d97706',badge:'ET',above:false},
-    {vendor:'ServiceNow',amt:'$8.5M',days:66,color:'#22d3ee',badge:'IT',above:true},
-    {vendor:'Workato',amt:'$5.3M',days:73,color:'#22d3ee',badge:'DA&O',above:false},
-    {vendor:'Snowflake',amt:'$7.3M',days:110,color:'#22d3ee',badge:'DA&O',above:true},
-    {vendor:'SF Training',amt:'$6.2M',days:125,color:'#22d3ee',badge:'ET',above:false}
+    {v:'Workday',a:'$23.7M',d:20,c:'#ef4444',above:true},
+    {v:'Cornerstone',a:'$4.4M',d:31,c:'#d97706',above:false},
+    {v:'ServiceNow',a:'$8.5M',d:66,c:'#22d3ee',above:true},
+    {v:'Workato',a:'$5.3M',d:73,c:'#22d3ee',above:false},
+    {v:'Snowflake',a:'$7.3M',d:110,c:'#22d3ee',above:true},
+    {v:'SF Training',a:'$6.2M',d:125,c:'#22d3ee',above:false}
   ];
 
-  // total label
-  svg.appendChild(svgText('$55.4M renewing',VW/2,VH-2,'tl-total-lbl','middle'));
-
   renewals.forEach(function(r){
-    var x=LPAD+(r.days/180)*TRACK_W;
+    var x=LPAD+(r.d/180)*TW;
     var above=r.above;
-    var dotY=TY;
     var connY=above?TY-8:TY+8;
-    var labelY=above?TY-20:TY+22;
+    var lblY=above?TY-20:TY+22;
     var amtY=above?TY-10:TY+32;
-
-    // connector
-    svg.appendChild(mkSVG('line',{x1:x,y1:dotY,x2:x,y2:connY,stroke:r.color,'stroke-width':'1','stroke-dasharray':'2 2','opacity':'0.6'}));
-
-    // dot
-    var dot=mkSVG('circle',{cx:x,cy:dotY,r:'6',fill:r.color,'class':'tl-dot'});
-    svg.appendChild(dot);
-
-    // vendor label
-    svg.appendChild(svgText(r.vendor,x,labelY,'tl-label','middle'));
-    svg.appendChild(svgText(r.amt+' · '+r.days+'d',x,amtY,'tl-amount','middle'));
+    svg.appendChild(mk('line',{x1:x,y1:TY,x2:x,y2:connY,stroke:r.c,'stroke-width':'1','stroke-dasharray':'2 2','opacity':'0.6'}));
+    svg.appendChild(mk('circle',{cx:x,cy:TY,r:'6',fill:r.c,'class':'tl-dot'}));
+    svg.appendChild(txt(r.v,x,lblY,'tl-label','middle'));
+    svg.appendChild(txt(r.a+' · '+r.d+'d',x,amtY,'tl-amount','middle'));
   });
+
+  svg.appendChild(txt('$55.4M renewing over 180 days',700/2,100,'tl-total-lbl','middle'));
 })();
 
 /* ── GAUGE ANIMATION ────────────────────────── */
-(function animGauge(){
+(function(){
   var arcLen=Math.PI*90;
   var envPct=118.5/125.9;
   var envLen=arcLen*envPct;
-  var overLen=arcLen-envLen;
-
   var fill=document.getElementById('g-fill');
   var over=document.getElementById('g-over');
-
   fill.style.strokeDasharray=arcLen+' '+arcLen;
   fill.style.strokeDashoffset=arcLen;
-
   setTimeout(function(){
     fill.style.transition='stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)';
     fill.style.strokeDashoffset=(arcLen-envLen).toFixed(2);
@@ -670,7 +674,7 @@ setTimeout(function(){
   countUp('g-main',125.9,'$','M',1,1600);
 },200);
 
-/* ── DRIFT BAR ANIMATIONS ───────────────────── */
+/* ── DRIFT BARS ─────────────────────────────── */
 setTimeout(function(){
   document.getElementById('db-es').style.width='100%';
   document.getElementById('db-ci').style.width='54.9%';
@@ -678,8 +682,8 @@ setTimeout(function(){
   document.getElementById('db-ps').style.width='39.8%';
 },300);
 
-/* ── BUILD QUERY CHIPS ──────────────────────── */
-(function buildQuery(){
+/* ── QUERY ──────────────────────────────────── */
+(function(){
   var chips=document.getElementById('q-chips');
   Q_SUGGESTIONS.forEach(function(q){
     var btn=el('button','q-chip');
@@ -694,14 +698,10 @@ setTimeout(function(){
     var val=document.getElementById('q-input').value.trim().toLowerCase();
     var matched=null;
     Q_SUGGESTIONS.forEach(function(q){if(val.indexOf(q.label.toLowerCase().split(' ')[0])>-1)matched=q.key;});
-    if(!matched){
-      Object.keys(Q_RESPONSES).forEach(function(k){if(val.indexOf(k)>-1)matched=k;});
-    }
+    if(!matched)Object.keys(Q_RESPONSES).forEach(function(k){if(val.indexOf(k)>-1)matched=k;});
     showAnswer(matched||'closeoutlook');
   });
-  document.getElementById('q-input').addEventListener('keydown',function(e){
-    if(e.key==='Enter')document.getElementById('q-btn').click();
-  });
+  document.getElementById('q-input').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('q-btn').click();});
 })();
 
 function showAnswer(key){
@@ -720,6 +720,8 @@ var mTier=document.getElementById('m-tier');
 var mType=document.getElementById('m-type');
 var mHeadline=document.getElementById('m-headline');
 var mImpact=document.getElementById('m-impact');
+var mHeroNum=document.getElementById('m-hero-num');
+var mHeroLbl=document.getElementById('m-hero-lbl');
 var mBody=document.getElementById('m-body');
 
 function openModal(sig){
@@ -729,13 +731,15 @@ function openModal(sig){
   mType.textContent=sig.type;
   mHeadline.textContent=sig.headline;
   mImpact.textContent=sig.impact;
+  mHeroNum.className='modal-hero-num '+(sig.heroNumCls||'');
+  mHeroNum.textContent=sig.heroNum;
+  mHeroLbl.textContent=sig.heroLbl;
+
   while(mBody.firstChild)mBody.removeChild(mBody.firstChild);
 
-  // AI Analysis
   var lbl1=el('div','modal-sec-label');lbl1.textContent='AI Analysis';mBody.appendChild(lbl1);
   var analysis=el('p','modal-analysis');richText(sig.analysis,analysis);mBody.appendChild(analysis);
 
-  // Evidence
   var lbl2=el('div','modal-sec-label');lbl2.textContent='Evidence';mBody.appendChild(lbl2);
   var tbl=el('div','modal-ev-table');
   var hdr=el('div','modal-ev-row hd');
@@ -745,8 +749,7 @@ function openModal(sig){
   tbl.appendChild(hdr);
   sig.evidence.forEach(function(ev){
     var row=el('div','modal-ev-row');
-    var c1=el('div','modal-ev-cell');
-    c1.appendChild(tx(ev.label));
+    var c1=el('div','modal-ev-cell');c1.appendChild(document.createTextNode(ev.label));
     var badge=el('span','modal-ev-badge');badge.textContent=ev.badge;c1.appendChild(badge);
     var c2=el('div','modal-ev-cell mono');c2.textContent=ev.primary;
     var c3=el('div','modal-ev-cell mono '+(ev.secCls||''));c3.textContent=ev.secondary;
@@ -755,33 +758,40 @@ function openModal(sig){
   });
   mBody.appendChild(tbl);
 
-  // Recommended Actions
   var lbl3=el('div','modal-sec-label');lbl3.textContent='Recommended Actions';mBody.appendChild(lbl3);
   sig.actions.forEach(function(act,i){
     var item=el('div','modal-action-item');
-    var num=el('div','modal-action-num');num.textContent=i+1;
-    var textWrap=el('div','');
+    var num=el('div','modal-action-num '+(act.priority||'plan'));num.textContent=i+1;
+    var right=el('div','modal-action-right');
+    var pri=el('div','modal-action-priority '+(act.priority||'plan'));pri.textContent=(act.priority||'plan').toUpperCase();
     var txt=el('p','modal-action-text');richText(act.text,txt);
+    var footer=el('div','modal-action-footer');
     var owner=el('div','modal-action-owner');owner.textContent=act.owner;
-    textWrap.appendChild(txt);textWrap.appendChild(owner);
-    item.appendChild(num);item.appendChild(textWrap);
+    footer.appendChild(owner);
+    right.appendChild(pri);right.appendChild(txt);right.appendChild(footer);
+    item.appendChild(num);item.appendChild(right);
     mBody.appendChild(item);
   });
 
   overlay.classList.add('open');
-  panel.classList.add('open');
+  panel.classList.remove('flip-out');
+  panel.classList.add('flip-in');
   document.body.style.overflow='hidden';
   panel.scrollTop=0;
 }
 
 function closeModal(){
-  overlay.classList.remove('open');
-  panel.classList.remove('open');
-  document.body.style.overflow='';
+  panel.classList.remove('flip-in');
+  panel.classList.add('flip-out');
+  setTimeout(function(){
+    overlay.classList.remove('open');
+    panel.classList.remove('flip-out');
+    document.body.style.overflow='';
+  },320);
 }
 
 document.getElementById('m-close').addEventListener('click',closeModal);
-overlay.addEventListener('click',closeModal);
+overlay.addEventListener('click',function(e){if(e.target===overlay)closeModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
 
 })();
