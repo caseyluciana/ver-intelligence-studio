@@ -52,7 +52,8 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .btn-theme:hover{color:var(--text);border-color:var(--text-muted);}
 
 /* MAIN */
-#wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:28px 24px 80px;}
+#wrap{position:relative;z-index:1;max-width:1560px;margin:0 auto;padding:32px 48px 80px;}
+@media(max-width:700px){#wrap{padding:20px 18px 60px;}}
 
 /* HERO ROW */
 .hero-row{display:grid;grid-template-columns:260px 1fr 260px;gap:20px;align-items:center;margin-bottom:32px;}
@@ -120,10 +121,13 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .sig-tile.critical::before{background:var(--red);}
 .sig-tile.elevated::before{background:var(--amber);}
 .sig-tile.monitor::before{background:var(--teal);}
-.sig-tile.critical{border-color:var(--red-border);}
-.sig-tile.elevated{border-color:var(--amber-border);}
-@keyframes tile-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}50%{box-shadow:0 0 0 8px rgba(239,68,68,0.06);}}
-.sig-tile.critical{animation:tile-pulse 3.5s ease-in-out infinite;}
+.sig-tile.critical{border-color:rgba(239,68,68,.3);}
+.sig-tile.elevated{border-color:rgba(217,119,6,.3);box-shadow:0 0 0 1px rgba(217,119,6,.12),0 0 20px rgba(217,119,6,.14);}
+@keyframes tile-pulse{
+  0%,100%{box-shadow:0 0 0 1px rgba(239,68,68,.22),0 0 16px rgba(239,68,68,.14);}
+  50%{box-shadow:0 0 0 1px rgba(239,68,68,.38),0 0 32px rgba(239,68,68,.28);}
+}
+.sig-tile.critical{animation:tile-pulse 3.2s ease-in-out infinite;}
 .tile-type{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-top:4px;}
 .tile-type.critical{color:var(--red);}
 .tile-type.elevated{color:var(--amber);}
@@ -136,6 +140,17 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .tile-conf.high{background:var(--red-bg);color:var(--red);}
 .tile-conf.med{background:var(--amber-bg);color:var(--amber);}
 .tile-view{font-size:10px;font-weight:700;color:var(--ai);letter-spacing:.03em;}
+.tile-pillars{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.tile-pillar{font-size:8px;font-weight:700;letter-spacing:.06em;padding:2px 5px;border-radius:3px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-faint);}
+.tile-pillar.active{background:var(--ai-bg);border-color:var(--ai-border);color:var(--ai);}
+
+/* PILLAR FILTER */
+.pillar-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.pillar-filter-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);}
+.pf-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:10px;font-weight:700;padding:4px 11px;cursor:pointer;transition:all .15s;letter-spacing:.04em;}
+.pf-btn:hover{border-color:var(--ai-border);color:var(--ai);}
+.pf-btn.active{background:var(--ai-bg);border-color:var(--ai-border);color:var(--ai);}
+.sig-tile.dimmed{opacity:.35;filter:saturate(0.3);}
 
 /* TIMELINE */
 .timeline-wrap{margin-bottom:36px;}
@@ -175,7 +190,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 }
 #modal-overlay.open{opacity:1;pointer-events:all;}
 #modal-panel{
-  width:min(940px,96vw);max-height:82vh;overflow-y:auto;
+  width:min(1120px,97vw);max-height:84vh;overflow-y:auto;
   background:var(--surface);border:1px solid var(--border);border-radius:18px;
   position:relative;
   transition:box-shadow .35s ease,border-color .35s ease;
@@ -197,7 +212,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 
 /* MODAL CONTENT */
 .modal-accent{display:none;}
-.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);position:relative;}
+.modal-header{padding:20px 30px 16px;border-bottom:1px solid var(--border);position:relative;}
 .modal-close{position:absolute;top:14px;right:16px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;transition:color .15s,border-color .15s;}
 .modal-close:hover{color:var(--text);border-color:var(--text-muted);}
 .modal-tier{display:inline-flex;align-items:center;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:4px;margin-bottom:8px;}
@@ -219,8 +234,8 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
 .modal-hero-lbl{font-size:11px;color:var(--text-muted);letter-spacing:.06em;font-weight:600;}
 
 /* MODAL BODY */
-.modal-body{padding:18px 22px 22px;}
-.modal-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:4px;}
+.modal-body{padding:20px 30px 28px;}
+.modal-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:4px;}
 @media(max-width:600px){.modal-body-grid{grid-template-columns:1fr;}}
 .modal-body-col{display:flex;flex-direction:column;}
 .modal-sec-label{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;margin-top:20px;}
@@ -368,6 +383,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'I
     </div>
     <span class="sec-hd-meta">Click any signal to open intelligence brief</span>
   </div>
+  <div class="pillar-filter" id="pillar-filter"></div>
   <div class="tiles-grid" id="tiles-grid"></div>
 
   <div class="timeline-wrap">
@@ -449,6 +465,7 @@ var SIGNALS=[
     headline:'$49.2M renewing across 6 contracts in a 90-day window',
     impact:'90-day window · 2.8x Q4 historical baseline · 5 pillars affected',
     tileNum:'$49.2M',tileNumCls:'red',tileHint:'6 contracts · 90-day window',
+    pillars:['ES','IT','ET','DA&O'],
     conf:'HIGH',confCls:'high',
     heroNum:'$49.2M',heroNumCls:'critical',heroLbl:'total renewal exposure in 90-day window',
     analysis:'**The portfolio is carrying an abnormal renewal concentration risk entering Q4.** $49.2M in active contracts are approaching renewal inside a 90-day window — 2.8x the historical Q4 baseline. This is not a sequencing issue. It reflects multi-year contract stacking across ES, IT, ET, and DA&O pillars that converged without a coordinated renewal calendar. The most acute exposure is Workday ($23.7M, expires Nov 30), which is 20 days out with no signed extension on record. A missed or delayed renewal here triggers a service continuity gap for HR Systems across the enterprise. The remainder of the cluster compounds through January.',
@@ -472,6 +489,7 @@ var SIGNALS=[
     headline:'Cloud infrastructure running $3.9M over YTD model with Q4 acceleration',
     impact:'YTD overage · +12.8% vs. plan · Q4 run rate unsustainable',
     tileNum:'+$3.9M',tileNumCls:'red',tileHint:'YTD overage · Q4 acceleration',
+    pillars:['DA&O','AI Ops'],
     conf:'HIGH',confCls:'high',
     heroNum:'+$3.9M',heroNumCls:'critical',heroLbl:'YTD cloud spend overage vs. approved model',
     analysis:'**Cloud infrastructure spend is tracking 12.8% above the FY27 YTD model with a Q4 acceleration pattern that suggests the full-year variance will exceed $6M.** The primary driver is compute-on-demand consumption in the DA&O and AI workloads — both scoped under pre-production estimates that did not account for inference scaling. Secondary driver is storage egress charges from data platform migrations that extended beyond the original timeline. The signal is compounded by the absence of a cloud cost governance mechanism: spend is reviewed monthly but not gated at provisioning. At current trajectory, cloud infrastructure will close FY27 between $32.6M and $34.1M against a $28.7M approved envelope.',
@@ -493,6 +511,7 @@ var SIGNALS=[
     headline:'Workday SLA expires in 20 days with no signed extension on record',
     impact:'Nov 30 expiry · $23.7M at risk · HR Systems continuity exposure',
     tileNum:'20 days',tileNumCls:'red',tileHint:'Workday SLA expiry · $23.7M',
+    pillars:['ES'],
     conf:'HIGH',confCls:'high',
     heroNum:'20 days',heroNumCls:'critical',heroLbl:'until Workday SLA expires — no extension on record',
     analysis:'**Workday is the single highest-risk renewal in the portfolio.** At $23.7M — 19% of the full Q4 renewal cluster — it is the largest single contract expiring in the 90-day window. The SLA expires November 30, 2026. As of today, no signed extension is on record and no contingency plan has been documented by the ES pillar. A lapse in the Workday SLA creates direct HR Systems continuity risk: payroll, talent management, and workforce analytics are all Workday-dependent processes with no documented fallback. The concentration signal here is structural — enterprise HR is running 100% on a single platform, which is appropriate operationally but makes the renewal a binary event from a risk perspective.',
@@ -514,6 +533,7 @@ var SIGNALS=[
     headline:'$20.3M in active engagements showing governance review gaps',
     impact:'4 vendors · Missing SLA documentation · Review cycle overdue >90d',
     tileNum:'$20.3M',tileNumCls:'amber',tileHint:'governance review gaps · 4 vendors',
+    pillars:['DA&O','IT'],
     conf:'MED',confCls:'med',
     heroNum:'$20.3M',heroNumCls:'elevated',heroLbl:'in vendor engagements with open governance gaps',
     analysis:'**Four active vendor engagements totaling $20.3M are flagged for governance review gaps.** The signal is elevated — not critical — because no immediate service disruption risk is present, but the absence of current SLA documentation and overdue review cycles creates legal and audit exposure. Two of the four engagements have not had a formal governance review in over 90 days. One lacks a current SOW on file. This pattern typically precedes either a renewal surprise (terms assumed to be static when they are not) or a compliance flag during an internal audit. The portfolio governance model was designed to catch exactly this — the signal is working correctly.',
@@ -535,6 +555,7 @@ var SIGNALS=[
     headline:'Portfolio projects $125.9M close against $118.5M approved envelope',
     impact:'+$7.4M variance · 6.2% over envelope · Board visibility required',
     tileNum:'+$7.4M',tileNumCls:'amber',tileHint:'vs. approved envelope · 6.2% over',
+    pillars:['ES','IT','ET','DA&O','AI Ops'],
     conf:'HIGH',confCls:'high',
     heroNum:'+$7.4M',heroNumCls:'elevated',heroLbl:'projected over FY27 approved envelope — board visibility required',
     analysis:'**The FY27 portfolio is tracking to close $7.4M over the board-approved envelope.** The variance is driven by three primary contributors: cloud spend acceleration (+$3.9M), Q4 renewal pricing adjustments (+$2.1M variance vs. prior-year renewal baselines), and two unplanned professional services engagements approved under pillar discretionary budgets (+$1.4M). The signal is elevated because the trajectory is directionally clear and there is still runway to intervene — but the window for meaningful course correction closes at end of November. After that, Q4 commitments will have largely locked in. This is a visibility and governance issue as much as a spend issue: the $7.4M represents decisions made across pillars without a cross-portfolio view of cumulative envelope impact.',
@@ -584,22 +605,66 @@ document.getElementById('theme-btn').addEventListener('click',function(){
   html.setAttribute('data-theme',html.getAttribute('data-theme')==='dark'?'light':'dark');
 });
 
-/* ── BUILD SIGNAL TILES ─────────────────────── */
+/* ── BUILD SIGNAL TILES + PILLAR FILTER ─────── */
 (function(){
   var grid=document.getElementById('tiles-grid');
+  var filterStrip=document.getElementById('pillar-filter');
+  var ALL_PILLARS=['ES','IT','ET','DA&O','AI Ops'];
+  var activePillar=null;
+
+  // collect tiles for filter
+  var tileEls=[];
+
   SIGNALS.forEach(function(sig,idx){
     var tile=el('div','sig-tile '+sig.tier);
     tile.setAttribute('data-idx',idx);
+    tile.setAttribute('data-pillars',(sig.pillars||[]).join(','));
     var ttype=el('div','tile-type '+sig.tier);ttype.textContent=sig.type;
     var tnum=el('div','tile-num '+(sig.tileNumCls||''));tnum.textContent=sig.tileNum;
     var thint=el('div','tile-hint');thint.textContent=sig.tileHint;
+    // pillar tags
+    var tp=el('div','tile-pillars');
+    (sig.pillars||[]).forEach(function(p){
+      var tag=el('span','tile-pillar');tag.textContent=p;tp.appendChild(tag);
+    });
     var tfoot=el('div','tile-footer');
     var tconf=el('div','tile-conf '+sig.confCls);tconf.textContent=sig.conf;
     var tview=el('div','tile-view');tview.textContent='View brief →';
     tfoot.appendChild(tconf);tfoot.appendChild(tview);
-    tile.appendChild(ttype);tile.appendChild(tnum);tile.appendChild(thint);tile.appendChild(tfoot);
+    tile.appendChild(ttype);tile.appendChild(tnum);tile.appendChild(thint);tile.appendChild(tp);tile.appendChild(tfoot);
     grid.appendChild(tile);
+    tileEls.push(tile);
   });
+
+  // build filter strip
+  var lbl=el('span','pillar-filter-lbl');lbl.textContent='Pillar';filterStrip.appendChild(lbl);
+  ALL_PILLARS.forEach(function(p){
+    var btn=el('button','pf-btn');btn.textContent=p;
+    btn.addEventListener('click',function(){
+      if(activePillar===p){
+        activePillar=null;
+        btn.classList.remove('active');
+        tileEls.forEach(function(t){t.classList.remove('dimmed');});
+        // reset all tags
+        filterStrip.querySelectorAll('.pf-btn').forEach(function(b){b.classList.remove('active');});
+        tileEls.forEach(function(t){t.querySelectorAll('.tile-pillar').forEach(function(tag){tag.classList.remove('active');});});
+      } else {
+        activePillar=p;
+        filterStrip.querySelectorAll('.pf-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        tileEls.forEach(function(t){
+          var ps=t.getAttribute('data-pillars').split(',');
+          var hit=ps.indexOf(p)>-1;
+          t.classList.toggle('dimmed',!hit);
+          t.querySelectorAll('.tile-pillar').forEach(function(tag){
+            tag.classList.toggle('active',tag.textContent===p);
+          });
+        });
+      }
+    });
+    filterStrip.appendChild(btn);
+  });
+
   grid.addEventListener('click',function(e){
     var t=e.target.closest('.sig-tile');
     if(!t)return;
