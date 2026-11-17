@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DA&O Strategy & Ops — Operating Thesis</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F1EFEB;
+  --bg-alt:#E8E6E0;
+  --bg-inv:#131009;
+  --ink:#131009;
+  --ink-muted:rgba(19,16,9,0.60);
+  --ink-faint:rgba(19,16,9,0.36);
+  --amber:#92400E;
+  --amber-mid:#C2810A;
+  --amber-bg:rgba(146,64,14,0.07);
+  --amber-border:rgba(146,64,14,0.18);
+  --teal:#0D7268;
+  --violet:#5B21B6;
+  --green:#065F46;
+  --border:rgba(19,16,9,0.09);
+  --border-soft:rgba(19,16,9,0.05);
+}
+html,body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;}
+
+/* STRUCTURE */
+.page{max-width:1440px;margin:0 auto;padding:0 clamp(32px,8vw,140px);}
+.sec{padding:clamp(80px,10vw,130px) 0;border-top:1px solid var(--border-soft);}
+.sec.alt{background:var(--bg-alt);}
+.sec.inv{background:var(--bg-inv);border-color:transparent;}
+
+/* HERO */
+.hero{padding:clamp(80px,12vw,160px) 0 clamp(60px,8vw,100px);border-bottom:1px solid var(--border-soft);position:relative;}
+.hero-label{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:32px;display:flex;align-items:center;gap:14px;}
+.hero-label::before{content:'';width:36px;height:1px;background:var(--amber);}
+.hero-hl{font-size:clamp(52px,8vw,110px);font-weight:900;line-height:0.92;letter-spacing:-0.04em;margin-bottom:36px;max-width:900px;}
+.hero-hl em{font-style:normal;color:var(--amber);}
+.hero-sub{font-size:clamp(16px,1.8vw,20px);color:var(--ink-muted);max-width:520px;line-height:1.80;margin-bottom:52px;font-weight:400;}
+.hero-pillars{display:flex;gap:10px;flex-wrap:wrap;}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.03em;border:1px solid;}
+.pill-a{color:var(--amber);border-color:var(--amber-border);background:var(--amber-bg);}
+.pill-t{color:var(--teal);border-color:rgba(13,114,104,0.20);background:rgba(13,114,104,0.07);}
+.pill-v{color:var(--violet);border-color:rgba(91,33,182,0.20);background:rgba(91,33,182,0.07);}
+.pill-g{color:var(--green);border-color:rgba(6,95,70,0.20);background:rgba(6,95,70,0.07);}
+.pill-n{color:var(--ink-faint);border-color:var(--border);background:transparent;}
+
+/* TENET LABEL */
+.tenet-label{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+.tenet-label::before{content:'';width:28px;height:1px;background:var(--amber);}
+.tenet-label.tl{color:var(--teal);}.tenet-label.tl::before{background:var(--teal);}
+.tenet-label.vl{color:var(--violet);}.tenet-label.vl::before{background:var(--violet);}
+.tenet-label.gl{color:var(--green);}.tenet-label.gl::before{background:var(--green);}
+
+/* DISPLAY HEADLINE */
+.dh{font-size:clamp(36px,5vw,66px);font-weight:900;line-height:1.0;letter-spacing:-0.03em;margin-bottom:32px;max-width:680px;}
+.dh em{font-style:normal;color:var(--amber);}
+.dh em.tl{color:var(--teal);}
+.dh em.vl{color:var(--violet);}
+.dh em.gl{color:var(--green);}
+
+/* PROSE */
+.prose{font-size:clamp(15px,1.4vw,17px);color:var(--ink-muted);line-height:1.90;max-width:640px;margin-bottom:28px;}
+.prose strong{color:var(--ink);font-weight:600;}
+.prose + .prose{margin-top:-8px;}
+
+/* PULL QUOTE */
+.pull{font-size:clamp(17px,2vw,22px);font-weight:700;color:var(--ink);line-height:1.55;max-width:680px;padding:28px 0 28px 28px;border-left:3px solid var(--amber-mid);margin:40px 0;}
+.pull.tl{border-color:var(--teal);}
+.pull.vl{border-color:var(--violet);}
+
+/* SPLIT LAYOUTS */
+.split{display:grid;gap:clamp(40px,6vw,100px);align-items:start;}
+.split-60-40{grid-template-columns:60fr 40fr;}
+.split-40-60{grid-template-columns:40fr 60fr;}
+.split-50-50{grid-template-columns:1fr 1fr;}
+@media(max-width:860px){.split-60-40,.split-40-60,.split-50-50{grid-template-columns:1fr;}}
+
+/* TENET WATERMARK */
+.tenet-wm{font-size:clamp(140px,20vw,260px);font-weight:900;line-height:1;letter-spacing:-0.06em;color:var(--ink);opacity:0.04;user-select:none;pointer-events:none;line-height:0.85;}
+
+/* GIANT STATS STRIP */
+.stat-strip{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:52px 0;}
+@media(max-width:680px){.stat-strip{flex-direction:column;}}
+.ss-item{flex:1;padding:clamp(28px,4vw,44px) clamp(20px,3vw,36px);border-right:1px solid var(--border);}
+.ss-item:last-child{border-right:none;}
+.ss-num{font-size:clamp(44px,6vw,80px);font-weight:900;line-height:1;letter-spacing:-0.04em;margin-bottom:10px;}
+.ss-num.a{color:var(--amber);}
+.ss-num.t{color:var(--teal);}
+.ss-num.v{color:var(--violet);}
+.ss-num.g{color:var(--green);}
+.ss-label{font-size:12px;color:var(--ink-faint);line-height:1.55;max-width:160px;}
+
+/* TOOL LIST */
+.tool-list{margin:48px 0 0;}
+.tool-link{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding:18px 0;border-bottom:1px solid var(--border-soft);text-decoration:none;color:var(--ink);transition:color .18s;}
+.tool-link:first-child{border-top:1px solid var(--border-soft);}
+.tool-link:hover{color:var(--amber);}
+.tool-link:hover .tool-arrow{transform:translateX(5px);}
+.tool-ico{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+.tool-name{font-size:15px;font-weight:700;}
+.tool-desc{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+.tool-name-wrap{display:flex;flex-direction:column;}
+.tool-arrow{font-size:16px;color:var(--amber);transition:transform .18s;flex-shrink:0;}
+.tool-tag{font-size:9px;font-weight:700;letter-spacing:0.08em;padding:3px 8px;border-radius:3px;background:rgba(13,114,104,0.10);border:1px solid rgba(13,114,104,0.20);color:var(--teal);align-self:center;}
+
+/* PILLAR COMPARE */
+.pillar-row{display:flex;border-radius:14px;overflow:hidden;border:1px solid var(--border);margin:44px 0;}
+@media(max-width:680px){.pillar-row{flex-direction:column;}}
+.pr-seg{flex:1;padding:clamp(18px,2.5vw,28px) clamp(16px,2vw,24px);border-right:1px solid var(--border-soft);}
+.pr-seg:last-child{border-right:none;}
+.pr-label{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:6px;}
+.pr-name{font-size:14px;font-weight:800;margin-bottom:5px;}
+.pr-num{font-family:'JetBrains Mono',monospace;font-size:clamp(22px,3vw,32px);font-weight:700;line-height:1;margin-bottom:6px;}
+.pr-body{font-size:11px;color:var(--ink-faint);line-height:1.55;}
+.pr-a{background:rgba(146,64,14,0.04);}.pr-a .pr-label{color:var(--amber);}.pr-a .pr-num{color:var(--amber);}
+.pr-t{background:rgba(13,114,104,0.04);}.pr-t .pr-label{color:var(--teal);}.pr-t .pr-num{color:var(--teal);}
+.pr-v{background:rgba(91,33,182,0.04);}.pr-v .pr-label{color:var(--violet);}.pr-v .pr-num{color:var(--violet);}
+.pr-g{background:rgba(6,95,70,0.04);}.pr-g .pr-label{color:var(--green);}.pr-g .pr-num{color:var(--green);}
+
+/* OWNERSHIP SPLIT */
+.own-col-lbl{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;}
+.own-col-lbl.muted{color:var(--ink-faint);}
+.own-col-lbl.amber{color:var(--amber);}
+.own-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.own-ico{font-size:15px;flex-shrink:0;width:22px;}
+.own-txt{font-size:13px;color:var(--ink-muted);line-height:1.55;}
+
+/* INV SECTION (closing) */
+.inv-label{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(241,239,235,0.42);margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:14px;}
+.inv-label::before,.inv-label::after{content:'';flex:0 0 28px;height:1px;background:rgba(241,239,235,0.20);}
+.inv-hl{font-size:clamp(32px,4.5vw,58px);font-weight:900;line-height:1.05;letter-spacing:-0.025em;color:#F1EFEB;text-align:center;max-width:700px;margin:0 auto 20px;}
+.inv-hl em{font-style:normal;color:#D97706;}
+.inv-sub{font-size:16px;color:rgba(241,239,235,0.58);max-width:440px;margin:0 auto 44px;line-height:1.80;text-align:center;}
+.inv-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.inv-chip{display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid rgba(241,239,235,0.14);color:rgba(241,239,235,0.50);background:rgba(241,239,235,0.04);}
+.inv-chip.amber{border-color:rgba(217,119,6,0.30);color:#D97706;background:rgba(217,119,6,0.08);}
+
+/* SCROLL FADE */
+.fi{opacity:0;transform:translateY(24px);transition:opacity 0.60s ease,transform 0.60s ease;}
+.fi.on{opacity:1;transform:translateY(0);}
+.fi.d1{transition-delay:0.08s;}.fi.d2{transition-delay:0.16s;}.fi.d3{transition-delay:0.24s;}.fi.d4{transition-delay:0.32s;}.fi.d5{transition-delay:0.42s;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<section class="hero">
+<div class="page">
+  <div class="hero-label fi">Operating Thesis &mdash; DA&amp;O Strategy &amp; Ops</div>
+  <div class="hero-hl fi d1">The infrastructure<br>everyone else is<br><em>standing on.</em></div>
+  <p class="hero-sub fi d2">Four pillars. One mandate. The operating model that makes data-driven decisions possible &mdash; built from inside the walls, by the people who know what it actually takes.</p>
+  <div class="hero-pillars fi d3">
+    <span class="pill pill-a">&#9679; VER Ops</span>
+    <span class="pill pill-t">&#9679; Financial Intelligence</span>
+    <span class="pill pill-v">&#9679; AI Ops</span>
+    <span class="pill pill-g">&#9679; DA&amp;O Strategy</span>
+    <span class="pill pill-n">DA&amp;O &middot; DET &middot; FY27</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ TENET 01 ══════════════════ -->
+<section class="sec">
+<div class="page">
+  <div class="split split-60-40">
+    <div>
+      <div class="tenet-label fi">Tenet 01 &mdash; The Foundation</div>
+      <div class="dh fi d1">Without the backoffice,<br><em>nothing scales.</em></div>
+      <p class="prose fi d2">There&rsquo;s a version of this organization where every important decision already has the full picture behind it &mdash; where the contract about to auto-renew at a 20% premium gets caught with six months of runway, where the spend pattern building quietly across three pillars gets surfaced before it becomes a Q4 fire drill, where the vendor risk no single program could see becomes visible at the portfolio level before it lands in a delivery meeting.</p>
+      <p class="prose fi d2">That version of the org doesn&rsquo;t happen automatically. It requires a function whose entire purpose is to hold the view that no individual pillar can hold alone &mdash; the cross-portfolio visibility, the intelligence layer, the advisory capacity that runs upstream of commitment. <strong>That&rsquo;s what DA&amp;O Strategy &amp; Ops is. Not a support function behind the scenes. The foundation the frontline is standing on.</strong></p>
+      <div class="pull fi d3">&ldquo;Without optimizing third-party spend and vendor relationships, trusted advisory, compliance and risk management, innovation and reporting &mdash; data-driven decisions don&rsquo;t happen.&rdquo;</div>
+    </div>
+    <div style="padding-top:8px;">
+      <div class="tenet-wm fi" style="color:var(--amber);opacity:0.07;">01</div>
+      <div class="pillar-row fi d2">
+        <div class="pr-seg pr-a">
+          <div class="pr-label">VER Ops</div>
+          <div class="pr-name">Vendor &amp; Engagement</div>
+          <div class="pr-num">$3M+</div>
+          <div class="pr-body">Cost avoidance documented. Rate benchmarking, SOW review, supplier intelligence, pre-execution contract review.</div>
+        </div>
+      </div>
+      <div class="pillar-row fi d3">
+        <div class="pr-seg pr-t">
+          <div class="pr-label">Financial Intelligence</div>
+          <div class="pr-name">Cost &amp; Ops</div>
+          <div class="pr-num">$68M</div>
+          <div class="pr-body">Total cost intelligence across software, vendor, and technology spend. Full portfolio coverage.</div>
+        </div>
+      </div>
+      <div class="pillar-row fi d4">
+        <div class="pr-seg pr-v">
+          <div class="pr-label">AI Ops</div>
+          <div class="pr-name">Platform &amp; Governance</div>
+          <div class="pr-num">32</div>
+          <div class="pr-body">AI-powered modules in production. ROI measurement, spend governance, multi-model methodology.</div>
+        </div>
+      </div>
+      <div class="pillar-row fi d5">
+        <div class="pr-seg pr-g">
+          <div class="pr-label">DA&amp;O Strategy</div>
+          <div class="pr-name">Portfolio &amp; Execution</div>
+          <div class="pr-num">4</div>
+          <div class="pr-body">The coordination frame that formalizes what&rsquo;s already running &mdash; portfolio monitoring and executive reporting cadence.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ TENET 02 ══════════════════ -->
+<section class="sec alt">
+<div class="page">
+  <div class="tenet-label fi">Tenet 02 &mdash; The Mandate</div>
+  <div class="dh fi d1">Not enablement.<br><em>Execution.</em></div>
+  <div class="split split-50-50" style="margin-top:16px;">
+    <div>
+      <p class="prose fi d2">The distinction matters more than it sounds. Enablement is about building the conditions for good work. Execution is about doing it. This function does the second thing &mdash; it owns the use cases, runs the analyses, builds the tools, and delivers the intelligence that stakeholders act on.</p>
+      <p class="prose fi d2">T&amp;E builds the culture that welcomes AI. DA&amp;O Strategy &amp; Ops is the operational layer that makes AI decisions stick and cost-conscious choices actually happen. These two functions aren&rsquo;t competing for the same space. <strong>They&rsquo;re occupying completely different axes &mdash; and the org needs both.</strong></p>
+      <div class="pull fi d3">&ldquo;Not a support layer for someone else&rsquo;s execution. The execution itself.&rdquo;</div>
+    </div>
+    <div>
+      <div class="fi d2" style="margin-bottom:24px;">
+        <div class="own-col-lbl muted">T&amp;E &mdash; Transformation &amp; Enablement</div>
+        <div class="own-row"><div class="own-ico">&#127891;</div><div class="own-txt">AMAs and speaker series</div></div>
+        <div class="own-row"><div class="own-ico">&#129309;</div><div class="own-txt">Peer-led learning programs</div></div>
+        <div class="own-row"><div class="own-ico">&#128226;</div><div class="own-txt">AI awareness and adoption culture</div></div>
+        <div class="own-row"><div class="own-ico">&#127807;</div><div class="own-txt">Enablement series and cohorts</div></div>
+        <div class="own-row"><div class="own-ico">&#128506;</div><div class="own-txt">AI literacy across the org</div></div>
+      </div>
+      <div class="fi d3" style="padding-left:20px;border-left:2px solid var(--amber-mid);">
+        <div class="own-col-lbl amber">DA&amp;O Strategy &amp; Ops &mdash; What We Own</div>
+        <div class="own-row"><div class="own-ico">&#127919;</div><div class="own-txt">Use case selection and prioritization</div></div>
+        <div class="own-row"><div class="own-ico">&#127959;</div><div class="own-txt">Build execution and tool ownership</div></div>
+        <div class="own-row"><div class="own-ico">&#128200;</div><div class="own-txt">ROI measurement and value proof</div></div>
+        <div class="own-row"><div class="own-ico">&#128196;</div><div class="own-txt">Documentation and operating standards</div></div>
+        <div class="own-row"><div class="own-ico">&#128176;</div><div class="own-txt">AI spend, token, and budget governance</div></div>
+        <div class="own-row"><div class="own-ico">&#128101;</div><div class="own-txt">Vendor, licensing, and tool decisions</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ TENET 03 ══════════════════ -->
+<section class="sec">
+<div class="page">
+  <div class="tenet-label vl fi">Tenet 03 &mdash; The Proof</div>
+  <div class="dh fi d1">Real data. Real tools.<br><em class="vl">Real impact.</em></div>
+  <p class="prose fi d2">These numbers aren&rsquo;t projections or modeled estimates. They are documented outcomes &mdash; the actual financial record of work that already happened. The function didn&rsquo;t start when it got a name. <strong>The impact existed before the formalization did.</strong></p>
+
+  <div class="stat-strip fi d3">
+    <div class="ss-item">
+      <div class="ss-num t" data-count="68" data-prefix="$" data-suffix="M">$0</div>
+      <div class="ss-label">Technology &amp; software portfolio under FinOps management</div>
+    </div>
+    <div class="ss-item">
+      <div class="ss-num a" data-count="3" data-prefix="$" data-suffix="M+">$0</div>
+      <div class="ss-label">Vendor &amp; contract cost avoidance documented by VER Ops</div>
+    </div>
+    <div class="ss-item">
+      <div class="ss-num v" data-count="10.2" data-prefix="$" data-suffix="M" data-decimals="1">$0</div>
+      <div class="ss-label">Identified savings currently in active pipeline</div>
+    </div>
+    <div class="ss-item">
+      <div class="ss-num g" data-count="64" data-prefix="$" data-suffix="M">$0</div>
+      <div class="ss-label">Software renewal horizon managed through Q4 FY27</div>
+    </div>
+  </div>
+
+  <div class="tenet-label fi d2" style="margin-top:52px;">Six tools live. Zero engineering budget.</div>
+  <div class="tool-list fi d3">
+    <a class="tool-link" href="tco_standalone.html" target="_blank">
+      <div class="tool-ico">⚖️</div>
+      <div class="tool-name-wrap"><div class="tool-name">TCO Calculator</div><div class="tool-desc">True cost modeling with hidden cost layers, risk weighting, and multi-scenario comparison</div></div>
+      <div class="tool-tag">LIVE</div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a class="tool-link" href="sow_estimator.html" target="_blank">
+      <div class="tool-ico">📄</div>
+      <div class="tool-name-wrap"><div class="tool-name">SOW Estimator</div><div class="tool-desc">58+ role analysis with region multipliers, PDF/DOCX upload, and risk flags before signature</div></div>
+      <div class="tool-tag">LIVE</div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a class="tool-link" href="vendor_home.html" target="_blank">
+      <div class="tool-ico">🗂️</div>
+      <div class="tool-name-wrap"><div class="tool-name">Vendor Profiles</div><div class="tool-desc">Full vendor view — spend history, risk posture, active contracts, and renewal outlook</div></div>
+      <div class="tool-tag">LIVE</div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a class="tool-link" href="roi_value_scorecard.html" target="_blank">
+      <div class="tool-ico">📊</div>
+      <div class="tool-name-wrap"><div class="tool-name">ROI &amp; Value Scorecard</div><div class="tool-desc">Intelligence ROI simulation — time saved, cost avoided, and value delivered by engagement type</div></div>
+      <div class="tool-tag">LIVE</div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a class="tool-link" href="dao_intelligence_layer.html" target="_blank">
+      <div class="tool-ico">🧠</div>
+      <div class="tool-name-wrap"><div class="tool-name">DAO Intelligence Layer</div><div class="tool-desc">AI portfolio command center — signals, renewal horizon, spend analytics, intelligence briefs</div></div>
+      <div class="tool-tag">LIVE</div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a class="tool-link" href="dao_strategy_ops.html" target="_blank">
+      <div class="tool-ico">🏛️</div>
+      <div class="tool-name-wrap"><div class="tool-name">Strategy &amp; Ops Deck</div><div class="tool-desc">The formal four-pillar operating model — impact, structure, mandate, and ask</div></div>
+      <div class="tool-tag">LIVE</div>
+      <div class="tool-arrow">→</div>
+    </a>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ TENET 04 ══════════════════ -->
+<section class="sec alt">
+<div class="page">
+  <div class="split split-40-60">
+    <div>
+      <div class="tenet-wm fi" style="color:var(--teal);opacity:0.07;font-size:clamp(100px,16vw,200px);">04</div>
+    </div>
+    <div>
+      <div class="tenet-label tl fi">Tenet 04 &mdash; Cross-Pillar Intelligence</div>
+      <div class="dh fi d1">One function.<br><em class="tl">Every pillar.</em></div>
+      <p class="prose fi d2">Portfolio management works vertically &mdash; one pillar, one team, one set of delivery outcomes to own. What this function does runs perpendicular to that. It holds the horizontal view that no vertical function can hold alone, which means it sees things no single pillar can: the vendor relationships that span multiple programs, the cost patterns that only become visible at portfolio scale, the renewal pressure compounding across three separate budgets.</p>
+      <p class="prose fi d2">That&rsquo;s not a wider version of portfolio management. <strong>It&rsquo;s a different kind of function entirely</strong> &mdash; accountable not to delivery outcomes but to the quality of the intelligence that shapes decisions before those outcomes get locked in.</p>
+      <div class="pull tl fi d3">&ldquo;Breadth isn&rsquo;t a scope problem. It&rsquo;s the entire point. The patterns that only emerge when you look across every pillar simultaneously &mdash; nobody else is positioned to see them.&rdquo;</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ TENET 05 ══════════════════ -->
+<section class="sec">
+<div class="page">
+  <div class="tenet-label gl fi">Tenet 05 &mdash; The Approach</div>
+  <div class="dh fi d1">Founder&rsquo;s energy.<br><em class="gl">Infrastructure scale.</em></div>
+  <div class="split split-60-40" style="margin-top:8px;">
+    <div>
+      <p class="prose fi d2">CKO4 described it as founder&rsquo;s energy: move with speed and purpose, use the right tool for the right job, know what your teams are spending, be Customer Zero, prove what you&rsquo;re getting for the investment. What it described was already happening here.</p>
+      <p class="prose fi d2">The tools got built before anyone commissioned them. The ROI was tracked before anyone required it. The operating model was running before it had a name. <strong>That&rsquo;s not a coincidence or an accident of timing &mdash; it&rsquo;s what happens when the people doing the work already understand why the work matters and refuse to wait for permission to prove it.</strong></p>
+      <div class="pull fi d3">&ldquo;DA&amp;O Strategy &amp; Ops isn&rsquo;t a response to this mandate. It&rsquo;s the infrastructure that makes the mandate executable.&rdquo;</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="fi d2" style="padding:20px 22px;border:1px solid var(--border);border-radius:12px;background:var(--amber-bg);">
+        <div style="font-size:18px;margin-bottom:8px;">🎯</div>
+        <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;font-style:italic;">&ldquo;Right tool for the right job.&rdquo;</div>
+        <div style="font-size:12px;color:var(--ink-muted);line-height:1.65;">Our build philosophy lives this. Every model doing exactly what it does best &mdash; documented, repeatable, production-ready.</div>
+      </div>
+      <div class="fi d3" style="padding:20px 22px;border:1px solid var(--border);border-radius:12px;">
+        <div style="font-size:18px;margin-bottom:8px;">📈</div>
+        <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;font-style:italic;">&ldquo;Know what your teams are spending.&rdquo;</div>
+        <div style="font-size:12px;color:var(--ink-muted);line-height:1.65;">Real-time spend visibility, cost-per-use-case, and budget envelopes by pillar. Nobody runs blind on AI or vendor costs.</div>
+      </div>
+      <div class="fi d4" style="padding:20px 22px;border:1px solid var(--border);border-radius:12px;">
+        <div style="font-size:18px;margin-bottom:8px;">👥</div>
+        <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;font-style:italic;">&ldquo;We&rsquo;re Customer Zero.&rdquo;</div>
+        <div style="font-size:12px;color:var(--ink-muted);line-height:1.65;">Every tool this function builds is a shareable proof point for the rest of the company &mdash; built first, proven first, ready to scale.</div>
+      </div>
+      <div class="fi d5" style="padding:20px 22px;border:1px solid var(--border);border-radius:12px;">
+        <div style="font-size:18px;margin-bottom:8px;">🔍</div>
+        <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;font-style:italic;">&ldquo;What are we getting for them?&rdquo;</div>
+        <div style="font-size:12px;color:var(--ink-muted);line-height:1.65;">Time saved, cost avoided, quality improved &mdash; quantified and reported quarterly. The answer is always ready.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ CLOSING ══════════════════ -->
+<section class="sec inv">
+<div class="page" style="text-align:center;padding-top:clamp(60px,8vw,100px);padding-bottom:clamp(60px,8vw,100px);">
+  <div class="inv-label fi">DA&amp;O &middot; DET &middot; FY27</div>
+  <div class="inv-hl fi d1">The mandate is executable.<br><em>The infrastructure is already here.</em></div>
+  <p class="inv-sub fi d2">Four pillars. One function. Already running. This isn&rsquo;t a proposal &mdash; it&rsquo;s a report on work that never stopped.</p>
+  <div class="inv-chips fi d3">
+    <span class="inv-chip amber">$118.5M+ under management</span>
+    <span class="inv-chip amber">$3M+ cost avoidance</span>
+    <span class="inv-chip amber">32 AI modules deployed</span>
+    <span class="inv-chip">6 tools live</span>
+    <span class="inv-chip">FY27 Q3</span>
+  </div>
+</div>
+</section>
+
+<script>
+var obs=new IntersectionObserver(function(e){e.forEach(function(n){if(n.isIntersecting)n.target.classList.add('on');});},{threshold:0.10,rootMargin:'0px 0px -32px 0px'});
+document.querySelectorAll('.fi').forEach(function(el){obs.observe(el);});
+
+function countUp(el){
+  var target=parseFloat(el.dataset.count)||0,prefix=el.dataset.prefix||'',suffix=el.dataset.suffix||'',dec=parseInt(el.dataset.decimals)||0,dur=1800,start=null;
+  function step(ts){
+    if(!start)start=ts;
+    var p=Math.min((ts-start)/dur,1),ease=1-Math.pow(1-p,3);
+    el.textContent=prefix+(target*ease).toFixed(dec)+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+var sObs=new IntersectionObserver(function(e){e.forEach(function(n){if(n.isIntersecting){n.target.querySelectorAll('[data-count]').forEach(countUp);sObs.unobserve(n.target);}});},{threshold:0.3});
+document.querySelectorAll('.stat-strip').forEach(function(el){sObs.observe(el);});
+</script>
+</body>
+</html>

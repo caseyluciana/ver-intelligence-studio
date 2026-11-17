@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intelligence in Action — DA&O Strategy & Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#F0ECFF;
+  --ink-muted:rgba(240,236,255,0.62);
+  --ink-faint:rgba(240,236,255,0.34);
+  --lilac:#A78BFA;
+  --lilac-bg:rgba(167,139,250,0.09);
+  --lilac-border:rgba(167,139,250,0.26);
+  --fuchsia:#D492E8;
+  --fuchsia-bg:rgba(212,146,232,0.09);
+  --fuchsia-border:rgba(212,146,232,0.26);
+  --teal:#2DD4BF;
+  --teal-bg:rgba(45,212,191,0.07);
+  --teal-border:rgba(45,212,191,0.24);
+  --amber:#F59E0B;
+  --amber-bg:rgba(245,158,11,0.08);
+  --amber-border:rgba(245,158,11,0.22);
+  --risk:#F87171;
+  --risk-bg:rgba(248,113,113,0.08);
+  --risk-border:rgba(248,113,113,0.22);
+  --border:rgba(240,236,255,0.08);
+  --border-soft:rgba(240,236,255,0.05);
+}
+
+html,body{
+  font-family:'Inter',sans-serif;
+  font-size:16px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  height:100%;
+  cursor:pointer;
+  user-select:none;
+}
+
+/* ── SCENES ───────────────────────────────── */
+.scene{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.80s ease;
+  z-index:1;
+  overflow:hidden;
+  padding:clamp(32px,5vw,72px) clamp(32px,7vw,110px);
+}
+.scene::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+.scene.active{opacity:1;pointer-events:auto;z-index:2;}
+.scene.leaving{opacity:0;z-index:3;pointer-events:none;}
+
+/* per-scene background + ambient glow */
+#s1{background:linear-gradient(140deg,#1C0D3C 0%,#28104A 55%,#2E0D3E 100%);}
+#s1::before{background:
+  radial-gradient(ellipse 65% 70% at 8% 90%,rgba(167,139,250,0.26) 0%,transparent 55%),
+  radial-gradient(ellipse 48% 48% at 92% 8%,rgba(212,146,232,0.18) 0%,transparent 50%),
+  radial-gradient(ellipse 55% 35% at 50% 5%,rgba(192,110,255,0.10) 0%,transparent 55%);}
+
+#s2{background:linear-gradient(225deg,#220C3E 0%,#2E1048 55%,#200D36 100%);}
+#s2::before{background:
+  radial-gradient(ellipse 50% 50% at 82% 10%,rgba(245,158,11,0.11) 0%,transparent 50%),
+  radial-gradient(ellipse 50% 65% at 4% 94%,rgba(212,146,232,0.20) 0%,transparent 50%),
+  radial-gradient(ellipse 65% 38% at 50% 100%,rgba(167,139,250,0.14) 0%,transparent 55%);}
+
+#s3{background:linear-gradient(90deg,#1E1046 0%,#2C155A 50%,#240F46 100%);}
+#s3::before{background:
+  radial-gradient(ellipse 46% 72% at 14% 50%,rgba(45,212,191,0.16) 0%,transparent 55%),
+  radial-gradient(ellipse 46% 72% at 86% 50%,rgba(248,113,113,0.13) 0%,transparent 55%),
+  radial-gradient(ellipse 65% 28% at 50% 0%,rgba(167,139,250,0.14) 0%,transparent 50%);}
+
+#s4{background:linear-gradient(165deg,#220F40 0%,#2C1250 55%,#1E0C34 100%);}
+#s4::before{background:
+  radial-gradient(ellipse 62% 56% at 50% 74%,rgba(45,212,191,0.12) 0%,transparent 60%),
+  radial-gradient(ellipse 42% 42% at 94% 6%,rgba(167,139,250,0.16) 0%,transparent 50%),
+  radial-gradient(ellipse 42% 42% at 6% 6%,rgba(212,146,232,0.14) 0%,transparent 50%);}
+
+#s5{background:radial-gradient(ellipse 110% 110% at 50% 50%,#300E50 0%,#1E0A3C 50%,#100520 100%);}
+#s5::before{background:
+  radial-gradient(ellipse 70% 70% at 50% 46%,rgba(167,139,250,0.26) 0%,transparent 55%),
+  radial-gradient(ellipse 48% 48% at 50% 46%,rgba(212,146,232,0.22) 0%,transparent 45%),
+  radial-gradient(ellipse 28% 28% at 50% 46%,rgba(248,220,255,0.10) 0%,transparent 40%);}
+
+.scene-inner{position:relative;z-index:1;width:100%;max-width:1200px;}
+.scene-inner.narrow{max-width:760px;margin:0 auto;}
+
+/* ── SCENE ELEMENT ANIMATIONS ───────────────── */
+.ani{
+  opacity:0;
+  transform:translateY(18px);
+  transition:opacity 0.28s ease,transform 0.28s ease;
+}
+.scene.active .ani{
+  opacity:1;
+  transform:translateY(0);
+  transition:opacity 0.65s ease,transform 0.65s ease;
+}
+.scene.active .ani.d1{transition-delay:0.12s;}
+.scene.active .ani.d2{transition-delay:0.26s;}
+.scene.active .ani.d3{transition-delay:0.44s;}
+.scene.active .ani.d4{transition-delay:0.64s;}
+.scene.active .ani.d5{transition-delay:0.86s;}
+
+/* ── TYPOGRAPHY ──────────────────────────── */
+.scene-tag{
+  font-size:10px;font-weight:700;letter-spacing:0.17em;text-transform:uppercase;
+  color:var(--lilac);display:flex;align-items:center;gap:12px;margin-bottom:28px;
+}
+.scene-tag::before{content:'';width:20px;height:1px;background:var(--lilac);}
+
+.act-mark{
+  font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--ink-faint);display:flex;align-items:center;gap:12px;margin-bottom:28px;
+}
+.act-mark::before{content:'';width:20px;height:1px;background:var(--ink-faint);}
+.act-mark.tl{color:var(--teal);}.act-mark.tl::before{background:var(--teal);}
+.act-mark.am{color:var(--amber);}.act-mark.am::before{background:var(--amber);}
+
+.cold-hl{
+  font-size:clamp(44px,8.5vw,106px);font-weight:900;line-height:0.90;
+  letter-spacing:-0.04em;color:var(--ink);margin-bottom:36px;
+}
+.cold-hl em{font-style:normal;color:var(--teal);}
+
+.scene-dh{
+  font-size:clamp(34px,5.5vw,66px);font-weight:900;line-height:0.95;
+  letter-spacing:-0.035em;margin-bottom:28px;color:var(--ink);
+}
+.scene-dh em{font-style:normal;color:var(--teal);}
+.scene-dh em.am{color:var(--amber);}
+
+.scene-prose{
+  font-size:clamp(14px,1.4vw,17px);color:var(--ink-muted);
+  line-height:1.90;max-width:560px;margin-bottom:16px;
+}
+.scene-prose strong{color:var(--ink);font-weight:600;}
+
+.pull{
+  font-size:clamp(14px,1.5vw,17px);font-weight:700;color:var(--ink);
+  line-height:1.55;padding:18px 0 18px 20px;border-left:3px solid var(--fuchsia);
+  margin-top:28px;max-width:500px;
+}
+
+/* ── CHIPS ───────────────────────────────── */
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:36px;}
+.chip{
+  display:inline-flex;align-items:center;padding:6px 14px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:0.04em;
+  border:1px solid var(--border);color:var(--ink-faint);background:rgba(240,236,255,0.04);
+}
+.chip.lilac{border-color:var(--lilac-border);color:var(--lilac);background:var(--lilac-bg);}
+.chip.fu{border-color:var(--fuchsia-border);color:var(--fuchsia);background:var(--fuchsia-bg);}
+.chip.tl{border-color:var(--teal-border);color:var(--teal);background:var(--teal-bg);}
+.chip.am{border-color:var(--amber-border);color:var(--amber);background:var(--amber-bg);}
+.chip.rk{border-color:var(--risk-border);color:var(--risk);background:var(--risk-bg);}
+
+/* ── SPLIT LAYOUT ────────────────────────── */
+.split{display:grid;gap:clamp(32px,5vw,72px);align-items:start;}
+.s5050{grid-template-columns:1fr 1fr;}
+.s6040{grid-template-columns:60fr 40fr;}
+@media(max-width:800px){.s5050,.s6040{grid-template-columns:1fr;}}
+
+/* ── KNOWN PANEL ─────────────────────────── */
+.known-panel{
+  background:rgba(240,236,255,0.03);border:1px solid var(--border);
+  border-radius:16px;padding:clamp(18px,2.5vw,28px);
+}
+.kp-head{
+  font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:16px;padding-bottom:12px;
+  border-bottom:1px solid var(--border-soft);
+}
+.kp-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:9px 0;border-bottom:1px solid var(--border-soft);
+}
+.kp-row:last-child{border-bottom:none;}
+.kp-key{font-size:11px;color:var(--ink-faint);}
+.kp-val{font-size:12px;font-weight:600;color:var(--ink);}
+.kp-val.ok{color:#34D399;}
+.kp-val.am{color:var(--amber);}
+.kp-val.gap{color:var(--ink-faint);font-weight:400;font-style:italic;font-size:11px;}
+
+/* ── INTEL PANELS (Scene 3) ───────────────── */
+.reveal-panels{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,36px);margin-top:28px;}
+@media(max-width:760px){.reveal-panels{grid-template-columns:1fr;}}
+
+.intel-left,.intel-right{border-radius:16px;padding:clamp(18px,2.5vw,28px);opacity:0;}
+
+.intel-left{
+  background:var(--teal-bg);border:1px solid var(--teal-border);
+  transform:translateX(-44px);box-shadow:0 0 0 rgba(45,212,191,0);
+}
+.intel-right{
+  background:var(--risk-bg);border:1px solid var(--risk-border);
+  transform:translateX(44px);box-shadow:0 0 0 rgba(248,113,113,0);
+}
+
+#s3.active .intel-left{
+  animation:slideInL 0.9s ease 0.42s forwards;
+}
+#s3.active .intel-right{
+  animation:slideInR 0.9s ease 1.0s forwards;
+}
+
+@keyframes slideInL{
+  from{opacity:0;transform:translateX(-44px);box-shadow:0 0 0 rgba(45,212,191,0);}
+  to{opacity:1;transform:translateX(0);box-shadow:0 0 56px rgba(45,212,191,0.18);}
+}
+@keyframes slideInR{
+  from{opacity:0;transform:translateX(44px);box-shadow:0 0 0 rgba(248,113,113,0);}
+  to{opacity:1;transform:translateX(0);box-shadow:0 0 48px rgba(248,113,113,0.14);}
+}
+
+.ip-badge{
+  display:inline-flex;align-items:center;padding:3px 10px;border-radius:4px;
+  font-size:9px;font-weight:700;letter-spacing:0.11em;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.ip-badge.tl{background:rgba(45,212,191,0.14);border:1px solid var(--teal-border);color:var(--teal);}
+.ip-badge.rk{background:rgba(248,113,113,0.14);border:1px solid var(--risk-border);color:var(--risk);}
+
+.ip-num{
+  font-family:'JetBrains Mono',monospace;font-size:clamp(28px,4.5vw,46px);
+  font-weight:700;line-height:1;margin-bottom:6px;
+}
+.ip-num.tl{color:var(--teal);}
+.ip-num.rk{color:var(--risk);}
+.ip-num-lbl{font-size:11px;color:var(--ink-faint);margin-bottom:16px;}
+
+.ip-body{font-size:12px;color:var(--ink-muted);line-height:1.75;}
+.ip-body strong{color:var(--teal);font-weight:600;}
+.ip-body.rk strong{color:var(--risk);}
+.ip-sep{height:1px;background:var(--teal-border);margin:16px 0;}
+.ip-sep.rk{background:var(--risk-border);}
+
+.risk-row{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid rgba(248,113,113,0.08);}
+.risk-row:last-child{border-bottom:none;padding-bottom:0;}
+.risk-n{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--risk);flex-shrink:0;width:16px;padding-top:2px;}
+.risk-wrap{}
+.risk-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.risk-desc{font-size:11px;color:var(--ink-muted);line-height:1.60;}
+.risk-tag{display:inline-flex;margin-top:4px;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;background:rgba(248,113,113,0.14);color:var(--risk);}
+
+/* ── OUTCOME NUMBERS (Scene 4) ───────────── */
+.outcome-nums{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);border-radius:16px;overflow:hidden;
+  margin:36px 0 32px;
+}
+@media(max-width:620px){.outcome-nums{grid-template-columns:1fr;}}
+.on-cell{
+  background:#1C0E3A;padding:clamp(20px,3vw,36px) clamp(16px,2.5vw,28px);
+}
+.on-num{
+  font-family:'JetBrains Mono',monospace;font-size:clamp(28px,4.5vw,52px);
+  font-weight:700;line-height:1;letter-spacing:-0.025em;margin-bottom:10px;
+}
+.on-num.tl{color:var(--teal);}
+.on-num.am{color:var(--amber);}
+.on-num.ok{color:#34D399;}
+.on-lbl{font-size:11px;color:var(--ink-faint);line-height:1.55;}
+
+/* ── CLOSING CTA (Scene 5) ───────────────── */
+.closing-hl{
+  font-size:clamp(28px,4.5vw,58px);font-weight:900;line-height:1.05;
+  letter-spacing:-0.025em;margin-bottom:20px;color:var(--ink);max-width:720px;
+}
+.closing-hl em{font-style:normal;color:var(--lilac);}
+.closing-sub{font-size:clamp(14px,1.4vw,17px);color:var(--ink-muted);max-width:500px;line-height:1.90;margin-bottom:36px;}
+.cta-link{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:12px 28px;border-radius:8px;font-size:13px;font-weight:700;
+  border:1px solid var(--fuchsia-border);color:var(--fuchsia);background:var(--fuchsia-bg);
+  text-decoration:none;transition:background 0.2s,box-shadow 0.2s;cursor:pointer;
+}
+.cta-link:hover{background:rgba(212,146,232,0.16);box-shadow:0 0 32px rgba(212,146,232,0.18);}
+
+/* ── NAV ─────────────────────────────────── */
+#scene-counter{
+  position:fixed;top:28px;right:36px;z-index:100;
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+  color:rgba(212,146,232,0.55);letter-spacing:0.08em;
+}
+#nav-dots{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  z-index:100;display:flex;gap:8px;align-items:center;
+}
+.dot{
+  width:6px;height:6px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(240,236,255,0.18);transition:background 0.3s,transform 0.3s,box-shadow 0.3s;padding:0;
+}
+.dot.active{background:var(--fuchsia);transform:scale(1.5);box-shadow:0 0 10px rgba(212,146,232,0.5);}
+
+#hint{
+  position:fixed;bottom:28px;right:36px;z-index:100;
+  font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;
+  color:rgba(212,146,232,0.50);opacity:0;transition:opacity 0.4s;
+}
+#hint.show{opacity:1;}
+
+#back-btn{
+  position:fixed;top:50%;left:28px;transform:translateY(-50%);z-index:100;
+  font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  color:rgba(212,146,232,0.30);background:none;border:none;cursor:pointer;
+  padding:12px 8px;transition:color 0.2s;display:none;
+}
+#back-btn:hover{color:var(--fuchsia);}
+#back-btn.show{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ══════ SCENE 1 — COLD OPEN ══════ -->
+<section class="scene active" id="s1">
+  <div class="scene-inner narrow">
+    <div class="scene-tag ani">Intelligence in Action &mdash; DA&amp;O Strategy &amp; Ops</div>
+    <div class="cold-hl ani d1">
+      48 hours<br>before the<br>signature.<br><em>Nobody had<br>looked.</em>
+    </div>
+    <div class="chips ani d2">
+      <span class="chip am">$6.8M SOW</span>
+      <span class="chip fu">48 HRS TO SIGN</span>
+      <span class="chip rk">3 RISKS BURIED</span>
+      <span class="chip rk">$16.3M EXPOSURE</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ SCENE 2 — WHAT THEY KNEW ══════ -->
+<section class="scene" id="s2">
+  <div class="scene-inner">
+    <div class="split s6040">
+      <div>
+        <div class="act-mark am ani">Act 01 &mdash; What They Knew</div>
+        <div class="scene-dh ani d1">The paperwork<br>said <em class="am">ready.</em></div>
+        <p class="scene-prose ani d2">The stakeholder team had done everything their process required. Legal had reviewed the contract language. Finance had approved the budget three weeks earlier. The vendor had an established relationship &mdash; previous engagements, nothing on record to flag.</p>
+        <p class="scene-prose ani d2">From inside their pillar, the picture was complete. <strong>The contract was reasonable, the vendor was known, the budget was approved.</strong> There was no signal, from where they were sitting, that anything needed another look.</p>
+        <div class="pull ani d3">&ldquo;Every piece of paperwork said this was ready. Paperwork doesn&rsquo;t see across pillars.&rdquo;</div>
+      </div>
+      <div class="ani d2">
+        <div class="known-panel">
+          <div class="kp-head">Stakeholder View &mdash; Pre-Intelligence</div>
+          <div class="kp-row"><div class="kp-key">SOW Value</div><div class="kp-val am">$6.8M</div></div>
+          <div class="kp-row"><div class="kp-key">Legal Review</div><div class="kp-val ok">Complete</div></div>
+          <div class="kp-row"><div class="kp-key">Budget Status</div><div class="kp-val ok">Approved</div></div>
+          <div class="kp-row"><div class="kp-key">Vendor Relationship</div><div class="kp-val ok">Established</div></div>
+          <div class="kp-row"><div class="kp-key">Timeline</div><div class="kp-val am">Q-end commitment</div></div>
+          <div class="kp-row"><div class="kp-key">Cross-Pillar Exposure</div><div class="kp-val gap">not visible</div></div>
+          <div class="kp-row"><div class="kp-key">Rate Benchmark</div><div class="kp-val gap">not reviewed</div></div>
+          <div class="kp-row"><div class="kp-key">IP Clause Risk</div><div class="kp-val gap">not flagged</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ SCENE 3 — THE REVEAL ══════ -->
+<section class="scene" id="s3">
+  <div class="scene-inner">
+    <div class="act-mark tl ani">Act 02 &mdash; The Intelligence Enters</div>
+    <div class="reveal-panels">
+
+      <!-- LEFT: Concentration Risk -->
+      <div class="intel-left">
+        <div class="ip-badge tl">VER Intelligence</div>
+        <div class="ip-num tl" data-count="16.3" data-prefix="$" data-suffix="M" data-decimals="1">$0</div>
+        <div class="ip-num-lbl">combined vendor exposure across three pillars</div>
+        <div class="ip-sep"></div>
+        <div class="ip-body">
+          This vendor already holds two active contracts across the portfolio &mdash; a $5.1M implementation in one pillar and a $4.4M licensing arrangement in another. Adding this $6.8M SOW brings total single-vendor exposure to $16.3M with no concentration flag in any of the three pillar budgets.<br><br>
+          <strong>No individual team could see this. VER could.</strong>
+        </div>
+      </div>
+
+      <!-- RIGHT: SOW Risks -->
+      <div class="intel-right">
+        <div class="ip-badge rk">3 Risks Found Before Signature</div>
+        <div class="ip-sep rk"></div>
+
+        <div class="risk-row">
+          <div class="risk-n">01</div>
+          <div class="risk-wrap">
+            <div class="risk-title">Role Mix &mdash; 38% Over Benchmark</div>
+            <div class="risk-desc">Stated role composition benchmarks 38% above market rate for this engagement type and region. Addressable before signature.</div>
+            <span class="risk-tag">$412K addressable</span>
+          </div>
+        </div>
+
+        <div class="risk-row">
+          <div class="risk-n">02</div>
+          <div class="risk-wrap">
+            <div class="risk-title">Unmapped Deliverable</div>
+            <div class="risk-desc">Deliverable 3 &mdash; &ldquo;ongoing advisory support&rdquo; &mdash; maps to no stated project outcome. No definition of done, no exit condition.</div>
+            <span class="risk-tag">Scope exposure</span>
+          </div>
+        </div>
+
+        <div class="risk-row">
+          <div class="risk-n">03</div>
+          <div class="risk-wrap">
+            <div class="risk-title">IP Assignment &mdash; Unusually Broad</div>
+            <div class="risk-desc">Section 8.2 assigns IP rights beyond standard terms for this category. Industry-standard language caps this. This version doesn&rsquo;t.</div>
+            <span class="risk-tag">Material exposure</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════ SCENE 4 — THE OUTCOME ══════ -->
+<section class="scene" id="s4">
+  <div class="scene-inner narrow">
+    <div class="act-mark tl ani">Act 03 &mdash; What Changed</div>
+    <div class="scene-dh ani d1">Signed on schedule.<br><em>Restructured first.</em></div>
+
+    <div class="outcome-nums ani d2">
+      <div class="on-cell">
+        <div class="on-num tl" data-count="412" data-prefix="$" data-suffix="K">$0</div>
+        <div class="on-lbl">Recovered in role mix renegotiation before signature</div>
+      </div>
+      <div class="on-cell">
+        <div class="on-num am">3 of 3</div>
+        <div class="on-lbl">SOW risks resolved before the document was signed</div>
+      </div>
+      <div class="on-cell">
+        <div class="on-num ok">On time</div>
+        <div class="on-lbl">Signed within the original Q-end window &mdash; not delayed</div>
+      </div>
+    </div>
+
+    <p class="scene-prose ani d3">The timeline held. What changed was what they signed &mdash; a renegotiated role mix, an amended IP clause, a deliverable with an actual definition of done, and a concentration risk flag that went to portfolio leadership before it became a Q-end fire drill.</p>
+  </div>
+</section>
+
+<!-- ══════ SCENE 5 — THE BRIDGE ══════ -->
+<section class="scene" id="s5">
+  <div class="scene-inner narrow" style="text-align:center;">
+    <div class="scene-tag ani" style="justify-content:center;">DA&amp;O Strategy &amp; Ops &mdash; VER Intelligence</div>
+    <div class="closing-hl ani d1" style="margin:0 auto 20px;">
+      This is what it looks like<br>when the intelligence layer<br>is <em>in the room.</em>
+    </div>
+    <p class="closing-sub ani d2" style="margin:0 auto 32px;">Not after the signature. Not in the quarterly review. Before the pen hits the paper &mdash; when there&rsquo;s still something to do about it.</p>
+    <div class="chips ani d3" style="justify-content:center;margin-bottom:36px;">
+      <span class="chip tl">Cross-pillar visibility</span>
+      <span class="chip tl">SOW intelligence</span>
+      <span class="chip fu">Rate benchmarking</span>
+      <span class="chip lilac">Concentration risk</span>
+      <span class="chip fu">DA&amp;O &middot; DET &middot; FY27</span>
+    </div>
+    <div class="ani d4">
+      <a class="cta-link" href="dao_intelligence_layer.html">View the Intelligence Layer &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ NAVIGATION ══════ -->
+<div id="scene-counter">01 / 05</div>
+<button id="back-btn" aria-label="Previous scene">&#8592; BACK</button>
+<div id="nav-dots">
+  <button class="dot active" data-i="0" aria-label="Scene 1"></button>
+  <button class="dot" data-i="1" aria-label="Scene 2"></button>
+  <button class="dot" data-i="2" aria-label="Scene 3"></button>
+  <button class="dot" data-i="3" aria-label="Scene 4"></button>
+  <button class="dot" data-i="4" aria-label="Scene 5"></button>
+</div>
+<div id="hint">click to continue &rarr;</div>
+
+<script>
+(function(){
+  var scenes=Array.from(document.querySelectorAll('.scene'));
+  var dots=Array.from(document.querySelectorAll('.dot'));
+  var counter=document.getElementById('scene-counter');
+  var hint=document.getElementById('hint');
+  var backBtn=document.getElementById('back-btn');
+  var TOTAL=scenes.length;
+  var current=0;
+  var transitioning=false;
+  var hintTimer=null;
+  var countersRun=false;
+
+  function pad(n){return n<10?'0'+n:String(n);}
+
+  function updateNav(){
+    counter.textContent=pad(current+1)+' / '+pad(TOTAL);
+    dots.forEach(function(d,i){d.classList.toggle('active',i===current);});
+    backBtn.classList.toggle('show',current>0);
+    clearTimeout(hintTimer);
+    hint.classList.remove('show');
+    if(current<TOTAL-1){
+      hintTimer=setTimeout(function(){hint.classList.add('show');},2200);
+    }
+  }
+
+  function triggerCounters(){
+    if(countersRun)return;
+    countersRun=true;
+    document.querySelectorAll('#s4 [data-count]').forEach(function(el){
+      var target=parseFloat(el.dataset.count)||0;
+      var prefix=el.dataset.prefix||'';
+      var suffix=el.dataset.suffix||'';
+      var dec=parseInt(el.dataset.decimals)||0;
+      var dur=1500,start=null;
+      function step(ts){
+        if(!start)start=ts;
+        var p=Math.min((ts-start)/dur,1);
+        var ease=1-Math.pow(1-p,3);
+        el.textContent=prefix+(target*ease).toFixed(dec)+suffix;
+        if(p<1)requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  function triggerRevealCounters(){
+    document.querySelectorAll('#s3 [data-count]').forEach(function(el){
+      var target=parseFloat(el.dataset.count)||0;
+      var prefix=el.dataset.prefix||'';
+      var suffix=el.dataset.suffix||'';
+      var dec=parseInt(el.dataset.decimals)||0;
+      var dur=1200,start=null;
+      function step(ts){
+        if(!start)start=ts;
+        var p=Math.min((ts-start)/dur,1);
+        var ease=1-Math.pow(1-p,3);
+        el.textContent=prefix+(target*ease).toFixed(dec)+suffix;
+        if(p<1)requestAnimationFrame(step);
+      }
+      setTimeout(function(){requestAnimationFrame(step);},1200);
+    });
+  }
+
+  function goTo(n){
+    if(transitioning||n===current||n<0||n>=TOTAL)return;
+    transitioning=true;
+    var prev=scenes[current];
+    var next=scenes[n];
+
+    prev.classList.add('leaving');
+    prev.classList.remove('active');
+
+    // reset s3 panel animations so they replay on re-entry
+    if(n===2){
+      var il=document.querySelector('.intel-left');
+      var ir=document.querySelector('.intel-right');
+      il.style.animation='none';
+      ir.style.animation='none';
+      il.offsetHeight;
+      ir.offsetHeight;
+      il.style.animation='';
+      ir.style.animation='';
+    }
+
+    current=n;
+    next.classList.add('active');
+    updateNav();
+
+    if(n===2) triggerRevealCounters();
+    if(n===3) setTimeout(triggerCounters,500);
+
+    setTimeout(function(){
+      prev.classList.remove('leaving');
+      transitioning=false;
+    },850);
+  }
+
+  // Click anywhere to advance (skip interactive elements)
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#nav-dots')||e.target.closest('#back-btn')||e.target.closest('.cta-link')){return;}
+    goTo(current+1);
+  });
+
+  // Keyboard
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();goTo(current+1);}
+    if(e.key==='ArrowLeft'){e.preventDefault();goTo(current-1);}
+  });
+
+  // Dots
+  dots.forEach(function(d){
+    d.addEventListener('click',function(e){
+      e.stopPropagation();
+      goTo(parseInt(d.dataset.i));
+    });
+  });
+
+  // Back
+  backBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    goTo(current-1);
+  });
+
+  // Auto-advance scene 1
+  setTimeout(function(){if(current===0)goTo(1);},5500);
+
+  updateNav();
+})();
+</script>
+</body>
+</html>
